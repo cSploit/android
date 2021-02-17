@@ -1,0 +1,199 @@
+.TH SLAPD-PERL 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.SH NAME
+slapd\-perl \- Perl backend to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The Perl backend to
+.BR slapd (8)
+works by embedding a
+.BR perl (1)
+interpreter into
+.BR slapd (8).
+Any perl database section of the configuration file
+.BR slapd.conf (5)
+must then specify what Perl module to use.
+.B Slapd
+then creates a new Perl object that handles all the requests for that
+particular instance of the backend.
+.LP
+You will need to create a method for each one of the
+following actions:
+.LP
+.nf
+  * new        # creates a new object,
+  * search     # performs the ldap search,
+  * compare    # does a compare,
+  * modify     # modifies an entry,
+  * add        # adds an entry to backend,
+  * modrdn     # modifies an entry's rdn,
+  * delete     # deletes an ldap entry,
+  * config     # module-specific config directives,
+  * init       # called after backend is initialized.
+.fi
+.LP
+Unless otherwise specified, the methods return the result code
+which will be returned to the client.  Unimplemented actions
+can just return unwillingToPerform (53).
+.TP
+.B new
+This method is called when the configuration file encounters a 
+.B perlmod
+line.
+The module in that line is then effectively `use'd into the perl
+interpreter, then the \fBnew\fR method is called to create a new
+object.
+Note that multiple instances of that object may be instantiated, as
+with any perl object.
+.\" .LP
+The
+.B new
+method receives the class name as argument.
+.TP
+.B search
+This method is called when a search request comes from a client.
+It arguments are as follows:
+.nf
+  * object reference
+  * base DN
+  * scope
+  * alias dereferencing policy
+  * size limit
+  * time limit
+  * filter string
+  * attributes only flag (1 for yes)
+  * list of attributes to return (may be empty)
+.fi
+.LP
+Return value: (resultcode, ldif-entry, ldif-entry, ...)
+.TP
+.B compare
+This method is called when a compare request comes from a client.
+Its arguments are as follows.
+.nf
+  * object reference
+  * dn
+  * attribute assertion string
+.fi
+.LP
+.TP
+.B modify
+This method is called when a modify request comes from a client.
+Its arguments are as follows.
+.nf
+  * object reference
+  * dn
+  * a list formatted as follows
+    ({ "ADD" | "DELETE" | "REPLACE" },
+     attributetype, value...)...
+.fi
+.LP
+.TP
+.B add
+This method is called when a add request comes from a client.
+Its arguments are as follows.
+.nf
+  * object reference
+  * entry in string format
+.fi
+.LP
+.TP
+.B modrdn
+This method is called when a modrdn request comes from a client.
+Its arguments are as follows.
+.nf
+  * object reference
+  * dn
+  * new rdn
+  * delete old dn flag (1 means yes)
+.fi
+.LP
+.TP
+.B delete
+This method is called when a delete request comes from a client.
+Its arguments are as follows.
+.nf
+  * object reference
+  * dn
+.fi
+.LP
+.TP
+.B config
+This method is called once for each perlModuleConfig line in the
+.BR slapd.conf (5)
+configuration file.
+Its arguments are as follows.
+.nf
+  * object reference
+  * array of arguments on line
+.fi
+.LP
+Return value: nonzero if this is not a valid option.
+.TP
+.B init
+This method is called after backend is initialized.
+Its argument is as follows.
+.nf
+  * object reference
+.fi
+.LP
+Return value: nonzero if initialization failed.
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the PERL backend database.
+That is, they must follow a "database perl" line and come before any
+subsequent "backend" or "database" lines.
+Other database options are described in the
+.BR slapd.conf (5)
+manual page.
+.TP
+.B perlModulePath /path/to/libs
+Add the path to the @INC variable.
+.TP
+.B perlModule ModName
+`Use' the module name ModName from ModName.pm
+.TP
+.B filterSearchResults
+Search results are candidates that need to be filtered (with the
+filter in the search request), rather than search results to be
+returned directly to the client.
+.TP
+.B perlModuleConfig <arguments>
+Invoke the module's config method with the given arguments.
+.SH EXAMPLE
+There is an example Perl module `SampleLDAP' in the slapd/back\-perl/
+directory in the OpenLDAP source tree.
+.SH ACCESS CONTROL
+The
+.B perl
+backend does not honor any of the access control semantics described in
+.BR slapd.access (5);
+all access control is delegated to the underlying PERL scripting.
+Only
+.B read (=r)
+access to the
+.B entry
+pseudo-attribute and to the other attribute values of the entries
+returned by the
+.B search
+operation is honored, which is performed by the frontend.
+.SH WARNING
+The interface of this backend to the perl module MAY change.
+Any suggestions would greatly be appreciated.
+
+Note: in previous versions, any unrecognized lines in the slapd.conf
+file were passed to the perl module's config method. This behavior is
+deprecated (but still allowed for backward compatibility), and the
+perlModuleConfig directive should instead be used to invoke the
+module's config method. This compatibility feature will be removed at
+some future date.
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd (8),
+.BR perl (1).

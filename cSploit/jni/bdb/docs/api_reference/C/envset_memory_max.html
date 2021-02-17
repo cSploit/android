@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_ENV-&gt;set_memory_max()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="env.html" title="Chapter 5.  The DB_ENV Handle" />
+    <link rel="prev" href="envset_memory_init.html" title="DB_ENV-&gt;set_memory_init()" />
+    <link rel="next" href="envset_metadata_dir.html" title="DB_ENV-&gt;set_metadata_dir()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_ENV-&gt;set_memory_max()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envset_memory_init.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. 
+                The DB_ENV Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envset_metadata_dir.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envset_memory_max"></a>DB_ENV-&gt;set_memory_max()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB_ENV-&gt;set_memory_max(DB_ENV *dbenv, u_int32_t gbytes, u_int32_t bytes); </pre>
+      <p>
+        This method sets the maximum amount of memory to be used by shared
+        structures in the main environment region.  These are the
+        structures used to coordinate access to the environment other than
+        mutexes and those in the page cache (memory pool).  If the region
+        files are in memory mapped files,  or if
+        <code class="literal">DB_PRIVATE</code> is specified, the memory specified by
+        this method is not allocated completely at startup.  As memory is
+        needed, the shared region will be extended or, in the case of
+        <code class="literal">DB_PRIVATE</code>, more memory will be allocated using
+        the system malloc call.  For memory mapped files, a mapped region
+        will be allocated to this size but the underlying file will only be
+        allocated sufficient memory to hold the initial allocation of
+        shared memory structures as set by
+	<a class="xref" href="envset_memory_init.html" title="DB_ENV-&gt;set_memory_init()">DB_ENV-&gt;set_memory_init()</a>.
+    </p>
+      <p>
+        If no memory maximum is specified then it is calculated from
+        defaults, initial settings or (deprecated) maximum settings of the
+        various shared structures.  In the case of environments created
+        with <code class="literal">DB_PRIVATE</code>, no maximum need be set and the
+        shared structure allocation will grow as needed until the process
+        memory limit is exhausted.
+    </p>
+      <p>
+         The database environment's maximum memory  may also be configured
+         using the environment's 
+         <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> 
+         file.  The syntax of the entry in that file is a single line with
+         the string "set_memory_max", one or more whitespace characters,
+         followed by the maximum to be allocated. Because the 
+         <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> 
+         file is read when the database environment is opened, it will
+         silently overrule configuration done before that time.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;set_memory_max()</code> method must be
+         called prior to opening the database environment.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp52192776"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp52205600"></a>gbytes</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    The maximum memory is set to 
+                    <span class="bold"><strong>gbytes</strong></span> gigabytes plus
+                    <span class="bold"><strong>bytes</strong></span>.
+                </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp52163952"></a>bytes</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    The maximum memory is set to 
+                    <span class="bold"><strong>gbytes</strong></span> gigabytes plus
+                    <span class="bold"><strong>bytes</strong></span>.
+                </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp52054072"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                The <code class="methodname">DB_ENV-&gt;set_memory_max()</code> <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+            </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp52164288"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If the method was called after <a class="xref" href="envopen.html" title="DB_ENV-&gt;open()">DB_ENV-&gt;open()</a> 
+                was called; or if an invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp52214536"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp52215872"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="env.html#envlist" title="Database Environments and Related Methods">Database Environments and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envset_memory_init.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="env.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envset_metadata_dir.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_ENV-&gt;set_memory_init() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_ENV-&gt;set_metadata_dir()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+.TH IPX_CMD 8 "IPX Utilities" "ipx_cmd" 
+.SH NAME
+ipx_cmd \- bridge between Novell's SCMD driver and local IPX network
+.SH SYNOPSIS
+.B ipx_cmd
+\fB\-A\fP \fIserver name\fP
+[ \fB\-l\fP \fIlocal interface name\fP ]
+.SH DESCRIPTION
+.B ipx_cmd
+moves packets from \fItap\fP\fBN\fP to \fIserver\fP and vice versa.
+It is something like \fBIPX Tunnel\fP, but it uses Novell Netware 5
+server \fBCompatibility Mode Driver\fP (AKA \fBMigration Agent\fP) on the 
+other end of wire. You must first configure your kernel \fItap\fP\fBN\fP
+device with IPX \fBEthernetII\fP frame and with network number set up on 
+server (you can use kernel autodetection).
+.SH OPTIONS
+.TP
+\fB\-A\fP \fIserver name\fP
+This is IP name of compatibility mode server. You can use DNS name or dotted
+quad to specify server address.
+.TP
+\fB\-l\fP \fIlocal interface name\fP
+This allows you to specify, which of your IP addresses should be used as
+IP address of client side of CMD driver. You must configure your \fItap\fP\fBN\fP
+device with hardware address \fB7E:01:AA:BB:CC:DD\fP, where AA:BB:CC:DD is
+your IP address in hexa.
+.SH EXAMPLE
+If you are on server \fIplatan.vc.cvut.cz\fP (\fI147.32.240.81\fP) and your 
+migration agent runs on server \fIboris.vc.cvut.cz\fP, you can configure
+your system with:
+
+.RS 3
+insmod ethertap
+.br
+ifconfig tap0 hw ether 7E:01:93:20:F0:51 up
+.br
+ipx_interface add -p tap0 EtherII
+.br
+ipx_cmd -A boris.vc.cvut.cz -l 147.32.240.81 &
+.RE
+.SH BUGS
+This program was written to satisfy my own needs and should be really improved.
+At least it should configure \fItap\fP interface itself.
+.SH AUTHOR
+Petr Vandrovec <vandrove@vc.cvut.cz>

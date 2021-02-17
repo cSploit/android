@@ -1,0 +1,234 @@
+Format-Specification: http://wiki.debian.org/Proposals/CopyrightFormat
+Upstream-Author: Mike D. Schiffman <mike@infonexus.com>
+Packaged-By: Domenico Andreoli <cavok@debian.org>
+Packaged-Date: Mon, 18 Nov 2002 23:53:40 +0100
+Original-Source-Location: http://www.packetfactory.net/libnet/
+
+Files: debian/*
+Copyright: © 2008, David Paleino <d.paleino@gmail.com>
+ © 2002-2008, Domenico Andreoli <cavok@debian.org>
+License: BSD-2
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ .
+ 1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ ARE DISCLAIMED.IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ SUCH DAMAGE.
+
+Files: include/bpf.h
+ include/win32/getopt.h
+ include/win32/in_systm.h
+ sample/win32/getopt.c
+Copyright: © 1982-1997, The Regents of the University of California
+License: BSD-4
+ * This code is derived from the Stanford/CMU enet packet filter,
+ * (net/enet.c) distributed as part of 4.3BSD, and code contributed
+ * to Berkeley by Steven McCanne and Van Jacobson both of Lawrence 
+ * Berkeley Laboratory.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *    This product includes software developed by the University of
+ *    California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+
+Files: include/ifaddrlist.h
+Copyright: © 1997, The Regents of the University of California
+License: BSD-3
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that: (1) source code distributions
+ * retain the above copyright notice and this paragraph in its entirety, (2)
+ * distributions including binary code include the above copyright notice and
+ * this paragraph in its entirety in the documentation or other materials
+ * provided with the distribution, and (3) all advertising materials mentioning
+ * features or use of this software display the following acknowledgement:
+ * ``This product includes software developed by the University of California,
+ * Lawrence Berkeley Laboratory and its contributors.'' Neither the name of
+ * the University nor the names of its contributors may be used to endorse
+ * or promote products derived from this software without specific prior
+ * written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+Files: include/libnet/libnet-asn1.h
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 1988-1989, Carnegie Mellon University
+License: BSD-2 | other
+ *  Permission to use, copy, modify, and distribute this software and its
+ *  documentation for any purpose and without fee is hereby granted,
+ *  provided that the above copyright notice appear in all copies and that
+ *  both that copyright notice and this permission notice appear in
+ *  supporting documentation, and that the name of CMU not be
+ *  used in advertising or publicity pertaining to distribution of the
+ *  software without specific, written prior permission.
+ *
+ *  CMU DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+ *  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
+ *  CMU BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR
+ *  ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+ *  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ *  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+ *  SOFTWARE.
+
+Files: sample/bgp4*
+ sample/dns.c
+ sample/gre.c
+ sample/ip_link.c
+ sample/ip_raw.c
+ sample/sebek.c
+ sample/tftp.c
+ src/libnet_build_bgp.c
+ src/libnet_build_gre.c
+Copyright: © 2003-2004 Frédéric Raynal <pappy@security-labs.org>
+License: BSD-2
+
+Files: sample/icmp_redirect.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 2003, Alberto Ornaghi <alor@antifork.org>
+License: BSD-2
+
+Files: sample/icmp_timeexceed.c
+ src/libnet_build_sebek.c
+ src/libnet_cq.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 2003, Frédéric Raynal <pappy@security-labs.org>
+License: BSD-2
+
+Files: sample/ospf*
+ src/libnet_build_ospf.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 1999-2000, Andrew Reiter <areiter@bindview.com>
+License: BSD-2
+
+Files: sample/ping_of_death.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 1999-2001, Dug Song <dugsong@monkey.org>
+License: BSD-2
+
+Files: srct/libnet_asn1.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 1988-1992, Carnegie Mellon University
+ © 1993-1996, 1998, The Regents of the University of California
+License: BSD-3 | other
+==> BSD-3 <==
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that: (1) source code distributions
+ * retain the above copyright notice and this paragraph in its entirety, (2)
+ * distributions including binary code include the above copyright notice and
+ * this paragraph in its entirety in the documentation or other materials
+ * provided with the distribution, and (3) all advertising materials mentioning
+ * features or use of this software display the following acknowledgement:
+ * ``This product includes software developed by the University of California,
+ * Lawrence Berkeley Laboratory and its contributors.'' Neither the name of
+ * the University nor the names of its contributors may be used to endorse
+ * or promote products derived from this software without specific prior
+ * written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+==> other <==
+ *  Permission to use, copy, modify, and distribute this software and its
+ *  documentation for any purpose and without fee is hereby granted,
+ *  provided that the above copyright notice appear in all copies and that
+ *  both that copyright notice and this permission notice appear in
+ *  supporting documentation, and that the name of CMU not be
+ *  used in advertising or publicity pertaining to distribution of the
+ *  software without specific, written prior permission.
+ *
+ *  CMU DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+ *  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT SHALL
+ *  CMU BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR
+ *  ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+ *  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ *  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+ *  SOFTWARE.
+
+Files: src/libnet_build_fddi.c
+ src/libnet_build_rpc.c
+ src/libnet_build_token_ring.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © Jason Damron <jsdamron@hushmail.com> <jdamron@stackheap.org>
+License: BSD-2
+
+Files: src/libnet_build_ipsec.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 2002, Jose Nazario <jose@crimelabs.net>
+License: BSD-2
+
+Files: src/libnet_build_link.c
+ src/libnet_write.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 2003, Roberto Larcher <roberto.larcher@libero.it>
+License: BSD-2
+
+Files: src/libnet_dll.c
+Copyright: © 2002, Roberto Larcher <roberto.larcher@libero.it>
+License: BSD-2
+
+Files: src/libnet_link_dlpi.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 1993-1997, The Regents of the University of California
+ © Atanu Ghosh <atanu@cs.ucl.ac.uk>, University College London
+License: BSD-3
+
+Files: src/libnet_link_nit.c
+ src/libnet_link_none.c
+ src/libnet_link_pf.c
+ src/libnet_link_snoop.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 1990-1996, 1998, The Regents of the University of California.
+License: BSD-3
+
+Files: src/libnet_link_snit.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 1990-1996, 1998, The Regents of the University of California.
+ © 1989, Micky Liu <micky@cunixc.cc.columbia.edu>, Columbia University
+License: BSD-3
+
+Files: src/libnet_link_win32.c
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+ © 2001-2002, Don Bowman <don@sandvine.com>
+ © 2002, Roberto Larcher <roberto.larcher@libero.it>
+License: BSD-2
+
+Files: *
+Copyright: © 1998-2004, Mike D. Schiffman <mike@infonexus.com>
+License: BSD-2

@@ -1,0 +1,104 @@
+#
+# Makefile for the linux ncp-filesystem routines.
+#
+
+top_srcdir = @top_srcdir@
+top_builddir = .
+
+include ${top_builddir}/Make.rules
+
+.PHONY : all dep install install-dev clean mrproper distclean
+.PHONY : tags TAGS clean_me dist tgz
+
+BASE_SUBDIRS := lib sutil util man @ADDON_SUBDIRS@
+EXECSUBDIRS = intl @POSUB@ $(BASE_SUBDIRS)
+SUBDIRS := $(EXECSUBDIRS)
+INSTALL_SUBDIRS := $(SUBDIRS)
+INSTALL_DEV_SUBDIRS := lib sutil util man @ADDON_DEV_SUBDIRS@
+CLEAN_SUBDIRS := lib sutil util man intl @POSUB@ ipxdump ipx-1.0 ipx-1.0/Samples contrib/testing \
+	contrib/testing/pp contrib/tests contrib/libtrace contrib/nss64 \
+	contrib/tcl-utils contrib/php contrib/pam
+
+export INCLUDES VERSION HAVE_ELF CFLAGS 
+
+all:
+	set -e; for i in $(EXECSUBDIRS); do make -C $$i all; done
+	@if [ "$(HAVE_ELF)" = yes ] ;\
+	then \
+	echo ; echo ; echo ;\
+	echo Please add \'`pwd`/lib\' to the environment ; \
+	echo variable LD_LIBRARY_PATH by executing ; \
+	echo ;\
+	echo export LD_LIBRARY_PATH=\"\$$LD_LIBRARY_PATH:`pwd`/lib\" ; \
+	echo ;\
+	echo or do a \'make install\'. ;\
+	echo ;\
+	fi	
+
+dep:
+	for i in $(SUBDIRS); do	make -C $$i dep; done
+
+tags: TAGS
+TAGS:
+	etags --lang=c $$(find include lib sutil util ipx-1.0 ipxdump '*.[ch]')
+
+install:
+	for i in $(INSTALL_SUBDIRS); do	make -C $$i install; done
+
+install-dev:
+	for i in $(INSTALL_DEV_SUBDIRS); do make -C $$i install-dev; done
+
+clean_me:
+	rm -f `find -name '*.out'`
+	rm -f `find -name '*~'`
+	rm -f *.tgz
+
+clean: clean_me
+	for i in $(CLEAN_SUBDIRS); do make -C $$i clean; done
+
+mrproper: clean_me
+	for i in $(CLEAN_SUBDIRS); do make -C $$i mrproper; done
+
+distclean:
+	for i in $(CLEAN_SUBDIRS); do [ -f $$i/Makefile ] && make -C $$i distclean; done
+	rm -f contrib/pam/Makefile contrib/tknwmsg/Makefile
+	rm -f contrib/testing/pp/Makefile contrib/testing/Makefile
+	rm -f contrib/tcl-utils/Makefile contrib/tests/Makefile
+	rm -f contrib/php/.deps contrib/php/Makefile.in contrib/php/libs.mk contrib/php/config.nice contrib/php/conftest*
+	rm -rf contrib/php/modules
+	rm -f ipx-1.0/Samples/Makefile ipx-1.0/Makefile
+	rm -f ipxdump/Makefile
+	rm -f intl/Makefile po/Makefile po/Makefile.in
+	rm -f lib/Makefile man/Makefile sutil/Makefile util/Makefile
+	rm -f include/config.h 
+	rm -f include/ncp/ext/socket.h include/ncp/ext/stdint.h
+	rm -f include/ncp/kernel/fs.h
+	rm -f include/ncp/kernel/if.h include/ncp/kernel/route.h include/ncp/kernel/types.h
+	rm -f include/ncp/kernel/ipx.h 
+	rm -f include/ncp/nwnet.h
+	rm -f config.cache config.log config.status
+	rm -f Make.rules
+	rm -f Makefile
+
+SRCPATH=$(shell pwd)
+SRCDIR=$(shell basename $(SRCPATH))
+DISTFILE=ncpfs-$(VERSION).tar.gz
+
+dist: tgz
+	make dep
+	make all
+
+tgz:
+	if [ -d BitKeeper ]; then \
+		mkdir ncpfs-$(VERSION) && \
+		bk export -tplain ncpfs-$(VERSION) && \
+		tar cvf - ncpfs-$(VERSION) | (cd .. && gzip -9 > $(DISTFILE)) &&
+		rm -rf ncpfs-$(VERSION); \
+	else \
+		make distclean; \
+		(cd ..; tar cvf - $(SRCDIR) | gzip -9 > $(DISTFILE)); \
+	fi
+
+slackware:
+	make -C contrib/slackware slackware
+	make tgz

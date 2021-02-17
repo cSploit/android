@@ -1,0 +1,338 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Tuning
+
+This is perhaps one of the most important chapters in the guide, because if 
+you have not tuned {{slapd}}(8) correctly or grasped how to design your
+directory and environment, you can expect very poor performance.
+
+Reading, understanding and experimenting using the instructions and information
+in the following sections, will enable you to fully understand how to tailor 
+your directory server to your specific requirements.
+
+It should be noted that the following information has been collected over time
+from our community based FAQ. So obviously the benefit of this real world experience
+and advice should be of great value to the reader.
+
+
+H2: Performance Factors
+
+Various factors can play a part in how your directory performs on your chosen 
+hardware and environment. We will attempt to discuss these here.
+
+
+H3: Memory
+
+Scale your cache to use available memory and increase system memory if you can.
+
+See {{SECT:Caching}} for BDB cache tuning hints.
+Note that LMDB uses no cache of its own and has no tuning options, so the Caching
+section can be ignored when using LMDB.
+
+
+H3: Disks
+
+Use fast filesystems, and conduct your own testing to see which filesystem
+types perform best with your workload. (On our own Linux testing, EXT2 and JFS
+tend to provide better write performance than everything else, including
+newer filesystems like EXT4, BTRFS, etc.)
+
+Use fast subsystems. Put each database and logs on separate disks
+(for BDB this is configurable via {{DB_CONFIG}}):
+
+>       # Data Directory
+>       set_data_dir /data/db
+>       
+>       # Transaction Log settings
+>       set_lg_dir /logs
+
+
+H3: Network Topology
+
+http://www.openldap.org/faq/data/cache/363.html
+
+Drawing here.
+
+
+H3: Directory Layout Design
+
+Reference to other sections and good/bad drawing here.
+
+
+H3: Expected Usage
+
+Discussion.
+
+
+H2: Indexes
+
+H3: Understanding how a search works
+
+If you're searching on a filter that has been indexed, then the search reads 
+the index and pulls exactly the entries that are referenced by the index. 
+If the filter term has not been indexed, then the search must read every single
+ entry in the target scope and test to see if each entry matches the filter. 
+Obviously indexing can save a lot of work when it's used correctly.
+
+H3: What to index
+
+You should create indices to match the actual filter terms used in
+search queries. 
+
+>        index cn,sn,givenname,mail eq
+
+Each attribute index can be tuned further by selecting the set of index types to generate. For example, substring and approximate search for organizations (o) may make little sense (and isn't like done very often). And searching for {{userPassword}} likely makes no sense what so ever.
+
+General rule: don't go overboard with indexes. Unused indexes must be maintained and hence can only slow things down. 
+
+See {{slapd.conf}}(8) and {{slapdindex}}(8) for more information
+
+
+H3: Presence indexing
+
+If your client application uses presence filters and if the
+target attribute exists on the majority of entries in your target scope, then
+all of those entries are going to be read anyway, because they are valid
+members of the result set. In a subtree where 100% of the
+entries are going to contain the same attributes, the presence index does
+absolutely NOTHING to benefit the search, because 100% of the entries match
+that presence filter. 
+
+So the resource cost of generating the index is a
+complete waste of CPU time, disk, and memory. Don't do it unless you know
+that it will be used, and that the attribute in question occurs very
+infrequently in the target data. 
+
+Almost no applications use presence filters in their search queries. Presence
+indexing is pointless when the target attribute exists on the majority of
+entries in the database. In most LDAP deployments, presence indexing should
+not be done, it's just wasted overhead.
+
+See the {{Logging}} section below on what to watch our for if you have a frequently searched
+for attribute that is unindexed.
+
+
+H2: Logging
+
+H3: What log level to use
+
+The default of {{loglevel stats}} (256) is really the best bet. There's a corollary to 
+this when problems *do* arise, don't try to trace them using syslog. 
+Use the debug flag instead, and capture slapd's stderr output. syslog is too 
+slow for debug tracing, and it's inherently lossy - it will throw away messages when it
+can't keep up.
+
+Contrary to popular belief, {{loglevel 0}} is not ideal for production as you 
+won't be able to track when problems first arise.
+
+H3: What to watch out for
+
+The most common message you'll see that you should pay attention to is:
+
+>       "<= bdb_equality_candidates: (foo) index_param failed (18)"
+
+That means that some application tried to use an equality filter ({{foo=<somevalue>}}) 
+and attribute {{foo}} does not have an equality index. If you see a lot of these
+messages, you should add the index. If you see one every month or so, it may
+be acceptable to ignore it.
+
+The default syslog level is stats (256) which logs the basic parameters of each
+request; it usually produces 1-3 lines of output. On Solaris and systems that
+only provide synchronous syslog, you may want to turn it off completely, but
+usually you want to leave it enabled so that you'll be able to see index
+messages whenever they arise. On Linux you can configure syslogd to run
+asynchronously, in which case the performance hit for moderate syslog traffic
+pretty much disappears.
+
+H3: Improving throughput
+
+You can improve logging performance on some systems by configuring syslog not 
+to sync the file system with every write ({{man syslogd/syslog.conf}}). In Linux, 
+you can prepend the log file name with a "-" in {{syslog.conf}}. For example, 
+if you are using the default LOCAL4 logging you could try:
+
+>       # LDAP logs
+>       LOCAL4.*         -/var/log/ldap
+
+For syslog-ng, add or modify the following line in {{syslog-ng.conf}}:
+
+>       options { sync(n); };
+
+where n is the number of lines which will be buffered before a write.
+
+
+H2: Caching
+
+We all know what caching is, don't we? 
+
+In brief, "A cache is a block of memory for temporary storage of data likely 
+to be used again" - {{URL:http://en.wikipedia.org/wiki/Cache}}
+
+There are 3 types of caches, BerkeleyDB's own cache, {{slapd}}(8) 
+entry cache and {{TERM:IDL}} (IDL) cache.
+
+
+H3: Berkeley DB Cache
+
+There are two ways to tune for the BDB cachesize:
+
+(a) BDB cache size necessary to load the database via slapadd in optimal time
+
+(b) BDB cache size necessary to have a high performing running slapd once the data is loaded
+
+For (a), the optimal cachesize is the size of the entire database.  If you 
+already have the database loaded, this is simply a 
+
+>       du -c -h *.bdb 
+
+in the directory containing the OpenLDAP ({{/usr/local/var/openldap-data}}) data.
+
+For (b), the optimal cachesize is just the size of the {{id2entry.bdb}} file, 
+plus about 10% for growth.
+
+The tuning of {{DB_CONFIG}} should be done for each BDB type database 
+instantiated (back-bdb, back-hdb).
+
+Note that while the {{TERM:BDB}} cache is just raw chunks of memory and 
+configured as a memory size, the {{slapd}}(8) entry cache holds parsed entries, 
+and the size of each entry is variable. 
+
+There is also an IDL cache which is used for Index Data Lookups. 
+If you can fit all of your database into slapd's entry cache, and all of your 
+index lookups fit in the IDL cache, that will provide the maximum throughput. 
+
+If not, but you can fit the entire database into the BDB cache, then you 
+should do that and shrink the slapd entry cache as appropriate. 
+
+Failing that, you should balance the BDB cache against the entry cache.
+
+It is worth noting that it is not absolutely necessary to configure a BerkeleyDB 
+cache equal in size to your entire database. All that you need is a cache 
+that's large enough for your "working set." 
+
+That means, large enough to hold all of the most frequently accessed data, 
+plus a few less-frequently accessed items.
+
+For more information, please see: {{URL:http://www.oracle.com/technology/documentation/berkeley-db/db/ref/am_conf/cachesize.html}}
+
+H4: Calculating Cachesize
+
+The back-bdb database lives in two main files, {{F:dn2id.bdb}} and {{F:id2entry.bdb}}. 
+These are B-tree databases. We have never documented the back-bdb internal 
+layout before, because it didn't seem like something anyone should have to worry 
+about, nor was it necessarily cast in stone. But here's how it works today, 
+in OpenLDAP 2.4.
+
+A B-tree is a balanced tree; it stores data in its leaf nodes and bookkeeping 
+data in its interior nodes (If you don't know what tree data structures look
+ like in general, Google for some references, because that's getting far too 
+elementary for the purposes of this discussion).
+
+For decent performance, you need enough cache memory to contain all the nodes 
+along the path from the root of the tree down to the particular data item 
+you're accessing. That's enough cache for a single search. For the general case, 
+you want enough cache to contain all the internal nodes in the database. 
+
+>       db_stat -d
+
+will tell you how many internal pages are present in a database. You should 
+check this number for both dn2id and id2entry.
+
+Also note that {{id2entry}} always uses 16KB per "page", while {{dn2id}} uses whatever 
+the underlying filesystem uses, typically 4 or 8KB. To avoid thrashing,
+your cache must be at least as large as the number of internal pages in both 
+the {{dn2id}} and {{id2entry}} databases, plus some extra space to accommodate
+the actual leaf data pages.
+
+For example, in my OpenLDAP 2.4 test database, I have an input LDIF file that's 
+about 360MB. With the back-hdb backend this creates a {{dn2id.bdb}} that's 68MB, 
+and an {{id2entry}} that's 800MB. db_stat tells me that {{dn2id}} uses 4KB pages, has 
+433 internal pages, and 6378 leaf pages. The id2entry uses 16KB pages, has 52 
+internal pages, and 45912 leaf pages. In order to efficiently retrieve any 
+single entry in this database, the cache should be at least
+
+>       (433+1) * 4KB + (52+1) * 16KB in size: 1736KB + 848KB =~ 2.5MB.
+
+This doesn't take into account other library overhead, so this is even lower 
+than the barest minimum. The default cache size, when nothing is configured, 
+is only 256KB. 
+
+This 2.5MB number also doesn't take indexing into account. Each indexed
+attribute results in another database file.  Earlier versions of OpenLDAP
+kept these index databases in Hash format, but from OpenLDAP 2.2 onward
+the index databases are in B-tree format so the same procedure can
+be used to calculate the necessary amount of cache for each index database.
+
+For example, if your only index is for the objectClass attribute and db_stat
+reveals that {{objectClass.bdb}} has 339 internal pages and uses 4096 byte
+pages, the additional cache needed for just this attribute index is
+
+>       (339+1) * 4KB =~ 1.3MB.
+
+With only this index enabled, I'd figure at least a 4MB cache for this backend. 
+(Of course you're using a single cache shared among all of the database files, 
+so the cache pages will most likely get used for something other than what you 
+accounted for, but this gives you a fighting chance.)
+
+With this 4MB cache I can slapcat this entire database on my 1.3GHz PIII in 
+1 minute, 40 seconds. With the cache doubled to 8MB, it still takes the same 1:40s. 
+Once you've got enough cache to fit the B-tree internal pages, increasing it 
+further won't have any effect until the cache really is large enough to hold 
+100% of the data pages. I don't have enough free RAM to hold all the 800MB 
+id2entry data, so 4MB is good enough.
+
+With back-bdb and back-hdb you can use "db_stat -m" to check how well the 
+database cache is performing. 
+
+For more information on {{db_stat}}: {{URL:http://www.oracle.com/technology/documentation/berkeley-db/db/utility/db_stat.html}}
+
+H3: {{slapd}}(8) Entry Cache (cachesize)
+
+The {{slapd}}(8) entry cache operates on decoded entries. The rationale - entries 
+in the entry cache can be used directly, giving the fastest response. If an entry 
+isn't in the entry cache but can be extracted from the BDB page cache, that will 
+avoid an I/O but it will still require parsing, so this will be slower. 
+
+If the entry is in neither cache then BDB will have to flush some of its current 
+cached pages and bring in the needed pages, resulting in a couple of expensive 
+I/Os as well as parsing.
+
+The most optimal value is of course, the entire number of entries in the database.  
+However, most directory servers don't consistently serve out their entire database, so setting this to a lesser number that more closely matches the believed working set of data is 
+sufficient. This is the second most important parameter for the DB.
+
+As far as balancing the entry cache vs the BDB cache - parsed entries in memory 
+are generally about twice as large as they are on disk. 
+
+As we have already mentioned, not having a proper database cache size will 
+cause performance issues. These issues are not an indication of corruption 
+occurring in the database. It is merely the fact that the cache is thrashing 
+itself that causes performance/response time to slowdown. 
+
+
+H3: {{TERM:IDL}} Cache (idlcachesize)
+
+Each IDL holds the search results from a given query, so the IDL cache will 
+end up holding the most frequently requested search results.  For back-bdb, 
+it is generally recommended to match the "cachesize" setting.  For back-hdb, 
+it is generally recommended to be 3x"cachesize".
+
+{NOTE: The idlcachesize setting directly affects search performance}
+
+
+H2: {{slapd}}(8) Threads
+
+{{slapd}}(8) can process requests via a configurable number of threads, which
+in turn affects the in/out rate of connections.
+
+This value should generally be a function of the number of "real" cores on 
+the system, for example on a server with 2 CPUs with one core each, set this 
+to 8, or 4 threads per real core.  This is a "read" maximized value. The more 
+threads that are configured per core, the slower {{slapd}}(8) responds for 
+"read" operations.  On the flip side, it appears to handle write operations 
+faster in a heavy write/low read scenario.
+
+The upper bound for good read performance appears to be 16 threads (which
+also happens to be the default setting).

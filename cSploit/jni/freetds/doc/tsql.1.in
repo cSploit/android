@@ -1,0 +1,148 @@
+.\" cf. groff_mdoc
+.Dd April 26, 2012
+.Os FreeTDS @VERSION@
+.Dt TSQL FreeTDS "FreeTDS Reference Manual"
+.Sh NAME
+.Nm tsql
+.Nd utility to test FreeTDS connections and queries
+.Sh SYNOPSIS
+.Nm
+.Bro
+.Fl S Ar servername
+.Op Fl I Ar interface
+|
+.Fl H Ar hostname
+.Op Fl L
+.Op Fl p Ar port
+.Brc
+.Op Fl D Ar dbname
+.Op Fl U Ar username
+.Op Fl P Ar password
+.Op Fl o Ar options
+.Nm
+.Fl C
+.Sh DESCRIPTION
+.Nm
+is a FreeTDS diagnostic tool. It uses the TDS protocol to connect to a
+Sybase or Microsoft SQL Server, and lets the user issue queries.
+.Nm
+does
+not use the FreeTDS client libraries. Instead, it uses only the lowest level
+library, libtds, to test the protocol implementation.
+.Pp
+.Nm
+can be run in two ways, one which uses the freetds.conf and one which
+connects directly using the server's hostname and port.
+The
+.Fl H
+and
+.Fl p
+parameters are provided to let the user verify a server is listening on
+the named host and port. These parameters override any configuration files
+and environment variables.
+.Pl
+The
+.Fl S
+parameter can be used to test the local configuration. FreeTDS will use
+freetds.conf (or equivalent) and environment variables in the normal way to
+determine the server's IP address and port. You can use
+.Fl I
+to specify a filename, overriding FreeTDS's configuration file search
+algorithm.
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl S Ar servername
+database server to which to connect.
+.It Fl D Ar dbname
+database to use.
+.It Fl I Ar interface
+freetds.conf or interfaces file describing servername.
+.It Fl H Ar hostname
+DNS hostname of the server.
+.It Fl p Ar port
+port at which SQL Server is listening.
+.It Fl U Ar username
+database login name. If username is not provided, a domain
+login is attempted for TDS 7+ connections.
+.It Fl P Ar password
+database password.
+.It Fl L
+list Microsoft server instances (with
+.Fl H Ns ).
+.It Fl C
+print some of the compile-time configuration parameters.
+.It Fl o Ar options
+apply the options specified to every command.
+.Bl -tag -width indent
+.It Fl f
+No footer
+.Bq result count
+.It Fl h
+No header
+.Bq titles
+.It Fl t
+Print time
+.It Fl v
+Print version
+.It Fl q
+Quiet
+.El
+.El
+.\"
+.Sh NOTES
+If you can connect with
+.Ql tsql -S servername Ns ,
+your basic FreeTDS installation is working.
+.Pp
+Typing
+.Ql exit Ns ,
+.Ql quit Ns ,
+or
+.Ql bye
+(or
+.Li ^D Ns )
+exits
+.Nm Ns .
+.Pp
+Typing
+.Ql version
+displays the TDS protocol version.
+.Pp
+Command batches may be separated with
+.Ql go
+or
+.Ql GO Ns .
+If
+.Ql GO
+the version string is reported before executing the batch.
+.Pp
+After prompting for the password (if not provided with
+.Fl P Ns ),
+.Nm
+will attempt to connect to the remote server.
+.Nm
+displays a counter indicating the number
+of seconds elapsed during the connection attempt. Typically,
+.Nm
+immediately responds with a
+.Ql 1>
+prompt. If you see the counter (1, 2, 3, ...), most likely
+.Nm
+is unable to connect to the indicated server.
+.Pp
+.Nm
+is not a replacement for a complete isql such as sqsh (www.sqsh.org).
+If you have suggestions for ways to make
+.Nm
+more useful as a diagnostic tool, please post them to the FreeTDS
+mailing list for consideration.
+.Sh HISTORY
+.Nm
+first appeared in FreeTDS 0.60.
+.Sh AUTHORS
+The
+.Nm
+utility was written by
+.An Brian Bruns Ns .
+.Sh BUGS
+Several, to be sure, now that it's documented. :)

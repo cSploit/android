@@ -1,0 +1,196 @@
+Compiling and installing ncpfs
+==============================
+
+
+0. Quick start
+--------------
+
+Run "./configure", then "make install install-dev" and wait for successfull 
+completion. You can omit "install-dev" if you do not plan to compile other
+libncp based programs, such as apache NDS authorization module.
+
+
+
+1. Configuration
+----------------
+
+Except usual configuration options, you can add some of these options to
+configure commandline:
+
+  --enable-warnings       Enable very verbose build warnings. Please do not
+                          report these warnings as a bugs. They are all
+			  intentionaly left in sources. Disabled by default.
+  
+  --enable-pam            Build PAM NCP authentication module. You must have
+                          installed PAM headers in your standard include
+			  directories. By default PAM directory is 
+			  automatically determined (in /lib/security, 
+			  /usr/lib/security, or /usr/local/lib/security) from
+			  place of already installed modules. You can override
+			  this with adding path after enable-pam. For example:
+			      --enable-pam=/lib/pam/modules
+
+  --disable-ipx-tools     Disables building of ipx tools. By default tools are
+                          enabled. Use this only if you are using some else
+			  ipx-tools package or if your system does not support
+			  IPX.
+
+  --disable-udp           Disable NCP/UDP and NCP/TCP. By default they are
+                          enabled. Use this only for systems which do not
+			  have IP at all. Otherwise you'll get very crippled
+			  version of ncpfs - with full version you can access
+			  servers anywhere on the Internet if there is no
+			  firewall on port 524...
+
+  --disable-ipx           Disable NCP/IPX. By default IPX is enabled. Do not
+                          disable IPX unless your system does not support
+			  IPX at all.
+			  
+  --disable-signatures    Disable packet signing code. By default signatures
+                          are enabled. Do not disable this, connecting without
+			  signatures is very dangerous.
+
+  --disable-nds           Disable NDS support. By default NDS is enabled.
+                          Disable it only if you are not sure that you can
+			  use RSA for authorization purposes. Library produced
+			  with this option is very limited in functionality
+			  and 3rd party programs may not work with your
+			  library.
+
+  --disable-mount-v2      Disable support for Linux 2.0. Support is enabled
+                          by default and you should not disable it.
+
+  --disable-mount-v3      Disable support for Linux 2.2 and Linux 2.4. Support
+                          is enabled by default and you should not disable it.
+
+  --disable-kernel        Do not use kernel interface. Use this only if there
+                          is no ncpfs for your kernel (such as on AIX or IRIX).
+			  
+  --disable-reentrant     Do not compile threading support into library. By 
+                          default it is autodetected - if library compiled
+			  with pthreads can run without them, support is enabled.
+			  Disable this only if you are 100% sure that you'll not
+			  use libncp in any multithreaded application, or if
+			  your system does not support pthreads at all.
+
+  --disable-versions      Do not use version symbols in library. By default 
+                          enabled if your system supports it. If you'll disable
+			  it, you may have troubles with binary compatibility
+			  when upgrading to newer versions.
+			  
+  --disable-function-sections   Do not use -ffunction-sections and 
+                          -fdata-sections for static libraries. Enabled whenever
+			  binutils can do this. If you disable this, all 
+			  statically linked programs are larger than they 
+			  really need.
+			  
+  --enable-trace          Enable trace of ncp calls. Do not enable it unless 
+                          you are debugging ncpfs. Each libncp call then spews
+			  tons of data to stdout/stderr.
+
+  --disable-nls           Do not use Native Language Support. See ABOUT-NLS for
+                          details.
+
+  --with-included-gettext Use the GNU gettext library included here. See 
+  			  ABOUT-NLS for details.
+			  
+  --with-catgets          Use catgets functions if available. See ABOUT-NLS for
+                          details.
+
+
+
+2. Compilation
+--------------
+
+Just type "make" in top of directory structure. You need GNU make and GNU gcc.
+
+
+
+3. Installation
+---------------
+
+As root, type "make install" to install shared library and utilities. If you
+plan to compile other programs for ncpfs, also run "make install-dev". This
+installs ncpfs headers and static library.
+
+
+
+4. Runtime
+----------
+
+4.1. Configuration
+------------------
+
+You can configure system behavior with global configuration file, 
+/etc/ncpfs.conf, and local configuration files, ~/.nwclient. See ConfigFile
+for details about contents of these files.
+
+
+4.2. Limitations
+----------------
+
+4.2.1. Available transports
+--------------------------
+
+Temporary connections always support all available transports you
+compiled.
+
+Persistent (ncpmount) connection capabilities are constrained by your
+kernel. 2.0.x kernels support only NCP over IPX, 2.[123].x kernels support
+NCP over IPX or UDP, and 2.4.x kernels support NCP over any of IPX, UDP or
+TCP.
+
+
+4.2.2. NDS support
+------------------
+
+For full NDS support (background authentication) you must enable 'NDS
+authentication support' in kernel configuration. This option is available
+only in 2.[34].x kernels. In 2.2.x kernels you can make option available
+by simple uncommenting this option in linux/fs/ncpfs/Config.in (option is
+commented out because of at the time 2.2.0 was released there was no
+userspace support). If you have older kernel, you should upgrade if you
+need such support.
+
+
+4.2.3. Internationalization support
+-----------------------------------
+
+Currently only available localizations are English, Germany and Czech.
+
+
+4.2.4. Codepages support
+------------------------
+
+Codepage converting support is limited by underlying iconv implementation.
+If no usable iconv is found, built in support for ISO-8859-1 and UTF-8
+is used.
+NOTE: glibc2.1 implementation is treated as unusable on little endian
+machines, unless you add "alias WCHAR_T// INTERNAL" at the end of
+"/usr/lib/gconv/gconv-modules" file. Without this alias wchar_t format
+used by wc* function group is unavailable to iconv. Clueless programmers.
+glibc2.2 provides WCHAR_T encoding, so you should upgrade if you need codepage
+not listed above.
+
+
+
+5. Something went wrong
+-----------------------
+
+If things do not work as expected, make sure that you installed ncpfs 
+correctly. By default, ncp tools are installed into /usr/local, while
+distributions put them into /usr. So you can end up with new tool using
+old shared library. And it does not work...
+
+Also, look into BUGS, FAQ, README and README.NDS. If you'll not find
+answer here, try asking on linware@sh.cvut.cz list (listserv@sh.cvut.cz).
+
+If you are sure that problem is in ncpfs implementation, send me bugreport
+or patch (unified diff preferred).
+
+
+
+
+--
+Trhovy Stepanov, March 10th, 2001
+Petr Vandrovec <vandrove@vc.cvut.cz>

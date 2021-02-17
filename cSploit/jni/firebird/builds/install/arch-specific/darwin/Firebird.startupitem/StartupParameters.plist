@@ -1,0 +1,7 @@
+{
+  Description     = "Firebird SQL Database server";
+  Provides        = ("Firebird Server");
+  Requires        = ("DirectoryServices");
+  Uses            = ("Disks", "NFS");
+  OrderPreference = "None";
+}

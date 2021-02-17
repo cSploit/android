@@ -1,0 +1,126 @@
+.TH SLAPD-NDB 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2008-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd\-ndb \- MySQL NDB backend to slapd
+.SH SYNOPSIS
+.B ETCDIR/slapd.conf
+.SH DESCRIPTION
+The \fBndb\fP backend to
+.BR slapd (8)
+uses the MySQL Cluster package to store data, through its NDB API.
+It provides fault tolerance with extreme scalability, along with
+a degree of SQL compatibility.
+.LP
+This backend is designed to store LDAP information using tables that
+are also visible from SQL. It uses a higher level SQL API for creating
+these tables, while using the low level NDB API for storing and
+retrieving the data within these tables. The NDB Cluster engine
+allows data to be partitioned across multiple data nodes, and this
+backend allows multiple slapd instances to operate against a given
+database concurrently.
+.LP
+The general approach is to use distinct tables for each LDAP object class.
+Entries comprised of multiple object classes will have their data
+spread across multiple tables. The data tables use a 64 bit entryID
+as their primary key. The DIT hierarchy is maintained in a separate
+table, which maps DNs to entryIDs.
+.LP
+This backend is experimental. While intended to be a general-purpose
+backend, it is currently missing a number of common LDAP features.
+See the \fBTODO\fP file in the source directory for details.
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the \fBndb\fP backend database.
+That is, they must follow a "database ndb" line and
+come before any subsequent "backend" or "database" lines.
+Other database options are described in the
+.BR slapd.conf (5)
+manual page.
+
+.SH DATA SOURCE CONFIGURATION
+
+.TP
+.B dbhost <hostname>
+The name or IP address of the host running the MySQL server. The default
+is "localhost". On Unix systems, the connection to a local server is made
+using a Unix Domain socket, whose path is specified using the
+.B dbsocket
+directive.
+.TP
+.B dbuser <username>
+The MySQL login ID to use when connecting to the MySQL server. The chosen
+user must have sufficient privileges to manipulate the SQL tables in the
+target database.
+.TP
+.B dbpasswd <password>
+The password for the \fBdbuser\fP.
+.TP
+.B dbname <database name>
+The name of the MySQL database to use.
+.TP
+.B dbport <port>
+The port number to use for the TCP connection to the MySQL server.
+.TP
+.B dbsocket <path>
+The socket to be used for connecting to a local MySQL server.
+.TP
+.B dbflag <integer>
+Client flags for the MySQL session. See the MySQL documentation for details.
+.TP
+.B dbconnect <connectstring>
+The name or IP address of the host running the cluster manager. The default
+is "localhost".
+.TP
+.B dbconnections <integer>
+The number of cluster connections to establish. Using up to 4 may improve
+performance under heavier load. The default is 1.
+
+.SH SCHEMA CONFIGURATION
+.TP
+.B attrlen <attribute> <length>
+Specify the column length to use for a particular attribute. LDAP attributes are
+stored in individual columns of the SQL tables. The maximum column lengths for
+each column must be specified when creating these tables. If a length constraint
+was specified in the attribute's LDAP schema definition, that value will be used
+by default. If the schema didn't specify a constraint, the default is 128 bytes.
+Currently the maximum is 1024.
+.TP
+.B index <attr[,attr...]>
+Specify a list of attributes for which indexing should be maintained.
+Currently there is no support for substring indexing; a single index structure
+provides presence, equality, and inequality indexing for the specified attributes.
+.TP
+.B attrset <set> <attrs>
+Specify a list of attributes to be treated as an attribute set. This directive
+creates a table named \fIset\fP which will contain all of the listed attributes.
+Ordinarily an attribute resides in a table named by an object class that uses
+the attribute. However, attributes are only allowed to appear in a single table.
+For attributes that are derived from an inherited object class definition,
+the attribute will only be stored in the superior class's table.
+Attribute sets should be defined for any attributes that are used in multiple
+unrelated object classes, i.e., classes that are not connected by a simple
+inheritance chain.
+.SH ACCESS CONTROL
+The 
+.B ndb
+backend honors most access control semantics as indicated in
+.BR slapd.access (5).
+.SH FILES
+.TP
+.B ETCDIR/slapd.conf
+default 
+.B slapd 
+configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd (8),
+.BR slapadd (8),
+.BR slapcat (8),
+.BR slapindex (8),
+MySQL Cluster documentation.
+.SH AUTHOR
+Howard Chu, with assistance from Johan Andersson et al @ MySQL.

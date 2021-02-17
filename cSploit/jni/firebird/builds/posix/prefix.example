@@ -1,0 +1,8 @@
+#_____________________________________________________________________________
+
+# Changing options based on module
+
+# Something that Solaris was doing for intl libraries.
+if $(eq $(ModuleName), "intl") 
+    LIB_LINK_OPTIONS := -assert pure-text -assert nosymbolic 
+endif

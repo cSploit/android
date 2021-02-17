@@ -1,0 +1,69 @@
+.TH LDAP_ABANDON 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_abandon_ext \- Abandon an LDAP operation in progress
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_abandon_ext(
+.RS
+.ft B
+LDAP *\fIld\fB,
+Bint \fImsgid\fB,
+LDAPControl **\fIsctrls\fB,
+LDAPControl **\fIcctrls\fB );
+.RE
+.fi
+.SH DESCRIPTION
+The
+.B ldap_abandon_ext()
+routine is used to send a LDAP Abandon request for an
+operation in progress.  The \fImsgid\fP passed should be the
+message id of an outstanding LDAP operation, such as returned by
+.BR ldap_search_ext (3).
+.LP
+.BR ldap_abandon_ext ()
+checks to see if the result of the operation has already come in.  If it
+has, it deletes it from the queue of pending messages.  If not,
+it sends an LDAP abandon request to the LDAP server.
+.LP
+The caller can expect that the result of an abandoned operation
+will not be returned from a future call to
+.BR ldap_result (3).
+.LP
+.B ldap_abandon_ext()
+allows server and client controls to be passed in via the
+.I sctrls
+and
+.I cctrls
+parameters, respectively.
+.LP
+.B ldap_abandon_ext()
+returns a code indicating success or, in the case of failure, the
+nature of the failure.  See
+.BR ldap_error (3)
+for details.
+.SH DEPRECATED INTERFACES
+The
+.B ldap_abandon()
+routine is deprecated in favor of the
+.B ldap_abandon_ext()
+routine. 
+.LP
+.so Deprecated
+
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_error (3),
+.BR ldap_result (3),
+.BR ldap_search_ext (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project
+

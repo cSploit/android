@@ -1,0 +1,8 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+#
+# guide.sdf 
+#
+
+!include "master.sdf"

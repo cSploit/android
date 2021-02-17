@@ -1,0 +1,72 @@
+# $OpenLDAP$
+
+This directory contains slapd overlays specific to samba4 LDAP backend:
+
+	- pguid (not used)
+	- rdnval (under evaluation)
+	- vernum (under evaluation)
+
+
+  - PGUID
+
+This overlay maintains the operational attribute "parentUUID".  It contains
+the entryUUID of the parent entry.  This overlay is not being considered
+right now.
+
+
+  - RDNVAL
+
+This overlay maintains the operational attribute "rdnValue".  It contains
+the value of the entry's RDN.  This attribute is defined by the overlay
+itself as
+
+	( 1.3.6.1.4.1.4203.666.1.58
+		NAME 'rdnValue'
+		DESC 'the value of the naming attributes'
+		SYNTAX '1.3.6.1.4.1.1466.115.121.1.15'
+		EQUALITY caseIgnoreMatch
+		USAGE dSAOperation
+		NO-USER-MODIFICATION )
+
+under OpenLDAP's development OID arc.  This OID is temporary.
+
+To use the overlay, add:
+
+	moduleload <path to>rdnval.so
+	...
+
+	database <whatever>
+	...
+	overlay rdnval
+
+to your slapd configuration file.  An instance is required for each database
+that needs to maintain this attribute.
+
+
+  - VERNUM
+
+This overlay increments a counter any time an attribute is modified.
+It is intended to increment the counter 'msDS-KeyVersionNumber' when
+the attribute 'unicodePwd' is modified.
+ 
+
+These overlays are only set up to be built as a dynamically loaded modules.
+On most platforms, in order for the modules to be usable, all of the 
+library dependencies must also be available as shared libraries.
+
+If you need to build the overlays statically, you will have to move them
+into the slapd/overlays directory and edit the Makefile and overlays.c
+to reference them. 
+
+---
+This work is part of OpenLDAP Software <http://www.openldap.org/>.
+Copyright 2009-2014 The OpenLDAP Foundation.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in the file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+<http://www.OpenLDAP.org/license.html>.
+

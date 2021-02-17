@@ -1,0 +1,138 @@
+<!-- doc/src/sgml/contrib.sgml -->
+
+<appendix id="contrib">
+ <title>Additional Supplied Modules</title>
+
+ <para>
+  This appendix contains information regarding the modules that
+  can be found in the <literal>contrib</literal> directory of the
+  <productname>PostgreSQL</> distribution.
+  These include porting tools, analysis utilities,
+  and plug-in features that are not part of the core PostgreSQL system,
+  mainly because they address a limited audience or are too experimental
+  to be part of the main source tree.  This does not preclude their
+  usefulness.
+ </para>
+
+ <para>
+  When building from the source distribution, these modules are not built
+  automatically, unless you build the "world" target
+  (see <xref linkend="build">).
+  You can build and install all of them by running:
+<screen>
+<userinput>gmake</userinput>
+<userinput>gmake install</userinput>
+</screen>
+  in the <literal>contrib</literal> directory of a configured source tree;
+  or to build and install
+  just one selected module, do the same in that module's subdirectory.
+  Many of the modules have regression tests, which can be executed by
+  running:
+<screen>
+<userinput>gmake installcheck</userinput>
+</screen>
+  once you have a <productname>PostgreSQL</> server running.  (Note that
+  <literal>gmake check</> is not supported; you must have an operational
+  database server to perform these tests, and you must have built and
+  installed the module(s) to be tested.)
+ </para>
+
+ <para>
+  If you are using a pre-packaged version of <productname>PostgreSQL</>,
+  these modules are typically made available as a separate subpackage,
+  such as <literal>postgresql-contrib</>.
+ </para>
+
+ <para>
+  Many modules supply new user-defined functions, operators, or types.
+  To make use of one of these modules, after you have installed the code
+  you need to register the new SQL objects in the database system.
+  In <productname>PostgreSQL</> 9.1 and later, this is done by executing
+  a <xref linkend="sql-createextension"> command.  In a fresh database,
+  you can simply do
+
+<programlisting>
+CREATE EXTENSION <replaceable>module_name</>;
+</programlisting>
+
+  This command must be run by a database superuser.  This registers the
+  new SQL objects in the current database only, so you need to run this
+  command in each database that you want
+  the module's facilities to be available in.  Alternatively, run it in
+  database <literal>template1</> so that the extension will be copied into
+  subsequently-created databases by default.
+ </para>
+
+ <para>
+  Many modules allow you to install their objects in a schema of your
+  choice.  To do that, add <literal>SCHEMA
+  <replaceable>schema_name</></literal> to the <command>CREATE EXTENSION</>
+  command.  By default, the objects will be placed in your current creation
+  target schema, typically <literal>public</>.
+ </para>
+
+ <para>
+  If your database was brought forward by dump and reload from a pre-9.1
+  version of <productname>PostgreSQL</>, and you had been using the pre-9.1
+  version of the module in it, you should instead do
+
+<programlisting>
+CREATE EXTENSION <replaceable>module_name</> FROM unpackaged;
+</programlisting>
+
+  This will update the pre-9.1 objects of the module into a proper
+  <firstterm>extension</> object.  Future updates to the module will be
+  managed by <xref linkend="sql-alterextension">.
+  For more information about extension updates, see
+  <xref linkend="extend-extensions">.
+ </para>
+
+ &adminpack;
+ &auth-delay;
+ &auto-explain;
+ &btree-gin;
+ &btree-gist;
+ &chkpass;
+ &citext;
+ &cube;
+ &dblink;
+ &dict-int;
+ &dict-xsyn;
+ &dummy-seclabel;
+ &earthdistance;
+ &file-fdw;
+ &fuzzystrmatch;
+ &hstore;
+ &intagg;
+ &intarray;
+ &isn;
+ &lo;
+ &ltree;
+ &oid2name;
+ &pageinspect;
+ &passwordcheck;
+ &pgarchivecleanup;
+ &pgbench;
+ &pgbuffercache;
+ &pgcrypto;
+ &pgfreespacemap;
+ &pgrowlocks;
+ &pgstandby;
+ &pgstatstatements;
+ &pgstattuple;
+ &pgtestfsync;
+ &pgtrgm;
+ &pgupgrade;
+ &seg;
+ &sepgsql;
+ &contrib-spi;
+ &sslinfo;
+ &tablefunc;
+ &test-parser;
+ &tsearch2;
+ &unaccent;
+ &uuid-ossp;
+ &vacuumlo;
+ &xml2;
+
+</appendix>

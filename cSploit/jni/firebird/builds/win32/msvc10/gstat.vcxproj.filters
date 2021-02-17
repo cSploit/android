@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="UTILITIES files">
+      <UniqueIdentifier>{d1710e2e-ebf5-41ad-bfab-3cfc31cb3568}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{1c45342c-123f-42e9-9a49-ff69f254379e}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{9730a97d-e176-4ef0-913c-a155734dd4d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JRD files">
+      <UniqueIdentifier>{0f51e8fe-c55b-4527-be3e-72c5e0732e20}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\utilities\gstat\ppg.cpp">
+      <Filter>UTILITIES files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\btn.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\ods.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\utilities\gstat\main\gstatMain.cpp">
+      <Filter>UTILITIES files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\utilities\gstat\dba.cpp">
+      <Filter>UTILITIES files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\jrd\btn.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\utilities\gstat\ppg_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\utilities\gstat\dba.epp">
+      <Filter>UTILITIES files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

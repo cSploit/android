@@ -1,0 +1,174 @@
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# You may obtain a copy of the Licence at
+# http://www.gnu.org/licences/lgpl.html
+# 
+# As a special exception this file can also be included in modules
+# with other source code as long as that source code has been 
+# released under an Open Source Initiative certificed licence.  
+# More information about OSI certification can be found at: 
+# http://www.opensource.org 
+# 
+# This module is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public Licence for more details.
+# 
+# This module was created by members of the firebird development 
+# team.  All individual contributions remain the Copyright (C) of 
+# those individuals and all rights are reserved.  Contributors to 
+# this file are either listed below or can be obtained from a CVS 
+# history command.
+#
+#  Created by:  Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#
+#  Contributor(s):
+# 
+#
+#
+ROOT=../..
+
+# Add the install include directory to the search path since the
+# examples need to build using those headers values.
+
+CFLAGS := $(CFLAGS) -I$(FB_BUILD)/include
+
+
+include     $(ROOT)/gen/make.defaults
+ifdef SFIO_EXAMPLES 
+include     $(ROOT)/gen/make.platform.solaris.examples
+else
+include     $(ROOT)/gen/make.platform
+endif
+include     $(ROOT)/gen/make.rules
+include     $(ROOT)/gen/make.shared.variables
+
+@SET_MAKE@
+
+PATH := ./:$(BIN):$(PATH)
+export PATH
+
+#ifeq ($(PLATFORM),DARWIN)
+#DYLD_LIBRARY_PATH := $(GEN_ROOT)/firebird/lib
+#export DYLD_LIBRARY_PATH
+#else
+#LD_LIBRARY_PATH := $(GEN_ROOT)/firebird/lib
+#export LD_LIBRARY_PATH
+#endif
+GPRE_FLAGS=	-r -m -z -n
+
+LIB_LINK_RPATH = $(call LIB_PLATFORM_RPATH,$(if $(subst intl,,$(1)),$(LIB),$(LIB)/../intl))
+LIB_LINK_MAPFILE =
+
+EXAMPLES_DEST=	$(GEN_ROOT)/examples
+EXAMPLES_SRC=	$(ROOT)/examples
+
+
+EMPBLD_Objects=	$(EXAMPLES_DEST)/empbuild.o
+
+INTLBLD_Objects= $(EXAMPLES_DEST)/intlbld.o
+
+INPUT_Files   =	empddl.sql empdml.sql indexoff.sql indexon.sql \
+		job.inp lang.inp proj.inp qtr.inp
+INPUT_Sources =   $(addprefix $(EXAMPLES_DEST)/, $(INPUT_Files))
+
+INTL_Files    =	intlddl.sql intldml.sql indexoff.sql indexon.sql \
+		job.inp lang.inp proj.inp qtr.inp
+INTL_Sources =   $(addprefix $(EXAMPLES_DEST)/, $(INTL_Files))
+
+EMPLOYEE_DB=	$(EXAMPLES_DEST)/employee.fdb
+FINAL_EMPDB=	$(FIREBIRD)/examples/empbuild/employee.fdb
+INTLEMP_DB=	$(EXAMPLES_DEST)/intlemp.fdb
+
+.PHONY: all examples
+
+all: examples
+
+# examples: $(EMPLOYEE_DB) $(INTLEMP_DB) $(FIREBIRD)/examples/README
+examples:	$(FINAL_EMPDB) $(FIREBIRD)/examples/README
+
+$(FINAL_EMPDB):	$(EMPLOYEE_DB)
+	$(RM) $(FINAL_EMPDB)
+	$(CP) $(EMPLOYEE_DB) $(FINAL_EMPDB)
+
+$(FIREBIRD)/examples/README:
+	$(CP) $(ROOT)/examples/readme $(FIREBIRD)/examples/README
+	$(CP) $(ROOT)/examples/*.* $(FIREBIRD)/examples/
+	$(CP) $(ROOT)/examples/api/*.* $(FIREBIRD)/examples/api/
+	$(CP) $(ROOT)/examples/dbcrypt/*.* $(FIREBIRD)/examples/dbcrypt/
+	$(CP) $(ROOT)/examples/include/*.* $(FIREBIRD)/examples/include/
+	$(CP) $(ROOT)/examples/interfaces/*.* $(FIREBIRD)/examples/interfaces/
+	$(CP) $(ROOT)/examples/package/*.* $(FIREBIRD)/examples/package/
+	$(CP) $(ROOT)/examples/stat/*.* $(FIREBIRD)/examples/stat/
+	$(CP) $(ROOT)/examples/udf/*.* $(FIREBIRD)/examples/udf/
+	$(CP) $(ROOT)/examples/udr/*.* $(FIREBIRD)/examples/udr/
+#	$(CP) intlemp.fdb $(FIREBIRD)/examples/empbuild/
+
+$(EXAMPLES_DEST)% : $(EXAMPLES_SRC)%
+	$(CP) $^ $@
+
+# Ok the following little story is, first build empbuild.fdb an empty db
+# using a script file.  Then we can compile the empbuild.e file, then we 
+# can run it to create employee.fdb database populated with data by the
+# program.  Thats how I found it.
+# MOD July-2001
+#
+# Another problem here is that empbuild does not fail when it gets an error
+# so MAKE thinks it's all run ok.  empbuild should be modified to return an
+# error when it fails. 
+# MOD 28-July-2002
+
+
+$(EMPLOYEE_DB):	$(EXAMPLES_DEST)/empbuild$(EXEC_EXT) $(INPUT_Sources) $(EXAMPLES_DEST)/isql$(EXEC_EXT)
+	-$(RM) $(EMPLOYEE_DB)
+	./empbuild $(EMPLOYEE_DB)
+	$(GFIX) -write sync $(EMPLOYEE_DB)
+	-$(CHMOD_6) $(EMPLOYEE_DB)
+
+# To get past the fact isql is called from the programs, we create a local link in this directory
+
+$(EXAMPLES_DEST)/isql$(EXEC_EXT):
+	-$(RM) $(EXAMPLES_DEST)/isql$(EXEC_EXT)
+	$(LN) $(ISQL) $(EXAMPLES_DEST)/isql$(EXEC_EXT)
+
+$(EXAMPLES_DEST)/empbuild$(EXEC_EXT): $(EMPBLD_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ -L$(LIB) $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+$(EXAMPLES_DEST)/empbuild.c:	$(EXAMPLES_DEST)/empbuild.fdb $(EXAMPLES_DEST)/empbuild.e
+
+$(EXAMPLES_DEST)/empbuild.fdb : $(EXAMPLES_DEST)/empddl.sql $(EXAMPLES_DEST)/empbld.sql $(EXAMPLES_DEST)/isql$(EXEC_EXT)
+	-$(RM) $(EXAMPLES_DEST)/empbuild.fdb
+	$(EXAMPLES_DEST)/isql$(EXEC_EXT) -i empbld.sql
+
+# The chain for intlemp.fdb is the same a script file to create an empty database
+# to allow a .e program to be compiled, to then create and populate with data
+# the intlemp.fdb database.
+
+$(EXAMPLES_DEST)/intlemp.fdb:	$(EXAMPLES_DEST)/intlbld$(EXEC_EXT) $(INTL_Sources) $(EXAMPLES_DEST)/isql$(EXEC_EXT)
+	-$(RM) intlemp.fdb
+	./intlbld intlemp.fdb
+	-$(CHMOD_6) intlemp.fdb
+
+$(EXAMPLES_DEST)/intlbld$(EXEC_EXT): $(INTLBLD_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) @^ -o $@ -L$(LIB) $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+$(EXAMPLES_DEST)/intlbld.c:	$(EXAMPLES_DEST)/intlbuild.fdb $(EXAMPLES_DEST)/intlbld.e
+
+$(EXAMPLES_DEST)/intlbuild.fdb : $(EXAMPLES_DEST)/intlddl.sql $(EXAMPLES_DEST)/intlbld.sql $(EXAMPLES_DEST)/isql$(EXEC_EXT)
+	-$(RM) intlbuild.fdb
+	$(EXAMPLES_DEST)/isql$(EXEC_EXT) -i intlbld.sql
+
+
+$(EXAMPLES_DEST)/%.sql: $(EXAMPLES_SRC)/empbuild/%.sql
+	$(CP) $^ $@
+
+$(EXAMPLES_DEST)/%.inp: $(EXAMPLES_SRC)/empbuild/%.inp
+	$(CP) $^ $@
+
+$(EXAMPLES_DEST)/%.e: $(EXAMPLES_SRC)/empbuild/%.e
+	$(CP) $^ $@
+
+$(EXAMPLES_DEST)/%.h: $(EXAMPLES_SRC)/common/%.h
+	$(CP) $^ $@

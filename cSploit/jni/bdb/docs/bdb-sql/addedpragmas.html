@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Added PRAGMAs</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="dbsqlbasics.html" title="Chapter 1. Berkeley DB SQL: The Absolute Basics" />
+    <link rel="prev" href="changedpragmas.html" title="Changed PRAGMAs" />
+    <link rel="next" href="miscdiff.html" title="Miscellaneous Differences" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Added PRAGMAs</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="changedpragmas.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 1. Berkeley DB SQL: The Absolute Basics</th>
+          <td width="20%" align="right"> <a accesskey="n" href="miscdiff.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="addedpragmas"></a>Added PRAGMAs</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#bdbsql_error_file">PRAGMA bdbsql_error_file</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#bdbsql_lock_tablesize">PRAGMA bdbsql_lock_tablesize</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#bdbsql_shared_resources">PRAGMA bdbsql_shared_resources</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#bdbsql_single_process">PRAGMA bdbsql_single_process</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#bdbsql_system_memory">PRAGMA bdbsql_system_memory</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#bdbsql_vacuum_fillpercent">PRAGMA bdbsql_vacuum_fillpercent</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#bdbsql_vacuum_pages">PRAGMA bdbsql_vacuum_pages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#large_record_opt">PRAGMA large_record_opt</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#multiversion">PRAGMA multiversion</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#snapshot_isolation">PRAGMA snapshot_isolation</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#trickle">PRAGMA trickle</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#txn_bulk">PRAGMA txn_bulk</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="addedpragmas.html#replication_pragmas">Replication PRAGMAs</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+                The following PRAGMAs are added in the Berkeley DB SQL interface.
+            </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bdbsql_error_file"></a>PRAGMA bdbsql_error_file</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA bdbsql_error_file [filename]</pre>
+        <p>
+                    Redirects internal Berkeley DB error messages to
+                    the named file. If a relative path is specified to
+                    <code class="literal">[filename]</code>, then the path is
+                    interpreted as being relative to the current
+                    working directory.
+                </p>
+        <p>
+                    If this PRAGMA is issued with no filename, then the
+                    current target for Berkeley DB error output is
+                    returned. By default, error messages are sent to
+                    <code class="literal">STDERR</code>.
+                </p>
+        <p>
+                    This PRAGMA can be issued at any time; initial
+                    database access does not have to occur before this
+                    PRAGMA can be used.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bdbsql_lock_tablesize"></a>PRAGMA bdbsql_lock_tablesize</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA bdbsql_lock_tablesize [= N]</pre>
+        <p>
+                    Sets or reports the number of buckets in the Berkeley DB environment's 
+                    lock object hash table.
+                </p>
+        <p>
+                    This pragma must be called prior to opening/creating the
+                    database environment.
+                </p>
+        <p>
+                    For more details, see
+                    <a href="../api_reference/C/envget_lk_tablesize.html" class="olink">get_lk_tablesize</a>
+                    and 
+                    <a href="../api_reference/C/envset_lk_tablesize.html" class="olink">set_lk_tablesize</a>.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bdbsql_shared_resources"></a>PRAGMA bdbsql_shared_resources</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA bdbsql_shared_resources [= N]</pre>
+        <p>
+                    Sets or reports the maximum amount of memory (bytes) to be
+                    used by shared structures in the main environment region.
+                </p>
+        <p>
+                    This pragma must be called prior to opening/creating the
+                    database environment.
+                </p>
+        <p>
+                    For more details, see
+                    <a href="../api_reference/C/envget_memory_max.html" class="olink">get_memory_max</a>
+                    and 
+                    <a href="../api_reference/C/envset_memory_max.html" class="olink">set_memory_max</a>.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bdbsql_single_process"></a>PRAGMA bdbsql_single_process</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA bdbsql_single_process = boolean</pre>
+        <p>
+                    To create a private environment rather than a shared
+                    environment, enable this pragma. The cache and other
+                    region files will be created in memory rather than
+                    using file backed shared memory.
+                </p>
+        <p>
+                    In Berkeley DB SQL the default behavior is to allow a
+                    database to be opened and operated on by multiple
+                    processes simultaneously. When this pragma is enabled,
+                    accessing the same database from multiple processes
+                    simultaneously can lead to data corruption. Either
+                    option supports accessing a database using a single
+                    process multi-threaded application.
+                </p>
+        <p>
+                    By default omit sharing is disabled. This pragma must
+                    be called prior to opening/creating the database
+                    environment.  Because the setting is not persistent,
+                    you may need to invoke it before every database open,
+                    or define compile option
+                    <code class="literal">BDBSQL_OMIT_SHARING</code> instead.
+                </p>
+        <p>
+                    For more information, see <a href="../programmer_reference/env_region.html" class="olink">Shared memory region</a>. Note that this
+                    pragma causes the <a href="../api_reference/C/envopen.html#envopen_DB_PRIVATE" class="olink">DB_PRIVATE</a> flag to be specified in 
+                    the <a href="../api_reference/C/envopen.html" class="olink">DB_ENV-&gt;open()</a> method.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bdbsql_system_memory"></a>PRAGMA bdbsql_system_memory</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA bdbsql_system_memory [base segment ID]</pre>
+        <p>
+                    Queries or sets a flag that causes the database's
+                    shared resources to be created in system shared
+                    memory. By default the database's shared resources
+                    are created in file-backed shared memory. 
+                </p>
+        <p>
+                    If a [base segment ID] is specified, the shared
+                    resources will be created using X/Open style shared
+                    memory interfaces. The [base segment ID] will be
+                    used as the starting ID for shared resources used
+                    by the database. Use different [base segment ID]
+                    values for different databases. It is possible for
+                    multi-process applications to use a single database
+                    by specifying the same [base segment ID] to this
+                    PRAGMA. Each connection needs to set this PRAGMA.
+                </p>
+        <p>
+                    This PRAGMA may be used to set a [base segment ID]
+                    only before the first table is created in the
+                    database.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bdbsql_vacuum_fillpercent"></a>PRAGMA bdbsql_vacuum_fillpercent</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA bdbsql_vacuum_fillpercent [= N]</pre>
+        <p>
+                    Sets or reports the page full threshold. 
+                    Any page in the database that is at or below this
+                    percentage full is considered for vacuuming when
+                    <code class="literal">PRAGMA incremental_vacuum</code> is
+                    enabled.  The value is specified as a percentage
+                    between 1 and 100.  By default, pages 85% full and
+                    below are considered for vacuuming.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bdbsql_vacuum_pages"></a>PRAGMA bdbsql_vacuum_pages</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA bdbsql_vacuum_pages [= N]</pre>
+        <p>
+                    Sets or reports the maximum number of pages to be
+                    returned to the file system from the free page list
+                    when incremental vacuuming is enabled. By
+                    default, up to 128 pages are removed from the free
+                    list.
+                </p>
+        <p>
+                    Page vacuuming is controlled using 
+                    <a class="xref" href="changedpragmas.html#auto_vacuum" title="PRAGMA auto_vacuum">PRAGMA auto_vacuum</a>.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="large_record_opt"></a>PRAGMA large_record_opt</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA large_record_opt [= number bytes]</pre>
+        <p>
+                    Enables optimized storage of large records. Any record
+                    larger than the given number of bytes will be stored in
+                    a new format that improves read and write performance
+                    for large records. 
+                </p>
+        <p>
+                    This pragma must be called before any data is added to
+                    the database, otherwise it will be ignored. 
+                </p>
+        <p>
+                    This optimization is incompatible with encryption, and
+                    <code class="literal">SQLITE_ReadUncommitted</code>.
+                </p>
+        <p>
+                    This optimization stores large records in a folder
+                    called <code class="literal">__db_bl</code> in the journal folder.
+                    So if the database is manually moved to a new location,
+                    the folder with the large records most also be moved.
+                    The Online Backup Function will automatically backup up
+                    these records with the rest of the database.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="multiversion"></a>PRAGMA multiversion</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA multiversion</pre>
+        <p>
+                    Controls whether Multiversion Concurrency Control (MVCC) is on
+                    or off. You can not use this PRAGMA at any time during
+                    your application's runtime after your database tables
+                    have been accessed.
+                </p>
+        <p>
+                    For more information on MVCC and snapshot isolation,
+                    see <a class="xref" href="mvcc.html" title="Using Multiversion Concurrency Control">Using Multiversion Concurrency Control</a>
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="snapshot_isolation"></a>PRAGMA snapshot_isolation</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA snapshot_isolation</pre>
+        <p>
+                    Controls whether snapshot isolation is turned on. This
+                    PRAGMA can be used at any time during your
+                    application's runtime <span class="emphasis"><em>after</em></span>
+                    Multiversion Concurrency Control (MVCC) has been turned on.
+                </p>
+        <p>
+                    For more information on MVCC and snapshot isolation,
+                    see <a class="xref" href="mvcc.html" title="Using Multiversion Concurrency Control">Using Multiversion Concurrency Control</a>
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="trickle"></a>PRAGMA trickle</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA trickle [percent]</pre>
+        <p>
+                    Ensures that at least the specified percentage of
+                    pages in the shared cache are clean. This can cause
+                    pages that have been modified to be flushed to
+                    disk.
+                </p>
+        <p>
+                    The trickle functionality enables an application to
+                    ensure that a page is available for reading new
+                    information into the shared cache without waiting
+                    for a write operation to complete.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="txn_bulk"></a>PRAGMA txn_bulk</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">PRAGMA TXN_BULK</pre>
+        <p>
+                    Enables transactional bulk loading optimization.
+                    For more information, see
+                    <a class="xref" href="dbfeatures.html#bulkloading" title="Using Bulk Loading">Using Bulk Loading</a>.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="replication_pragmas"></a>Replication PRAGMAs</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    Fourteen PRAGMAs were added to manage and control replication.
+                    They are described in 
+                    <a class="xref" href="sqlrep.html" title="Chapter 4. Using Replication with the SQL API">Using Replication with the SQL API</a>:
+                </p>
+        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+          <h3 class="title">Note</h3>
+          <p>
+                        If you are using these replication PRAGMAs and you
+                        want to perform a backup, there is an additional
+                        backup step for the pragma file. See
+                        <a class="xref" href="admin.html#backup" title="Backing Up Berkeley DB SQL Databases">Backing Up Berkeley DB SQL Databases</a>
+                        for more information.
+                    </p>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication" title="PRAGMA replication">PRAGMA replication</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_ack_policy" title="PRAGMA replication_ack_policy">PRAGMA replication_ack_policy</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_ack_timeout" title="PRAGMA replication_ack_timeout">PRAGMA replication_ack_timeout</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_get_master" title="PRAGMA replication_get_master">PRAGMA replication_get_master</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_initial_master" title="PRAGMA replication_initial_master">PRAGMA replication_initial_master</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_local_site" title="PRAGMA replication_local_site">PRAGMA replication_local_site</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_num_sites" title="PRAGMA replication_num_sites">PRAGMA replication_num_sites</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_perm_failed" title="PRAGMA replication_perm_failed">PRAGMA replication_perm_failed</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_priority" title="PRAGMA replication_priority">PRAGMA replication_priority</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_remote_site" title="PRAGMA replication_remote_site">PRAGMA replication_remote_site</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_remove_site" title="PRAGMA replication_remove_site">PRAGMA replication_remove_site</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_site_status" title="PRAGMA replication_site_status">PRAGMA replication_site_status</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_verbose_output" title="PRAGMA replication_verbose_output">PRAGMA replication_verbose_output</a>
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <a class="xref" href="reppragma.html#pragma_replication_verbose_file" title="PRAGMA replication_verbose_file">PRAGMA replication_verbose_file</a>
+                        </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="changedpragmas.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="dbsqlbasics.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="miscdiff.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Changed PRAGMAs </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Miscellaneous Differences</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

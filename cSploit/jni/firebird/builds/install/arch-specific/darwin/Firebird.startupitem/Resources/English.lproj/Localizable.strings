@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+	<key>Firebird SQL Database server</key>
+	<string>Firebird SQL Database server</string>
+	<key>Starting Firebird SQL Database server</key>
+	<string>Starting Firebird SQL Database server</string>
+	<key>Stopping Firebird SQL Database server</key>
+	<string>Stopping Firebird SQL Database server</string>
+	<key>Restarting Firebird SQL Database server</key>
+	<string>Restarting Firebird SQL Database server</string>
+</dict>
+</plist>
+

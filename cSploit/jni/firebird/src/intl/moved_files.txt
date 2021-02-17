@@ -1,0 +1,89 @@
+Changes
+
+-------------------------------------> Removed
+
+cs_jis_20208_1990.c
+cs2jis_p.h
+mac_*
+
+-------------------------------------> Changed name
+
+lc_unicode.c	> lc_unicode_ucs2.c
+cs_unicode.c	> cs_unicode_ucs2.c
+cs_utffss.c	> cs_unicode_fss.c
+cs_latin1.c	> cs_iso8859_1.c
+cs_latin2.c	> cs_iso8859_2.c
+
+-------------------------------------> Moved to charsets
+
+cs_437.h
+cs_850.h
+cs_852.h
+cs_857.h
+cs_860.h
+cs_861.h
+cs_863.h
+cs_865.h
+cs_big5.h
+cs_gb2312.h
+cs_jis_0208_1990.h
+cs_ksc5601.h
+cs_latin1.h	> cs_iso8859_1.h
+cs_latin2.h	> cs_iso8859_2.h
+cs_next.h
+cs_sjis.h
+cs_w1250.h
+cs_w1251.h
+cs_w1253.h
+cs_w1254.h
+
+-------------------------------------> Moved to collations
+
+ascii.h		> ascii.h
+ascii2.h	> ascii2.h
+ancyrr.h	> pw1251cyrr.h
+anczech.h	> pw1250czech.h
+angreek1.h	> pw1253greek1.h
+anhun.h		> pw1250hun.h
+anhundc.h	> pw1250hundc.h
+anpolish.h	> pw1250polish.h
+ansii850.h	> pw1252i850.h
+ansiintl.h	> pw1250intl.h
+ansinor4.h	> pw1252nor4.h
+ansislov.h	> pw1250slov.h
+ansispan.h	> pw1252span.h
+anspswfn.h	> pw1252swfn.h
+anturk.h	> pw1254turk.h
+
+bllt1*.h	> bl88591*.h
+
+blnxt*.h	> blNEXT*.h
+
+db*.h		> db*.h
+
+cyrr.h		> pd866cyrr.h
+czech.h		> pd852czech.h
+hun852dc.h	> pd852hundc.h
+iceland.h	> pd861iceland.h
+intl.h		> pd437intl.h
+nordan40.h	> pd865nordan40.
+slovene.h	> pd852slovene.
+swedfin.h	> pd437swedfin.h
+turk.h		> pd857turk.h
+
+-------------------------------------> Moved to conversions
+
+tx437_865.h
+tx437_lat1.h
+tx865_lat1.h
+
+-------------------------------------> Moved to utils
+
+dtest.c
+dtest2.c
+make.maps
+mapcompare.cpp
+mapdump.c
+mapgen4.c
+maptest.cpp
+maptest2.c

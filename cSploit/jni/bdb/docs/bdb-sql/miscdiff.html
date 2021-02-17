@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Miscellaneous Differences</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="dbsqlbasics.html" title="Chapter 1. Berkeley DB SQL: The Absolute Basics" />
+    <link rel="prev" href="addedpragmas.html" title="Added PRAGMAs" />
+    <link rel="next" href="bdb-concepts.html" title="Berkeley DB Concepts" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Miscellaneous Differences</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="addedpragmas.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 1. Berkeley DB SQL: The Absolute Basics</th>
+          <td width="20%" align="right"> <a accesskey="n" href="bdb-concepts.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="miscdiff"></a>Miscellaneous Differences</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                The following miscellaneous differences also exist between
+                the BDB SQL interface and SQLite:
+            </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                        The BDB SQL interface does not support the <code class="literal">IMMEDIATE</code> keyword 
+                        (<code class="literal">BEGIN IMMEDIATE</code> behaves just like <code class="literal">BEGIN</code>).
+                    </p>
+          </li>
+          <li>
+            <p>
+                        When an exclusive transaction is active, it will
+                        block any new transactions from beginning (they
+                        will be blocked during their first operation until
+                        the exclusive transactions commits or aborts).
+                        Non-exclusive transactions that are active when the
+                        exclusive transaction begins will not be able to
+                        execute any more operations without being blocked
+                        until the exclusive transactions finishes. 
+                    </p>
+          </li>
+          <li>
+            <p>
+                        Enabling MVCC mostly disables exclusive
+                        transactions.  Exclusive transactions can still be
+                        used, but they will run concurrently with regular
+                        transactions, even ones that write to the database.
+                        The only advantage of exclusive transactions in
+                        this case is that two exclusive transactions will
+                        be forced to run in serial, and that if an
+                        exclusive transaction and non-exclusive transaction
+                        experience deadlock, then the non-exclusive
+                        transaction will always be the transaction forced
+                        to release its locks.
+                    </p>
+            <p>
+                        For more information on MVCC and snapshot
+                        isolation, see 
+                        <a class="xref" href="mvcc.html" title="Using Multiversion Concurrency Control">Using Multiversion Concurrency Control</a>
+                    </p>
+          </li>
+          <li>
+            <p>
+                        There are differences in how the two products work
+                        in a concurrent application that will cause the
+                        BDB SQL interface to deadlock where SQLite would result in a
+                        different error. This is because the products use
+                        different locking paradigms. See
+                        <a class="xref" href="lockingnotes.html" title="Chapter 2. Locking Notes">Locking Notes</a>
+                        for more information.
+                    </p>
+          </li>
+          <li>
+            <p>
+                        The BDB SQL does not call the busy callback when a
+                        session attempts to operate the same database page
+                        that another session has locked.  It blocks
+                        instead. This means that the functions
+                        <code class="literal">sqlite3_busy_handler</code> and
+                        <code class="literal">sqlite3_busy_timeout</code> are not
+                        effective in BDB SQL.
+                    </p>
+          </li>
+          <li>
+            <p>
+                        The BDB SQL does not support two phase commit across databases.
+                        Attaching to multiple databases can lead to inconsistency 
+                        after recovery and undetected deadlocks when 
+                        accessing multiple databases from concurrent transactions 
+                        in different order. Hence, applications must ensure that 
+                        they access databases in the same order in any transaction 
+                        that spans multiple databases.  Else, a deadlock can 
+                        occur that causes threads to block, and the deadlock will 
+                        not be detected by Berkeley DB.
+                    </p>
+          </li>
+          <li>
+            <p>
+                        In BDB SQL, when two sessions accessing the same database 
+                        perform conflicting operations on the same page, one session 
+                        will be blocked until the conflicting operations are resolved. 
+                        For example,
+                        </p>
+            <p><span class="bold"><strong>Session 1:</strong></span>
+					</p>
+            <pre class="programlisting">dbsql&gt; insert into a values (4);
+dbsql&gt; begin;
+dbsql&gt; insert into a values (5); </pre>
+            <p>
+                <span class="bold"><strong>Session 2:</strong></span>
+            </p>
+            <pre class="programlisting">dbsql&gt; select * from a;
+</pre>
+            <p>
+					What happens here is that Session 2 is blocked until Session 1 commits the transaction.
+					</p>
+            <p><span class="bold"><strong>Session 1:</strong></span>
+					</p>
+            <pre class="programlisting">dbsql&gt; commit;
+</pre>
+            <p>
+                <span class="bold"><strong>Session 2:</strong></span>
+				</p>
+            <pre class="programlisting">dbsql&gt; select * from a;
+4
+5
+</pre>
+            <p>
+                    Under such situations in SQLite, operations poll
+                    instead of blocking, and a callback is used to
+                    determine whether to continue polling. 
+                    </p>
+          </li>
+          <li>
+            <p>
+                        By default, you always only have a single database
+                        file when you use BDB SQL interface SQL, just as you do
+                        when you use SQLite. However, you can configure
+                        BDB SQL interface at compile time to create one BDB SQL interface
+                        database file for each SQL table that you
+                        create. How to perform this configuration is
+                        described in the <em class="citetitle">Berkeley DB Installation and Build Guide</em>.
+                    </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="addedpragmas.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="dbsqlbasics.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="bdb-concepts.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Added PRAGMAs </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Berkeley DB Concepts</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

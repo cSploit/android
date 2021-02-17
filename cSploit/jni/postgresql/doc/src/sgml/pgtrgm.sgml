@@ -1,0 +1,293 @@
+<!-- doc/src/sgml/pgtrgm.sgml -->
+
+<sect1 id="pgtrgm" xreflabel="pg_trgm">
+ <title>pg_trgm</title>
+
+ <indexterm zone="pgtrgm">
+  <primary>pg_trgm</primary>
+ </indexterm>
+
+ <para>
+  The <filename>pg_trgm</filename> module provides functions and operators
+  for determining the similarity of <acronym>ASCII</>
+  alphanumeric text based on trigram matching, as
+  well as index operator classes that support fast searching for similar
+  strings.
+ </para>
+
+ <sect2>
+  <title>Trigram (or Trigraph) Concepts</title>
+
+  <para>
+   A trigram is a group of three consecutive characters taken
+   from a string.  We can measure the similarity of two strings by
+   counting the number of trigrams they share.  This simple idea
+   turns out to be very effective for measuring the similarity of
+   words in many natural languages.
+  </para>
+
+  <note>
+   <para>
+    A string is considered to have two spaces
+    prefixed and one space suffixed when determining the set
+    of trigrams contained in the string.
+    For example, the set of trigrams in the string
+    <quote><literal>cat</literal></quote> is
+    <quote><literal>  c</literal></quote>,
+    <quote><literal> ca</literal></quote>,
+    <quote><literal>cat</literal></quote>, and
+    <quote><literal>at </literal></quote>.
+   </para>
+  </note>
+ </sect2>
+
+ <sect2>
+  <title>Functions and Operators</title>
+
+  <para>
+   The functions provided by the <filename>pg_trgm</filename> module
+   are shown in <xref linkend="pgtrgm-func-table">, the operators
+   in <xref linkend="pgtrgm-op-table">.
+  </para>
+
+  <table id="pgtrgm-func-table">
+   <title><filename>pg_trgm</filename> Functions</title>
+   <tgroup cols="3">
+    <thead>
+     <row>
+      <entry>Function</entry>
+      <entry>Returns</entry>
+      <entry>Description</entry>
+     </row>
+    </thead>
+
+    <tbody>
+     <row>
+      <entry><function>similarity(text, text)</function></entry>
+      <entry><type>real</type></entry>
+      <entry>
+       Returns a number that indicates how similar the two arguments are.
+       The range of the result is zero (indicating that the two strings are
+       completely dissimilar) to one (indicating that the two strings are
+       identical).
+      </entry>
+     </row>
+     <row>
+      <entry><function>show_trgm(text)</function></entry>
+      <entry><type>text[]</type></entry>
+      <entry>
+       Returns an array of all the trigrams in the given string.
+       (In practice this is seldom useful except for debugging.)
+      </entry>
+     </row>
+     <row>
+      <entry><function>show_limit()</function></entry>
+      <entry><type>real</type></entry>
+      <entry>
+       Returns the current similarity threshold used by the <literal>%</>
+       operator.  This sets the minimum similarity between
+       two words for them to be considered similar enough to
+       be misspellings of each other, for example.
+      </entry>
+     </row>
+     <row>
+      <entry><function>set_limit(real)</function></entry>
+      <entry><type>real</type></entry>
+      <entry>
+       Sets the current similarity threshold that is used by the <literal>%</>
+       operator.  The threshold must be between 0 and 1 (default is 0.3).
+       Returns the same value passed in.
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+
+  <table id="pgtrgm-op-table">
+   <title><filename>pg_trgm</filename> Operators</title>
+   <tgroup cols="3">
+    <thead>
+     <row>
+      <entry>Operator</entry>
+      <entry>Returns</entry>
+      <entry>Description</entry>
+     </row>
+    </thead>
+
+    <tbody>
+     <row>
+      <entry><type>text</> <literal>%</literal> <type>text</></entry>
+      <entry><type>boolean</type></entry>
+      <entry>
+       Returns <literal>true</> if its arguments have a similarity that is
+       greater than the current similarity threshold set by
+       <function>set_limit</>.
+      </entry>
+     </row>
+     <row>
+      <entry><type>text</> <literal>&lt;-&gt;</literal> <type>text</></entry>
+      <entry><type>real</type></entry>
+      <entry>
+       Returns the <quote>distance</> between the arguments, that is
+       one minus the <function>similarity()</> value.
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+ </sect2>
+
+ <sect2>
+  <title>Index Support</title>
+
+  <para>
+   The <filename>pg_trgm</filename> module provides GiST and GIN index
+   operator classes that allow you to create an index over a text column for
+   the purpose of very fast similarity searches.  These index types support
+   the above-described similarity operators, and additionally support
+   trigram-based index searches for <literal>LIKE</> and <literal>ILIKE</>
+   queries.  (These indexes do not support equality nor simple comparison
+   operators, so you may need a regular B-tree index too.)
+  </para>
+
+  <para>
+   Example:
+
+<programlisting>
+CREATE TABLE test_trgm (t text);
+CREATE INDEX trgm_idx ON test_trgm USING gist (t gist_trgm_ops);
+</programlisting>
+or
+<programlisting>
+CREATE INDEX trgm_idx ON test_trgm USING gin (t gin_trgm_ops);
+</programlisting>
+  </para>
+
+  <para>
+   At this point, you will have an index on the <structfield>t</> column that
+   you can use for similarity searching.  A typical query is
+<programlisting>
+SELECT t, similarity(t, '<replaceable>word</>') AS sml
+  FROM test_trgm
+  WHERE t % '<replaceable>word</>'
+  ORDER BY sml DESC, t;
+</programlisting>
+   This will return all values in the text column that are sufficiently
+   similar to <replaceable>word</>, sorted from best match to worst.  The
+   index will be used to make this a fast operation even over very large data
+   sets.
+  </para>
+
+  <para>
+   A variant of the above query is
+<programlisting>
+SELECT t, t &lt;-&gt; '<replaceable>word</>' AS dist
+  FROM test_trgm
+  ORDER BY dist LIMIT 10;
+</programlisting>
+   This can be implemented quite efficiently by GiST indexes, but not
+   by GIN indexes.  It will usually beat the first formulation when only
+   a small number of the closest matches is wanted.
+  </para>
+
+  <para>
+   Beginning in <productname>PostgreSQL</> 9.1, these index types also support
+   index searches for <literal>LIKE</> and <literal>ILIKE</>, for example
+<programlisting>
+SELECT * FROM test_trgm WHERE t LIKE '%foo%bar';
+</programlisting>
+   The index search works by extracting trigrams from the search string
+   and then looking these up in the index.  The more trigrams in the search
+   string, the more effective the index search is.  Unlike B-tree based
+   searches, the search string need not be left-anchored.
+  </para>
+
+  <para>
+   The choice between GiST and GIN indexing depends on the relative
+   performance characteristics of GiST and GIN, which are discussed elsewhere.
+   As a rule of thumb, a GIN index is faster to search than a GiST index, but
+   slower to build or update; so GIN is better suited for static data and GiST
+   for often-updated data.
+  </para>
+ </sect2>
+
+ <sect2>
+  <title>Text Search Integration</title>
+
+  <para>
+   Trigram matching is a very useful tool when used in conjunction
+   with a full text index.  In particular it can help to recognize
+   misspelled input words that will not be matched directly by the
+   full text search mechanism.
+  </para>
+
+  <para>
+   The first step is to generate an auxiliary table containing all
+   the unique words in the documents:
+
+<programlisting>
+CREATE TABLE words AS SELECT word FROM
+        ts_stat('SELECT to_tsvector(''simple'', bodytext) FROM documents');
+</programlisting>
+
+   where <structname>documents</> is a table that has a text field
+   <structfield>bodytext</> that we wish to search.  The reason for using
+   the <literal>simple</> configuration with the <function>to_tsvector</>
+   function, instead of using a language-specific configuration,
+   is that we want a list of the original (unstemmed) words.
+  </para>
+
+  <para>
+   Next, create a trigram index on the word column:
+
+<programlisting>
+CREATE INDEX words_idx ON words USING gin(word gin_trgm_ops);
+</programlisting>
+
+   Now, a <command>SELECT</command> query similar to the previous example can
+   be used to suggest spellings for misspelled words in user search terms.
+   A useful extra test is to require that the selected words are also of
+   similar length to the misspelled word.
+  </para>
+
+  <note>
+   <para>
+    Since the <structname>words</> table has been generated as a separate,
+    static table, it will need to be periodically regenerated so that
+    it remains reasonably up-to-date with the document collection.
+    Keeping it exactly current is usually unnecessary.
+   </para>
+  </note>
+ </sect2>
+
+ <sect2>
+  <title>References</title>
+
+  <para>
+   GiST Development Site
+   <ulink url="http://www.sai.msu.su/~megera/postgres/gist/"></ulink>
+  </para>
+  <para>
+   Tsearch2 Development Site
+   <ulink url="http://www.sai.msu.su/~megera/postgres/gist/tsearch/V2/"></ulink>
+  </para>
+ </sect2>
+
+ <sect2>
+  <title>Authors</title>
+
+  <para>
+   Oleg Bartunov <email>oleg@sai.msu.su</email>, Moscow, Moscow University, Russia
+  </para>
+  <para>
+   Teodor Sigaev <email>teodor@sigaev.ru</email>, Moscow, Delta-Soft Ltd.,Russia
+  </para>
+  <para>
+   Documentation: Christopher Kings-Lynne
+  </para>
+  <para>
+   This module is sponsored by Delta-Soft Ltd., Moscow, Russia.
+  </para>
+ </sect2>
+
+</sect1>

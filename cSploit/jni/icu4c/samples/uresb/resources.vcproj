@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="9.00"
+	Name="resources"
+	ProjectGUID="{69437707-2FEF-4E2C-8C3F-6E6B3D241366}"
+	Keyword="MakeFileProj"
+	TargetFrameworkVersion="131072"
+	>
+	<Platforms>
+		<Platform
+			Name="Win32"
+		/>
+		<Platform
+			Name="x64"
+		/>
+	</Platforms>
+	<ToolFiles>
+	</ToolFiles>
+	<Configurations>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory=".\resources_Win32_Debug"
+			IntermediateDirectory=".\resources_Win32_Debug"
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake /f &quot;resources.mak&quot; CFG=x86\Debug"
+				ReBuildCommandLine="nmake /f &quot;resources.mak&quot; /a CFG=x86\Debug"
+				CleanCommandLine="nmake /f &quot;resources.mak&quot; clean CFG=x86\Debug"
+				Output="uresb_root.res"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Debug|x64"
+			OutputDirectory=".\x64\Debug"
+			IntermediateDirectory=".\x64\Debug"
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake /f &quot;resources.mak&quot; CFG=x64\Debug"
+				ReBuildCommandLine="nmake /f &quot;resources.mak&quot; /a CFG=x64\Debug"
+				CleanCommandLine="nmake /f &quot;resources.mak&quot; clean CFG=x64\Debug"
+				Output="uresb_root.res"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|Win32"
+			OutputDirectory=".\resources_Win32_Release"
+			IntermediateDirectory=".\resources_Win32_Release"
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake /f &quot;resources.mak&quot; CFG=x86\Release"
+				ReBuildCommandLine="nmake /f &quot;resources.mak&quot; /a CFG=x86\Release"
+				CleanCommandLine="nmake /f &quot;resources.mak&quot; clean CFG=x86\Release"
+				Output="uresb_root.res"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory=".\x64\Release"
+			IntermediateDirectory=".\x64\Release"
+			ConfigurationType="0"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC71.vsprops"
+			>
+			<Tool
+				Name="VCNMakeTool"
+				BuildCommandLine="nmake /f &quot;resources.mak&quot; CFG=x64\Release"
+				ReBuildCommandLine="nmake /f &quot;resources.mak&quot; /a CFG=x64\Release"
+				CleanCommandLine="nmake /f &quot;resources.mak&quot; clean CFG=x64\Release"
+				Output="uresb_root.res"
+				PreprocessorDefinitions=""
+				IncludeSearchPath=""
+				ForcedIncludes=""
+				AssemblySearchPath=""
+				ForcedUsingAssemblies=""
+				CompileAsManaged=""
+			/>
+		</Configuration>
+	</Configurations>
+	<References>
+	</References>
+	<Files>
+		<Filter
+			Name="Resource Files"
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;txt"
+			>
+			<File
+				RelativePath=".\en.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\root.txt"
+				>
+			</File>
+			<File
+				RelativePath=".\sr.txt"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Build Script"
+			>
+			<File
+				RelativePath=".\resources.mak"
+				>
+			</File>
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

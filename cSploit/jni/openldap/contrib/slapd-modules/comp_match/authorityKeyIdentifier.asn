@@ -1,0 +1,65 @@
+AuthorityKeyIdentifierDefinition DEFINITIONS ::=
+BEGIN
+AuthorityKeyIdentifier ::= SEQUENCE {
+    keyIdentifier             [0] IMPLICIT KeyIdentifier            OPTIONAL,
+    authorityCertIssuer       [1] IMPLICIT GeneralNames             OPTIONAL,
+    authorityCertSerialNumber [2] IMPLICIT CertificateSerialNumber  OPTIONAL }
+    -- authorityCertIssuer and authorityCertSerialNumber MUST both
+    -- be present or both be absent
+
+KeyIdentifier ::= OCTET STRING
+
+CertificateSerialNumber ::= INTEGER
+
+GeneralNames ::= SEQUENCE SIZE (1..MAX) OF GeneralName
+
+GeneralName ::= CHOICE {
+        otherName                       [0]     OtherName,
+        rfc822Name                      [1]     IA5String,
+        dNSName                         [2]     IA5String,
+        x400Address                     [3]     ORAddress,
+        directoryName                   [4]     Name,
+        ediPartyName                    [5]     EDIPartyName,
+        uniformResourceIdentifier       [6]     IA5String,
+        iPAddress                       [7]     OCTET STRING,
+        registeredID                    [8]     OBJECT IDENTIFIER }
+
+OtherName ::= SEQUENCE {
+        type-id    OBJECT IDENTIFIER,
+        value      [0] EXPLICIT ANY DEFINED BY type-id }
+
+EDIPartyName ::= SEQUENCE {
+        nameAssigner            [0]     DirectoryString OPTIONAL,
+        partyName               [1]     DirectoryString }
+
+-- following ORAddress may not conform original def. in ASN.1
+ORAddress ::= SEQUENCE {
+-- built-in-standard-attributes BuiltInStandardAttributes,
+	type-id	OBJECT IDENTIFIER,
+-- built-in-domain-defined-attributes
+	value	ANY DEFINED BY type-id,
+-- BuiltInDomainDefinedAttributes OPTIONAL,
+-- see also teletex-domain-defined-attributes
+--extension-attributes ExtensionAttributes OPTIONAL }
+	extension	OCTET STRING OPTIONAL }
+
+
+Name ::= CHOICE {
+     rdnSequence	RDNSequence }
+
+RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+
+RelativeDistinguishedName ::= SET OF AttributeTypeAndValue
+
+AttributeTypeAndValue ::= SEQUENCE {
+     type     OBJECT IDENTIFIER,
+     value    ANY DEFINED BY type}
+
+DirectoryString ::= CHOICE {
+	teletexString	TeletexString (SIZE (1..MAX)),
+	printableString	PrintableString (SIZE (1..MAX)),
+	universalString	UniversalString (SIZE (1..MAX)),
+	utf8String	UTF8String (SIZE (1..MAX)),
+	bmpString	BMPString (SIZE (1..MAX)) }
+
+END

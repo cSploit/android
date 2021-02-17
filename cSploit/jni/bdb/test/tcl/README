@@ -1,0 +1,182 @@
+Rules for the Berkeley DB test suite
+
+1.  Test Naming
+
+The primary script for running Berkeley DB scripts is named
+'test.tcl'.  
+
+Tests are named with a (prefix, test number) combination.  The
+prefix indicates the type of test (lock, log, rep, etc.).  The
+prefix 'test' is used for plain vanilla DB testing.  Test numbers
+are 3 digits long, starting from 001.
+
+Procedures common to a group of tests, or to all tests, are placed
+in files named 'xxxutils.tcl'.  At the moment, we have the following
+utilities files:
+
+testutils.tcl		Utilities common to all DB tests
+reputils.tcl		Utilities for replication testing.
+reputilsnoenv.tcl	Utilities for replication testing.
+siutils.tcl		Utilities for secondary index testing.
+xmlutils.tcl 		Utilities for XML testing.
+foputils.tcl 		Utilities for file operations testing.
+
+2.  Internal test structure
+
+Each line within a test should be no more than 80 characters long.
+
+Each test starts with a section like the following:
+
+# See the file LICENSE for redistribution information.
+#
+# Copyright (c) 1996, 2014 Oracle and/or its affiliates.  All rights reserved.
+#
+# $Id$
+#
+# TEST	test001
+# TEST	Small keys/data
+# TEST		Put/get per key
+# TEST		Dump file
+# TEST		Close, reopen
+# TEST		Dump file
+# TEST
+# TEST	Use the first 10,000 entries from the dictionary.
+# TEST	Insert each with self as key and data; retrieve each.
+# TEST	After all are entered, retrieve all; compare output to original.
+# TEST	Close file, reopen, do retrieve and re-verify.
+
+Always mention the license and claim copyright first. 
+Copy the sentences from another file, but adjust the copyright 
+date if you're creating a new file.  The '$Id$' is left over 
+from when we used a different version control system, CVS 
+instead of mercurial.  I don't think it does any harm, but
+I don't think it has to be in there, either. 
+
+The section of lines beginning # TEST is used to automatically 
+maintain the TESTS file, a listing of all tests and what they 
+do.   Use this section to briefly describe the test's purpose
+and structure.  The TESTS file gets rebuilt by the dist/s_test
+script, which is run when we run s_all.
+
+Next comes the main procedure of the test, which has the same name
+as the tcl file.  The test should be liberally commented, and also
+should use 'puts' to send messages to the output file.
+
+Sections of a test are identified with letters: test001.a, test001.b,
+test001.c.
+
+Here's some typical output:
+
+	puts "Test$tnum: $method ($args) $nentries equal key/data pairs"
+ 	puts "\tTest$tnum.a: put/get loop"
+	puts "\tTest$tnum.b: dump file"
+	puts "\tTest$tnum.c: close, open, and dump file"
+	puts "\tTest$tnum.d: close, open, and dump file in reverse direction"
+
+The reporting of the current value of the args is particularly
+useful, allowing us to say at a glance that "testxxx is failing in
+btree" or whatever.  Each line of output must begin with the test name.
+We use this to separate expected informational output from errors.
+
+Supporting procedures follow the main procedure.   Procedures used
+by more than one test should go into the appropriate XXXutils.tcl
+file.
+
+3.  Reporting failures
+
+Failures in tests are reported with a message starting with the
+prefix "FAIL:".  Failures in tests are usually caught with the
+error_check_good and error_check_bad routines to compare an
+actual return value to an expected return value.  These routines
+take care of putting the "FAIL:" prefix on the message.
+
+4.  Running tests
+
+Any single test can be run from the tclsh prompt by typing the
+name of the test.  If it's a test from the 'testxxx' group, you
+should also specify the method you'd like to test:
+
+	log001
+	test001 btree
+
+To run one of the 'testxxx' tests for all methods, use the
+run_test procedure:
+
+	run_test test001
+
+Any group of tests (the subsystems lock, log, test, etc.) can be
+run by typing
+
+	r $sub
+
+where sub is the name of the subsystem.  This also works for 
+access methods:  r btree, r hash, and so on. 
+
+For any of the following methods
+
+run_method
+run_secmethod
+run_secenv
+run_reptest
+run_repmethod
+run_envmethod
+run_recd
+
+you can type
+
+run (suffix method start stop).
+
+For example, to run test010 through test020 in btree using
+run_method:
+
+	run method btree 10 20
+
+Or the same tests in repmethod:
+
+	run repmethod btree 10 20
+
+Notice the missing underbar.
+
+If you omit the start and stop numbers, you'll get all the tests:
+
+	run method btree
+
+run_recd is a special case, in that it runs the recdxxx tests;
+all the others run the testxxx tests.
+
+To run the standard test suite, type run_std at the tclsh prompt.
+To run all the tests, type run_all.  Run_all runs each of the 
+testXXX tests under many different conditions:  with and without 
+transaction, partitioning, replication, encryption, different 
+page sizes, and so on.  When writing a new test -- call it test150 --
+it's a good idea to run 'run_all test150' and make sure it passes. 
+This command will run test150 in all the different ways that 
+a run_all run would.  Similarly you can do 'run_std test150'. 
+
+Just as the testXXX tests are run in different ways, the 
+replication tests are also set up so they can be run with 
+databases in-memory or on-disk, log files in-memory or 
+on-disk, replication files in-memory or on-disk, and with
+or without private environments.  These options can be accessed
+with the commands
+
+% run_inmem_db rep001 btree (in-memory databases)
+% run_inmem_log rep001 btree (in-memory logs)
+% run_mixedmode rep001 btree (runs through the various options of 
+	master logs on-disk/in-mem and client logs on-disk/in-mem)
+% run_env_private rep001 btree (open all envs with -private)
+% run_inmem_rep rep001 btree (in-memory rep files: __db.rep.gen, 
+	__db.rep.egen, __db.rep.init, etc.)
+% run_inmem_tests (runs all the in-memory testing)
+
+
+
+If you are running run_std or run_all, you may use the run_parallel
+interface to speed things up or to test under conditions of high
+system load.  Run_parallel creates a list of all tests in the run,
+reorders the tests randomly, then runs the tests in a number of
+parallel processes.  To run run_std in five processes type
+
+	run_parallel 5 run_std
+
+

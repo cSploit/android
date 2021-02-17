@@ -1,0 +1,20 @@
+Summary: Firebird Relational Database Server and Client tools.
+Name: Firebird
+Version: @FIREBIRD_VERSION@.@FB_BUILD_NUM@
+Release: @FIREBIRD_PACKAGE_VERSION@
+License: Distributable 
+Group: Applications/Databases 
+Source: Firebird-@FIREBIRD_VERSION@.@FB_BUILD_NUM@.tar.bz2
+URL: http://firebird.sourceforge.net 
+# Prefix: /
+AutoReqProv: no 
+# BuildArchitectures: @CPU_TYPE@
+# BuildRoot: /var/tmp/%{name}-buildroot
+BuildRoot: @BUILD_ROOT_DIR@/gen/buildroot
+Requires: ### will be set in Makefile to current libncurses and libstdc ###
+Provides: Firebird libfbclient.so.2@RPM64@ libfbembed.so.2.5@RPM64@ libgds.so
+
+%description
+Firebird is a powerful, high-performance relational database designed to be embedded into
+applications on multiple platforms.  
+

@@ -1,0 +1,1400 @@
+
+
+
+Network Working Group                                       S. Haripriya
+Internet-Draft                                         Jaimon. Jose, Ed.
+Updates: 02 (if approved)                               Jim. Sermersheim
+Intended status: Standards Track                            Novell, Inc.
+Expires: July 9, 2007                                    January 5, 2007
+
+
+                    LDAP: Dynamic Groups for LDAPv3
+                    draft-haripriya-dynamicgroup-02
+
+Status of this Memo
+
+   By submitting this Internet-Draft, each author represents that any
+   applicable patent or other IPR claims of which he or she is aware
+   have been or will be disclosed, and any of which he or she becomes
+   aware will be disclosed, in accordance with Section 6 of BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on July 9, 2007.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2007).
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                  [Page 1]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+Abstract
+
+   This document describes the requirements, semantics, schema elements,
+   and operations needed for a dynamic group feature in LDAP.  A dynamic
+   group is defined here as a group object with a membership list of
+   distinguished names that is dynamically generated using LDAP search
+   criteria.  The dynamic membership list may then be interrogated by
+   LDAP search and compare operations, and may also be used to find the
+   groups that an object is a member of.  This feature eliminates a huge
+   amount of the administrative effort required today for maintaining
+   group memberships and role-based operations in large enterprises.
+
+
+Table of Contents
+
+   1.  Conventions used in this document  . . . . . . . . . . . . . .  4
+   2.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  5
+   3.  Requirements of a dynamic group feature  . . . . . . . . . . .  6
+   4.  Schema and Semantic Definitions for Dynamic Groups . . . . . .  7
+     4.1.  Object Classes . . . . . . . . . . . . . . . . . . . . . .  7
+       4.1.1.  dynamicGroup . . . . . . . . . . . . . . . . . . . . .  7
+       4.1.2.  dynamicGroupOfUniqueNames  . . . . . . . . . . . . . .  7
+       4.1.3.  dynamicGroupAux  . . . . . . . . . . . . . . . . . . .  7
+       4.1.4.  dynamicGroupOfUniqueNamesAux . . . . . . . . . . . . .  7
+     4.2.  Attributes . . . . . . . . . . . . . . . . . . . . . . . .  8
+       4.2.1.  memberQueryURL . . . . . . . . . . . . . . . . . . . .  8
+       4.2.2.  excludedMember . . . . . . . . . . . . . . . . . . . . 11
+     4.3.  member . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+     4.4.  uniqueMember . . . . . . . . . . . . . . . . . . . . . . . 11
+     4.5.  dgIdentity . . . . . . . . . . . . . . . . . . . . . . . . 11
+       4.5.1.  dgIdentity - Security implications . . . . . . . . . . 12
+   5.  Advertisement of support for dynamic groups  . . . . . . . . . 13
+   6.  Dynamic Group Operations . . . . . . . . . . . . . . . . . . . 14
+     6.1.  Existing Operations  . . . . . . . . . . . . . . . . . . . 14
+       6.1.1.  Access to resources in the directory . . . . . . . . . 14
+       6.1.2.  Reading a dynamic group object . . . . . . . . . . . . 14
+       6.1.3.  'Is Member Of' functionality . . . . . . . . . . . . . 15
+     6.2.  New Extensions . . . . . . . . . . . . . . . . . . . . . . 16
+       6.2.1.  Managing the static members of a dynamic group . . . . 16
+   7.  Performance Considerations . . . . . . . . . . . . . . . . . . 17
+     7.1.  Caching of Dynamic Members . . . . . . . . . . . . . . . . 17
+   8.  Security Considerations  . . . . . . . . . . . . . . . . . . . 18
+   9.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 19
+   10. Conclusions  . . . . . . . . . . . . . . . . . . . . . . . . . 20
+   11. Normative References . . . . . . . . . . . . . . . . . . . . . 21
+   Appendix A.  Example Values for memberQueryURL . . . . . . . . . . 22
+   Appendix B.  Acknowledgments . . . . . . . . . . . . . . . . . . . 23
+   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 24
+
+
+
+Haripriya, et al.         Expires July 9, 2007                  [Page 2]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+   Intellectual Property and Copyright Statements . . . . . . . . . . 25
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                  [Page 3]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+1.  Conventions used in this document
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in [1].
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                  [Page 4]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+2.  Introduction
+
+   The LDAP schema described in [4] defines two object classes:
+   'groupOfNames', and 'groupOfUniqueNames', that hold a static list of
+   distinguished names in their 'member' or 'uniqueMember' attributes
+   respectively, and are typically used to describe a group of objects
+   for various functions.  These grouping functions range from simple
+   group membership applications such as email distribution lists to
+   describing common authorization for a set of users The administration
+   and updating of these membership lists must be done by specifically
+   modifying the DN values in the member or uniqueMember attributes.
+   Thus, each time a change in membership happens, a process must exist
+   which adds or removes the particular entry's DN from the member
+   attribute.  For example, consider an organization, where the access
+   to its facilities is controlled by membership in a directory group.
+   Assume that all employees in a department have been added to the
+   group that provides access to the required department facility.  If
+   an employee moves from one department to another, the administrator
+   must remove the employee from one group and add him to another.
+   Similarly consider an organization that wants to provide access to
+   its facility, to both interns and employees on weekdays, but only to
+   employees on weekends.  It would be effort-consuming to achieve this
+   with static groups.
+
+   "Dynamic groups" are like normal groups, but they let one specify
+   criteria to be used for evaluating membership to a group; the
+   membership of the group is determined dynamically by the directory
+   servers involved.  This lets the group administrator define the
+   membership in terms of attributes, and let the DSAs worry about who
+   are the actual members.  This solution is more scalable and reduces
+   administrative costs.  This can also supplement static groups in LDAP
+   to provide flexibility to the user.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                  [Page 5]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+3.  Requirements of a dynamic group feature
+
+   The following requirements SHOULD be met by a proposal for the
+   dynamic groups feature:
+
+   1.  Creation and administration of dynamic groups should be done
+       using normal LDAP operations.
+
+   2.  Applications must be able to use dynamic groups in the same way
+       that they are able to use static groups for listing members and
+       for membership evaluation.
+
+   3.  Interrogation of a dynamic group's membership should be done
+       using normal LDAP operations, and should be consistent.  This
+       means that all authorization identities with the same permission
+       to the membership attribute of a dynamic group (such as 'read')
+       should be presented with the same membership list.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                  [Page 6]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+4.  Schema and Semantic Definitions for Dynamic Groups
+
+   The dynamic group classes are defined by the following schema
+
+4.1.  Object Classes
+
+   The following object classes MUST be supported, and their semantics
+   understood by the server, for it to support the dynamic groups
+   feature.
+
+4.1.1.  dynamicGroup
+
+   ( <OID.TBD> NAME 'dynamicGroup' SUP groupOfNames STRUCTURAL MAY
+   (memberQueryURL $ excludedMember $ dgIdentity ))
+
+   This structural object class is used to create a dynamic group
+   object.  It is derived from groupOfNames, which is defined in [4].
+
+4.1.2.  dynamicGroupOfUniqueNames
+
+   ( <OID.TBD> NAME 'dynamicGroupOfUniqueNames' SUP groupOfUniqueNames
+   STRUCTURAL MAY (memberQueryURL $ excludedMember $ dgIdentity ))
+
+   This structural object class is used to create a dynamic group object
+   whose membership list is held in a uniqueMember attribute.  It is
+   derived from groupOfUniqueNames, which is defined in [4].
+
+4.1.3.  dynamicGroupAux
+
+   ( <OID.TBD> NAME 'dynamicGroupAux' SUP groupOfNames AUXILIARY MAY
+   (memberQueryURL $ excludedMember $ dgIdentity ))
+
+   This auxiliary object class is used to convert an existing object to
+   a dynamic group or to create an object of another object class but
+   with dynamic group capabilities.  This is derived from groupOfNames
+   which is defined in [4].
+
+4.1.4.  dynamicGroupOfUniqueNamesAux
+
+  ( <OID.TBD> NAME 'dynamicGroupOfUniqueNamesAux' SUP groupOfUniqueNames
+  AUXILIARY MAY (memberQueryURL $ excludedMember $ dgIdentity ))
+
+   This auxiliary object class is used to convert an existing object to
+   a dynamic group of unique names or to create an object of another
+   object class but with dynamic group capabilities.  This is derived
+   from groupOfUniqueNames which is defined in [4].
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                  [Page 7]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+4.2.  Attributes
+
+   The following attribute names MUST be supported by the server.
+
+4.2.1.  memberQueryURL
+
+   This attribute describes the membership of the list using an LDAPURL
+   [3].
+
+ (<OID.TBD> NAME 'memberQueryURL' SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+   The value of memberQueryURL is encoded as an LDAPURL [3]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                  [Page 8]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+   The BNF from [3] is listed here for reference.
+ldapurl = scheme COLON SLASH SLASH [host [COLON port]] [SLASH dn
+                     [QUESTION [attributes] [QUESTION [scope] [QUESTION [filter] [QUESTION
+                     extensions]]]]]
+                                ; <host> and <port> are defined
+                                ;   in Sections 3.2.2 and 3.2.3
+                                ;   of [RFC3986].
+                                ; <filter> is from Section 3 of
+                                ;   [RFC4515], subject to the
+                                ;   provisions of the
+                                ;   "Percent-Encoding" section
+                                ;   below.
+scheme      = "ldap"
+dn          = distinguishedName ; From Section 3 of [RFC4514],
+                                ; subject to the provisions of
+                                ; the "Percent-Encoding"
+                                ; section below.
+attributes  = attrdesc *(COMMA attrdesc)
+attrdesc    = selector *(COMMA selector)
+selector    = attributeSelector ; From Section 4.5.1 of
+                                ; [RFC4511], subject to the
+                                ; provisions of the
+                                ; "Percent-Encoding" section
+                                ; below.
+scope       = "base" / "one" / "sub"
+extensions  = extension *(COMMA extension)
+extension   = [EXCLAMATION] extype [EQUALS exvalue]
+extype      = oid               ; From section 1.4 of [RFC4512].
+exvalue     = LDAPString        ; From section 4.1.2 of
+                                ; [RFC4511], subject to the
+                                ; provisions of the
+                                ; "Percent-Encoding" section
+                                ; below.
+EXCLAMATION = %x21              ; exclamation mark ("!")
+SLASH       = %x2F              ; forward slash ("/")
+COLON       = %x3A              ; colon (":")
+QUESTION    = %x3F              ; question mark ("?")
+
+
+   For the purpose of evaluating dynamic members, the directory server
+   uses only the dn, scope, filter and extensions fields.  All remaining
+   fields are ignored if specified.  If other fields are specified, the
+   server SHALL ignore them and MAY omit them when presenting the value
+   to a client.  The dn is used to specify the base dn from which to
+   start the search for dynamic members.  The scope specifies the scope
+   with respect to the dn in which to search for dynamic members.  The
+   filter specifies the criteria with which to select objects for
+   dynamic membership.
+
+
+
+Haripriya, et al.         Expires July 9, 2007                  [Page 9]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+4.2.1.1.  The x-chain extension
+
+   A new extension is defined for use of the memberQueryURL in dynamic
+   groups, named 'x-chain'. x-chain does not take a value.  When x-chain
+   is present, the server must follow any search continuation references
+   to other servers while searching for dynamic members.  When x-chain
+   is absent, the dynamic members computed will be only those that are
+   present on the server from which the search is made.  A directory
+   server supporting the memberQueryURL MAY support the x-chain
+   extension, thus the x-chain extension could be critical or non-
+   critical as specified by the '!' prefix to the extension type.
+
+4.2.1.2.  Semantics of multiple values for memberQueryURL
+
+   The memberQueryURL MAY have multiple values, and in that case, the
+   members of the dynamic group will be the union of the members
+   computed using each individual URL value.  This is useful in
+   specifying a group membership that is made up from subtrees rooted at
+   different base DNs, and possibly using different filters.
+
+4.2.1.3.  Condition of membership
+
+   An object O is a member of a dynamic group G if and only if
+
+   (( O is a value of the 'member' or 'uniqueMember' attribute of G)
+
+   OR
+
+   (( O is selected by the membership criteria specified in the
+   'memberQueryURL' attribute values of G)
+
+   AND
+
+   ( O is not listed in the 'excludedMember' attribute of G) ))
+
+   If a member M of a dynamic group G happens to be a dynamic or a
+   static group, the static or dynamic members of M SHALL NOT be
+   considered as members of G. M is a member of G though.
+
+   The last condition is imposed because
+
+   o  Recursively evaluating members of members may degrade the
+      performance of the server drastically.
+
+   o  Looping may occur particularly in situations where the search
+      chains across multiple-servers.
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 10]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+   o  Dynamic membership assertions (compare operation) cannot be
+      optimized if recursive memberships are allowed.  Without
+      recursion, comparisons can be made light-weight.
+
+4.2.2.  excludedMember
+
+   ( <OID.TBD> NAME 'excludedMember' SUP distinguishedName )
+
+   This attribute is used to exclude entries from being a dynamic member
+   of a dynamic group.  Thus an entry is a dynamic member of a dynamic
+   group if and only if it is selected by the member criteria specified
+   by the 'memberQueryURL' attribute or explicitly added to the member
+   or uniqueMember attribute, and it is not listed in the
+   'excludedMember' attribute.
+
+4.3.  member
+
+   ( 2.5.4.31 NAME 'member' SUP distinguishedName )
+
+   Defined in [4], this attribute is overloaded when used in the context
+   of a dynamic group.  It is used to explicitly specify static members
+   of a dynamic group.  If the same entry is listed in both the 'member'
+   and 'excludedMember' attributes, the 'member' overrides the
+   'excludedMember', and the entry is considered to be a member of the
+   group.  This attribute is also used to interrogate both the static
+   and dynamic member values of a dynamic group object.  Subclasses of
+   this attribute are NOT considered in this manner.
+
+4.4.  uniqueMember
+
+   ( 2.5.4.32 NAME 'uniqueMember' SUP distinguishedName )
+
+   Defined in [4], this attribute is overloaded when used in the context
+   of a dynamic group.  It is used to specify the static members of a
+   dynamic group.  If the same entry is listed in both the
+   'uniqueMember' and 'excludedMember' attributes, the 'uniqueMember'
+   overrides the 'excludedMember', and the entry is considered to be a
+   member of the group.  This attribute is also used to interrogate both
+   the static and dynamic member values of a dynamic group object.
+   Subclasses of this attribute are NOT considered in this manner.
+
+4.5.  dgIdentity
+
+   ( <OID.TBD> NAME 'identity' SUP distinguishedName SINGLE-VALUE )
+
+   In order to provide consistent results when processing the search
+   criteria, the server must use a single authorization identity.  If
+   the authorization of the bound identity is used, the membership list
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 11]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+   will vary, from identity to identity due to differing access
+   controls.  This may either be done by the server authenticating as
+   the dgIdentity prior to performing a search or compare operation, or
+   may be done by simply assuming the authorization of the dgIdentity
+   when performing those operations.  As server implementations vary, so
+   may the mechanisms to achieve consistent results through the use of
+   the dgIdentity.  In the case that the server authenticates as the
+   dgIdentity, it may be required by the server that this identity have
+   proper authentication credentials, and it may be required that this
+   identity reside in the DIB of the local server.
+
+   In the absence of an identity value, or in case the identity value
+   cannot be used, the server will process the memberQueryURL as the
+   anonymous identity.  This attribute MAY be supported, and represents
+   the identity the server will use for processing the memberQueryURL.
+
+4.5.1.  dgIdentity - Security implications
+
+   Because this attribute indirectly but effectively grants anyone with
+   read or compare access to the member or uniqueMember attribute
+   sufficient permission to gain a DN result set from the
+   memberQueryURL, server implementations SHOULD NOT allow this
+   attribute to be populated with the DN of any object that is not
+   administered by the identity making the change to this attribute.
+   For purposes of this document, to "administer an object" indicates
+   that the administrative identity has the ability to fully update the
+   access control mechanism in place the object in question.  As of this
+   writing, there is no way to describe further what it means to be
+   fully able to administer the access control mechanism for an object,
+   so this definition is left as implementation-specific.
+
+   This requirement will allow an entity that has privileges to
+   administer a particular subtree (meaning that entity can add, delete,
+   and update objects in that subtree), to place in the dgIdentity DNs
+   of only those objects it administers.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 12]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+5.  Advertisement of support for dynamic groups
+
+   If the dynamic groups schema is not present on an LDAP server, it
+   MUST be assumed that the dynamic groups feature is not supported.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 13]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+6.  Dynamic Group Operations
+
+6.1.  Existing Operations
+
+   The following operations SHOULD expose the dynamic groups
+   functionality.  These operations do not require any change in the
+   LDAP protocol to be exchanged between the client and server.
+
+6.1.1.  Access to resources in the directory
+
+   If access control items are set on a target resource object in the
+   directory, with the subject being a dynamic group object, then all
+   the members of the group object, including the dynamic members, will
+   get the same permissions on the target entry.  This would be the most
+   useful application of dynamic groups as seen by an administrator
+   because it lets the server control access to resources based on
+   dynamic membership to a trustee (subject of ACI) of the resource.
+   The way to specify a dynamic ACL is currently implementation
+   specific, as there is no common ACL definition for LDAP, and hence
+   will be dealt with in a separate document or later (TO BE DONE).
+
+6.1.2.  Reading a dynamic group object
+
+   When the member attributes of a dynamic group object is listed by the
+   client using an LDAP search operation, the member values returned
+   SHOULD contain both the static and dynamic members of the group
+   object.  This functionality will not require a change to the
+   protocol, and the clients need not be aware of dynamic groups to
+   exploit this functionality.  This feature is useful for clients that
+   determine access privileges to a resource by themselves, by reading
+   the members of a group object.  It will also be useful to
+   administrators who want to see the result of the query URL that they
+   set on the dynamic group entry.  Note that this overloads the
+   semantics of the 'member' and 'uniqueMember' attributes.  This could
+   lead to some surprises for the client .
+
+   for example: Clients that read the member attribute of a dynamic
+   group object and then attempt to remove values (which were dynamic)
+   could get an error specifying such a value was not there.
+
+   Example:
+
+   Let cn=dg1,o=myorg be a dynamic group object with the following
+   attributes stored in the directory.
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 14]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+      member: cn=admin,o=myorg
+
+      excludedMember: cn=guest,ou=finance,o=myorg
+
+      excludedMember: cn=robin,ou=finance,o=myorg
+
+      memberQueryURL:
+      ldap:///ou=finance,o=myorg??sub?(objectclass=organizationalPerson)
+
+   If there are 5 organizationalPerson objects under ou=finance,o=myorg
+   with common names bob, alice, john, robin, and guest, then the output
+   of a base-scope LDAP search at cn=dg1,o=myorg, with the attribute
+   list containing 'member' will be as follows:
+
+      dn: cn=dg1,o=myorg
+
+      member: cn=admin,o=myorg
+
+      member: cn=bob,ou=finance,o=myorg
+
+      member: cn=alice,ou=finance,o=myorg
+
+      member: cn=john,ou=finance,o=myorg
+
+6.1.3.  'Is Member Of' functionality
+
+   The LDAP compare operation allows one to discover whether a given DN
+   is in the membership list of a dynamic group.  Again, the server
+   SHOULD produce consistent results among different authorization
+   identities when processing this request, as long as those identities
+   have the same access to the member or uniqueMember attribute.  Using
+   the data from the example in Section 6.1.2, a compare on
+   cn=dg1,o=myorg, for the AVA member=cn=bob,ou=finance,o=myorg would
+   result in a response of compareTrue (assuming the bound identity was
+   authorized to compare the member attribute of cn=dg1,o=myorg).
+
+   Likewise, a search operation that contains an equalityMatch or
+   presence filter, naming the member or uniqueMember attribute as the
+   attribute (such as (member= cn=bob,ou=finance,o=myorg), or
+   (member=*)), will cause the server to evaluate this filter against
+   the rules given in Section 4.2.1.3 in the event that the search is
+   performed on a dynamic group object.  As of this writing, no other
+   matching rules exist for the distinguished name syntax, thus no
+   requirements beyond equalityMatch are given here.
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 15]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+6.2.  New Extensions
+
+   The following new extensions are added for dynamic group support.
+
+6.2.1.  Managing the static members of a dynamic group
+
+   Because a dynamic group overloads the semantics of the member and
+   uniqueMember attributes, a mechanism is needed to retrieve the static
+   values found in these attributes for management purposes.  To serve
+   this need, a new attribute option is defined here called 'x-static'.
+   Attribute options are discussed in Section 2.5 of [2].  This option
+   SHALL only be specified with the 'member' or 'uniqueMember'
+   attribute.  When the LDAP server does not understand the semantics of
+   this option on a given attribute, the option SHOULD be ignored.  This
+   attribute option is only used to affect the transmitted values, and
+   does not impose sub-typing semantics on the attribute.
+
+   This option MAY be specified by a client during a search request in
+   the list of attributes to be returned, i.e. member;x-static.  In this
+   case, the server SHALL only return those members of the dynamic group
+   that are statically listed as values of the member or uniqueMember
+   attribute.  The evaluation process listed in Section 9 SHALL NOT be
+   used to populate the values to be returned.
+
+   This option MAY be specified is either an equalityMatch or presence
+   search filter.  In this case, the server evaluates only the values
+   statically listed in the member or uniqueMember attribute, and does
+   not apply the evaluation process listed in Section 9.
+
+   This option MAY be specified in update operations such as add and
+   modify, but SHOULD be ignored, as its presence is semantically the
+   same as its non-presence.
+
+   Note to user: Performing a search to read a dynamic group, with a
+   filter item such as (member=*), and specifying member;x-static, may
+   result in a search result entry that has no member attribute.  This
+   may seem counter-intuitive.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 16]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+7.  Performance Considerations
+
+   When the x-chain extension is present on the memberQueryURL, the
+   server MUST follow any search continuation references to other
+   servers while searching for dynamic members.  This may be expensive
+   and slow in a true distributed environment.  The dynamicGroup
+   implementation can consider a distributed caching feature to improve
+   the performance.  An outline of such a distributed caching is given
+   below.
+
+7.1.  Caching of Dynamic Members
+
+   Since the dynamic members of a group are computed every time the
+   group is accessed, the performance could be affected.  An
+   implementation of dynamic groups can get around this problem by
+   caching the computed members of a dynamic group locally and using the
+   cached data subsequently.  One way to do this is to create pseudo-
+   objects for each dynamic group on every server that holds an object
+   that is a dynamic member of the group.  With this, the computation of
+   the dynamic members of a group reduces to the task of reading the
+   pseudo-objects from each server.  These pseudo-objects need to be
+   linked from the original dynamic group to speed up the member
+   computation.  Also, since these are cached objects, appropriate
+   timeouts need to be associated with the cache after which the cache
+   should be invalidated or refreshed
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 17]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+8.  Security Considerations
+
+   This document discusses the use of one object as the identity
+   (Section 4.5) with which to read information for another object.  If
+   the creation of the dgIdentity attribute is uncontrolled, an intruder
+   could potentially create a dynamic group with the identity of, say,
+   the administrator, to be able to read the directory as the
+   administrator, and see information which would be otherwise
+   unavailable to him.  Thus, a person adding an object as identity of a
+   dynamic group should have appropriate permissions on the object being
+   added as identity.
+
+   This document also discusses using dynamic memberships to provide
+   access for resources in a directory.  As the dynamic members are not
+   created by the administrator, there could be surprises for the
+   administrator in the form of certain objects getting access to
+   certain resources through dynamic membership, which the administrator
+   never intended.  So the administrator should be wary of such
+   problems.  The administrator could view the memberships and make sure
+   that anybody who is not supposed to be a member of a group is added
+   to the excludedMember list.
+
+   Denial of service attacks can be launched on an LDAP server, by
+   repeatedly searching for a dynamic group with a large membership list
+   and listing the member attribute.  A more effective form of denial of
+   service attack could be launched by making searches of the form
+   (member="somedn") at the top of tree and closing the client
+   connection as soon as the search starts.  Some administrative limits
+   be imposed to avoid such situations.
+
+   The dynamic groups feature could be potentially misused by a user to
+   circumvent any administrative size-limit restriction placed on the
+   server.  In order to search an LDAP server and obtain the names of
+   all the objects on the server irrespective of admin size-limit
+   restriction on the server, the LDAP user could create a dynamic group
+   with a memberQueryURL which matches all objects in the tree, and list
+   just that one object.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 18]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+9.  IANA Considerations
+
+   There are no IANA considerations.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 19]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+10.  Conclusions
+
+   This document discusses the syntax, semantics and usage of dynamic
+   groups in LDAPv3.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 20]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+11.  Normative References
+
+   [1]  Bradner, S., "Key words for use in RFCs to Indicate Requirement
+        Levels", BCP 14, RFC 2119, March 1997.
+
+   [2]  Zeilenga, K., "Lightweight Directory Access Protocol (LDAP):
+        Directory Information Models", RFC 4512, June 2006.
+
+   [3]  Smith, M. and T. Howes, "Lightweight Directory Access Protocol
+        (LDAP): Uniform Resource Locator", RFC 4516, June 2006.
+
+   [4]  Sciberras, A., "Lightweight Directory Access Protocol (LDAP):
+        Schema for User Applications", RFC 4519, June 2006.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 21]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+Appendix A.  Example Values for memberQueryURL
+
+   1.  This memberQueryURL value specifies the membership criteria for a
+       dynamic group entry as "all inetorgperson entries that also have
+       their title attribute set to 'manager', and are in the DIT-wide
+       subtree under ou=hr,o=myorg ".
+
+          memberQueryURL: ldap:///
+          ou=hr,o=myorg??sub?(&
+          (objectclass=inetorgperson)(title=manager))? x-chain
+
+   2.  This value lets the user specify the membership criteria for a
+       dynamic group entry as "all entries on the local server, that
+       either have unix accounts or belong to the unix department, and
+       are under the engineering container ".
+
+          memberQueryURL: ldap:///ou=eng,o=myorg??sub?
+          (|(objectclass=posixaccount)(department=unix))
+
+   3.  These values let the user specify the membership criteria as "all
+       inetorgperson entries on the local server, in either the
+       ou=eng,o=myorg or ou=support,o=myorg" subtrees.
+
+          memberQueryURL:
+          ldap:///ou=eng,o=myorg??sub?(objectclass=inetorgperson)
+
+          memberQueryURL:
+          ldap:///ou=support,o=myorg??sub?(objectclass=inetorgperson)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 22]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+Appendix B.  Acknowledgments
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 23]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+Authors' Addresses
+
+   Haripriya S
+   Novell, Inc.
+   49/1 & 49/3 Garvebhavi Palya,
+   7th Mile, Hosur Road
+   Bangalore, Karnataka  560068
+   India
+
+   Email: sharipriya@novell.com
+
+
+   Jaimon Jose (editor)
+   Novell, Inc.
+   49/1 & 49/3 Garvebhavi Palya,
+   7th Mile, Hosur Road
+   Bangalore, Karnataka  560068
+   India
+
+   Email: jjaimon@novell.com
+
+
+   Jim Sermersheim
+   Novell, Inc.
+   1800 South Novell Place
+   Provo, Utah  84606
+   US
+
+   Email: jimse@novell.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 24]
+
+Internet-Draft       LDAP: Dynamic Groups for LDAPv3        January 2007
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2007).
+
+   This document is subject to the rights, licenses and restrictions
+   contained in BCP 78, and except as set forth therein, the authors
+   retain all their rights.
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Intellectual Property
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+Acknowledgment
+
+   Funding for the RFC Editor function is provided by the IETF
+   Administrative Support Activity (IASA).
+
+
+
+
+
+Haripriya, et al.         Expires July 9, 2007                 [Page 25]
+

@@ -1,0 +1,1851 @@
+
+
+
+
+
+
+Network Working Group                                         P. Fleming
+Request for Comments: 3712                                           IBM
+Category: Informational                                      I. McDonald
+                                                              High North
+                                                           February 2004
+
+
+             Lightweight Directory Access Protocol (LDAP):
+                      Schema for Printer Services
+
+Status of this Memo
+
+   This memo provides information for the Internet community.  It does
+   not specify an Internet standard of any kind.  Distribution of this
+   memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2004).  All Rights Reserved.
+
+Abstract
+
+   This document defines a schema, object classes and attributes, for
+   printers and printer services, for use with directories that support
+   Lightweight Directory Access Protocol v3 (LDAP-TS).  This document is
+   based on the printer attributes listed in Appendix E of Internet
+   Printing Protocol/1.1 (IPP) (RFC 2911).  A few additional printer
+   attributes are based on definitions in the Printer MIB (RFC 1759).
+
+Table of Contents
+
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
+       1.1.  Rationale for using DirectoryString Syntax . . . . . . .  3
+       1.2.  Rationale for using caseIgnoreMatch. . . . . . . . . . .  4
+       1.3.  Rationale for using caseIgnoreSubstringsMatch. . . . . .  5
+   2.  Terminology and Conventions. . . . . . . . . . . . . . . . . .  5
+   3.  Definition of Object Classes . . . . . . . . . . . . . . . . .  6
+       3.1.  slpServicePrinter. . . . . . . . . . . . . . . . . . . .  6
+       3.2.  printerAbstract. . . . . . . . . . . . . . . . . . . . .  7
+       3.3.  printerService . . . . . . . . . . . . . . . . . . . . .  8
+       3.4.  printerServiceAuxClass . . . . . . . . . . . . . . . . .  8
+       3.5.  printerIPP . . . . . . . . . . . . . . . . . . . . . . .  8
+       3.6.  printerLPR . . . . . . . . . . . . . . . . . . . . . . .  9
+   4.  Definition of Attribute Types. . . . . . . . . . . . . . . . .  9
+       4.1.  printer-uri. . . . . . . . . . . . . . . . . . . . . . . 11
+       4.2.  printer-xri-supported. . . . . . . . . . . . . . . . . . 11
+       4.3.  printer-name . . . . . . . . . . . . . . . . . . . . . . 13
+       4.4.  printer-natural-language-configured. . . . . . . . . . . 13
+
+
+
+Fleming & McDonald           Informational                      [Page 1]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+       4.5.  printer-location . . . . . . . . . . . . . . . . . . . . 14
+       4.6.  printer-info . . . . . . . . . . . . . . . . . . . . . . 14
+       4.7.  printer-more-info. . . . . . . . . . . . . . . . . . . . 14
+       4.8.  printer-make-and-model . . . . . . . . . . . . . . . . . 15
+       4.9.  printer-ipp-versions-supported . . . . . . . . . . . . . 15
+       4.10. printer-multiple-document-jobs-supported . . . . . . . . 16
+       4.11. printer-charset-configured . . . . . . . . . . . . . . . 16
+       4.12. printer-charset-supported. . . . . . . . . . . . . . . . 16
+       4.13. printer-generated-natural-language-supported . . . . . . 17
+       4.14. printer-document-format-supported. . . . . . . . . . . . 17
+       4.15. printer-color-supported. . . . . . . . . . . . . . . . . 18
+       4.16. printer-compression-supported. . . . . . . . . . . . . . 18
+       4.17. printer-pages-per-minute . . . . . . . . . . . . . . . . 18
+       4.18. printer-pages-per-minute-color . . . . . . . . . . . . . 19
+       4.19. printer-finishings-supported . . . . . . . . . . . . . . 19
+       4.20. printer-number-up-supported. . . . . . . . . . . . . . . 19
+       4.21. printer-sides-supported. . . . . . . . . . . . . . . . . 20
+       4.22. printer-media-supported. . . . . . . . . . . . . . . . . 20
+       4.23. printer-media-local-supported. . . . . . . . . . . . . . 20
+       4.24. printer-resolution-supported . . . . . . . . . . . . . . 21
+       4.25. printer-print-quality-supported. . . . . . . . . . . . . 22
+       4.26. printer-job-priority-supported . . . . . . . . . . . . . 22
+       4.27. printer-copies-supported . . . . . . . . . . . . . . . . 22
+       4.28. printer-job-k-octets-supported . . . . . . . . . . . . . 23
+       4.29. printer-current-operator . . . . . . . . . . . . . . . . 23
+       4.30. printer-service-person . . . . . . . . . . . . . . . . . 24
+       4.31. printer-delivery-orientation-supported . . . . . . . . . 24
+       4.32. printer-stacking-order-supported . . . . . . . . . . . . 24
+       4.33. printer-output-features-supported. . . . . . . . . . . . 25
+       4.34. printer-aliases. . . . . . . . . . . . . . . . . . . . . 25
+   5.  Definition of Syntaxes . . . . . . . . . . . . . . . . . . . . 26
+   6.  Definition of Matching Rules . . . . . . . . . . . . . . . . . 26
+   7.  IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 26
+       7.1.  Registration of Object Classes . . . . . . . . . . . . . 26
+       7.2.  Registration of Attribute Types. . . . . . . . . . . . . 27
+   8.  Internationalization Considerations. . . . . . . . . . . . . . 28
+   9.  Security Considerations. . . . . . . . . . . . . . . . . . . . 29
+   10. References . . . . . . . . . . . . . . . . . . . . . . . . . . 29
+       10.1. Normative References . . . . . . . . . . . . . . . . . . 29
+       10.2. Informative References . . . . . . . . . . . . . . . . . 30
+   11. Acknowledgments. . . . . . . . . . . . . . . . . . . . . . . . 32
+   12. Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . 32
+   13. Full Copyright Statement . . . . . . . . . . . . . . . . . . . 33
+
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                      [Page 2]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+1.  Introduction
+
+   This document defines several object classes to provide Lightweight
+   Directory Access Protocol v3 [LDAP-TS] applications with flexible
+   options in defining printer information using LDAP schema.  Classes
+   are provided for defining directory entries with common printer
+   information as well as for extending existing directory entries with
+   SLPv2 [RFC2608], IPP/1.1 [RFC2911], and LPR [RFC1179] specific
+   information.
+
+   The schema defined in this document is based on the printer
+   attributes listed in Appendix E 'Generic Directory Schema' of
+   Internet Printing Protocol/1.1 (IPP) [RFC2911].  A few additional
+   printer attributes are based on definitions in the Printer MIB
+   [RFC1759].
+
+   The schema defined in this document is technically aligned with the
+   stable IANA-registered 'service:printer:' v2.0 template [SLP-PRT],
+   for compatibility with already deployed Service Location Protocol
+   (SLPv2) [RFC2608] service advertising and discovery infrastructure.
+   The attribute syntaxes are technically aligned with the
+   'service:printer:' v2.0 template - therefore simpler types are
+   sometimes used (for example, 'DirectoryString' [RFC2252] rather than
+   'labeledURI' [RFC2079] for the 'printer-uri' attribute).
+
+   Please send comments directly to the authors at the addresses listed
+   in Section 13 "Authors' Addresses".
+
+1.1.  Rationale for using DirectoryString Syntax
+
+   The attribute syntax 'DirectoryString' (UTF-8 [RFC2279]) defined in
+   [RFC2252] is specified for several groups of string attributes that
+   are defined in this document:
+
+   1)  URI
+       - printer-uri, printer-xri-supported, printer-more-info
+
+       The UTF-8 encoding is forward compatible with any future
+       deployment of (UTF-8 based) IRI (Internationalized Resource
+       Identifiers) [W3C-IRI] currently being developed by the W3C
+       Internationalization Working Group.
+
+   2)  Description
+       - printer-name, printer-location, printer-info,
+       printer-make-and-model
+
+
+
+
+
+
+Fleming & McDonald           Informational                      [Page 3]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+       The UTF-8 encoding supports descriptions in any language,
+       conformant with the "IETF Policy on Character Sets and Languages"
+       [RFC2277].
+
+       Note:  The printer-natural-language-configured attribute contains
+       a language tag [RFC3066] for these description attributes (for
+       example, to support text-to-speech conversions).
+
+   3)  Keyword
+       - printer-compression-supported, printer-finishings-supported,
+       printer-media-supported, printer-media-local-supported,
+       printer-print-quality-supported
+
+       The UTF-8 encoding is compatible with the current IPP/1.1
+       [RFC2911] definition of the equivalent attributes, most of which
+       have the IPP/1.1 union syntax 'keyword or name'.  The keyword
+       attributes defined in this document are extensible by
+       site-specific or vendor-specific 'names' which behave like new
+       'keywords'
+
+       Note:  In IPP/1.1, each value is strongly typed over-the-wire as
+       either 'keyword' or 'name'.  This union selector is not preserved
+       in the definitions of these equivalent LDAP attributes.
+
+1.2.  Rationale for using caseIgnoreMatch
+
+   The EQUALITY matching rule 'caseIgnoreMatch' defined in [RFC2252] is
+   specified for several groups of string attributes that are defined in
+   this document:
+
+   1)  URI
+
+       These URI attributes specify EQUALITY matching with
+       'caseIgnoreMatch' (rather than with 'caseExactMatch') in order to
+       conform to the spirit of [RFC2396], which requires case
+       insensitive matching on the host part of a URI versus case
+       sensitive matching on the remainder of a URI.
+
+       These URI attributes follow existing practice of supporting case
+       insensitive equality matching for host names in the
+       associatedDomain attribute defined in [RFC1274].
+
+       Either equality matching rule choice would be a compromise:
+       a) case sensitive whole URI matching may lead to false negative
+       matches and has been shown to be fragile (given deployed client
+       applications that 'pretty up' host names displayed and
+       transferred in URI);
+
+
+
+
+Fleming & McDonald           Informational                      [Page 4]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+       b) case insensitive whole URI matching may lead to false positive
+       matches, although it is a dangerous practice to publish URI that
+       differ only by case (for example, in the path elements).
+
+   2)  Description
+
+       Case insensitive equality matching is more user-friendly for
+       description attributes.
+
+   3)  Keyword
+
+       Case insensitive equality matching is more user-friendly for
+       keyword attributes.
+
+1.3.  Rationale for using caseIgnoreSubstringsMatch
+
+   The SUBSTR matching rule 'caseIgnoreSubstringsMatch' defined in
+   [RFC2252] is specified for several groups of string attributes that
+   are defined in this document:
+
+   1)  URI
+
+       These URI attributes follow existing practice of supporting case
+       insensitive equality matching for host names in the
+       associatedDomain attribute defined in [RFC1274].
+
+   2)  Description
+
+       Support for case insensitive substring matching is more
+       user-friendly for description attributes.
+
+   3)  Keyword
+
+       Support for case insensitive substring matching is more
+       user-friendly for keyword attributes.
+
+2.  Terminology and Conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in BCP 14 [RFC2119].
+
+   Schema definitions are provided using LDAPv3 [LDAP-TS] description
+   formats.  Definitions provided here are formatted (line wrapped) for
+   readability.
+
+
+
+
+
+
+Fleming & McDonald           Informational                      [Page 5]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+3.  Definition of Object Classes
+
+   We define the following LDAP object classes for use with both generic
+   printer related information and services specific to SLPv2 [RFC2608],
+   IPP/1.1 [RFC2911], and LPR [RFC1179].
+
+   slpServicePrinter - auxiliary class for SLP registered printers
+   printerAbstract - abstract class for all printer classes
+   printerService - structural class for printers
+   printerServiceAuxClass - auxiliary class for printers
+   printerIPP - auxiliary class for IPP printers
+   printerLPR - auxiliary class for LPR printers
+
+   The following are some examples of how applications may choose to use
+   these classes when creating directory entries:
+
+   1)  Use printerService for directory entries containing common
+       printer information.
+
+   2)  Use both printerService and slpServicePrinter for directory
+       entries containing common printer information for SLP registered
+       printers.
+
+   3)  Use printerService, printerLPR and printerIPP for directory
+       entries containing common printer information for printers that
+       support both LPR and IPP.
+
+   4)  Use printerServiceAuxClass and object classes not defined by this
+       document for directory entries containing common printer
+       information.  In this example, printerServiceAuxClass is used for
+       extending other structural classes defining printer information
+       with common printer information defined in this document.
+
+   Refer to Section 4 for definition of attribute types referenced by
+   these object classes.  We use attribute names instead of OIDs in
+   object class definitions for clarity.  Some attribute names described
+   in [RFC2911] have been prefixed with 'printer-' as recommended in
+   [RFC2926] and [SLP-PRT].
+
+3.1.  slpServicePrinter
+
+   ( 1.3.18.0.2.6.254
+   NAME  'slpServicePrinter'
+   DESC  'Service Location Protocol (SLP) information.'
+   AUXILIARY
+   SUP   slpService
+   )
+
+
+
+
+Fleming & McDonald           Informational                      [Page 6]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   This auxiliary class defines Service Location Protocol (SLPv2)
+   [RFC2608] specific information.  It should be used with a structural
+   class such as printerService.  It may be used to create new or extend
+   existing directory entries with SLP 'service:printer' abstract
+   service type information as defined in [SLP-PRT].  This object class
+   is derived from 'slpService', the parent class for all SLP services,
+   defined in [RFC2926].
+
+3.2.  printerAbstract
+
+   ( 1.3.18.0.2.6.258
+   NAME  'printerAbstract'
+   DESC  'Printer related information.'
+   ABSTRACT
+   SUP   top
+   MAY   ( printer-name $
+           printer-natural-language-configured $
+           printer-location $ printer-info $ printer-more-info $
+           printer-make-and-model $
+           printer-multiple-document-jobs-supported $
+           printer-charset-configured $ printer-charset-supported $
+           printer-generated-natural-language-supported $
+           printer-document-format-supported $ printer-color-supported $
+           printer-compression-supported $ printer-pages-per-minute $
+           printer-pages-per-minute-color $
+           printer-finishings-supported $ printer-number-up-supported $
+           printer-sides-supported $ printer-media-supported $
+           printer-media-local-supported $
+           printer-resolution-supported $
+           printer-print-quality-supported $
+           printer-job-priority-supported $ printer-copies-supported $
+           printer-job-k-octets-supported $ printer-current-operator $
+           printer-service-person $
+           printer-delivery-orientation-supported $
+           printer-stacking-order-supported $
+           printer-output-features-supported )
+   )
+
+   This abstract class defines printer information.  It is a base class
+   for deriving other printer related classes, such as, but not limited
+   to, classes defined in this document.  It defines a common set of
+   printer attributes that are not specific to any one type of service,
+   protocol or operating system.
+
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                      [Page 7]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+3.3.  printerService
+
+   ( 1.3.18.0.2.6.255
+   NAME  'printerService'
+   DESC  'Printer information.'
+   STRUCTURAL
+   SUP   printerAbstract
+   MAY   ( printer-uri $ printer-xri-supported )
+   )
+
+   This structural class defines printer information.  It is derived
+   from class printerAbstract and thus inherits common printer
+   attributes.  This class can be used with or without auxiliary classes
+   to define printer information.  Auxiliary classes can be used to
+   extend the common printer information with protocol, service or
+   operating system specific information.
+
+   Note:  When extending other structural classes with auxiliary
+   classes, printerService should not be used.
+
+3.4.  printerServiceAuxClass
+
+   ( 1.3.18.0.2.6.257
+   NAME  'printerServiceAuxClass'
+   DESC  'Printer information.'
+   AUXILIARY
+   SUP   printerAbstract
+   MAY   ( printer-uri $ printer-xri-supported )
+   )
+
+   This auxiliary class defines printer information.  It is derived from
+   class printerAbstract and thus inherits common printer attributes.
+   This class should be used with a structural class.
+
+3.5.  printerIPP
+
+   ( 1.3.18.0.2.6.256
+   NAME  'printerIPP'
+   DESC  'Internet Printing Protocol (IPP) information.'
+   AUXILIARY
+   SUP   top
+   MAY   ( printer-ipp-versions-supported $
+           printer-multiple-document-jobs-supported )
+   )
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                      [Page 8]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   This auxiliary class defines Internet Printing Protocol (IPP/1.1)
+   [RFC2911] information.  It should be used with a structural class
+   such as printerService.  It is used to extend structural classes with
+   IPP specific printer information.
+
+3.6.  printerLPR
+
+   ( 1.3.18.0.2.6.253
+   NAME  'printerLPR'
+   DESC  'LPR information.'
+   AUXILIARY
+   SUP   top
+   MUST  ( printer-name )
+   MAY   ( printer-aliases)
+   )
+
+   This auxiliary class defines LPR [RFC1179] information.  It should be
+   used with a structural class such as printerService.  It is used to
+   identify directory entries that support LPR.
+
+4.  Definition of Attribute Types
+
+   The following attribute types are referenced by the object classes
+   defined in Section 3.
+
+   The following attribute types reference syntax OIDs defined in
+   Section 6 of [RFC2252] (see Section 5 'Definition of Syntaxes'
+   below).
+
+   The following attribute types reference matching rule names (instead
+   of OIDs) for clarity (see Section 6 below).  For optional attributes,
+   if the printer information is not known, the attribute value should
+   not be set.  In the following definitions, referenced matching rules
+   are defined in Section 8 of [RFC2252] and/or Section 2 of [RFC3698]
+   (see Section 6 'Definition of Matching Rules' below).
+
+   The following table is a summary of the attribute names defined by
+   this document and their corresponding names from [RFC2911].  Some
+   attribute names described in [RFC2911] have been prefixed with
+   'printer-' as recommended in [RFC2926], to address the flat namespace
+   for LDAP identifiers.
+
+
+
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                      [Page 9]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   LDAP & SLP Printer Schema       IPP Model [RFC2911]
+   ------------------------------  -------------------------------------
+   printer-uri
+   printer-xri-supported
+                                   [IPP printer-uri-supported]
+                                   [IPP uri-authentication-supported]
+                                   [IPP uri-security-supported]
+   printer-name                    printer-name
+   printer-natural-language-configured
+                                   natural-language-configured
+   printer-location                printer-location
+   printer-info                    printer-info
+   printer-more-info               printer-more-info
+   printer-make-and-model          printer-make-and-model
+   printer-ipp-versions-supported  ipp-versions-supported
+   printer-multiple-document-jobs-supported
+                                   multiple-document-jobs-supported
+   printer-charset-configured      charset-configured
+   printer-charset-supported       charset-supported
+   printer-generated-natural-language-supported
+                                   generated-natural-language-supported
+   printer-document-format-supported
+                                   document-format-supported
+   printer-color-supported         color-supported
+   printer-compression-supported   compression-supported
+   printer-pages-per-minute        pages-per-minute
+   printer-pages-per-minute-color  pages-per-minute-color
+   printer-finishings-supported    finishings-supported
+   printer-number-up-supported     number-up-supported
+   printer-sides-supported         sides-supported
+   printer-media-supported         media-supported
+   printer-media-local-supported   [site names from IPP media-supported]
+   printer-resolution-supported    printer-resolution-supported
+   printer-print-quality-supported print-quality-supported
+   printer-job-priority-supported  job-priority-supported
+   printer-copies-supported        copies-supported
+   printer-job-k-octets-supported  job-k-octets-supported
+   printer-current-operator
+   printer-service-person
+   printer-delivery-orientation-supported
+   printer-stacking-order-supported
+   printer-output-features-supported
+   printer-aliases
+
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 10]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+4.1.  printer-uri
+
+   ( 1.3.18.0.2.4.1140
+   NAME 'printer-uri'
+   DESC 'A URI supported by this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15
+   SINGLE-VALUE
+   )
+
+   If the printer-xri-supported LDAP attribute is implemented, then this
+   printer-uri value should be listed in printer-xri-supported.
+
+   Values of URI should conform to [RFC2396], although URI schemes may
+   be defined which do not conform to [RFC2396] (see [RFC2717] and
+   [RFC2718]).
+
+   Note:  LDAP application clients should not attempt to use malformed
+   URI values read from this attribute.  LDAP administrative clients
+   should not write malformed URI values into this attribute.
+
+   Note:  For SLP registered printers, the LDAP printer-uri attribute
+   should be set to the value of the SLP-registered URL of the printer,
+   for interworking with SLPv2 [RFC2608] service discovery.
+
+   Note:  See Sections 1.1, 1.2, and 1.3 for rationale for design
+   choices.
+
+4.2.  printer-xri-supported
+
+   ( 1.3.18.0.2.4.1107
+   NAME 'printer-xri-supported'
+   DESC 'The unordered list of XRI (extended resource identifiers)
+         supported by this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+   )
+
+   A list of XRI (extended resource identifiers) supported by this
+   printer.  Each value of this list should consist of a URI (uniform
+   resource identifier) followed by (optional) authentication and
+   security fields.
+
+   Values of URI should conform to [RFC2396], although URI schemes may
+   be defined which do not conform to [RFC2396] (see [RFC2717] and
+   [RFC2718]).
+
+
+
+Fleming & McDonald           Informational                     [Page 11]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   Note:  LDAP application clients should not attempt to use malformed
+   URI values read from this attribute.  LDAP administrative clients
+   should not write malformed URI values into this attribute.
+
+   Note:  This attribute is based on 'printer-uri-supported', 'uri-
+   authentication-supported', and `'uri-security-supported' (called the
+   'Three Musketeers' because they are parallel ordered attributes)
+   defined in IPP/1.1 [RFC2911].  This attribute unfolds those IPP/1.1
+   attributes and thus avoids the ordering (and same number of values)
+   constraints of the IPP/1.1 separate attributes.
+
+   Defined keywords for fields include:
+
+       'uri' (IPP 'printer-uri-supported')
+       'auth' (IPP 'uri-authentication-supported')
+       'sec' (IPP 'uri-security-supported')
+
+   A missing 'auth' field should be interpreted to mean 'none'.  Per
+   IPP/1.1 [RFC2911], defined values of the 'auth' field include:
+
+       'none' (no authentication for this URI)
+       'requesting-user-name' (from operation request)
+       'basic' (HTTP/1.1 Basic [RFC2617])
+       'digest' (HTTP/1.1 Basic, [RFC2617])
+       'certificate' (from certificate)
+
+   A missing 'sec' field should be interpreted to mean 'none'.  Per
+   IPP/1.1 [RFC2911], defined values of the 'sec' field include:
+
+       'none' (no security for this URI)
+       'ssl3' (Netscape SSL3)
+       'tls' (IETF TLS/1.0, [RFC2246])
+
+   Each XRI field should be delimited by '<'.  For example:
+
+       'uri=ipp://foo.com< auth=digest< sec=tls<'
+       'uri=lpr://bar.com< auth=none< sec=none<'
+       'uri=mailto:printer@foobar.com< auth=none< sec=none<'
+
+   Note:  The syntax and delimiter for this attribute are aligned with
+   the equivalent attribute in the 'service:printer:' v2.0 template
+   [SLP-PRT].  Whitespace is permitted after (but not before) the
+   delimiter '<'.  Note that this delimiter differs from printer-
+   resolution-supported.
+
+   Note:  See Sections 1.1, 1.2, and 1.3 for rationale for design
+   choices.
+
+
+
+
+Fleming & McDonald           Informational                     [Page 12]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+4.3.  printer-name
+
+   ( 1.3.18.0.2.4.1135
+   NAME 'printer-name'
+   DESC 'The site-specific administrative name of this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   SINGLE-VALUE
+   )
+
+   Values of this attribute should be specified in the language
+   specified in printer-natural-language-configured (for example, to
+   support text-to-speech conversions), although the printer's name may
+   be specified in any language.  This name may be the last part of the
+   printer's URI or it may be completely unrelated.  This name may
+   contain characters that are not allowed in a conventional URI (see
+   [RFC2396]).
+
+4.4.  printer-natural-language-configured
+
+   ( 1.3.18.0.2.4.1119
+   NAME 'printer-natural-language-configured'
+   DESC 'The configured natural language in which error and status
+         messages will be generated (by default) by this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   SINGLE-VALUE
+   )
+
+   Also, a possible natural language for printer string attributes set
+   by operator, system administrator, or manufacturer.  Also, the
+   (declared) natural language of the printer-name, printer-location,
+   printer-info, and printer-make-and-model attributes of this printer.
+
+   Values of language tags should conform to "Tags for the
+   Identification of Languages" [RFC3066].  For example:
+
+       'en-us' (English as spoken in the US)
+       'fr-fr' (French as spoken in France)
+
+   For consistency with IPP/1.1 [RFC2911], language tags in this
+   attribute should be lowercase normalized.
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 13]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+4.5.  printer-location
+
+   ( 1.3.18.0.2.4.1136
+   NAME 'printer-location'
+   DESC 'The physical location of this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   SINGLE-VALUE
+   )
+
+   For example:
+
+       'Room 123A'
+       'Second floor of building XYZ'
+
+4.6.  printer-info
+
+   ( 1.3.18.0.2.4.1139
+   NAME 'printer-info'
+   DESC 'Descriptive information about this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   SINGLE-VALUE
+   )
+
+   For example:
+
+      'This printer can be used for printing color transparencies for
+       HR presentations'
+      'Out of courtesy for others, please print only small (1-5 page)
+       jobs at this printer'
+      'This printer is going away on July 1, 1997, please find a new
+       printer'
+
+4.7.  printer-more-info
+
+   ( 1.3.18.0.2.4.1134
+   NAME 'printer-more-info'
+   DESC 'A URI for more information about this specific printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15
+   SINGLE-VALUE
+   )
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 14]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   For example, this could be an HTTP type URI referencing an HTML page
+   accessible to a Web Browser.  The information obtained from this URI
+   is intended for end user consumption.
+
+   Values of URI should conform to [RFC2396], although URI schemes may
+   be defined which do not conform to [RFC2396] (see [RFC2717] and
+   [RFC2718]).
+
+   Note:  LDAP application clients should not attempt to use malformed
+   URI values read from this attribute.  LDAP administrative clients
+   should not write malformed URI values into this attribute.
+
+   Note:  See Sections 1.1, 1.2, and 1.3 for rationale for design
+   choices.
+
+4.8.  printer-make-and-model
+
+   ( 1.3.18.0.2.4.1138
+   NAME 'printer-make-and-model'
+   DESC 'Make and model of this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   SINGLE-VALUE
+   )
+
+   Note:  The printer manufacturer may initially populate this
+   attribute.
+
+4.9.  printer-ipp-versions-supported
+
+   ( 1.3.18.0.2.4.1133
+   NAME 'printer-ipp-versions-supported'
+   DESC 'IPP protocol version(s) that this printer supports.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   )
+
+   The IPP protocol version(s) should include major and minor versions,
+   i.e., the exact version numbers for which this Printer implementation
+   meets the IPP version-specific conformance requirements.
+
+
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 15]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+4.10.  printer-multiple-document-jobs-supported
+
+   ( 1.3.18.0.2.4.1132
+   NAME 'printer-multiple-document-jobs-supported'
+   DESC 'Indicates whether or not this printer supports more than one
+         document per job.'
+   EQUALITY booleanMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.7
+   SINGLE-VALUE
+   )
+
+4.11.  printer-charset-configured
+
+   ( 1.3.18.0.2.4.1109
+   NAME 'printer-charset-configured'
+   DESC 'The configured charset in which error and status messages will
+         be generated (by default) by this printer.'
+   EQUALITY caseIgnoreMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{63}
+   SINGLE-VALUE
+   )
+
+   Also, a possible charset for printer string attributes set by
+   operator, system administrator, or manufacturer.  For example:
+
+       'utf-8' (ISO 10646/Unicode in UTF-8 transform [RFC2279])
+       'iso-8859-1' (Latin1)
+
+   Values of charset tags should be defined in the IANA Registry of
+   Coded Character Sets [IANA-CHAR] (see also [RFC2978]) and the
+   '(preferred MIME name)' should be used as the charset tag in this
+   attribute.
+
+   For consistency with IPP/1.1 [RFC2911], charset tags in this
+   attribute should be lowercase normalized.
+
+4.12.  printer-charset-supported
+
+   ( 1.3.18.0.2.4.1131
+   NAME 'printer-charset-supported'
+   DESC 'Set of charsets supported for the attribute values of syntax
+         DirectoryString for this directory entry.'
+   EQUALITY caseIgnoreMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{63}
+   )
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 16]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   For example:
+
+       'utf-8' (ISO 10646/Unicode in UTF-8 transform [RFC2279])
+       'iso-8859-1' (Latin1)
+
+   Values of charset tags should be defined in the IANA Registry of
+   Coded Character Sets [IANA-CHAR] (see also [RFC2978]) and the
+   '(preferred MIME name)' should be used as the charset tag in this
+   attribute.
+
+   For consistency with IPP/1.1 [RFC2911], charset tags in this
+   attribute should be lowercase normalized.
+
+4.13.  printer-generated-natural-language-supported
+
+   ( 1.3.18.0.2.4.1137
+   NAME 'printer-generated-natural-language-supported'
+   DESC 'Natural language(s) supported for this directory entry.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{63}
+   )
+
+   Values of language tags should conform to "Tags for the
+   Identification of Languages" [RFC3066].  For example:
+
+       'en-us' (English as spoken in the US)
+       'fr-fr' (French as spoken in France)
+
+   For consistency with IPP/1.1 [RFC2911], language tags in this
+   attribute should be lowercase normalized.
+
+4.14.  printer-document-format-supported
+
+   ( 1.3.18.0.2.4.1130
+   NAME 'printer-document-format-supported'
+   DESC 'The possible source document formats which may be interpreted
+         and printed by this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   )
+
+   Values of document formats should be MIME media types defined in the
+   IANA Registry of MIME Media Types [IANA-MIME] (see also [RFC2048]).
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 17]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+4.15.  printer-color-supported
+
+   ( 1.3.18.0.2.4.1129
+   NAME 'printer-color-supported'
+   DESC 'Indicates whether this printer is capable of any type of color
+         printing at all, including highlight color.'
+   EQUALITY booleanMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.7
+   SINGLE-VALUE
+   )
+
+4.16.  printer-compression-supported
+
+   ( 1.3.18.0.2.4.1128
+   NAME 'printer-compression-supported'
+   DESC 'Compression algorithms supported by this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{255}
+   )
+
+   Values defined in IPP/1.1 [RFC2911] include:
+
+       'none' (no compression is used)
+       'deflate' (public domain ZIP described in [RFC1951])
+       'gzip' (GNU ZIP described in [RFC1952])
+       'compress' (UNIX compression described in [RFC1977])
+
+4.17.  printer-pages-per-minute
+
+   ( 1.3.18.0.2.4.1127
+   NAME 'printer-pages-per-minute'
+   DESC 'The nominal number of pages per minute which may be output by
+         this printer.'
+   EQUALITY integerMatch
+   ORDERING integerOrderingMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE-VALUE
+   )
+
+   This attribute is informative, not a service guarantee.  Typically,
+   it is the value used in marketing literature to describe this
+   printer.  For example, the value for a simplex or black-and-white
+   print mode.
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 18]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+4.18.  printer-pages-per-minute-color
+
+   ( 1.3.18.0.2.4.1126
+   NAME 'printer-pages-per-minute-color'
+   DESC 'The nominal number of color pages per minute which may be
+         output by this printer.'
+   EQUALITY integerMatch
+   ORDERING integerOrderingMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE-VALUE
+   )
+
+   This attribute is informative, not a service guarantee.  Typically,
+   it is the value used in marketing literature to describe this
+   printer.
+
+
+4.19.  printer-finishings-supported
+
+   ( 1.3.18.0.2.4.1125
+   NAME 'printer-finishings-supported'
+   DESC 'The possible finishing operations supported by this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{255}
+   )
+
+   Values defined in IPP/1.1 [RFC2911] include:  'none', 'staple',
+   'punch', 'cover', 'bind', 'saddle-stitch', 'edge-stitch',
+   'staple-top-left', 'staple-bottom-left', 'staple-top-right',
+   'staple-bottom-right', 'edge-stitch-left', 'edge-stitch-top',
+   'edge-stitch-right', 'edge-stitch-bottom', 'staple-dual-left',
+   'staple-dual-top', 'staple-dual-right', 'staple-dual-bottom'.
+
+   Note:  Implementations may support other values.
+
+4.20.  printer-number-up-supported
+
+   ( 1.3.18.0.2.4.1124
+   NAME 'printer-number-up-supported'
+   DESC 'The possible numbers of print-stream pages to impose upon a
+         single side of an instance of a selected medium.'
+   EQUALITY integerMatch
+   ORDERING integerOrderingMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.27
+   )
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 19]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   Values defined in IPP/1.1 [RFC2911] include: '1', '2', and '4'.
+
+   Note:  Implementations may support other values.
+
+4.21.  printer-sides-supported
+
+   ( 1.3.18.0.2.4.1123
+   NAME 'printer-sides-supported'
+   DESC 'The number of impression sides (one or two) and the two-sided
+         impression rotations supported by this printer.'
+   EQUALITY caseIgnoreMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   )
+
+   Values defined in IPP/1.1 [RFC2911] include:  'one-sided', 'two-
+   sided-long-edge', 'two-sided-short-edge'.'
+
+4.22.  printer-media-supported
+
+   ( 1.3.18.0.2.4.1122
+   NAME 'printer-media-supported'
+   DESC 'The standard names/types/sizes (and optional color suffixes) of
+         the media supported by this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{255}
+   )
+
+   Values are defined in IPP/1.1 [RFC2911] or any IANA registered
+   extensions.  For example:
+
+       'iso-a4'
+       'envelope'
+       'na-letter-white'
+
+4.23.  printer-media-local-supported
+
+   ( 1.3.18.0.2.4.1117
+   NAME 'printer-media-local-supported'
+   DESC 'Site-specific names of media supported by this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{255}
+   )
+
+   Values should be in the natural language specified by printer-
+   natural-language-configured.
+
+
+
+
+Fleming & McDonald           Informational                     [Page 20]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   For example:
+
+       'purchasing-form' (site-specific name)
+
+   as opposed to 'na-letter' (standard keyword from IPP/1.1 [RFC2911])
+   in the printer-media-supported attribute.
+
+4.24.  printer-resolution-supported
+
+   ( 1.3.18.0.2.4.1121
+   NAME 'printer-resolution-supported'
+   DESC 'List of resolutions supported for printing documents by this
+         printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{255}
+   )
+
+   Each resolution value should be a string containing 3 fields:
+   1)  Cross feed direction resolution (positive integer);
+   2)  Feed direction resolution (positive integer);
+   3)  Unit - 'dpi' (dots per inch) or 'dpcm' (dots per centimeter).
+
+   Each resolution field should be delimited by '>'.  For example:
+
+       '300> 300> dpi>'
+       '600> 600> dpi>'
+
+   Note:  This attribute is based on 'printer-resolution-supported'
+   defined in IPP/1.1 [RFC2911] (which has a binary complex encoding)
+   derived from 'prtMarkerAddressabilityFeedDir',
+   'prtMarkerAddressabilityXFeedDir', and 'prtMarkerAddressabilityUnit'
+   defined in the Printer MIB [RFC1759] (which have integer encodings).
+
+   Note:  The syntax and delimiter for this attribute are aligned with
+   the equivalent attribute in the 'service:printer:' v2.0 template
+   [SLP-PRT].  Whitespace is permitted after (but not before) the
+   delimiter '>'.  Note that this delimiter differs from printer-xri-
+   supported.
+
+
+
+
+
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 21]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+4.25.  printer-print-quality-supported
+
+   ( 1.3.18.0.2.4.1120
+   NAME 'printer-print-quality-supported'
+   DESC 'List of print qualities supported for printing documents on
+         this printer.'
+   EQUALITY caseIgnoreMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   )
+
+   Values defined in IPP/1.1 [RFC2911] include:
+
+       'unknown'
+       'draft'
+       'normal'
+       'high'
+
+4.26.  printer-job-priority-supported
+
+   ( 1.3.18.0.2.4.1110
+   NAME 'printer-job-priority-supported'
+   DESC 'Indicates the number of job priority levels supported by this
+         printer.'
+   EQUALITY integerMatch
+   ORDERING integerOrderingMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE-VALUE
+   )
+
+   An IPP/1.1 [RFC2911] conformant Printer, which supports job priority,
+   always supports a full range of priorities from '1' to '100' (to
+   ensure consistent behavior), therefore this attribute describes the
+   'granularity' of priority supported.  Values of this attribute are
+   from '1' to '100'.
+
+4.27.  printer-copies-supported
+
+   ( 1.3.18.0.2.4.1118
+   NAME 'printer-copies-supported'
+   DESC 'The maximum number of copies of a document that may be printed
+         as a single job on this printer.'
+   EQUALITY integerMatch
+   ORDERING integerOrderingMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE-VALUE
+   )
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 22]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   A positive value indicates the maximum supported copies.  A value of
+   '0' indicates no maximum limit.  A value of '-1' indicates 'unknown'.
+
+   Note:  The syntax and values for this attribute are aligned with the
+   equivalent attribute in the 'service:printer:' v2.0 template [SLP-
+   PRT].
+
+4.28.  printer-job-k-octets-supported
+
+   ( 1.3.18.0.2.4.1111
+   NAME 'printer-job-k-octets-supported'
+   DESC 'The maximum size in kilobytes (1,024 octets actually) incoming
+         print job that this printer will accept.'
+   EQUALITY integerMatch
+   ORDERING integerOrderingMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE-VALUE
+   )
+
+   A positive value indicates the maximum supported job size.  A value
+   of '0' indicates no maximum limit.  A value of '-1' indicates
+   'unknown'.
+
+   Note:  The syntax and values for this attribute are aligned with the
+   equivalent attribute in the 'service:printer:' v2.0 template [SLP-
+   PRT].
+
+4.29.  printer-current-operator
+
+   ( 1.3.18.0.2.4.1112
+   NAME 'printer-current-operator'
+   DESC 'The identity of the current human operator responsible for
+         operating this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   SINGLE-VALUE
+   )
+
+   The value of this attribute should include information that would
+   enable other humans to reach the operator, such as a telephone
+   number.
+
+
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 23]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+4.30.  printer-service-person
+
+   ( 1.3.18.0.2.4.1113
+   NAME 'printer-service-person'
+   DESC 'The identity of the current human service person responsible
+         for servicing this printer.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   SINGLE-VALUE
+   )
+
+   The value of this attribute should include information that would
+   enable other humans to reach the service person, such as a telephone
+   number.
+
+4.31.  printer-delivery-orientation-supported
+
+   ( 1.3.18.0.2.4.1114
+   NAME 'printer-delivery-orientation-supported'
+   DESC 'The possible delivery orientations of pages as they are printed
+         and ejected from this printer.'
+   EQUALITY caseIgnoreMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   )
+
+   Values defined include:
+
+       'unknown'
+       'face-up'
+       'face-down'
+
+   Note:  The syntax and values for this attribute are aligned with the
+   equivalent attribute in the 'service:printer:' v2.0 template [SLP-
+   PRT].
+
+4.32.  printer-stacking-order-supported
+
+   ( 1.3.18.0.2.4.1115
+   NAME 'printer-stacking-order-supported'
+   DESC 'The possible stacking order of pages as they are printed and
+         ejected from this printer.'
+   EQUALITY caseIgnoreMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   )
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 24]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   Values defined include:
+
+       'unknown'
+       'first-to-last'
+       'last-to-first'
+
+   Note:  The syntax and values for this attribute are aligned with the
+   equivalent attribute in the 'service:printer:' v2.0 template [SLP-
+   PRT].
+
+4.33.  printer-output-features-supported
+
+   ( 1.3.18.0.2.4.1116
+   NAME 'printer-output-features-supported'
+   DESC 'The possible output features supported by this printer.'
+   EQUALITY caseIgnoreMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   )
+
+   Values defined include:
+
+       'unknown'
+       'bursting'
+       'decollating'
+       'page-collating'
+       'offset-stacking'
+
+   Note:  The syntax and values for this attribute are aligned with the
+   equivalent attribute in the 'service:printer:' v2.0 template [SLP-
+   PRT].
+
+   Note:  Implementations may support other values.
+
+4.34.  printer-aliases
+
+   ( 1.3.18.0.2.4.1108
+   NAME 'printer-aliases'
+   DESC 'List of site-specific administrative names of this printer in
+         addition to the value specified for printer-name.'
+   EQUALITY caseIgnoreMatch
+   SUBSTR caseIgnoreSubstringsMatch
+   SYNTAX  1.3.6.1.4.1.1466.115.121.1.15{127}
+   )
+
+   Values of this attribute should be specified in the language
+   specified in printer-natural-language-configured (for example, to
+   support text-to-speech conversions), although the printer's alias may
+   be specified in any language.
+
+
+
+Fleming & McDonald           Informational                     [Page 25]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+5.  Definition of Syntaxes
+
+   No new attribute syntaxes are defined by this document.
+
+   The attribute types defined in Section 4 of this document reference
+   syntax OIDs defined in Section 6 of [RFC2252], which are summarized
+   below:
+
+   Syntax OID                      Syntax Description
+   ------------------------------  ------------------
+   1.3.6.1.4.1.1466.115.121.1.7    Boolean
+   1.3.6.1.4.1.1466.115.121.1.15   DirectoryString (UTF-8 [RFC2279])
+   1.3.6.1.4.1.1466.115.121.1.27   Integer
+
+6.  Definition of Matching Rules
+
+   No new matching rules are defined by this document.
+
+   The attribute types defined in Section 4 of this document reference
+   matching rules defined in Section 8 of [RFC2252] and/or Section 2 of
+   [RFC3698], which are summarized below:
+
+   Matching Rule OID               Matching Rule Name          Usage
+   ------------------------------  ------------------          -----
+   2.5.13.13                       booleanMatch                EQUALITY
+   2.5.13.2                        caseIgnoreMatch             EQUALITY
+   2.5.13.14                       integerMatch                EQUALITY
+   2.5.13.15                       integerOrderingMatch        ORDERING
+   2.5.13.4                        caseIgnoreSubstringsMatch   SUBSTR
+
+7.  IANA Considerations
+
+   This document does not define any new syntaxes or matching rules.
+
+   This document does define the following Object Identifier
+   Descriptors.  They have been registered by the IANA:
+
+7.1.  Registration of Object Classes
+
+   Subject:  Request for LDAP Descriptor Registration
+
+   Descriptor (short name):  see table below
+
+   Object Identifier:  see table below
+
+   Person & email address to contact for further information:  see below
+
+   Usage:  object class
+
+
+
+Fleming & McDonald           Informational                     [Page 26]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   Specification:  RFC3712
+
+   Author/Change Controller:
+
+       Pat Fleming
+       IBM
+       Highway 52 N
+       Rochester, MN 55901
+       USA
+       Phone: +1 507-253-7583
+       EMail: flemingp@us.ibm.com
+
+   Comments:
+
+   Object Class                                    OID
+   ------------------------------------            ---------------------
+   slpServicePrinter                               1.3.18.0.2.6.254
+   printerAbstract                                 1.3.18.0.2.6.258
+   printerService                                  1.3.18.0.2.6.255
+   printerServiceAuxClass                          1.3.18.0.2.6.257
+   printerIPP                                      1.3.18.0.2.6.256
+   printerLPR                                      1.3.18.0.2.6.253
+
+7.2.  Registration of Attribute Types
+
+   Subject:  Request for LDAP Descriptor Registration
+
+   Descriptor (short name):  see table below
+
+   Object Identifier:  see table below
+
+   Person & email address to contact for further information:  see below
+
+   Usage:  attribute type
+
+   Specification:  RFC3712
+
+   Author/Change Controller:
+
+       Pat Fleming
+       IBM
+       Highway 52 N
+       Rochester, MN 55901
+       USA
+       Phone: +1 507-253-7583
+       EMail: flemingp@us.ibm.com
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 27]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   Comments:
+
+   Attribute Type                                  OID
+   ------------------------------------            ---------------------
+   printer-uri                                     1.3.18.0.2.4.1140
+   printer-xri-supported                           1.3.18.0.2.4.1107
+   printer-name                                    1.3.18.0.2.4.1135
+   printer-natural-language-configured             1.3.18.0.2.4.1119
+   printer-location                                1.3.18.0.2.4.1136
+   printer-info                                    1.3.18.0.2.4.1139
+   printer-more-info                               1.3.18.0.2.4.1134
+   printer-make-and-model                          1.3.18.0.2.4.1138
+   printer-ipp-versions-supported                  1.3.18.0.2.4.1133
+   printer-multiple-document-jobs-supported        1.3.18.0.2.4.1132
+   printer-charset-configured                      1.3.18.0.2.4.1109
+   printer-charset-supported                       1.3.18.0.2.4.1131
+   printer-generated-natural-language-supported    1.3.18.0.2.4.1137
+   printer-document-format-supported               1.3.18.0.2.4.1130
+   printer-color-supported                         1.3.18.0.2.4.1129
+   printer-compression-supported                   1.3.18.0.2.4.1128
+   printer-pages-per-minute                        1.3.18.0.2.4.1127
+   printer-pages-per-minute-color                  1.3.18.0.2.4.1126
+   printer-finishings-supported                    1.3.18.0.2.4.1125
+   printer-number-up-supported                     1.3.18.0.2.4.1124
+   printer-sides-supported                         1.3.18.0.2.4.1123
+   printer-media-supported                         1.3.18.0.2.4.1122
+   printer-media-local-supported                   1.3.18.0.2.4.1117
+   printer-resolution-supported                    1.3.18.0.2.4.1121
+   printer-print-quality-supported                 1.3.18.0.2.4.1120
+   printer-job-priority-supported                  1.3.18.0.2.4.1110
+   printer-copies-supported                        1.3.18.0.2.4.1118
+   printer-job-k-octets-supported                  1.3.18.0.2.4.1111
+   printer-current-operator                        1.3.18.0.2.4.1112
+   printer-service-person                          1.3.18.0.2.4.1113
+   printer-delivery-orientation-supported          1.3.18.0.2.4.1114
+   printer-stacking-order-supported                1.3.18.0.2.4.1115
+   printer-output-features-supported               1.3.18.0.2.4.1116
+   printer-aliases                                 1.3.18.0.2.4.1108
+
+8.  Internationalization Considerations
+
+   All text string attributes defined in this document of syntax
+   [RFC2279], as required by [RFC2252].
+
+   A language tag [RFC3066] for all of the text string attributes
+   defined in this document is contained in the printer-natural-
+   language-configured attribute.
+
+
+
+
+Fleming & McDonald           Informational                     [Page 28]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   Therefore, all object classes defined in this document conform to the
+   "IETF Policy on Character Sets and Languages" [RFC2277].
+
+9.  Security Considerations
+
+   See [RFC2829] for detailed guidance on authentication methods for
+   LDAP.  See [RFC2830] for detailed guidance of using TLS/1.0 [RFC2246]
+   to supply connection confidentiality and data integrity for LDAP
+   sessions.
+
+   As with any LDAP schema, it is important to protect specific entries
+   and attributes with the appropriate access control.  It is
+   particularly important that only administrators can modify entries
+   defined in this LDAP printer schema.  Otherwise, an LDAP client might
+   be fooled into diverting print service requests from the original
+   printer (or spooler) to a malicious intruder's host system, thus
+   exposing the information in printed documents.
+
+   For additional security considerations of deploying printers in an
+   IPP environment, see Section 8 of [RFC2911].
+
+10.  References
+
+10.1.  Normative References
+
+   [IANA-CHAR] IANA Registry of Character Sets
+               http://www.iana.org/assignments/charset-reg/...
+
+   [IANA-MIME] IANA Registry of MIME Media Types
+               http://www.iana.org/assignments/media-types/...
+
+   [LDAP-TS]   Hodges, J. and R. Morgan, "Lightweight Directory Access
+               Protocol (v3): Technical Specification", RFC 3377,
+               September 2002.
+
+   [RFC1274]   Barker, P. and S. Kille, "The COSINE and Internet X.500
+               Schema", RFC 1274, November 1991.
+
+   [RFC1759]   Smith, R., Wright, F., Hastings, T., Zilles, S. and J.
+               Gyllenskog, "Printer MIB", RFC 1759, March 1995.
+
+   [RFC2119]   Bradner, S., "Key words for use in RFCs to Indicate
+               Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC2252]   Wahl, M., Coulbeck, T., Howes, T. and S. Kille,
+               "Lightweight Directory Access Protocol (v3): Attribute
+               Syntax Definitions", RFC 2252, December 1997.
+
+
+
+
+Fleming & McDonald           Informational                     [Page 29]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   [RFC2396]   Berners-Lee. T., Fielding, R. and L. Masinter, "URI
+               Generic Syntax", RFC 2396, August 1998.
+
+   [RFC2829]   Wahl, M., Alvestrand, H., Hodges, J. and R. Morgan,
+               "Authentication Methods for LDAP", RFC 2829, May 2000.
+
+   [RFC2830]   Hodges, J., Morgan, R. and M. Wahl, "Lightweight
+               Directory Access Protocol (v3): Extension for Transport
+               Layer Security", RFC 2830, May 2000.
+
+   [RFC2911]   Hastings, T., Ed.., Herrito, R., deBry, R., Isaacson, S.
+               and P. Powell, "Internet Printing Protocol/1.1: Model and
+               Semantics", RFC 2911, September 2000.
+
+   [RFC2926]   Kempf, J., Moats, R. and P. St. Pierre, "Conversion of
+               LDAP Schemas to and from SLP Templates", RFC 2926,
+               September 2000.
+
+   [RFC3066]   Alvestrand, H., "Tags for the Identification of
+               Languages", BCP 47, RFC 3066, January 2001.
+
+   [RFC3698]   Zeilenga, K., Ed., "Lightweight Directory Access Protocol
+               (LDAP): Additional Matching Rules", RFC 3698, February
+               2004.
+
+10.2.  Informative References
+
+   [IANA-SLPT] IANA Registry of SLP Templates
+               http://www.iana.org/assignments/svrloc-templates/...
+
+   [RFC1179]   McLaughlin, L., "Line Printer Daemon Protocol", RFC 1179,
+               August 1990.
+
+   [RFC1951]   Deutsch, P., "DEFLATE Compressed Data Format
+               Specification Version 1.3", RFC 1951, May 1996.
+
+   [RFC1952]   Deutsch, P., "GZIP File Format Specification Version
+               4.3", RFC 1952, May 1996.
+
+   [RFC1977]   Schryver, V., "PPP BSD Compression Protocol", RFC 1977,
+               August 1996.
+
+   [RFC2048]   Freed, N., Klensin, J. and J. Postel, "Multipurpose
+               Internet Mail Extensions (MIME) Part Four: Registration
+               Procedures", BCP 13, RFC 2048, November 1996.
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 30]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+   [RFC2079]   Smith, M., "Definition of an X.500 Attribute Type and an
+               Object Class to Hold Uniform Resource Identifiers
+               (URIs)", RFC 2079, January 1997.
+
+   [RFC2246]   Dierks, T. and C. Allen, "TLS Protocol Version 1.0", RFC
+               2246, January 1999.
+
+   [RFC2277]   Alvestrand, H., "IETF Policy on Character Sets and
+               Languages", RFC 2277, January 1998.
+
+   [RFC2279]   Yergeau, F., "UTF-8, a Transformation Format of ISO
+               10646", RFC 2279, January 1998.
+
+   [RFC2608]   Guttman, E., Perkins, C., Veizades, J. and M. Day,
+               "Service Location Protocol v2", RFC 2608, June 1999.
+
+   [RFC2609]   Guttman, E., Perkins, C. and J. Kempf, "Service Templates
+               and Service: Schemes", RFC 2609, June 1999.
+
+   [RFC2617]   Franks, J., Hallam-Baker, P., Hostetler, J., Lawrence,
+               S., Leach, P., Luotonen, A. and L. Stewart, "HTTP
+               Authentication: Basic and Digest Access Authentication",
+               RFC 2617, June 1999.
+
+   [RFC2717]   Petke, R. and I. King, "Registration Procedures for URL
+               Scheme Names", RFC 2717, November 1999.
+
+   [RFC2718]   Masinter, L., Alvestrand, H., Zigmond, D. and R. Petke,
+               "Guidelines for new URL Schemes", BCP 19, RFC 2718,
+               November 1999.
+
+   [RFC2978]   Freed, N. and J.Postel, "IANA Charset Registration
+               Procedures", RFC2978, October 2000.
+
+   [SLP-PRT]   St. Pierre, Isaacson, McDonald.  Definition of the
+               Printer Abstract Service Type v2.0, <durable URL below>,
+               May 2000. Reviewed and approved by IETF SLP Designated
+               Expert, according to Section 5 'IANA Considerations' in
+               [RFC2609].
+
+               Archived in the IANA Registry of SLP Templates [IANA-
+               SLPT] at: http://www.iana.org/assignments/svrloc-
+               templates/printer.2.0.en
+
+   [W3C-IRI]   Duerst, Suignard, "Internationalized Resource Identifiers
+               (IRI), Work in Progress.
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 31]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+11.  Acknowledgments
+
+   The editors wish to acknowledge the very significant contributions of
+   Ken Jones (Bytemobile) and Harry Lewis (IBM) during the development
+   of this document.
+
+   Thanks to Patrik Faltstrom (Cisco), Ryan Moats (Lemur Networks),
+   Robert Moore (IBM), Lee Rafalow (IBM), Kimberly Reger (IBM), Kurt
+   Zeilenga (OpenLDAP), and the members of the IETF IPP Working Group,
+   for review comments and help in preparing this document.
+
+12.  Authors' Addresses
+
+   Please send comments to the authors at the addresses listed below.
+
+   Pat Fleming
+   IBM
+   Highway 52 N
+   Rochester, MN 55901
+   USA
+
+   Phone: +1 507-253-7583
+   EMail: flemingp@us.ibm.com
+
+
+   Ira McDonald
+   High North Inc
+   221 Ridge Ave
+   Grand Marais, MI 49839
+   USA
+
+   Phone: +1 906-494-2434
+   Email: imcdonald@sharplabs.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 32]
+
+RFC 3712            LDAP Schema for Printer Services       February 2004
+
+
+13.  Full Copyright Statement
+
+   Copyright (C) The Internet Society (2004).  This document is subject
+   to the rights, licenses and restrictions contained in BCP 78 and
+   except as set forth therein, the authors retain all their rights.
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE
+   REPRESENTS OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE
+   INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+   THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Intellectual Property
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed
+   to pertain to the implementation or use of the technology
+   described in this document or the extent to which any license
+   under such rights might or might not be available; nor does it
+   represent that it has made any independent effort to identify any
+   such rights.  Information on the procedures with respect to
+   rights in RFC documents can be found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use
+   of such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository
+   at http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention
+   any copyrights, patents or patent applications, or other
+   proprietary rights that may cover technology that may be required
+   to implement this standard.  Please address the information to the
+   IETF at ietf-ipr@ietf.org.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+Fleming & McDonald           Informational                     [Page 33]
+

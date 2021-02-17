@@ -1,0 +1,29 @@
+Recovering the build process after adding fields to the engine.
+
+The following steps were used in Win32, but the idea may apply to other platforms
+as well. This solution implies manual intervention. Permanent changes were
+suggested in fb-devel that allow an automated build to succeed.
+
+- Start the current build's executable (let's assume the debug server).
+- Modify preprocess.bat as instructed inside the file (look for "CVC -" comments).
+The problem lies mainly with backup.epp and restore.epp, both part of gbak.
+- Run make_boot for release and make_all for release. This step must catch
+compilation errors. The idea is to avoid the build process getting rid of the
+current debug server version. If only build_all has problems, keep running
+preprocess.bat after your changes and then build_all until everything compiles.
+- Run make_boot for debug.
+- Shutdown the server.
+- Run make_all for debug.
+- Start the newly compiled server instance (debug or release, although
+debug will catch more problems. We'll assume the debug server).
+- Run prepare with the path pointing to the running server's root dir. Now you
+have the build support databases (gen/dbs) with the new structure.
+- Revert preprocess.bat to the normal state (undo the temporary changes).
+- Run make_boot for release and make_all for release.
+- Run make_boot for debug.
+- Shutdown the server.
+- Run make_all for debug.
+
+You should have the server, the utilities and the support databases with the
+changed structure. Now both the release and debug versions are upgraded.
+

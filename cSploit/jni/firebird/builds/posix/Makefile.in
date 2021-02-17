@@ -1,0 +1,674 @@
+#
+#	PROGRAM:	Firebird single makefile
+#	MODULE:		Makefile.in
+#	DESCRIPTION:	Posix build main file
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# You may obtain a copy of the Licence at
+# http://www.gnu.org/licences/lgpl.html
+# 
+# As a special exception this file can also be included in modules
+# with other source code as long as that source code has been 
+# released under an Open Source Initiative certificed licence.  
+# More information about OSI certification can be found at: 
+# http://www.opensource.org 
+# 
+# This module is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public Licence for more details.
+# 
+# This module was created by members of the firebird development 
+# team.  All individual contributions remain the Copyright (C) of 
+# those individuals and all rights are reserved.  Contributors to 
+# this file are either listed below or can be obtained from a CVS 
+# history command.
+#
+#  Created by:  Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#
+#  Contributor(s):
+#		Alex Peshkoff - created single makefile based on Mark's files
+# 
+
+ROOT=$(shell cd ..; pwd)
+
+include     make.defaults
+ifeq ($(CROSS_OUT), Y)
+include     make.crossPlatform
+else
+include     make.platform
+endif
+include     make.rules
+include     make.shared.variables
+
+@SET_MAKE@
+
+ifeq ($(IsDeveloper), Y)
+  DefaultTarget := Debug
+else
+  DefaultTarget := Release
+endif
+
+ifeq ($(IsCross), Y)
+  Process := cross_process
+else
+  Process := master_process
+endif
+
+.PHONY:	master_process cross_process firebird Debug Release extern
+
+all:	firebird
+
+firebird:
+	$(MAKE) TARGET=$(DefaultTarget) $(Process)
+
+Release:
+	$(MAKE) TARGET=Release $(Process)
+
+Debug:
+	$(MAKE) TARGET=Debug $(Process)
+
+
+#----------------------------------------------------------------------------
+# jrd/build_no.h contains the version and build# fields used throughout the
+# program and quoted in the tools.  This routine will update the build_no.h
+# file with the auto update build# script file, writeBuildNum.sh.  The
+# writeBuildNum.sh script is autoupdated by CVS checkins.
+#
+
+.PHONY: updateBuildNum
+
+updateBuildNum : $(SRC_ROOT)/jrd/build_no.h $(GEN_ROOT)/Make.Version
+
+$(SRC_ROOT)/jrd/build_no.h : $(SRC_ROOT)/misc/writeBuildNum.sh
+	(cd $(ROOT); ./src/misc/writeBuildNum.sh rebuildHeader)
+
+$(GEN_ROOT)/Make.Version : $(SRC_ROOT)/misc/writeBuildNum.sh
+	$(SRC_ROOT)/misc/writeBuildNum.sh createMakeVersion $@
+
+
+#___________________________________________________________________________
+# build external software
+#
+
+extern:
+	$(MAKE) -C $(ROOT)/extern/btyacc
+ifeq ($(STD_EDITLINE),false)
+ifeq ($(EDITLINE_FLG),Y)
+	$(MAKE) -f $(GEN_ROOT)/Makefile.extern.editline
+endif
+endif
+
+
+#___________________________________________________________________________
+# create platform-specific export lists (version scripts) in gen
+#
+
+%.vers: $(ROOT)/builds/posix/%.vers
+	sh vers.sh $(firstword $@)
+
+export_lists: $(ALLVERS)
+
+#___________________________________________________________________________
+# LibTomMath - used by cross-builds
+#
+
+.PHONY:	tommath
+TOMLIB=$(LIB)/libtommath.a
+TOM_Objs=$(addprefix ../extern/libtommath/,$(call doObjects,$(call dirFiles,../extern/libtommath)))
+
+tommath:	$(TOMLIB)
+
+$(TOMLIB):	$(TOM_Objs)
+	-$(RM) $@
+	$(STATICLIB_LINK) $@ $^
+
+#___________________________________________________________________________
+# main build target for both debug abd release builds
+#
+
+.PHONY:	cross1 cross2 boot yvalve engine fbintl gpre utilities plugins rest codes ids examples
+
+master_process:
+	ln -sf $(SRC_ROOT)/include/gen/autoconfig.auto $(SRC_ROOT)/include/gen/autoconfig.h
+	$(MAKE) updateBuildNum
+	$(MAKE) export_lists
+	$(MAKE) extern
+	$(MAKE) boot
+	$(MAKE) yvalve
+ifeq ($(IsDeveloper), Y)
+# In developer mode we must regenerate various files in include/gen
+	$(MAKE) ids
+endif
+	$(MAKE) engine
+	$(MAKE) fbintl
+	$(MAKE) utilities
+# Now having ready such useful tools as gbak and isql, we may restore / create
+# required databases and switch to full-featured gpre
+	$(MAKE) gpre
+# Pay attention - after build force gpre_current to point to gpre 
+# even if gpre itself was not rebuilt
+	-$(RM) $(GPRE_CURRENT)
+	(cd $(BIN); $(LN) $(notdir $(GPRE)) $(notdir $(GPRE_CURRENT)))
+ifeq ($(IsDeveloper), Y)
+# In developer mode we must regenerate various files in include/gen
+	$(MAKE) codes
+endif
+	$(MAKE) plugins
+	$(MAKE) examples
+	$(MAKE) rest
+
+
+cross_process:
+	$(MAKE) TARGET=Native cross1
+	$(MAKE) CROSS_OUT=Y cross2
+
+cross1:
+	ln -sf $(SRC_ROOT)/include/gen/autoconfig.auto $(SRC_ROOT)/include/gen/autoconfig.h
+	$(MAKE) updateBuildNum
+	$(MAKE) export_lists
+	$(MAKE) extern
+	$(MAKE) boot
+	$(MAKE) yvalve
+ifeq ($(IsDeveloper), Y)
+# In developer mode we must regenerate various files in include/gen
+	$(MAKE) ids
+endif
+	$(MAKE) engine
+	$(MAKE) fbintl
+	$(MAKE) gbak isql gfix
+# Now having ready such useful tools as gbak and isql, we may restore / create
+# required databases and switch to full-featured gpre
+	$(MAKE) gpre
+# Pay attention - after build force gpre_current to point to gpre 
+# even if gpre itself was not rebuilt
+	-$(RM) $(GPRE_CURRENT)
+	(cd $(BIN); $(LN) $(notdir $(RUN_GPRE)) $(notdir $(GPRE_CURRENT)))
+
+cross2:
+	ln -sf $(SRC_ROOT)/include/cross/$(CROSS_CONFIG) $(SRC_ROOT)/include/gen/autoconfig.h
+	$(MAKE) tommath
+	$(MAKE) yvalve
+
+
+#___________________________________________________________________________
+# static library - various common code, used in different FB projects
+#
+
+$(COMMON_LIB):	$(Common_Objects)
+	-$(RM) $@
+	$(STATICLIB_LINK) $@ $^
+
+
+#___________________________________________________________________________
+# gpre_boot
+#
+
+boot: $(GPRE_BOOT)
+
+$(GPRE_BOOT):	$(GPRE_Boot_Objects) $(COMMON_LIB)
+	$(STATICEXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ -L$(LIB) $(LINK_LIBS)
+	-$(RM) $(GPRE_CURRENT)
+	(cd $(@D); $(LN) $(@F) $(notdir $(GPRE_CURRENT)))
+
+
+#___________________________________________________________________________
+# yValve
+#
+
+yvalve: $(LIBFIREBIRD_BASENAME)
+
+ifneq ($(LibraryBaseName),$(LibrarySoName))
+$(LIBFIREBIRD_BASENAME):	$(LIBFIREBIRD_SONAME)
+	(cd $(LIB) && $(LN) -f $(LibrarySoName) $(LibraryBaseName) )
+endif
+
+ifneq ($(LibrarySoName),$(LibraryFullName))
+$(LIBFIREBIRD_SONAME):	$(LIBFIREBIRD_FULLNAME)
+	(cd $(LIB) && $(LN) -f $(LibraryFullName) $(LibrarySoName) )
+endif
+
+# remote redirector is statically linked in main FB library
+$(LIBFIREBIRD_FULLNAME):	$(YValve_Objects) $(Remote_Client_Objects) $(COMMON_LIB)
+	$(LINK_FIREBIRD) -o $@ $^ $(LINK_FIREBIRD_LIBS)
+
+
+#___________________________________________________________________________
+# core part - jrd's engine
+#
+
+engine: $(ENGINE_SONAME)
+
+$(ENGINE_SONAME):	$(Engine_Objects) $(SVC_Objects) $(COMMON_LIB)
+	$(LINK_ENGINE) -o $@ $^ $(LINK_ENGINE_LIBS)
+
+
+#___________________________________________________________________________
+# intl support
+#
+
+fbintl: $(LIBFBINTL_SO)
+
+$(LIBFBINTL_SO):	$(INTL_Objects) $(COMMON_LIB)
+	$(LINK_INTL) -o $@ $^ $(LINK_INTL_LIBS)
+
+
+#___________________________________________________________________________
+# full gpre
+# when switching to it we also build databases needed later
+#
+
+.PHONY:	databases
+
+gpre: $(GPRE) databases
+
+$(GPRE):	$(GPRE_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+HELP_FDB = $(FIREBIRD)/help/help.fdb
+SECURITY_FDB = $(FIREBIRD)/security3.fdb
+SECURITY_TMP = security.tmp
+
+databases:		yachts.lnk msg.timestamp $(HELP_FDB) $(SECURITY_FDB)
+
+export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):$(FIREBIRD)/lib
+
+yachts.lnk:		metadata.fdb
+	-$(RM) $@
+	$(LN) $^ $@
+
+metadata.fdb:	$(RUN_ISQL) $(SRC_ROOT)/dbs/metadata.sql
+	-$(RM) $@
+	$(RUN_ISQL) -q -i $(SRC_ROOT)/dbs/metadata.sql
+	$(RUN_GFIX) -mode read_only $@
+	$(CHMOD) 0444 $@
+
+$(HELP_FDB):	help.fdb
+	-$(RM) $@
+	$(CP) $^ $@
+	$(CHMOD) 0444 $@
+
+help.fdb:	$(BLD_ROOT)/misc/help.gbak
+	$(RUN_GBAK) -MODE read_only -R $< $@
+	$(CHMOD) 0444 $@
+
+$(SECURITY_FDB):	security.fdb
+	-$(RM) $@
+	$(CP) $^ $@
+
+security.fdb:	$(SRC_ROOT)/dbs/security.sql
+	-$(RM) $@
+	-$(RM) $(SECURITY_TMP)
+	echo create database \'$(SECURITY_TMP)\'\; | $(RUN_ISQL)
+	$(RUN_GFIX) -write async $(SECURITY_TMP)
+	$(RUN_ISQL) -i $^ $(SECURITY_TMP)
+	$(CHMOD) a=rw $(SECURITY_TMP)
+	$(CP) $(SECURITY_TMP) $@
+	$(RUN_GFIX) -write sync $@
+
+msg.timestamp:	$(MSG_FILES)
+	-$(RM) msg.fdb
+	echo create database \'msg.fdb\'\; | $(RUN_ISQL)
+	$(RUN_GFIX) -write async msg.fdb
+	for sql in $(MSG_FILES); do (echo $$sql; $(RUN_ISQL) -i $$sql msg.fdb) || exit; done
+	$(TOUCH) $@
+
+
+.PHONY:	udfs ibutil ibudf fbudf udfsupport
+
+udfsupport:
+	$(MAKE) ibutil
+	$(MAKE) udfs
+
+udfs:	ibudf fbudf
+
+UDF = $(FB_BUILD)/UDF
+IBUDF_SO = $(UDF)/ib_udf.$(SHRLIB_EXT)
+FBUDF_SO = $(UDF)/fbudf.$(SHRLIB_EXT)
+
+ibudf:	$(IBUDF_SO)
+
+$(IBUDF_SO):	$(IBUDF_Objects)
+	$(call LINK_UDF,ib_udf) -o $@ $^ $(LINK_UDF_LIBS)
+
+fbudf:	$(FBUDF_SO)
+
+$(FBUDF_SO):	$(FBUDF_Objects) $(COMMON_LIB)
+	$(call LINK_UDF,fbudf) -o $@ $^ $(LINK_UDF_LIBS) $(FIREBIRD_LIBRARY_LINK)
+
+ibutil: $(LIBIBUTIL_SO)
+
+$(LIBIBUTIL_SO): $(UTIL_Objects)
+	$(LINK_IB_UTIL) -o $@ $^ $(LINK_IB_UTIL_LIBS)
+
+
+#___________________________________________________________________________
+# most of utilities, including network server and UDFs
+# qli is not here cause it needs special database (help.fdb), therefore needs gbak
+#
+
+.PHONY:	firebird_server fb_lock_print fbguard fbsvcmgr fbtracemgr gbak gfix gsec gsplit gstat isql nbackup
+
+utilities: firebird_server fb_lock_print fbguard fbsvcmgr fbtracemgr gbak gfix gsec gsplit gstat isql nbackup udfsupport
+
+firebird_server:	$(FB_DAEMON)
+
+$(FB_DAEMON):	$(Remote_Server_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+fb_lock_print:	$(LOCKPRINT)
+
+$(LOCKPRINT):	$(LOCKPRINT_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+fbguard:		$(FBGUARD)
+
+$(FBGUARD):		$(FBGUARD_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+fbsvcmgr:		$(FBSVCMGR)
+
+$(FBSVCMGR):	$(FBSVCMGR_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+fbtracemgr:		$(FBTRACEMGR)
+
+$(FBTRACEMGR):	$(FBTRACEMGR_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+gbak:			$(GBAK)
+
+$(GBAK):		$(GBAK_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+gsplit:			$(GSPLIT)
+
+$(GSPLIT):		$(GSPLIT_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+gfix:			$(GFIX)
+
+$(GFIX):		$(GFIX_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+gsec:			$(GSEC)
+
+$(GSEC):		$(GSEC_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+gstat:			$(GSTAT)
+
+$(GSTAT):		$(GSTAT_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+isql:			$(ISQL)
+
+$(ISQL):		$(ISQL_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LIBEDITLINE) $(LINK_LIBS)
+
+nbackup:		$(NBACKUP)
+
+$(NBACKUP):		$(NBACKUP_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+
+#___________________________________________________________________________
+# plugins - some of them are required to build examples, use separate entry for them
+#
+
+.PHONY:	udr legacy_user_management legacy_auth_server trace auth_debug
+UDR_PLUGIN = $(call makePluginName,udr_engine)
+LEGACY_USER_MANAGER = $(call makePluginName,Legacy_UserManager)
+LEGACY_AUTH_SERVER = $(call makePluginName,Legacy_Auth)
+SRP_USER_MANAGER = $(call makePluginName,Srp)
+FBTRACE = $(call makePluginName,fbtrace)
+AUTH_DEBUGGER = $(call makePluginName,Auth_Debug)
+
+BUILD_DEBUG:=
+ifeq ($(TARGET),Debug)
+	BUILD_DEBUG:=auth_debug
+endif
+
+plugins: udr legacy_user_management legacy_auth_server srp_user_management trace $(BUILD_DEBUG)
+
+udr:	$(UDR_PLUGIN) $(PLUGINS)/udr_engine.conf
+
+$(PLUGINS)/udr_engine.conf: $(ROOT)/src/plugins/udr_engine/udr_engine.conf
+	cp $^ $@
+
+$(UDR_PLUGIN):	$(UDRENG_Objects) $(COMMON_LIB)
+	$(LINK_UDRENG) $(call LIB_LINK_SONAME,$(notdir $@).0) -o $@ $^ $(LINK_UDRENG_LIBS) $(FIREBIRD_LIBRARY_LINK)
+
+legacy_user_management:	$(LEGACY_USER_MANAGER)
+
+$(LEGACY_USER_MANAGER):	$(LEGACY_USERS_MANAGE_Objects) $(COMMON_LIB)
+	$(LINK_PLUGIN) $(call LIB_LINK_SONAME,$(notdir $@).0) -o $@ $^ $(LINK_PLUG_LIBS) $(FIREBIRD_LIBRARY_LINK)
+
+legacy_auth_server:	$(LEGACY_AUTH_SERVER)
+
+$(LEGACY_AUTH_SERVER):	$(LEGACY_AUTH_SERVER_Objects) $(COMMON_LIB)
+	$(LINK_PLUGIN) $(call LIB_LINK_SONAME,$(notdir $@).0) -o $@ $^ $(LINK_PLUG_LIBS) $(FIREBIRD_LIBRARY_LINK)
+
+trace:	$(FBTRACE)
+
+$(FBTRACE):	$(FBTRACE_UTIL_Objects) $(COMMON_LIB)
+	$(LINK_TRACE) -o $@ $^ $(FIREBIRD_LIBRARY_LINK) $(LINK_TRACE_LIBS)
+
+auth_debug:	$(AUTH_DEBUGGER)
+
+$(AUTH_DEBUGGER):	$(AUTH_DEBUGGER_Objects) $(COMMON_LIB)
+	$(LINK_PLUGIN) $(call LIB_LINK_SONAME,$(notdir $@).0) -o $@ $^ $(LINK_PLUG_LIBS) $(FIREBIRD_LIBRARY_LINK)
+
+srp_user_management: $(SRP_USER_MANAGER)
+
+$(SRP_USER_MANAGER):	$(SRP_USERS_MANAGE_Objects) $(COMMON_LIB)
+	$(LINK_PLUGIN) $(call LIB_LINK_SONAME,$(notdir $@).0) -o $@ $^ $(LINK_PLUG_LIBS) $(FIREBIRD_LIBRARY_LINK)
+
+#___________________________________________________________________________
+# codes - developers change them sometimes
+#
+
+.PHONY: gen_codes
+CODES = $(BIN)/codes$(EXEC_EXT)
+IDS = $(SRC_ROOT)/include/gen/ids.h
+
+codes:	gen_codes
+
+ids:	$(IDS)
+
+gen_codes:	$(CODES) msg.timestamp
+	$(CODES) $(SRC_ROOT)/include/gen $(LNG_ROOT)
+
+$(CODES):	$(CODES_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+$(IDS):		$(SRC_ROOT)/misc/ids.m $(SRC_ROOT)/jrd/relations.h
+	m4 $< > $@
+
+
+#___________________________________________________________________________
+# all the rest we need to build
+#
+
+.PHONY:	qli message_file
+
+rest:	qli message_file
+
+qli:		$(QLI)
+
+$(QLI):		$(QLI_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+examples: include_generic
+	$(MAKE) -f Makefile.examples -C $(GEN_ROOT)/examples/
+	$(MAKE) -f Makefile.plugins_examples -C $(GEN_ROOT)/examples/
+
+message_file:	$(FIREBIRD_MSG)
+
+$(FIREBIRD_MSG):	$(RUN_BUILD_FILE) msg.timestamp
+	$(RUN_BUILD_FILE) -d msg.fdb -f $@
+	$(CHMOD_6) $@
+
+$(BUILD_FILE):	$(BUILD_Objects) $(COMMON_LIB)
+	$(EXE_LINK) $(EXE_LINK_OPTIONS) $^ -o $@ $(FIREBIRD_LIBRARY_LINK) $(LINK_LIBS)
+
+
+#---------------------------------------------------------------------------
+
+# This target builds the include files for distribution with the release
+# Some of the files differ from the ones used internally to compile the
+# software - mainly they are just flattened out to make the view simpler
+# from an external point of view.
+
+INCLUDE_DEST=   $(FB_BUILD)/include
+
+include_generic: $(INCLUDE_DEST)/ib_util.h  \
+                 $(INCLUDE_DEST)/ibase.h
+
+# ib_util.h actually is a marker for a number of headers
+
+# All these files are #included in ibase.h. Here we cat them all together
+# and remove the embedded #includes to make it simpler for external usage.
+
+IBASE_ExtraFiles = include/types_pub.h include/consts_pub.h dsql/sqlda_pub.h common/dsc_pub.h jrd/ibase.h jrd/inf_pub.h jrd/blr.h include/gen/iberror.h
+SRC_IBASE_ExtraFiles = $(addprefix $(SRC_ROOT)/, $(IBASE_ExtraFiles))
+MAKE_HEADER_Src = $(addprefix $(SRC_ROOT)/, misc/makeHeader.cpp)
+MAKE_HEADER_Bin = ./makeHeader
+
+$(INCLUDE_DEST)/ibase.h: $(SRC_IBASE_ExtraFiles)
+	$(STATICEXE_LINK) -o $(MAKE_HEADER_Bin) $(MAKE_HEADER_Src)
+	$(CP) $^ .
+	$(MAKE_HEADER_Bin) <ibase.h >$@
+	$(RM) -f ibase.h
+
+# Copy all the other headers to the distribution directory. We use
+# ib_util.h as the marker for all the files.
+
+OtherDistribHeaders = extlib/ib_util.h \
+                      yvalve/perf.h  \
+                      include/gen/iberror.h
+
+SRC_OtherDistribHeaders = $(addprefix $(SRC_ROOT)/, $(OtherDistribHeaders))
+
+$(INCLUDE_DEST)/ib_util.h : $(SRC_OtherDistribHeaders)
+	mkdir -p $(INCLUDE_DEST)
+	$(CP) $^ $(INCLUDE_DEST)/
+
+
+# There are also gds*f and gds*ada header files around if someone
+# wants them. You might need to hunt around in the old cvs tree for them.
+
+#___________________________________________________________________________
+# track dependencies
+#
+
+include $(ROOT)/gen/make.shared.targets
+
+Dependencies = $(AllObjects:.o=.d) 
+-include $(Dependencies)
+
+
+#___________________________________________________________________________
+# create binary packages
+#
+
+.PHONY: install silent_install install-embedded package packages dist
+ 
+install install-embedded silent_install package packages dist:
+	$(MAKE) -f Makefile.install $@
+
+
+#___________________________________________________________________________
+# various cleaning
+#
+.PHONY: clean clean_objects clean_dependancies clean_extern_objects clean_build \
+		clean_gpre_gen clean_icu clean_dbs clean_examples clean_makefiles \
+		clean_editline clean_all
+
+
+clean: clean_objects clean_dependancies clean_extern_objects clean_build \
+		clean_yacc_gen clean_gpre_gen clean_dbs clean_examples clean_tommath
+
+ifeq ($(EDITLINE_FLG),Y)
+ifeq ($(STD_EDITLINE),false)
+clean: clean_editline
+endif
+endif
+
+clean_config clean_all: clean clean_makefiles
+	$(RM) $(ROOT)/configure
+	$(RM) $(ROOT)/aclocal.m4
+	$(RM) $(ROOT)/config.log
+	$(RM) $(ROOT)/config.status
+	$(RM) $(ROOT)/libtool
+	$(RM_R) $(ROOT)/autom4te.cache
+	-$(MAKE) -C $(ROOT)/extern/editline distclean
+#	-$(MAKE) -C $(ROOT)/extern/icu/source distclean
+	-$(MAKE) -C $(ROOT)/extern/btyacc distclean
+
+clean_dbs:
+	$(RM) *.fdb *.FDB msg.timestamp
+	$(RM) yachts.lnk
+
+
+# The examples are a bit different, since the makefile is included in the directory
+# and not in the gen directory, deleting it means, make clean; make doesnt work correctly
+# so the code below deletes all the other stuff but not the Makefile.examples MOD Nov-2007
+
+clean_examples:
+	$(RM) `find $(GEN_ROOT)/examples/ -type f ! -name 'Make*'`
+
+clean_editline:
+	-$(MAKE) -C $(ROOT)/extern/editline clean
+
+#clean_icu:
+#	-$(MAKE) -C $(ROOT)/extern/icu/source clean
+
+clean_tommath:
+	-$(MAKE) -C $(ROOT)/extern/libtommath clean
+
+clean_objects:
+	$(RM) `find $(TMP_ROOT)/ -type f -name '*.o' -print`
+	$(RM) `find $(TMP_ROOT)/ -type f -name '*.a' -print`
+
+clean_extern_objects:
+	$(RM) `find $(ROOT)/extern/ -type f -name '*.lo' -print`
+	$(RM) `find $(ROOT)/extern/ -type f -name '*.o' -print`
+
+# Clear out dependancies files created by the gcc compiler
+# since when .o and other files are deleted the dependant
+# targets need to be recalculated
+# MOD 10-July-2002
+
+clean_dependancies:
+	$(RM) -f `find $(TMP_ROOT)/ -type f -name '*.d' -print`
+
+# delete only all of the files of type regular file in $FIREBIRD
+# leave the directories to make dependacies work still
+# MOD 11-July-2002
+
+clean_build:
+	$(RM) `find $(GEN_ROOT)/*/firebird \( -type f -o -type l \) -print`
+#	$(RM) $(GDSLIB_OBJECTS) $(GDSLIB_PHASE3_OBJECTS)
+
+#
+clean_makefiles:
+	$(RM) $(GEN_ROOT)/Make*
+	$(RM) $(GEN_ROOT)/make*
+	$(RM) `find $(GEN_ROOT)/install \( -type f -o -type l \) -print`
+	-$(RM) $(GEN_ROOT)/examples/Make*
+	$(RM) $(ROOT)/Makefile
+	$(RM) $(SRC_ROOT)/include/gen/autoconfig.h
+
+clean_gpre_gen:
+	-$(RM) -f `find $(TMP_ROOT)/ -type f -name '*.cpp' -print`
+
+clean_yacc_gen:
+	$(RM) $(ROOT)/src/dsql/parse.cpp $(ROOT)/src/dsql/dsql.tab.h
+
+#___________________________________________________________________________
+# Extra platform specific targets
+@POSTFIX_INCLUDE@

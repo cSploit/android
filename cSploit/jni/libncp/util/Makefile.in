@@ -1,0 +1,115 @@
+#
+# Makefile for the linux ncp-filesystem routines.
+#
+
+top_srcdir = @top_srcdir@
+top_builddir = ..
+this_srcdir = ${top_srcdir}/util
+
+include ${top_builddir}/Make.rules
+
+vpath %.c ${this_srcdir}
+
+USE_KERNEL = @USE_KERNEL@
+NDS_SUPPORT = @NDS_SUPPORT@
+MOUNT2 = @MOUNT2@
+
+LIBS = @INTLLIBS@ @LIBS@
+
+O_OTHER = dsqueue.o
+O_USERUTILS = slist.o pqlist.o nwfsinfo.o pserver.o nprint.o nsend.o \
+	nwpasswd.o nwbols.o nwbocreate.o nwborm.o nwboprops.o \
+	pqstat.o nwpqjob.o nwbpcreate.o nwbprm.o nwbpvalues.o nwbpadd.o \
+	nwbpset.o nwgrant.o nwrevoke.o nwuserlist.o nwauth.o \
+	nwfstime.o nwvolinfo.o nwtrustee.o nwdir.o \
+	nwfsctrl.o nwpjmv.o
+O_SBINUTILS =
+ifeq ($(USE_KERNEL),1)
+O_USERUTILS += ncopy.o nwtrustee2.o nwpurge.o nwrights.o
+O_SBINUTILS += nwmsg.o
+endif
+ifeq ($(NDS_SUPPORT),1)
+O_USERUTILS += nwdpvalues.o
+endif
+
+USERUTILS = $(O_USERUTILS:%.o=%)
+SBINUTILS = $(O_SBINUTILS:%.o=%)
+
+UTILS = $(USERUTILS) $(SBINUTILS) ncptest
+
+ifeq ($(HAVE_ELF),yes)
+NCP_LIB = libncp.so
+NCPLIB_DIR = ../lib
+LIBDEP = $(NCPLIB_DIR)/$(NCP_LIB)
+else
+NCP_LIB = libncp.a
+NCPLIB_DIR = ../lib
+LIBDEP = $(NCPLIB_DIR)/$(NCP_LIB)
+endif
+
+CFLAGS_ncopy.o  = -D_GNU_SOURCE
+ADDOBJS_pqstat  = dsqueue.o
+ADDOBJS_nwpqjob = dsqueue.o
+ADDOBJS_nprint  = dsqueue.o
+
+.PHONY : all install install-dev dep clean mrproper distclean
+.PHONY : default
+
+default:
+	make -C ..
+
+all: $(UTILS) ncptest # ipx_probe
+
+install: all
+	${INSTALL} -d $(DESTDIR)$(bindir)
+	${INSTALL} $(USERUTILS) $(DESTDIR)$(bindir)
+	ln -sf nwpqjob $(DESTDIR)$(bindir)/pqrm
+ifneq ($(SBINUTILS),)
+	${INSTALL} -d $(DESTDIR)$(sbindir)
+	${INSTALL} $(SBINUTILS) $(DESTDIR)$(sbindir)
+endif
+ifeq ($(USE_KERNEL)$(MOUNT2),11)
+ifneq ($(sbindir),/sbin)
+	ln -sf ..$(sbindir)/nwmsg $(DESTDIR)/sbin/nwmsg
+endif
+endif
+
+install-dev:
+
+../lib/libncp.a:
+	make -C ../lib libncp.a
+
+../lib/libncp.so:
+	make -C ../lib libncp.so
+
+$(O_USERUTILS) $(O_SBINUTILS) $(O_OTHER) ncptest.o: %.o: %.c
+	$(CC) $(CFLAGS) $(CCFLAGS) $(CFLAGS_$@) -o $@ -c $<
+
+%.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+					
+pqstat nwpqjob nprint: dsqueue.o
+
+$(UTILS): %: %.o $(LIBDEP)
+	$(CC) $(CFLAGS) -o $@ $(addsuffix .o,$@) $(ADDOBJS_$@) -L$(NCPLIB_DIR) -lncp ${LIBS}
+
+ipx_probe: ipx_probe.c
+	$(CC) $(CFLAGS) $(CCFLAGS) -o ipx_probe ipx_probe.c ${LIBS}
+
+dep:
+
+clean:
+	rm -f *.o *~ core $(UTILS) ipx_probe
+
+mrproper: clean
+	rm -f *.d
+
+distclean: mrproper
+
+ifeq ($(NEED_DEP),yes)
+include $(UTILS:%=%.d)
+endif
+

@@ -1,0 +1,186 @@
+set IGNORE_CASES {
+  alter-7.1		{# differences in representing numbers }
+  attach4-1.5	{# differences in wal behavior}
+  autovacuum-1.*.3	{# file size }
+  autovacuum-[279].*	{# file size, root page }
+  autovacuum-3.7	{# file size }
+  backup-4.5.*	 	{# Can backup databases with different pages sizes }
+  backup-4.3.4	 	{# Different ways in BDB handles contention }	
+  backup-5.*.1.1	{# different database sizes in backup }
+  backup-10.*.[23]	{# DB uses a larger page size, so the backup finishes
+	                  faster than it does in SQLite. We return done not OK}
+  backup-10.2.5
+  backup2-6 		{# different error codes for opening a readonly file }
+  backup2-7 
+  backup2-10
+  backup2-11
+  backup2-13		
+  cast-3.[37]		{# differences in representing numbers }
+  cast-3.1[37]		{# differences in representing numbers }
+  cast-3.23		{# differences in representing numbers }
+  collate5-2.1.[134]	{# Result order doesn't match with NOCASE collation }
+  collate5-2.[23].[13]
+  e_select-4.9.1        {# sqlite changed formerly working test, investigating }
+  e_select-4.10.1       {# sqlite changed formerly working test, investigating }
+  e_select-7.10.[235689]	{# both answers are correct for NOCASE union}
+  e_select-8.4.[89]	{# sqlite changed formerly working test, investigating }
+  e_select-8.5.[34]	{# sqlite changed formerly working test, investigating }
+  fts4aa-1.9		{# Defer fixing this until later }
+  fts4merge-fts3-5.*	{# Also defered }
+  fts4merge-fts4-5.*
+  fts4merge-fts*-7.3
+  func-29.4		{# Test unsupported pager function. }
+  hook-3.3		{# we commit when opening the environment }
+  hook-3.4
+  incrblob-7.3.2	{# file size }
+  incrvacuum-3.[234]	{# file size }
+  incrvacuum-[456].*	{# file size }
+  incrvacuum-7.*.[12]	{# file size }
+  incrvacuum-10.*	{# file size }
+  incrvacuum-12.2	{# vacuum not blocked by an exclusive transaction }
+  incrvacuum-12.[45]	{# assumes metadata changes will be lost on close }
+  incrvacuum-13.*	{# file size }
+  incrvacuum2-*		{# file size }
+  incrvacuum-1.[47]	{# BDB allows setting vacuum at any time while SQLite does not }
+  incrvacuum-2.2	{# BDB allows setting vacuum at any time while SQLite does not }
+  autovacuum-3.[36]	{# BDB allows setting vacuum at any time while SQLite does not }
+  expr-13.[14567]	{# differences in representing numbers }
+  pagesize-1.[14]	{# different page size defaults }
+  nan-*			{# Output is system dependent ("inf"/"Infinity") }
+  savepoint7-2.2	{# Different messages when aborting a txn. }
+  tempdb-2.[23]		{# Uses open file counts, #17964 }
+  thread003.1.2		{# BDB db file size not accurate until close, #17965 }
+  thread1-2.[3467]	{# BDB expects different results for threaded case. }
+  thread1-2.11		{# BDB expects different results for threaded case. }
+  trans-9.*.[45]-*	{# Uses sqlite_fullsync_count }
+  vacuum-1.[36]		{# file size checks not valid without checkpoint }
+  vacuum-7.1		{# Berkeley DB no-ops the freelist_count pragma. }
+  vacuum-7.5		{# Berkeley DB can enable vacuum of an existing db }
+  vacuum2-2.1		{# reading bytes directly from metadata page }
+  vacuum2-3.1		{# absolute file size assumption }
+  vacuum2-3.13		{# absolute file size assumption }
+  vacuum2-4.1		{# In DBSQL, metadata settings cannot be changed by vacuum. #18545 }
+  vacuum2-4.[47]	{# vacuum setting is not persistent }
+  vacuum2-5.[234]	{# Concurrent vacuum works in Berkeley DB }
+  zeroblob-1.1.1	{# Makes assumptions about memory usage }
+}
+
+set EXCLUDE_CASES {
+  alter3-[34].3
+  alter3-5.5
+  alter3-7.*
+  alter4-[34].3
+  alter4-5.5
+  alter4-7.*
+  autovacuum-8.2	{# vacuum blocked by an exclusive transaction }
+  backup-6.3		{# Backup remaining and total not exact }
+  backup-6.4
+  backup-6.5
+  backup-6.6
+  backup-7.1.2		{# Hangs because locks block instead of throw }
+  backup-7.1.3
+  backup-7.2.2
+  backup-8.9		{# Slightly different error message }
+  backup2-3.1		{# Hangs because locks block instead of throw }
+  createtab-[012].2
+  descidx1-[1236].*
+  descidx2-*
+  descidx3-*
+  fts3aj-*		{# DBSQL does not support two phase commit across databases. #18340}
+  fts3shared-*		{# Locks block instead of throwing an exception. }
+  incrblob-2.1.2	{# Pager implementation specific tests }
+  incrblob-6.[23456]	{# Cannot read a table that is write locked }
+  incrblob-6.12
+  incrblob-7.2.3 	{# Makes assumptions on sqlitemaster page format }
+  incrvacuum-1.2.[01]	{# Assumes database file is created by a pragma }
+  incrvacuum-12.[23]	{# vacuum blocked by an exclusive transaction }
+  incrvacuum-13.1	{# DBSQL would not create db file immediately after open }
+  incrvacuum-14.1	{# Opens an invalid database, earlier error with BDB }
+  incrvacuum2-4.*	{# Skip wal testing since DBSQL does not generate test.db-wal }
+  insert-5.[45]         {# Table root pages are different }
+  incrblob2-5.[345678]	{# Hangs because Berkeley does not lock tables }
+  interrupt-2.4
+  minmax3-*
+  nan-3.*		{# database file read/write }
+  pagesize-1.3		{# different default page size }
+  pagesize-2.*.3	{# file size }
+  pagesize-2.*.30	{# different default page size }
+  rdonly-*
+  server1-1.[5679]	{# Two read threads block }
+  server1-2.[23456]	{# Two read threads block }
+  shared2-1.[23]	{# Cannot truncate with open cursors }
+  shared2-2.[12]	{# Cannot read a database during a rollback }
+  shared3-2.4		{# Cannot change the cache size after opening }
+  shared3-2.[678]	{# One handle per process for DB_REGISTER }
+  shared6-1.2.[3] 	{# Locks block instead of throwing an exception }
+  shared6-1.3.[2345] 	{# Locks block instead of throwing an exception }
+  shared6-1.4.[123]
+  shared6-2.*
+  shared6-3.[2468]
+  shared6-3.10
+  sqllimits1-7.7.*
+  sqllimits1-16.2	{# Requires too many memory. Does not suit for every platfrom. #18597 }
+  table-15.[12]		{# Requires more resources than the defaults }
+  thread005-1.[2-9]* 	{# Locks block instead of throwing an exception }
+  thread005-1.1[0-9]* 	{# Locks block instead of throwing an exception }
+  trans-3.[235689]	{# Attempting to read from a write locked table }
+  trans-4.[4578]	{# Attempting to read from a write locked table }
+  trans-8.[14]
+  vtab_shared-1.8.2	{# Locks block instead of throwing an exception }
+  vtab_shared-1.8.3
+  vtab_shared-1.10
+}
+
+# Add ignore/exclude cases for Windows/cygwin platform.
+# $tcl_platform(os) on cygwin also contains "Windows", so below statement also covers cygwin.
+if {[string first "windows" [string tolower $tcl_platform(os)]] >=0 } { 
+  lappend IGNORE_CASES expr-1.106		{# differences in representing numbers. #19803 }
+  lappend IGNORE_CASES expr-1.\[2\]*		{# differences in representing numbers. #19803 }
+  lappend IGNORE_CASES incrblob_err-5.1.3	{# Due to Windows Tcl 8.5 difference. #19803 }
+}
+
+# manydb.test fails on HP-UX because of resource limitations, not a real bug 
+if {$tcl_platform(os) == "HP-UX"} {
+  lappend EXCLUDE_CASES manydb-*
+}
+
+# These errors only appear if encryption is turned on
+# In backup2 the ignored tests check opening illegal data files.  Our
+# code trys to open the encrypted environment (without a key) before
+# it checks that the data files are legal
+# In openv2 using the -readonly flag prevents tester.tcl from 
+# automatically adding the encryption key when opening the database,
+# again the native SQL code must have checked whether the datafiles
+# were readonly or not before checking encryption (they pass if a key
+# is passed to the open call)
+if {[sqlite3 -has-codec]} {
+  lappend IGNORE_CASES backup2-6 backup2-7 backup2-11
+  lappend EXCLUDE_CASES openv2-1.3 openv2-1.4 openv2-2.*
+}
+
+# Add ignore/exclude cases for Android platform.
+# 1) The code tests existence of daemon '/sbin/adbd'(Android Debug Bridge) to 
+#    distinguish whether the test is executed on Android. That's because:
+#    a) The cross-complied Tcl lib does not include any Android platform 
+#       information in built-in array(like platform(os)).
+#    b) testfixture can not call system command to get system information.
+#    c) Only Android platforms(emulator/device) have daemon /sbin/adbd. And 
+#       it must exists on Android platform. So it's a reasonable flag.
+# 2) There is an item "malloeF" in the patch. It's not a typo. That's because 
+#    some of testcases in mallocF.test are named malloce-*.
+if {[file exists /sbin/adbd]} {
+  lappend IGNORE_CASES backup2-6		{# SQLite has the same failure on Android }
+  lappend IGNORE_CASES delete-8.\[123456\]	{# SQLite has the same failure on Android }
+  lappend EXCLUDE_CASES temptable-6.\[236\]	{# Requires unsupported permissions setting }
+  lappend IGNORE_CASES logsize-1.\[14\]		{# Default log size is due to Android.mk }
+  lappend IGNORE_CASES logsize-2.1		{# Default log size is due to Android.mk }
+  lappend EXCLUDE_CASES altermalloc-*		{# Requires too much memory on Android }
+  lappend EXCLUDE_CASES backup_malloc-*		{# Requires too much memory on Android }
+  lappend EXCLUDE_CASES fkey_malloc-*		{# Requires too much memory on Android }
+  lappend EXCLUDE_CASES malloc\[46789ABDEFGHJ\]-*    {# Requires too much memory on Android }
+  lappend EXCLUDE_CASES malloeF-*		{# Requires too much memory on Android }
+  lappend EXCLUDE_CASES manydb-*		{# Requires too much memory on Android }
+  lappend EXCLUDE_CASES vtab_err-*		{# Requires too much memory on Android }
+  lappend EXCLUDE_CASES where8m-*		{# Requires too much memory on Android }
+}
+

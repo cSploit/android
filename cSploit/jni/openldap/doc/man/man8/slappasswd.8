@@ -1,0 +1,203 @@
+.TH SLAPPASSWD 8C "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slappasswd \- OpenLDAP password utility
+.SH SYNOPSIS
+.B SBINDIR/slappasswd
+[\c
+.BR \-v ]
+[\c
+.BR \-u ]
+[\c
+.BR \-g \||\| \-s \ \fIsecret\fR \||\| \fB\-T \ \fIfile\fR]
+[\c
+.BI \-h \ hash\fR]
+[\c
+.BI \-c \ salt-format\fR]
+[\c
+.BR \-n ]
+[\c
+.BI \-o \ option\fR[ = value\fR]]
+.LP
+.SH DESCRIPTION
+.LP
+.B Slappasswd
+is used to generate an userPassword value
+suitable for use with
+.BR ldapmodify (1),
+.BR slapd.conf (5)
+.I rootpw
+configuration directive or the 
+.BR slapd\-config (5) 
+.I olcRootPW
+configuration directive.
+.
+.SH OPTIONS
+.TP
+.B \-v
+enable verbose mode.
+.TP
+.B \-u
+Generate RFC 2307 userPassword values (the default).  Future
+versions of this program may generate alternative syntaxes
+by default.  This option is provided for forward compatibility.
+.TP
+.BI \-s \ secret
+The secret to hash.
+If this,
+.B \-g
+and
+.B \-T
+are absent, the user will be prompted for the secret to hash.
+.BR \-s ,
+.B \-g
+and
+.B \-T
+are mutually exclusive flags.
+.TP
+.BI \-g
+Generate the secret.
+If this,
+.B \-s
+and
+.B \-T
+are absent, the user will be prompted for the secret to hash.
+.BR \-s ,
+.B \-g
+and
+.B \-T
+are mutually exclusive flags.
+If this is present,
+.I {CLEARTEXT}
+is used as scheme.
+.B \-g
+and
+.B \-h
+are mutually exclusive flags.
+.TP
+.BI \-T \ "file"
+Hash the contents of the file.
+If this,
+.B \-g
+and
+.B \-s
+are absent, the user will be prompted for the secret to hash.
+.BR \-s ,
+.B \-g
+and
+.B \-T
+and mutually exclusive flags.
+.TP
+.BI \-h \ "scheme"
+If \fB\-h\fP is specified, one of the following RFC 2307 schemes may
+be specified:
+.BR {CRYPT} ,
+.BR {MD5} ,
+.BR {SMD5} ,
+.BR {SSHA} ", and"
+.BR {SHA} .
+The default is 
+.BR {SSHA} .
+
+Note that scheme names may need to be protected, due to
+.B {
+and
+.BR } ,
+from expansion by the user's command interpreter.
+
+.B {SHA}
+and
+.B {SSHA}
+use the SHA-1 algorithm (FIPS 160-1), the latter with a seed.
+
+.B {MD5}
+and
+.B {SMD5}
+use the MD5 algorithm (RFC 1321), the latter with a seed.
+
+.B {CRYPT}
+uses the
+.BR crypt (3).
+
+.B {CLEARTEXT}
+indicates that the new password should be added to userPassword as
+clear text.
+Unless
+.I {CLEARTEXT}
+is used, this flag is incompatible with option
+.BR \-g .
+.TP
+.BI \-c \ crypt-salt-format
+Specify the format of the salt passed to
+.BR crypt (3)
+when generating {CRYPT} passwords.  
+This string needs to be in
+.BR sprintf (3)
+format and may include one (and only one)
+.B %s
+conversion.
+This conversion will be substituted with a string of random
+characters from [A\-Za\-z0\-9./].  For example,
+.RB ' %.2s '
+provides a two character salt and
+.RB ' $1$%.8s '
+tells some
+versions of
+.BR crypt (3)
+to use an MD5 algorithm and provides
+8 random characters of salt.
+The default is
+.RB ' %s ' ,
+which provides 31 characters of salt.
+.TP
+.BI \-n
+Omit the trailing newline; useful to pipe the credentials
+into a command.
+.TP
+.BI \-o \ option\fR[ = value\fR]
+Specify an
+.I option
+with a(n optional)
+.IR value .
+Possible generic options/values are:
+.LP
+.nf
+              module\-path=<pathspec> (see `\fBmodulepath\fP' in slapd.conf(5))
+              module\-load=<filename> (see `\fBmoduleload\fP' in slapd.conf(5))
+
+.in
+You can load a dynamically loadable password hash module by
+using this option.
+.SH LIMITATIONS
+The practice of storing hashed passwords in userPassword violates
+Standard Track (RFC 4519) schema specifications and may hinder
+interoperability.  A new attribute type, authPassword, to hold
+hashed passwords has been defined (RFC 3112), but is not yet
+implemented in
+.BR slapd (8).
+.LP
+It should also be noted that the behavior of
+.BR crypt (3)
+is platform specific.
+.SH "SECURITY CONSIDERATIONS"
+Use of hashed passwords does not protect passwords during
+protocol transfer.  TLS or other eavesdropping protections
+should be in-place before using LDAP simple bind.
+.LP
+The hashed password values should be protected as if they
+were clear text passwords.
+.SH "SEE ALSO"
+.BR ldappasswd (1),
+.BR ldapmodify (1),
+.BR slapd (8),
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.B RFC 2307\fP,
+.B RFC 4519\fP,
+.B RFC 3112
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

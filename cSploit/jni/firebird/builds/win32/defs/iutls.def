@@ -1,0 +1,185 @@
+;  The contents of this file are subject to the Interbase Public
+;  License Version 1.0 (the "License"); you may not use this file
+;  except in compliance with the License. You may obtain a copy
+;  of the License at http://www.Inprise.com/IPL.html
+; 
+;  Software distributed under the License is distributed on an
+;  "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+;  or implied. See the License for the specific language governing
+;  rights and limitations under the License.
+; 
+;  The Original Code was created by Inprise Corporation
+;  and its predecessors. Portions created by Inprise Corporation are
+;  Copyright (C) Inprise Corporation.
+; 
+;  All Rights Reserved.
+;  Contributor(s): ______________________________________.
+;------------------------------------------------------------
+;  IUTLS DLL MODULE DEFINITION FILE
+;------------------------------------------------------------
+
+LIBRARY     IUTLS
+
+DESCRIPTION 'INTERNAL UTILITY INTERBASE MODULE'
+CODE MOVEABLE 
+DATA MOVEABLE SINGLE
+SEGMENTS
+    _TEXT              DISCARDABLE
+    DSC_TEXT           DISCARDABLE
+    ENC_TEXT           DISCARDABLE
+    FUNCTION_TEXT      DISCARDABLE
+    GDS_TEXT           DISCARDABLE
+    ISC_TEXT           DISCARDABLE
+    ISC_FILE_TEXT      DISCARDABLE
+    ISC_IPC_TEXT       DISCARDABLE
+    ISC_SYNC_TEXT      DISCARDABLE
+    IUTLSWEP_TEXT      PRELOAD
+    LOITER_TEXT        DISCARDABLE
+    MATH_TEXT          DISCARDABLE
+    NODE_TEXT          DISCARDABLE
+    SDL_TEXT           DISCARDABLE
+    THD_TEXT           DISCARDABLE
+    UTLD_TEXT          DISCARDABLE
+    DLLSHELL_TEXT      PRELOAD
+
+
+EXPORTS
+; Next new ordinal must be > 95
+
+; DSC.C
+	_DSC_convert_to_text_length    @2
+	_DSC_make_descriptor           @3
+	_DSC_string_length             @4
+
+; ENC.C
+	_ENC_crypt                     @5
+
+; FUNCTION.C
+	_FUNCTIONS_entrypoint          @6
+
+; GDS.C
+	_gds__alloc                    @7
+	_gds__decode                   @8
+	_gds__decode_date              @9
+	_gds__encode                   @10
+	_gds__encode_date              @11
+	_gds__free                     @12
+	_gds__ftof                     @13
+	_gds__interprete               @14
+	_gds__interprete_a             @15
+	_fb_interpret
+	_gds__log                      @16
+	_gds__log_status               @17
+	_gds__msg_close                @18
+	_gds__msg_format               @19
+	_gds__msg_lookup               @20
+	_gds__msg_open                 @21
+	_gds__msg_put                  @22
+	_gds__parse_bpb                @23
+	_gds__parse_bpb2               @24
+	_gds__prefix                   @25
+	_gds__print_blr                @26
+	_gds__print_status             @27
+	_gds__put_error                @28
+	_gds__qtoq                     @29
+	_gds__register_cleanup         @30
+	_gds__sqlcode                  @31
+	_gds__sqlcode_s                @32
+	_gds__temp_multi_file          @34
+	_gds__unregister_cleanup       @35
+	_gds__vax_integer              @36
+	_gds__vtof                     @37
+	_gds__vtov                     @38
+
+	_gds__alloc_debug              @96
+	_gds_alloc_flag_unfreed        @97
+	_gds_alloc_report              @98
+
+	_isc_print_sqlerror            @39
+	_isc_sql_interprete            @40
+
+; ISC.C
+	_ISC_check_process_existence   @41
+	_ISC_get_config                @42
+	_ISC_get_host                  @43
+	_ISC_get_user                  @44
+	_ISC_ast_enter                 @45
+	_ISC_ast_exit                  @46
+	_ISC_prefix_interbase              @91
+
+; ISC_FILE.C
+	_ISC_expand_filename           @47
+	_ISC_check_if_remote           @48
+	_ISC_analyze_spx               @49
+	_ISC_analyze_tcp               @50
+	_ISC_analyze_pclan             @94
+	_ISC_expand_share              @95
+
+; ISC_IPC.C
+	_ISC_enter                     @51
+	_ISC_exit                      @52
+	_ISC_signal                    @53
+	_ISC_signal_cancel             @54
+	_ISC_signal_init               @55
+	_ISC_inhibit                   @56
+	_ISC_enable                    @57
+
+; ISC_SYNC.C
+	_ISC_event_clear               @58
+	_ISC_event_init                @59
+	_ISC_event_post                @60
+	_ISC_event_wait                @61
+	_ISC_map_file                  @62
+	_ISC_mutex_init                @63
+	_ISC_mutex_lock                @64
+	_ISC_mutex_unlock              @65
+	_ISC_remap_file                @66
+	_ISC_unmap_file                @67
+
+; LOITER.C
+	_LOITER_loiter                             @87
+
+; MATH.C
+	_MATH_divide                               @92
+	_MATH_multiply                             @93
+
+; NODE.C
+	_NODE_license                  @68
+
+
+; SDL.C
+	_SDL_compute_subscript         @70
+	_SDL_info                      @71
+	_SDL_prepare_slice             @72
+	_SDL_walk                      @73
+
+; THD.C
+	_gds__thread_start             @74
+
+	_THD_get_specific              @75
+	_THD_init                      @76
+	_THD_put_specific              @77
+	_THD_restore_specific          @78
+	_THD_mutex_destroy             @79
+	_THD_mutex_init                @80
+	_THD_mutex_lock                @81
+	_THD_mutex_unlock              @82
+	_THD_wlck_destroy              @83
+	_THD_wlck_init                 @84
+	_THD_wlck_lock                 @85
+	_THD_wlck_unlock               @86
+
+; ../DSQL/UTLD.C
+	_UTLD_parse_sql_info           @88
+	_UTLD_parse_sqlda              @89
+	_UTLD_save_status_strings      @90
+
+; SEG.C
+	_SEG_compare		       @101
+	_SEG_move                      @99
+	_SEG_set                       @100
+
+
+;-------------------------------------------
+	WEP                             @1 RESIDENTNAME
+

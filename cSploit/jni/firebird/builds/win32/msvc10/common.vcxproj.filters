@@ -1,0 +1,525 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="common">
+      <UniqueIdentifier>{f95ad003-41e0-4fd7-b4de-7f3a729835c3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="classes">
+      <UniqueIdentifier>{496670e9-f445-4416-a716-96ec5709858c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="config">
+      <UniqueIdentifier>{dfed73a4-6b65-411d-b43b-d000b7edfb70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{03f83331-723e-4ba5-9ebb-348f0554a088}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\common\xdr.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\Auth.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\call_service.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\CharSet.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\cvt.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\db_alias.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\dllinst.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\dsc.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\enc.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\fb_exception.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\IntlUtil.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\isc.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\isc_file.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\isc_sync.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\pretty.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\ScanDir.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\sdl.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\sha.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\StatusArg.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\StatusHolder.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\TextType.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\thd.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\ThreadData.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\ThreadStart.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\unicode_util.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\utils.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\UtilSvc.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\UserBlob.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\alloc.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\BaseStream.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\ClumpletReader.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\ClumpletWriter.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\DbImplementation.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\fb_string.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\init.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\locks.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\MetaName.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\MsgPrint.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\SafeArg.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\semaphore.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\Switches.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\TempFile.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\timestamp.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\config\config.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\config\config_file.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\config\ConfigCache.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\config\dir_list.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\config\os\win32\config_root.cpp">
+      <Filter>config</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\os\win32\fbsyslog.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\os\win32\guid.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\os\win32\isc_ipc.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\os\win32\mod_loader.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\os\win32\os_utils.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\os\win32\path_utils.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\security.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\StatementMetadata.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\Synchronize.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\SyncObject.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\ImplementHelper.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\BigInteger.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\NoThrowTimeStamp.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\BlrWriter.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\classes\InternalMessageBuffer.cpp">
+      <Filter>classes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\IntlParametersBlock.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\MsgMetadata.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\common\xdr_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\Auth.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\call_service.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\cdbtable.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\CharSet.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\CsConvert.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\cvt.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\db_alias.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\dllinst.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\dsc.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\dsc_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\dsc_pub.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\dyntable.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\enc_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\intlobj_new.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\IntlUtil.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\isc_f_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\isc_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\isc_s_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\prett_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\ScanDir.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\sdl.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\sdl_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\sdltable.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\sha.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\StatusArg.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\StatusHolder.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\stuff.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\TextType.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\thd.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\ThreadData.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\ThreadStart.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\unicode_util.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\utils_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\UtilSvc.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\xdr.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\vector.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\Aligner.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\alloc.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\array.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\auto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\BaseStream.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\ByteChunk.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\ClumpletReader.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\ClumpletWriter.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\condition.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\DbImplementation.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\fb_atomic.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\fb_pair.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\fb_string.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\fb_tls.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\File.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\FpeControl.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\GenericMap.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\Hash.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\ImplementHelper.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\init.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\locks.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\MetaName.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\MsgPrint.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\NestConst.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\Nullable.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\objects_array.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\QualifiedName.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\RefCounted.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\RefMutex.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\rwlock.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\SafeArg.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\semaphore.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\sparse_bitmap.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\stack.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\Switches.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\TempFile.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\timestamp.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\tree.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\TriState.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\UserBlob.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\VaryStr.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\config\config.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\config\config_file.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\config\ConfigCache.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\config\dir_list.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\config\os\config_root.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\os\divorce.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\os\fbsyslog.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\os\guid.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\os\isc_i_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\os\mod_loader.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\os\os_utils.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\os\path_utils.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\common.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\file_params.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\gdsassert.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\StatementMetadata.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\SyncObject.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\Synchronize.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\BigInteger.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\NoThrowTimeStamp.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\BlrReader.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\BlrWriter.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\classes\InternalMessageBuffer.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\IntlParametersBlock.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common\MsgMetadata.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

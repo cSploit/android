@@ -1,0 +1,11 @@
+--- libnet.orig/src/libnet_pblock.c
++++ libnet/src/libnet_pblock.c
+@@ -389,7 +389,7 @@
+             {
+                 if ((q->flags) & LIBNET_PBLOCK_DO_CHECKSUM)
+                 {
+-                    int offset = (l->total_size + l->aligner) - q->ip_offset;
++                    int offset = l->aligner + q->ip_offset;
+                     c = libnet_do_checksum(l, *packet + offset,
+                             libnet_pblock_p2p(q->type), q->h_len);
+                     if (c == -1)

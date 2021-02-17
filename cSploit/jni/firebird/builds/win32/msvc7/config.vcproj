@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="config" ProjectGUID="{E83187C1-AAC2-445D-B8B2-883EFC10C39A}">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Release|Win32" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="2" InlineFunctionExpansion="1" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" AdditionalIncludeDirectories="../../../src/include;../../../src/include/gen;../../../src/jrd;../../../src/vulcan;../../../src/include,../../../src/include/gen" PreprocessorDefinitions="WIN32,NDEBUG,_LIB;NAMESPACE=Vulcan" AdditionalOptions="/EHsc-" OmitFramePointers="true" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLinkerTool" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+    </Configuration>
+    <Configuration Name="Debug|Win32" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" AdditionalIncludeDirectories="../../../src/include;../../../src/include/gen;../../../src/jrd;../../../src/vulcan;../../../src/include,../../../src/include/gen" PreprocessorDefinitions="WIN32;_DEBUG;_LIB;DEV_BUILD;NAMESPACE=Vulcan" UsePrecompiledHeader="0" AdditionalOptions="/EHsc-" OmitFramePointers="true" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLinkerTool" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="Config files">
+      <File RelativePath="..\..\..\src\config\AdminException.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\Args.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\ArgsException.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\ConfigFile.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\Configuration.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\ConfObj.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\ConfObject.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\Element.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\FileName.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\InputFile.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\InputStream.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\Lex.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\ScanDir.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\Stream.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\config\StreamSegment.cpp">
+      </File>
+    </Filter>
+    <Filter Name="Vulcan files">
+      <File RelativePath="..\..\..\src\vulcan\PathName.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\vulcan\RefObject.cpp">
+      </File>
+    </Filter>
+    <Filter Name="Header files" Filter="h">
+      <File RelativePath="..\..\..\src\vulcan\PathName.h">
+      </File>
+      <File RelativePath="..\..\..\src\vulcan\RefObject.h">
+      </File>
+      <File RelativePath="..\..\..\src\config\ScanDir.h">
+      </File>
+    </Filter>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

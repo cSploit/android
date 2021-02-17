@@ -1,0 +1,17 @@
+GENCCODE_ASSEMBLY_TYPE=-a gcc
+SO=so
+SOBJ=so
+A=a
+LIBPREFIX=lib
+LIB_EXT_ORDER=.42.0
+COMPILE=gcc -D_REENTRANT  -O3  -c
+LIBFLAGS=-I../common -I../common -DPIC -fPIC
+GENLIB=gcc -O3   -shared
+LDICUDTFLAGS=-nodefaultlibs -nostdlib
+LD_SONAME=-Wl,-soname -Wl,
+RPATH_FLAGS=
+BIR_LDFLAGS=-Wl,-Bsymbolic
+AR=/usr/bin/ar
+ARFLAGS=r
+RANLIB=ranlib
+INSTALL_CMD=/usr/bin/install -c -m 644

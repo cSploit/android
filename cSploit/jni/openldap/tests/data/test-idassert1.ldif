@@ -1,0 +1,67 @@
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: uid=bjorn,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Bjorn Jensen
+sn: Jensen
+uid: bjorn
+userPassword:: Ympvcm4=
+mail: bjorn@example.com
+description: ***
+authzFrom: dn.exact:uid=jaj,o=Example,c=US
+authzFrom: dn.subtree:ou=People,dc=example,dc=it
+
+dn: uid=bjensen,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Barbara Jensen
+sn: Jensen
+uid: bjensen
+userPassword:: YmplbnNlbg==
+mail: bjensen@example.com
+description: ***
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=All,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: All
+member: uid=bjorn,ou=People,dc=example,dc=com
+member: uid=bjensen,ou=People,dc=example,dc=com
+
+dn: cn=Authorizable,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Authorizable
+member: uid=bjorn,ou=People,dc=example,dc=com
+
+dn: ou=Admin,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Admin
+
+dn: cn=Proxy US,ou=Admin,dc=example,dc=com
+objectClass: applicationProcess
+objectClass: simpleSecurityObject
+cn: Proxy US
+userPassword:: cHJveHk=
+authzTo: dn.subtree:ou=People,dc=example,dc=it
+
+dn: cn=Proxy IT,ou=Admin,dc=example,dc=com
+objectClass: applicationProcess
+objectClass: simpleSecurityObject
+cn: Proxy IT
+userPassword:: cHJveHk=
+authzTo: dn.exact:cn=Sandbox,ou=Admin,dc=example,dc=com
+authzTo: dn.exact:
+
+dn: cn=Sandbox,ou=Admin,dc=example,dc=com
+objectClass: applicationProcess
+cn: Sandbox

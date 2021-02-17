@@ -1,0 +1,55 @@
+-------------
+BUILDING CSVN
+-------------
+
+Before building csvn, first verify that you have all the required software
+installed:
+
+  - Python 2.4 or later
+  - ctypes 1.0 or later (NOTE: ctypes is included by default with Python 2.5)
+  - Subversion 1.4.3 or later (including header files)
+  - APR and APR-util (including header files, and the
+                      apr-1-config / apr-config script)
+
+Next, checkout the latest version of ctypesgen from
+http://code.google.com/p/ctypesgen/ to a "ctypesgen" subdirectory under
+the ctypes python bindings.
+
+For example:
+   $ svn co http://ctypesgen.googlecode.com/svn/trunk ctypesgen
+
+Once you have all of the above software installed, you can build the
+ctypes Python bindings by running the following:
+
+python setup.py build --apr=<path> --apr-util=<path> --subversion=<path> \
+--ctypesgen=<path>
+
+If you're having problems getting the right path specified for any of the
+options above, or you'd like a full list of options which can be passed to
+the setup.py build command, feel free to run "python setup.py build --help".
+
+------------
+TESTING CSVN
+------------
+
+You can test the bindings by running test/run_all.py. The output of
+test/run_all.py should look something like this:
+
+   $ python test/run_all.py
+
+   ..........................
+   ----------------------------------------------------------------------
+   Ran 26 tests in 51.456s
+
+   OK
+
+---------------
+INSTALLING CSVN
+---------------
+
+One you have built the ctypes python bindings using "python setup.py build ..."
+you can then install the bindings using the "python setup.py install" command.
+This command, by default, will install the ctypes-python-bindings into your
+Python's site-packages but if you'd like to install elsewhere, feel free to run
+"python setup.py install --help" to get a list of options that will help you
+install the ctypes-python-bindings wherever and however you'd like.

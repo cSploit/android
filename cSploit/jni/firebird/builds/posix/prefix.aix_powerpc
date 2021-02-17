@@ -1,0 +1,81 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+# Copyright (C) Inprise Corporation.
+#
+# All Rights Reserved.
+# Contributor(s): Bill Oliver
+#
+# Compiler settings for 64-bit AIX/powerpc using gcc and native linker
+#
+# Tested with AIX 6.1.0.0. Requires AIX 5.1+
+#
+# 2008-11-04 recommend gcc 4.3.1 or higher
+#
+# To compile an application in 64 bit mode, one should use the option -maix64,
+# which enables the 64-bit AIX ABI such as: 64-bit pointers, 64-bit long type,
+# and the infrastructure needed to support them. Specifying -maix64 implies
+# -mpowerpc64 and -mpowerpc, while -maix32 disables the 64-bit ABI and implies
+# -mno-powerpc64. GCC defaults to -maix32.
+#
+# Notes:
+#
+# 1) Set these variables before running autogen.sh. If you don't,
+#    sizeof long will be incorrectly detected as 4, not 8, by autoconf.
+#
+#       export CXXFLAGS=-maix64
+#       export CFLAGS=-maix64
+
+# _AIX, _POWER are pre-defined by gcc. To see list of all system-specific
+# pre-defined macros, type "echo | cpp -dM  | sort"
+
+
+# we put the g++ runtime in the LIBPATH env variable so that gpre_boot
+# and other tools can find it during the build process. The -blibpath
+# option removes this path from the output object modules.
+GCC_RUNTIME=$(shell dirname $(shell g++ $(CXXFLAGS) -print-file-name=libstdc++.a))
+export GCC_RUNTIME
+LIBPATH=$(FIREBIRD)/lib:$(GCC_RUNTIME)
+export LIBPATH
+
+# AIX ld option to set run-time library path is -Wl-blibpath:path1:path2
+# Additional -blibpath options are not additive! All paths must be provided as a colon separated list.
+LIB_PATH_OPTS= -Wl,-blibpath:@FB_LIBDIR@:@FB_INTLDIR@:/usr/local/lib:/usr/lib:/lib:$(GCC_RUNTIME)
+
+# non-firebird libraries have .a extension
+SHRLIB_FOREIGN_EXT=a
+
+# -O3 causes lock manager seizure for gcc 4.2.3, 4.2.4, -O2 is ok
+# -O3 turns on -finline-functions, no need to specify it explicitly.
+PROD_FLAGS=-ggdb -O3 -fsigned-char -fmessage-length=0 -fno-omit-frame-pointer -pipe -MMD -fPIC 
+
+# -Wno-unused-variable
+DEV_FLAGS=-ggdb -O0 -fsigned-char -fmessage-length=0 -pipe -MMD -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-switch -Wno-parentheses -Wno-unknown-pragmas -Wno-non-virtual-dtor
+
+# link options when using IBM /usr/bin/ld fronted by g++
+EXE_LINK_OPTIONS= $(LDFLAGS) $(THR_FLAGS) $(UNDEF_FLAGS) $(LIB_PATH_OPTS) -Wl,-bbigtoc,-brtl
+LIB_LINK_OPTIONS= $(LDFLAGS) $(THR_FLAGS) $(LIB_PATH_OPTS) -shared -Wl,-G,-bbigtoc
+
+# AIX ld uses "export files" to manage symbol visibility. Export files are
+# functionally similar to "version files" on ELF systems and are specified
+# with the "-Wl,-bE:exportfile.exp" option.
+LIB_LINK_MAPFILE=-Wl,-bE:$(1)
+
+# These options aren't used by AIX (XCOFF) object files...
+LIB_LINK_RPATH=
+LIB_LINK_SONAME=
+
+# add LDFLAGS here, so it will be picked up even if user doesn't export LDFLAGS
+#LDFLAGS=-Wl,-bbigtoc,-b64
+#LDFLAGS=-Wl,-bbigtoc
+
+UNDEF_PLATFORM=

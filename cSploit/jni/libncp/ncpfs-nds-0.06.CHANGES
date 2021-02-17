@@ -1,0 +1,96 @@
+Release 0.06, January 20, 1998
+*	Signature support (re)included. Because of this the name has changed
+	and the kernel patch is added.
+*	Fixed segfault in nds_login_auth when trying server context.
+	(with thanks to K J MacDonald, kenny@holyrood.ed.ac.uk)
+
+
+Release 0.05, November 7, 1997
+*	Added include errno.h to ndslib.c (needed for glibc)
+*	Modified nwsfind to accept -a parameter that causes nwsfind to
+	interpret the server name as an address.
+*	Fixed segfault in ncp_open_addr
+*	Modified lib/ncplib.c:ncp_open_addr to call nwsfind with the address
+	(creates a route to the address if necessary).
+
+Release 0.04, November 5, 1997
+Changes since 0.03:
+*	Added support for NDS login/authenticate to a read-only replica 
+	(untested)
+*	ncpmount has new option -b to use bindery logins to NDS servers 
+	(actually since	0.01)
+(Again with thanks to Petr Vandrovec, vandrove@vc.cvut.cz)
+
+
+Release 0.03, November 2, 1997
+Changes since 0.02:
+*	(Hopefully temporarily) removed signature support, it seems to be
+	legally protected. Because of this the name has changed and the
+	kernel patch is removed.
+
+
+Release 0.02, October 15, 1997
+Changes since 0.01:
+*	Fixed bug with empty passwords
+*	Fixed bug with beginlogin id != user id
+*	Fixed bug with fragger handle != 0
+*	Removed ncpsign.* from ./sutil, moved ncpsign.h to ./include
+*	Reorganized packet signature initializing
+*	Added support for NDS grace logins
+(With thanks to Petr Vandrovec, vandrove@vc.cvut.cz)
+
+
+Changes made by ncpfs-nds-sign-0.01.patch:
+
+*	Adds NDS_SUPPORT conditional variable to main Makefile
+*	Puts set -e; ahead of the SUBDIRS loop in the main Makefile to abort
+	the loop if compilation in a subdir fails
+*	Adds README.NDS file
+*	Adds fields for packet signatures to struct ncp_conn
+*	Adds the following functions to the lib/ncplib.c
+	ncp_negotiate_size_and_options Negotiate packet size and options
+	ncp_get_bindery_access_level Get bindery access level
+	ncp_init_pb_conn	Initialize packet burst connection
+	ncp_send_nds_frag	Send message with NDS fragger protocol
+	ncp_sign_start		Initialize internal signing structures
+	ncp_send_nds		Send request for NDS function
+	ncp_change_conn_state	Change NW 4 connection state
+*	Modifies ncp_open_temporary in lib/ncplib.c to use NDS login if
+	compiled with -DNDS_SUPPORT and server has NDS.
+*	Adds two error messages to ncplib_err.et
+*	Modifies lib/ncplib.c to generate packet signatures when wanted.
+*	Adds lib/ndslib.c with the following external used functions:
+	strlen_u		Get length of unicode string
+	strcpy_uc		Copy unicode string to normal string
+	strcpy_cu		Copy normal string to unicode string
+	nds_get_server_name	Get name and domain of current server
+	nds_get_tree_name	Get current NDS tree name
+	nds_login_auth		NDS login and authenticate to current server
+*	Adds mpilib.c, mpilib.h, usuals.h and platform.h from the PGP 2.3
+	source to lib/ for the RSA encryption, which is necessary for NDS
+	login/authenticate.
+*	Adds lib/ndscrypt.c with hash and encrypt functions for NDS login.
+*	Adds lib/ncpsign.c with a MD4 hash function for packet signatures.
+*	Modifies lib/Makefile to add ncpsign.o, ndslib.o, mpilib.o and 
+	ndscrypt.o to libncp.
+*	Modifies sutil/Makefile to add ndslib.o,mpilib.o,ndscrypt.o to libncp.
+*	Adds ncp_send_nds_frag, ncp_send_nds, ncp_change_conn_state to
+        sutil/ncplib.c
+*	Modifies sutil/ncpmount.c to:
+	give more verbose error message if mount(2) fails;
+	use NDS login if compiled with -DNDS_SUPPORT and server has NDS;
+	start packet signature generation.
+(See below for changes to kernel-1.2/*)
+
+
+Changes made by ncpfs-nds-sign-0.01.kernel.patch:
+
+*	Modifies Makefile to add ncpsign_kernel.o to ncpfs.o
+*	Modifies inode.c to query whether the server wants packet signatures.
+*	Adds ioctls to start packet signature generation and to query
+	whether the server wants packet signing.
+*	Adds ncp_negotiate_size_and_options to ncplib_kernel.c.
+*	Modifies sock.c to sign packets when enabled.
+*	Adds ncpsign_kernel.c to generatie packet signatures.
+
+Arne de Bruijn, October 4, 1997

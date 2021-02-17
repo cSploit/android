@@ -1,0 +1,1332 @@
+.TH SLAPD-META 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation, All Rights Reserved.
+.\" Copying restrictions apply.  See the COPYRIGHT file.
+.\" Copyright 2001, Pierangelo Masarati, All rights reserved. <ando@sys-net.it>
+.\" $OpenLDAP$
+.\"
+.\" Portions of this document should probably be moved to slapd-ldap(5)
+.\" and maybe manual pages for librewrite.
+.\"
+.SH NAME
+slapd\-meta \- metadirectory backend to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The
+.B meta
+backend to
+.BR slapd (8)
+performs basic LDAP proxying with respect to a set of remote LDAP
+servers, called "targets".
+The information contained in these servers can be presented as
+belonging to a single Directory Information Tree (DIT).
+.LP
+A basic knowledge of the functionality of the
+.BR slapd\-ldap (5)
+backend is recommended.
+This backend has been designed as an enhancement of the ldap backend.
+The two backends share many features (actually they also share
+portions of code).
+While the
+.B ldap
+backend is intended to proxy operations directed to a single server, the
+.B meta
+backend is mainly intended for proxying of multiple servers and possibly
+naming context masquerading.
+These features, although useful in many scenarios, may result in
+excessive overhead for some applications, so its use should be
+carefully considered.
+In the examples section, some typical scenarios will be discussed.
+
+The proxy instance of
+.BR slapd (8)
+must contain schema information for the attributes and objectClasses
+used in filters, request DN and request-related data in general.
+It should also contain schema information for the data returned
+by the proxied server.
+It is the responsibility of the proxy administrator to keep the schema
+of the proxy lined up with that of the proxied server.
+
+.LP
+Note: When looping back to the same instance of \fBslapd\fP(8), 
+each connection requires a new thread; as a consequence, \fBslapd\fP(8)
+must be compiled with thread support, and the \fBthreads\fP parameter 
+may need some tuning; in those cases, unless the multiple target feature
+is required, one may consider using \fBslapd\-relay\fP(5) instead, 
+which performs the relayed operation internally and thus reuses 
+the same connection.
+
+.SH EXAMPLES
+There are examples in various places in this document, as well as in the
+slapd/back\-meta/data/ directory in the OpenLDAP source tree.
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the META backend database.
+That is, they must follow a "database meta" line and come before any
+subsequent "backend" or "database" lines.
+Other database options are described in the
+.BR slapd.conf (5)
+manual page.
+.LP
+Note: In early versions of back-ldap and back-meta it was recommended to always set
+.LP
+.RS
+.nf
+lastmod  off
+.fi
+.RE
+.LP
+for 
+.B ldap
+and
+.B meta
+databases.
+This was required because operational attributes related to entry creation 
+and modification should not be proxied, as they could be mistakenly written
+to the target server(s), generating an error.
+The current implementation automatically sets lastmod to \fBoff\fP, 
+so its use is redundant and should be omitted.
+
+.SH SPECIAL CONFIGURATION DIRECTIVES
+Target configuration starts with the "uri" directive.
+All the configuration directives that are not specific to targets
+should be defined first for clarity, including those that are common
+to all backends.
+They are:
+
+.TP
+.B conn\-ttl <time>
+This directive causes a cached connection to be dropped an recreated
+after a given ttl, regardless of being idle or not.
+
+.TP
+.B default\-target none
+This directive forces the backend to reject all those operations
+that must resolve to a single target in case none or multiple
+targets are selected.
+They include: add, delete, modify, modrdn; compare is not included, as
+well as bind since, as they don't alter entries, in case of multiple
+matches an attempt is made to perform the operation on any candidate
+target, with the constraint that at most one must succeed.
+This directive can also be used when processing targets to mark a
+specific target as default.
+
+.TP
+.B dncache\-ttl {DISABLED|forever|<ttl>}
+This directive sets the time-to-live of the DN cache.
+This caches the target that holds a given DN to speed up target
+selection in case multiple targets would result from an uncached
+search; forever means cache never expires; disabled means no DN
+caching; otherwise a valid ( > 0 ) ttl is required, in the format
+illustrated for the 
+.B idle\-timeout
+directive.
+
+.TP
+.B onerr {CONTINUE|report|stop}
+This directive allows to select the behavior in case an error is returned
+by one target during a search.
+The default, \fBcontinue\fP, consists in continuing the operation, 
+trying to return as much data as possible.
+If the value is set to \fBstop\fP, the search is terminated as soon 
+as an error is returned by one target, and the error is immediately 
+propagated to the client.
+If the value is set to \fBreport\fP, the search is continuated to the end
+but, in case at least one target returned an error code, the first
+non-success error code is returned.
+
+.TP
+.B norefs <NO|yes>
+If
+.BR yes ,
+do not return search reference responses.
+By default, they are returned unless request is LDAPv2.
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.TP
+.B noundeffilter <NO|yes>
+If
+.BR yes ,
+return success instead of searching if a filter is undefined or contains
+undefined portions.
+By default, the search is propagated after replacing undefined portions
+with
+.BR (!(objectClass=*)) ,
+which corresponds to the empty result set.
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.TP
+.B protocol\-version {0,2,3}
+This directive indicates what protocol version must be used to contact
+the remote server.
+If set to 0 (the default), the proxy uses the same protocol version 
+used by the client, otherwise the requested protocol is used.
+The proxy returns \fIunwillingToPerform\fP if an operation that is 
+incompatible with the requested protocol is attempted.
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.TP
+.B pseudoroot\-bind\-defer {YES|no}
+This directive, when set to 
+.BR yes ,
+causes the authentication to the remote servers with the pseudo-root
+identity (the identity defined in each
+.B idassert-bind
+directive) to be deferred until actually needed by subsequent operations.
+Otherwise, all binds as the rootdn are propagated to the targets.
+
+.TP
+.B quarantine <interval>,<num>[;<interval>,<num>[...]]
+Turns on quarantine of URIs that returned
+.IR LDAP_UNAVAILABLE ,
+so that an attempt to reconnect only occurs at given intervals instead
+of any time a client requests an operation.
+The pattern is: retry only after at least
+.I interval
+seconds elapsed since last attempt, for exactly
+.I num
+times; then use the next pattern.
+If
+.I num
+for the last pattern is "\fB+\fP", it retries forever; otherwise, 
+no more retries occur.
+This directive must appear before any target specification;
+it affects all targets with the same pattern.
+
+.TP
+.B rebind\-as\-user {NO|yes}
+If this option is given, the client's bind credentials are remembered
+for rebinds, when trying to re-establish a broken connection,
+or when chasing a referral, if 
+.B chase\-referrals
+is set to
+.IR yes .
+
+.TP
+.B session\-tracking\-request {NO|yes}
+Adds session tracking control for all requests.
+The client's IP and hostname, and the identity associated to each request,
+if known, are sent to the remote server for informational purposes.
+This directive is incompatible with setting \fIprotocol\-version\fP to 2.
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.TP
+.B single\-conn {NO|yes}
+Discards current cached connection when the client rebinds.
+
+.TP
+.B use\-temporary\-conn {NO|yes}
+when set to 
+.BR yes ,
+create a temporary connection whenever competing with other threads
+for a shared one; otherwise, wait until the shared connection is available.
+
+.SH TARGET SPECIFICATION
+Target specification starts with a "uri" directive:
+
+.TP
+.B uri <protocol>://[<host>]/<naming context> [...]
+The <protocol> part can be anything
+.BR ldap_initialize (3)
+accepts ({ldap|ldaps|ldapi} and variants); the <host> may be
+omitted, defaulting to whatever is set in
+.BR ldap.conf (5).
+The <naming context> part is \fImandatory\fP for the first URI,
+but it \fImust be omitted\fP for subsequent ones, if any.
+The naming context part must be within the naming context defined for the backend,
+e.g.:
+.LP
+.RS
+.nf
+suffix "\fBdc=foo,dc=com\fP"
+uri    "ldap://x.foo.com/dc=x,\fBdc=foo,dc=com\fP"
+.fi
+
+.RE
+.RS
+The <naming context> part doesn't need to be unique across the targets;
+it may also match one of the values of the "suffix" directive.
+Multiple URIs may be defined in a single URI statement.
+The additional URIs must be separate arguments and must not have any
+<naming context> part.  This causes the underlying library
+to contact the first server of the list that responds.
+For example, if \fIl1.foo.com\fP and \fIl2.foo.com\fP are shadows
+of the same server, the directive
+.LP
+.nf
+suffix "\fBdc=foo,dc=com\fP"
+uri    "ldap://l1.foo.com/\fBdc=foo,dc=com\fP" "ldap://l2.foo.com/"
+.fi
+
+.RE
+.RS
+causes \fIl2.foo.com\fP to be contacted whenever \fIl1.foo.com\fP
+does not respond.
+In that case, the URI list is internally rearranged, by moving unavailable
+URIs to the end, so that further connection attempts occur with respect to
+the last URI that succeeded.
+.RE
+
+.TP
+.B acl\-authcDN "<administrative DN for access control purposes>"
+DN which is used to query the target server for acl checking,
+as in the LDAP backend; it is supposed to have read access 
+on the target server to attributes used on the proxy for acl checking.
+There is no risk of giving away such values; they are only used to
+check permissions.
+.B The acl\-authcDN identity is by no means implicitly used by the proxy 
+.B when the client connects anonymously.
+
+.TP
+.B acl\-passwd <password>
+Password used with the
+.B 
+acl\-authcDN
+above.
+
+.TP
+.B bind\-timeout <microseconds>
+This directive defines the timeout, in microseconds, used when polling
+for response after an asynchronous bind connection.  The initial call
+to ldap_result(3) is performed with a trade-off timeout of 100000 us;
+if that results in a timeout exceeded, subsequent calls use the value
+provided with
+.BR bind\-timeout .
+The default value is used also for subsequent calls if
+.B bind\-timeout
+is not specified.
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.TP
+.B chase\-referrals {YES|no}
+enable/disable automatic referral chasing, which is delegated to the
+underlying libldap, with rebinding eventually performed if the
+\fBrebind\-as\-user\fP directive is used.  The default is to chase referrals.
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.TP
+.B client\-pr {accept-unsolicited|DISABLE|<size>}
+This feature allows to use RFC 2696 Paged Results control when performing
+search operations with a specific target,
+irrespective of the client's request.
+When set to a numeric value, Paged Results control is always
+used with \fIsize\fP as the page size.
+When set to \fIaccept-unsolicited\fP, unsolicited Paged Results
+control responses are accepted and honored
+for compatibility with broken remote DSAs.
+The client is not exposed to paged results handling
+between
+.BR slapd\-meta (5)
+and the remote servers.
+By default (disabled), Paged Results control is not used
+and responses are not accepted.
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.TP
+.B default\-target [<target>]
+The "default\-target" directive can also be used during target specification.
+With no arguments it marks the current target as the default.
+The optional number marks target <target> as the default one, starting
+from 1.
+Target <target> must be defined.
+
+.TP
+.B filter <pattern>
+This directive allows specifying a
+.BR regex (5)
+pattern to indicate what search filter terms are actually served by a target.
+
+In a search request, if the search filter matches the \fIpattern\fP
+the target is considered while fulfilling the request; otherwise
+the target is ignored. There may be multiple occurrences of
+the
+.B filter
+directive for each target.
+
+.TP
+.B idassert\-authzFrom <authz-regexp>
+if defined, selects what
+.I local
+identities are authorized to exploit the identity assertion feature.
+The string
+.B <authz-regexp>
+follows the rules defined for the
+.I authzFrom
+attribute.
+See 
+.BR slapd.conf (5),
+section related to
+.BR authz\-policy ,
+for details on the syntax of this field.
+
+.HP
+.hy 0
+.B idassert\-bind
+.B bindmethod=none|simple|sasl [binddn=<simple DN>] [credentials=<simple password>]
+.B [saslmech=<SASL mech>] [secprops=<properties>] [realm=<realm>]
+.B [authcId=<authentication ID>] [authzId=<authorization ID>]
+.B [authz={native|proxyauthz}] [mode=<mode>] [flags=<flags>]
+.B [starttls=no|yes|critical]
+.B [tls_cert=<file>]
+.B [tls_key=<file>]
+.B [tls_cacert=<file>]
+.B [tls_cacertdir=<path>]
+.B [tls_reqcert=never|allow|try|demand]
+.B [tls_ciphersuite=<ciphers>]
+.B [tls_protocol_min=<major>[.<minor>]]
+.B [tls_crlcheck=none|peer|all]
+.RS
+Allows to define the parameters of the authentication method that is 
+internally used by the proxy to authorize connections that are 
+authenticated by other databases.
+The identity defined by this directive, according to the properties
+associated to the authentication method, is supposed to have auth access 
+on the target server to attributes used on the proxy for authentication
+and authorization, and to be allowed to authorize the users.
+This requires to have
+.B proxyAuthz
+privileges on a wide set of DNs, e.g.
+.BR authzTo=dn.subtree:"" ,
+and the remote server to have
+.B authz\-policy
+set to
+.B to
+or
+.BR both .
+See
+.BR slapd.conf (5)
+for details on these statements and for remarks and drawbacks about
+their usage.
+The supported bindmethods are
+
+\fBnone|simple|sasl\fP
+
+where
+.B none
+is the default, i.e. no \fIidentity assertion\fP is performed.
+
+The authz parameter is used to instruct the SASL bind to exploit 
+.B native 
+SASL authorization, if available; since connections are cached,
+this should only be used when authorizing with a fixed identity
+(e.g. by means of the 
+.B authzDN
+or
+.B authzID
+parameters).
+Otherwise, the default
+.B proxyauthz
+is used, i.e. the proxyAuthz control (Proxied Authorization, RFC 4370)
+is added to all operations.
+
+The supported modes are:
+
+\fB<mode> := {legacy|anonymous|none|self}\fP
+
+If 
+.B <mode>
+is not present, and 
+.B authzId
+is given, the proxy always authorizes that identity.
+.B <authorization ID>
+can be 
+
+\fBu:<user>\fP
+
+\fB[dn:]<DN>\fP
+
+The former is supposed to be expanded by the remote server according 
+to the authz rules; see
+.BR slapd.conf (5)
+for details.
+In the latter case, whether or not the 
+.B dn:
+prefix is present, the string must pass DN validation and normalization.
+
+The default mode is 
+.BR legacy ,
+which implies that the proxy will either perform a simple bind as the
+.I authcDN
+or a SASL bind as the
+.I authcID
+and assert the client's identity when it is not anonymous.
+Direct binds are always proxied.
+The other modes imply that the proxy will always either perform a simple bind 
+as the
+.IR authcDN
+or a SASL bind as the
+.IR authcID ,
+unless restricted by
+.BR idassert\-authzFrom
+rules (see below), in which case the operation will fail;
+eventually, it will assert some other identity according to
+.BR <mode> .
+Other identity assertion modes are
+.BR anonymous
+and
+.BR self ,
+which respectively mean that the 
+.I empty 
+or the 
+.IR client 's 
+identity
+will be asserted;
+.BR none ,
+which means that no proxyAuthz control will be used, so the
+.I authcDN
+or the
+.I authcID
+identity will be asserted.
+For all modes that require the use of the
+.I proxyAuthz 
+control, on the remote server the proxy identity must have appropriate 
+.I authzTo
+permissions, or the asserted identities must have appropriate
+.I authzFrom 
+permissions.  Note, however, that the ID assertion feature is mostly 
+useful when the asserted identities do not exist on the remote server.
+When
+.I bindmethod
+is
+.BR SASL ,
+the 
+.I authcDN
+must be specified in addition to the
+.IR authcID ,
+although it is not used within the authentication process.
+
+Flags can be
+
+\fBoverride,[non\-]prescriptive,proxy\-authz\-[non\-]critical\fP
+
+When the 
+.B override
+flag is used, identity assertion takes place even when the database
+is authorizing for the identity of the client, i.e. after binding
+with the provided identity, and thus authenticating it, the proxy
+performs the identity assertion using the configured identity and
+authentication method.
+
+When the
+.B prescriptive
+flag is used (the default), operations fail with
+\fIinappropriateAuthentication\fP
+for those identities whose assertion is not allowed by the
+.B idassert\-authzFrom
+patterns.
+If the 
+.B non\-prescriptive
+flag is used, operations are performed anonymously for those identities 
+whose assertion is not allowed by the
+.B idassert\-authzFrom
+patterns.
+
+When the
+.B proxy\-authz\-non\-critical
+flag is used (the default), the proxyAuthz control is not marked as critical,
+in violation of RFC 4370.  Use of
+.B proxy\-authz\-critical
+is recommended.
+
+The TLS settings default to the same as the main slapd TLS settings,
+except for
+.B tls_reqcert
+which defaults to "demand".
+
+The identity associated to this directive is also used for privileged
+operations whenever \fBidassert\-bind\fP is defined and \fBacl\-bind\fP
+is not.  See \fBacl\-bind\fP for details.
+.RE
+
+.TP
+.B idle\-timeout <time>
+This directive causes a cached connection to be dropped an recreated
+after it has been idle for the specified time.
+The value can be specified as
+
+[<d>d][<h>h][<m>m][<s>[s]]
+
+where <d>, <h>, <m> and <s> are respectively treated as days, hours, 
+minutes and seconds.
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.TP
+.B keepalive  <idle>:<probes>:<interval>
+The
+.B keepalive
+parameter sets the values of \fIidle\fP, \fIprobes\fP, and \fIinterval\fP
+used to check whether a socket is alive;
+.I idle
+is the number of seconds a connection needs to remain idle before TCP
+starts sending keepalive probes;
+.I probes
+is the maximum number of keepalive probes TCP should send before dropping
+the connection;
+.I interval
+is interval in seconds between individual keepalive probes.
+Only some systems support the customization of these values;
+the
+.B keepalive
+parameter is ignored otherwise, and system-wide settings are used.
+
+.TP
+.B map "{attribute|objectclass} [<local name>|*] {<foreign name>|*}"
+This maps object classes and attributes as in the LDAP backend.
+See
+.BR slapd\-ldap (5).
+
+.TP
+.B network\-timeout <time>
+Sets the network timeout value after which
+.BR poll (2)/ select (2) 
+following a 
+.BR connect (2) 
+returns in case of no activity.
+The value is in seconds, and it can be specified as for
+.BR idle\-timeout .
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.TP
+.B nretries {forever|never|<nretries>}
+This directive defines how many times a bind should be retried
+in case of temporary failure in contacting a target.  If defined
+before any target specification, it applies to all targets (by default,
+.BR 3
+times);
+the global value can be overridden by redefinitions inside each target
+specification.
+
+.TP
+.B rewrite* ...
+The rewrite options are described in the "REWRITING" section.
+
+.TP
+.B subtree\-{exclude|include} "<rule>"
+This directive allows to indicate what subtrees are actually served
+by a target.
+The syntax of the supported rules is
+
+\fB<rule>: [dn[.<style>]:]<pattern>\fP
+
+\fB<style>: subtree|children|regex\fP
+
+When \fB<style>\fP is either \fBsubtree\fP or \fBchildren\fP
+the \fB<pattern>\fP is a DN that must be within the naming context
+served by the target.
+When \fB<style>\fP is \fBregex\fP the \fB<pattern>\fP is a
+.BR regex (5)
+pattern.
+If the \fBdn.<style>:\fP prefix is omitted, \fBdn.subtree:\fP
+is implicitly assumed for backward compatibility.
+
+In the
+.B subtree\-exclude
+form if the \fIrequest DN\fP matches at least one rule,
+the target is not considered while fulfilling the request;
+otherwise, the target is considered based on the value of the \fIrequest DN\fP.
+When the request is a search, also the \fIscope\fP is considered.
+
+In the
+.B subtree\-include
+form if the \fIrequest DN\fP matches at least one rule,
+the target is considered while fulfilling the request;
+otherwise the target is ignored.
+
+.LP
+.RS
+.nf
+    |  match  | exclude |
+    +---------+---------+-------------------+
+    |    T    |    T    | not candidate     |
+    |    F    |    T    | continue checking |
+    +---------+---------+-------------------+
+    |    T    |    F    | candidate         |
+    |    F    |    F    | not candidate     |
+    +---------+---------+-------------------+
+.fi
+
+.RE
+.RS
+There may be multiple occurrences of the
+.B subtree\-exclude
+or
+.B subtree\-include
+directive for each of the targets, but they are mutually exclusive.
+.RE
+
+.TP
+.B suffixmassage "<virtual naming context>" "<real naming context>"
+All the directives starting with "rewrite" refer to the rewrite engine
+that has been added to slapd.
+The "suffixmassage" directive was introduced in the LDAP backend to
+allow suffix massaging while proxying.
+It has been obsoleted by the rewriting tools.
+However, both for backward compatibility and for ease of configuration
+when simple suffix massage is required, it has been preserved.
+It wraps the basic rewriting instructions that perform suffix
+massaging.  See the "REWRITING" section for a detailed list 
+of the rewrite rules it implies.
+
+.TP
+.B t\-f\-support {NO|yes|discover}
+enable if the remote server supports absolute filters
+(see \fIRFC 4526\fP for details).
+If set to
+.BR discover ,
+support is detected by reading the remote server's root DSE.
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.TP
+.B timeout [<op>=]<val> [...]
+This directive allows to set per-operation timeouts.
+Operations can be
+
+\fB<op> ::= bind, add, delete, modrdn, modify, compare, search\fP
+
+The overall duration of the \fBsearch\fP operation is controlled either
+by the \fBtimelimit\fP parameter or by server-side enforced
+time limits (see \fBtimelimit\fP and \fBlimits\fP in
+.BR slapd.conf (5)
+for details).
+This \fBtimeout\fP parameter controls how long the target can be 
+irresponsive before the operation is aborted.
+Timeout is meaningless for the remaining operations,
+\fBunbind\fP and \fBabandon\fP, which do not imply any response,
+while it is not yet implemented in currently supported \fBextended\fP 
+operations.
+If no operation is specified, the timeout \fBval\fP affects all
+supported operations.
+If specified before any target definition, it affects all targets
+unless overridden by per-target directives.
+
+Note: if the timeout is exceeded, the operation is cancelled
+(according to the \fBcancel\fP directive);
+the protocol does not provide any means to rollback operations,
+so the client will not be notified about the result of the operation,
+which may eventually succeeded or not.
+In case the timeout is exceeded during a bind operation, the connection
+is destroyed, according to RFC4511.
+
+.TP
+.B tls {[try\-]start|[try\-]propagate}
+execute the StartTLS extended operation when the connection is initialized;
+only works if the URI directive protocol scheme is not \fBldaps://\fP.
+\fBpropagate\fP issues the StartTLS operation only if the original
+connection did.
+The \fBtry\-\fP prefix instructs the proxy to continue operations
+if the StartTLS operation failed; its use is highly deprecated.
+If set before any target specification, it affects all targets, unless
+overridden by any per-target directive.
+
+.SH SCENARIOS
+A powerful (and in some sense dangerous) rewrite engine has been added
+to both the LDAP and Meta backends.
+While the former can gain limited beneficial effects from rewriting
+stuff, the latter can become an amazingly powerful tool.
+.LP
+Consider a couple of scenarios first.
+.LP
+1) Two directory servers share two levels of naming context;
+say "dc=a,dc=foo,dc=com" and "dc=b,dc=foo,dc=com".
+Then, an unambiguous Meta database can be configured as:
+.LP
+.RS
+.nf
+database meta
+suffix   "\fBdc=foo,dc=com\fP"
+uri      "ldap://a.foo.com/dc=a,\fBdc=foo,dc=com\fP"
+uri      "ldap://b.foo.com/dc=b,\fBdc=foo,dc=com\fP"
+.fi
+.RE
+.LP
+Operations directed to a specific target can be easily resolved
+because there are no ambiguities.
+The only operation that may resolve to multiple targets is a search
+with base "dc=foo,dc=com" and scope at least "one", which results in
+spawning two searches to the targets.
+.LP
+2a) Two directory servers don't share any portion of naming context,
+but they'd present as a single DIT
+[Caveat: uniqueness of (massaged) entries among the two servers is
+assumed; integrity checks risk to incur in excessive overhead and have
+not been implemented].
+Say we have "dc=bar,dc=org" and "o=Foo,c=US",
+and we'd like them to appear as branches of "dc=foo,dc=com", say
+"dc=a,dc=foo,dc=com" and "dc=b,dc=foo,dc=com".
+Then we need to configure our Meta backend as:
+.LP
+.RS
+.nf
+database      meta
+suffix        "dc=foo,dc=com"
+
+uri           "ldap://a.bar.com/\fBdc=a,dc=foo,dc=com\fP"
+suffixmassage "\fBdc=a,dc=foo,dc=com\fP" "dc=bar,dc=org"
+
+uri           "ldap://b.foo.com/\fBdc=b,dc=foo,dc=com\fP"
+suffixmassage "\fBdc=b,dc=foo,dc=com\fP" "o=Foo,c=US"
+.fi
+.RE
+.LP
+Again, operations can be resolved without ambiguity, although
+some rewriting is required.
+Notice that the virtual naming context of each target is a branch of
+the database's naming context; it is rewritten back and forth when
+operations are performed towards the target servers.
+What "back and forth" means will be clarified later.
+.LP
+When a search with base "dc=foo,dc=com" is attempted, if the 
+scope is "base" it fails with "no such object"; in fact, the
+common root of the two targets (prior to massaging) does not
+exist.
+If the scope is "one", both targets are contacted with the base
+replaced by each target's base; the scope is derated to "base".
+In general, a scope "one" search is honored, and the scope is derated,
+only when the incoming base is at most one level lower of a target's
+naming context (prior to massaging).
+.LP
+Finally, if the scope is "sub" the incoming base is replaced
+by each target's unmassaged naming context, and the scope
+is not altered.
+.LP
+2b) Consider the above reported scenario with the two servers
+sharing the same naming context:
+.LP
+.RS
+.nf
+database      meta
+suffix        "\fBdc=foo,dc=com\fP"
+
+uri           "ldap://a.bar.com/\fBdc=foo,dc=com\fP"
+suffixmassage "\fBdc=foo,dc=com\fP" "dc=bar,dc=org"
+
+uri           "ldap://b.foo.com/\fBdc=foo,dc=com\fP"
+suffixmassage "\fBdc=foo,dc=com\fP" "o=Foo,c=US"
+.fi
+.RE
+.LP
+All the previous considerations hold, except that now there is
+no way to unambiguously resolve a DN.
+In this case, all the operations that require an unambiguous target
+selection will fail unless the DN is already cached or a default
+target has been set.
+Practical configurations may result as a combination of all the
+above scenarios.
+.SH ACLs
+Note on ACLs: at present you may add whatever ACL rule you desire
+to to the Meta (and LDAP) backends.
+However, the meaning of an ACL on a proxy may require some
+considerations.
+Two philosophies may be considered:
+.LP
+a) the remote server dictates the permissions; the proxy simply passes
+back what it gets from the remote server.
+.LP
+b) the remote server unveils "everything"; the proxy is responsible
+for protecting data from unauthorized access.
+.LP
+Of course the latter sounds unreasonable, but it is not.
+It is possible to imagine scenarios in which a remote host discloses
+data that can be considered "public" inside an intranet, and a proxy
+that connects it to the internet may impose additional constraints.
+To this purpose, the proxy should be able to comply with all the ACL
+matching criteria that the server supports.
+This has been achieved with regard to all the criteria supported by
+slapd except a special subtle case (please file an ITS if you can
+find other exceptions: <http://www.openldap.org/its/>).
+The rule
+.LP
+.RS
+.nf
+access to dn="<dn>" attrs=<attr>
+       by dnattr=<dnattr> read
+       by * none
+.fi
+.RE
+.LP
+cannot be matched iff the attribute that is being requested, <attr>,
+is NOT <dnattr>, and the attribute that determines membership,
+<dnattr>, has not been requested (e.g. in a search)
+.LP
+In fact this ACL is resolved by slapd using the portion of entry it
+retrieved from the remote server without requiring any further
+intervention of the backend, so, if the <dnattr> attribute has not
+been fetched, the match cannot be assessed because the attribute is
+not present, not because no value matches the requirement!
+.LP
+Note on ACLs and attribute mapping: ACLs are applied to the mapped
+attributes; for instance, if the attribute locally known as "foo" is
+mapped to "bar" on a remote server, then local ACLs apply to attribute
+"foo" and are totally unaware of its remote name.
+The remote server will check permissions for "bar", and the local
+server will possibly enforce additional restrictions to "foo".
+.\"
+.\" If this section is moved, also update the reference in
+.\" libraries/librewrite/RATIONALE.
+.\"
+.SH REWRITING
+A string is rewritten according to a set of rules, called a `rewrite
+context'.
+The rules are based on POSIX (''extended'') regular expressions (regex)
+with substring matching; basic variable substitution and map resolution 
+of substrings is allowed by specific mechanisms detailed in the following.
+The behavior of pattern matching/substitution can be altered by a set
+of flags.
+.LP
+The underlying concept is to build a lightweight rewrite module
+for the slapd server (initially dedicated to the LDAP backend).
+.SH Passes
+An incoming string is matched against a set of rules.
+Rules are made of a regex match pattern, a substitution pattern
+and a set of actions, described by a set of flags.
+In case of match a string rewriting is performed according to the
+substitution pattern that allows to refer to substrings matched in the
+incoming string.
+The actions, if any, are finally performed.
+The substitution pattern allows map resolution of substrings.
+A map is a generic object that maps a substitution pattern to a value.
+The flags are divided in "Pattern matching Flags" and "Action Flags";
+the former alter the regex match pattern behavior while the latter
+alter the action that is taken after substitution.
+.SH "Pattern Matching Flags"
+.TP
+.B `C'
+honors case in matching (default is case insensitive)
+.TP
+.B `R'
+use POSIX ''basic'' regular expressions (default is ''extended'')
+.TP
+.B `M{n}'
+allow no more than
+.B n
+recursive passes for a specific rule; does not alter the max total count
+of passes, so it can only enforce a stricter limit for a specific rule.
+.SH "Action Flags"
+.TP
+.B `:'
+apply the rule once only (default is recursive)
+.TP
+.B `@'
+stop applying rules in case of match; the current rule is still applied 
+recursively; combine with `:' to apply the current rule only once 
+and then stop.
+.TP
+.B `#'
+stop current operation if the rule matches, and issue an `unwilling to
+perform' error.
+.TP
+.B `G{n}'
+jump
+.B n
+rules back and forth (watch for loops!).
+Note that `G{1}' is implicit in every rule.
+.TP
+.B `I'
+ignores errors in rule; this means, in case of error, e.g. issued by a
+map, the error is treated as a missed match.
+The `unwilling to perform' is not overridden.
+.TP
+.B `U{n}'
+uses
+.B
+n
+as return code if the rule matches; the flag does not alter the recursive
+behavior of the rule, so, to have it performed only once, it must be used 
+in combination with `:', e.g.
+.B `:U{16}'
+returns the value `16' after exactly one execution of the rule, if the
+pattern matches.
+As a consequence, its behavior is equivalent to `@', with the return
+code set to
+.BR n ;
+or, in other words, `@' is equivalent to `U{0}'.
+By convention, the freely available codes are above 16 included;
+the others are reserved.
+.LP
+The ordering of the flags can be significant.
+For instance: `IG{2}' means ignore errors and jump two lines ahead
+both in case of match and in case of error, while `G{2}I' means ignore
+errors, but jump two lines ahead only in case of match.
+.LP
+More flags (mainly Action Flags) will be added as needed.
+.SH "Pattern matching:"
+See
+.BR regex (7)
+and/or
+.BR re_format (7).
+.SH "Substitution Pattern Syntax:"
+Everything starting with `%' requires substitution;
+.LP
+the only obvious exception is `%%', which is left as is;
+.LP
+the basic substitution is `%d', where `d' is a digit;
+0 means the whole string, while 1-9 is a submatch;
+.LP
+a `%' followed by a `{' invokes an advanced substitution.
+The pattern is:
+.LP
+.RS
+`%' `{' [ <op> ] <name> `(' <substitution> `)' `}'
+.RE
+.LP
+where <name> must be a legal name for the map, i.e.
+.LP
+.RS
+.nf
+<name> ::= [a-z][a-z0-9]* (case insensitive)
+<op> ::= `>' `|' `&' `&&' `*' `**' `$'
+.fi
+.RE
+.LP
+and <substitution> must be a legal substitution
+pattern, with no limits on the nesting level.
+.LP
+The operators are:
+.TP
+.B >
+sub context invocation; <name> must be a legal, already defined
+rewrite context name
+.TP
+.B |
+external command invocation; <name> must refer to a legal, already
+defined command name (NOT IMPL.)
+.TP
+.B &
+variable assignment; <name> defines a variable in the running
+operation structure which can be dereferenced later; operator
+.B &
+assigns a variable in the rewrite context scope; operator
+.B &&
+assigns a variable that scopes the entire session, e.g. its value
+can be dereferenced later by other rewrite contexts
+.TP
+.B *
+variable dereferencing; <name> must refer to a variable that is
+defined and assigned for the running operation; operator
+.B *
+dereferences a variable scoping the rewrite context; operator
+.B **
+dereferences a variable scoping the whole session, e.g. the value
+is passed across rewrite contexts
+.TP
+.B $
+parameter dereferencing; <name> must refer to an existing parameter;
+the idea is to make some run-time parameters set by the system
+available to the rewrite engine, as the client host name, the bind DN
+if any, constant parameters initialized at config time, and so on;
+no parameter is currently set by either 
+.B back\-ldap
+or
+.BR back\-meta ,
+but constant parameters can be defined in the configuration file
+by using the
+.B rewriteParam
+directive.
+.LP
+Substitution escaping has been delegated to the `%' symbol, 
+which is used instead of `\e' in string substitution patterns
+because `\e' is already escaped by slapd's low level parsing routines;
+as a consequence, regex escaping requires two `\e' symbols,
+e.g. `\fB.*\e.foo\e.bar\fP' must be written as `\fB.*\e\e.foo\e\e.bar\fP'.
+.\"
+.\" The symbol can be altered at will by redefining the related macro in
+.\" "rewrite-int.h".
+.\"
+.SH "Rewrite context:"
+A rewrite context is a set of rules which are applied in sequence.
+The basic idea is to have an application initialize a rewrite
+engine (think of Apache's mod_rewrite ...) with a set of rewrite
+contexts; when string rewriting is required, one invokes the
+appropriate rewrite context with the input string and obtains the
+newly rewritten one if no errors occur.
+.LP
+Each basic server operation is associated to a rewrite context;
+they are divided in two main groups: client \-> server and
+server \-> client rewriting.
+.LP
+client \-> server:
+.LP
+.RS
+.nf
+(default)            if defined and no specific context 
+                     is available
+bindDN               bind
+searchBase           search
+searchFilter         search
+searchFilterAttrDN   search
+compareDN            compare
+compareAttrDN        compare AVA
+addDN                add
+addAttrDN            add AVA
+modifyDN             modify
+modifyAttrDN         modify AVA
+modrDN               modrdn
+newSuperiorDN        modrdn
+deleteDN             delete
+exopPasswdDN         password modify extended operation DN if proxy
+.fi
+.RE
+.LP
+server \-> client:
+.LP
+.RS
+.nf
+searchResult         search (only if defined; no default;
+                     acts on DN and DN-syntax attributes 
+                     of search results)
+searchAttrDN         search AVA
+matchedDN            all ops (only if applicable)
+.fi
+.RE
+.LP
+.SH "Basic configuration syntax"
+.TP
+.B rewriteEngine { on | off }
+If `on', the requested rewriting is performed; if `off', no
+rewriting takes place (an easy way to stop rewriting without
+altering too much the configuration file).
+.TP
+.B rewriteContext <context name> "[ alias <aliased context name> ]"
+<Context name> is the name that identifies the context, i.e. the name
+used by the application to refer to the set of rules it contains.
+It is used also to reference sub contexts in string rewriting.
+A context may alias another one.
+In this case the alias context contains no rule, and any reference to
+it will result in accessing the aliased one.
+.TP
+.B rewriteRule "<regex match pattern>" "<substitution pattern>" "[ <flags> ]"
+Determines how a string can be rewritten if a pattern is matched.
+Examples are reported below.
+.SH "Additional configuration syntax:"
+.TP
+.B rewriteMap "<map type>" "<map name>" "[ <map attrs> ]"
+Allows to define a map that transforms substring rewriting into
+something else.
+The map is referenced inside the substitution pattern of a rule.
+.TP
+.B rewriteParam <param name> <param value>
+Sets a value with global scope, that can be dereferenced by the
+command `%{$paramName}'.
+.TP
+.B rewriteMaxPasses <number of passes> [<number of passes per rule>]
+Sets the maximum number of total rewriting passes that can be
+performed in a single rewrite operation (to avoid loops).
+A safe default is set to 100; note that reaching this limit is still
+treated as a success; recursive invocation of rules is simply 
+interrupted.
+The count applies to the rewriting operation as a whole, not 
+to any single rule; an optional per-rule limit can be set.
+This limit is overridden by setting specific per-rule limits
+with the `M{n}' flag.
+.SH "Configuration examples:"
+.nf
+# set to `off' to disable rewriting
+rewriteEngine on
+
+# the rules the "suffixmassage" directive implies
+rewriteEngine on
+# all dataflow from client to server referring to DNs
+rewriteContext default
+rewriteRule "(.*)<virtualnamingcontext>$" "%1<realnamingcontext>" ":"
+# empty filter rule
+rewriteContext searchFilter
+# all dataflow from server to client
+rewriteContext searchResult
+rewriteRule "(.*)<realnamingcontext>$" "%1<virtualnamingcontext>" ":"
+rewriteContext searchAttrDN alias searchResult
+rewriteContext matchedDN alias searchResult
+
+# Everything defined here goes into the `default' context.
+# This rule changes the naming context of anything sent
+# to `dc=home,dc=net' to `dc=OpenLDAP, dc=org'
+
+rewriteRule "(.*)dc=home,[ ]?dc=net"
+            "%1dc=OpenLDAP, dc=org"  ":"
+
+# since a pretty/normalized DN does not include spaces
+# after rdn separators, e.g. `,', this rule suffices:
+
+rewriteRule "(.*)dc=home,dc=net"
+            "%1dc=OpenLDAP,dc=org"  ":"
+
+# Start a new context (ends input of the previous one).
+# This rule adds blanks between DN parts if not present.
+rewriteContext  addBlanks
+rewriteRule     "(.*),([^ ].*)" "%1, %2"
+
+# This one eats blanks
+rewriteContext  eatBlanks
+rewriteRule     "(.*),[ ](.*)" "%1,%2"
+
+# Here control goes back to the default rewrite
+# context; rules are appended to the existing ones.
+# anything that gets here is piped into rule `addBlanks'
+rewriteContext  default
+rewriteRule     ".*" "%{>addBlanks(%0)}" ":"
+
+.\" # Anything with `uid=username' is looked up in
+.\" # /etc/passwd for gecos (I know it's nearly useless,
+.\" # but it is there just as a guideline to implementing
+.\" # custom maps).
+.\" # Note the `I' flag that leaves `uid=username' in place 
+.\" # if `username' does not have a valid account, and the
+.\" # `:' that forces the rule to be processed exactly once.
+.\" rewriteContext  uid2Gecos
+.\" rewriteRule     "(.*)uid=([a-z0-9]+),(.+)"
+.\"                 "%1cn=%2{xpasswd},%3"      "I:"
+.\" 
+.\" # Finally, in a bind, if one uses a `uid=username' DN,
+.\" # it is rewritten in `cn=name surname' if possible.
+.\" rewriteContext  bindDN
+.\" rewriteRule     ".*" "%{>addBlanks(%{>uid2Gecos(%0)})}" ":"
+.\" 
+# Rewrite the search base according to `default' rules.
+rewriteContext  searchBase alias default
+
+# Search results with OpenLDAP DN are rewritten back with
+# `dc=home,dc=net' naming context, with spaces eaten.
+rewriteContext  searchResult
+rewriteRule     "(.*[^ ]?)[ ]?dc=OpenLDAP,[ ]?dc=org"
+                "%{>eatBlanks(%1)}dc=home,dc=net"    ":"
+
+# Bind with email instead of full DN: we first need
+# an ldap map that turns attributes into a DN (the
+# argument used when invoking the map is appended to 
+# the URI and acts as the filter portion)
+rewriteMap ldap attr2dn "ldap://host/dc=my,dc=org?dn?sub"
+
+# Then we need to detect DN made up of a single email,
+# e.g. `mail=someone@example.com'; note that the rule
+# in case of match stops rewriting; in case of error,
+# it is ignored.  In case we are mapping virtual
+# to real naming contexts, we also need to rewrite
+# regular DNs, because the definition of a bindDn
+# rewrite context overrides the default definition.
+rewriteContext bindDN
+rewriteRule "^mail=[^,]+@[^,]+$" "%{attr2dn(%0)}" ":@I"
+
+# This is a rather sophisticated example. It massages a
+# search filter in case who performs the search has
+# administrative privileges.  First we need to keep
+# track of the bind DN of the incoming request, which is
+# stored in a variable called `binddn' with session scope,
+# and left in place to allow regular binding:
+rewriteContext  bindDN
+rewriteRule     ".+" "%{&&binddn(%0)}%0" ":"
+
+# A search filter containing `uid=' is rewritten only
+# if an appropriate DN is bound.
+# To do this, in the first rule the bound DN is
+# dereferenced, while the filter is decomposed in a
+# prefix, in the value of the `uid=<arg>' AVA, and 
+# in a suffix. A tag `<>' is appended to the DN. 
+# If the DN refers to an entry in the `ou=admin' subtree, 
+# the filter is rewritten OR-ing the `uid=<arg>' with
+# `cn=<arg>'; otherwise it is left as is. This could be
+# useful, for instance, to allow apache's auth_ldap-1.4
+# module to authenticate users with both `uid' and
+# `cn', but only if the request comes from a possible
+# `cn=Web auth,ou=admin,dc=home,dc=net' user.
+rewriteContext searchFilter
+rewriteRule "(.*\e\e()uid=([a-z0-9_]+)(\e\e).*)"
+  "%{**binddn}<>%{&prefix(%1)}%{&arg(%2)}%{&suffix(%3)}"
+  ":I"
+rewriteRule "[^,]+,ou=admin,dc=home,dc=net"
+  "%{*prefix}|(uid=%{*arg})(cn=%{*arg})%{*suffix}" ":@I"
+rewriteRule ".*<>" "%{*prefix}uid=%{*arg}%{*suffix}" ":"
+
+# This example shows how to strip unwanted DN-valued
+# attribute values from a search result; the first rule
+# matches DN values below "ou=People,dc=example,dc=com";
+# in case of match the rewriting exits successfully.
+# The second rule matches everything else and causes
+# the value to be rejected.
+rewriteContext searchResult
+rewriteRule ".*,ou=People,dc=example,dc=com" "%0" ":@"
+rewriteRule ".*" "" "#"
+.fi
+.SH "LDAP Proxy resolution (a possible evolution of slapd\-ldap(5)):"
+In case the rewritten DN is an LDAP URI, the operation is initiated
+towards the host[:port] indicated in the uri, if it does not refer
+to the local server.
+E.g.:
+.LP
+.nf
+  rewriteRule '^cn=root,.*' '%0'                     'G{3}'
+  rewriteRule '^cn=[a-l].*' 'ldap://ldap1.my.org/%0' ':@'
+  rewriteRule '^cn=[m-z].*' 'ldap://ldap2.my.org/%0' ':@'
+  rewriteRule '.*'          'ldap://ldap3.my.org/%0' ':@'
+.fi
+.LP
+(Rule 1 is simply there to illustrate the `G{n}' action; it could have
+been written:
+.LP
+.nf
+  rewriteRule '^cn=root,.*' 'ldap://ldap3.my.org/%0' ':@'
+.fi
+.LP
+with the advantage of saving one rewrite pass ...)
+
+.SH ACCESS CONTROL
+The
+.B meta
+backend does not honor all ACL semantics as described in
+.BR slapd.access (5).
+In general, access checking is delegated to the remote server(s).
+Only
+.B read (=r)
+access to the
+.B entry
+pseudo-attribute and to the other attribute values of the entries
+returned by the
+.B search
+operation is honored, which is performed by the frontend.
+
+.SH PROXY CACHE OVERLAY
+The proxy cache overlay 
+allows caching of LDAP search requests (queries) in a local database.
+See 
+.BR slapo\-pcache (5)
+for details.
+
+.SH DEPRECATED STATEMENTS
+The following statements have been deprecated and should no longer be used.
+
+.TP
+.B pseudorootdn "<substitute DN in case of rootdn bind>"
+Use
+.B idassert\-bind
+instead.
+
+.TP
+.B pseudorootpw "<substitute password in case of rootdn bind>"
+Use
+.B idassert\-bind
+instead.
+
+
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-ldap (5),
+.BR slapo\-pcache (5),
+.BR slapd (8),
+.BR regex (7),
+.BR re_format (7).
+.SH AUTHOR
+Pierangelo Masarati, based on back-ldap by Howard Chu

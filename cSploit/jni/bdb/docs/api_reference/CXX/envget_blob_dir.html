@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbEnv::get_blob_dir()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="blob.html" title="Chapter 14.  Binary Large Objects" />
+    <link rel="prev" href="dbstream_write.html" title="DbStream::write()" />
+    <link rel="next" href="envget_blob_threshold.html" title="DbEnv::get_blob_threshold()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbEnv::get_blob_dir()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbstream_write.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 14. 
+                Binary Large Objects
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envget_blob_threshold.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envget_blob_dir"></a>DbEnv::get_blob_dir()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+ 
+int
+DbEnv::get_blob_dir(const char **dirp);  </pre>
+      <p>
+         The <code class="methodname">DbEnv::get_blob_dir()</code> method returns
+         the directory location where blob data is stored. The default
+         location can be set using <a class="xref" href="envset_blob_dir.html" title="DbEnv::set_blob_dir()">DbEnv::set_blob_dir()</a>. Use this method only
+         if the database was opened in an environment. If the database
+         was not opened within an encompassing environment, use
+         <a class="xref" href="get_blob_dir.html" title="Db::get_blob_dir()">Db::get_blob_dir()</a> instead.
+     </p>
+      <p>
+         The <code class="methodname">DbEnv::get_blob_dir()</code> method always returns
+         0 to indicate success.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5268120"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5268400"></a>dirp</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 The <span class="bold"><strong>dirp</strong></span> parameter
+                 references memory into which is copied the path to the
+                 BLOB data directory. If <a class="xref" href="envset_blob_dir.html" title="DbEnv::set_blob_dir()">DbEnv::set_blob_dir()</a> has not been
+                 called prior to calling this method, or if BLOBS are not
+                 supported by this environment, then this parameter is set
+                 to NULL.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5288120"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5273880"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="blob.html#bloblist" title="BLOBs and Related Methods">BLOBs and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbstream_write.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="blob.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envget_blob_threshold.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbStream::write() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbEnv::get_blob_threshold()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+typedef struct
+{
+	int	idx;
+	char*	name;
+	int	datatype;
+	int	nullable;
+	int	writable;
+} col_desc_t;
+
+static col_desc_t nncol_info_tab[] =
+{
+	en_article_num, "Article-Num",	en_t_num, 0, 0,
+	en_article_num,	"Article",	en_t_num, 0, 0, /* alias name */
+
+	en_newsgroups,	"Newsgroups",	en_t_str, 1, 0,
+	en_newsgroups,	"Groups",	en_t_str, 1, 0, /* alias name */
+	en_subject,	"Subject",	en_t_str, 0, 1,
+	en_from,	"From", 	en_t_str, 0, 1,
+	en_sender,	"Sender",	en_t_str, 1, 1,
+	en_organization,"Organization", en_t_str, 1, 1,
+	en_summary,	"Summary",	en_t_str, 1, 1,
+	en_keywords,	"Keywords",	en_t_str, 1, 1,
+	en_expires,	"Expires",	en_t_str, 1, 1,
+	en_msgid,	"Message-ID",	en_t_str, 1, 1,
+	en_msgid,	"Msgid",	en_t_str, 1, 1, /* alias name */
+	en_references,	"References",	en_t_str, 1, 1,
+	en_followup_to, "Followup-To",	en_t_str, 1, 1,
+	en_reply_to,	"Reply-To",	en_t_str, 1, 1,
+	en_distribution,"Distribution", en_t_str, 1, 1,
+
+	en_xref,	"Xref", 	en_t_str, 1, 0,
+	en_host,   "NNTP-Posting-Host", en_t_str, 1, 0,
+	en_host,	"Host",		en_t_str, 1, 0, /* alias name */
+	en_date,	"Date", 	en_t_date,1, 0,
+	en_path,	"Path", 	en_t_str, 1, 0,
+
+	en_lines,	"Lines",	en_t_num, 1, 0,
+
+	en_x_newsreader,"X-Newsreader", en_t_str, 1, 0,
+	en_x_newsreader,"Agent",	en_t_str, 1, 0, /* alias name */
+
+	en_body,	"Body", 	en_t_text,0, 1,
+	en_body,	"Text",		en_t_text,0, 1, /* alias name */
+
+	en_sql_count,	"count()",	en_t_num, 1, 0,
+	en_sql_qstr,	"qstring",	en_t_str, 1, 0,
+	en_sql_num,	"number",	en_t_num, 1, 0,
+	en_sql_date,	"const. date",	en_t_date,1, 0
+};

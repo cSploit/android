@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Configuring Berkeley DB with the Tuxedo System</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="xa.html" title="Chapter 13.  Distributed Transactions" />
+    <link rel="prev" href="xa_xa_intro.html" title="XA Introduction" />
+    <link rel="next" href="xa_xa_restrict.html" title="Restrictions on XA Transactions" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Configuring Berkeley DB with the Tuxedo System</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="xa_xa_intro.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 13. 
+		Distributed Transactions
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="xa_xa_restrict.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="xa_xa_config"></a>Configuring Berkeley DB with the Tuxedo System</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="xa_xa_config.html#idp2346992">Update the Resource Manager File in Tuxedo</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="xa_xa_config.html#idp2372504">Build the Transaction Manager Server</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="xa_xa_config.html#idp2318584">Update the UBBCONFIG File</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+To configure the Tuxedo system to use Berkeley DB resource managers, do the following:
+</p>
+      <div class="sect2" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="idp2346992"></a>Update the Resource Manager File in Tuxedo</h3></div></div></div><p>For the purposes of this discussion, assume that the Tuxedo home directory is in</p><pre class="programlisting">/home/tuxedo</pre>
+In that case, the resource manager file will be located in
+<pre class="programlisting">/home/tuxedo/udataobj/RM</pre>
+Edit the resource manager file to identify the Berkeley DB resource manager, the name of the resource manager switch, and the name of the library for the resource manager.
+<p>For example, on a RedHat Linux Enterprise (64-bit) installation of Oracle Tuxedo 11gR1, you can update the resource manager file by adding the following line:</p><pre class="programlisting">BERKELEY-DB:db_xa_switch:-L${DB_INSTALL}/lib -ldb </pre><p>where <code class="literal">${DB_INSTALL}</code> is the directory into which you installed the Berkeley DB
+library.</p><p>Note that the load options may differ depending on the platform of 
+your system.</p></div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2372504"></a>Build the Transaction Manager Server</h3>
+            </div>
+          </div>
+        </div>
+        <p>To do this, use the
+Tuxedo <span class="bold"><strong>buildtms(1)</strong></span> utility.  The <span class="bold"><strong>buildtms</strong></span> command will create
+the <code class="literal">Berkeley-DB</code> resource manager in the directory from which it was run.
+The parameters to the <span class="bold"><strong>buildtms</strong></span> command should be:</p>
+        <pre class="programlisting">buildtms -v -o DBRM -r BERKELEY-DB</pre>
+        <p>This will create an executable transaction manager server, <code class="literal">DBRM</code>, which is
+called by Tuxedo to process begins, commits, and aborts.</p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2318584"></a>Update the UBBCONFIG File</h3>
+            </div>
+          </div>
+        </div>
+        <p>You must make sure that your TUXCONFIG environment variable
+identifies an UBBCONFIG file that properly identifies your resource
+managers.  In the GROUPS section of the UBBCONFIG file, you should identify the
+group's LMID and GRPNO, as well as the transaction manager server name
+"TMSNAME=DBRM."  You must also specify the OPENINFO parameter, setting it
+equal to the string</p>
+        <pre class="programlisting">rm_name:dir</pre>
+        <p>where rm_name is the resource name specified in the RM file (that is,
+BERKELEY-DB) and dir is the directory for the Berkeley DB home environment
+(see <a href="../api_reference/C/envopen.html" class="olink">DB_ENV-&gt;open()</a> for a discussion of Berkeley DB environments).</p>
+        <p>Because Tuxedo resource manager startup accepts only a single string
+for configuration, any environment customization that might have been
+done via the config parameter to <a href="../api_reference/C/envopen.html" class="olink">DB_ENV-&gt;open()</a> must instead be done
+by placing a <a class="xref" href="env_db_config.html" title="DB_CONFIG configuration file">DB_CONFIG configuration file</a> in the Berkeley DB environment directory.
+See <a class="xref" href="env_naming.html" title="File naming">File naming</a> for further
+information.</p>
+        <p>Consider the following configuration.  We have built a transaction
+manager server, as described previously.  We want the Berkeley DB environment
+to be <code class="literal">/home/dbhome</code>, our database files to be maintained in
+<code class="literal">/home/datafiles</code>, our log files to be maintained in
+<code class="literal">/home/log</code>, and we want a duplexed server.</p>
+        <p>The GROUPS section of the ubb file might look like the following:</p>
+        <pre class="programlisting">group_tm LMID=myname GRPNO=1 TMSNAME=DBRM TMSCOUNT=2 \
+	OPENINFO="BERKELEY-DB:/home/dbhome"</pre>
+        <p>There would be a <a class="xref" href="env_db_config.html" title="DB_CONFIG configuration file">DB_CONFIG configuration file</a> in the directory
+<code class="literal">/home/dbhome</code> that contained the following two lines:</p>
+        <pre class="programlisting">add_data_dir    /home/datafiles
+set_lg_dir      /home/log</pre>
+        <p>Finally, the UBBCONFIG file must be translated into a binary version using
+Tuxedo's <span class="bold"><strong>tmloadcf</strong></span>(1) utility, and then the pathname of that
+binary file must be specified as your TUXCONFIG environment variable.</p>
+      </div>
+      <p>At this point, your system is properly initialized to use the Berkeley DB
+resource manager.</p>
+      <p>See <a href="../api_reference/C/db.html" class="olink">DB class</a> for further information on accessing data files
+using XA.</p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="xa_xa_intro.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="xa.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="xa_xa_restrict.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">XA Introduction </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Restrictions on XA Transactions</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

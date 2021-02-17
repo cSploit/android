@@ -1,0 +1,669 @@
+#
+#    May you do good and not evil.
+#    May you find forgiveness for yourself and forgive others.
+#    May you share freely, never taking more than you give.
+#
+#***********************************************************************
+# This file implements regression tests for some simple Berkeley DB specific
+# sequences.
+#
+# Functionality:
+# select create_sequence("<name>", ...)
+#  Options:
+#   cache (string), value (int)
+#   incr (string), value (int)
+#   minvalue (string), value (int)
+#   maxvalue (string), value (int)
+#   start (string), value (int)
+#  
+# select nextval("<name>");
+# select drop_sequence("<name>");
+
+
+set testdir [file dirname $argv0]/../../lang/sql/sqlite/test
+source $testdir/tester.tcl
+reset_db
+
+# Test that basic sequence functionality works.
+#
+
+do_test bdb_sequences-1.1 {
+  execsql {
+    select create_sequence("a");
+  }
+} {0}
+
+do_test bdb_sequences-1.2 {
+  set v [catch {execsql {
+    select currval("a");
+  }} msg]
+  lappend v $msg
+} {1 {Can't call currval on an unused sequence.}}
+
+do_test bdb_sequences-1.3 {
+  execsql {
+    select nextval("a");
+  }
+} {0}
+
+do_test bdb_sequences-1.4 {
+  execsql {
+    select nextval("a");
+  }
+} {1}
+
+do_test bdb_sequences-1.5 {
+  execsql {
+    select drop_sequence("a");
+  }
+} {0}
+
+do_test bdb_sequences-1.6 {
+  set v [catch {execsql {
+    select nextval("a");
+  }} msg]
+  lappend v $msg
+} {1 {no such sequence: a}}
+
+# Test the sequence_create parameters
+do_test bdb_sequences-2.1 {
+  execsql {
+    select create_sequence("b", "cache", 10);
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select drop_sequence("b");
+  }
+} {0 0 1 2 3 4 5 6 7 8 9 10 0}
+
+do_test bdb_sequences-2.3 {
+  execsql {
+    select create_sequence("b", "minvalue", 10, "maxvalue", 30);
+    select drop_sequence("b");
+  }
+} {0 0}
+
+do_test bdb_sequences-2.4 {
+  set v [catch {execsql {
+    select create_sequence("b", "minvalue", 40, "maxvalue", 30);
+  }} msg]
+  lappend v $msg
+} {1 {Sequence create failed: Invalid parameter.}}
+
+do_test bdb_sequences-2.5 {
+  execsql {
+    select create_sequence("b", "incr", 3);
+    select nextval("b");
+    select nextval("b");
+    select drop_sequence("b");
+  }
+} {0 0 3 0}
+
+do_test bdb_sequences-2.6 {
+  execsql {
+    select create_sequence("b", "incr", -3);
+    select nextval("b");
+    select nextval("b");
+    select drop_sequence("b");
+  }
+} {0 0 -3 0}
+
+do_test bdb_sequences-2.7 {
+  execsql {
+    select create_sequence("b", "start", 40);
+    select nextval("b");
+    select drop_sequence("b");
+  }
+} {0 40 0}
+
+do_test bdb_sequences-2.8 {
+  execsql {
+    select create_sequence("b", "incr", -3, "start", 5);
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select drop_sequence("b");
+  }
+} {0 5 2 -1 0}
+
+do_test bdb_sequences-2.9 {
+  set v [catch {execsql {
+    select create_sequence("b", "maxvalue", 2);
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+  }} msg]
+  lappend v $msg
+} {1 {Sequence value out of bounds.}}
+
+do_test bdb_sequences-2.10 {
+  execsql {
+    select drop_sequence("b");
+  }
+} {0}
+
+integrity_check bdb_sequences-2.99
+
+# Test some default start values when ranges are used.
+
+do_test bdb_sequences-3.1 {
+  execsql {
+    select create_sequence("a", "maxvalue", 30, "incr", -2);
+    select nextval("a");
+    select drop_sequence("a");
+  }
+} {0 30 0}
+
+do_test bdb_sequences-3.2 {
+  execsql {
+    select create_sequence("a", "maxvalue", 30, "incr", 2);
+    select nextval("a");
+    select drop_sequence("a");
+  }
+} {0 0 0}
+
+do_test bdb_sequences-3.3 {
+  execsql {
+    select create_sequence("a", "minvalue", 30, "incr", 2);
+    select nextval("a");
+    select drop_sequence("a");
+  }
+} {0 30 0}
+
+do_test bdb_sequences-3.4 {
+  execsql {
+    select create_sequence("a", "maxvalue", 30, "incr", 2);
+    select nextval("a");
+    select drop_sequence("a");
+  }
+} {0 0 0}
+
+#
+# Closing a handle, re-opening and using an existing sequence. 
+#
+do_test bdb_sequences-4.1 {
+  execsql {
+    select create_sequence("b", "start", 40);
+    select nextval("b");
+  }
+} {0 40}
+db close
+
+sqlite3 db test.db
+# Can not create an existing sequence which is exist.
+do_test bdb_sequences-4.2 {
+  set v [catch {execsql {
+    select create_sequence("b", "start", 40);
+  }} msg]
+  lappend v $msg
+} {1 {Attempt to call sequence_create when a sequence already exists.}}
+
+do_test bdb_sequences-4.3 {
+  execsql {
+    select nextval("b");
+  }
+} {41}
+
+# Can not create an existing sequence which created by previous handle
+do_test bdb_sequences-4.4 {
+  set v [catch {execsql {
+    select create_sequence("b", "start", 2);
+  }} msg]
+  lappend v $msg
+} {1 {Attempt to call sequence_create when a sequence already exists.}}
+
+do_test bdb_sequences-4.5 {
+  execsql {
+    select nextval("b");
+    select drop_sequence("b");
+  }
+} {42 0}
+db close
+
+# Can not get a droped sequence
+sqlite3 db test.db
+do_test bdb_sequences-4.6 {
+  set v [catch {execsql {
+    select nextval("b");
+  }} msg]
+  lappend v $msg
+} {1 {no such sequence: b}}
+
+#
+# Accessing the sequence using multiple connections.
+#
+sqlite3 db1 test.db
+sqlite3 db2 test.db
+
+do_test bdb_sequences-5.1 {
+  execsql {
+    select create_sequence("b", "start", 32768);
+    select nextval("b");
+  } db1
+} {0 32768}
+
+# conn2 can not create an existing sequence which created by conn1
+do_test bdb_sequences-5.2 {
+  set v [catch {execsql {
+    select create_sequence("b", "start", 2);
+  } db2 } msg]
+  lappend v $msg
+} {1 {Attempt to call sequence_create when a sequence already exists.}}
+
+# conn2 can use the sequence created by conn1
+do_test bdb_sequences-5.3 {
+  execsql {
+    select nextval("b");
+  } db2
+} {32769}
+
+do_test bdb_sequences-5.4 {
+  execsql {
+    select drop_sequence("b");
+  } db2
+} {0}
+
+# Make sure that the other connection can not get a droped sequence
+do_test bdb_sequences-5.5 {
+  set v [catch {execsql {
+    select nextval("b");
+  } db1 } msg]
+  lappend v $msg
+} {1 {no such sequence: b}}
+
+# Drop a sequence twice
+do_test bdb_sequences-5.6 {
+  set v [catch {execsql {
+    select drop_sequence("b");
+  } db1 } msg]
+  lappend v $msg
+} {1 {no such sequence: b}}
+
+#
+# Accessing multiple sequences using multiple connections.
+#
+sqlite3 db1 test.db
+sqlite3 db2 test.db
+
+do_test bdb_sequences-6.1 {
+  execsql {
+    select create_sequence("a1", "start", 101);
+    select create_sequence("a2", "start", 201);
+    select nextval("a1");
+    select nextval("a2");
+  } db1
+} {0 0 101 201}
+
+# conn2 can create sequences and can see conn1's sequences
+do_test bdb_sequences-6.2 {
+  execsql {
+    select create_sequence("b1", "start", 301);
+    select create_sequence("b2", "start", 402);
+    select nextval("a1");
+    select nextval("a2");
+    select nextval("b1");
+    select nextval("b2");
+  } db1
+} {0 0 102 202 301 402}
+
+# conn1 can drop conn2's sequence, and createan other one
+do_test bdb_sequences-6.3 {
+  execsql {
+    select drop_sequence("b1");
+    select create_sequence("b1", "start", 501);
+    select nextval("b1");
+  } db1
+} {0 0 501}
+
+# conn2 can access the new sequence "b1", which created by conn1
+do_test bdb_sequences-6.4 {
+  execsql {
+    select nextval("b1");
+  } db1
+} {502}
+db1 close
+db2 close
+
+#
+# Test minvalue
+#
+sqlite3 db test.db
+do_test bdb_sequences-7.1 {
+  execsql {
+    select create_sequence('b7', 'start', 10, 'minvalue', 0, 'maxvalue', 10, 'increment by', -1);
+  }
+} {0}
+
+# Go through the sequence to minvalue
+do_test bdb_sequences-7.2 {
+  execsql {
+    select nextval('b7');
+    select nextval('b7');
+    select nextval('b7');
+    select nextval('b7');
+    select nextval('b7');
+    select nextval('b7');
+    select nextval('b7');
+    select nextval('b7');
+    select nextval('b7');
+    select nextval('b7');
+    select nextval('b7');
+  }
+} {10 9 8 7 6 5 4 3 2 1 0}
+
+do_test bdb_sequences-7.3 {
+  set v [catch {execsql {
+    select nextval('b7');
+  }} msg]
+  lappend v $msg
+} {1 {Sequence value out of bounds.}}
+
+do_test bdb_sequences-7.4 {
+  execsql {
+    select create_sequence('c7', 'start', 2, 'minvalue', -1, 'increment by', -1);
+  }
+} {0}
+
+# Go through the sequence to minvalue
+do_test bdb_sequences-7.5 {
+  execsql {
+    select nextval('c7');
+    select nextval('c7');
+    select nextval('c7');
+    select nextval('c7');
+  }
+} {2 1 0 -1}
+
+do_test bdb_sequences-7.6 {
+  set v [catch {execsql {
+    select nextval('c7');
+  }} msg]
+  lappend v $msg
+} {1 {Sequence value out of bounds.}}
+
+db close
+
+#
+# Test maxvalue
+#
+sqlite3 db test.db
+do_test bdb_sequences-8.1 {
+  execsql {
+    select create_sequence('b8', 'start', -1, 'minvalue', -3, 'maxvalue', 3, 'increment by', 1);
+  }
+} {0}
+
+# Go through the sequence to minvalue
+do_test bdb_sequences-8.2 {
+  execsql {
+    select nextval('b8');
+    select nextval('b8');
+    select nextval('b8');
+    select nextval('b8');
+    select nextval('b8');
+  }
+} {-1 0 1 2 3}
+
+do_test bdb_sequences-8.3 {
+  set v [catch {execsql {
+    select nextval('b8');
+  }} msg]
+  lappend v $msg
+} {1 {Sequence value out of bounds.}}
+
+do_test bdb_sequences-8.4 {
+  execsql {
+    select create_sequence('c8', 'start', -1, 'minvalue', -2, 'maxvalue', -1, 'increment by', 1);
+  }
+} {0}
+
+do_test bdb_sequences-8.5 {
+  execsql {
+    select nextval('c8');
+  }
+} {-1}
+
+do_test bdb_sequences-8.6 {
+  set v [catch {execsql {
+    select nextval('c8');
+  }} msg]
+  lappend v $msg
+} {1 {Sequence value out of bounds.}}
+
+do_test bdb_sequences-8.7 {
+  execsql {
+    select drop_sequence('c8');
+  }
+} {0}
+
+# Minimum sequence value must be less than maximum sequence value
+do_test bdb_sequences-8.7 {
+  set v [catch {execsql {
+    select create_sequence('d8', 'start', -1, 'minvalue', -1, 'maxvalue', -1, 'increment by', 1);
+  }} msg]
+  lappend v $msg
+} {1 {Failed to create sequence d8. Error: Invalid argument}}
+
+db close
+
+#
+# Creating a sequence with invalid parameters will end in error msg, and
+# ensure that the sequence itself does not get created eventually.
+#
+sqlite3 db test.db
+
+do_test bdb_sequences-9.1 {
+  set v [catch {execsql {
+    select create_sequence('b9', 'start', 10, 'minvalue', 0, 'maxvalue', 0, 'increment by', 1);
+  }} msg]
+  lappend v $msg
+} {1 {Sequence create failed: Invalid parameter.}}
+
+# Ensure that the sequence itself does not get created eventually.
+do_test bdb_sequences-9.2 {
+  set v [catch {execsql {
+    select create_sequence('b9', 'start', 10, 'minvalue', 0, 'maxvalue', 0, 'increment by', 1);
+  }} msg]
+  lappend v $msg
+} {1 {Sequence create failed: Invalid parameter.}}
+
+db close
+
+#
+# Test in-memory database
+#
+sqlite3 db :memory:
+do_test bdb_sequences-10.1 {
+  set v [catch {execsql {
+    select create_sequence('a10');
+  }} msg]
+  lappend v $msg
+} {1 {Sequences do not support in-memory or temporary databases.}}
+
+do_test bdb_sequences-10.2 {
+  set v [catch {execsql {
+    select nextval('a10');
+  }} msg]
+  lappend v $msg
+} {1 {Sequences do not support in-memory or temporary databases.}}
+db close
+
+#
+# Test temp database
+#
+sqlite3 db {}
+do_test bdb_sequences-11.1 {
+  set v [catch {execsql {
+    select create_sequence('a11');
+  }} msg]
+  lappend v $msg
+} {1 {Sequences do not support in-memory or temporary databases.}}
+
+do_test bdb_sequences-11.2 {
+  set v [catch {execsql {
+    select nextval('a11');
+  }} msg]
+  lappend v $msg
+} {1 {Sequences do not support in-memory or temporary databases.}}
+db close
+
+#
+# Test rollback of sequences.
+#
+sqlite3 db test.db
+do_test bdb_sequences-12.1 {
+  execsql {
+    begin;
+    select create_sequence('c8');
+    commit;
+  }
+} {0}
+
+do_test bdb_sequences-12.2 {
+  execsql {
+    select drop_sequence('c8');
+  }
+} {0}
+
+do_test bdb_sequences-12.3 {
+  execsql {
+    begin;
+    select create_sequence('c8');
+    rollback;
+  }
+} {0}
+
+do_test bdb_sequences-12.4 {
+  set v [catch {execsql {select nextval('c8')}} msg]
+  lappend v $msg
+} {1 {no such sequence: c8}}
+
+do_test bdb_sequences-12.5 {
+  execsql {
+    begin;
+    select create_sequence('c8');
+    select nextval('c8');
+    select currval('c8');
+    select nextval('c8');
+    commit;
+  }
+} {0 0 0 1}
+
+do_test bdb_sequences-12.6 {
+  execsql {
+    select nextval('c8');
+    select drop_sequence('c8');
+  }
+} {2 0}
+
+# Test that caching sequences work as expected.
+#
+
+do_test bdb_sequences-13.1 {
+  execsql {
+    select create_sequence("a", "cache", 2);
+  }
+} {0}
+
+do_test bdb_sequences-13.2 {
+  execsql {
+    select nextval("a");
+  }
+} {0}
+
+# Ensure that the cache rolls over.
+do_test bdb_sequences-13.3 {
+  execsql {
+    select nextval("a");
+    select nextval("a");
+  }
+} {1 2}
+
+do_test bdb_sequences-13.4 {
+  execsql {
+    select drop_sequence("a");
+  }
+} {0}
+
+do_test bdb_sequences-13.5 {
+  set v [catch {execsql {
+    begin;
+    select create_sequence("a", "cache", 2);
+  }} msg]
+  lappend v $msg
+} {1 {Cannot create caching sequence in a transaction.}}
+
+do_test bdb_sequences-13.6 {
+  execsql {
+    rollback;
+  }
+} {}
+
+do_test bdb_sequences-13.7 {
+  execsql {
+    select create_sequence("a", "cache", 2);
+  }
+} {0}
+
+# Check that rollback doesn't affect the caching sequence.
+do_test bdb_sequences-13.8 {
+  execsql {
+    begin;
+    select nextval("a");
+    rollback;
+    select nextval("a");
+  }
+} {0 1}
+
+do_test bdb_sequences-13.9 {
+  execsql {
+    select drop_sequence("a");
+  }
+} {0}
+
+do_test bdb_sequences-13.10 {
+  execsql {
+    select create_sequence("a", "cache", 2);
+    select nextval("a");
+  }
+} {0 0}
+
+do_test bdb_sequences-13.11 {
+  set v [catch {execsql {
+    begin;
+    select drop_sequence("a");
+  }} msg]
+  lappend v $msg
+} {1 {Cannot drop caching sequence in a transaction.}}
+
+do_test bdb_sequences-13.12 {
+  execsql {
+    commit;
+  }
+} {}
+
+do_test bdb_sequences-13.13 {
+  set v [catch {execsql {
+    begin exclusive;
+    select nextval("a");
+  }} msg]
+  lappend v $msg
+} {1 {Can't call nextval on a caching sequence while an exclusive transaction is active.}}
+
+do_test bdb_sequences-13.14 {
+  execsql {
+    commit;
+  }
+} {}
+
+finish_test
+

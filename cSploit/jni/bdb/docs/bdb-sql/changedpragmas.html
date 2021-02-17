@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Changed PRAGMAs</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="dbsqlbasics.html" title="Chapter 1. Berkeley DB SQL: The Absolute Basics" />
+    <link rel="prev" href="unsupportedpragmas.html" title="Unsupported PRAGMAs" />
+    <link rel="next" href="addedpragmas.html" title="Added PRAGMAs" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Changed PRAGMAs</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="unsupportedpragmas.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 1. Berkeley DB SQL: The Absolute Basics</th>
+          <td width="20%" align="right"> <a accesskey="n" href="addedpragmas.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="changedpragmas"></a>Changed PRAGMAs</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="changedpragmas.html#auto_vacuum">PRAGMA auto_vacuum</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="changedpragmas.html#incremental_vacuum">PRAGMA incremental_vacuum</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="changedpragmas.html#journal_size_limit">PRAGMA journal_size_limit</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+                The following PRAGMAs are available in the BDB SQL interface, but they
+                behave differently in some way from standard SQLite.
+            </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="auto_vacuum"></a>PRAGMA auto_vacuum</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    The syntax for this PRAGMA is:
+                </p>
+        <pre class="programlisting">PRAGMA auto_vacuum
+PRAGMA auto_vacuum = 0 | NONE | 1 | FULL | 2 | INCREMENTAL </pre>
+        <p>
+                    Standard SQLite does not allow you to enable or
+                    disable auto-vacuum after a table has been created.
+                    Berkeley DB, however, allows you to change this at any time.
+                </p>
+        <p>
+                    In the previous syntax, <code class="literal">0</code> and
+                    <code class="literal">NONE</code> both turn off auto vacuuming.
+                </p>
+        <p>
+                    <code class="literal">1</code> or <code class="literal">FULL</code> causes
+                    full vacuuming to occur. That is, the BDB SQL interface will vacuum
+                    the entire database at each commit using a very low
+                    fill percentage (1%) in order to return emptied pages
+                    to the file system. Because Berkeley DB allows you to call
+                    this PRAGMA at any time, it is recommended that you do
+                    not turn on FULL vacuuming because doing so can result
+                    in a great deal of overhead to your transaction
+                    commits.
+                </p>
+        <p>
+                    If <code class="literal">2</code> or <code class="literal">INCREMENTAL</code>
+                    is used, then incremental vacuuming is enabled. The
+                    amount of vacuuming that is performed for incremental
+                    vacuum is controlled using the following PRAGMAs:
+                </p>
+        <table class="simplelist" border="0" summary="Simple list">
+          <tr>
+            <td>
+              <a class="xref" href="addedpragmas.html#bdbsql_vacuum_fillpercent" title="PRAGMA bdbsql_vacuum_fillpercent">PRAGMA bdbsql_vacuum_fillpercent</a>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <a class="xref" href="addedpragmas.html#bdbsql_vacuum_pages" title="PRAGMA bdbsql_vacuum_pages">PRAGMA bdbsql_vacuum_pages</a>
+            </td>
+          </tr>
+        </table>
+        <p>
+                    Note that you can call 
+                    <a class="xref" href="changedpragmas.html#incremental_vacuum" title="PRAGMA incremental_vacuum">PRAGMA incremental_vacuum</a>
+                    to perform an incremental vacuum operation on demand.
+                </p>
+        <p>
+                    When performing vacuum operations, Berkeley DB
+                    defragments and repacks individual database pages,
+                    while SQLite only truncates the freelist pages from
+                    the database file.
+                </p>
+        <p>
+                    For more information on auto vacuum, see
+                    <a class="ulink" href="http://www.sqlite.org/pragma.html#pragma_auto_vacuum" target="_top">PRAGMA auto_vacuum</a>
+                    in the SQLite documentation.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="incremental_vacuum"></a>PRAGMA incremental_vacuum</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    Performs incremental vacuum operations on demand. You can cause
+                    incremental vacuum operations to be performed automatically using 
+                    <a class="xref" href="changedpragmas.html#auto_vacuum" title="PRAGMA auto_vacuum">PRAGMA auto_vacuum</a>.
+                </p>
+        <p>
+                    Note that for SQLite, this PRAGMA is used to specify
+                    the maximum number of pages to be freed during
+                    vacuuming. For Berkeley DB, you use 
+                    <code class="literal">PRAGMA bdbsql_vacuum_pages</code> instead.
+                </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="journal_size_limit"></a>PRAGMA journal_size_limit</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    For standard SQLite, this pragma identifies the
+                    maximum size that the journal file is allowed to be.
+                </p>
+        <p>
+                    Berkeley DB uses multiple journal files, Berkeley DB journal
+                    files are different to a SQLite journal file in that they
+                    contain information about multiple transactions, rather
+                    than a single transaction (similar to the SQLite WAL
+                    journal file). Over the course
+                    of the database's lifetime, Berkeley DB will probably create
+                    multiple journal files. A new journal file is created when
+                    the current journal file has reached the maximum size
+                    configured using the journal_size_limit pragma.
+                </p>
+        <p>
+                    Note that a BDB SQL interface journal file is referred to as a log
+                    file in the Berkeley DB documentation.
+                </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="unsupportedpragmas.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="dbsqlbasics.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="addedpragmas.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Unsupported PRAGMAs </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Added PRAGMAs</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="GPRE files">
+      <UniqueIdentifier>{11018968-f943-43a8-98d5-0c4b7945faea}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="GPRE files\epp files">
+      <UniqueIdentifier>{cb2662f4-fa8b-46e1-9553-c94832689e9b}</UniqueIdentifier>
+      <Extensions>epp</Extensions>
+    </Filter>
+    <Filter Include="GPRE files\Generated files">
+      <UniqueIdentifier>{0a194b12-fcfe-4b9f-b7eb-f175ba253fd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{9622adbe-ffad-4a2a-9790-37fd66af31e3}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{98a65697-c33c-4784-b6f5-6061a81a21d9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\gpre\std\gpre_meta.epp">
+      <Filter>GPRE files\epp files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\gen\gpre\std\gpre_meta.cpp">
+      <Filter>GPRE files\Generated files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

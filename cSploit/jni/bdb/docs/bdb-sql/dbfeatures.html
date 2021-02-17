@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 3. Berkeley DB Features</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="prev" href="lockhandling.html" title="Lock Handling" />
+    <link rel="next" href="mvcc.html" title="Using Multiversion Concurrency Control" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 3. Berkeley DB Features</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="lockhandling.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="mvcc.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="dbfeatures"></a>Chapter 3. Berkeley DB Features</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="dbfeatures.html#bulkloading">Using Bulk Loading</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="mvcc.html">Using Multiversion Concurrency Control</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="selectpage_size.html">Selecting the Page Size</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+            When using the Berkeley DB SQL API, there are features that you
+            can manage using PRAGMAs that are unique to Berkeley DB. This
+            chapter discusses these features.
+        </p>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="bulkloading"></a>Using Bulk Loading</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+                Bulk loading is an I/O optimization feature that is useful
+                when loading large amounts of data to the database inside
+                of a single transaction.
+                The bulk load optimization avoids writing some log records to
+                the journal file. This can provide significant performance
+                benefits when loading a large number of new rows into a
+                database.
+            </p>
+        <p>
+                When you use bulk load, nested transactions are
+                disabled. This means that you cannot undo any
+                single operation. Instead, if you want to undo a
+                given operation, you must undo everything performed
+                within the transaction.
+            </p>
+        <p>
+                It is not possible to use the bulk load functionality when
+                replication is enabled.
+            </p>
+        <p>
+                To enable bulk loading, use:
+            </p>
+        <p>
+                    <span class="bold"><strong>PRAGMA TXN_BULK</strong></span> = 0 | 1;
+            </p>
+        <p>
+                Default value is <code class="literal">0</code>, which means the
+                PRAGMA is turned off and so bulk loading is not in use.
+                <code class="literal">1</code> means bulk loading is in use.
+            </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="lockhandling.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="mvcc.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Lock Handling </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Using Multiversion Concurrency Control</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

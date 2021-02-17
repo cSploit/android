@@ -1,0 +1,424 @@
+/* include/config.h.in.  Generated from configure.in by autoheader.  */
+
+/* debug support */
+#undef DEBUG
+
+/* gcc version */
+#undef GCC_VERSION
+
+/* Define to 1 if you have the `argz_append' function. */
+#undef HAVE_ARGZ_APPEND
+
+/* Define to 1 if you have the `argz_create_sep' function. */
+#undef HAVE_ARGZ_CREATE_SEP
+
+/* Define to 1 if you have the <argz.h> header file. */
+#undef HAVE_ARGZ_H
+
+/* Define to 1 if you have the `argz_insert' function. */
+#undef HAVE_ARGZ_INSERT
+
+/* Define to 1 if you have the `argz_next' function. */
+#undef HAVE_ARGZ_NEXT
+
+/* Define to 1 if you have the `argz_stringify' function. */
+#undef HAVE_ARGZ_STRINGIFY
+
+/* Define to 1 if you have the <arpa/nameser.h> header file. */
+#undef HAVE_ARPA_NAMESER_H
+
+/* Define to 1 if you have the <assert.h> header file. */
+#undef HAVE_ASSERT_H
+
+/* Define to 1 if you have the `basename' function. */
+#undef HAVE_BASENAME
+
+/* Define to 1 if you have the `bcopy' function. */
+#undef HAVE_BCOPY
+
+/* Define to 1 if you have the `closedir' function. */
+#undef HAVE_CLOSEDIR
+
+/* Define to 1 if you have the <ctype.h> header file. */
+#undef HAVE_CTYPE_H
+
+/* Define to 1 if you have the `daemon' function. */
+#undef HAVE_DAEMON
+
+/* Define to 1 if you have the <dirent.h> header file. */
+#undef HAVE_DIRENT_H
+
+/* Define if you have the GNU dld library. */
+#undef HAVE_DLD
+
+/* Define to 1 if you have the <dld.h> header file. */
+#undef HAVE_DLD_H
+
+/* Define to 1 if you have the `dlerror' function. */
+#undef HAVE_DLERROR
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <dl.h> header file. */
+#undef HAVE_DL_H
+
+/* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
+#undef HAVE_DOPRNT
+
+/* Define if you have the _dyld_func_lookup function. */
+#undef HAVE_DYLD
+
+/* Define to 1 if you have the <errno.h> header file. */
+#undef HAVE_ERRNO_H
+
+/* Define to 1 if the system has the type `error_t'. */
+#undef HAVE_ERROR_T
+
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
+/* Define to 1 if you have the `getifaddrs' function. */
+#undef HAVE_GETIFADDRS
+
+/* Define to 1 if you have the `getopt_long' function. */
+#undef HAVE_GETOPT_LONG
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
+
+/* gtk+ support */
+#undef HAVE_GTK
+
+/* Define to 1 if you have the `index' function. */
+#undef HAVE_INDEX
+
+/* Define to 1 if you have the `inet_aton' function. */
+#undef HAVE_INET_ATON
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define if you have the libdl library or equivalent. */
+#undef HAVE_LIBDL
+
+/* Define to 1 if you have the <libgen.h> header file. */
+#undef HAVE_LIBGEN_H
+
+/* Define to 1 if you have the `iphlpapi' library (-liphlpapi). */
+#undef HAVE_LIBIPHLPAPI
+
+/* Define to 1 if you have the `net' library (-lnet). */
+#undef HAVE_LIBNET
+
+/* Define to 1 if you have the `packet' library (-lpacket). */
+#undef HAVE_LIBPACKET
+
+/* Define to 1 if you have the `pcap' library (-lpcap). */
+#undef HAVE_LIBPCAP
+
+/* Define to 1 if you have the `wpcap' library (-lwpcap). */
+#undef HAVE_LIBWPCAP
+
+/* Define to 1 if you have the `ws2_32' library (-lws2_32). */
+#undef HAVE_LIBWS2_32
+
+/* Define to 1 if you have the <ltdl.h> header file. */
+#undef HAVE_LTDL_H
+
+/* Define to 1 if you have the <mach-o/dyld.h> header file. */
+#undef HAVE_MACH_O_DYLD_H
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if you have the `memcmp' function. */
+#undef HAVE_MEMCMP
+
+/* Define to 1 if you have the `memcpy' function. */
+#undef HAVE_MEMCPY
+
+/* Define to 1 if you have the `memmem' function. */
+#undef HAVE_MEMMEM
+
+/* Define to 1 if you have the `memmove' function. */
+#undef HAVE_MEMMOVE
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* ncurses support */
+#undef HAVE_NCURSES
+
+/* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
+#undef HAVE_NDIR_H
+
+/* nameser NS_GET32 */
+#undef HAVE_NS_GET
+
+/* Define to 1 if you have the `opendir' function. */
+#undef HAVE_OPENDIR
+
+/* openssl executable path */
+#undef HAVE_OPENSSL
+
+/* perl compatible regex */
+#undef HAVE_PCRE
+
+/* plugins support */
+#undef HAVE_PLUGINS
+
+/* Define to 1 if you have the `poll' function. */
+#undef HAVE_POLL
+
+/* Define to 1 if you have the <poll.h> header file. */
+#undef HAVE_POLL_H
+
+/* Define if libtool can extract symbol lists from object files. */
+#undef HAVE_PRELOADED_SYMBOLS
+
+/* Define to 1 if you have the `readdir' function. */
+#undef HAVE_READDIR
+
+/* Define to 1 if you have the `rindex' function. */
+#undef HAVE_RINDEX
+
+/* Define to 1 if you have the `scandir' function. */
+#undef HAVE_SCANDIR
+
+/* Define to 1 if you have the `select' function. */
+#undef HAVE_SELECT
+
+/* Define if you have the shl_load function. */
+#undef HAVE_SHL_LOAD
+
+/* Define to 1 if you have the <signal.h> header file. */
+#undef HAVE_SIGNAL_H
+
+/* Define to 1 if you have the <stdarg.h> header file. */
+#undef HAVE_STDARG_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strcasestr' function. */
+#undef HAVE_STRCASESTR
+
+/* Define to 1 if you have the `strchr' function. */
+#undef HAVE_STRCHR
+
+/* Define to 1 if you have the `strcmp' function. */
+#undef HAVE_STRCMP
+
+/* Define to 1 if you have the `strdup' function. */
+#undef HAVE_STRDUP
+
+/* Define to 1 if you have the `strerror' function. */
+#undef HAVE_STRERROR
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strlcat' function. */
+#undef HAVE_STRLCAT
+
+/* Define to 1 if you have the `strlcpy' function. */
+#undef HAVE_STRLCPY
+
+/* Define to 1 if you have the `strrchr' function. */
+#undef HAVE_STRRCHR
+
+/* Define to 1 if you have the `strsep' function. */
+#undef HAVE_STRSEP
+
+/* Define to 1 if you have the `strsignal' function. */
+#undef HAVE_STRSIGNAL
+
+/* Define to 1 if you have the `strstr' function. */
+#undef HAVE_STRSTR
+
+/* Define to 1 if you have the `strtok_r' function. */
+#undef HAVE_STRTOK_R
+
+/* Define to 1 if you have the <sys/cdefs.h> header file. */
+#undef HAVE_SYS_CDEFS_H
+
+/* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_SYS_DIR_H
+
+/* Define to 1 if you have the <sys/dl.h> header file. */
+#undef HAVE_SYS_DL_H
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#undef HAVE_SYS_IOCTL_H
+
+/* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_SYS_NDIR_H
+
+/* Define to 1 if you have the <sys/poll.h> header file. */
+#undef HAVE_SYS_POLL_H
+
+/* Define to 1 if you have the <sys/select.h> header file. */
+#undef HAVE_SYS_SELECT_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <sys/utsname.h> header file. */
+#undef HAVE_SYS_UTSNAME_H
+
+/* Define to 1 if you have the <termios.h> header file. */
+#undef HAVE_TERMIOS_H
+
+/* Define to 1 if you have the `uname' function. */
+#undef HAVE_UNAME
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* support for UTF-8 */
+#undef HAVE_UTF8
+
+/* Define to 1 if you have the `vprintf' function. */
+#undef HAVE_VPRINTF
+
+/* Define to 1 if you have the `vsnprintf' function. */
+#undef HAVE_VSNPRINTF
+
+/* where can I find the ettercap executable ? */
+#undef INSTALL_BINDIR
+
+/* where can I find my data file ? */
+#undef INSTALL_DATADIR
+
+/* the exec_prefix passed by configure */
+#undef INSTALL_EXECPREFIX
+
+/* where can I find my plugins ? */
+#undef INSTALL_LIBDIR
+
+/* the prefix passed by configure */
+#undef INSTALL_PREFIX
+
+/* where can I find my sysconf file ? */
+#undef INSTALL_SYSCONFDIR
+
+/* Define if the OS needs help to load dependent libraries for dlopen(). */
+#undef LTDL_DLOPEN_DEPLIBS
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LTDL_OBJDIR
+
+/* Define to the name of the environment variable that determines the dynamic
+   library search path. */
+#undef LTDL_SHLIBPATH_VAR
+
+/* Define to the extension used for shared libraries, say, ".so". */
+#undef LTDL_SHLIB_EXT
+
+/* Define to the system default library search path. */
+#undef LTDL_SYSSEARCHPATH
+
+/* Define if dlsym() requires a leading underscore in symbol names. */
+#undef NEED_USCORE
+
+/* compiling under bsd */
+#undef OS_BSD
+
+/* compiling under free bsd */
+#undef OS_BSD_FREE
+
+/* compiling under net bsd */
+#undef OS_BSD_NET
+
+/* compiling under open bsd */
+#undef OS_BSD_OPEN
+
+/* compiling under cygwin */
+#undef OS_CYGWIN
+
+/* compiling under macosx */
+#undef OS_DARWIN
+
+/* compiling under linux */
+#undef OS_LINUX
+
+/* compiling under mingw */
+#undef OS_MINGW
+
+/* compiling under solaris */
+#undef OS_SOLARIS
+
+/* compiling under windows */
+#undef OS_WINDOWS
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define as the return type of signal handlers (`int' or `void'). */
+#undef RETSIGTYPE
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Define to 1 if your <sys/time.h> declares `struct tm'. */
+#undef TM_IN_SYS_TIME
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to 1 if your processor stores words with the most significant byte
+   first (like Motorola and SPARC, unlike Intel and VAX). */
+#undef WORDS_BIGENDIAN
+
+/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
+   `char[]'. */
+#undef YYTEXT_POINTER
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
+
+/* Define to a type to use for `error_t' if it is not otherwise available. */
+#undef error_t
+
+/* Define to `int' if <sys/types.h> does not define. */
+#undef pid_t
+
+/* Define to `unsigned' if <sys/types.h> does not define. */
+#undef size_t

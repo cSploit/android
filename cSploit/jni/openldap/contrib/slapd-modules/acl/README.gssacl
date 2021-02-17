@@ -1,0 +1,32 @@
+This directory contains native slapd plugins that implement access rules.
+
+gssacl.c contains a simple example that implements access control
+based on GSS naming extensions attributes.
+
+To use the acl-gssacl plugin, add:
+
+moduleload acl-gssacl.so
+
+to your slapd configuration file.
+It is configured using
+
+access to <what>
+        by dynacl/gss/<attribute>.[.{base,regex,expand}]=<valpat> {<level>|<priv(s)>}
+
+The default is "exact"; in case of "expand", "<valpat>" results from
+the expansion of submatches in the "<what>" portion.  "<level>|<priv(s)>"
+describe the level of privilege this rule can assume.
+
+Use Makefile to compile this plugin or use a command line similar to:
+
+gcc -shared -I../../../include -I../../../servers/slapd -Wall -g \
+	-o acl-gssacl.so gssacl.c
+
+
+---
+Copyright 2011 PADL Software Pty Ltd. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+

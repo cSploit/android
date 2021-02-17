@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="UTILITIES files">
+      <UniqueIdentifier>{a4227c9b-9ff9-4f5d-ba6c-93047f4503b0}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{624c72bc-fde4-43c5-8ae8-865accbf35e7}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{387a9f3a-c471-48ce-bec0-0d9f9347ce13}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\utilities\install\install_reg.cpp">
+      <Filter>UTILITIES files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\utilities\install\registry.cpp">
+      <Filter>UTILITIES files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\utilities\install\regis_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\utilities\install\registry.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

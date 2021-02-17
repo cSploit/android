@@ -1,0 +1,28 @@
+#$Id: tds.dox,v 1.9 2005-06-26 14:25:19 jklowden Exp $
+PROJECT_NAME =		"FreeTDS API"
+OUTPUT_DIRECTORY =	doc/reference
+GENERATE_LATEX   =	NO
+GENERATE_MAN =		NO
+GENERATE_RTF =		NO
+CASE_SENSE_NAMES =	NO
+INPUT =			$(SRCDIR)/src  \
+			$(SRCDIR)/include \
+			$(SRCDIR)/win32 \
+			$(SRCDIR)/vms 
+EXCLUDE_PATTERNS =	*/unittests/*
+RECURSIVE =		YES
+QUIET =			YES
+SHORT_NAMES = 		YES
+JAVADOC_AUTOBRIEF = 	YES
+PREDEFINED =		HAVE_SSL
+INTERNAL_DOCS = 	YES	
+EXAMPLE_PATH = 		$(SRCDIR)/src/tds/example
+SORT_BRIEF_DOCS = 	YES
+EXTRACT_STATIC = 	YES
+ALIASES += tds="@param tds A pointer to the TDSSOCKET structure managing a client/server operation."
+
+CALL_GRAPH = YES
+CALLER_GRAPH = YES
+HAVE_DOT = YES
+MAX_DOT_GRAPH_DEPTH = 3
+DOT_IMAGE_FORMAT = svg

@@ -1,0 +1,91 @@
+Alias handling and ambiguous field detecting has been improved in FB2.0.
+
+Changes:
+a) When an alias is present on a table, that alias must be used or no alias at 
+   all, the tablename only is not valid anymore.
+b) Fields without qualifier can now be used in a higher scope level. Own scope 
+   level is checked first and ambiguous field checking is done on scope level.
+
+Author:
+    Arno Brinkman <firebird@abvisie.nl>
+
+Examples:
+a)
+  1. 
+    When an alias is present it must be used or no alias at all must be used.
+    This query was allowed in FB1.5 and earlier versions:
+    
+    SELECT
+      RDB$RELATIONS.RDB$RELATION_NAME
+    FROM
+      RDB$RELATIONS R
+    
+    but will now correctly report an error that the field
+    "RDB$RELATIONS.RDB$RELATION_NAME" couldn't be found.
+    
+    Use this (preferred):
+    
+    SELECT
+      R.RDB$RELATION_NAME
+    FROM
+      RDB$RELATIONS R
+    
+    or this statement:
+    
+    SELECT
+      RDB$RELATION_NAME
+    FROM
+      RDB$RELATIONS R
+    
+  2. 
+    The statement below will now correctly use the FieldID from the subselect 
+    and from the updating table:
+    
+    UPDATE
+      TableA
+    SET
+      FieldA = (SELECT SUM(A.FieldB) FROM TableA A WHERE A.FieldID = TableA.FieldID)
+    
+    In firebird it's possible to give an alias by an update statement, but by 
+    many other database vendors this isn't supported. These SQL statements are
+    now better interchangeable between other SQL database products.
+
+  3. 
+    This example didn't run correctly in FB1.5 and earlier:
+    
+    SELECT
+      RDB$RELATIONS.RDB$RELATION_NAME,
+      R2.RDB$RELATION_NAME
+    FROM
+      RDB$RELATIONS
+      JOIN RDB$RELATIONS R2 ON
+        (R2.RDB$RELATION_NAME = RDB$RELATIONS.RDB$RELATION_NAME)
+    
+    If RDB$RELATIONS contains 90 records, it would return 90 * 90 = 8100 records, 
+    but in FB2.0 it will correctly return 90 records.
+    
+    
+
+b)
+  1.
+    This failed in FB1.5, but is possible in FB2.0:
+    
+    SELECT
+      (SELECT RDB$RELATION_NAME FROM RDB$DATABASE)
+    FROM
+      RDB$RELATIONS
+
+  2.
+    Ambiguity checking in sub-selects. The query below did run on FB1.5 
+    without reporting an ambiguity, but will report it in FB2.0:
+
+    SELECT
+      (SELECT
+         FIRST 1 RDB$RELATION_NAME
+       FROM
+         RDB$RELATIONS R1
+         JOIN RDB$RELATIONS R2 ON
+           (R2.RDB$RELATION_NAME = R1.RDB$RELATION_NAME))
+    FROM
+      RDB$DATABASE
+

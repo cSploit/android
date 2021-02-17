@@ -1,0 +1,82 @@
+.TH SLAPO-CLOAK 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation, All Rights Reserved.
+.\" Copying restrictions apply.  See the COPYRIGHT file.
+.\" $OpenLDAP$
+.SH NAME
+slapo-cloak \- Attribute cloak overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The
+.B cloak
+overlay to
+.BR slapd (8)
+allows the server to hide specific attributes, unless explicitely requested
+by the client. This improve performance when a client requests all attributes
+and get a huge binary attribute that is of no interest for it.
+This behavior is disabled when the \fImanageDSAit\fP
+control (RFC 3296) is used.
+
+.SH CONFIGURATION
+The config directives that are specific to the
+.B cloak
+overlay must be prefixed by
+.BR cloak\- ,
+to avoid potential conflicts with directives specific to the underlying 
+database or to other stacked overlays.
+
+.TP
+.B overlay cloak
+This directive adds the cloak overlay to the current database,
+or to the frontend, if used before any database instantiation; see
+.BR slapd.conf (5)
+for details.
+
+.LP
+This
+.B slapd.conf
+configuration option is defined for the cloak overlay. It may have multiple 
+occurrences, and it must appear after the
+.B overlay
+directive:
+.TP
+.B cloak-attr <attribute> [<class>]
+The value 
+.B <attribute>
+is the name of the attribute that will be cloaked.
+
+The optional
+.B <class>
+restricts cloaking only to entries of the named 
+.B <class>.
+
+.SH EXAMPLE
+This example hide the
+.B jpegPhoto
+attribute. Add the following to slapd.conf:
+
+.LP
+.nf
+    database <database>
+    # ...
+
+    overlay cloak
+    cloak-attr jpegPhoto
+.fi
+.LP
+and that slapd loads cloak.la, if compiled as a run-time module;
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd (8).
+The
+.BR slapo-cloak (5)
+overlay supports dynamic configuration via
+.BR back-config .
+.SH ACKNOWLEDGEMENTS
+.P
+This module was originally written in 2008 by Emmanuel Dreyfus.

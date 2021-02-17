@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 14.  Binary Large Objects</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="prev" href="txnset_timeout.html" title="DbTxn::set_timeout()" />
+    <link rel="next" href="get_blob_dir.html" title="Db::get_blob_dir()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 14. 
+                Binary Large Objects
+        </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="txnset_timeout.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="get_blob_dir.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="blob"></a>Chapter 14. 
+                Binary Large Objects
+        </h2>
+          </div>
+        </div>
+      </div>
+      <p>
+            Binary Large Objects (BLOB) support is designed for efficient
+            storage of large objects. An object is considered to be large
+            if it is more than a third of the size of a page. Without BLOB
+            support, large objects must be broken up into smaller pieces,
+            and then reassembled and/or disassembled every time the record
+            is read or updated. Berkeley DB BLOB support avoids this
+            assembly/disassembly process by storing the large object in a
+            special directory set aside for the purpose.  The data itself
+            is not kept in the database, nor is it placed into the
+            in-memory cache.
+        </p>
+      <p>
+            BLOBs can only be stored using the data portion of a key/data
+            pair. They are supported only for Btree, Hash, and Heap
+            databases, and only so long as the database is not configured
+            for checksums, encryption, duplicate records, or duplicate
+            sorted records. In addition, the Dbt that you use to
+            access the BLOB data cannot be configured as a partial
+            Dbt if you want to access the data using the BLOB's
+            streaming interface (introduced below).
+        </p>
+      <p>
+            Note that if the environment is transactionally-protected, then
+            all access to the BLOB is also transactionally protected.
+        </p>
+      <p>
+            BLOBs are not supported for environments configured for
+            replication. Nor can BLOBs be used with in-memory-only
+            databases.
+        </p>
+      <p>
+            In order to use Berkeley DB's BLOB support, you must set the
+            BLOB threshold to a non-zero positive value. (The default value
+            is <code class="literal">0</code>, which means that BLOBs are not
+            enabled). You set the BLOB threshold using either
+            <a class="xref" href="set_blob_threshold.html" title="Db::set_blob_threshold()">Db::set_blob_threshold()</a> or <a class="xref" href="envset_blob_threshold.html" title="DbEnv::set_blob_threshold()">DbEnv::set_blob_threshold()</a>.
+        </p>
+      <p>
+            Once BLOBs are enabled, there are two ways to create a BLOB record:
+        </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                    Configure the Dbt used to access the BLOB data
+                    (that is, the Dbt used for the data portion of
+                    the record) with the 
+                    <a class="link" href="dbt.html#dbt_DB_DBT_BLOB">DB_DBT_BLOB</a>
+                    flag. This causes the data to be stored as a BLOB
+                    regardless of its size, so long as the database
+                    otherwise supports BLOBs.
+                </p>
+          </li>
+          <li>
+            <p>
+                    Alternatively, creating a data item with a size greater
+                    than the BLOB threshold will cause that data item to be
+                    stored as a BLOB.  Of course, for this method to work,
+                    the BLOB threshold must be greater than
+                    <code class="literal">0</code>.
+                </p>
+          </li>
+        </ul>
+      </div>
+      <p>
+            BLOBs may be accessed in the same way as other Dbt
+            data, so long as the data itself will fit into memory. More
+            likely, you will find it necessary to use the BLOB streaming
+            API to read and write BLOB data. You open a BLOB stream using
+            the <a class="xref" href="dbstream.html" title="Dbc::db_stream()">Dbc::db_stream()</a> method, close it with the <a class="xref" href="dbstream_close.html" title="DbStream::close()">DbStream::close()</a>
+            method, write to it using the the <a class="xref" href="dbstream_write.html" title="DbStream::write()">DbStream::write()</a> method, and
+            read it using the <a class="xref" href="dbstream_read.html" title="DbStream::read()">DbStream::read()</a> method.
+        </p>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="bloblist"></a>BLOBs and Related Methods</h2>
+            </div>
+          </div>
+        </div>
+        <div class="navtable">
+          <table border="1" width="80%">
+            <thead>
+              <tr>
+                <th>BLOB Operations</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <a class="xref" href="dbstream.html" title="Dbc::db_stream()">Dbc::db_stream()</a>
+                </td>
+                <td>Create a BLOB stream</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="dbstream_close.html" title="DbStream::close()">DbStream::close()</a>
+                </td>
+                <td>Close a BLOB stream</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="dbstream_read.html" title="DbStream::read()">DbStream::read()</a>
+                </td>
+                <td>Read a BLOB stream</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="dbstream_size.html" title="DbStream::size()">DbStream::size()</a>
+                </td>
+                <td>Returns the size of a BLOB</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="dbstream_write.html" title="DbStream::write()">DbStream::write()</a>
+                </td>
+                <td>Write a BLOB stream</td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <span class="bold">
+                    <strong>BLOB Configuration</strong>
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td><a class="xref" href="set_blob_dir.html" title="Db::set_blob_dir()">Db::set_blob_dir()</a>, <a class="xref" href="get_blob_dir.html" title="Db::get_blob_dir()">Db::get_blob_dir()</a></td>
+                <td>Sets/gets the location where blob data is stored</td>
+              </tr>
+              <tr>
+                <td><a class="xref" href="set_blob_threshold.html" title="Db::set_blob_threshold()">Db::set_blob_threshold()</a>, <a class="xref" href="get_blob_threshold.html" title="Db::get_blob_threshold()">Db::get_blob_threshold()</a></td>
+                <td>Sets/gets the size when data records are stored as blobs</td>
+              </tr>
+              <tr>
+                <td><a class="xref" href="envset_blob_dir.html" title="DbEnv::set_blob_dir()">DbEnv::set_blob_dir()</a>, <a class="xref" href="envget_blob_dir.html" title="DbEnv::get_blob_dir()">DbEnv::get_blob_dir()</a></td>
+                <td>Sets/gets the location where blob data is stored</td>
+              </tr>
+              <tr>
+                <td><a class="xref" href="envset_blob_threshold.html" title="DbEnv::set_blob_threshold()">DbEnv::set_blob_threshold()</a>, <a class="xref" href="envget_blob_threshold.html" title="DbEnv::get_blob_threshold()">DbEnv::get_blob_threshold()</a></td>
+                <td>Sets/gets the default size for the environment when BLOBs are used</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="txnset_timeout.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="get_blob_dir.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbTxn::set_timeout() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Db::get_blob_dir()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

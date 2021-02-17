@@ -1,0 +1,98 @@
+## Example configuration file for svnperms.py. ##
+
+# $Id: svnperms.conf.example 1028289 2010-10-28 13:20:45Z cmpilato $
+#
+# Multiple global [groups] sections are accepted, but be aware
+# that it's the same as concatenating them all in a single entry.
+# You can also create section specific groups, using a syntax
+# like [sectionname groups].
+#
+[groups]
+group1 = user1 user2 user3
+group2 = user4 user5
+supergroup = @group1 @group2 user6
+
+#
+# Example repository control, showing allowed syntax.
+#
+# - the latest match is what counts
+# - groups are prefixed by "@"
+# - you can use groups and users in the same definition
+# - all permissions may be revoked with ()
+# - line breaks are accepted
+#
+[example1 groups]
+group3 = user9 user10
+
+[example1]
+trunk/.* = *(add,remove,update) @group1,user4,user5(update)
+           user6,user7()
+trunk/.* = user8(add,update)
+tags/[^/]+/ = @group3(add)
+branches/[^/]+/.* = *(add,remove,update)
+
+#
+# One of the most used repository structures, for a single project.
+#
+[example2]
+trunk/.* = *(add,remove,update)
+tags/[^/]+/ = *(add)
+branches/[^/]+/.* = *(add,remove,update)
+
+#
+# Another common structure, expecting a project name inside the repository
+# (like trunk/myproject/ and tags/myproject/). In this example, only admins
+# are allowed to create projects, and there are project specific access
+# lists.
+#
+[example3 groups]
+admins = john
+project1 = user1 user2
+project2 = user3 user4
+
+[example3]
+trunk/[^/]+/ = @admins(add,remove)
+trunk/project1/.+ = @project1(add,remove,update)
+trunk/project2/.+ = @project2(add,remove,update)
+tags/[^/]+/ = @admins(add,remove)
+tags/project1/[^/]+/ = @project1(add,remove)
+tags/project2/[^/]+/ = @project2(add,remove)
+branches/[^/]+/ = @admins(add,remove)
+branches/project1/[^/]+/.* = @project1(add,remove,update)
+branches/project2/[^/]+/.* = @project2(add,remove,update)
+
+#
+# A more complex structure, as defined in the following URL:
+#
+# http://moin.conectiva.com.br/RepositorySystem
+#
+[example4 groups]
+admins = user1 user2
+updaters = user3
+
+[example4]
+snapshot/[^/]+/(current/(SPECS/|SOURCES/)?)? = *(add)
+snapshot/[^/]+/ = @admins(add,remove)
+snapshot/[^/]+/current/SPECS/[^/]+\.spec = *(add,remove,update)
+snapshot/[^/]+/current/SOURCES/[^/]+ = *(add,remove,update)
+snapshot/[^/]+/releases/[^/]+/([^/+]/)? = autouser(add)
+snapshot/[^/]+/pristine/ = autouser(add,remove)
+branches/[^/]+/.* = *(add,remove,update)
+releases/[^/]+/ = @admins(add)
+tags/[^/]+/ = *(add,remove)
+updates/[^/]+/[^/]+/(current/(SPECS/|SOURCES/)?)? = @updaters,autouser(add)
+updates/[^/]+/[^/]+/current/SPECS/[^/]+\.spec = @updaters,autouser(add,update)
+updates/[^/]+/[^/]+/current/SOURCES/[^/]+ = @updaters,autouser(add,remove,update)
+updates/[^/]+/[^/]+/releases/.* = autouser(add)
+updates/[^/]+/[^/]+/pristine/ = autouser(add,remove)
+
+#
+# Sections can inherit settings from previously defined sections, using
+# the "extends" keyword in the section declaration.  In this example, 
+# the [example5] section inherits all the settings from [example2], and 
+# adds a new setting for a releases directory which behaves like the 
+# tags directory.
+#
+[example5 extends example2]
+releases/[^/]+/ = *(add)
+

@@ -1,0 +1,168 @@
+diff -urdN linux-2.4.4.orig/Documentation/Configure.help linux/Documentation/Configure.help
+--- linux-2.4.4.orig/Documentation/Configure.help	Fri Apr 20 16:23:12 2001
++++ linux/Documentation/Configure.help	Tue May  1 16:26:10 2001
+@@ -12174,7 +12174,7 @@
+   case insensitive, and case in names is preserved. Say Y. You can
+   disable it at mount time with the -N os2 parameter of ncpmount.
+ 
+-Lowercase DOS filenames on LONG namespace volume
++Lowercase DOS filenames
+ CONFIG_NCPFS_SMALLDOS
+   If you say Y here, every filename on a NetWare server volume using
+   the OS2/LONG namespace and created under DOS or on a volume using
+@@ -12192,25 +12192,7 @@
+   effects by saying Y to "Allow using of Native Language Support"
+   below.
+ 
+-Allow mounting of volume subdirectories
+-CONFIG_NCPFS_MOUNT_SUBDIR
+-  Allows you to mount not only whole servers or whole volumes, but
+-  also subdirectories from a volume. It can be used to reexport data
+-  and so on. There is no reason to say N, so Y is recommended unless
+-  you count every byte.
+-
+-  To utilize this feature you must use ncpfs-2.0.12 or newer.
+-
+-NDS authentication support
+-CONFIG_NCPFS_NDS_DOMAINS
+-  This allows storing NDS private keys in kernel space where they
+-  can be used to authenticate another server as interserver NDS
+-  accesses need it. You must use ncpfs-2.0.12.1 or newer to utilize
+-  this feature. Say Y if you are using NDS connections to NetWare
+-  servers. Do not say Y if security is primary for you because root
+-  can read your session key (from /proc/kcore).
+-
+-Allow using of Native Language Support
++Use Native Language Support
+ CONFIG_NCPFS_NLS
+   Allows you to use codepages and I/O charsets for file name
+   translation between the server file system and input/output. This
+@@ -12218,6 +12200,16 @@
+   systems, e.g. Windows 95. See also NLS for more Information.
+ 
+   To select codepages and I/O charsets use ncpfs-2.2.0.13 or newer.
++
++Default NLS Codepage
++CONFIG_NCPFS_NLS_CP
++  This setting allows you to specify a default value for which
++  codepage the server uses. If this field is left blank no
++  translations will be done by default. The local codepage/charset
++  default to CONFIG_NLS_DEFAULT.
++
++  The nls settings can be changed at mount time, if your ncpmount
++  supports that, using the codepage and iocharset parameters.
+ 
+ Symbolic links and mode permission bits
+ CONFIG_NCPFS_EXTRAS
+diff -urdN linux-2.4.4.orig/fs/ncpfs/Config.in linux/fs/ncpfs/Config.in
+--- linux-2.4.4.orig/fs/ncpfs/Config.in	Mon Dec 11 20:59:28 2000
++++ linux/fs/ncpfs/Config.in	Tue May  1 15:55:22 2001
+@@ -8,4 +8,7 @@
+ dep_mbool '  Use LONG (OS/2) namespace if available' CONFIG_NCPFS_OS2_NS $CONFIG_NCP_FS
+ dep_mbool '  Lowercase DOS filenames' CONFIG_NCPFS_SMALLDOS $CONFIG_NCP_FS
+ dep_mbool '  Use Native Language Support' CONFIG_NCPFS_NLS $CONFIG_NCP_FS
++if [ "$CONFIG_NCPFS_NLS" = "y" ]; then
++   string '   Default NLS Codepage' CONFIG_NCPFS_NLS_CP "cp437"
++fi
+ dep_mbool '  Enable symbolic links and execute flags' CONFIG_NCPFS_EXTRAS $CONFIG_NCP_FS
+diff -urdN linux-2.4.4.orig/fs/ncpfs/inode.c linux/fs/ncpfs/inode.c
+--- linux-2.4.4.orig/fs/ncpfs/inode.c	Tue Apr 17 23:16:39 2001
++++ linux/fs/ncpfs/inode.c	Sat Apr 28 14:14:09 2001
+@@ -4,7 +4,7 @@
+  *  Copyright (C) 1995, 1996 by Volker Lendecke
+  *  Modified for big endian by J.F. Chadima and David S. Miller
+  *  Modified 1997 Peter Waltenberg, Bill Hawes, David Woodhouse for 2.1 dcache
+- *  Modified 1998 Wolfram Pienkoss for NLS
++ *  Modified 1998-2001 Wolfram Pienkoss for NLS
+  *
+  */
+ 
+@@ -369,7 +369,7 @@
+ 
+ #ifdef CONFIG_NCPFS_NLS
+ 	/* load the default NLS charsets */
+-	server->nls_vol = load_nls_default();
++	server->nls_vol = ncp_load_nls_default_cp();
+ 	server->nls_io = load_nls_default();
+ #endif /* CONFIG_NCPFS_NLS */
+ 
+diff -urdN linux-2.4.4.orig/fs/ncpfs/ioctl.c linux/fs/ncpfs/ioctl.c
+--- linux-2.4.4.orig/fs/ncpfs/ioctl.c	Mon Dec 11 20:59:28 2000
++++ linux/fs/ncpfs/ioctl.c	Sat Apr 28 14:14:23 2001
+@@ -3,7 +3,7 @@
+  *
+  *  Copyright (C) 1995, 1996 by Volker Lendecke
+  *  Modified 1997 Peter Waltenberg, Bill Hawes, David Woodhouse for 2.1 dcache
+- *  Modified 1998, 1999 Wolfram Pienkoss for NLS
++ *  Modified 1998-2001 Wolfram Pienkoss for NLS
+  *
+  */
+ 
+@@ -526,7 +526,7 @@
+ 			user.codepage[NCP_IOCSNAME_LEN] = 0;
+ 			if (!user.codepage[0] ||
+ 					!strcmp(user.codepage, "default"))
+-				codepage = load_nls_default();
++				codepage = ncp_load_nls_default_cp();
+ 			else {
+ 				codepage = load_nls(user.codepage);
+ 				if (!codepage) {
+diff -urdN linux-2.4.4.orig/fs/ncpfs/ncplib_kernel.c linux/fs/ncpfs/ncplib_kernel.c
+--- linux-2.4.4.orig/fs/ncpfs/ncplib_kernel.c	Tue Nov 14 21:16:33 2000
++++ linux/fs/ncpfs/ncplib_kernel.c	Tue May  1 16:30:39 2001
+@@ -4,7 +4,7 @@
+  *  Copyright (C) 1995, 1996 by Volker Lendecke
+  *  Modified for big endian by J.F. Chadima and David S. Miller
+  *  Modified 1997 Peter Waltenberg, Bill Hawes, David Woodhouse for 2.1 dcache
+- *  Modified 1999 Wolfram Pienkoss for NLS
++ *  Modified 1999-2001 Wolfram Pienkoss for NLS
+  *
+  */
+ 
+@@ -893,6 +893,18 @@
+ /* This are the NLS conversion routines with inspirations and code parts
+  * from the vfat file system and hints from Petr Vandrovec.
+  */
++
++struct
++nls_table *ncp_load_nls_default_cp(void)
++{
++	struct nls_table *default_nls;
++
++	default_nls = load_nls(NCPFS_NLS_CP);
++	if (default_nls != NULL)
++		return default_nls;
++	else
++		return load_nls_default();
++}
+ 
+ inline unsigned char
+ ncp__tolower(struct nls_table *t, unsigned char c)
+diff -urdN linux-2.4.4.orig/fs/ncpfs/ncplib_kernel.h linux/fs/ncpfs/ncplib_kernel.h
+--- linux-2.4.4.orig/fs/ncpfs/ncplib_kernel.h	Sat Apr 28 09:53:23 2001
++++ linux/fs/ncpfs/ncplib_kernel.h	Tue May  1 16:32:09 2001
+@@ -4,7 +4,7 @@
+  *  Copyright (C) 1995, 1996 by Volker Lendecke
+  *  Modified for big endian by J.F. Chadima and David S. Miller
+  *  Modified 1997 Peter Waltenberg, Bill Hawes, David Woodhouse for 2.1 dcache
+- *  Modified 1998, 1999 Wolfram Pienkoss for NLS
++ *  Modified 1998-2001 Wolfram Pienkoss for NLS
+  *  Modified 1999 Wolfram Pienkoss for directory caching
+  *
+  */
+@@ -101,6 +101,14 @@
+ 			__u8, __u8, __u32);
+ 
+ #ifdef CONFIG_NCPFS_NLS
++
++#ifdef CONFIG_NCPFS_NLS_CP
++#define NCPFS_NLS_CP CONFIG_NCPFS_NLS_CP
++#else
++#define NCPFS_NLS_CP ""
++#endif
++
++struct nls_table *ncp_load_nls_default_cp(void);
+ 
+ unsigned char ncp__tolower(struct nls_table *, unsigned char);
+ unsigned char ncp__toupper(struct nls_table *, unsigned char);
+

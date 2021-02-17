@@ -1,0 +1,68 @@
+
+/* OS/2 Warp 4.0 Resource Script File - Created by Universal Resource Editor */
+
+#define INCL_WINSYS
+#define INCL_WINBIDI
+#define INCL_WINSTDDLGS
+#define INCL_WINSTDSPIN
+#define INCL_NLS
+#define INCL_SW
+
+#include <os2.h>
+
+#include "resourceos2.h"
+
+DLGTEMPLATE DLG_SQLITEODBCCONFIGURATION MOVEABLE DISCARDABLE
+BEGIN
+    DIALOG "SQLite ODBC Configuation",DLG_SQLITEODBCCONFIGURATION,8,30,238,111,
+        FS_NOBYTEALIGN | FS_BORDER | WS_CLIPSIBLINGS | WS_SAVEBITS |
+        WS_VISIBLE, FCF_TITLEBAR | FCF_SYSMENU | FCF_TASKLIST
+    PRESPARAMS PP_FONTNAMESIZE, "9.WarpSans"
+    PRESPARAMS PP_USER, "12.System Proportional"
+    BEGIN
+        CONTROL "OK",                  DID_OK, 5, 5, 38, 12, WC_BUTTON,
+                                            BS_PUSHBUTTON | BS_DEFAULT |
+                                            WS_GROUP | WS_TABSTOP | WS_VISIBLE
+        CONTROL "Cancel",              DID_CANCEL, 48, 5, 38, 12, WC_BUTTON,
+                                            BS_PUSHBUTTON | WS_TABSTOP |
+                                            WS_VISIBLE
+        CONTROL "Data source name",    ST_DATASOURCENAME, 6, 96, 47, 7,
+                                            WC_STATIC, SS_TEXT | DT_LEFT |
+                                            DT_TOP | WS_GROUP | WS_VISIBLE
+        CONTROL "Description",         ST_DESCRIPTION, 6, 84, 41, 7, WC_STATIC,
+                                            SS_TEXT | DT_LEFT | DT_TOP |
+                                            WS_GROUP | WS_VISIBLE
+        CONTROL "Database name",       ST_DATABASENAME, 6, 70, 38, 7, WC_STATIC,
+                                            SS_TEXT | DT_LEFT | DT_TOP |
+                                            WS_GROUP | WS_VISIBLE
+        CONTROL "Timeout",             ST_TIMEOUT, 6, 55, 38, 6, WC_STATIC,
+                                            SS_TEXT | DT_LEFT | DT_TOP |
+                                            WS_GROUP | WS_VISIBLE
+        CONTROL "",                    EF_DSNNAME, 62, 96, 95, 7, WC_ENTRYFIELD,
+                                            ES_MARGIN | ES_ANY | WS_TABSTOP |
+                                            WS_VISIBLE
+                CTLDATA 8, 32, 0, 0
+        CONTROL "",                    EF_DSNDESC, 62, 83, 141, 7,
+                                            WC_ENTRYFIELD, ES_MARGIN | ES_ANY |
+                                            WS_TABSTOP | WS_VISIBLE
+                CTLDATA 8, 32, 0, 0
+        CONTROL "",                    EF_DATABASE, 62, 69, 125, 7,
+                                            WC_ENTRYFIELD, ES_MARGIN | ES_ANY |
+                                            WS_TABSTOP | WS_VISIBLE
+                CTLDATA 8, 32, 0, 0
+        CONTROL "",                    EF_TIMEOUT, 62, 54, 47, 7, WC_ENTRYFIELD,
+                                            ES_MARGIN | ES_ANY | WS_TABSTOP |
+                                            WS_VISIBLE
+                CTLDATA 8, 32, 0, 0
+        CONTROL "Browse",              IDC_BROWSE, 197, 67, 38, 12, WC_BUTTON,
+                                            BS_PUSHBUTTON | WS_TABSTOP |
+                                            WS_VISIBLE
+        CONTROL "No ~Wide character",  IDC_NOWCHAR, 62, 38, 57, 8, WC_BUTTON,
+                                            BS_AUTOCHECKBOX | WS_TABSTOP |
+                                            WS_VISIBLE
+        CONTROL "~Step API",           IDC_STEPAPI, 136, 37, 38, 10, WC_BUTTON,
+                                            BS_AUTOCHECKBOX | WS_TABSTOP |
+                                            WS_VISIBLE
+    END
+END
+

@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="headers">
+      <UniqueIdentifier>{e851796a-334f-465a-87d4-3a8493cde72c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{c8501fd3-5859-4685-baad-969e1b6e2e1c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{a06a0231-22bb-432f-95c2-ee97b9a1cee8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GPRE files">
+      <UniqueIdentifier>{754afcc7-5b6d-4620-abe9-78b4653e08b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="preprocessed">
+      <UniqueIdentifier>{5ee9ba85-e5ee-4f0d-a7b6-9ac703ff491c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Auth">
+      <UniqueIdentifier>{2d91d43b-c689-41b3-9d55-227f0a4f5193}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Remote client">
+      <UniqueIdentifier>{e5984b18-8167-41b3-9f37-51ccf2fd566e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\yvalve\why.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\yvalve\alt.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\yvalve\DistributedTransaction.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\yvalve\gds.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\yvalve\keywords.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\yvalve\perf.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\yvalve\preparse.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\yvalve\user_dsql.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\yvalve\utl.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\auth\SecurityDatabase\LegacyClient.cpp">
+      <Filter>Auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\os\win32\ibinitdll.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\yvalve\array.cpp">
+      <Filter>preprocessed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\yvalve\blob.cpp">
+      <Filter>preprocessed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\client\interface.cpp">
+      <Filter>Remote client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\yvalve\PluginManager.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\yvalve\MasterImplementation.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\auth\SecureRemotePassword\client\SrpClient.cpp">
+      <Filter>Auth</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\plugins\crypt\arc4\Arc4.cpp">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\client\BlrFromMessage.cpp">
+      <Filter>Remote client</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\yvalve\why_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\alt_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\array_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\blob_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\gds_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\keywords.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\perf.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\perf_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\prepa_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\user__proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\utl_proto.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\auth\SecurityDatabase\LegacyClient.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\auth\trusted\AuthSspi.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\yvalve\PluginManager.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\auth\SecureRemotePassword\client\SrpClient.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\plugins\crypt\arc4\Arc4.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\remote\client\BlrFromMessage.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\defs\firebird.def" />
+    <None Include="..\..\..\src\yvalve\array.epp">
+      <Filter>GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\yvalve\blob.epp">
+      <Filter>GPRE files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

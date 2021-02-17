@@ -1,0 +1,69 @@
+Name;vendor;varint;fixed;nullable;variable;blob;numeric;unicode;ascii;size;nullable type;display size;
+SYB5INT8;SYB;0;1;0;0;0;0;0;0;8;SYBINTN;20;
+SYBBINARY;ALL;1;0;1;1;0;0;0;0;-1;0;2S;
+SYBBIT;ALL;0;1;0;0;0;0;0;0;1;SYBBITN;1;
+SYBBITN;MS;1;0;1;0;0;0;0;0;1;0;1;# Sybase bit is not nullable
+SYBBLOB;SYB;??;0;1;1;1;0;Depend;Depend;-1;0;;
+SYBBOUNDARY;SYB;1;0;1;1;0;0;0;1;-1;0;;
+SYBCHAR;ALL;1;0;1;1;0;0;0;1;-1;0;S;
+SYBDATE;SYB;0;1;0;0;0;0;0;0;4;SYBDATEN;19;# FIXME check always yyyy-mm-dd ??
+SYBDATEN;SYB;1;0;1;0;0;0;0;0;4;0;19;
+SYBDATETIME;ALL;0;1;0;0;0;0;0;0;8;SYBDATETIMN;23;# yyyy-mm-dd hh:mm:ss[.fff], precision !!
+SYBDATETIME4;ALL;0;1;0;0;0;0;0;0;4;SYBDATETIMN;19;# yyyy-mm-dd hh:mm:ss[.fff]
+SYBDATETIMN;ALL;1;0;1;0;0;0;0;0;-1;0;;
+SYBMSDATE;MS;1;0;1;0;0;0;0;0;3;0;10;
+SYBMSTIME;MS;1;0;1;0;0;0;0;0;-1;0;16;
+SYBMSDATETIME2;MS;1;0;1;0;0;0;0;0;-1;0;27;# display 10+1+16
+SYBMSDATETIMEOFFSET;MS;1;0;1;0;0;0;0;0;-1;0;33;# display 10+1+16+1+5
+SYBDECIMAL;ALL;1;0;1;0;0;1;0;0;-1;0;P+2;
+SYBFLT8;ALL;0;1;0;0;0;0;0;0;8;SYBFLTN;24;# sure display??
+SYBFLTN;ALL;1;0;1;0;0;0;0;0;-1;0;;
+SYBIMAGE;ALL;4;0;1;1;1;0;0;0;-1;0;2S;
+SYBINT1;ALL;0;1;0;0;0;0;0;0;1;SYBINTN;3;
+SYBINT2;ALL;0;1;0;0;0;0;0;0;2;SYBINTN;6;
+SYBINT4;ALL;0;1;0;0;0;0;0;0;4;SYBINTN;11;
+SYBINT8;MS;0;1;0;0;0;0;0;0;8;SYBINTN;20;
+SYBINTERVAL;SYB;0;1;0;0;0;0;0;0;8;0;;
+SYBINTN;ALL;1;0;1;0;0;0;0;0;-1;0;;
+SYBLONGBINARY;SYB;5;0;1;1;1;0;Depend;Depend;-1;0;2S;
+SYBLONGCHAR;SYB;5;0;1;1;1;0;??;??;-1;0;S;
+SYBMONEY;ALL;0;1;0;0;0;0;0;0;8;SYBMONEYN;21;
+SYBMONEY4;ALL;0;1;0;0;0;0;0;0;4;SYBMONEYN;12;
+SYBMONEYN;ALL;1;0;1;0;0;0;0;0;-1;0;;
+SYBMSUDT;MS;8;0;1;1;1;0;0;0;-1;0;;
+SYBMSXML;MS;8;0;1;1;1;0;1;0;-1;0;;
+SYBNTEXT;MS;4;0;1;1;1;0;1;0;-1;0;S/2;
+SYBNUMERIC;ALL;1;0;1;0;0;1;0;0;-1;0;P+2;
+SYBNVARCHAR;MS;??;0;1;1;0;0;1;0;-1;0;S/2;# Same as XSYBNVARCHAR ??
+SYBREAL;ALL;0;1;0;0;0;0;0;0;4;SYBFLTN;14;
+SYBSENSITIVITY;SYB;1;0;1;1;0;0;0;1;-1;0;;
+SYBSINT1;SYB;0;1;0;0;0;0;0;0;1;0;4;
+SYBTEXT;ALL;4;0;1;1;1;0;0;1;-1;0;S;
+SYBTIME;SYB;0;1;0;0;0;0;0;0;4;SYBTIMEN;19;# FIXME check always hh:mm:ss[.fff]
+SYBTIMEN;SYB;1;0;1;0;0;0;0;0;4;0;19;
+SYBUINT1;SYB;0;1;0;0;0;0;0;0;1;SYBUINTN;3;
+SYBUINT2;SYB;0;1;0;0;0;0;0;0;2;SYBUINTN;5;
+SYBUINT4;SYB;0;1;0;0;0;0;0;0;4;SYBUINTN;10;
+SYBUINT8;SYB;0;1;0;0;0;0;0;0;8;SYBUINTN;20;
+SYBUINTN;SYB;1;0;1;0;0;0;0;0;-1;0;;
+SYBUNIQUE;MS;1;0;1;0;0;0;0;0;16;0;36;# have size but is nullable
+SYBUNITEXT;SYB;4;0;1;1;1;0;1;0;-1;0;S/2;# UTF-16
+SYBVARBINARY;ALL;1;0;1;1;0;0;0;0;-1;0;2S;
+SYBVARCHAR;ALL;1;0;1;1;0;0;0;1;-1;0;S;
+SYBVARIANT;MS;4;0;1;1;0;0;Depend;Depend;-1;0;;# varint ok ?
+SYBVOID;ALL;0;1;0;0;0;0;0;0;0;0;;
+SYBXML;SYB;4;0;1;1;1;0;??;??;-1;0;;
+XSYBBINARY;MS;2;0;1;1;0;0;0;0;-1;0;S;
+XSYBCHAR;MS;2;0;1;1;0;0;0;1;-1;0;S;
+XSYBNCHAR;MS;2;0;1;1;0;0;1;0;-1;0;S/2;
+XSYBNVARCHAR;MS;2;0;1;1;0;0;1;0;-1;0;S/2;
+XSYBVARBINARY;MS;2;0;1;1;0;0;0;0;-1;0;2S;
+XSYBVARCHAR;MS;2;0;1;1;0;0;0;1;-1;0;S;
+;;;;;;;;;;;;;
+# XSYBVARCHAR blob se TDS9 ??;;;;;;;;;;;;;
+# char if ascii or unicode;;;;;;;;;;;;;
+# there are some type that allow size 0 or a constants (SYBDATEN, SYBUNIQUE);;;;;;;;;;;;;
+# some type (BITN, DATEN, UNIQUE, MSDATE) have size but are nullable;;;;;;;;;;;;;
+# tds_get_conversion_type from nullable to not nullable;;;;;;;;;;;;;
+# tds_get_cardinal_type ??;;;;;;;;;;;;;
+;;;;;;;;;;;;;

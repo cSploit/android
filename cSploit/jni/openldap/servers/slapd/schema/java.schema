@@ -1,0 +1,403 @@
+# java.schema -- Java Object Schema
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+# Java Object Schema (defined in RFC 2713)
+#	depends upon core.schema
+#
+
+# Network Working Group                                            V. Ryan
+# Request for Comments: 2713                                   S. Seligman
+# Category: Informational                                           R. Lee
+#                                                   Sun Microsystems, Inc.
+#                                                             October 1999
+# 
+# 
+#      Schema for Representing Java(tm) Objects in an LDAP Directory
+# 
+# Status of this Memo
+# 
+#    This memo provides information for the Internet community.  It does
+#    not specify an Internet standard of any kind.  Distribution of this
+#    memo is unlimited.
+# 
+# Copyright Notice
+# 
+#    Copyright (C) The Internet Society (1999).  All Rights Reserved.
+# 
+# Abstract
+# 
+#    This document defines the schema for representing Java(tm) objects in
+#    an LDAP directory [LDAPv3].  It defines schema elements to represent
+#    a Java serialized object [Serial], a Java marshalled object [RMI], a
+#    Java remote object [RMI], and a JNDI reference [JNDI].
+# 
+
+# [trimmed]
+
+# 3 Attribute Type Definitions
+# 
+#    The following attribute types are defined in this document:
+# 
+#        javaClassName
+#        javaClassNames
+#        javaCodebase
+#        javaSerializedData
+#        javaFactory
+#        javaReferenceAddress
+#        javaDoc
+# 
+# 3.1 javaClassName
+# 
+#    This attribute stores the fully qualified name of the Java object's
+#    "distinguished" class or interface (for example, "java.lang.String").
+#    It is a single-valued attribute. This attribute's syntax is '
+#    Directory String' and its case is significant.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.1.6
+#          NAME 'javaClassName'
+#          DESC 'Fully qualified name of distinguished Java class or
+#                interface'
+#          EQUALITY caseExactMatch
+#          SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+#          SINGLE-VALUE
+#        )
+# 
+attributetype ( 1.3.6.1.4.1.42.2.27.4.1.6
+	NAME 'javaClassName'
+	DESC 'Fully qualified name of distinguished Java class or interface'
+	EQUALITY caseExactMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+ 
+# 3.2 javaCodebase
+# 
+#    This attribute stores the Java class definition's locations.  It
+#    specifies the locations from which to load the class definition for
+#    the class specified by the javaClassName attribute.  Each value of
+#    the attribute contains an ordered list of URLs, separated by spaces.
+#    For example, a value of "url1 url2 url3" means that the three
+#    (possibly interdependent) URLs (url1, url2, and url3) form the
+#    codebase for loading in the Java class definition.
+# 
+#    If the javaCodebase attribute contains more than one value, each
+#    value is an independent codebase. That is, there is no relationship
+#    between the URLs in one value and those in another; each value can be
+#    viewed as an alternate source for loading the Java class definition.
+#    See [Java] for information regarding class loading.
+# 
+#    This attribute's syntax is 'IA5 String' and its case is significant.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.1.7
+#          NAME 'javaCodebase'
+#          DESC 'URL(s) specifying the location of class definition'
+#          EQUALITY caseExactIA5Match
+#          SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+#        )
+# 
+attributetype ( 1.3.6.1.4.1.42.2.27.4.1.7
+	NAME 'javaCodebase'
+	DESC 'URL(s) specifying the location of class definition'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+# 3.3 javaClassNames
+# 
+#    This attribute stores the Java object's fully qualified class or
+#    interface names (for example, "java.lang.String").  It is a
+#    multivalued attribute. When more than one value is present, each is
+#    the name of a class or interface, or ancestor class or interface, of
+#    this object.
+# 
+#    This attribute's syntax is 'Directory String' and its case is
+#    significant.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.1.13
+#          NAME 'javaClassNames'
+#          DESC 'Fully qualified Java class or interface name'
+#          EQUALITY caseExactMatch
+#          SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+#        )
+# 
+# 
+attributetype ( 1.3.6.1.4.1.42.2.27.4.1.13
+	NAME 'javaClassNames'
+	DESC 'Fully qualified Java class or interface name'
+	EQUALITY caseExactMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+ 
+# 3.4 javaSerializedData
+# 
+#    This attribute stores the serialized form of a Java object.  The
+#    serialized form is described in [Serial].
+# 
+#    This attribute's syntax is 'Octet String'.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.1.8
+#          NAME 'javaSerializedData
+#          DESC 'Serialized form of a Java object'
+#          SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+#          SINGLE-VALUE
+#        )
+# 
+attributetype ( 1.3.6.1.4.1.42.2.27.4.1.8
+	NAME 'javaSerializedData'
+	DESC 'Serialized form of a Java object'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+	SINGLE-VALUE )
+
+# 3.5 javaFactory
+# 
+#    This attribute stores the fully qualified class name of the object
+#    factory (for example, "com.wiz.jndi.WizObjectFactory") that can be
+#    used to create an instance of the object identified by the
+#    javaClassName attribute.
+# 
+#    This attribute's syntax is 'Directory String' and its case is
+#    significant.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.1.10
+#          NAME 'javaFactory'
+#          DESC 'Fully qualified Java class name of a JNDI object factory'
+#          EQUALITY caseExactMatch
+#          SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+#          SINGLE-VALUE
+#        )
+# 
+attributetype ( 1.3.6.1.4.1.42.2.27.4.1.10
+	NAME 'javaFactory'
+	DESC 'Fully qualified Java class name of a JNDI object factory'
+	EQUALITY caseExactMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+	SINGLE-VALUE )
+
+# 3.6 javaReferenceAddress
+# 
+#    This attribute represents the sequence of addresses of a JNDI
+#    reference.  Each of its values represents one address, a Java object
+#    of type javax.naming.RefAddr.  Its value is a concatenation of the
+#    address type and address contents, preceded by a sequence number (the
+#    order of addresses in a JNDI reference is significant).  For example:
+# 
+#        #0#TypeA#ValA
+#        #1#TypeB#ValB
+#        #2#TypeC##rO0ABXNyABpq...
+# 
+#    In more detail, the value is encoded as follows:
+# 
+#    The delimiter is the first character of the value.  For readability
+#    the character '#' is recommended when it is not otherwise used
+#    anywhere in the value, but any character may be used subject to
+#    restrictions given below.
+# 
+#    The first delimiter is followed by the sequence number.  The sequence
+#    number of an address is its position in the JNDI reference, with the
+#    first address being numbered 0.  It is represented by its shortest
+#    string form, in decimal notation.
+# 
+#    The sequence number is followed by a delimiter, then by the address
+#    type, and then by another delimiter.  If the address is of Java class
+#    javax.naming.StringRefAddr, then this delimiter is followed by the
+#    value of the address contents (which is a string).  Otherwise, this
+#    delimiter is followed immediately by another delimiter, and then by
+#    the Base64 encoding of the serialized form of the entire address.
+# 
+#    The delimiter may be any character other than a digit or a character
+#    contained in the address type.  In addition, if the address contents
+#    is a string, the delimiter may not be the first character of that
+#    string.
+# 
+#    This attribute's syntax is 'Directory String' and its case is
+#    significant.  It can contain multiple values.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.1.11
+#          NAME 'javaReferenceAddress'
+#          DESC 'Addresses associated with a JNDI Reference'
+#          EQUALITY caseExactMatch
+#          SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+#        )
+# 
+attributetype ( 1.3.6.1.4.1.42.2.27.4.1.11
+	NAME 'javaReferenceAddress'
+	DESC 'Addresses associated with a JNDI Reference'
+	EQUALITY caseExactMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# 3.7 javaDoc
+# 
+#    This attribute stores a pointer to the Java documentation for the
+#    class.  It's value is a URL. For example, the following URL points to
+#    the specification of the java.lang.String class:
+#    http://java.sun.com/products/jdk/1.2/docs/api/java/lang/String.html
+# 
+#    This attribute's syntax is 'IA5 String' and its case is significant.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.1.12
+#          NAME 'javaDoc'
+#          DESC 'The Java documentation for the class'
+#          EQUALITY caseExactIA5Match
+#          SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+#        )
+# 
+attributetype ( 1.3.6.1.4.1.42.2.27.4.1.12
+	NAME 'javaDoc'
+	DESC 'The Java documentation for the class'
+	EQUALITY caseExactIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+
+# 4 Object Class Definitions
+# 
+#    The following object classes are defined in this document:
+# 
+#        javaContainer
+#        javaObject
+#        javaSerializedObject
+#        javaMarshalledObject
+#        javaNamingReference
+# 
+# 4.1 javaContainer
+# 
+#    This structural object class represents a container for a Java
+#    object.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.2.1
+#          NAME 'javaContainer'
+#          DESC 'Container for a Java object'
+#          SUP top
+#          STRUCTURAL
+#          MUST ( cn )
+#        )
+# 
+objectclass ( 1.3.6.1.4.1.42.2.27.4.2.1
+	NAME 'javaContainer'
+	DESC 'Container for a Java object'
+	SUP top
+	STRUCTURAL
+	MUST cn )
+
+# 4.2 javaObject
+# 
+#    This abstract object class represents a Java object.  A javaObject
+#    cannot exist in the directory; only auxiliary or structural
+#    subclasses of it can exist in the directory.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.2.4
+#          NAME 'javaObject'
+#          DESC 'Java object representation'
+#          SUP top
+#          ABSTRACT
+#          MUST ( javaClassName )
+#          MAY ( javaClassNames $
+#                javaCodebase $
+#                javaDoc $
+#                description )
+#        )
+# 
+objectclass ( 1.3.6.1.4.1.42.2.27.4.2.4
+	NAME 'javaObject'
+	DESC 'Java object representation'
+	SUP top
+	ABSTRACT
+	MUST javaClassName
+	MAY ( javaClassNames $ javaCodebase $
+		javaDoc $ description ) )
+
+# 4.3 javaSerializedObject
+# 
+#    This auxiliary object class represents a Java serialized object.  It
+#    must be mixed in with a structural object class.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.2.5
+#          NAME 'javaSerializedObject'
+#          DESC 'Java serialized object'
+#          SUP javaObject
+#          AUXILIARY
+#          MUST ( javaSerializedData )
+#        )
+# 
+objectclass ( 1.3.6.1.4.1.42.2.27.4.2.5
+	NAME 'javaSerializedObject'
+	DESC 'Java serialized object'
+	SUP javaObject
+	AUXILIARY
+	MUST javaSerializedData )
+ 
+# 4.4 javaMarshalledObject
+# 
+#    This auxiliary object class represents a Java marshalled object.  It
+#    must be mixed in with a structural object class.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.2.8
+#          NAME 'javaMarshalledObject'
+#          DESC 'Java marshalled object'
+#          SUP javaObject
+#          AUXILIARY
+#          MUST ( javaSerializedData )
+#        )
+# 
+objectclass ( 1.3.6.1.4.1.42.2.27.4.2.8
+	NAME 'javaMarshalledObject'
+	DESC 'Java marshalled object'
+	SUP javaObject
+	AUXILIARY
+	MUST javaSerializedData )
+
+# 4.5 javaNamingReference
+# 
+#    This auxiliary object class represents a JNDI reference.  It must be
+#    mixed in with a structural object class.
+# 
+#        ( 1.3.6.1.4.1.42.2.27.4.2.7
+#          NAME 'javaNamingReference'
+#          DESC 'JNDI reference'
+#          SUP javaObject
+#          AUXILIARY
+#          MAY ( javaReferenceAddress $
+#                javaFactory )
+#        )
+# 
+objectclass ( 1.3.6.1.4.1.42.2.27.4.2.7
+	NAME 'javaNamingReference'
+	DESC 'JNDI reference'
+	SUP javaObject
+	AUXILIARY
+	MAY ( javaReferenceAddress $ javaFactory ) )
+ 
+# Full Copyright Statement
+# 
+#    Copyright (C) The Internet Society (1999).  All Rights Reserved.
+# 
+#    This document and translations of it may be copied and furnished to
+#    others, and derivative works that comment on or otherwise explain it
+#    or assist in its implementation may be prepared, copied, published
+#    and distributed, in whole or in part, without restriction of any
+#    kind, provided that the above copyright notice and this paragraph are
+#    included on all such copies and derivative works.  However, this
+#    document itself may not be modified in any way, such as by removing
+#    the copyright notice or references to the Internet Society or other
+#    Internet organizations, except as needed for the purpose of
+#    developing Internet standards in which case the procedures for
+#    copyrights defined in the Internet Standards process must be
+#    followed, or as required to translate it into languages other than
+#    English.
+# 
+#    The limited permissions granted above are perpetual and will not be
+#    revoked by the Internet Society or its successors or assigns.
+# 
+#    This document and the information contained herein is provided on an
+#    "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+#    TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+#    BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+#    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+#    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.

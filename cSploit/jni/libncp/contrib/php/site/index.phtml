@@ -1,0 +1,108 @@
+<?
+session_start();
+global $ss_authenticated;
+#echo "session auth:".$ss_authenticated."<br>";
+if (session_is_registered("ss_authenticated"))
+  {
+    session_unregister ("ss_authenticated");
+    unset ($ss_authenticated);
+    #echo "session auth:".$ss_authenticated."<br>";
+  }
+?>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<!-- *************************************************
+        EDITEUR WEBEXPERT
+        DATE DE CREATION: 01/01/00
+        DERNIERE MODIFICATION: 01/01/00
+************************************************** -->
+<HTML>
+<HEAD>
+<TITLE>Identification</TITLE>
+<!META NAME="Patrick Pollet" CONTENT="INSA de Lyon">
+<!META NAME="Description" CONTENT="">
+
+<SCRIPT LANGUAGE="JavaScript">
+<!--  Debut du script
+
+function testf(form)
+{
+var erreur = 0;
+//alert ("début de test")
+
+if (form.uid.value.length <3)
+{
+  alert ("Votre login est trop court !");
+  form.uid.focus();
+ return(false);
+}
+
+if (form.pwd.value.length  <5 )
+{
+  alert ("Votre mot de passe comporte au moins cinq caractères");
+  form.pwd.focus();
+ return(false);
+}
+
+//alert ("fin de test"+erreur)
+return (true)
+}
+//  Fin du script -->
+</SCRIPT>
+
+</HEAD>
+<BODY onload="javascript:document.IDD.uid.focus();">
+
+<?php
+
+$strEntete="Bienvenue au Centre Informatique du Premier Cycle<p>  Identification";
+include("header.inc.php3");
+?>
+<CENTER>
+
+<FORM NAME=IDD ACTION="nds.php" METHOD=POST onsubmit="return testf(this)">
+<?
+#echo "session user:".$ss_username."<br>";
+#echo "session auth:".$ss_authenticated."<br>";
+#echo "session tree:".$ss_tree."<br>";
+?>
+<TABLE border=1>
+  <TR>
+    <TD align=right bgcolor = <? echo $cfgBgcolorTwo;?> ><br>Veuillez entrer votre login Novell:<br>&nbsp<br></TD>
+    <TD><INPUT TYPE="text" NAME="uid" SIZE="15" MAXLENGTH="15"
+   <?
+    #remet le login
+    if ($uid!="") { echo " value=".$uid; }
+  ?>
+>
+</TD>
+  </TR>
+  <TR>
+    <TD align=right bgcolor = <? echo $cfgBgcolorTwo;?>><br>Et votre mot de passe:<br>&nbsp<br></TD>
+    <TD><INPUT TYPE="password" NAME="pwd" SIZE="12" MAXLENGTH="12">
+    <TD><INPUT TYPE=HIDDEN NAME="tree" VALUE="INSA_ROOT">
+        <INPUT TYPE=HIDDEN NAME="ctx" VALUE=".PC">
+</TD>
+  </TR>
+<TR>
+<TD COLSPAN=2 ALIGN="CENTER">
+<br>&nbsp<br>
+
+<INPUT TYPE="reset" VALUE="Annuler" onclick="javascript:document.IDD.uid.focus();">
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<INPUT TYPE="submit" VALUE=" Valider ">
+
+<br>&nbsp<br>
+
+</TD>
+</TR>
+</TABLE>
+</FORM>
+</CENTER>
+<?php
+require ("footer.inc.php3");
+?>
+
+</BODY>
+</HTML>
+

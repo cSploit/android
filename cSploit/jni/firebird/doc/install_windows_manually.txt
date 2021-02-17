@@ -1,0 +1,87 @@
+--------------------------------------
+Firebird 2.1 manual installation notes
+--------------------------------------
+
+Contents
+--------
+
+o Installation as a service
+o Execution as an application
+o Installation with a different service name
+o Uninstallation
+
+
+Installation as a service
+-------------------------
+
+Firebird can be manually set up to run as a service in a windows
+environment by executing the following steps:
+
+  - Make sure that an existing version of Firebird is not running.
+
+  - Unzip the archive into the new directory.
+
+  - Set the FIREBIRD env var to point to the root of this directory.
+    (It is also recommended that the FIREBIRD env var also be used in
+    the PATH env var, rather than hard-coding a path.)
+
+  - change the current directory to <root>\bin (here and below
+    <root> is the directory where v2.1 files are located)
+
+  - Execute either install_super.bat or install_classic.bat depending
+    on architecture required.
+
+  - optionally, you can copy both fbclient.dll and gds32.dll
+    to the OS system directory. To do so, use the provided instclient.exe
+    tool.
+
+
+Execution as an application
+---------------------------
+
+Alternatively, Firebird can be run as an application. Most of the instructions
+for installing as a service should be followed. However, you should skip the
+step to run the batch file.
+
+Firebird is run as application by executing it with the -a switch:
+
+   fbserver.exe -a
+
+
+Installation with a different service name
+------------------------------------------
+
+A new feature of Firebird 2.1 is the option to run multiple Firebird services
+simultaneously. To do this you need to make appropriate changes to the
+firebird.conf file and then run instsvc with the -name option. For example:
+
+  instsvc install -auto -superserver -guardian -name secondservice
+  instsvc start -name secondservice
+
+The install_super.bat and install_classic.bat will do this automatically for
+you. After modifying the firebird.conf file just pass the servicename as a
+parameter:
+
+  install_super.bat secondservice
+
+NOTE: If you are running multiple Firebird services it is essential that you 
+do not configure the FIREBIRD environment variable at the system level.
+
+
+Uninstallation
+--------------
+
+  - To remove FB 2.1 you should run the uninstall.bat.
+
+  - Pass the service name as a parameter if you have installed Firebird to
+    use a different service name.
+
+  - If you used instclient to deploy a library to system32 you should run
+
+      instclient.exe remove <libname>
+
+  - Delete installation directory. You may wish to keep the log file, security
+    database, firebird.conf and databases.conf.
+
+
+

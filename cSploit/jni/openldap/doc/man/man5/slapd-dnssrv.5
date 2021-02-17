@@ -1,0 +1,49 @@
+.TH SLAPD-DNSSRV 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd\-dnssrv \- DNS SRV referral backend to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The DNSSRV backend to
+.BR slapd (8)
+serves up referrals based upon SRV resource records held in
+the Domain Name System.
+.LP
+This backend is experimental.
+.SH CONFIGURATION
+The DNSSRV backend has no backend nor database specific options.
+It is configured simply by "database dnssrv" followed a suffix
+directive, e.g. suffix "".
+.SH ACCESS CONTROL
+The
+.B dnssrv
+backend does not honor all ACL semantics as described in
+.BR slapd.access (5).
+In fact, this backend only implements the
+.B search
+operation when the
+.B manageDSAit
+control (RFC 3296) is used, otherwise for every operation a referral,
+whenever appropriate, or an error is returned.
+Currently, there is no means to condition the returning of the referral
+by means of ACLs; no access control is implemented, except for 
+.B read (=r)
+access to the returned entries, which is actually provided by the frontend.
+Note, however, that the information returned by this backend is collected
+through the DNS, so it is public by definition.
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.br
+.SH SEE ALSO
+\fB"OpenLDAP Root Service - An experimental LDAP referral
+service"\fR [RFC 3088],
+.br
+\fB"OpenLDAP LDAP Root Service"\fR <http://www.openldap.org/faq/?file=393)>,
+.br
+.BR slapd.conf (5),
+.BR slapd (8)

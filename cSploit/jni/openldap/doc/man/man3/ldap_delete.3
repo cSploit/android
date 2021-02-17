@@ -1,0 +1,89 @@
+.TH LDAP_DELETE 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_delete, ldap_delete_s, ldap_delete_ext, ldap_delete_ext_s \- Perform an LDAP delete operation.
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_delete_s(ld, dn)
+.ft
+LDAP *ld;
+char *dn;
+.LP
+.ft B
+int ldap_delete(ld, dn)
+.ft
+LDAP *ld;
+char *dn;
+.LP
+.ft B
+int ldap_delete_ext(ld, dn, serverctrls, clientctrls, msgidp)
+.ft
+LDAP *ld;
+char *dn;
+LDAPControl **serverctrls, **clientctrls;
+int *msgidp;
+.LP
+.ft B
+int ldap_delete_ext_s(ld, dn, serverctrls, clientctrls)
+.ft
+LDAP *ld;
+char *dn;
+LDAPControl **serverctrls, **clientctrls;
+.SH DESCRIPTION
+The
+.B ldap_delete_s()
+routine is used to perform an LDAP delete operation
+synchronously. It takes \fIdn\fP, the DN of the entry to be deleted.
+It returns an LDAP error code, indicating the success or failure of the
+operation.
+.LP
+The
+.B ldap_delete()
+routine is used to perform an LDAP delete operation
+asynchronously. It takes the same parameters as
+.BR ldap_delete_s(),
+but returns the message id of the request it initiated. The result of
+the delete can be obtained by a subsequent call to
+.BR ldap_result (3).
+.LP
+The
+.B ldap_delete_ext()
+routine  allows  server  and client controls to be 
+specified to extend the delete request. This routine is asynchronous like 
+ldap_delete(), but its return value is an LDAP error code. It stores the 
+message id of the request in the integer pointed to by msgidp.
+.LP
+The
+.B ldap_delete_ext_s()
+routine is the synchronous version of
+.BR ldap_delete_ext().
+It also returns an LDAP error code indicating success 
+or failure of the operation.
+.SH ERRORS
+.B ldap_delete_s()
+returns an LDAP error code which can be interpreted
+by calling one of
+.BR ldap_perror (3)
+and friends.
+.B ldap_delete()
+returns \-1 if something went wrong initiating the request. It returns the
+non-negative message id of the request if things went ok.
+.LP
+.B ldap_delete_ext()
+and
+.B ldap_delete_ext_s()
+return some Non-zero value if
+something  went wrong initiating the request, else return 0.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_error (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

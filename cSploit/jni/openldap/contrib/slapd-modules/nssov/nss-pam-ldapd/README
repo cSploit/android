@@ -1,0 +1,15 @@
+These files were pulled from the nss-pam-ldapd project version 0.8.12.
+Copyright notices are in the individual files.
+
+This is not the full distribution of nss-pam-ldapd, and does not
+include the client-side stub libraries.  Get the latest release of
+nss-pam-ldapd from http://arthurdejong.org/nss-pam-ldapd/ to use
+this overlay.
+
+If your system already has the nss-pam-ldapd stub libraries
+installed, make sure the versions match the version number
+shown above. Otherwise, there may be incompatible differences in
+the protocols being used. Currently nssov requires at least
+version 0.8.11. If your system's version is older, you will need
+to install the client-side stubs from source.
+

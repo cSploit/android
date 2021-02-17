@@ -1,0 +1,194 @@
+.TH SLAPSCHEMA 8C "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapschema \- SLAPD in-database schema checking utility
+.SH SYNOPSIS
+.B SBINDIR/slapschema
+[\c
+.BI \-a filter\fR]
+[\c
+.BI \-b suffix\fR]
+[\c
+.BR \-c ]
+[\c
+.BI \-d debug-level\fR]
+[\c
+.BI \-f slapd.conf\fR]
+[\c
+.BI \-F confdir\fR]
+[\c
+.BR \-g ]
+[\c
+.BI \-H URI\fR]
+[\c
+.BI \-l error-file\fR]
+[\c
+.BI \-n dbnum\fR]
+[\c
+.BI \-o option\fR[ = value\fR]]
+[\c
+.BI \-s subtree-dn\fR]
+[\c
+.BR \-v ]
+.LP
+.SH DESCRIPTION
+.LP
+.B Slapschema
+is used to check schema compliance of the contents of a
+.BR slapd (8)
+database.
+It opens the given database determined by the database number or
+suffix and checks the compliance of its contents with the corresponding
+schema. Errors are written to standard output or the specified file.
+Databases configured as
+.B subordinate
+of this one are also output, unless \fB\-g\fP is specified.
+.LP
+Administrators may need to modify existing schema items, including
+adding new required attributes to objectClasses,
+removing existing required or allowed attributes from objectClasses,
+entirely removing objectClasses,
+or any other change that may result in making perfectly valid entries
+no longer compliant with the modified schema.
+The execution of the
+.B slapschema
+tool after modifying the schema can point out
+inconsistencies that would otherwise surface only when
+inconsistent entries need to be modified.
+
+.LP
+The entry records are checked in database order, not superior first
+order.  The entry records will be checked considering all
+(user and operational) attributes stored in the database.
+Dynamically generated attributes (such as subschemaSubentry)
+will not be considered.
+.SH OPTIONS
+.TP
+.BI \-a \ filter
+Only check entries matching the asserted filter.
+For example
+
+slapschema \-a \\
+    "(!(entryDN:dnSubtreeMatch:=ou=People,dc=example,dc=com))"
+
+will check all but the "ou=People,dc=example,dc=com" subtree
+of the "dc=example,dc=com" database.
+Deprecated; use \fB-H\fP \fIldap:///???(filter)\fP instead.
+.TP
+.BI \-b \ suffix 
+Use the specified \fIsuffix\fR to determine which database to
+check.  The \fB\-b\fP cannot be used in conjunction
+with the
+.B \-n
+option.
+.TP
+.B \-c
+Enable continue (ignore errors) mode.
+.TP
+.BI \-d \ debug-level
+Enable debugging messages as defined by the specified
+.IR debug-level ;
+see
+.BR slapd (8)
+for details.
+.TP
+.BI \-f \ slapd.conf
+Specify an alternative
+.BR slapd.conf (5)
+file.
+.TP
+.BI \-F \ confdir
+specify a config directory.
+If both
+.B \-f
+and
+.B \-F
+are specified, the config file will be read and converted to
+config directory format and written to the specified directory.
+If neither option is specified, an attempt to read the
+default config directory will be made before trying to use the default
+config file. If a valid config directory exists then the
+default config file is ignored.
+.TP
+.B \-g
+disable subordinate gluing.  Only the specified database will be
+processed, and not its glued subordinates (if any).
+.TP
+.B \-H \ URI
+use dn, scope and filter from URI to only handle matching entries.
+.TP
+.BI \-l \ error-file
+Write errors to specified file instead of standard output.
+.TP
+.BI \-n \ dbnum
+Check the \fIdbnum\fR\-th database listed in the
+configuration file. The config database
+.BR slapd\-config (5),
+is always the first database, so use
+.B \-n 0
+
+The
+.B \-n
+cannot be used in conjunction with the
+.B \-b
+option.
+.TP
+.BI \-o \ option\fR[ = value\fR]
+Specify an
+.I option
+with a(n optional)
+.IR value .
+Possible generic options/values are:
+.LP
+.nf
+              syslog=<subsystems>  (see `\-s' in slapd(8))
+              syslog\-level=<level> (see `\-S' in slapd(8))
+              syslog\-user=<user>   (see `\-l' in slapd(8))
+
+.fi
+.TP
+.BI \-s \ subtree-dn
+Only check entries in the subtree specified by this DN.
+Implies \fB\-b\fP \fIsubtree-dn\fP if no
+.B \-b
+nor
+.B \-n
+option is given.
+Deprecated; use \fB-H\fP \fIldap:///subtree-dn\fP instead.
+.TP
+.B \-v
+Enable verbose mode.
+.SH LIMITATIONS
+For some backend types, your
+.BR slapd (8)
+should not be running (at least, not in read-write
+mode) when you do this to ensure consistency of the database. It is
+always safe to run 
+.B slapschema
+with the
+.BR slapd\-bdb (5),
+.BR slapd\-hdb (5),
+and
+.BR slapd\-null (5)
+backends.
+.SH EXAMPLES
+To check the schema compliance of your SLAPD database after modifications
+to the schema, and put any error in a file called
+.BR errors.ldif ,
+give the command:
+.LP
+.nf
+.ft tt
+	SBINDIR/slapschema \-l errors.ldif
+.ft
+.fi
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR ldif (5),
+.BR slapd (8)
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

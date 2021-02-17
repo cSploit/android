@@ -1,0 +1,46 @@
+# Makefile.in for back-dnssrv
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## Portions Copyright 1998-2003 Kurt D. Zeilenga.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+# ACKNOWLEDGEMENTS:
+#  The DNSSRV backend was written by Kurt D. Zeilenga.
+#
+
+SRCS	= init.c bind.c search.c config.c referral.c
+OBJS	= init.lo bind.lo search.lo config.lo referral.lo
+
+LDAP_INCDIR= ../../../include       
+LDAP_LIBDIR= ../../../libraries
+
+BUILD_OPT = "--enable-dnssrv"
+BUILD_MOD = @BUILD_DNSSRV@
+
+mod_DEFS = -DSLAPD_IMPORT
+MOD_DEFS = $(@BUILD_DNSSRV@_DEFS)
+
+shared_LDAP_LIBS = $(LDAP_LIBLDAP_R_LA) $(LDAP_LIBLBER_LA)
+NT_LINK_LIBS = -L.. -lslapd $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+UNIX_LINK_LIBS = $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+
+LIBBASE = back_dnssrv
+
+XINCPATH = -I.. -I$(srcdir)/..
+XDEFS = $(MODULES_CPPFLAGS)
+
+all-local-lib:	../.backend
+
+../.backend: lib$(LIBBASE).a
+	@touch $@
+

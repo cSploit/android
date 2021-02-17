@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>rep_set_config</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="configuration_reference.html" title="Appendix B. DB_CONFIG Parameter Reference" />
+    <link rel="prev" href="rep_set_clockskew_parameter.html" title="rep_set_clockskew" />
+    <link rel="next" href="rep_set_limit_parameter.html" title="rep_set_limit" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">rep_set_config</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="rep_set_clockskew_parameter.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix B. DB_CONFIG Parameter Reference</th>
+          <td width="20%" align="right"> <a accesskey="n" href="rep_set_limit_parameter.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="rep_set_config_parameter"></a>rep_set_config</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+        Configures the Berkeley DB replication subsystem.
+    </p>
+      <p>
+         The syntax of this parameter in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file is a single
+         line with the string <code class="literal">rep_set_config</code>, one or
+         more whitespace characters, and the method parameter as a string
+         and optionally one or more whitespace characters, and the string
+         <code class="literal">on</code> or <code class="literal">off</code>. If the optional
+         string is omitted, the default is <code class="literal">on</code>.  For
+         example:
+    </p>
+      <pre class="programlisting">rep_set_config DB_REP_CONF_NOWAIT on</pre>
+      <p>
+        or
+    </p>
+      <pre class="programlisting">rep_set_config DB_REP_CONF_NOWAIT</pre>
+      <p>
+        Configures the Berkeley DB replication subsystem such that the
+        method calls that would normally block while clients are in
+        recovery will return errors immediately.
+    </p>
+      <p>The method parameters are:</p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>DB_REP_CONF_AUTOINIT</li>
+          <li>DB_REP_CONF_BULK</li>
+          <li>DB_REP_CONF_DELAYCLIENT</li>
+          <li>DB_REP_CONF_INMEM</li>
+          <li>DB_REP_CONF_LEASE</li>
+          <li>DB_REP_CONF_NOWAIT</li>
+          <li>DB_REPMGR_CONF_ELECTIONS</li>
+          <li>DB_REPMGR_CONF_2SITE_STRICT</li>
+        </ul>
+      </div>
+      <p>
+        For more information, see <a class="xref" href="repconfig.html" title="DbEnv::rep_set_config()">DbEnv::rep_set_config()</a>. 
+    </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="rep_set_clockskew_parameter.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="configuration_reference.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="rep_set_limit_parameter.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">rep_set_clockskew </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> rep_set_limit</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

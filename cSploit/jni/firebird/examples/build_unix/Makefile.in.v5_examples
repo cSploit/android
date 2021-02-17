@@ -1,0 +1,174 @@
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# You may obtain a copy of the Licence at
+# http://www.gnu.org/licences/lgpl.html
+# 
+# As a special exception this file can also be included in modules
+# with other source code as long as that source code has been 
+# released under an Open Source Initiative certificed licence.  
+# More information about OSI certification can be found at: 
+# http://www.opensource.org 
+# 
+# This module is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public Licence for more details.
+# 
+# This module was created by members of the firebird development 
+# team.  All individual contributions remain the Copyright (C) of 
+# those individuals and all rights are reserved.  Contributors to 
+# this file are either listed below or can be obtained from a CVS 
+# history command.
+#
+#  Created by:  Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#
+#  Contributor(s):
+# 
+#
+#  $Id: Makefile.in.v5_examples,v 1.1 2003-07-11 13:30:32 brodsom Exp $
+#
+ROOT=../..
+ObjModuleName=v5_examples
+
+# Add the install include directory to the search path since the
+# examples need to build using those headers values.
+
+CFLAGS := $(CFLAGS) -I../firebird/include
+
+
+include     $(ROOT)/gen/make.defaults
+include     $(ROOT)/gen/make.platform
+include     $(ROOT)/gen/make.rules
+include     $(ROOT)/gen/make.shared.variables
+
+@SET_MAKE@
+
+PATH := ./:$(BIN):$(PATH)
+export PATH
+
+
+GPRE_FLAGS=	-r -m -z -n
+
+EXAMPLES_DEST=	$(FIREBIRD)/examples/v5/
+EXAMPLES_SRC=	$(SRC_ROOT)/v5_examples/
+
+
+EMPBLD_Objects=	empbuild.o
+
+INTLBLD_Objects= intlbld.o
+
+INPUT_FILES=	empddl.sql empdml.sql indexoff.sql indexon.sql \
+		job.inp lang.inp proj.inp qtr.inp
+
+INTL_FILES=	intlddl.sql intldml.sql indexoff.sql indexon.sql \
+		job.inp lang.inp proj.inp qtr.inp
+
+EXAMPLE_FILES=	readme align.h api1.c api10.c api11.c api12.c api13.c \
+		api14.e api15.c api16.c api16t.c api2.c api3.c api4.c \
+		api5.c api6.c api7.c api8.c api9.c api9f.c apifull.c \
+		employe2.sql dyn1.e dyn2.e dyn3.e dyn4.e dyn5.e dynfull.e \
+		example.h api9f.sql stat1.e stat10.e stat11.e stat12.e \
+		stat12t.e stat2.e stat3.e stat4.e stat5.e stat6.e stat7.e \
+		stat8.e stat9.e udf.sql udflib.c
+
+EXAMPLES=	$(addprefix $(EXAMPLES_DEST), $(EXAMPLE_FILES))
+
+NT_EXAMPLES_FILES=		api9f.def udflib.def #makefile.bc makefile.msc
+
+NT_EXAMPLES=	$(addprefix $(EXAMPLES_DEST), $(NT_EXAMPLE_FILES))
+
+EXAMPLE_DB=	$(EXAMPLES_DEST)employee.fdb
+
+
+.PHONY: all v5_examples
+
+all: v5_examples
+
+# PR 2002-06-23 - Temporarily removed intlemp from the build as it caused a segfault
+# The lines to change back are prefixed with ##
+##v5_examples: employee.fdb intlemp.fdb $(EXAMPLE_SRC)Makefile
+v5_examples: $(EXAMPLE_DB) $(EXAMPLES) $(NT_EXAMPLES)
+
+$(EXAMPLES_DEST)% : $(EXAMPLES_SRC)%
+	$(CP) $^ $@
+
+$(EXAMPLE_DB) : employee.fdb
+	$(GBAK_STATIC) employee.fdb $(EXAMPLES_DEST)employee.gbk
+#	-$(RM) $(EXAMPLE_DB)
+	$(GBAK_STATIC) -r $(EXAMPLES_DEST)employee.gbk $(EXAMPLE_DB)
+
+# Ok the following little story is, first build empbuild.fdb an empty db
+# using a script file.  Then we can compile the empbuild.e file, then we 
+# can run it to create employee.fdb database populated with data by the
+# program.  Thats how I found it.
+# MOD July-2001
+#
+# Another problem here is that empbuild does not fail when it gets an error
+# so MAKE thinks it's all run ok.  empbuild should be modified to return an
+# error when it fails. 
+# MOD 28-July-2002
+
+
+employee.fdb:	empbuild$(EXEC_EXT) $(INPUT_FILES) isql$(EXEC_EXT)
+	-$(RM) employee.fdb
+	./empbuild employee.fdb
+	-$(CHMOD_6) employee.fdb
+
+# To get past the fact isql is called from the programs, we create a local link
+# to the static one in this directory
+
+isql$(EXEC_EXT):
+	-$(LN) $(ISQL_STATIC) isql$(EXEC_EXT)
+
+empbuild$(EXEC_EXT): $(EMPBLD_Objects) $(LIBFBCOMMON_A) $(LIBFBSTATIC_A) 
+	$(EXE_LINK) $(LINK_OPTS) $(EMPBLD_Objects) -o $@ -L$(LIB) -lfbstatic -lfbcommon $(LINK_LIBS)
+
+empbuild.c:	empbuild.fdb empbuild.e
+
+empbuild.fdb : $(EXAMPLES_SRC)empddl.sql $(EXAMPLES_SRC)empbld.sql
+	-$(CP) $^ .
+	-$(RM) $@
+	$(ISQL_STATIC) -i empbld.sql
+
+# The chain for intlemp.fdb is the same a script file to create an empty database
+# to allow a .e program to be compiled, to then create and populate with data
+# the intlemp.fdb database.
+
+intlemp.fdb:	intlbld$(EXEC_EXT) $(INTL_FILES)
+	-$(RM) intlemp.fdb
+#	$(CP) $(SRC_ROOT)/examples/intlddl.sql .
+#	$(CP) $(SRC_ROOT)/examples/indexoff.sql .
+#	$(CP) $(SRC_ROOT)/examples/indexon.sql .
+#	$(CP) $(SRC_ROOT)/examples/intldml.sql .
+#	$(CP) $(SRC_ROOT)/examples/lang.inp .
+	./intlbld intlemp.fdb
+	-$(CHMOD_6) intlemp.fdb
+
+intlbuild.fdb : intlddl.sql intlbld.sql 
+	-$(RM) intlbuild.fdb
+	$(ISQL_STATIC) -i intlbld.sql
+
+
+intlbld: $(INTLBLD_Objects)  $(LIBFBCOMMON_A) $(LIBFBSTATIC_A) 
+	-$(RM) $@
+	$(EXE_LINK) $(LINK_OPTS) $(INTLBLD_Objects) -o $@ -L$(LIB) -lfbstatic -lfbcommon $(LINK_LIBS)
+
+intlbld.exe:	$(INTLBLD_OBJ)
+	-$(RM) intlbld.exe
+	$(CC) $(O_EXE_SWITCH)intlbld $(LINK_OPTS) intlbld.o $(GDS_LINK)
+
+
+intlbld.c:	intlbuild.fdb intlbld.e
+
+
+
+%.sql:: $(SRC_ROOT)/v5_examples/%.sql
+	$(CP) $^ $@
+
+%.inp:: $(SRC_ROOT)/v5_examples/%.inp
+	$(CP) $^ $@
+
+%.e:: $(SRC_ROOT)/v5_examples/%.e
+	$(CP) $^ $@

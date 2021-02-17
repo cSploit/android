@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>set_lg_regionmax</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="configuration_reference.html" title="Appendix D. DB_CONFIG Parameter Reference" />
+    <link rel="prev" href="set_lg_max_parameter.html" title="set_lg_max" />
+    <link rel="next" href="set_lk_detect_parameter.html" title="set_lk_detect" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">set_lg_regionmax</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="set_lg_max_parameter.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix D. DB_CONFIG Parameter Reference</th>
+          <td width="20%" align="right"> <a accesskey="n" href="set_lk_detect_parameter.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="set_lg_regionmax_parameter"></a>set_lg_regionmax</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                 Sets the size of the underlying logging area of the Berkeley DB
+                 environment, in bytes.  By default, or if the value is set to 0, the
+                 minimum region size is used, approximately 128KB.  The log region is
+                 used to store filenames, and so may need to be increased in size if a
+                 large number of files will be opened and registered with the specified
+                 Berkeley DB environment's log manager.
+            </p>
+      <p>
+                 The syntax of this parameter in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file is a
+                 single line with the string
+                 <code class="literal">set_lg_regionmax</code>, one or more
+                 whitespace characters, and the log region size in bytes.
+            </p>
+      <p>
+                 If the database environment already exists when this parameter is
+                 changed, it is ignored. To change this value after the environment
+                 has been created, re-create your environment.
+            </p>
+      <p>For more information, see <a class="xref" href="envget_lg_regionmax.html" title="DB_ENV-&gt;get_lg_regionmax()">DB_ENV-&gt;get_lg_regionmax()</a>. </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="set_lg_max_parameter.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="configuration_reference.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="set_lk_detect_parameter.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">set_lg_max </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> set_lk_detect</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

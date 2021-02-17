@@ -1,0 +1,102 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+. $SRCDIR/scripts/defines.sh
+
+TB="" TN=""
+if test -t 1 ; then
+	TB=`$SHTOOL echo -e "%B" 2>/dev/null`
+	TN=`$SHTOOL echo -e "%b" 2>/dev/null`
+fi
+
+FAILCOUNT=0
+SKIPCOUNT=0
+SLEEPTIME=10
+
+echo ">>>>> Executing all LDAP tests for $BACKEND"
+
+if [ -n "$NOEXIT" ]; then
+	echo "Result	Test" > $TESTWD/results
+fi
+
+for CMD in $SRCDIR/scripts/test*; do
+	case "$CMD" in
+		*~)		continue;;
+		*.bak)	continue;;
+		*.orig)	continue;;
+		*.sav)	continue;;
+		*)		test -f "$CMD" || continue;;
+	esac
+
+	# remove cruft from prior test
+	if test $PRESERVE = yes ; then
+		/bin/rm -rf $TESTDIR/db.*
+	else
+		/bin/rm -rf $TESTDIR
+	fi
+	if test $BACKEND = ndb ; then
+		mysql --user root <<EOF
+		drop database if exists db_1;
+		drop database if exists db_2;
+		drop database if exists db_3;
+		drop database if exists db_4;
+		drop database if exists db_5;
+		drop database if exists db_6;
+EOF
+	fi
+
+	if [ -x "$CMD" ]; then
+		BCMD=`basename $CMD`
+		echo ">>>>> Starting ${TB}$BCMD${TN} for $BACKEND..."
+		$CMD
+		RC=$?
+		if test $RC -eq 0 ; then
+			echo ">>>>> $BCMD completed ${TB}OK${TN} for $BACKEND."
+		else
+			echo ">>>>> $BCMD ${TB}failed${TN} for $BACKEND"
+			FAILCOUNT=`expr $FAILCOUNT + 1`
+
+			if [ -n "$NOEXIT" ]; then
+				echo "Continuing."
+			else
+				echo "(exit $RC)"
+				exit $RC
+			fi
+		fi
+	else
+		echo ">>>>> Skipping ${TB}$BCMD${TN} for $BACKEND."
+		SKIPCOUNT=`expr $SKIPCOUNT + 1`
+		RC="-"
+	fi
+
+	if [ -n "$NOEXIT" ]; then
+		echo "$RC	$BCMD" >> $TESTWD/results
+	fi
+
+#	echo ">>>>> waiting $SLEEPTIME seconds for things to exit"
+#	sleep $SLEEPTIME
+	echo ""
+done
+
+if [ -n "$NOEXIT" ]; then
+	if [ "$FAILCOUNT" -gt 0 ]; then
+		cat $TESTWD/results
+		echo "$FAILCOUNT tests for $BACKEND ${TB}failed${TN}. Please review the test log."
+	else
+		echo "All executed tests for $BACKEND ${TB}succeeded${TN}."
+	fi
+fi
+
+echo "$SKIPCOUNT tests for $BACKEND were ${TB}skipped${TN}."

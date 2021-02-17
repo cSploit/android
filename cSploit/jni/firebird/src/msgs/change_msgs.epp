@@ -1,0 +1,482 @@
+/*
+ *	PROGRAM:		Firebird Message file edit program
+ *	MODULE:			change_msgs.epp
+ *	DESCRIPTION:	Allow limited change of messages in database
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+#include "firebird.h"
+#include <stdio.h>
+#include "../jrd/ibase.h"
+
+#include <stdlib.h>
+
+#ifdef HAVE_STRING_H
+#include <string.h>
+#endif
+
+
+
+DATABASE DB = "msg.fdb";
+
+//#define FAC_SQL_POSITIVE	14
+//#define FAC_SQL_NEGATIVE	13
+
+const char LOWER_A	= 'a';
+const char UPPER_A	= 'A';
+const char LOWER_Z	= 'z';
+const char UPPER_Z	= 'Z';
+
+static void ascii_str_upper(char*);
+static void explicit_print(const TEXT*);
+static bool get_sql_class(char*);
+static bool get_sql_subclass(char*);
+#ifdef NOT_USED_OR_REPLACED
+static bool get_symbol(char*);
+#endif
+static bool mustget(char*);
+static bool translate(const char*, char*, SSHORT);
+
+
+int main( int argc, char **argv)
+{
+/**************************************
+ *
+ *	m a i n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Top level routine.
+ *
+ **************************************/
+	char facility[20], text[256];
+	BASED_ON MESSAGES.ROUTINE routine;
+	BASED_ON MESSAGES.MODULE module;
+	BASED_ON SYSTEM_ERRORS.SQL_CLASS sql_class;
+	BASED_ON SYSTEM_ERRORS.SQL_SUBCLASS sql_sub_class;
+	BASED_ON SYSTEM_ERRORS.GDS_SYMBOL symbol;
+	SCHAR input[200];
+	char yesno[100];
+	char nstring[32];
+	SSHORT count;
+	SSHORT sql_number;
+	SSHORT msg_number;
+
+	printf("\nHit Ctrl-D (or Ctrl-Z) at prompt to exit level\n");
+	printf("You will be prompted for facility, module, routine and message text\n");
+	printf("You *must* enter module and routine names for each message; be prepared\n");
+	printf("You may assign an optional symbol for the message\n");
+	printf("Escape sequences may be entered and will be translated to single bytes\n");
+
+	READY;
+	START_TRANSACTION;
+
+	for (;;)
+	{
+		printf("Facility: ");
+		if (!gets(facility))
+			break;
+		count = 0;
+		msg_number = 0;
+		ascii_str_upper(facility);
+		FOR X IN FACILITIES WITH X.FACILITY = facility
+			count++;
+			for (;;)
+			{
+				bool sys_error = false;
+
+				printf("Message number (%d) ? ", msg_number + 1);
+				if (!gets(input))
+					break;
+				if (!input[0])
+					msg_number++;
+				else
+					msg_number = atoi(input);
+				if (msg_number <= 0)
+					break;
+				printf("Facility: %s\n", X.FACILITY);
+				FOR Y IN MESSAGES WITH
+					Y.FAC_CODE EQ X.FAC_CODE AND Y.NUMBER EQ msg_number;
+
+					printf(" Message: %d\n", Y.NUMBER);
+					printf("  Module: %s\n", Y.MODULE);
+					printf(" Routine: %s\n", Y.ROUTINE);
+					printf("    Text: ");
+					explicit_print(Y.TEXT);
+					printf("\n");
+					printf("  Symbol: %s\n", Y.SYMBOL);
+				END_FOR
+
+				FOR Z IN SYSTEM_ERRORS WITH X.FAC_CODE EQ Z.FAC_CODE AND
+					Z.NUMBER EQ msg_number;
+					printf("SQLCODE: %d\n", Z.SQL_CODE);
+					printf("   SQL_CLASS:    %s\n", Z.SQL_CLASS);
+					printf("SQL_SUBCLASS: %s\n", Z.SQL_SUBCLASS);
+					sys_error = true;
+				END_FOR
+
+				printf(" Modify? ");
+				if (mustget(yesno) && (yesno[0] == 'y' || yesno[0] == 'Y'))
+				{
+					module[0] = 0;
+					printf(" Module: ");
+					if (!gets(module))
+						break;
+					routine[0] = 0;
+					printf("Routine: ");
+					if (!gets(routine))
+						break;
+					text[0] = 0;
+					printf("   Text: ");
+					if (!gets(text))
+						break;
+					symbol[0] = 0;
+					printf(" Symbol: ");
+					if (!gets(symbol))
+						break;
+					if (sys_error || X.FAC_CODE == 0)
+					{
+						printf("SQLCODE: ");
+						if (mustget(nstring))
+							sql_number = atoi(nstring);
+						if (!get_sql_class(sql_class))
+							/* continue */ ;
+						if (!get_sql_subclass(sql_sub_class))
+							/* continue */ ;
+					}
+
+					FOR Y IN MESSAGES WITH
+						Y.FAC_CODE EQ X.FAC_CODE AND Y.NUMBER EQ msg_number;
+						MODIFY Y USING
+							if (module[0])
+								strcpy(Y.MODULE, module);
+							if (routine[0])
+								strcpy(Y.ROUTINE, routine);
+							if (text[0])
+								while (!translate(text, Y.TEXT, sizeof(Y.TEXT)))
+								{
+									printf("Message too long: max length: %d\n", sizeof(Y.TEXT));
+									mustget(text);
+								}
+							if (symbol[0])
+								strcpy(Y.SYMBOL, symbol);
+						END_MODIFY;
+					END_FOR;
+
+					FOR Z IN SYSTEM_ERRORS WITH
+						Z.FAC_CODE EQ X.FAC_CODE AND Z.NUMBER EQ msg_number;
+						MODIFY Z USING
+							if (symbol[0])
+								strcpy(Z.GDS_SYMBOL, symbol);
+							if (sql_number != 0)
+								Z.SQL_CODE = sql_number;
+							if (sql_class[0])
+								strcpy(Z.SQL_CLASS, sql_class);
+							if (sql_sub_class[0])
+								strcpy(Z.SQL_SUBCLASS, sql_sub_class);
+						END_MODIFY;
+					END_FOR;
+				}
+			}
+		END_FOR;
+		if (!count)
+		{
+			printf("Facilty %s not found\n  Known facilities are:\n",
+					  facility);
+			FOR F IN FACILITIES SORTED BY F.FACILITY
+				printf("    %s\n", F.FACILITY);
+			END_FOR;
+		}
+	}
+
+	printf("\n\nCommitting changes...");
+	COMMIT;
+	FINISH;
+	printf("done.\n");
+
+	exit(FINI_OK);
+}
+
+
+static void ascii_str_upper( char* str)
+{
+/**************************************
+ *
+ *      a s c i i _ s t r _ u p p e r
+ *
+ **************************************
+ *
+ * Functional description
+ *      change a string to all upper case
+ *
+ **************************************/
+
+	while (*str)
+	{
+		/* subtract 32 if necessary */
+
+		if (*str >= LOWER_A && *str <= LOWER_Z)
+			*str += (UPPER_A - LOWER_A);
+		str++;
+	}
+}
+
+
+static void explicit_print( const TEXT* string)
+{
+/**************************************
+ *
+ *	e x p l i c i t _ p r i n t
+ *
+ **************************************
+ *
+ * Functional description
+ *	Let it all hang out: print line
+ *      with explicit \n \b \t \f etc.
+ *      to make changing messages easy
+ *
+ **************************************/
+	const TEXT* p = string;
+
+	while (*p)
+	{
+		switch (*p)
+		{
+		case '\n':
+			putchar('\\');
+			putchar('n');
+			break;
+		case '\t':
+			putchar('\\');
+			putchar('t');
+			break;
+		case '\f':
+			putchar('\\');
+			putchar('f');
+			break;
+		case '\b':
+			putchar('\\');
+			putchar('b');
+			break;
+		case '\r':
+			putchar('\\');
+			putchar('r');
+			break;
+		case '\v':
+			putchar('\\');
+			break;
+		case '\\':
+			putchar('\\');
+			putchar('\\');
+			break;
+		case '\"':
+			putchar('\\');
+			putchar('\"');
+			break;
+		case '\'':
+			putchar('\\');
+			putchar('\'');
+			break;
+		default:
+			putchar(*p);
+		}
+		*p++;
+	}
+}
+
+
+static bool get_sql_class(char* sql_class)
+{
+/**************************************
+ *
+ *	g e t _ s q l _ c l a s s
+ *
+ **************************************
+ *
+ * Functional description
+ *	get a two character sql_class string
+ *	return true if we get one, otherwise false
+ *
+ **************************************/
+	while (true)
+	{
+		printf("   SQLCLASS: ");
+		gets(sql_class);
+		const SSHORT length = strlen(sql_class);
+		if (!length)
+			break;
+
+		if (length == 2)
+			return true;
+
+		fprintf(stderr, "Sqlclass is two characters!\n");
+	}
+
+	return false;
+}
+
+
+static bool get_sql_subclass(char* sql_sub_class)
+{
+/**************************************
+ *
+ *	g e t _ s q l _ s u b c l a s s
+ *
+ **************************************
+ *
+ * Functional description
+ *	get a three character sql_subclass string
+ *	return true if we get one, otherwise false
+ *
+ **************************************/
+	while (true)
+	{
+		printf("SQLSUBCLASS: ");
+		gets(sql_sub_class);
+		const SSHORT length = strlen(sql_sub_class);
+		if (!length)
+			break;
+
+		if (length == 3)
+			return true;
+
+		fprintf(stderr, "Sqlsubclass is three characters!\n");
+	}
+	return false;
+}
+
+#ifdef NOT_USED_OR_REPLACED
+static bool get_symbol(char* symbol)
+{
+/**************************************
+ *
+ *	g e t _ s y m b o l
+ *
+ **************************************
+ *
+ * Functional description
+ *	insist on getting the symbol
+ *	return true when we get one
+ *
+ **************************************/
+	while (true)
+	{
+		fprintf(stderr, "Symbols are required for system errors!\n");
+		printf(" Symbol: ");
+		gets(symbol);
+		if (strlen(symbol))
+			return true;
+	}
+}
+#endif
+
+static bool mustget(char* s)
+{
+/**************************************
+ *
+ *	m u s t g e t
+ *
+ **************************************
+ *
+ * Functional description
+ *	gets & returns a string.  Returns false
+ *	if string is empty.
+ *
+ **************************************/
+
+	if (!gets(s))
+		return false;
+
+	return (s[0] != 0);
+}
+
+
+static bool translate(const char* source, char* target, SSHORT length)
+{
+/**************************************
+ *
+ *	t r a n s l a t e
+ *
+ **************************************
+ *
+ * Functional description
+ * 	make explicit escape sequences into
+ *	ascii, returns length ok?
+ *
+ **************************************/
+	SCHAR* p = target;
+	const SCHAR* q = source;
+
+	while (*q)
+	{
+		if (!--length)
+			return false;
+
+		if (*q == '\\')
+		{
+			*q++;
+			switch (*q)
+			{
+			case 'n':
+				*p++ = '\n';
+				break;
+			case 't':
+				*p++ = '\t';
+				break;
+			case 'f':
+				*p++ = '\f';
+				break;
+			case 'a':
+				*p++ = '\a';
+				break;
+			case 'b':
+				*p++ = '\b';
+				break;
+			case 'r':
+				*p++ = '\r';
+				break;
+			case 'v':
+				*p++ = '\v';
+				break;
+			case '\\':
+				*p++ = '\\';
+				break;
+			case '\"':
+				*p++ = '\"';
+				break;
+			case '\'':
+				*p++ = '\'';
+				break;
+			default:
+				printf
+					("\n\n*** Escape sequence not understood; being copied unchanged ***\n\n");
+				*p++ = '\\';
+				*p++ = *q;
+			}
+			*q++;
+		}
+		else
+			*p++ = *q++;
+	}
+	*p = 0;
+
+	return true;
+}
+

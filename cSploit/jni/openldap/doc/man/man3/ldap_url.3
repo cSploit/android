@@ -1,0 +1,83 @@
+.TH LDAP_URL 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_is_ldap_url, ldap_url_parse, ldap_free_urldesc \- LDAP Uniform Resource Locator routines
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_is_ldap_url( const char *url )
+.LP
+.ft B
+int ldap_url_parse( const char *url, LDAPURLDesc **ludpp )
+.LP
+typedef struct ldap_url_desc {
+    char *      lud_scheme;     /* URI scheme */
+    char *      lud_host;       /* LDAP host to contact */
+    int         lud_port;       /* port on host */
+    char *      lud_dn;         /* base for search */
+    char **     lud_attrs;      /* list of attributes */
+    int         lud_scope;      /* a LDAP_SCOPE_... value */
+    char *      lud_filter;     /* LDAP search filter */
+    char **     lud_exts;       /* LDAP extensions */
+    int         lud_crit_exts;  /* true if any extension is critical */
+    /* may contain additional fields for internal use */
+} LDAPURLDesc;
+.LP
+.ft B
+void ldap_free_urldesc( LDAPURLDesc *ludp );
+.SH DESCRIPTION
+These routines support the use of LDAP URLs (Uniform Resource Locators)
+as detailed in RFC 4516.  LDAP URLs look like this:
+.nf
+
+  \fBldap://\fP\fIhostport\fP\fB/\fP\fIdn\fP[\fB?\fP\fIattrs\fP[\fB?\fP\fIscope\fP[\fB?\fP\fIfilter\fP[\fB?\fP\fIexts\fP]]]]
+
+where:
+  \fIhostport\fP is a host name with an optional ":portnumber"
+  \fIdn\fP is the search base
+  \fIattrs\fP is a comma separated list of attributes to request
+  \fIscope\fP is one of these three strings:
+    base one sub (default=base)
+  \fIfilter\fP is filter
+  \fIexts\fP are recognized set of LDAP and/or API extensions.
+
+Example:
+  ldap://ldap.example.net/dc=example,dc=net?cn,sn?sub?(cn=*)
+
+.fi
+.LP
+URLs that are wrapped in angle-brackets and/or preceded by "URL:" are also
+tolerated.  Alternative LDAP schemes such as ldaps:// and ldapi:// may be
+parsed using the below routines as well.
+.LP
+.B ldap_is_ldap_url()
+returns a non-zero value if \fIurl\fP looks like an LDAP URL (as
+opposed to some other kind of URL).  It can be used as a quick check
+for an LDAP URL; the
+.B ldap_url_parse()
+routine should be used if a more thorough check is needed.
+.LP
+.B ldap_url_parse()
+breaks down an LDAP URL passed in \fIurl\fP into its component pieces.
+If successful, zero is returned, an LDAP URL description is
+allocated, filled in, and \fIludpp\fP is set to point to it.  If an
+error occurs, a non-zero URL error code is returned.
+.LP
+.B ldap_free_urldesc()
+should be called to free an LDAP URL description that was obtained from
+a call to
+.B ldap_url_parse().
+.SH SEE ALSO
+.nf
+.BR ldap (3)
+.BR "RFC 4516" " <http://www.rfc-editor.org/rfc/rfc4516.txt>"
+.SH ACKNOWLEDGEMENTS
+.fi
+.so ../Project

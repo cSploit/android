@@ -1,0 +1,73 @@
+############################################################################
+#                                                                          #
+#  ettercap -- etter.dns -- host file for dns_spoof plugin                 #
+#                                                                          #
+#  Copyright (C) ALoR & NaGA                                               #
+#                                                                          #
+#  This program is free software; you can redistribute it and/or modify    #
+#  it under the terms of the GNU General Public License as published by    #
+#  the Free Software Foundation; either version 2 of the License, or       #
+#  (at your option) any later version.                                     #
+#                                                                          #
+############################################################################
+#                                                                          #
+# Sample hosts file for dns_spoof plugin                                   #
+#                                                                          #
+# the format is (for A query):                                             #
+#   www.myhostname.com A 168.11.22.33                                      #
+#   *.foo.com          A 168.44.55.66                                      #
+#                                                                          #
+# or for PTR query:                                                        #
+#   www.bar.com A 10.0.0.10                                                #
+#                                                                          #
+# or for MX query:                                                         #
+#    domain.com MX xxx.xxx.xxx.xxx                                         #
+#                                                                          #
+# or for WINS query:                                                       #
+#    workgroup WINS 127.0.0.1                                              #
+#    PC*       WINS 127.0.0.1                                              #
+#                                                                          #
+# NOTE: the wildcarded hosts can't be used to poison the PTR requests      #
+#       so if you want to reverse poison you have to specify a plain       #
+#       host. (look at the www.microsoft.com example)                      #
+#                                                                          #
+############################################################################
+
+################################
+# microsoft sucks ;)
+# redirect it to www.linux.org
+#
+
+microsoft.com      A   198.182.196.56
+*.microsoft.com    A   198.182.196.56
+www.microsoft.com  PTR 198.182.196.56      # Wildcards in PTR are not allowed
+
+##########################################
+# no one out there can have our domains...
+#
+
+www.alor.org  A 127.0.0.1
+www.naga.org  A 127.0.0.1
+
+###############################################
+# one day we will have our ettercap.org domain
+#
+
+www.ettercap.org           A  127.0.0.1
+ettercap.sourceforge.net   A  216.136.171.201
+
+###############################################
+# some MX examples
+#
+
+alor.org   MX  127.0.0.1
+naga.org   MX  127.0.0.1
+
+###############################################
+# This messes up NetBIOS clients using DNS
+# resolutions. I.e. Windows/Samba file sharing.
+#
+
+LAB-PC*  WINS  127.0.0.1
+
+# vim:ts=8:noexpandtab

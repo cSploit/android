@@ -1,0 +1,84 @@
+## ------------------------------- ##
+## Android cross-compilation hacks ##
+## ------------------------------- ##
+# as_android_send SRC DST
+# -----------------------
+# copy SRC to DST on android phone
+as_android_send ()
+{
+	adb push "$1" "$2" &>/dev/null
+	return $?
+}
+
+# as_android_get SRC DST
+# -----------------------
+# copy SRC from android phone to DST
+as_android_get ()
+{
+	for f in $(adb shell ls "$1" | tr -d '\r'); do
+		adb pull "$f" "$2" &>/dev/null
+	done
+	return $?
+}
+
+# as_android_exec CMD
+# ---------------
+# execute CMD on android phone
+as_android_exec ()
+{
+	local exitcode;
+	local wd=".";
+	test ${1:0:1} = '/' && wd=$(dirname "$1")
+	adb shell "\$SHELL cd $wd; $1; echo -ne \"\\tEXITCODE=\$?\"" &>adb.raw
+	exitcode=$?
+	#check if adb failed
+	if test $exitcode -ne 0; then
+		return $exitcode;
+	fi
+	exitcode=$(( $(grep "EXITCODE=" adb.raw | grep -oE "[0-9]+") + 0 ))
+	sed -E 's/\tEXITCODE=[0-9]+//' < adb.raw
+	$as_echo "adb shell \"\$SHELL cd $wd; $1; echo -ne \"\\tEXITCODE=\$?\" => $exitcode" >&5
+	return $exitcode
+}
+
+# as_android_rm FILE
+# ---------------
+# remove FILE from android phone
+as_android_rm ()
+{
+		for f in $(adb shell ls "$1" | tr -d '\r'); do
+		adb rm "$f" &>/dev/null
+	done
+	return $?
+}
+
+# as_android_run FILE
+# -------------------
+# run FILE on android phone
+as_android_run()
+{
+	local fname=$(basename "$1")
+	local remote_path="/data/local/tmp/$fname"
+	local exitcode;
+	as_android_send $1 $remote_path || as_fn_error "cannot upload \`$1' to \`$remote_path'"
+	as_android_exec $remote_path
+	exitcode=$?
+	as_android_get "/data/local/tmp/conf*" ./
+	as_android_rm $remote_path
+	as_android_rm "/data/local/tmp/conf*"
+	return $exitcode
+}
+
+# in ac_fn_c_try_run ()
+# substitute (eval "$ac_try") with:
+case $android in
+  yes)
+  eval ac_try="$ac_try"
+  as_android_run $ac_try 2>&5;;
+  *) (eval "$ac_try") 2>&5;;
+esac
+
+# set cross_compile=no and android=yes before project checks an AFTER libtool initialization.
+# usually after `case "$host:$CC" in' case statement
+cross_compiling=no
+android=yes

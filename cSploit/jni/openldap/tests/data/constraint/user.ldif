@@ -1,0 +1,10 @@
+dn: cn=John Doe,ou=users,dc=example,dc=com
+objectclass: inetOrgPerson
+objectclass: organizationalPerson
+cn: John Doe
+givenname: John
+sn: Doe
+mail: original@example.com
+description: desc1
+description: desc2
+uid: 1

@@ -1,0 +1,151 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+H1: Running slapd
+
+{{slapd}}(8) is designed to be run as a standalone service.  This
+allows the server to take advantage of caching, manage concurrency
+issues with underlying databases, and conserve system resources.
+Running from {{inetd}}(8) is {{NOT}} an option.
+
+
+H2: Command-Line Options
+
+{{slapd}}(8) supports a number of command-line options as detailed
+in the manual page.  This section details a few commonly used options.
+
+>	-f <filename>
+
+This option specifies an alternate configuration file for slapd.
+The default is normally {{F:/usr/local/etc/openldap/slapd.conf}}.
+
+>	-F <slapd-config-directory>
+
+Specifies the slapd configuration directory. The default is {{F:/usr/local/etc/openldap/slapd.d}}.
+
+If both {{EX:-f}} and {{EX:-F}} are specified, the config file will be read and converted 
+to config directory format and written to the specified directory.  
+If neither option is specified, slapd will attempt to read the default config 
+directory before trying to use the default config file. If a valid config 
+directory exists then the default config file is ignored. All of the slap tools 
+that use the config options observe this same behavior.
+
+>	-h <URLs>
+
+This option specifies alternative listener configurations.  The
+default is {{EX:ldap:///}} which implies {{TERM:LDAP}} over
+{{TERM:TCP}} on all interfaces on the default LDAP port 389.  You
+can specify specific host-port pairs or other protocol schemes (such
+as {{EX:ldaps://}} or {{EX:ldapi://}}).
+
+!block table
+URL        Protocol        Transport
+ldap:///   LDAP            TCP port 389
+ldaps:///  LDAP over SSL   TCP port 636
+ldapi:///  LDAP            IPC (Unix-domain socket)
+!endblock
+
+For example, {{EX:-h
+"ldaps:// ldap://127.0.0.1:666"}} will create two listeners: one
+for the (non-standard) {{EX:ldaps://}} scheme on all interfaces on
+the default {{EX:ldaps://}} port 636, and one for the standard
+{{EX:ldap://}} scheme on the {{EX:localhost}} ({{loopback}}) interface
+on port 666.  Hosts may be specified using using hostnames or
+{{TERM:IPv4}} or {{TERM:IPv6}} addresses.  Port values must be
+numeric.
+
+For LDAP over IPC, the pathname of the Unix-domain socket can be encoded
+in the URL. Note that directory separators must be 
+URL-encoded, like any other characters that are special to URLs.
+Thus the socket {{EX:/usr/local/var/ldapi}} must be encoded as
+
+>	ldapi://%2Fusr%2Flocal%2Fvar%2Fldapi
+
+ldapi: is described in detail in {{Using LDAP Over IPC Mechanisms}} [{{REF:Chu-LDAPI}}]
+
+Note that the ldapi:/// transport is not widely implemented: non-OpenLDAP clients
+may not be able to use it.
+
+>	-n <service-name>
+
+This option specifies the service name used for logging and
+other purposes. The default service name is {{EX:slapd}}.
+
+>	-l <syslog-local-user>
+
+This option specifies the local user for the {{syslog}}(8)
+facility.  Values can be {{EX:LOCAL0}}, {{EX:LOCAL1}}, {{EX:LOCAL2}}, ...,
+and {{EX:LOCAL7}}.  The default is {{EX:LOCAL4}}.  This option
+may not be supported on all systems.
+
+>	-u user -g group
+
+These options specify the user and group, respectively, to run
+as.  {{EX:user}} can be either a user name or uid.  {{EX:group}}
+can be either a group name or gid.
+
+>	-r directory
+
+This option specifies a run-time directory.  slapd will
+{{chroot}}(2) to this directory after opening listeners but
+before reading any configuration files or initializing
+any backends.
+.
+
+>	-d <level> | ?
+
+This option sets the slapd debug level to <level>. When level is a
+`?' character, the various debugging levels are printed and slapd
+exits, regardless of any other options you give it. Current
+debugging levels are
+
+!block table; colaligns="RL"; align=Center; \
+	title="Table 7.1: Debugging Levels"
+Level	Keyword		Description
+-1	any		enable all debugging
+0			no debugging
+1	(0x1 trace)	trace function calls
+2	(0x2 packets)	debug packet handling
+4	(0x4 args)	heavy trace debugging
+8	(0x8 conns)	connection management
+16	(0x10 BER)	print out packets sent and received
+32	(0x20 filter)	search filter processing
+64	(0x40 config)	configuration processing
+128	(0x80 ACL)	access control list processing
+256	(0x100 stats)	stats log connections/operations/results
+512	(0x200 stats2)	stats log entries sent
+1024	(0x400 shell)	print communication with shell backends
+2048	(0x800 parse)	print entry parsing debugging
+16384	(0x4000 sync)	syncrepl consumer processing
+32768	(0x8000 none)	only messages that get logged whatever log level is set
+!endblock
+
+You may enable multiple levels by specifying the debug option once for each desired level.  Or, since debugging levels are additive, you can do the math yourself. That is, if you want to trace function calls and watch the config file being processed, you could set level to the sum of those two levels (in this case, {{EX: -d 65}}).  Or, you can let slapd do the math, (e.g. {{EX: -d 1 -d 64}}).  Consult {{F: <ldap_log.h>}} for more details.
+
+Note: slapd must have been compiled with {{EX:--enable-debug}}
+defined for any debugging information beyond the two stats levels
+to be available (the default).
+
+
+H2: Starting slapd
+
+In general, slapd is run like this:
+
+>	/usr/local/libexec/slapd [<option>]*
+
+where {{F:/usr/local/libexec}} is determined by {{EX:configure}}
+and <option> is one of the options described above (or in {{slapd}}(8)).
+Unless you have specified a debugging level (including level {{EX:0}}),
+slapd will automatically fork and detach itself from its controlling
+terminal and run in the background.
+
+H2: Stopping slapd
+
+To kill off {{slapd}}(8) safely, you should give a command like this
+
+> 	kill -INT `cat /usr/local/var/slapd.pid`
+
+where {{F:/usr/local/var}} is determined by {{EX:configure}}.
+
+Killing slapd by a more drastic method may cause information loss or
+database corruption.

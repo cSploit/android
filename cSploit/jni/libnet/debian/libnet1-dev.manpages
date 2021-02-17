@@ -1,0 +1,4 @@
+debian/libnet-config.1
+doc/man/man3/libnet-macros.h.3
+doc/man/man3/libnet.h.3
+doc/man/man3/libnet-functions.h.3

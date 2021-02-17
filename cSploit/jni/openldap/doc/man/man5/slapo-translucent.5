@@ -1,0 +1,133 @@
+.TH SLAPO-TRANSLUCENT 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2004-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-translucent \- Translucent Proxy overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The Translucent Proxy overlay can be used with a backend database such as
+.BR slapd\-bdb (5)
+to create a "translucent proxy".  Entries retrieved from a remote LDAP
+server may have some or all attributes overridden, or new attributes
+added, by entries in the local database before being presented to the
+client.
+.LP
+A
+.BR search
+operation is first populated with entries from the remote LDAP server, the
+attributes of which are then overridden with any attributes defined in the
+local database. Local overrides may be populated with the
+.BR add ,
+.B modify ,
+and
+.B modrdn
+operations, the use of which is restricted to the root user.
+.LP
+A
+.BR compare
+operation will perform a comparison with attributes defined in the local
+database record (if any) before any comparison is made with data in the
+remote database.
+.SH CONFIGURATION
+The Translucent Proxy overlay uses a proxied database,
+typically a (set of) remote LDAP server(s), which is configured with the options shown in
+.BR slapd\-ldap (5),
+.BR slapd\-meta (5)
+or similar.
+These
+.B slapd.conf
+options are specific to the Translucent Proxy overlay; they must appear 
+after the
+.B overlay
+directive that instantiates the
+.B translucent
+overlay.
+.TP
+.B translucent_strict
+By default, attempts to delete attributes in either the local or remote
+databases will be silently ignored. The
+.B translucent_strict
+directive causes these modifications to fail with a Constraint Violation.
+.TP
+.B translucent_no_glue
+This configuration option disables the automatic creation of "glue" records
+for an
+.B add
+or
+.B modrdn
+operation, such that all parents of an entry added to the local database
+must be created by hand. Glue records are always created for a
+.B modify
+operation.
+.TP
+.B translucent_local <attr[,attr...]>
+Specify a list of attributes that should be searched for in the local database
+when used in a search filter. By default, search filters are only handled by
+the remote database. With this directive, search filters will be split into a
+local and remote portion, and local attributes will be searched locally.
+.TP
+.B translucent_remote <attr[,attr...]>
+Specify a list of attributes that should be searched for in the remote database
+when used in a search filter. This directive complements the
+.B translucent_local
+directive. Attributes may be specified as both local and remote if desired.
+.LP
+If neither
+.B translucent_local
+nor
+.B translucent_remote
+are specified, the default behavior is to search the remote database with the
+complete search filter. If only
+.B translucent_local
+is specified, searches will only be run on the local database. Likewise, if only
+.B translucent_remote
+is specified, searches will only be run on the remote database. In any case, both
+the local and remote entries corresponding to a search result will be merged
+before being returned to the client.
+
+.TP
+.B translucent_bind_local 
+Enable looking for locally stored credentials for simple bind when binding
+to the remote database fails.  Disabled by default.
+
+.TP
+.B translucent_pwmod_local
+Enable RFC 3062 Password Modification extended operation on locally stored
+credentials.  The operation only applies to entries that exist in the remote
+database.  Disabled by default.
+
+.SH ACCESS CONTROL
+Access control is delegated to either the remote DSA(s) or to the local database
+backend for
+.B auth
+and
+.B write
+operations.
+It is delegated to the remote DSA(s) and to the frontend for
+.B read
+operations.
+Local access rules involving data returned by the remote DSA(s) should be designed
+with care.  In fact, entries are returned by the remote DSA(s) only based on the
+remote fraction of the data, based on the identity the operation is performed as.
+As a consequence, local rules might only be allowed to see a portion
+of the remote data.
+
+.SH CAVEATS
+.LP
+The Translucent Proxy overlay will disable schema checking in the local database,
+so that an entry consisting of overlay attributes need not adhere to the
+complete schema.
+.LP
+Because the translucent overlay does not perform any DN rewrites,  the local
+and remote database instances must have the same suffix.  Other configurations
+will probably fail with No Such Object and other errors.
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd\-ldap (5).

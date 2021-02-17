@@ -1,0 +1,515 @@
+.TH LDAP.CONF 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap.conf, .ldaprc \- LDAP configuration file/environment variables
+.SH SYNOPSIS
+ETCDIR/ldap.conf, ldaprc, .ldaprc, $LDAP<option-name>
+.SH DESCRIPTION
+If the environment variable \fBLDAPNOINIT\fP is defined, all
+defaulting is disabled.
+.LP
+The
+.I ldap.conf
+configuration file is used to set system-wide defaults to be applied when
+running
+.I ldap
+clients.
+.LP
+Users may create an optional configuration file,
+.I ldaprc
+or
+.IR .ldaprc ,
+in their home directory which will be used to override the system-wide
+defaults file.
+The file
+.I ldaprc
+in the current working directory is also used.
+.LP
+.LP
+Additional configuration files can be specified using
+the \fBLDAPCONF\fP and \fBLDAPRC\fP environment variables.
+\fBLDAPCONF\fP may be set to the path of a configuration file.  This
+path can be absolute or relative to the current working directory.
+The \fBLDAPRC\fP, if defined, should be the basename of a file
+in the current working directory or in the user's home directory.
+.LP
+Environmental variables may also be used to augment the file based defaults.
+The name of the variable is the option name with an added prefix of \fBLDAP\fP.
+For example, to define \fBBASE\fP via the environment, set the variable
+\fBLDAPBASE\fP to the desired value.
+.LP
+Some options are user-only.  Such options are ignored if present
+in the
+.I ldap.conf
+(or file specified by
+.BR LDAPCONF ).
+.LP
+Thus the following files and variables are read, in order:
+.nf
+    variable     $LDAPNOINIT, and if that is not set:
+    system file  ETCDIR/ldap.conf,
+    user files   $HOME/ldaprc,  $HOME/.ldaprc,  ./ldaprc,
+    system file  $LDAPCONF,
+    user files   $HOME/$LDAPRC, $HOME/.$LDAPRC, ./$LDAPRC,
+    variables    $LDAP<uppercase option name>.
+.fi
+Settings late in the list override earlier ones.
+.SH SYNTAX
+The configuration options are case-insensitive;
+their value, on a case by case basis, may be case-sensitive.
+.LP
+Blank lines are ignored.
+.br
+Lines beginning with a hash mark (`#') are comments, and ignored.
+.LP
+Valid lines are made of an option's name (a sequence of non-blanks,
+conventionally written in uppercase, although not required), 
+followed by a value.
+The value starts with the first non-blank character after 
+the option's name, and terminates at the end of the line, 
+or at the last sequence of blanks before the end of the line.
+The tokenization of the value, if any, is delegated to the handler(s)
+for that option, if any.  Quoting values that contain blanks 
+may be incorrect, as the quotes would become part of the value.
+For example,
+
+.nf
+	# Wrong - erroneous quotes:
+	URI     "ldap:// ldaps://"
+
+	# Right - space-separated list of URIs, without quotes:
+	URI     ldap:// ldaps://
+
+	# Right - DN syntax needs quoting for Example, Inc:
+	BASE    ou=IT staff,o="Example, Inc",c=US
+	# or:
+	BASE    ou=IT staff,o=Example2C Inc,c=US
+
+	# Wrong - comment on same line as option:
+	DEREF   never           # Never follow aliases
+.fi
+.LP
+A line cannot be longer than LINE_MAX, which should be more than 2000 bytes
+on all platforms.
+There is no mechanism to split a long line on multiple lines, either for
+beautification or to overcome the above limit.
+.SH OPTIONS
+The different configuration options are:
+.TP
+.B URI <ldap[si]://[name[:port]] ...>
+Specifies the URI(s) of an LDAP server(s) to which the
+.I LDAP 
+library should connect.  The URI scheme may be any of
+.BR ldap ,
+.B ldaps 
+or
+.BR ldapi ,
+which refer to LDAP over TCP, LDAP over SSL (TLS) and LDAP
+over IPC (UNIX domain sockets), respectively.
+Each server's name can be specified as a
+domain-style name or an IP address literal.  Optionally, the
+server's name can followed by a ':' and the port number the LDAP
+server is listening on.  If no port number is provided, the default
+port for the scheme is used (389 for ldap://, 636 for ldaps://).
+For LDAP over IPC,
+.B name 
+is the name of the socket, and no
+.B port
+is required, nor allowed; note that directory separators must be 
+URL-encoded, like any other characters that are special to URLs; 
+so the socket
+
+	/usr/local/var/ldapi
+
+must be specified as
+
+	ldapi://%2Fusr%2Flocal%2Fvar%2Fldapi
+
+A space separated list of URIs may be provided.
+.TP
+.B BASE <base>
+Specifies the default base DN to use when performing ldap operations.
+The base must be specified as a Distinguished Name in LDAP format.
+.TP
+.B BINDDN <dn>
+Specifies the default bind DN to use when performing ldap operations.
+The bind DN must be specified as a Distinguished Name in LDAP format.
+.B This is a user-only option.
+.TP
+.B DEREF <when>
+Specifies how alias dereferencing is done when performing a search. The
+.B <when>
+can be specified as one of the following keywords:
+.RS
+.TP
+.B never
+Aliases are never dereferenced. This is the default.
+.TP
+.B searching
+Aliases are dereferenced in subordinates of the base object, but
+not in locating the base object of the search.
+.TP
+.B finding
+Aliases are only dereferenced when locating the base object of the search.
+.TP
+.B always
+Aliases are dereferenced both in searching and in locating the base object
+of the search.
+.RE
+.TP
+.TP
+.B HOST <name[:port] ...>
+Specifies the name(s) of an LDAP server(s) to which the
+.I LDAP 
+library should connect.  Each server's name can be specified as a
+domain-style name or an IP address and optionally followed by a ':' and
+the port number the ldap server is listening on.  A space separated
+list of hosts may be provided.
+.B HOST
+is deprecated in favor of
+.BR URI .
+.TP
+.B NETWORK_TIMEOUT <integer>
+Specifies the timeout (in seconds) after which the poll(2)/select(2)
+following a connect(2) returns in case of no activity.
+.TP
+.B PORT <port>
+Specifies the default port used when connecting to LDAP servers(s).
+The port may be specified as a number.
+.B PORT
+is deprecated in favor of
+.BR URI.
+.TP
+.B REFERRALS <on/true/yes/off/false/no>
+Specifies if the client should automatically follow referrals returned
+by LDAP servers.
+The default is on.
+Note that the command line tools
+.BR ldapsearch (1)
+&co always override this option.
+.\" This should only be allowed via ldap_set_option(3)
+.\".TP
+.\".B RESTART <on/true/yes/off/false/no>
+.\"Determines whether the library should implicitly restart connections (FIXME).
+.TP
+.B SIZELIMIT <integer>
+Specifies a size limit (number of entries) to use when performing searches.
+The number should be a non-negative integer.  \fISIZELIMIT\fP of zero (0)
+specifies a request for unlimited search size.  Please note that the server
+may still apply any server-side limit on the amount of entries that can be 
+returned by a search operation.
+.TP
+.B TIMELIMIT <integer>
+Specifies a time limit (in seconds) to use when performing searches.
+The number should be a non-negative integer.  \fITIMELIMIT\fP of zero (0)
+specifies unlimited search time to be used.  Please note that the server
+may still apply any server-side limit on the duration of a search operation.
+.B VERSION {2|3}
+Specifies what version of the LDAP protocol should be used.
+.TP
+.B TIMEOUT <integer>
+Specifies a timeout (in seconds) after which calls to synchronous LDAP
+APIs will abort if no response is received.  Also used for any
+.BR ldap_result (3)
+calls where a NULL timeout parameter is supplied.
+.SH SASL OPTIONS
+If OpenLDAP is built with Simple Authentication and Security Layer support,
+there are more options you can specify.
+.TP
+.B SASL_MECH <mechanism>
+Specifies the SASL mechanism to use.
+.B This is a user-only option.
+.TP
+.B SASL_REALM <realm>
+Specifies the SASL realm.
+.B This is a user-only option.
+.TP
+.B SASL_AUTHCID <authcid>
+Specifies the authentication identity.
+.B This is a user-only option.
+.TP
+.B SASL_AUTHZID <authcid>
+Specifies the proxy authorization identity.
+.B This is a user-only option.
+.TP
+.B SASL_SECPROPS <properties>
+Specifies Cyrus SASL security properties. The 
+.B <properties>
+can be specified as a comma-separated list of the following:
+.RS
+.TP
+.B none
+(without any other properties) causes the properties
+defaults ("noanonymous,noplain") to be cleared.
+.TP
+.B noplain
+disables mechanisms susceptible to simple passive attacks.
+.TP
+.B noactive
+disables mechanisms susceptible to active attacks.
+.TP
+.B nodict
+disables mechanisms susceptible to passive dictionary attacks.
+.TP
+.B noanonymous
+disables mechanisms which support anonymous login.
+.TP
+.B forwardsec
+requires forward secrecy between sessions.
+.TP
+.B passcred
+requires mechanisms which pass client credentials (and allows
+mechanisms which can pass credentials to do so).
+.TP
+.B minssf=<factor> 
+specifies the minimum acceptable
+.I security strength factor
+as an integer approximating the effective key length used for
+encryption.  0 (zero) implies no protection, 1 implies integrity
+protection only, 56 allows DES or other weak ciphers, 112
+allows triple DES and other strong ciphers, 128 allows RC4,
+Blowfish and other modern strong ciphers.  The default is 0.
+.TP
+.B maxssf=<factor> 
+specifies the maximum acceptable
+.I security strength factor
+as an integer (see
+.B minssf
+description).  The default is
+.BR INT_MAX .
+.TP
+.B maxbufsize=<factor> 
+specifies the maximum security layer receive buffer
+size allowed.  0 disables security layers.  The default is 65536.
+.RE
+.SH GSSAPI OPTIONS
+If OpenLDAP is built with Generic Security Services Application Programming Interface support,
+there are more options you can specify.
+.TP
+.B GSSAPI_SIGN <on/true/yes/off/false/no>
+Specifies if GSSAPI signing (GSS_C_INTEG_FLAG) should be used.
+The default is off.
+.TP
+.B GSSAPI_ENCRYPT <on/true/yes/off/false/no>
+Specifies if GSSAPI encryption (GSS_C_INTEG_FLAG and GSS_C_CONF_FLAG)
+should be used. The default is off.
+.TP
+.B GSSAPI_ALLOW_REMOTE_PRINCIPAL <on/true/yes/off/false/no>
+Specifies if GSSAPI based authentication should try to form the
+target principal name out of the ldapServiceName or dnsHostName
+attribute of the targets RootDSE entry. The default is off.
+.SH TLS OPTIONS
+If OpenLDAP is built with Transport Layer Security support, there
+are more options you can specify.  These options are used when an
+.B ldaps:// URI
+is selected (by default or otherwise) or when the application
+negotiates TLS by issuing the LDAP StartTLS operation.
+.TP
+.B TLS_CACERT <filename>
+Specifies the file that contains certificates for all of the Certificate
+Authorities the client will recognize.
+.TP
+.B TLS_CACERTDIR <path>
+Specifies the path of a directory that contains Certificate Authority
+certificates in separate individual files. The
+.B TLS_CACERT
+is always used before
+.B TLS_CACERTDIR.
+This parameter is ignored with GnuTLS.
+
+When using Mozilla NSS, <path> may contain a Mozilla NSS cert/key
+database.  If <path> contains a Mozilla NSS cert/key database and
+CA cert files, OpenLDAP will use the cert/key database and will
+ignore the CA cert files.
+.TP
+.B TLS_CERT <filename>
+Specifies the file that contains the client certificate.
+.B This is a user-only option.
+
+When using Mozilla NSS, if using a cert/key database (specified with
+TLS_CACERTDIR), TLS_CERT specifies the name of the certificate to use:
+.nf
+	TLS_CERT Certificate for Sam Carter
+.fi
+If using a token other than the internal built in token, specify the
+token name first, followed by a colon:
+.nf
+	TLS_CERT my hardware device:Certificate for Sam Carter
+.fi
+Use certutil -L to list the certificates by name:
+.nf
+	certutil -d /path/to/certdbdir -L
+.fi
+.TP
+.B TLS_KEY <filename>
+Specifies the file that contains the private key that matches the certificate
+stored in the
+.B TLS_CERT
+file. Currently, the private key must not be protected with a password, so
+it is of critical importance that the key file is protected carefully.
+.B This is a user-only option.
+
+When using Mozilla NSS, TLS_KEY specifies the name of a file that contains
+the password for the key for the certificate specified with TLS_CERT.  The
+modutil command can be used to turn off password protection for the cert/key
+database.  For example, if TLS_CACERTDIR specifies /home/scarter/.moznss as
+the location of the cert/key database, use modutil to change the password
+to the empty string:
+.nf
+	modutil -dbdir ~/.moznss -changepw 'NSS Certificate DB'
+.fi
+You must have the old password, if any.  Ignore the WARNING about the running
+browser.  Press 'Enter' for the new password.
+
+.TP
+.B TLS_CIPHER_SUITE <cipher-suite-spec>
+Specifies acceptable cipher suite and preference order.
+<cipher-suite-spec> should be a cipher specification for 
+the TLS library in use (OpenSSL, GnuTLS, or Mozilla NSS).
+Example:
+.RS
+.RS
+.TP
+.I OpenSSL:
+TLS_CIPHER_SUITE HIGH:MEDIUM:+SSLv2
+.TP
+.I GnuTLS:
+TLS_CIPHER_SUITE SECURE256:!AES-128-CBC
+.RE
+
+To check what ciphers a given spec selects in OpenSSL, use:
+
+.nf
+	openssl ciphers \-v <cipher-suite-spec>
+.fi
+
+With GnuTLS the available specs can be found in the manual page of 
+.BR gnutls\-cli (1)
+(see the description of the 
+option
+.BR \-\-priority ).
+
+In older versions of GnuTLS, where gnutls\-cli does not support the option
+\-\-priority, you can obtain the \(em more limited \(em list of ciphers by calling:
+
+.nf
+	gnutls\-cli \-l
+.fi
+
+When using Mozilla NSS, the OpenSSL cipher suite specifications are used and
+translated into the format used internally by Mozilla NSS.  There isn't an easy
+way to list the cipher suites from the command line.  The authoritative list
+is in the source code for Mozilla NSS in the file sslinfo.c in the structure
+.nf
+        static const SSLCipherSuiteInfo suiteInfo[]
+.fi
+.RE
+.TP
+.B TLS_PROTOCOL_MIN <major>[.<minor>]
+Specifies minimum SSL/TLS protocol version that will be negotiated.
+If the server doesn't support at least that version,
+the SSL handshake will fail.
+To require TLS 1.x or higher, set this option to 3.(x+1),
+e.g.,
+
+.nf
+	TLS_PROTOCOL_MIN 3.2
+.fi
+
+would require TLS 1.1.
+Specifying a minimum that is higher than that supported by the
+OpenLDAP implementation will result in it requiring the
+highest level that it does support.
+This parameter is ignored with GnuTLS.
+.TP
+.B TLS_RANDFILE <filename>
+Specifies the file to obtain random bits from when /dev/[u]random is
+not available. Generally set to the name of the EGD/PRNGD socket.
+The environment variable RANDFILE can also be used to specify the filename.
+This parameter is ignored with GnuTLS and Mozilla NSS.
+.TP
+.B TLS_REQCERT <level>
+Specifies what checks to perform on server certificates in a TLS session,
+if any. The
+.B <level>
+can be specified as one of the following keywords:
+.RS
+.TP
+.B never
+The client will not request or check any server certificate.
+.TP
+.B allow
+The server certificate is requested. If no certificate is provided,
+the session proceeds normally. If a bad certificate is provided, it will
+be ignored and the session proceeds normally.
+.TP
+.B try
+The server certificate is requested. If no certificate is provided,
+the session proceeds normally. If a bad certificate is provided,
+the session is immediately terminated.
+.TP
+.B demand | hard
+These keywords are equivalent. The server certificate is requested. If no
+certificate is provided, or a bad certificate is provided, the session
+is immediately terminated. This is the default setting.
+.RE
+.TP
+.B TLS_CRLCHECK <level>
+Specifies if the Certificate Revocation List (CRL) of the CA should be 
+used to verify if the server certificates have not been revoked. This
+requires
+.B TLS_CACERTDIR
+parameter to be set. This parameter is ignored with GnuTLS and Mozilla NSS.
+.B <level>
+can be specified as one of the following keywords:
+.RS
+.TP
+.B none
+No CRL checks are performed
+.TP
+.B peer
+Check the CRL of the peer certificate
+.TP
+.B all
+Check the CRL for a whole certificate chain
+.RE
+.TP
+.B TLS_CRLFILE <filename>
+Specifies the file containing a Certificate Revocation List to be used
+to verify if the server certificates have not been revoked. This
+parameter is only supported with GnuTLS and Mozilla NSS.
+.SH "ENVIRONMENT VARIABLES"
+.TP
+LDAPNOINIT
+disable all defaulting
+.TP
+LDAPCONF
+path of a configuration file
+.TP
+LDAPRC
+basename of ldaprc file in $HOME or $CWD
+.TP
+LDAP<option-name>
+Set <option-name> as from ldap.conf
+.SH FILES
+.TP
+.I  ETCDIR/ldap.conf
+system-wide ldap configuration file
+.TP
+.I  $HOME/ldaprc, $HOME/.ldaprc
+user ldap configuration file
+.TP
+.I  $CWD/ldaprc
+local ldap configuration file
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR ldap_set_option (3),
+.BR ldap_result (3),
+.BR openssl (1),
+.BR sasl (3)
+.SH AUTHOR
+Kurt Zeilenga, The OpenLDAP Project
+.SH ACKNOWLEDGEMENTS
+.so ../Project

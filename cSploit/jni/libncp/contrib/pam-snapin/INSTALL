@@ -1,0 +1,48 @@
+
+INSTALLATION: 
+CONTENT OF THE ZIP:
+
+Directories:
+REALDS8: snapin that recognizes NDS8 Unix attributes  see the README inside.
+	PAMNCP  REG       Registry entries to add this snapin to current user.
+	PAMNCP  DLL       The actual snapin DLL
+
+DUMMYDS8: snapin for testing on DS7 with dummy attributes (LINUX:*), see the README inside.
+	PAMNCP  REG       Registry entries to add this snapin to current user.
+	PAMNCP  DLL       The actual snapin DLL
+DLLS:     modules were compiled with BC++4.5. Make sure that you have CW3215.DLL
+          if you are going to use precompiled modules.
+
+Source code are for Borland C 4.5.
+I am not sure that the snapin code can be provided under GPL since it 
+use the copyrighted NDSK API calls and the toolbox to make "snapins".
+If you need to recompile , you must have subscribed to developer.novell.com (free)
+to be able to download the latest NDK for C.
+As far as the snapin toolkit, it can be found at the follwing place:
+------------------------------------------------------------------------
+http://developer.novell.com/graveyard/index.htm
+
+"downloads from this page are provided as a courtesy to our development
+community. From this page, you can access utilities, APIs, and some source 
+code for items"that are no longer in active development at Novell."
+-------------------------------------------------------------------------
+
+Unzip this file to a temporary directory and proceed as follow, depending of your version of NWAdmin. If you run several versions of NWAdmin, repeat the process for each one. 
+NWADMIN95.EXE: 
+1. copy the appropriate pamncp.dll in the sys:public/win95 of your servers. 
+2.  Check that snapin32.dll AND cw3220.dll are there. If absent, make sure they are in a  directory of your path, or copy these files from a recent Novell distribution. To  sys:public/win95. 
+3.  Double-click on the pamncp.reg icon to register the snapin in the Current User part of the local registry. Note that this step should be done for every user running this snapin. My solution is to create a NAL application for NWadmin95 and to import the pamncp.reg file into its registry settings page.
+NWADMINNT.EXE 
+1. copy the pamncp.dll in the sys:public/winnt of your servers.
+2. steps 2 and 3 are identical to the NWADMIN95.EXE installation.
+
+NWADMIN32:
+1. copy the pamncp.dll in the sys:public/win32/snapins directory. No registry entries are needed. 
+
+
+A more complete documentation is **under progress** at 
+http://cipcinsa.insa-lyon.fr/ppollet/pamncp/
+
+Patrick Pollet  
+Feb 05/02/2001
+

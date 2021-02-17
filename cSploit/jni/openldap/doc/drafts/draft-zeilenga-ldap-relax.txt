@@ -1,0 +1,675 @@
+
+
+
+
+
+
+INTERNET-DRAFT                                   Kurt D. Zeilenga
+Intended Category: Experimental                  Isode Limited
+Expires in six months                            14 February 2007
+
+
+
+                       The LDAP Relax Rules Control
+                    <draft-zeilenga-ldap-relax-01.txt>
+
+
+Status of this Memo
+
+  This document is intended to be, after appropriate review and
+  revision, submitted to the RFC Editor for publication as an
+  Experimental document.   Distribution of this memo is unlimited.
+  Technical discussion of this document will take place on the IETF LDAP
+  Extensions mailing list <ldapext@ietf.org>.  Please send editorial
+  comments directly to the author <Kurt.Zeilenga@Isode.COM>.
+
+  This document replaces draft-zeilenga-ldap-managedit-xx.txt.
+
+  By submitting this Internet-Draft, each author represents that any
+  applicable patent or other IPR claims of which he or she is aware have
+  been or will be disclosed, and any of which he or she becomes aware
+  will be disclosed, in accordance with Section 6 of BCP 79.
+
+  Internet-Drafts are working documents of the Internet Engineering Task
+  Force (IETF), its areas, and its working groups. Note that other
+  groups may also distribute working documents as Internet-Drafts.
+
+  Internet-Drafts are draft documents valid for a maximum of six months
+  and may be updated, replaced, or obsoleted by other documents at any
+  time. It is inappropriate to use Internet-Drafts as reference material
+  or to cite them other than as "work in progress."
+
+  The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/1id-abstracts.html.
+
+  The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html.
+
+
+  Copyright (C) The IETF Trust (2007).  All Rights Reserved.
+
+  Please see the Full Copyright section near the end of this document
+  for more information.
+
+
+
+
+
+Zeilenga                LDAP Relax Rules Control                [Page 1]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+Abstract
+
+  This document defines the Lightweight Directory Access Protocol (LDAP)
+  Relax Rules Control which allows a directory user agent (a client) to
+  request the directory service temporarily relax enforcement of various
+  data and service model rules.
+
+
+1.  Background and Intended Use
+
+  Directory servers accessible via Lightweight Directory Access Protocol
+  (LDAP) [RFC4510] are expected to act in accordance with the X.500
+  [X.500] series of ITU-T Recommendations.  In particular, servers are
+  expected to ensure the X.500 data and service models are not violated.
+
+  An LDAP server is expected to prevent modification of the structural
+  object class of an object [RFC4512].  That is, the X.500 models do not
+  allow a 'person' object to be transformed into an
+  'organizationalPerson' object through modification of the object.
+  Instead, the 'person' object must be deleted and then a new
+  'organizationalPerson' object created in its place.  This approach,
+  aside from being inconvient, is problematic for a number reasons.
+  First, as LDAP does not have a standardized method for performing the
+  two operations in a single transaction, the intermediate directory
+  state (after the delete, before the add) is visible to other clients,
+  which may lead to undesirable client behavior.  Second, attributes
+  such as 'entryUUID' [RFC4530] will reflect the object was replaced,
+  not transformed.
+
+  An LDAP server is expected to prevent clients from modifying values of
+  NO-USER-MODIFICATION attributes [RFC4512].  For instance, an entry is
+  not allowed to assign or modify the value of the 'entryUUID'
+  attribute.  However, where an administrator is restoring a previously
+  existing object, for instance when repartitioning data between
+  directory servers or when migrating from one vendor server product to
+  another, it may be desirable to allow the client to assign or modify
+  the value of the 'entryUUID' attribute.
+
+  This document defines the LDAP Relax Rules control.  This control may
+  be attached to LDAP requests to update the Directory Information Tree
+  (DIT) to request various data and service rules be temporarily relaxed
+  during the performance of the requested DIT update.  The server is
+  however to ensure the resulting directory state is valid.
+
+  Use of this control is expected that use of this extension will be
+  restricted by administrative and/or access controls.  It is intended
+  to be used primarily by directory administrators.
+
+
+
+
+Zeilenga                LDAP Relax Rules Control                [Page 2]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+  This extension is considered experimental as it is not yet clear
+  whether it adequately addresses directory administrators' needs for
+  flexible mechanisms for managing directory objects.  It is hoped that
+  after suitable amount of time, either this extension or a suitable
+  replacement will be standardization.
+
+
+1.1. Terminology
+
+  Protocol elements are described using ASN.1 [X.680] with implicit
+  tags.  The term "BER-encoded" means the element is to be encoded using
+  the Basic Encoding Rules [X.690] under the restrictions detailed in
+  Section 5.1 of [RFC4511].
+
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in BCP 14 [RFC2119].
+
+  DSA stands for Directory System Agent, a server.  DSE stands for
+  DSA-specific Entry.
+
+
+2.  The Relax Rules Control
+
+  The Relax Rules control is an LDAP Control [RFC4511] whose controlType
+  is IANA-ASSIGNED-OID, controlValue is empty, and the criticality of
+  TRUE.
+
+  There is no corresponding response control.
+
+  The control is appropriate for all LDAP update requests, including
+  add, delete, modify, and modifyDN (rename) [RFC4511].
+
+  The presence of the Rules Rules control in an LDAP update request
+  indicates the server temporarily relax X.500 model contraints during
+  performance of the directory update.
+
+  The server may restrict use of this control and/or limit the extent of
+  the relaxation provided based upon local policy or factors.
+
+  The server is obligated to ensure the resulting directory state is
+  consistent with the X.500 models.  For instance, the server ensure
+  that values of attributes conform to the value syntax.
+
+  It is noted that while this extension may be used to add or modify
+  objects in a manner which violate the controlling subschema, the
+  presence of objects in the DIT is not inconsistent with the X.500
+  models.  For instance, an object created prior to establshment of a
+
+
+
+Zeilenga                LDAP Relax Rules Control                [Page 3]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+  DIT content rule may contain an attribute now precluded by the current
+  controlling DIT Content Rule.
+
+  Servers implementing this technical specification SHOULD publish the
+  object identifier IANA-ASSIGNED-OID as a value of the
+  'supportedControl' attribute [RFC4512] in their root DSE.  A server
+  MAY choose to advertise this extension only when the client is
+  authorized to use it.
+
+
+3.  Use Cases
+
+3.1. Object metamorphism
+
+  In absence of this control, an attempt to modify an object's
+  'objectClass' in a manner which cause a change in the structural
+  object class of the object would normally lead to an
+  objectClassModsProhibited error [RFC4511].  The presence of the Relax
+  Rules control in the modify request requests the change be allowed.
+  If the server is willing and able to allow the change in the
+  structural object class of the object.
+
+  For instance, to change an 'organization' object into an
+  'organizationalUnit' object, a client could issue the following LDAP
+  request:
+
+      dn: o=Unit,dc=example,dc=net
+      control: IANA-ASSIGNED-OID
+      changetype: modify
+      delete: objectClass
+      objectClass: organization
+      -
+      add: objectClass
+      objectClass: organizationalUnit
+      -
+
+  In this case, the server is expected to either effect the requested
+  change in the structural object class, including updating of the value
+  of the structural object class, or fail the operation.
+
+
+3.2. Inactive Attribute Types
+
+  In absence of the Relax Rules control, an attempt to add or modify
+  values to an attribute whose type has been marked inactive in the
+  controlling subschema (its attribute type description contains the
+  OBSOLETE field) [RFC4512] normally results in a failure.
+
+
+
+
+Zeilenga                LDAP Relax Rules Control                [Page 4]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+  In the presence of the Relax Rules control, the server performs the
+  update operation as if the attribute's type is marked active in the
+  controlling subschema (its attribute type description does not contain
+  the OBSOLETE field).
+
+
+3.3. DIT Content Rules
+
+  In absence of the Relax Rules control, an attempt to include the name
+  (or OID) of an auxiliary class to an object's 'objectClass' which is
+  not allowed by the controlling DIT Content Rule would be disallowed
+  [RFC4512].   Additionally, an attempt to add values of an attribute
+  not allowed (or explicitly precluded) by the DIT Content Rule would
+  fail.
+
+  In presence of the Relax Rules control, the server performs the update
+  operation as if the controlling DIT Content Rule allowed any and all
+  known auxiliary classses to be present and allowed any and all known
+  attributes to be present (and precluded no attributes).
+
+
+3.4. DIT Structure Rules and Name Forms
+
+  In absence of the Relax Rules control, the service enforces DIT
+  structure rules and name form requirements of the controlling
+  subschema [RFC4512].
+
+  In the presence of the Relax Rules control, the server performs the
+  update operation ignoring all DIT structure rules and name forms in
+  the controlling subschema.
+
+
+3.5. Modification of Nonconformant Objects
+
+  It is also noted that in absense of this control, modification of an
+  object which presently violates the controlling subschema will fail
+  unless the modification would result in the object conforming to the
+  controlling subschema.  That is, modifications of an non-conformant
+  object should result in a conformant object.
+
+  In the presence of this control, modifications of a non-conformant
+  object need not result in a conformant object.
+
+
+3.6. NO-USER-MODIFICATION attribute modification
+
+  In absence of this control, an attempt to modify values of a
+  NO-USER-MODIFICATION attribute [RFC4512] would normally lead to a
+
+
+
+Zeilenga                LDAP Relax Rules Control                [Page 5]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+  constraintViolation or other appropriate error [RFC4511].  In the
+  presence of the Relax Rules control in the update request requests the
+  modification be allowed.
+
+  Relaxation of the NO-USER-MODIFICATION constraint is not appropriate
+  for some operational attribute types. For instance, as the value of
+  the 'structuralObjectClass' is derived by the values of the
+  'objectClass' attribute, the 'structuralObjectClass' attribute type's
+  NO-USER-MODIFICATION contraint MUST NOT be relaxed.  To effect a
+  change in the structuralObjectClass class, values of objectClass
+  should be changed as discussed in Section 3.1.  Other attributes for
+  which the NO-USER-MODIFICATION constraint should not be relaxed
+  include 'subschemaSubentry' [RFC4512] and
+  'collectiveAttributeSubentries' [RFC3671].
+
+  The subsections of this section discuss modification of various
+  operational attributes where their NO-USER-MODIFICATION constraint may
+  be relaxed.  Future documents may specify where NO-USER-MODIFICATION
+  constraints on other operational attribute may be relaxed.  In absence
+  of a document detailing that the NO-USER-MODIFICATION constraint on a
+  particular operational attribute may be relaxed, implementors SHOULD
+  assume relaxation of the constraint is not appropriate for that
+  attribute.
+
+
+3.1.1. 'entryUUID' attribute
+
+  To provide a value for the 'entryUUID' [RFC4530] attribute on entry
+  creation, the client should issue an LDAP Add request with a Relax
+  Rules control providing the desired value.  For instance:
+
+      dn: ou=Unit,dc=example,dc=net
+      control: IANA-ASSIGNED-OID
+      changetype: add
+      objectClass: organizationalUnit
+      ou: Unit
+      entryUUID: 597ae2f6-16a6-1027-98f4-d28b5365dc14
+
+  In this case, the server is either to add the entry using the
+  provided 'entryUUID' value or fail the request.
+
+  To provide a replacement value for the 'entryUUID' after entry
+  creation, the client should issue an LDAP Modify request with a
+  Relax Rules control including an approrpiate change.  For instance:
+
+      dn: ou=Unit,dc=example,dc=net
+      control: IANA-ASSIGNED-OID
+      changetype: modify
+
+
+
+Zeilenga                LDAP Relax Rules Control                [Page 6]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+      replace: entryUUID
+      entryUUID: 597ae2f6-16a6-1027-98f4-d28b5365dc14
+      -
+
+  In this case, the server is either to replace the 'entryUUID' value
+  as requested or fail the request.
+
+
+3.2.2. createTimestamp
+
+  To provide a value for the 'createTimestamp' [RFC4512] attribute
+  on entry creation, the client should issue an LDAP Add request with
+  a Relax Rules control providing the desired 'createTimestamp'
+  value.  For instance:
+
+      dn: ou=Unit,dc=example,dc=net
+      control: IANA-ASSIGNED-OID
+      changetype: add
+      objectClass: organizationalUnit
+      ou: Unit
+      createTimestamp: 20060101000000Z
+
+  In this case, the server is either to add the entry using the
+  provided 'createTimestamp' value or fail the request.
+
+  To provide a replacement value for the 'createTimestamp' after
+  entry creation, the client should issue an LDAP Modify request with
+  a Relax Rules control including an approrpiate change.  For instance:
+
+      dn: ou=Unit,dc=example,dc=net
+      control: IANA-ASSIGNED-OID
+      changetype: modify
+      replace: createTimestamp
+      createTimestamp: 20060101000000Z
+      -
+
+  In this case, the server is either to replace the 'createTimestamp'
+  value as requested or fail the request.
+
+  The server should ensure the requested 'createTimestamp' value is
+  appropriate.  In particular, it should fail the request if the
+  requested 'createTimestamp' value is in the future or is greater
+  than the value of the 'modifyTimestamp' attribute.
+
+
+3.2.3. modifyTimestamp
+
+  To provide a value for the 'modifyTimestamp' [RFC4512] attribute
+
+
+
+Zeilenga                LDAP Relax Rules Control                [Page 7]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+  on entry creation, the client should issue an LDAP Add request with
+  a Relax Rules control providing the desired 'modifyTimestamp'
+  value.  For instance:
+
+      dn: ou=Unit,dc=example,dc=net
+      control: IANA-ASSIGNED-OID
+      changetype: add
+      objectClass: organizationalUnit
+      ou: Unit
+      modifyTimestamp: 20060101000000Z
+
+  In this case, the server is either to add the entry using
+  the provided 'modifyTimestamp' value or fail the request.
+
+  To provide a replacement value for the 'modifyTimestamp' after
+  entry creation, the client should issue an LDAP Modify
+  request with a Relax Rules control including an approrpiate
+  change.  For instance:
+
+      dn: ou=Unit,dc=example,dc=net
+      control: IANA-ASSIGNED-OID
+      changetype: modify
+      replace: modifyTimestamp
+      modifyTimestamp: 20060101000000Z
+      -
+
+  In this case, the server is either to replace the 'modifyTimestamp'
+  value as requested or fail the request.
+
+  The server should ensure the requested 'modifyTimestamp' value is
+  appropriate.  In particular, it should fail the request if the
+  requested 'modifyTimestamp' value is in the future or is less than
+  the value of the 'createTimestamp' attribute.
+
+
+  3.2.3. creatorsName and modifiersName
+
+  To provide a value for the 'creatorsName' and/or 'modifiersName'
+  [RFC4512] attribute on entry creation, the client should issue an
+  LDAP Add request with a Relax Rules control providing the desired
+  values.  For instance:
+
+      dn: ou=Unit,dc=example,dc=net
+      control: IANA-ASSIGNED-OID
+      changetype: add
+      objectClass: organizationalUnit
+      ou: Unit
+      creatorsName: cn=Jane Doe,dc=example,net
+
+
+
+Zeilenga                LDAP Relax Rules Control                [Page 8]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+      modifiersName: cn=Jane Doe,dc=example,net
+
+  In this case, the server is either to add the entry using
+  the provided values or fail the request.
+
+  To provide a replacement values after entry creation for either of
+  the 'creatorsName' or 'modifiersName' attributes or both, the
+  client should issue an LDAP Modify request with a Relax Rules control
+  including the approrpiate changes.  For instance:
+
+      dn: ou=Unit,dc=example,dc=net
+      control: IANA-ASSIGNED-OID
+      changetype: modify
+      replace: creatorsName
+      creatorsName: cn=Jane Doe,dc=example,net
+      -
+      replace: modifiersName
+      modifiersName: cn=Jane Doe,dc=example,net
+      -
+
+  In this case, the server is either to replace the provided
+  values as requested or fail the request.
+
+
+4.  Security Considerations
+
+  Use of this extension should be subject to appropriate administrative
+  and access controls.  Use of this mechanism is intended to be
+  restricted to directory administrators.
+
+  Security considerations for the base operations [RFC4511] extended
+  by this control, as well as general LDAP security considerations
+  [RFC4510], generally apply to implementation and use of this
+  extension.
+
+
+5.  IANA Considerations
+
+5.1.  Object Identifier
+
+  It is requested that the IANA assign a LDAP Object Identifier
+  [RFC4520] to identify the LDAP Relax Rules Control defined in this
+  document.
+
+      Subject: Request for LDAP Object Identifier Registration
+      Person & email address to contact for further information:
+          Kurt Zeilenga <Kurt.Zeilenga@Isode.COM>
+      Specification: RFC XXXX
+
+
+
+Zeilenga                LDAP Relax Rules Control                [Page 9]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+      Author/Change Controller: Kurt Zeilenga <Kurt.Zeilenga@Isode.COM>
+      Comments: Identifies the LDAP Relax Rules Control
+
+5.2  LDAP Protocol Mechanism
+
+  Registration of this protocol mechanism [RFC4520] is requested.
+
+      Subject: Request for LDAP Protocol Mechanism Registration
+      Object Identifier: IANA-ASSIGNED-OID
+      Description: Relax Rules Control
+      Person & email address to contact for further information:
+          Kurt Zeilenga <Kurt.Zeilenga@Isode.COM>
+      Usage: Control
+      Specification: RFC XXXX
+      Author/Change Controller: Kurt Zeilenga <Kurt.Zeilenga@Isode.COM>
+      Comments: none
+
+
+6.  Author's Address
+
+  Kurt D. Zeilenga
+  Isode Limited
+
+  Email: Kurt.Zeilenga@Isode.COM
+
+
+7. References
+
+  [[Note to the RFC Editor: please replace the citation tags used in
+  referencing Internet-Drafts with tags of the form RFCnnnn where
+  possible.]]
+
+
+7.1. Normative References
+
+  [RFC2119]     Bradner, S., "Key words for use in RFCs to Indicate
+                Requirement Levels", BCP 14 (also RFC 2119), March 1997.
+
+  [RFC3671]     Zeilenga, K., "Collective Attributes in LDAP", RFC 3671,
+                December 2003.
+
+  [RFC4510]     Zeilenga, K. (editor), "LDAP: Technical Specification
+                Road Map", RFC 4510, June 2006.
+
+  [RFC4511]     Sermersheim, J. (editor), "LDAP: The Protocol", RFC
+                4511, June 2006.
+
+  [RFC4512]     Zeilenga, K. (editor), "LDAP: Directory Information
+
+
+
+Zeilenga                LDAP Relax Rules Control               [Page 10]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+                Models", RFC 4512, June 2006.
+
+  [RFC4530]     Zeilenga, K., "Lightweight Directory Access Protocol
+                (LDAP) entryUUID Operational Attribute", RFC 4530, June
+                2006.
+
+  [X.500]       International Telecommunication Union -
+                Telecommunication Standardization Sector, "The Directory
+                -- Overview of concepts, models and services,"
+                X.500(1993) (also ISO/IEC 9594-1:1994).
+
+
+7.2. Informative References
+
+  [RFC4520]     Zeilenga, K., "Internet Assigned Numbers Authority
+                (IANA) Considerations for the Lightweight Directory
+                Access Protocol (LDAP)", RFC 4520, BCP 64, June 2006.
+
+
+
+Intellectual Property
+
+  The IETF takes no position regarding the validity or scope of any
+  Intellectual Property Rights or other rights that might be claimed to
+  pertain to the implementation or use of the technology described in
+  this document or the extent to which any license under such rights
+  might or might not be available; nor does it represent that it has
+  made any independent effort to identify any such rights.  Information
+  on the procedures with respect to rights in RFC documents can be found
+  in BCP 78 and BCP 79.
+
+  Copies of IPR disclosures made to the IETF Secretariat and any
+  assurances of licenses to be made available, or the result of an
+  attempt made to obtain a general license or permission for the use of
+  such proprietary rights by implementers or users of this specification
+  can be obtained from the IETF on-line IPR repository at
+  http://www.ietf.org/ipr.
+
+  The IETF invites any interested party to bring to its attention any
+  copyrights, patents or patent applications, or other proprietary
+  rights that may cover technology that may be required to implement
+  this standard.  Please address the information to the IETF at
+  ietf-ipr@ietf.org.
+
+
+
+Full Copyright
+
+
+
+
+Zeilenga                LDAP Relax Rules Control               [Page 11]
+
+INTERNET-DRAFT        draft-zeilenga-ldap-relax-01      14 February 2007
+
+
+  Copyright (C) The IETF Trust (2007).
+
+  This document is subject to the rights, licenses and restrictions
+  contained in BCP 78, and except as set forth therein, the authors
+  retain all their rights.
+
+  This document and the information contained herein are provided on an
+  "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+  OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY, THE IETF TRUST AND
+  THE INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS
+  OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+  THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+  WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Zeilenga                LDAP Relax Rules Control               [Page 12]
+

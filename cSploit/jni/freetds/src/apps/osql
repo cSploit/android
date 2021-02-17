@@ -1,0 +1,388 @@
+#! /bin/sh
+# $Id: osql,v 1.12 2011-05-11 03:08:13 jklowden Exp $
+#
+# Check odbc.ini, odbcinst, and, optionally, freetds.conf, 
+# then execute isql (assume it's unixODBC's isql).  
+#
+
+USAGE="Syntax: $(basename $0) -S server -U user -P password"
+
+while getopts I:S:U:P: OPTION
+do
+	case ${OPTION} in
+		I)	OVER_DIR=${OPTARG}	# override
+			;;
+		S)	DSN=${OPTARG}
+			;;
+		U)	USERNAME=${OPTARG}
+			;;
+		P)	PASSWORD=${OPTARG}
+			;;
+		\?)     echo $USAGE
+			exit 1
+			;;
+	esac
+done
+
+#cho ${DSN} ${USERNAME} ${PASSWORD}
+if [ -z "${DSN}" -o -z "${USERNAME}" -o -z "${PASSWORD}" ]
+then 
+	
+	echo $USAGE
+	exit 1
+fi
+
+ISQL=$(command -v isql)
+if [ -z "${ISQL}" ]
+then
+	echo "$(basename $0): error: no \"isql\" command found.  Is unixODBC installed?"
+	exit 1
+fi
+
+# Establish ODBC prefix directory
+
+ISQL_DIR=$(strings ${ISQL} | grep ^/ | grep -v elf | grep -v '\.so\.' | head -1 | sed 's/lib$/etc/' )
+
+INI_DIRNAME="/tmp/$(basename $0).$$"
+exec 3> ${INI_DIRNAME}
+
+# Check the libraries, too. 
+if [ -z "${OVER_DIR}" ]
+then 
+	echo "checking shared odbc libraries linked to isql for default directories..."
+	(echo ${ISQL_DIR}; ldd "${ISQL}" | awk '/libodbc\./ {print $3}') \
+	| while read L
+	  do 
+	  	strings "$L" | grep '^/' | grep -v '/lib' \
+		| while read D 
+		  do 
+		  	if [ ! -s "${INI_DIRNAME}" ]
+			then
+			  	printf "	trying $D ... "
+			  	if [ -d "$D" -a -r "${D}/odbc.ini" ]
+				then
+					printf $D >&3
+					printf "OK"
+				else
+					printf "no"
+				fi
+				printf "\n"
+			fi
+		  done
+	  done
+fi
+
+ODBC_DIR=$(cat ${INI_DIRNAME}) && rm ${INI_DIRNAME}
+
+if [ -z "${ODBC_DIR}" -a -z "${OVER_DIR}" ]
+then
+	echo "$(basename $0): problem: no potential directory strings in \"$(command -v isql)\""
+	echo "$(basename $0): advice: use \"osql -I DIR\" where DIR unixODBC\'s install prefix e.g. /usr/local"
+	echo "isql strings are:"
+	strings ${ISQL} | grep ^/ | sed 's/^/+ /'
+	#xit 1
+fi
+
+if [ "${OVER_DIR}" ]
+then
+	if [ -d "${ODBC_DIR}" ]
+	then
+		echo "\"${ODBC_DIR}\" is a directory, overridden by"
+	else 
+		echo "\"${ODBC_DIR}\" is NOT a directory, overridden by"
+	fi
+	echo "\"${OVER_DIR}\"."
+	
+	if [ -d "${OVER_DIR}" ]
+	then
+		ODBC_DIR=${OVER_DIR}
+	else
+		echo "$(basename $0): error: \"${OVER_DIR}\" is not a directory"
+		exit 1
+	fi
+fi
+
+# Look for server entry in odbc.ini 
+echo 'checking odbc.ini files'
+for F in "${HOME}/.odbc.ini" "${ODBC_DIR}/odbc.ini"
+do
+	if [ ! -d "$(dirname $F)" ]
+	then
+		echo "warning: $(dirname $F) is not a directory" 
+		continue
+	fi
+	
+	if [ -r "$F" ]
+	then
+		echo "	reading $F"
+	else
+		echo "	cannot read \"$F\""
+		continue
+	fi
+
+	grep "[${DSN}]" $F > /dev/null
+
+	if [ $? -eq 0 ]
+	then
+		echo "[${DSN}] found in $F"
+		ODBC_INI=$F
+		break
+	else
+		echo "[${DSN}] not found in $F"
+	fi
+done
+
+if [ -z "${ODBC_INI}" ]
+then
+	echo "$(basename $0): error: unable to locate ${DSN} in any odbc.ini"
+	exit 1
+fi
+
+# Report finding of server entry
+echo found this section:
+SED_CMD="/^\[${DSN}\]/,/^[[:space:]]*$/ { s/^/	/; p; }"
+sed -ne "${SED_CMD}" ${ODBC_INI}
+
+#
+# Examine server entry in odbc.ini 
+#
+
+# Find the driver in the servername or default section
+for D in "${DSN}" 'default' 
+do
+	echo "looking for driver for DSN [$D] in ${ODBC_INI}"
+	grep "$D" ${ODBC_INI} > /dev/null
+	if [ $? -eq 0 ]
+	then
+		CMD="/^\[$D\]/,/^[[:space:]]*$/ { s/^/	/; p; }"
+		DRIVER_LINE=$(sed -ne "${CMD}" ${ODBC_INI} \
+				| grep -Ei '^[[:space:]]*driver[[:space:]]*=')
+		if [ -z "${DRIVER_LINE}" ]
+		then
+			echo "  no driver mentioned for [$D] in $(basename ${ODBC_INI})"
+			continue
+		fi
+
+		echo "  found driver line: \"${DRIVER_LINE}\""
+		DRIVER=$(echo ${DRIVER_LINE} \
+		    | awk -F ' *= *' '{print $2}' \
+		    | sed 's/[[:space:]][[:space:]]*//g')
+		if [ "${DRIVER}" ]
+		then
+			echo "  driver \"${DRIVER}\" found for [$D] in $(basename ${ODBC_INI})"
+			break
+		else
+			echo "  driver line for [$D] incomplete in $(basename ${ODBC_INI})"
+			continue
+		fi
+	fi
+done
+
+if [ -z "${DRIVER}" ]
+then
+	echo "$(basename $0): error: no driver found for [${DSN}] in $(basename ${ODBC_INI})"
+	exit 1
+fi
+
+# get filename of driver
+echo found driver named \"${DRIVER}\"
+if [ -d "${DRIVER}" -o ! -x "${DRIVER}" ]
+then
+	# not a filename, look it up
+	DRIVERNAME=${DRIVER}
+	ODBC_INST="${ODBC_DIR}/odbcinst.ini"
+	echo "\"${DRIVERNAME}\" is not an executable file"
+	echo "looking for entry named [${DRIVERNAME}] in ${ODBC_INST}"
+
+	grep "${DRIVERNAME}" ${ODBC_INST} > /dev/null
+	if [ $? -ne 0 ]
+	then
+		if [ $? -eq 1 ]
+		then
+			echo "$(basename $0): error: no driver entry [${DRIVERNAME}] in ${ODBC_INST}"
+		fi
+		exit 1;
+	fi
+	
+	CMD="/^\[${DRIVERNAME}\]/,/^[[:space:]]*$/ { s/^/	/; p; }"
+	DRIVER_LINE=$(sed -ne "${CMD}" ${ODBC_INST} \
+				| grep -Ei '^[[:space:]]*driver[[:space:]]*=')
+	if [ -z "${DRIVER_LINE}" ]
+	then
+		echo "$(basename $0): no driver mentioned for [${DRIVERNAME}] in $(basename ${ODBC_INST})"
+		exit 1
+	fi
+
+	echo "  found driver line: \"${DRIVER_LINE}\""
+	DRIVER=$(echo ${DRIVER_LINE} | awk -F ' *= *' '{print $2}')
+	if [ -z "${DRIVER}" ]
+	then
+		echo "$(basename $0): driver line incomplete for [${DRIVERNAME}] in $(basename ${ODBC_INST})"
+		exit 1
+	fi
+
+	echo "  found driver ${DRIVER} for [${DRIVERNAME}] in $(basename ${ODBC_INST})"
+fi
+
+if [ -z "${DRIVER}" ]
+then
+	echo $(basename $0): 'error: sorry, failed sanity check: ${DRIVER} is null' 
+	exit 1
+fi
+
+if [ -x "${DRIVER}" ]
+then
+	echo "${DRIVER} is an executable file"
+else
+	echo "${DRIVER} is not an executable file"
+	echo "$(basename $0): error: no driver found for ${DSN}"
+	exit 1
+fi
+
+# find the server/servername
+SERVER_LINE=$(sed -ne "${SED_CMD}" ${ODBC_INI} \
+		| grep -Ei '^[[:space:]]*server(name)*[[:space:]]*=')
+
+ATTRIBUTE=$(echo ${SERVER_LINE} | awk -F' *= *' '{print $1}')
+
+if [ -z "${ATTRIBUTE}" ]
+then
+	echo "$(basename $0): neither \"Server\" nor \"Servername\" found for [${DSN}] in $(basename ${ODBC_INI})"
+	exit 1
+fi
+
+echo ${SERVER_LINE} | grep -i servername >/dev/null
+
+#
+# Find the server's hostname 
+#
+if [ $? -eq 0 ] # ODBC-Combined
+then
+	TDS_SERVER=$(echo ${SERVER_LINE} | awk -F ' *= *' '{print $2}')
+	echo 'Using ODBC-Combined strategy'
+	echo "DSN [${DSN}] has servername \"${TDS_SERVER}\" (from ${ODBC_INI})"
+	if [ -z "${TDS_SERVER}" ]
+	then
+		exit 1
+	fi
+
+	# Look for $TDS_SERVER in freetds.conf 
+	
+	FREETDS_DIR=$(tsql -C | grep 'freetds.conf directory' | awk -F: '{print $2}' | sed 's/^ *//')
+	if [ -z "${FREETDS_DIR}" ]
+	then
+		echo "$(basename $0): error: unable to locate directory for freetds.conf using \"$(command -v tsql)\""
+		exit 1
+	fi
+	
+	for F in "${HOME}/.freetds.conf" "${FREETDS_DIR}/freetds.conf"
+	do
+		if [ -r "$F" ]
+		then
+			echo $F is a readable file
+		else
+			echo cannot read \"$F\"
+			continue
+		fi
+
+		echo "looking for [${TDS_SERVER}] in $F"
+		grep "[${TDS_SERVER}]" $F > /dev/null
+
+		if [ $? -eq 0 ]
+		then
+			FREETDS_CONF=$F
+			break
+		else
+			echo "[${TDS_SERVER}]" not found in $F
+		fi
+	done
+	
+	if [ -z "${FREETDS_CONF}" ]
+	then
+		echo "$(basename $0): error: unable to locate ${TDS_SERVER} in any freetds.conf"
+		exit 1
+	fi
+
+	# Examine server entry in freetds.conf 
+
+	echo found this section:
+	SED_CMD="/^\[${TDS_SERVER}\]/,/^[[:space:]]*$/ { s/^/	/; p; }"
+	sed -ne "${SED_CMD}" ${FREETDS_CONF}
+
+	SERVER_LINE=$(sed -ne "${SED_CMD}" ${FREETDS_CONF} \
+			| grep -Ei '^[[:space:]]*host[[:space:]]*=')
+
+	# No character class support in mawk, 
+	# cf. "Mawk does not support Posix character classes in expressions"
+	# https://bugs.launchpad.net/ubuntu/+source/mawk/+bug/69724
+	HOST=$(echo ${SERVER_LINE} | awk -F' *= *' '{print $2}')
+
+	if [ -z "${HOST}" ]
+	then
+		echo "$(basename $0): no \"host\" entry found for [${TDS_SERVER}] in $(basename ${FREETDS_CONF})"
+		exit 1
+	fi
+	
+else # odbc.ini contains a "server", a DNS host
+	HOST=$(echo ${SERVER_LINE} | awk -F ' *= *' '{print $2}')
+	echo "\"${ATTRIBUTE}\" found, not using freetds.conf"
+	echo "${ATTRIBUTE} is \"${HOST}\""
+	if [ -z "${HOST}" ]
+	then
+		echo "$(basename $0): no value found for \"${ATTRIBUTE}\" entry in $(basename ${ODBC_INI})"
+		exit 1
+	fi
+fi
+
+# If the "host" is an ip address, look up the name, for neatness, e.g. 
+## $ host 10.81.36.39
+## 39.36.81.10.IN-ADDR.ARPA domain name pointer ntc5003.eg.com
+if [ "${HOST}" = "$(echo ${HOST} | sed 's/[^.0-9]*//')" ]
+then 
+	ADDRESS=${HOST}
+	echo 'looking up hostname for ip address' ${ADDRESS}
+	HOST=$(host ${HOST} | awk '/domain/ {print $5}' | sed 's/\.$//')
+	if [ -z "${HOST}" ]
+	then
+		echo "$(basename $0): warning: no DNS hostname found for \"${ADDRESS}\""
+		HOST=${ADDRESS}	# restore host address string
+	fi
+fi
+
+# Now we have a DNS hostname for the server in HOST
+if [ "${HOST}" != "${ADDRESS}" ]
+then
+    ADDRESS=$(host ${HOST} | awk '/has address/ {print $4}' | head -1)
+fi
+if [ -z "${ADDRESS}" ]
+then
+	echo "$(basename $0): no IP address found for \"${HOST}\""
+	exit 1
+fi
+
+#cho ${HOST} has address ${ADDRESS}
+
+# Report what we know and exec isql 
+
+printf "\n"
+printf "Configuration looks OK.  Connection details:\n\n"
+printf "%22s:\t%-30s\n"  DSN ${DSN}
+printf "%22s:\t%-30s\n"  odbc.ini "${ODBC_INI}"
+printf "%22s:\t%-30s\n"  Driver ${DRIVER}
+printf "%22s:\t%-30s\n" "Server hostname" ${HOST}
+printf "%22s:\t%-30s\n"  Address ${ADDRESS}
+printf "\n"
+
+echo Attempting connection as ${USERNAME} ... 
+
+if [ -z "${TDSDUMP}" ]
+then 
+	TDSDUMP_AUTO="/tmp/$(basename $0).dump.$$"
+	export TDSDUMP=${TDSDUMP_AUTO}
+fi
+
+( set -x; isql ${DSN} ${USERNAME} ${PASSWORD} -v ) \
+	|| sed -ne 's/Connecting/FAILED &/p' ${TDSDUMP}
+
+test "${TDSDUMP_AUTO}" && rm -f ${TDSDUMP_AUTO}
+

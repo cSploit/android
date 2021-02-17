@@ -1,0 +1,228 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Peter Harvey">
+   <meta name="GENERATOR" content="Mozilla/4.77C-CCK-MCD Caldera Systems OpenLinux [en] (X11; U; Linux 2.4.2 i686) [Netscape]">
+   <title>unixODBC - Administrator Manual</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<img SRC="unixODBC.gif" height=32 width=32><font face="Arial,Helvetica"><font size=+4>unixODBC</font></font>
+<br>
+<hr WIDTH="100%">
+<center><b><font face="Arial,Helvetica"><font size=+3>ADMINISTRATOR MANUAL</font></font></b></center>
+
+<p><b><font face="Arial,Helvetica">Introduction</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Welcome to the unixODBC Administrator Manual.
+This manual has been created to help system administrators install and
+manage the ODBC sub-system.</font><font face="Arial,Helvetica"></font>
+<p><b><font face="Arial,Helvetica">Getting Started</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">At this point you know what ODBC is and
+what it can offer the Users of your system(s) - now you want to get it
+on your system(s).</font><font face="Arial,Helvetica"></font>
+<p><b><font face="Arial,Helvetica">Platforms</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">unixODBC implements ODBC on the following
+platforms;</font>
+<ul>
+<li>
+<font face="Arial,Helvetica">Linux</font></li>
+
+<li>
+<font face="Arial,Helvetica">Mac OSX</font></li>
+
+<li>
+<font face="Arial,Helvetica">VMS</font></li>
+
+<li>
+<font face="Arial,Helvetica">and various flavours of UNIX</font></li>
+</ul>
+<font face="Arial,Helvetica">This manual covers all platforms and will
+give special indication of differences for any particular platform.</font><font face="Arial,Helvetica"></font>
+<p><b><font face="Arial,Helvetica">Do You Have It?</font></b>
+<br><font face="Arial,Helvetica">&nbsp;</font>
+<br><font face="Arial,Helvetica">It is possible that your system already
+has unixODBC installed. The best way to check for this is to drop to a
+terminal and execute 'odbcinst --version'.</font>
+<br><font face="Arial,Helvetica"></font>&nbsp;
+<table BORDER COLS=1 WIDTH="100%" BGCOLOR="#FFFFCC" NOSAVE >
+<tr>
+<td>[root@p12 qt]# odbcinst --version
+<br>unixODBC 2.1.1
+<br>[root@p12 qt]#</td>
+</tr>
+</table>
+<font face="Arial,Helvetica"></font><font face="Arial,Helvetica"></font>
+<p><b><font face="Arial,Helvetica">Downloading</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">You can get the source from <a href="http://sourceforge.net/projects/unixodbc">Source
+Forge</a>.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">You can get binary distributions from various
+places. One place to look is with the vendor of your operating system.
+You can also go to <a href="http://sourceforge.net/projects/unixodbc/">Source
+Forge</a> and take a look at the Home Page to see the availibility and
+location of binary distributions.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Whether you choose a binary distribution
+or source code depends largely upon your site policy and which operating
+system you are working with. I recommend the following;</font>
+<ul>
+<li>
+<font face="Arial,Helvetica">Mac OSX - use a binary distribution</font></li>
+
+<li>
+<font face="Arial,Helvetica">Others - use a source distribution (tar-ball
+NOT CVS)</font></li>
+</ul>
+<font face="Arial,Helvetica"></font>
+<p><br><b><font face="Arial,Helvetica">Installing From Source</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">There are two options when installing from
+source. You can install from a source distribution (a gzipped tar-ball)
+or from CVS. In either case you will find README files in the main directory
+which should help you build and install unixODBC.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">The unixODBC build process uses the GNU&nbsp;auto-tools.
+This will be a concern to you if you choose to build from CVS because you
+must start the build process with 'make -f Makefile.cvs' - this, in turn,
+uses the GNU&nbsp;auto-tools (i.e. automake, autoconf) to build a 'configure'
+script. Unfortunately; the GNU&nbsp;auto-tools can be very version sensitive.
+See the README file(s) for more on this if you plan to build from CVS source.</font>
+<br><font face="Arial,Helvetica"></font>&nbsp;
+<table BORDER COLS=1 WIDTH="100%" BGCOLOR="#FFFFCC" NOSAVE >
+<tr>
+<td>[root@p12 unixODBC]# make -f Makefile.cvs&nbsp;</td>
+</tr>
+</table>
+<font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">You do not have to 'make -f Makefile.cvs'
+when using a source distribution. Regardless of whether you choose to use
+CVS or a source distribution you will want to execute the 'configure' script
+with options appropriate for your needs.</font>
+<br><font face="Arial,Helvetica"></font>&nbsp;
+<table BORDER COLS=1 WIDTH="100%" BGCOLOR="#FFFFCC" NOSAVE >
+<tr>
+<td>[root@p12 unixODBC]# ./configure --help</td>
+</tr>
+</table>
+<font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">The 'configure' script will check your
+system for features of interest and build some make files as well as create
+some include file(s) which will ensure that unixODBC will build without
+errors and only with features supported by your operating system.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">At this point it is important to think
+about whether or not GUI&nbsp;tools are important to you (and your Users).
+The 'configure' script will try to detect support for the GUI&nbsp;applications
+in unixODBC and will build them if such support exists. unixODBC&nbsp;includes
+GUI tools based upon the Qt class library and GTK. The Qt based tools will
+be built if libqt*so can be found. Linux systems will probably have this.
+You can get this from <a href="http://www.trolltech.com">Troll Tech</a>.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Now you are ready to build the sources.
+Do this with the usual build sequence of commands.</font>
+<br><font face="Arial,Helvetica"></font>&nbsp;
+<table BORDER COLS=1 WIDTH="100%" BGCOLOR="#FFFFCC" NOSAVE >
+<tr>
+<td>[root@p12 unixODBC]# make
+<br>[root@p12 unixODBC]# make install</td>
+</tr>
+</table>
+<font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica"><font color="#FF0000">Mac OSX</font>: The
+Apple folks seem to be grappling with their support for the GNU auto-tools
+at the time of this writing. I recommend installing from a binary distribution
+of unixODBC. If you must install from source, and you are having problems
+with the GNU&nbsp;auto-tools, then you may want to try the qmake build.
+The qmake build process is not well documented at this time. People familiar
+with qmake should be able to build unixODBC with the included qmake project
+files.</font><font face="Arial,Helvetica"></font>
+<p><b><font face="Arial,Helvetica">Installing From Binary</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">RPM</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Various RPMs exist for unixODBC. The best
+idea is to use any RPM files you can from your O/S vendor. Typically RPM&nbsp;distributions
+break unixODBC into more than one RPM distribution such as; core, and GUI.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Mac OSX Disk Images</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">A binary distribution for OSX has recently
+become availible in the downloads section at <a href="http://www.codebydesign.com/DataArchitect">CodeByDesign</a>.
+This includes proper Mac installs. The install should be done in the following
+order;</font>
+<ol>
+<li>
+<font face="Arial,Helvetica">Qt Runtime</font></li>
+
+<li>
+<font face="Arial,Helvetica">unixODBC</font></li>
+
+<li>
+<font face="Arial,Helvetica">drivers in any order</font></li>
+</ol>
+<font face="Arial,Helvetica">Others</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Proper install packages are also avalible
+for other platforms such as the Debian package format for Debian Linux.
+Check with the O/S vendor.</font><font face="Arial,Helvetica"></font>
+<p><b><font face="Arial,Helvetica">Where Are Installed Files</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">The location for files vary somewhat depending
+upon how you installed unixODBC&nbsp;(source or binary) and which platform
+you installed on. Furthermore; the location can be changed during a source
+install by './configure --prefix='.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Typically;</font>
+<ul>
+<li>
+<font face="Arial,Helvetica">library files will go in /usr/lib or /usr/local/lib</font></li>
+
+<li>
+<font face="Arial,Helvetica">binaries will go in /usr/bin or /usr/local/bin</font></li>
+
+<li>
+<font face="Arial,Helvetica">system config files will go in /etc or /usr/local/etc</font></li>
+</ul>
+<font face="Arial,Helvetica">The system config files are;</font>
+<ul>
+<li>
+<font face="Arial,Helvetica">odbcinst.ini - list of registered drivers</font></li>
+
+<li>
+<font face="Arial,Helvetica">odbc.ini - system data source names</font></li>
+</ul>
+<font face="Arial,Helvetica">The location of the system config files can
+be changed by setting the ODBCSYSINI&nbsp;environment variable at run-time.
+The system config files can be edited using a simple text editor but it
+is recommended that you use the ODBCConfig GUI&nbsp;tool or the odcinst
+command-line tool because they will validate the reading and writing of
+these files while ensuring that the current location is used.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica"><font color="#FF0000">Mac OSX</font>: The
+OSX binary install will use; /usr/lib, /usr/bin, /Applications/Utilities
+and /etc.</font><font face="Arial,Helvetica"></font>
+<p><b><font face="Arial,Helvetica">Post Install</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">You now have an ODBC&nbsp;sub-system installed
+on your system(s). What is the system administrators role from here? The
+system administrator is the only person who can install and register ODBC&nbsp;drivers
+and create/edit/delete system Data Source Names (DSN).</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Drivers</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Drivers should be installed and configured
+based upon the driver vendors instructions. Many drivers do not include
+a full install process - lacking the driver registration step. These drivers
+can be registered using the ODBCConfig GUI tool or the odbcinst command-line
+tool.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">System DSN</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">These can be created using the ODBCConfig
+GUI&nbsp;tool or the odbcinst command-line tool. ODBCConfig is the prefered
+method but not all drivers have a User Interface (U.I.) part.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica"><font color="#FF0000">Mac OSX</font>: In
+some cases the ODBCConfig icon will not open. In such a case you should
+drop to a terminal window and use the open command.</font>
+<br><font face="Arial,Helvetica"></font>&nbsp;
+<table BORDER COLS=1 WIDTH="100%" BGCOLOR="#FFFFCC" NOSAVE >
+<tr>
+<td># open /Applications/Utilities/ODBCConfig.app</td>
+</tr>
+</table>
+<font face="Arial,Helvetica"></font>
+<p><b><font face="Arial,Helvetica">Summary</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">unixODBC implements an ODBC&nbsp;sub-system
+for a wide variety of platforms. unixODBC can be installed using; binary,
+source and source from CVS. Drivers can be installed using installation
+methods created by the driver vendor with unixODBC tools availible to fill
+any gaps. ODBC&nbsp;system information can be managed using; ODBCConfig,
+odbcinst, or a text editor.</font>
+<br><font face="Arial,Helvetica"></font>&nbsp;
+<p>
+<hr WIDTH="100%">
+<br>&nbsp;
+<br>&nbsp;
+</body>
+</html>

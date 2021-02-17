@@ -1,0 +1,325 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+mkdir -p $TESTDIR $DBDIR1
+
+echo "Running slapadd to build slapd database..."
+. $CONFFILTER $BACKEND $MONITORDB < $CONF > $CONF1
+#echo $SLAPADD -f $CONF1 -l $LDIFORDERED
+$SLAPADD -f $CONF1 -l $LDIFORDERED
+RC=$?
+if test $RC != 0 ; then
+	echo "slapadd failed ($RC)!"
+	exit $RC
+fi
+
+echo "Starting slapd on TCP/IP port $PORT1..."
+#valgrind -v --gdb-attach=yes --logfile=info --num-callers=16 --leak-check=yes --leak-resolution=high $SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING </dev/tty > $LOG1 2>&1 &
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID"
+
+echo "Testing certificate handling..."
+
+sleep 1
+
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT1 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Add certificates..."
+$LDAPMODIFY -v -D "$MANAGERDN" -h $LOCALHOST -p $PORT1 -w $PASSWD > \
+	$TESTOUT 2>&1 << EOMODS
+version: 1
+
+# LEADING COMMENT AND WHITE SPACE
+
+# should use certificationAuthority instead of extensibleObject
+dn: dc=example,dc=com
+changetype: modify
+add: objectClass
+objectClass: extensibleObject
+-
+add: cAcertificate;binary
+cAcertificate;binary::
+ MIIDVDCCAr2gAwIBAgIBADANBgkqhkiG9w0BAQQFADB3MQswCQYDVQQGEwJVUzET
+ MBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwg
+ THRkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhh
+ bXBsZS5jb20wHhcNMDMxMDE3MTYzMDQxWhcNMDQxMDE2MTYzMDQxWjB3MQswCQYD
+ VQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAg
+ RXhhbXBsZSwgTHRkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJ
+ ARYOY2FAZXhhbXBsZS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBANlj
+ UGxiisAzEiALukzt3Gj/24MRw1J0AZx6GncXLhpNJsAFyA0bYZdAzgvydKeq/uX0
+ i5o/4Byc3G71XAAcbJZxDPtrLwpDAdMNOBvKV2r67yTgnpatFLfGRt/FWazj5EbF
+ YkorWWTe+4eEBd9VPzebHdIm+DPHipUfIAzRoNejAgMBAAGjge8wgewwHQYDVR0O
+ BBYEFEtvIRo2JNKQ+UOwU0ctfeHA5pgjMIGhBgNVHSMEgZkwgZaAFEtvIRo2JNKQ
+ +UOwU0ctfeHA5pgjoXukeTB3MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaWZv
+ cm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTHRkLjETMBEGA1UEAxMK
+ RXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5jb22CAQAwDAYD
+ VR0TBAUwAwEB/zAZBgNVHREEEjAQgQ5jYUBleGFtcGxlLmNvbTANBgkqhkiG9w0B
+ AQQFAAOBgQCgXD/+28El3GXi/uxMNEKqtnIhQdTnNU4il0fZ6pcmHPFC+61Bddow
+ 90ZZZh5Gbg5ZBxFRhDXN8K/fix3ewRSjASt40dGlEODkE+FsLMt04sYl6kX7RGKg
+ 9a46DkeG+uzZnN/3252uCgh+rjNMFAglueUTERv3EtUB1iXEoU3GyA==
+
+dn: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+changetype: modify
+add: objectClass
+objectClass: strongAuthenticationUser
+-
+add: userCertificate;binary
+userCertificate;binary::
+ MIIDazCCAtSgAwIBAgIBAjANBgkqhkiG9w0BAQQFADB3MQswCQYDVQQGEwJVUzET
+ MBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwg
+ THRkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhh
+ bXBsZS5jb20wHhcNMDMxMDE3MTYzMzE5WhcNMDQxMDE2MTYzMzE5WjB+MQswCQYD
+ VQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAg
+ RXhhbXBsZSwgTHRkLjEYMBYGA1UEAxMPVXJzdWxhIEhhbXBzdGVyMR8wHQYJKoZI
+ hvcNAQkBFhB1aGFtQGV4YW1wbGUuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCB
+ iQKBgQDuxgp5ELV9LmhxWMpV7qc4028QQT3+zzFDXhruuXE7ji2n3S3ea8bOwDtJ
+ h+qnsDe561DhHHHlgIjMKCiDEizYMpxvJPYEXmvp0huRkMgpKZgmel95BSkt6TYm
+ J0erS3aoimOHLEFimmnTLolNRMiWqNBvqwobx940PGwUWEePKQIDAQABo4H/MIH8
+ MAkGA1UdEwQCMAAwLAYJYIZIAYb4QgENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIENl
+ cnRpZmljYXRlMB0GA1UdDgQWBBSjI94TbBmuDEeUUOiC37EK0Uf0XjCBoQYDVR0j
+ BIGZMIGWgBRLbyEaNiTSkPlDsFNHLX3hwOaYI6F7pHkwdzELMAkGA1UEBhMCVVMx
+ EzARBgNVBAgTCkNhbGlmb3JuaWExHzAdBgNVBAoTFk9wZW5MREFQIEV4YW1wbGUs
+ IEx0ZC4xEzARBgNVBAMTCkV4YW1wbGUgQ0ExHTAbBgkqhkiG9w0BCQEWDmNhQGV4
+ YW1wbGUuY29tggEAMA0GCSqGSIb3DQEBBAUAA4GBAIgUcARb3OlWYNbmr1nmqESu
+ xLn16uqI1Ot6WkcICvpkdQ+Bo+R9AP05xpoXocZtKdNvBu3FNxB/jFkiOcLU2lX7
+ Px1Ijnsjh60qVRy9HOsHCungIKlGcnXLKHmKu0y//5jds/HnaJsGcHI5JRG7CBJb
+ W+wrwge3trJ1xHJI8prN
+
+dn: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+changetype: modify
+add: objectClass
+objectClass: strongAuthenticationUser
+-
+add: userCertificate;binary
+userCertificate;binary::
+ MIIDcDCCAtmgAwIBAgIBATANBgkqhkiG9w0BAQQFADB3MQswCQYDVQQGEwJVUzET
+ MBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwg
+ THRkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhh
+ bXBsZS5jb20wHhcNMDMxMDE3MTYzMTQwWhcNMDQxMDE2MTYzMTQwWjCBgjELMAkG
+ A1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExHzAdBgNVBAoTFk9wZW5MREFQ
+ IEV4YW1wbGUsIEx0ZC4xHTAbBgNVBAMUFEplbm5pZmVyICJKZW4iIFNtaXRoMR4w
+ HAYJKoZIhvcNAQkBFg9qZW5AZXhhbXBsZS5jb20wgZ8wDQYJKoZIhvcNAQEBBQAD
+ gY0AMIGJAoGBANUgO8cP/SjqgCVxxsRYv36AP0+QL81iEkGvR4gG6jbtDDBdVYDC
+ YbS2oKKNJ5e99NxGMIjOYfmKcAwmkV46IhdzUtkutgjHEG9vl5ajSwc1KSsbTMTy
+ NtuG3k5k02JYFbP+FrGyUE8iPqK4+i7mVjW4bh/MBCHW88FptnpDJiuHAgMBAAGj
+ gf8wgfwwCQYDVR0TBAIwADAsBglghkgBhvhCAQ0EHxYdT3BlblNTTCBHZW5lcmF0
+ ZWQgQ2VydGlmaWNhdGUwHQYDVR0OBBYEFEdo4jpxCQXJ1sh/E1O3ZBkLTbHkMIGh
+ BgNVHSMEgZkwgZaAFEtvIRo2JNKQ+UOwU0ctfeHA5pgjoXukeTB3MQswCQYDVQQG
+ EwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhh
+ bXBsZSwgTHRkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYO
+ Y2FAZXhhbXBsZS5jb22CAQAwDQYJKoZIhvcNAQEEBQADgYEAFpHsQUtSZQzmm9k2
+ Vrfs0h7tdkWF3LcHzHk4a/t3k4EXcqlHBxh4f0tmb4XNP9QupRgm6ggr8t3Rq0Vt
+ T8k50x4C7oE8HwZuEEB4FM7S1Zig3dfeJ8MJgdaLqt5/U9Ip/hZdzG2dsUsIceH/
+ 5MCKLu9bGJUjsKnGdm/KpaNwaNo=
+
+dn: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+changetype: modify
+add: userCertificate;binary
+userCertificate;binary::
+ MIIDjDCCAvWgAwIBAgIBAzANBgkqhkiG9w0BAQQFADB3MQswCQYDVQQGEwJVUzET
+ MBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwg
+ THRkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhh
+ bXBsZS5jb20wHhcNMDMxMDE3MTYzNTM1WhcNMDQxMDE2MTYzNTM1WjCBnjELMAkG
+ A1UEBhMCVVMxETAPBgNVBAgTCE1pY2hpZ2FuMR8wHQYDVQQKExZPcGVuTERBUCBF
+ eGFtcGxlLCBMdGQuMRswGQYDVQQLExJBbHVtbmkgQXNzb2ljYXRpb24xEjAQBgNV
+ BAMTCUplbiBTbWl0aDEqMCgGCSqGSIb3DQEJARYbamVuQG1haWwuYWx1bW5pLmV4
+ YW1wbGUuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDpnXWAL0VkROGO
+ 1Rg8J3u6F4F7yMqQCbUMsV9rxQisYj45+pmqiHV5urogvT4MGD6eLNFZKBn+0KRn
+ i++uu7gbartzpmBaHOlzRII9ZdVMFfrT2xYNgAlkne6pb6IZIN9UONuH/httENCD
+ J5WEpjZ48D1Lrml/HYO/W+SAMkpEqQIDAQABo4H/MIH8MAkGA1UdEwQCMAAwLAYJ
+ YIZIAYb4QgENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1Ud
+ DgQWBBTB2saht/od/nis76b9m+pjxfhSPjCBoQYDVR0jBIGZMIGWgBRLbyEaNiTS
+ kPlDsFNHLX3hwOaYI6F7pHkwdzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlm
+ b3JuaWExHzAdBgNVBAoTFk9wZW5MREFQIEV4YW1wbGUsIEx0ZC4xEzARBgNVBAMT
+ CkV4YW1wbGUgQ0ExHTAbBgkqhkiG9w0BCQEWDmNhQGV4YW1wbGUuY29tggEAMA0G
+ CSqGSIb3DQEBBAUAA4GBAIoGPc/AS0cNkMRDNoMIzcFdF9lONMduKBiSuFvv+x8n
+ Cek+LUdXxF59V2NPKh2V5gFh5xbAchyv6FVBnpVtPdB5akCr5tdFQhuBLUXXDk/t
+ THGpIWt7OAjEmpuMzsz3GUB8Zf9rioHOs1DMw+GpzWdnFITxXhAqEDc3quqPrpxZ
+-
+delete: userCertificate;binary
+userCertificate;binary::
+ MIIDcDCCAtmgAwIBAgIBATANBgkqhkiG9w0BAQQFADB3MQswCQYDVQQGEwJVUzET
+ MBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwg
+ THRkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhh
+ bXBsZS5jb20wHhcNMDMxMDE3MTYzMTQwWhcNMDQxMDE2MTYzMTQwWjCBgjELMAkG
+ A1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExHzAdBgNVBAoTFk9wZW5MREFQ
+ IEV4YW1wbGUsIEx0ZC4xHTAbBgNVBAMUFEplbm5pZmVyICJKZW4iIFNtaXRoMR4w
+ HAYJKoZIhvcNAQkBFg9qZW5AZXhhbXBsZS5jb20wgZ8wDQYJKoZIhvcNAQEBBQAD
+ gY0AMIGJAoGBANUgO8cP/SjqgCVxxsRYv36AP0+QL81iEkGvR4gG6jbtDDBdVYDC
+ YbS2oKKNJ5e99NxGMIjOYfmKcAwmkV46IhdzUtkutgjHEG9vl5ajSwc1KSsbTMTy
+ NtuG3k5k02JYFbP+FrGyUE8iPqK4+i7mVjW4bh/MBCHW88FptnpDJiuHAgMBAAGj
+ gf8wgfwwCQYDVR0TBAIwADAsBglghkgBhvhCAQ0EHxYdT3BlblNTTCBHZW5lcmF0
+ ZWQgQ2VydGlmaWNhdGUwHQYDVR0OBBYEFEdo4jpxCQXJ1sh/E1O3ZBkLTbHkMIGh
+ BgNVHSMEgZkwgZaAFEtvIRo2JNKQ+UOwU0ctfeHA5pgjoXukeTB3MQswCQYDVQQG
+ EwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhh
+ bXBsZSwgTHRkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYO
+ Y2FAZXhhbXBsZS5jb22CAQAwDQYJKoZIhvcNAQEEBQADgYEAFpHsQUtSZQzmm9k2
+ Vrfs0h7tdkWF3LcHzHk4a/t3k4EXcqlHBxh4f0tmb4XNP9QupRgm6ggr8t3Rq0Vt
+ T8k50x4C7oE8HwZuEEB4FM7S1Zig3dfeJ8MJgdaLqt5/U9Ip/hZdzG2dsUsIceH/
+ 5MCKLu9bGJUjsKnGdm/KpaNwaNo=
+
+dn: cn=Mark Elliot,ou=Alumni Association,ou=People,dc=example,dc=com
+changetype: modify
+replace: userCertificate;binary
+userCertificate;binary::
+ MIIDjDCCAvWgAwIBAgIBAzANBgkqhkiG9w0BAQQFADB3MQswCQYDVQQGEwJVUzET
+ MBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwg
+ THRkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhh
+ bXBsZS5jb20wHhcNMDMxMDE3MTYzNTM1WhcNMDQxMDE2MTYzNTM1WjCBnjELMAkG
+ A1UEBhMCVVMxETAPBgNVBAgTCE1pY2hpZ2FuMR8wHQYDVQQKExZPcGVuTERBUCBF
+ eGFtcGxlLCBMdGQuMRswGQYDVQQLExJBbHVtbmkgQXNzb2ljYXRpb24xEjAQBgNV
+ BAMTCUplbiBTbWl0aDEqMCgGCSqGSIb3DQEJARYbamVuQG1haWwuYWx1bW5pLmV4
+ YW1wbGUuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDpnXWAL0VkROGO
+ 1Rg8J3u6F4F7yMqQCbUMsV9rxQisYj45+pmqiHV5urogvT4MGD6eLNFZKBn+0KRn
+ i++uu7gbartzpmBaHOlzRII9ZdVMFfrT2xYNgAlkne6pb6IZIN9UONuH/httENCD
+ J5WEpjZ48D1Lrml/HYO/W+SAMkpEqQIDAQABo4H/MIH8MAkGA1UdEwQCMAAwLAYJ
+ YIZIAYb4QgENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1Ud
+ DgQWBBTB2saht/od/nis76b9m+pjxfhSPjCBoQYDVR0jBIGZMIGWgBRLbyEaNiTS
+ kPlDsFNHLX3hwOaYI6F7pHkwdzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlm
+ b3JuaWExHzAdBgNVBAoTFk9wZW5MREFQIEV4YW1wbGUsIEx0ZC4xEzARBgNVBAMT
+ CkV4YW1wbGUgQ0ExHTAbBgkqhkiG9w0BCQEWDmNhQGV4YW1wbGUuY29tggEAMA0G
+ CSqGSIb3DQEBBAUAA4GBAIoGPc/AS0cNkMRDNoMIzcFdF9lONMduKBiSuFvv+x8n
+ Cek+LUdXxF59V2NPKh2V5gFh5xbAchyv6FVBnpVtPdB5akCr5tdFQhuBLUXXDk/t
+ THGpIWt7OAjEmpuMzsz3GUB8Zf9rioHOs1DMw+GpzWdnFITxXhAqEDc3quqPrpxZ
+-
+delete: userCertificate;binary
+
+EOMODS
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo 'Using ldapsearch to retrieve (userCertificate;binary=*) ...'
+echo "# (userCertificate;binary=*)" > $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+    '(userCertificate;binary=*)' >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo 'Using ldapsearch to retrieve (cAcertificate=*) ...'
+echo "# (cAcertificate=*)" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+    '(cAcertificate=*)' >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+SNAI='2$EMAIL=ca@example.com,CN=Example CA,O=Openldap Example\5C, Ltd.,ST=California,C=US'
+
+echo 'Using ldapsearch to retrieve (userCertificate=serialNumberAndIssuer) [old format] ...'
+echo "# (userCertificate=$SNAI)" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+    "(userCertificate=$SNAI)" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+SNAI='{ serialNumber 2, issuer "EMAIL=ca@example.com,CN=Example CA,O=Openldap Example\5C, Ltd.,ST=California,C=US" }'
+
+echo 'Using ldapsearch to retrieve (userCertificate=serialNumberAndIssuer) [new format] ...'
+echo "# (userCertificate=$SNAI)" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+    "(userCertificate=$SNAI)" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+SNAI='3$EMAIL=ca@example.com,CN=Example CA,O=Openldap Example\5C, Ltd.,ST=California,C=US'
+
+echo 'Using ldapsearch to retrieve (userCertificate:certificateExactMatch:=serialNumberAndIssuer) [old format] ...'
+echo "# (userCertificate:certificateExactMatch:=$SNAI)" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+    "(userCertificate:certificateExactMatch:=$SNAI)" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+SNAI='{ issuer "EMAIL=ca@example.com,CN=Example CA,O=Openldap Example\5C, Ltd.,ST=California,C=US", serialNumber 3 }'
+
+echo 'Using ldapsearch to retrieve (userCertificate:certificateExactMatch:=serialNumberAndIssuer) [new format]...'
+echo "# (userCertificate:certificateExactMatch:=$SNAI)" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+    "(userCertificate:certificateExactMatch:=$SNAI)" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+LDIF=$CERTIFICATETLS
+
+echo "Filtering ldapsearch results..."
+$LDIFFILTER < $SEARCHOUT > $SEARCHFLT
+echo "Filtering original ldif used to create database..."
+$LDIFFILTER < $LDIF > $LDIFFLT
+echo "Comparing filter output..."
+$CMP $SEARCHFLT $LDIFFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "comparison failed - certificate operations did not complete correctly"
+	exit 1
+fi
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

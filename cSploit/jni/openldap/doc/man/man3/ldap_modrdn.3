@@ -1,0 +1,81 @@
+.TH LDAP_MODRDN 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_modrdn, ldap_modrdn_s, ldap_modrdn2, ldap_modrdn2_s \- Perform an LDAP modify RDN operation
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_modrdn(ld, dn, newrdn)
+.ft
+LDAP \(**ld;
+char \(**dn, \(**newrdn;
+.LP
+.ft B
+.LP
+.ft B
+int ldap_modrdn_s(ld, dn, newrdn)
+.ft
+LDAP \(**ld;
+char \(**dn, \(**newrdn;
+.LP
+.ft B
+int ldap_modrdn2(ld, dn, newrdn, deleteoldrdn)
+.ft
+LDAP \(**ld;
+char \(**dn, \(**newrdn;
+int deleteoldrdn;
+.LP
+.ft B
+int ldap_modrdn2_s(ld, dn, newrdn, deleteoldrdn)
+.ft
+LDAP \(**ld;
+char \(**dn, \(**newrdn;
+int deleteoldrdn;
+.SH DESCRIPTION
+The
+.B ldap_modrdn()
+and
+.B ldap_modrdn_s()
+routines perform an LDAP modify
+RDN operation.  They both take \fIdn\fP, the DN of the entry whose
+RDN is to be changed, and \fInewrdn\fP, the new RDN to give the entry.
+The old RDN of the entry is never kept as an attribute of the entry.
+.B ldap_modrdn()
+is asynchronous, returning the message id of the operation
+it initiates.
+.B ldap_modrdn_s()
+is synchronous, returning the LDAP error
+code indicating the success or failure of the operation.  Use of
+these routines is deprecated.  Use the versions described below
+instead.
+.LP
+The
+.B ldap_modrdn2()
+and
+.B ldap_modrdn2_s()
+routines also perform an LDAP
+modify RDN operation, taking the same parameters as above.  In addition,
+they both take the \fIdeleteoldrdn\fP parameter which is used as a boolean
+value to indicate whether the old RDN values should be deleted from
+the entry or not.
+.SH ERRORS
+The synchronous (_s) versions of these routines return an LDAP error
+code, either LDAP_SUCCESS or an error if there was trouble.
+The asynchronous versions return \-1 in case
+of trouble, setting the
+.B ld_errno
+field of \fIld\fP.  See
+.BR ldap_error (3)
+for more details.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_error (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

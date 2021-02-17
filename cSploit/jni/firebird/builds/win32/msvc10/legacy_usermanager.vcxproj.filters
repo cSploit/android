@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{f5abfba7-e5fe-444a-8f3a-71613bd06b14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="headers">
+      <UniqueIdentifier>{4d7668b6-d659-4684-ac32-6285d87a8977}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GPRE cpp">
+      <UniqueIdentifier>{65cc725f-d68d-46a8-b9fd-1a442c5aa8bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GPRE epp">
+      <UniqueIdentifier>{a4bf3426-2fd1-4474-8dcf-41acdd200b1a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\auth\SecurityDatabase\LegacyManagement.epp">
+      <Filter>GPRE epp</Filter>
+    </None>
+    <None Include="..\defs\plugin.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\auth\SecurityDatabase\LegacyManagement.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\gen\auth\SecurityDatabase\LegacyManagement.cpp">
+      <Filter>GPRE cpp</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

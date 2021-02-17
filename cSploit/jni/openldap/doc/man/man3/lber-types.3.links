@@ -1,0 +1,11 @@
+ber_bvarray_add.3
+ber_bvarray_free.3
+ber_bvdup.3
+ber_bvecadd.3
+ber_bvecfree.3
+ber_bvfree.3
+ber_bvstr.3
+ber_bvstrdup.3
+ber_dupbv.3
+ber_free.3
+ber_str2bv.3

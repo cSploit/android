@@ -1,0 +1,66 @@
+## Makefile.in for test programs
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+PROGRAMS = slapd-tester slapd-search slapd-read slapd-addel slapd-modrdn \
+		slapd-modify slapd-bind slapd-mtread ldif-filter
+
+SRCS     = slapd-common.c \
+		slapd-tester.c slapd-search.c slapd-read.c slapd-addel.c \
+		slapd-modrdn.c slapd-modify.c slapd-bind.c slapd-mtread.c \
+		ldif-filter.c
+
+LDAP_INCDIR= ../../include
+LDAP_LIBDIR= ../../libraries
+
+XLIBS    = $(LDAP_LIBLDAP_LA) $(LDAP_LIBLUTIL_A) $(LDAP_LIBLBER_LA)
+XRLIBS    = $(LDAP_LIBLDAP_R_LA) $(LDAP_LIBLUTIL_A) $(LDAP_LIBLBER_LA)
+XXLIBS	 = $(SECURITY_LIBS) $(LUTIL_LIBS)
+RLIBS = $(XRLIBS) $(XXLIBS) $(AC_LIBS) $(XXXLIBS)
+
+
+OBJS     = slapd-common.o
+
+# build-tools: FORCE
+# $(MAKE) $(MFLAGS) load-tools
+
+# load-tools: $(PROGRAMS)
+
+slapd-tester: slapd-tester.o $(OBJS) $(XLIBS)
+	$(LTLINK) -o $@ slapd-tester.o $(OBJS) $(LIBS)
+
+slapd-search: slapd-search.o $(OBJS) $(XLIBS)
+	$(LTLINK) -o $@ slapd-search.o $(OBJS) $(LIBS)
+
+slapd-read: slapd-read.o $(OBJS) $(XLIBS)
+	$(LTLINK) -o $@ slapd-read.o $(OBJS) $(LIBS)
+
+slapd-addel: slapd-addel.o $(OBJS) $(XLIBS)
+	$(LTLINK) -o $@ slapd-addel.o $(OBJS) $(LIBS)
+
+slapd-modrdn: slapd-modrdn.o $(OBJS) $(XLIBS)
+	$(LTLINK) -o $@ slapd-modrdn.o $(OBJS) $(LIBS)
+
+slapd-modify: slapd-modify.o $(OBJS) $(XLIBS)
+	$(LTLINK) -o $@ slapd-modify.o $(OBJS) $(LIBS)
+
+slapd-bind: slapd-bind.o $(OBJS) $(XLIBS)
+	$(LTLINK) -o $@ slapd-bind.o $(OBJS) $(LIBS)
+
+ldif-filter: ldif-filter.o $(XLIBS)
+	$(LTLINK) -o $@ ldif-filter.o $(LIBS)
+
+slapd-mtread: slapd-mtread.o $(OBJS) $(XRLIBS)
+	$(LTLINK) -o $@ slapd-mtread.o $(OBJS) $(RLIBS)
+

@@ -1,0 +1,202 @@
+.TH SLAPCAT 8C "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapcat \- SLAPD database to LDIF utility
+.SH SYNOPSIS
+.B SBINDIR/slapcat
+[\c
+.BI \-a filter\fR]
+[\c
+.BI \-b suffix\fR]
+[\c
+.BR \-c ]
+[\c
+.BI \-d debug-level\fR]
+[\c
+.BI \-f slapd.conf\fR]
+[\c
+.BI \-F confdir\fR]
+[\c
+.BR \-g ]
+[\c
+.BI \-H URI\fR]
+[\c
+.BI \-l ldif-file\fR]
+[\c
+.BI \-n dbnum\fR]
+[\c
+.BI \-o option\fR[ = value\fR]]
+[\c
+.BI \-s subtree-dn\fR]
+[\c
+.BR \-v ]
+.LP
+.SH DESCRIPTION
+.LP
+.B Slapcat
+is used to generate an LDAP Directory Interchange Format
+(LDIF) output based upon the contents of a
+.BR slapd (8)
+database.
+It opens the given database determined by the database number or
+suffix and writes the corresponding LDIF to standard output or
+the specified file.
+Databases configured as
+.B subordinate
+of this one are also output, unless \fB\-g\fP is specified.
+.LP
+The entry records are presented in database order, not superior first
+order.  The entry records will include all (user and operational)
+attributes stored in the database.  The entry records will not include
+dynamically generated attributes (such as subschemaSubentry).
+.LP
+The output of slapcat is intended to be used as input to
+.BR slapadd (8).
+The output of slapcat cannot generally be used as input to
+.BR ldapadd (1)
+or other LDAP clients without first editing the output.
+This editing would normally include reordering the records
+into superior first order and removing no-user-modification
+operational attributes.
+.SH OPTIONS
+.TP
+.BI \-a \ filter
+Only dump entries matching the asserted filter.
+For example
+
+slapcat \-a \\
+    "(!(entryDN:dnSubtreeMatch:=ou=People,dc=example,dc=com))"
+
+will dump all but the "ou=People,dc=example,dc=com" subtree
+of the "dc=example,dc=com" database.
+Deprecated; use \fB-H\fP \fIldap:///???(filter)\fP instead.
+.TP
+.BI \-b \ suffix 
+Use the specified \fIsuffix\fR to determine which database to
+generate output for.  The \fB\-b\fP cannot be used in conjunction
+with the
+.B \-n
+option.
+.TP
+.B \-c
+Enable continue (ignore errors) mode.
+Multiple occorrences of
+.B \-c
+make
+.BR slapcat (8)
+try harder.
+.TP
+.BI \-d \ debug-level
+Enable debugging messages as defined by the specified
+.IR debug-level ;
+see
+.BR slapd (8)
+for details.
+.TP
+.BI \-f \ slapd.conf
+Specify an alternative
+.BR slapd.conf (5)
+file.
+.TP
+.BI \-F \ confdir
+specify a config directory.
+If both
+.B \-f
+and
+.B \-F
+are specified, the config file will be read and converted to
+config directory format and written to the specified directory.
+If neither option is specified, an attempt to read the
+default config directory will be made before trying to use the default
+config file. If a valid config directory exists then the
+default config file is ignored.
+.TP
+.B \-g
+disable subordinate gluing.  Only the specified database will be
+processed, and not its glued subordinates (if any).
+.TP
+.B \-H \ URI
+use dn, scope and filter from URI to only handle matching entries.
+.TP
+.BI \-l \ ldif-file
+Write LDIF to specified file instead of standard output.
+.TP
+.BI \-n \ dbnum
+Generate output for the \fIdbnum\fR-th database listed in the
+configuration file. The config database
+.BR slapd\-config (5),
+is always the first database, so use
+.B \-n 0
+to select it.
+
+The
+.B \-n
+cannot be used in conjunction with the
+.B \-b
+option.
+.TP
+.BI \-o \ option\fR[ = value\fR]
+Specify an
+.I option
+with a(n optional)
+.IR value .
+Possible generic options/values are:
+.LP
+.nf
+              syslog=<subsystems>  (see `\-s' in slapd(8))
+              syslog\-level=<level> (see `\-S' in slapd(8))
+              syslog\-user=<user>   (see `\-l' in slapd(8))
+
+              ldif-wrap={no|<n>}
+
+.in
+\fIn\fP is the number of columns allowed for the LDIF output
+(\fIn\fP equal to \fI0\fP uses the default, corresponding to 76).
+Use \fIno\fP for no wrap.
+.TP
+.BI \-s \ subtree-dn
+Only dump entries in the subtree specified by this DN.
+Implies \fB\-b\fP \fIsubtree-dn\fP if no
+.B \-b
+or
+.B \-n
+option is given.
+Deprecated; use \fB-H\fP \fIldap:///subtree-dn\fP instead.
+.TP
+.B \-v
+Enable verbose mode.
+.SH LIMITATIONS
+For some backend types, your
+.BR slapd (8)
+should not be running (at least, not in read-write
+mode) when you do this to ensure consistency of the database. It is
+always safe to run 
+.B slapcat
+with the
+.BR slapd\-bdb (5),
+.BR slapd\-hdb (5),
+and
+.BR slapd\-null (5)
+backends.
+.SH EXAMPLES
+To make a text backup of your SLAPD database and put it in a file called
+.BR ldif ,
+give the command:
+.LP
+.nf
+.ft tt
+	SBINDIR/slapcat \-l ldif
+.ft
+.fi
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR ldif (5),
+.BR slapadd (8),
+.BR ldapadd (1),
+.BR slapd (8)
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

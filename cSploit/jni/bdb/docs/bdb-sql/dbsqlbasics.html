@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 1. Berkeley DB SQL: The Absolute Basics</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="prev" href="moreinfo.html" title="For More Information" />
+    <link rel="next" href="buildinstall.html" title="Getting and Installing BDB SQL" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 1. Berkeley DB SQL: The Absolute Basics</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="moreinfo.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="buildinstall.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="dbsqlbasics"></a>Chapter 1. Berkeley DB SQL: The Absolute Basics</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="dbsqlbasics.html#identicalusage">BDB SQL Is Nearly Identical to SQLite</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="buildinstall.html">Getting and Installing BDB SQL</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="buildinstall.html#onwin">On Windows Systems</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="buildinstall.html#onunix">On Unix</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="buildinstall.html#ado_net">The BDB SQL ADO.NET Interface</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="accessing_bdb_sql_databases.title.html">Accessing BDB SQL Databases</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="journaldirectory.html">The Journal Directory</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="unsupportedpragmas.html">Unsupported PRAGMAs</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="changedpragmas.html">Changed PRAGMAs</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="changedpragmas.html#auto_vacuum">PRAGMA auto_vacuum</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changedpragmas.html#incremental_vacuum">PRAGMA incremental_vacuum</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changedpragmas.html#journal_size_limit">PRAGMA journal_size_limit</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="addedpragmas.html">Added PRAGMAs</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#bdbsql_error_file">PRAGMA bdbsql_error_file</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#bdbsql_lock_tablesize">PRAGMA bdbsql_lock_tablesize</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#bdbsql_shared_resources">PRAGMA bdbsql_shared_resources</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#bdbsql_single_process">PRAGMA bdbsql_single_process</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#bdbsql_system_memory">PRAGMA bdbsql_system_memory</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#bdbsql_vacuum_fillpercent">PRAGMA bdbsql_vacuum_fillpercent</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#bdbsql_vacuum_pages">PRAGMA bdbsql_vacuum_pages</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#large_record_opt">PRAGMA large_record_opt</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#multiversion">PRAGMA multiversion</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#snapshot_isolation">PRAGMA snapshot_isolation</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#trickle">PRAGMA trickle</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#txn_bulk">PRAGMA txn_bulk</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="addedpragmas.html#replication_pragmas">Replication PRAGMAs</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="miscdiff.html">Miscellaneous Differences</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="bdb-concepts.html">Berkeley DB Concepts</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="sql_encryption.html">Encryption</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="sql_encryption.html#sql_native_encrypt">Berkeley DB encryption</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="sql_encryption.html#sql_see">SQLite Encryption Extension</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="sequencesupport.html">Using Sequences</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="sequencesupport.html#create_sequence">create_sequence</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="sequencesupport.html#seq_nextval">nextval</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="sequencesupport.html#seq_currval">currval</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="sequencesupport.html#seq_drop_sequence">drop_sequence</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="normal-sql.html">Differences for Users of other SQL Engines</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+            Welcome to the Berkeley DB SQL interface.  If you are a SQLite user who is
+            using the BDB SQL interface for reasons other than performance
+            enhancements, this chapter tells you the minimum things you
+            need to know about the interface.  You should simply read this
+            chapter and then skip the rest of this book.
+        </p>
+      <p>
+            If, however, you are using the BDB SQL interface for performance reasons,
+            then you need to read this chapter, plus most of the rest of
+            the chapters in this book (although you can probably skip most
+            of <a class="xref" href="admin.html" title="Chapter 5. Administrating Berkeley DB SQL Databases">Administrating Berkeley DB SQL Databases</a>, unless you 
+            want to administer your database "the Berkeley DB way").
+        </p>
+      <p>
+            Also, if you are an existing Berkeley DB user who is interested in
+            the BDB SQL interface, read this chapter plus the rest of this book.
+        </p>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="identicalusage"></a>BDB SQL Is Nearly Identical to SQLite</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+                Your interaction with the BDB SQL interface is almost identical to
+                SQLite. You use the same APIs, the same command shell
+                environment, the same SQL statements, and the same PRAGMAs
+                to work with the database created by the BDB SQL interface as you
+                would if you were using SQLite.
+            </p>
+        <p>
+                To learn how to use SQLite, see the official
+                <a class="ulink" href="http://www.sqlite.org/docs.html" target="_top">SQLite
+                    Documentation Page.</a>
+            </p>
+        <p>
+                That said, there are a few small differences between the
+                two interfaces. These are described in the remainder of
+                this chapter.
+            </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="moreinfo.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="buildinstall.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">For More Information </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Getting and Installing BDB SQL</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

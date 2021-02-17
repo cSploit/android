@@ -1,0 +1,769 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 4fdb8097-d6b7-af4b-b818-c79c3d7082dc
+
+Revision-number: 6
+Prop-content-length: 119
+Content-length: 119
+
+K 7
+svn:log
+V 18
+More work on trunk
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-22T14:34:02.734375Z
+PROPS-END
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/B
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/B/lambda
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 27
+Text-content-md5: 911c7a8d869b8c1e566f57da54d889c6
+Text-content-sha1: 784a9298366863da2b65ebf82b4e1123755a2421
+Content-length: 37
+
+PROPS-END
+This is the file 'lambda'.
+
+
+Node-path: trunk/B/E
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/B/E/new_alpha
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 25
+Text-content-md5: 67c756078f24f946f6ec2d00d02f50e1
+Text-content-sha1: d001710ac8e622c6d1fe59b1e265a3908acdd2a3
+Content-length: 35
+
+PROPS-END
+This is the file 'beta'.
+
+
+Node-path: trunk/B/F
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/mu
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 12
+Text-content-md5: f8a6701de14ec3fcfd9f2fe595e9c9ed
+Text-content-sha1: 8b787bd9293c8b962c7a637a9fdbf627fe68610e
+Content-length: 22
+
+PROPS-END
+new content
+
+
+Node-path: trunk/C
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/D
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/D/gamma
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 12
+Text-content-md5: f8a6701de14ec3fcfd9f2fe595e9c9ed
+Text-content-sha1: 8b787bd9293c8b962c7a637a9fdbf627fe68610e
+Content-length: 22
+
+PROPS-END
+new content
+
+
+Node-path: trunk/D/G
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/D/G/pi
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 23
+Text-content-md5: adddfc3e6b605b5f90ceeab11b4e8ab6
+Text-content-sha1: 411e258dc14b42701fdc29b75f653e93f8686415
+Content-length: 33
+
+PROPS-END
+This is the file 'pi'.
+
+
+Node-path: trunk/D/G/rho
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: 82f2211cf4ab22e3555fc7b835fbc604
+Text-content-sha1: 56388a031dffbf9df7c32e1f299b1d5d7ef60881
+Content-length: 34
+
+PROPS-END
+This is the file 'rho'.
+
+
+Node-path: trunk/D/G/tau
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: 9936e2716e469bb686deb98c280ead58
+Text-content-sha1: 62e8c07d56bee94ea4577e80414fa8805aaf0175
+Content-length: 34
+
+PROPS-END
+This is the file 'tau'.
+
+
+Node-path: trunk/D/H
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/D/H/chi
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: 8f5ebad6d1f7775c2682e54417cbe4d3
+Text-content-sha1: abeac1bf62099ab66b44779198dc19f40e3244f4
+Content-length: 34
+
+PROPS-END
+This is the file 'chi'.
+
+
+Node-path: trunk/D/H/omega
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 26
+Text-content-md5: fe4ec8bdd3d2056db4f55b474a10fadc
+Text-content-sha1: c06e671bf15a6af55086176a0931d3b5034c82e6
+Content-length: 36
+
+PROPS-END
+This is the file 'omega'.
+
+
+Node-path: trunk/D/H/psi
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: e81f8f68ba50e749c200cb3c9ce5d2b1
+Text-content-sha1: 9c438bde39e8ccbbd366df2638e3cb6700950204
+Content-length: 34
+
+PROPS-END
+This is the file 'psi'.
+
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/B1
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/B1/B
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/B1/B/lambda
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 27
+Text-content-md5: 911c7a8d869b8c1e566f57da54d889c6
+Text-content-sha1: 784a9298366863da2b65ebf82b4e1123755a2421
+Content-length: 37
+
+PROPS-END
+This is the file 'lambda'.
+
+
+Node-path: branches/B1/B/E
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/B1/B/E/alpha
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 26
+Text-content-md5: d1fa4a3ced98961674a441930a51f2d3
+Text-content-sha1: b347d1da69df9a6a70433ceeaa0d46c8483e8c03
+Content-length: 36
+
+PROPS-END
+This is the file 'alpha'.
+
+
+Node-path: branches/B1/B/E/beta
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 25
+Text-content-md5: 67c756078f24f946f6ec2d00d02f50e1
+Text-content-sha1: d001710ac8e622c6d1fe59b1e265a3908acdd2a3
+Content-length: 35
+
+PROPS-END
+This is the file 'beta'.
+
+
+Node-path: branches/B1/B/F
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/B1/mu
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 12
+Text-content-md5: f8a6701de14ec3fcfd9f2fe595e9c9ed
+Text-content-sha1: 8b787bd9293c8b962c7a637a9fdbf627fe68610e
+Content-length: 22
+
+PROPS-END
+new content
+
+
+Node-path: branches/B1/C
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/B1/D
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/B1/D/gamma
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 12
+Text-content-md5: f8a6701de14ec3fcfd9f2fe595e9c9ed
+Text-content-sha1: 8b787bd9293c8b962c7a637a9fdbf627fe68610e
+Content-length: 22
+
+PROPS-END
+new content
+
+
+Node-path: branches/B1/D/G
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/B1/D/G/pi
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 23
+Text-content-md5: adddfc3e6b605b5f90ceeab11b4e8ab6
+Text-content-sha1: 411e258dc14b42701fdc29b75f653e93f8686415
+Content-length: 33
+
+PROPS-END
+This is the file 'pi'.
+
+
+Node-path: branches/B1/D/G/rho
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: 82f2211cf4ab22e3555fc7b835fbc604
+Text-content-sha1: 56388a031dffbf9df7c32e1f299b1d5d7ef60881
+Content-length: 34
+
+PROPS-END
+This is the file 'rho'.
+
+
+Node-path: branches/B1/D/G/tau
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: 9936e2716e469bb686deb98c280ead58
+Text-content-sha1: 62e8c07d56bee94ea4577e80414fa8805aaf0175
+Content-length: 34
+
+PROPS-END
+This is the file 'tau'.
+
+
+Node-path: branches/B1/D/H
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/B1/D/H/chi
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: 8f5ebad6d1f7775c2682e54417cbe4d3
+Text-content-sha1: abeac1bf62099ab66b44779198dc19f40e3244f4
+Content-length: 34
+
+PROPS-END
+This is the file 'chi'.
+
+
+Node-path: branches/B1/D/H/omega
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 26
+Text-content-md5: fe4ec8bdd3d2056db4f55b474a10fadc
+Text-content-sha1: c06e671bf15a6af55086176a0931d3b5034c82e6
+Content-length: 36
+
+PROPS-END
+This is the file 'omega'.
+
+
+Node-path: branches/B1/D/H/psi
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: e81f8f68ba50e749c200cb3c9ce5d2b1
+Text-content-sha1: 9c438bde39e8ccbbd366df2638e3cb6700950204
+Content-length: 34
+
+PROPS-END
+This is the file 'psi'.
+
+
+Revision-number: 7
+Prop-content-length: 138
+Content-length: 138
+
+K 7
+svn:log
+V 37
+Create another branch B2 from trunk@6
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-22T14:34:28.500000Z
+PROPS-END
+
+Node-path: branches/B2
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 6
+Node-copyfrom-path: trunk
+
+
+Revision-number: 8
+Prop-content-length: 119
+Content-length: 119
+
+K 7
+svn:log
+V 18
+More work on trunk
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-22T14:38:53.468750Z
+PROPS-END
+
+Node-path: trunk/B/E/new_alpha
+Node-kind: file
+Node-action: change
+Text-content-length: 61
+Text-content-md5: ac5f7c1c890095cafdb4e2fa0ff2680b
+Text-content-sha1: dc90ed6c9f5254772c7b17f5e710a7c342623390
+Content-length: 61
+
+This is the file 'beta'.
+this is the new alpha based on beta
+
+
+Revision-number: 9
+Prop-content-length: 119
+Content-length: 119
+
+K 7
+svn:log
+V 18
+More work on trunk
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-22T14:39:10.625000Z
+PROPS-END
+
+Node-path: trunk/D/H/chi
+Node-kind: file
+Node-action: change
+Text-content-length: 12
+Text-content-md5: f8a6701de14ec3fcfd9f2fe595e9c9ed
+Text-content-sha1: 8b787bd9293c8b962c7a637a9fdbf627fe68610e
+Content-length: 12
+
+new content
+
+
+Revision-number: 10
+Prop-content-length: 135
+Content-length: 135
+
+K 7
+svn:log
+V 34
+Merge r6 from trunk to branches/B1
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-22T14:40:49.015625Z
+PROPS-END
+
+Node-path: branches/B1
+Node-kind: dir
+Node-action: change
+Prop-content-length: 42
+Content-length: 42
+
+K 13
+svn:mergeinfo
+V 8
+/trunk:6
+PROPS-END
+
+
+Node-path: branches/B1/B/E/new_alpha
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 6
+Node-copyfrom-path: trunk/B/E/new_alpha
+Text-copy-source-md5: 67c756078f24f946f6ec2d00d02f50e1
+Text-copy-source-sha1: d001710ac8e622c6d1fe59b1e265a3908acdd2a3
+
+
+Node-path: branches/B1/B/E/beta
+Node-action: delete
+
+
+Revision-number: 11
+Prop-content-length: 135
+Content-length: 135
+
+K 7
+svn:log
+V 34
+Merge r9 from trunk to branches/B2
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-22T14:53:44.156250Z
+PROPS-END
+
+Node-path: branches/B2
+Node-kind: dir
+Node-action: change
+Prop-content-length: 42
+Content-length: 42
+
+K 13
+svn:mergeinfo
+V 8
+/trunk:9
+PROPS-END
+
+
+Node-path: branches/B2/D/H/chi
+Node-kind: file
+Node-action: change
+Text-content-length: 12
+Text-content-md5: f8a6701de14ec3fcfd9f2fe595e9c9ed
+Text-content-sha1: 8b787bd9293c8b962c7a637a9fdbf627fe68610e
+Content-length: 12
+
+new content
+
+
+Revision-number: 12
+Prop-content-length: 111
+Content-length: 111
+
+K 7
+svn:log
+V 10
+Work on B2
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-22T14:55:17.390625Z
+PROPS-END
+
+Node-path: branches/B2/D/H/chi
+Node-kind: file
+Node-action: change
+Text-content-length: 10
+Text-content-md5: 7fb893eb43ac0ef015b2b95b88628b8c
+Text-content-sha1: a54c7be3471b59cb5be150b1f679c1d2895b00e0
+Content-length: 10
+
+B2 tweaks
+
+
+Revision-number: 13
+Prop-content-length: 132
+Content-length: 132
+
+K 7
+svn:log
+V 31
+Merge r11 and r12 from B2 to B1
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-22T14:55:51.703125Z
+PROPS-END
+
+Node-path: branches/B1
+Node-kind: dir
+Node-action: change
+Prop-content-length: 64
+Content-length: 64
+
+K 13
+svn:mergeinfo
+V 29
+/branches/B2:11-12
+/trunk:6,9
+PROPS-END
+
+
+Node-path: branches/B1/D/H/chi
+Node-kind: file
+Node-action: change
+Text-content-length: 10
+Text-content-md5: 7fb893eb43ac0ef015b2b95b88628b8c
+Text-content-sha1: a54c7be3471b59cb5be150b1f679c1d2895b00e0
+Content-length: 10
+
+B2 tweaks
+
+
+Revision-number: 14
+Prop-content-length: 143
+Content-length: 143
+
+K 7
+svn:log
+V 42
+Merge r5 from trunk/B/E to branches/B1/B/E
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-22T15:10:22.234375Z
+PROPS-END
+
+Node-path: branches/B1/B/E
+Node-kind: dir
+Node-action: change
+Prop-content-length: 74
+Content-length: 74
+
+K 13
+svn:mergeinfo
+V 39
+/branches/B2/B/E:11-12
+/trunk/B/E:5-6,9
+PROPS-END
+
+
+Node-path: branches/B1/B/E/alpha
+Node-action: delete
+
+
+Revision-number: 15
+Prop-content-length: 143
+Content-length: 143
+
+K 7
+svn:log
+V 42
+Merge r8 from trunk/B/E to branches/B1/B/E
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-24T15:00:17.203125Z
+PROPS-END
+
+Node-path: branches/B1/B/E
+Node-kind: dir
+Node-action: change
+Prop-content-length: 76
+Content-length: 76
+
+K 13
+svn:mergeinfo
+V 41
+/branches/B2/B/E:11-12
+/trunk/B/E:5-6,8-9
+PROPS-END
+
+
+Node-path: branches/B1/B/E/new_alpha
+Node-kind: file
+Node-action: change
+Text-content-length: 60
+Text-content-md5: b1738c908160291bb40ef9d1b8c89e82
+Text-content-sha1: ad6df4488978b8e8eade283028ab753791073a76
+Content-length: 60
+
+This is the file 'beta'.
+this is the new alpha based on beta
+

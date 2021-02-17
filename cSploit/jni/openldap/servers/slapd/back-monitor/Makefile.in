@@ -1,0 +1,49 @@
+# Makefile.in for back-monitor
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+SRCS = init.c search.c compare.c modify.c bind.c \
+	operational.c \
+	cache.c entry.c \
+	backend.c database.c thread.c conn.c rww.c log.c \
+	operation.c sent.c listener.c time.c overlay.c
+OBJS = init.lo search.lo compare.lo modify.lo bind.lo \
+	operational.lo \
+	cache.lo entry.lo \
+	backend.lo database.lo thread.lo conn.lo rww.lo log.lo \
+	operation.lo sent.lo listener.lo time.lo overlay.lo
+
+LDAP_INCDIR= ../../../include
+LDAP_LIBDIR= ../../../libraries
+
+BUILD_OPT = "--enable-monitor"
+BUILD_MOD = @BUILD_MONITOR@
+
+mod_DEFS = -DSLAPD_IMPORT
+MOD_DEFS = $(@BUILD_MONITOR@_DEFS)
+
+shared_LDAP_LIBS = $(LDAP_LIBLDAP_R_LA) $(LDAP_LIBLBER_LA)
+NT_LINK_LIBS = -L.. -lslapd $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+UNIX_LINK_LIBS = $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+
+LIBBASE = back_monitor
+
+XINCPATH = -I.. -I$(srcdir)/.. -I$(srcdir)/../slapi
+XDEFS = $(MODULES_CPPFLAGS)
+
+all-local-lib:	../.backend
+
+../.backend: lib$(LIBBASE).a
+	@touch $@
+

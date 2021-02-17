@@ -1,0 +1,70 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+SHTOOL="$SRCDIR/../build/shtool"
+
+TB="" TN=""
+if test -t 1 ; then
+	TB=`$SHTOOL echo -e "%B" 2>/dev/null`
+	TN=`$SHTOOL echo -e "%b" 2>/dev/null`
+fi
+
+SLEEPTIME=10
+
+echo "#######################################################################"
+echo "###                                                                 ###"
+echo "### SQL tests                                                       ###"
+echo "###                                                                 ###"
+echo "#######################################################################"
+echo "###"
+echo "### SQL tests require the sql backend, a properly configured"
+echo "### ODBC and a database populated with data from the applicable"
+echo "### servers/slapd/back-sql/rdbms_depend/* files."
+echo "###"
+echo "### Set SLAPD_USE_SQL to the desired RDBMS to enable this test;"
+echo "###"
+echo "### Currently supported RDBMSes are:"
+echo "###         ibmdb2, mysql, pgsql"
+echo "###"
+echo "### Set SLAPD_USE_SQLWRITE=yes to enable the write tests"
+echo "###"
+echo "### See servers/slapd/back-sql/rdbms_depend/README for more "
+echo "### details on how to set up the RDBMS and the ODBC"
+echo "###"
+
+echo ">>>>> Executing all LDAP tests for $BACKEND"
+
+for CMD in $SRCDIR/scripts/sql-test*; do
+	# remove cruft from prior test
+	if test $PRESERVE = yes ; then
+		/bin/rm -rf testrun/db.*
+	else
+		/bin/rm -rf testrun
+	fi
+
+	echo ">>>>> Starting ${TB}`basename $CMD`${TN} ..."
+	$CMD
+	RC=$?
+	if test $RC -eq 0 ; then
+		echo ">>>>> $CMD completed ${TB}OK${TN}."
+	else
+		echo ">>>>> $CMD ${TB}failed${TN} (exit $RC)"
+		exit $RC
+	fi
+
+	echo ">>>>> waiting $SLEEPTIME seconds for things to exit"
+	sleep $SLEEPTIME
+	echo ""
+done

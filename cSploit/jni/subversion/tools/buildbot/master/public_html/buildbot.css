@@ -1,0 +1,68 @@
+/* Copied from buildbot.ethereal.com. Thanks! */
+
+* {
+	font-family: verdana, arial, helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+a:link,a:visited,a:active {
+	color: #333;
+}
+a:hover {
+	color: #999;
+}
+
+.table {
+	border-spacing: 2px;
+}
+
+td.Project {
+	color: #000;
+	border: 1px solid #666666;
+	background-color: #fff;
+}
+
+td.Event, td.Activity, td.Time, td.Builder {
+/*	color: #333333; */
+	border: 1px solid #666666;
+	background-color: #eee;
+	font-weight: normal;
+}
+
+td.Change {
+	color: #fff;
+	border: 1px solid #666666;
+	background-color: #aaf;
+}
+
+/* LastBuild, BuildStep states */
+.success {
+	color: #FFFFFF;
+	border: 1px solid #666666;
+	background-color: #3b0;
+}
+
+.failure {
+	color: #FFFFFF;
+	border: 1px solid #666666;
+	background-color: #d33;
+}
+
+.warnings {
+	color: #FFFFFF;
+	border: 1px solid #666666;
+	background-color: #fa2;
+}
+
+.exception, td.offline {
+	color: #FFFFFF;
+	border: 1px solid #666666;
+	background-color: #e0b0ff;
+}
+
+.start,.running, td.building {
+	color: #555;
+	border: 1px solid #666666;
+	background-color: #fffc6c;
+}

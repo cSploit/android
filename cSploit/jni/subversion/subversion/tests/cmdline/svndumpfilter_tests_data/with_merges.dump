@@ -1,0 +1,346 @@
+SVN-fs-dump-format-version: 2
+
+UUID: a1b7b7ba-941c-4386-9e40-393dd6d760dd
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2007-11-22T07:36:52.981952Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 117
+Content-length: 117
+
+K 7
+svn:log
+V 14
+Creating trunk
+K 10
+svn:author
+V 8
+stylesen
+K 8
+svn:date
+V 27
+2007-11-22T07:36:53.035734Z
+PROPS-END
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 119
+Content-length: 119
+
+K 7
+svn:log
+V 16
+commit all files
+K 10
+svn:author
+V 8
+stylesen
+K 8
+svn:date
+V 27
+2007-11-22T07:36:54.168549Z
+PROPS-END
+
+Node-path: trunk/1
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 15
+Text-content-md5: 88c16a56754e0f17a93d269ae74dde9b
+Content-length: 25
+
+PROPS-END
+This is file 1
+
+
+Node-path: trunk/2
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 15
+Text-content-md5: db06069ef1c9f40986ffa06db4fe8fd7
+Content-length: 25
+
+PROPS-END
+This is file 2
+
+
+Node-path: trunk/3
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 15
+Text-content-md5: 95227e10e2c33771e1c1379b17330c86
+Content-length: 25
+
+PROPS-END
+This is file 3
+
+
+Node-path: trunk/4
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 15
+Text-content-md5: 601120837709ea5ee34dadddf5289113
+Content-length: 25
+
+PROPS-END
+This is file 4
+
+
+Node-path: trunk/5
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 15
+Text-content-md5: 657c74cf3521f7760f9203ac7d9d2cdb
+Content-length: 25
+
+PROPS-END
+This is file 5
+
+
+Revision-number: 3
+Prop-content-length: 118
+Content-length: 118
+
+K 7
+svn:log
+V 15
+Creating branch
+K 10
+svn:author
+V 8
+stylesen
+K 8
+svn:date
+V 27
+2007-11-22T07:36:55.138144Z
+PROPS-END
+
+Node-path: branch1
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 2
+Node-copyfrom-path: trunk
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 4
+Prop-content-length: 118
+Content-length: 118
+
+K 7
+svn:log
+V 15
+Creating branch
+K 10
+svn:author
+V 8
+stylesen
+K 8
+svn:date
+V 27
+2007-11-22T07:36:55.174720Z
+PROPS-END
+
+Node-path: branch2
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 3
+Node-copyfrom-path: trunk
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 5
+Prop-content-length: 116
+Content-length: 116
+
+K 7
+svn:log
+V 13
+commit change
+K 10
+svn:author
+V 8
+stylesen
+K 8
+svn:date
+V 27
+2007-11-22T07:36:56.137189Z
+PROPS-END
+
+Node-path: branch1/1
+Node-kind: file
+Node-action: change
+Text-content-length: 39
+Text-content-md5: 4769ac569ba7b962d2d2bf95c90f80b4
+Content-length: 39
+
+This is file 1
+This is file 1 modified
+
+
+Revision-number: 6
+Prop-content-length: 116
+Content-length: 116
+
+K 7
+svn:log
+V 13
+commit change
+K 10
+svn:author
+V 8
+stylesen
+K 8
+svn:date
+V 27
+2007-11-22T07:36:57.144314Z
+PROPS-END
+
+Node-path: branch1/2
+Node-kind: file
+Node-action: change
+Text-content-length: 39
+Text-content-md5: e4f2deb441ef67de82f3aefc6aef255e
+Content-length: 39
+
+This is file 2
+This is file 2 modified
+
+
+Revision-number: 7
+Prop-content-length: 116
+Content-length: 116
+
+K 7
+svn:log
+V 13
+commit change
+K 10
+svn:author
+V 8
+stylesen
+K 8
+svn:date
+V 27
+2007-11-22T07:36:58.146184Z
+PROPS-END
+
+Node-path: branch2/1
+Node-kind: file
+Node-action: change
+Text-content-length: 39
+Text-content-md5: 4769ac569ba7b962d2d2bf95c90f80b4
+Content-length: 39
+
+This is file 1
+This is file 1 modified
+
+
+Revision-number: 8
+Prop-content-length: 116
+Content-length: 116
+
+K 7
+svn:log
+V 13
+commit change
+K 10
+svn:author
+V 8
+stylesen
+K 8
+svn:date
+V 27
+2007-11-22T07:36:59.148564Z
+PROPS-END
+
+Node-path: branch2/2
+Node-kind: file
+Node-action: change
+Text-content-length: 39
+Text-content-md5: e4f2deb441ef67de82f3aefc6aef255e
+Content-length: 39
+
+This is file 2
+This is file 2 modified
+
+
+Revision-number: 9
+Prop-content-length: 116
+Content-length: 116
+
+K 7
+svn:log
+V 13
+commit change
+K 10
+svn:author
+V 8
+stylesen
+K 8
+svn:date
+V 27
+2007-11-22T07:37:02.140253Z
+PROPS-END
+
+Node-path: trunk
+Node-kind: dir
+Node-action: change
+Prop-content-length: 47
+Content-length: 47
+
+K 13
+svn:mergeinfo
+V 12
+/branch1:4-8
+PROPS-END
+
+
+Node-path: trunk/1
+Node-kind: file
+Node-action: change
+Text-content-length: 39
+Text-content-md5: 4769ac569ba7b962d2d2bf95c90f80b4
+Content-length: 39
+
+This is file 1
+This is file 1 modified
+
+
+Node-path: trunk/2
+Node-kind: file
+Node-action: change
+Text-content-length: 39
+Text-content-md5: e4f2deb441ef67de82f3aefc6aef255e
+Content-length: 39
+
+This is file 2
+This is file 2 modified
+
+

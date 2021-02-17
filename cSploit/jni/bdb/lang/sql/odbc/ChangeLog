@@ -1,0 +1,669 @@
+SQLite ODBC Driver
+------------------
+
+Mon Apr 01 2013 version 0.992 released
+
+	* update to SQLite 3.7.16.1
+	* enhancements in XPath virtual table module
+
+Wed Mar 20 2013 version 0.991 released
+
+	* update to SQLite 3.7.16
+	* added experimental libxml2 XPath virtual table module
+	* added Michael Brey's configure fixes
+	* added Zac Vawter's patch for Win32 ExpandEnviromentStrings()
+	  on database file names
+	* fixes for Windows 8 64bit (SetWindowLongPtr())
+	* added experimental SQLite4 driver
+	* fixes in impexp extension module
+	* added manifests to adddsn.exe/inst.exe
+
+Fri Dec 14 2012 version 0.99 released
+
+	* update to SQLite 3.7.15
+	* added read-only support for embedded SQLite3 databases
+	  in zipfile extension, and on Linux r/w support using
+	  mremap() system call
+	* fixed missing fclose() in blob_export SQLite function
+	* added proper handling for SQL_DIAG_CURSOR_ROW_COUNT and
+	  SQL_DIAG_ROW_COUNT in SQLGetDiagField()
+	* fixed return code for CREATE/DROP stmts in SQLPrepare()
+	  and SQLExecDirect() thanks Peter Harvey for reporting
+	* fixed missing SQL_DIAG_DYNAMIC_FUNCTION case in
+	  SQLGetDiagField(), thans Peter Harvey for reporting
+	* SQLGetData fixes for JDK1.7 on x86_64
+	* added UN*X build of ZIP read-only extension module
+
+Sat Oct 06 2012 version 0.98 released
+
+	* update to SQLite 3.7.14.1
+	* fixes in floating point retrieval for MSVC, thanks
+	  Ben van der Merwe for reporting and test
+	* added ZIP read-only extension module (zipfile)
+	* fixes in CSV table extension module
+	* fixes in handling default DSNs for Win32, thanks Zac Vawter
+	  for patch
+
+Thu Sep 06 2012 version 0.97 released
+
+	* update to SQLite 3.7.14
+	* added CSV table extension module (csvtable)
+	* added handling of SQL_DATA_AT_EXEC for parameter binding
+	* increased file name buffers for Win32
+	* length fixes in Win32 version of SQLDriverConnectW()
+
+Sun Jun 24 2012 version 0.96 released
+
+	* update to SQLite 3.7.13
+	* allow "PRAGMA" SQL command to return result set
+	* fixed UCS-2 surrogate sequences and UTF-8 translation,
+	  thanks KamLeong Lai for fix and testing
+
+Sat May 19 2012 version 0.95 released
+
+	* update to SQLite 3.7.12
+	* fixed compiler warnings
+	* now build SQLite 2 driver for Win64, too
+
+Wed Jan 25 2012 version 0.94 released
+
+	* update to SQLite 3.7.10
+	* use new MinGW cross compiler for Win32/Win64 binaries
+	* fixed strtol issues regarding timestamp fractional parts
+	* filter out ODBC escape sequences {oj ...} etc.
+
+Tue Nov 15 2011 version 0.93 released
+
+	* update to SQLite 3.7.9
+	* fixes regarding SQLULEN in Win64
+	* added infrastructure for building with SEE
+	* added compile option in SQLite3 driver to perform
+	  dynamic linking to SQLite engine internally in order
+	  to use System.data.SQLite (EXPERIMENTAL)
+	* SQL_ATTR_METADATA_ID partial support (stmt/conn level)
+	* reverted to SQLSetPos() fix of 0.91
+	* SQL_ATTR_CURRENT_CATALOG fix, thanks Stanislav Povolotsky
+
+Wed Sep 21 2011 version 0.92 released
+
+	* update to SQLite 3.7.8
+	* another SQLSetPos() fix
+	* added "Always BIGINT" DSN option
+	* bug fixes in blobtoxy extension module
+	* segfault in SQLite 2 driver fixed, thanks Dave Peticolas
+
+Thu Jul 07 2011 version 0.91 released
+
+	* update to SQLite 3.7.7.1
+	* updated blobtoxy module interface (xRename was missing)
+	* support URI names in SQLite 3 driver when available
+	* SQLite 3 driver now uses SQLite memory management routines
+	* fixed BIGINT signed/unsigned flag
+
+Thu Jun 09 2011 version 0.90 released
+
+	* update to SQLite 3.7.6.3
+	* added packaging infrastructure for Debian
+	* update sqlite+tcc module to TCC 0.9.25
+	* added blob_import/blob_export functions to SQLite 3 driver
+	* fixes in SQLSetPos()
+	* made SQLEndTran() logic simpler, no more automatic rollback
+	* reviewed Win32 installer, SQLite 2 now an optional component
+
+Fri Mar 25 2011 version 0.89 released
+
+	* update to SQLite 3.7.5
+	* fixes regarding parameter binding (conversions)
+	* added JSON output to impexp extension module
+	* improved Win32 cross build script
+
+Thu Dec 30 2010 version 0.88 released
+
+	* update to SQLite 3.7.4
+	* added logic to parse date/timestamps in MM/DD/YYYY format
+	* included Matthew Kirkwood's patch for handling
+	  SQL_ATTR_PARAMS_PROCESSED_PTR
+	* on Windows use CP_OEMCP transcoding for SQL_C_CHAR data
+	  (DSN option, default is on)
+	* further fixes in parameter binding (NULL pointer handling)
+
+Thu Sep 02 2010 version 0.87 released
+
+	* update to SQLite 3.7.2
+	* various fixes in parameter set handling
+	* again fixes in SQL_TIMESTAMP handling
+	* fixes in buffer length handling in SQLBindParameter()
+	* basic support for SQLTablePrivileges()
+	* support SQL_C_WCHAR for non-wide drivers (POSIX platforms)
+	* use sqlite3_profile() for tracing if available
+	* more fixes when calling internal variadic functions
+
+Wed May 26 2010 version 0.86 released
+
+	* update to SQLite 3.6.23.1
+	* fixes in handling SQL_TIMESTAMP data regarding fractional part
+	* fixes in SQLForeignKeys() and SQLGetTypeInfo() as suggested
+	  by Farid Zidan
+	* SQLGetData() now returns real length instead of SQL_NO_TOTAL
+	  when the buffer was too small
+	* added sqlite3_mod_extfunc.dll from www.sqlite.org/contrib
+	* fixed UTF8/UNICODE en/decoding of character range 0x80..0xff
+	* fixed SQLSetConnectAttr(..SQL_AUTOCOMMIT..) handling
+	  as suggested by Simon Schubert
+
+Tue Jan 12 2010 version 0.85 released
+
+	* update to SQLite 3.6.22
+	* added JournalMode DSN option
+	* again fixes in SQLPrimaryKeys()
+	* allow zero length parameter in SQLSetConnectAttr(..SQL_AUTO_COMMIT..)
+
+Wed Dec 02 2009 version 0.84 released
+
+	* update to SQLite 3.6.20
+	* SQLStatistics() now reports INTEGER PRIMARY KEY as first index
+	* SQL_ATTR_MAX_ROWS for SQLite3 driver
+	* fixed memory leaks in SQLPrimaryKeys()
+	* try to detect last argument of SQLSetStmtOption()
+	  needed for newer unixODBC versions
+
+Tue May 26 2009 version 0.83 released
+
+	* update to SQLite 3.6.14.2
+	* fixed UNICODE string length issues in SQLGetInfoW() et.al.
+
+Mon May 11 2009 version 0.82 released
+
+	* update to SQLite 3.6.14
+	* in driver connect dialog, disable DSN input field
+	  when driver name property is set on begin of dialog
+	* initial Win64 NSIS installer of SQLite3 driver
+	* Win64 version of SQLite3 driver can now be made with
+	  MingW-64 cross compiler
+	* eliminated warnings for Win64 build
+
+Tue Apr 14 2009 version 0.81 released
+
+	* update to SQLite 3.6.13
+	* use sqlite3_table_column_metadata() when available to
+	  optimize out "PRAGMA table_info()"
+	* configure now prefers the amalgamation SQLite3 source if
+	  it finds sqlite3.c/sqlite3.h using the --with-sqlite3 switch
+	* various hacks to make MS Excel/Query happy
+	* various fixes and enhancements in impexp.c
+	* keep sqlite3_stmt pointers as long as possible between
+	  SQLPrepare() and SQLExecute() in order to minimize
+	  SQLite API calls
+	* provide current date when retrieving TIME rows as TIMESTAMP
+	* now use amalgamation source sqlite3.c when building
+	  SQLite3 drivers
+	* partial implementation of SQLSetPos(), fixes in length
+	  handling for deferred parameters, and row-wise parameter
+	  array binding to make Database Template Library (DTL) happy
+	* 64 Bit fixes for getrowdata() thanks Nikolas Taylor for fix
+
+Tue Jan 27 2009 version 0.80 released
+
+	* update to SQLite 3.6.10
+	* Tru64 and HP/UX 64 bit fixes and build notes in README
+	  thanks to Nikola Radovanovic
+	* length/indicator fixes for parameter arrays
+	* getrowdata fixes for length/indicator and truncation
+	* added Win32 build option to use sqlite*.dll instead of
+	  static linking
+	* initial Win64 support, thanks Nikolas Taylor for help
+	* fixed x86_64 problems in SQLite2 driver
+	* provide ODBC2/ODBC3 column names for metadata w.r.t. SQL_HENV
+	* provide proper SQL_DESC_LENGTH for SQL_BIT
+	* fixes in SQLBindCol regarding SQL_BIND_BY_COLUMN
+	* made SQL_DESC_OCTET_LENGTH/SQL_DESC_TYPE_NAME more
+	  consistent w.r.t. wide-char types
+	* fix in iODBC include path in configure.in, thanks
+	  Ingo Bormuth for patch
+	* again fixes in SQLGetData for SQL_NO_DATA paths
+
+Mon Sep 29 2008 version 0.79 released
+
+	* update to SQLite 3.6.3
+	* fixes in SQLGetData for zero-length SQL_C_CHAR and SQL_C_BINARY
+	* fixed off-by-one counting problem for SQL_ATTR_ROW_NUMBER and
+	  SQL_ROW_NUMBER, thanks Christian Mueller for initial fix
+
+Sun Aug 24 2008 version 0.78 released
+
+	* update to SQLite 3.6.1
+	* relaxed fixupsql() parsing to be able to support
+	  "CREATE TRIGGER ..." SQL statements in SQLPrepare() et.al.
+	* added XML output format to impexp.c
+	* provide SQLAllocHandle/SQLFreeHandle for iODBC, too,
+	  thanks Nick Davis for patch
+	* double free fix in SQLPrimaryKeys(), thanks Ingo Bormuth
+	  for reporting
+	* increased some PRECISION fields in SQLGetTypeInfo()
+	* fix in SQLSetConnect(Attr|Option)(..SQL_AUTOCOMMIT..)
+	  when a transaction is in progress and autocommit is turned on
+	  again, thanks Sam Kanai for reporting
+
+Sun Jan 06 2008 version 0.77 released
+
+	* update to SQLite 3.5.4
+	* fixed length/offset issues in SQLGetData() when reading data
+	  in multiple chunks, thanks Sam Kanai for reporting
+	* fix in parameter binding regarding SQL_C_WCHAR/SQL_NTS buffers,
+	  thanks Sam Kanai for reporting
+	* fix regarding SQL_RESET_PARAMS and unbound parameter semantic,
+	  thanks Sam Kanai for reporting and providing initial fix
+	* fixes in Win32 rundll32 install/uninstall handlers
+	* more 64bit fixes
+	* fixed wrong typeinfo for time/timestamp
+	* now use sqlite3_bind_*() functions for SQLite3 driver's
+	  parameter passing
+
+Thu Oct 11 2007 version 0.76 released
+
+	* update to SQLite 3.5.1
+	* partly reverted SQLPrimaryKeys() change from version 0.73:
+	  report primary keys from PRAGMA table_info or if none found
+	  fall back to "*autoindex*" PKs from PRAGMA index_list
+	* minor tweaks in Makefile.in regarding libtool mode parameter
+	  and SQLite3 install targets
+	* added handling for SQL_DESC_SCHEMA_NAME in SQLColAttribute()
+	* added handling for SQL_ATTR_CURSOR_SENSITIVITY in SQLSetStmtAttr()
+	* improved SQLTables()/SQLColumns() regarding pattern search
+	* use *printf(3) format %Q instead of '%q' in SQLite 3 driver
+	* if available use newer SQLite3 APIs (sqlite3_prepare_v2() etc)
+
+Sat Aug 04 2007 version 0.75 released
+
+	* update to SQLite 3.4.1
+	* hack for MS Access' wrong usage of SQLStatistics
+	  (reserved error -7748)
+	* minor code cleanup
+	* fixed bug in SQLite2 driver SQLColumns()
+	* reworked start transaction logic w.r.t. meta data
+	  functions like SQLTables()
+	* added some additional logic to SQLCancel() and SQLite
+	  busy handlers
+
+Mon Apr 02 2007 version 0.74 released
+
+	* SQLColAttribute(s)(): provide proper info for
+	  SQL_DESC_NULLABLE/SQL_COLUMN_NULLABLE
+	* SQLPrimaryKeys(): report only real primary keys
+	* fixed SQL_COLUMN_PRECISION/SQL_DESC_PRECISION for
+	  integer/double/date/time/timestamp columns
+	* SQLStatistics(): report INTEGER PRIMARY KEY column as
+	  index when no other indices available
+	* fixed SQL_COLUMN_TYPE_NAME/SQL_DESC_TYPE_NAME return,
+	  should be "VARCHAR" instead of "VARCHAR(100)"
+	* fixed wrong pointer increments for DSN parsing on Win32
+	* minor fixes in blobtoxy extension module
+
+Sun Feb 18 2007 version 0.73 released
+
+	* update to SQLite 3.3.13
+	* SQLGetInfo(SQL_OWNER_TERM) now is empty string
+	* fixed bug in Win32 version concerning SQLDriverConnect()
+	* added -L/-l/-I/-i switches to sqlite+tcc.c
+
+Sat Feb 10 2007 version 0.72 released
+
+	* update to SQLite 3.3.12
+	* added case for SQL_DESC_NUM_PREC_RADIX in SQLColAttribute[s]
+	* Win32 MinGW build: turn on SQLITE_SOUNDEX
+	* UN*X: try libodbcinst.so.1/libiodbcinst.so.2 before
+	  libodbcinst.so/libiodbcinst.so for SQLGetPrivateProfileString(),
+	  the latter are normally only in development packages
+	* unquote table names for SQLForeignKeys() and
+	  pragma foreign_key_list()
+	* added Win32 build of experimental sqlite+tcc module
+	* fixes/additions in configure.in/Makefile.in
+	* minor changes regarding WITHOUT_DRIVERMGR compile-time switch
+	* added new compile-time switches WITHOUT_INSTALLER and
+	  WITHOUT_SHELL for Win32
+	* added blobtoxy and impexp loadable modules, Win32 names
+	  are sqlite3_mod_blobtoxy.dll and sqlite3_mod_impexp.dll
+	* added DSN option LoadExt for specification of loadable
+	  extensions as comma separated list of pathnames
+	* added Win32 build of FTS1/FTS2 to DLLs
+	  sqlite3_mod_fts1.dll and sqlite3_mod_fts2.dll
+
+Thu Jan 11 2007 version 0.71 released
+
+	* update to SQLite 3.3.10
+	* MingW Win32 build: added shell function in
+	  order to run driver DLL as SQLite shell from rundll32
+	* WIN32 thread safety as suggested by Dmitriy Ivanov:
+	  serialize most SQL*() APIs using critical section on ENV struct
+	* implemented SQLGetDiagField(W)(), initial code kindly
+	  donated by Arnold Schulz
+	* more tweaks regarding Win32 code page vs. UTF-8
+	* added patches from Debian 0.70 testing
+	* on Win32 don't assume that database, DSN, and driver names
+	  are UTF-8 encoded in SQLite3 driver
+	* fixes in corner cases of SQL query substitution
+	  with 0 parameters and SQL patterns (%)
+	* added "ShortNames" DSN option in SQLite 3 driver
+	* allow naming a column (no pattern) in SQLColumns()
+	* UN*X standard behaviour now is not to build drivers
+	  with wide char interfaces, this must be turned on
+	  explicitely by specifying "--enable-winterface" at
+	  configure time
+	* now provide SQL*W functions in Win32 SQLite3 driver, quick
+	  and dirty ported from sqliteodbc.c, not optimized for
+	  SQLite 3.x wide char APIs
+
+Sun Aug 20 2006 version 0.70 released
+
+	* update to SQLite 3.3.7
+	* fix for SQLBindCol(,,NULL,,) which must unbind column
+	* added missing SQL_CATALOG_NAME/SQL_COLLATION_SEQ in SQLGetInfo()
+	* added SQLiteODBCInstaller for Win32 as contributed
+	  by Gunter Hinrichsen
+	* added install/uninstall functions in Win32 versions in
+	  order to allow driver install/remove by rundll32
+
+Sun Jul 23 2006 version 0.69 released
+
+	* added "NoCreat" DSN option in SQLite3 driver to prevent
+	  from implicit creation of empty database files
+	* fixed severe bug in conditional compile for (un)defined
+	  HAVE_SQLITE3COLUMNTABLENAME, thanks Tim Tassonis for reporting
+	* detect and handle SQLITE_SCHEMA errors from sqlite3_prepare()
+
+Fri Jul 07 2006 version 0.68 released
+
+	* update to SQLite 3.3.6, 2.8.17
+	* increased default lock timeout to 100000 milliseconds
+	* use sqlite3_column_table_name when available
+	* improved type mapping/type detect for SQLite3 driver,
+	  thanks Rainer Keuchel for ideas/initial coding
+	* fixed buggy memcpy() in getrowdata(), thanks Rainer Keuchel
+	* tweaks in SQLTables()
+	* improved .spec file w.r.t. standard RPM/configure places,
+	* UN*X version: try to use dlopen() for SQLGetPrivateProfileString()
+	  in order to become agnostic of unixODBC vs iODBC
+	* fixes in SQLite3 driver regarding percent substitution
+	  for queries with no parameters (eg strftime SQL function)
+	* fixes w.r.t. SQL_C_DEFAULT type mapping
+	* fixes in SQLParamData()/SQLPutData() again
+	* minor changes in Win32 dialog handling
+
+Mon Apr 03 2006 version 0.67 released
+
+	* reworked blob handling in SQLite 2+3 drivers,
+	  thanks Altan Özgür for testing
+	* added NSIS installer script
+	* Win32 version can now be made with MingW cross compiler
+	* eliminated some more warnings in Win32 DSN config
+	* improved SQLite 3 tracing for DSN option "tracefile"
+	* added shell scripts drvdsninst.sh/drvdsnuninst.sh
+	  and Makefile targets drvinst/drvuninst
+	* added configure option --enable/disable-winterface to
+	  turn on (= enable, default) or off (= disable) SQLite 2.x
+	  SQLITE_UTF8 mapping to SQL*W() functions
+	* fixes in accordance with MSDN KB#294169 Unicode length
+	  arguments mainly in SQLColAttribute[s]*W()
+
+Sat Feb 25 2006 version 0.66 released
+
+	* update to SQLite 3.3.4
+	* added DSN option "LongNames" to switch behaviour
+	  regarding column name truncation
+	* eliminated warnings when compiled with GCC 4.x
+	* added handling for Unicode 2 word sequences
+	* added alpha SQL_BINARY support for SQLite 3 driver
+	* fixes regarding SQLParamData/SQLPutData for data-at-execution
+	  parameters
+	* GCC 4 related fixes regarding signedness warnings
+	* added mkopc3.c utility to create opcode.[ch] files for
+	  newer SQLite 3 (> 3.0.8) sources
+	* added SQL_BIT data type handling
+	* added SQL_BIGINT data type handling for SQLite 3
+	* fixes in fixupsql()
+	* some defines to deal with newer ODBC headers
+	* fixes w.r.t. va_list handling for sqlite_exec_vprintf,
+	  sqlite_vmprintf etc.
+	* update to SQLite 2.8.16
+	* fixes w.r.t. blob handling in SQLite2 driver
+	* added DSN option "NoTXN" to disable BEGIN/COMMIT/ROLLBACK
+	* added SQL_ATTR_NOSCAN handling
+	* added DSN option for PRAGMA synchronous (SQLite3 only)
+	* minor fixes concerning return code of SQLFetch() and friends
+	  w.r.t. non-SELECT statements
+	* added SQL_DESC_COUNT handling as requested by Vadim Zeitlin
+	* added OS/2 port in SQLite2 driver contributed by Lorne Sunley
+	* handle MEMO like TEXT in columns
+	* use BEGIN EXCLUSIVE transaction when SQLite >= 3.0.8
+	* fixed memory leak in vm_step/s3stmt_step
+
+Thu Oct 07 2004 version 0.65 released
+
+	* first (alpha) version of SQLite3 driver for Win32
+	* fixes in Win32 resources
+	* minor tweaks in SQLGetInfo()
+	* fixes in length return of SQLGetInfoW() concerning UNICODE data
+	* fixed errors in orientation/offset handling of SQLExtendedFetch/
+	  SQLFetchScroll, thanks Lucky Prianata for testing
+	* added handling of SQL_ATTR_ROW_BIND_OFFSET_PTR for statements
+	* added handling of SQL_ATTR_RETRIEVE_DATA for statements
+	  (seems to be needed by ADO)
+
+Sun Sep 05 2004 version 0.64 released
+
+	* added row-wise binding for rowsets
+	* fixed off-by-one error for SQL_FETCH_PRIOR
+	* another bug fix in fixupsql() concerning quotes thanks to
+	  Justin Foutts
+	* always fallback to _ROWID_ in SQLSpecialColumns(SQL_BEST_ROWID)
+	  even for tables w/o index
+	* update to SQLite 2.8.15
+	* fixes concerning SQL_COLUMN_LABEL in SQLColumnAttribute(s)
+
+Thu Jul 08 2004 version 0.63 released
+
+	* added tracefile DSN option using sqlite_trace() if available
+	* in drvprepare() make SQL check with all parameters set to NULL
+	* only use *step() for select statements w/o parameters
+	  (makes option usable on OpenOffice.org on Linux)
+	* added pre-alpha version for SQLite 3.x
+	* added limited support for paramsets/rowset for OTLv4
+	* added limited support for named parameters (Oracle-style)
+	* fixed problem in SQLBindParameter argument checking
+	* when using gcc do printf-style format checks on setstat/setstatd
+	* added SQLite functions current_(date|time|datetime)_(local|utc)
+	* include SQLite error codes or -1 in native error field in
+	  SQLError() and SQLGetDiagRec()
+	* bug fixes in SQLNativeSql() concerning buffer/length
+	  semantics, thanks to N Rajesh
+	* corrected problems in fixupdyncols (select on views) and
+	  UN*X version of drvdriverconnect
+	* added SQLite functions hextobin/bintohex when
+	  sqlite_(encode|decode)_binary API available
+	* introduced blob handling when sqlite_(encode|decode)_binary
+	  available (SQLite 2.8.14 made these APIs public)
+	* update to SQLite 2.8.14
+	* made SQL_COLUMN_LABEL different from SQL_COLUMN_NAME
+	* fix in configure.in concerning SQLITE_INC/LIBDIR macros,
+	  thanks to Stefan Radman
+
+Sat May 01 2004 version 0.62 released
+
+	* don't implement some APIs for unixODBC unicode driver version
+	* fixed unicode length semantics in SQLGetInfoW() et.al.
+	* when SQLITE_UTF8 make SQLDriverConnectW() on UN*X, too
+	* added missing SQL_DESC_TYPE_NAME case in SQLColAttribute(),
+	  patch provided by Chris Waters
+	  
+Sat Apr 24 2004 version 0.61 released
+
+	* fixed getrowdata() to support SQLGetData() with NULL ptr and
+	  SQLFetch() to retrieve proper data length, thanks to Joel Reed
+	* fall back to integer primary key columns in SQLPrimaryKeys()
+	  and SQLStatistics() when no indices on table found
+	* improved auto increment detection
+
+Thu Apr 08 2004 version 0.60 released
+
+	* improved RPM .spec file
+	* added heuristic to detect auto increment columns
+	  (not a 100% solution yet) for better OpenOffice.org
+	  support, thanks to Yves Chaufour for OOo testing
+	* added property list function for unixODBC setup dialog
+	* another SQLFreeStmt(...SQL_CLOSE) fix to make OOo work
+	* added implemetation of SQLForeignKeys()
+	* removed worker thread support, use sqlite_compile(),
+	  sqlite_step(), sqlite_finalize() instead, DSN option to
+	  use that feature is "StepAPI"
+	* minimum required SQLite version is now 2.8.0
+
+Sun Mar 21 2004 version 0.56 released
+
+	* update to SQLite 2.8.13
+	* fixes in UTF to unicode conversion
+	* fixes in handling of length indicator in SQLBindParameter()
+	* added SQL_{COLUMN,DESC}_{PRECISION,SCALE} to SQLColAttribute()
+	* some unixODBC tweaks related to SQLError()/SQLGetDiagRec()
+	* corrections in SQLError()/SQLGetDiagRec() handling,
+	* fixed bugs in SQLColAttribute() which crashed OpenOffice.org
+	* added SQL_FETCH_RELATIVE support as requested by Jorge Mason
+	* fix in SQLFreeStmt(...SQL_CLOSE): don't unbind bound columns
+	  thanks to Martin Saturka
+
+Sat Jan 25 2004 version 0.55 released
+
+	* update to SQLite 2.8.11
+	* fixes in error messages
+	* fixed SQL_IDENTIFIER_QUOTE_CHAR to be double-quote, thanks
+	  to Mourad Ben Cheikh
+	* minor fixes in functions related to SQLColAttribute(s)
+	* started support of bookmarks
+	* added SQL_DYNAMIC_CURSOR_ATTRIBUTES1 in drvgetinfo(),
+	  thanks to Jeff Robbins
+	* changed "numeric" in mapsqltype() to return SQL_DOUBLE,
+	  thanks to Cristian Guissani
+	* added add[sys]dsn/rem[sys]dsn utility programs for Win32
+	  as requested by Tom Shafer
+	* fix in ParseAttributes() for proper DSN configuration
+	* don't automatically rollback in drvexecute()
+	* bug fix in UTF8 version for deferred bound parameters
+	  thanks to Kimmo Hamalainen
+
+Sun Jul 27 2003 version 0.54 released
+
+	* update to SQLite 2.8.5
+	* minor fixes in SQLGetDiagRec()
+	* when ODBC V3 turned on report proper error codes (eg HY000)
+	* added partial support of SQL_ATTR_ROW_BIND_TYPE
+
+Fri Jul 11 2003 version 0.53 released
+
+	* update to SQLite 2.8.4
+	* added missing handling of ODBC V3 data type codes SQL_C_DATE,
+	  SQL_C_TIME, SQL_C_TIMESTAMP in some functions. Thanks to
+	  Justin at cloudmark dot com
+
+Sun Jun 15 2003 version 0.52 released
+
+	* update to SQLite 2.8.3
+	* fixed potential crash in dbopen() thanks to Gene Shkolnik
+	* some improvements and hacks for WIN32 ADO
+	* for SQL type "float" report SQL_DOUBLE instead of SQL_FLOAT
+	* WIN32: export more ODBC V2 symbols
+	* fixes in unicode conversions in SQLGetData() and drvbindparam().
+
+Thu May 15 2003 version 0.51 released
+
+	* added support for SQLITE_UTF8 by SQL*W unicode entries,
+	  partially tested on Win32 only!
+	* added ODBC v2/3 handling on SQLAllocHandle etc.
+	* use localeconv() to fixup floating point formatting
+	* eliminated unnecessary odbcver.h and ctl3d.h from
+	  *.rc and *.c files, thanks to Roberto Artigas Jr
+	* added ODBC version 3 SQL_TYPE_* features
+	* fixes in configure.in for Solaris, thanks to
+	  Gene Shkolnik
+	* fixed bug in drvbindparam() thanks to Alex Clement
+	* switched coroutine handling to use pth_uctx_*() from
+	  GNU pth package, configure option --enable-pth
+
+Sat Mar 08 2003 version 0.50 released
+
+	* changed freeresult() behaviour in order to allow
+	  SQLBindCol() column bindings before prepare/execute
+	* revision of SQLGetTypeInfo()
+	* minor changes in SQLGetInfo() and SQLGetFunctions()
+
+Sat Feb 22 2003 version 0.49 released
+
+	* update to SQLite 2.8.0
+	* bug fix in fixupsql() concerning quotes thanks to Alex Clement
+	* bug fix in substparam() for SQL_NTS/SQL_NULL_DATA
+	  thanks to Alex Clement
+	* bug fix in drvfetchscroll for wrong column counting
+	  for SQL_FETCH_ABSOLUTE, thanks to Gene Shkolnik
+
+Thu Jan 02 2003 version 0.48 released
+
+	* cleanup threading
+	* added mkopc tool for making opcodes.[ch] on Win32
+
+Sat Sep 14 2002 version 0.47 released
+
+	* fixed NULL pointer derefs in getmd() and mapsqltype()
+	* SQLBindCol() now always binds even if no result available
+
+Sat Aug 31 2002 version 0.46 released
+
+	* experimental: configuration option: use coroutine
+	  instead of thread for running select statements
+	* SQLMoreResults() now always returns SQL_NO_DATA
+	* use the new PRAGMA show_datatypes if available
+	* reworked busy handling logic to use sqlite_busy_handler()
+	* now perform sqlite_open() in single function dbopen()
+	* changed all pthread_cond_signal() to pthread_cond_broadcast()
+
+Fri Jul 05 2002 version 0.45 released
+
+	* improved timestamp scanning
+	* return result set with _ROWID_ for SQLSpecialColumns()
+	  when no unique column in table
+	* fixes in parameter substitution (SQLSetParam())
+	* fixed reading data in pieces (SQLGetData())
+	* added dummy implementations for SQLTablePrivileges(),
+	  SQLColumnPrivileges(), SQLProcedures(), SQLForeignKeys(),
+	  SQLProcedureColumns()
+	* code cleanup
+	* added support for NULL in parameters using %Q
+	  sqlite_..printf() format specifier for SQLite > 2.4.x
+
+Sun Jun 16 2002 version 0.44 released
+
+	* fixed getbool() to return false on empty string
+	* added implementation of SQLParamData(), SQLPutData()
+	* fixed values of NON_UNIQUE field in SQLStatistics(),
+	  store empty INDEX_QUALIFIER field in SQLStatistics()
+	* fixes in getrowdata() concerning partial retrieving
+	  of result set
+	* when starting an asynchronous query, set number of
+	  result rows to -1
+	* fixes in SQLBindParameters(), for some datatypes
+	  the binding was not performed
+
+Sun Jun 09 2002 version 0.43 released
+
+	* replaced all %s in PRAGMAs by '%q' to make SQLPrimaryKeys(),
+	  SQLStatistics(), SQLSpecialColumns() work on automatic indexes
+	* added NULLABLE column to result set of SQLSpecialColumns()
+	  to support last SQLSpecialColumns() parameter properly
+	* additions in SQLGetInfo()
+	* added implemetation of SQL(Get|Set)ConnectAttr()
+	* improved handling of SQLDriverConnect() for non Win32 OSes
+	* improved handling of arguments in SQLTables()
+
+Tue Jun 04 2002 version 0.42 released
+
+	* now use doxygen for docs
+	* added ChangeLog
+	* added BSD type license
+

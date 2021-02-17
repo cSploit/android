@@ -1,0 +1,152 @@
+.TH SLAPAUTH 8C "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2004-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapauth \- Check a list of string-represented IDs for LDAP authc/authz
+.SH SYNOPSIS
+.B SBINDIR/slapauth
+[\c
+.BI \-d \ debug-level\fR]
+[\c
+.BI \-f \ slapd.conf\fR]
+[\c
+.BI \-F \ confdir\fR]
+[\c
+.BI \-M \ mech\fR]
+[\c
+.BI \-o \ option\fR[ = value\fR]]
+[\c
+.BI \-R \ realm\fR]
+[\c
+.BI \-U \ authcID\fR]
+[\c
+.BR \-v ]
+[\c
+.BI \-X \ authzID\fR]
+.IR ID \ [ ... ]
+.LP
+.SH DESCRIPTION
+.LP
+.B Slapauth
+is used to check the behavior of the slapd in mapping identities 
+for authentication and authorization purposes, as specified in 
+.BR slapd.conf (5).
+It opens the
+.BR slapd.conf (5)
+configuration file or the 
+.BR slapd\-config (5) 
+backend, reads in the 
+.BR authz\-policy / olcAuthzPolicy
+and
+.BR authz\-regexp / olcAuthzRegexp
+directives, and then parses the 
+.I ID
+list given on the command-line.
+.LP
+.SH OPTIONS
+.TP
+.BI \-d \ debug-level
+enable debugging messages as defined by the specified
+.IR debug-level ;
+see
+.BR slapd (8)
+for details.
+.TP
+.BI \-f \ slapd.conf
+specify an alternative
+.BR slapd.conf (5)
+file.
+.TP
+.BI \-F \ confdir
+specify a config directory.
+If both
+.B \-f
+and
+.B \-F
+are specified, the config file will be read and converted to
+config directory format and written to the specified directory.
+If neither option is specified, an attempt to read the
+default config directory will be made before trying to use the default
+config file. If a valid config directory exists then the
+default config file is ignored.
+.TP
+.BI \-M \ mech
+specify a mechanism.
+.TP
+.BI \-o \ option\fR[ = value\fR]
+Specify an
+.I option
+with a(n optional)
+.IR value .
+Possible generic options/values are:
+.LP
+.nf
+              syslog=<subsystems>  (see `\-s' in slapd(8))
+              syslog\-level=<level> (see `\-S' in slapd(8))
+              syslog\-user=<user>   (see `\-l' in slapd(8))
+
+.fi
+.TP
+.BI \-R \ realm
+specify a realm.
+.TP
+.BI \-U \ authcID
+specify an ID to be used as 
+.I authcID
+throughout the test session.
+If present, and if no
+.I authzID
+is given, the IDs in the ID list are treated as 
+.IR authzID .
+.TP
+.BI \-X \ authzID
+specify an ID to be used as 
+.I authzID
+throughout the test session.
+If present, and if no
+.I authcID
+is given, the IDs in the ID list are treated as 
+.IR authcID .
+If both
+.I authcID 
+and
+.I authzID
+are given via command line switch, the ID list cannot be present.
+.TP
+.B \-v
+enable verbose mode.
+.SH EXAMPLES
+The command
+.LP
+.nf
+.ft tt
+	SBINDIR/slapauth \-f /ETCDIR/slapd.conf \-v \\
+            \-U bjorn \-X u:bjensen
+
+.ft
+.fi
+tests whether the user
+.I bjorn
+can assume the identity of the user 
+.I bjensen
+provided the directives
+.LP
+.nf
+.ft tt
+	authz\-policy from
+	authz\-regexp "^uid=([^,]+).*,cn=auth$"
+		"ldap:///dc=example,dc=net??sub?uid=$1"
+
+.ft
+.fi
+are defined in
+.BR slapd.conf (5).
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR slapd (8),
+.BR slaptest (8)
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

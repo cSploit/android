@@ -1,0 +1,112 @@
+#!/usr/bin/stap
+/*
+ * Copyright (c) 2012, 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * mutex.stp - Display DB mutex wait times.
+ *
+ * Specify one particular process with -x <pid> or -c "<program> [<args>..]"
+ *
+ * Probes: mutex suspend and resume
+ *   suspend(unsigned mutex, unsigned exclusive, unsigned alloc_id);
+ *   resume(unsigned mutex, unsigned exclusive, unsigned alloc_id);
+ *
+ *	mutex:
+ *		is the integer mutex id returned by mutex_alloc()
+ *	exclusive:
+ *		is set to 1 except when obtaining a read-write latch with
+ *		shared access (allocated with DB_MUTEX_SHARED), then it is 0.
+ *	alloc_id:
+ *		is one of dbinc/mutex.h's MTX_XXX definitions (i.e., the class)
+ */
+
+global idnames;
+global suspend;
+global mutexwaits;
+global classwaits;
+
+function getns()
+{
+	t = gettimeofday_ns();
+	/*
+	 * On some virtual machine monitors gettimeofday_ns() returns 0. When
+	 * that happens approximate it as if this has a 2 Ghz processor.
+	 */
+	if (t == 0)
+		t = get_cycles() / 2;
+	return (t);
+}
+
+probe begin
+{
+	idnames[1] = "APPLICATION";
+	idnames[2] = "ATOMIC_EMULATION";
+	idnames[3] = "DB_HANDLE";
+	idnames[4] = "ENV_DBLIST";
+	idnames[5] = "ENV_HANDLE";
+	idnames[6] = "ENV_REGION";
+	idnames[7] = "LOCK_REGION";
+	idnames[8] = "LOGICAL_LOCK";
+	idnames[9] = "LOG_FILENAME";
+	idnames[10] = "LOG_FLUSH";
+	idnames[11] = "LOG_HANDLE";
+	idnames[12] = "LOG_REGION";
+	idnames[13] = "MPOOLFILE_HANDLE";
+	idnames[14] = "MPOOL_BH";
+	idnames[15] = "MPOOL_FH";
+	idnames[16] = "MPOOL_FILE_BUCKET";
+	idnames[17] = "MPOOL_HANDLE";
+	idnames[18] = "MPOOL_HASH_BUCKET";
+	idnames[19] = "MPOOL_REGION";
+	idnames[20] = "MUTEX_REGION";
+	idnames[21] = "MUTEX_TEST";
+	idnames[22] = "REP_CHKPT";
+	idnames[23] = "REP_DATABASE";
+	idnames[24] = "REP_DIAG";
+	idnames[25] = "REP_EVENT";
+	idnames[26] = "REP_REGION";
+	idnames[27] = "REP_START";
+	idnames[28] = "REP_WAITER";
+	idnames[29] = "REPMGR";
+	idnames[30] = "SEQUENCE";
+	idnames[31] = "TWISTER";
+	idnames[32] = "TCL_EVENTS";
+	idnames[33] = "TXN_ACTIVE";
+	idnames[34] = "TXN_CHKPT";
+	idnames[35] = "TXN_COMMIT";
+	idnames[36] = "TXN_MVCC";
+	idnames[37] = "TXN_REGION";
+}
+
+probe process(@1).mark("mutex__suspend")
+{
+	suspend[tid()] = getns();
+
+}
+
+/* mutex-resume(unsigned mutex, boolean exclusive, unsigned alloc_id, struct __db_mutex_t *mutexp) */
+probe process(@1).mark("mutex__resume")
+{
+	start = suspend[tid()];
+	class = idnames[$arg3];
+	if (start != 0) {
+		duration = getns() - start;
+		mutexwaits[$arg1, $arg2, class, tid()] <<< duration;
+		classwaits[class, $arg2] <<< duration;
+		suspend[tid()] = 0;
+	}
+}
+
+probe end
+{
+	foreach ([mutex, excl, alloc_id, tid] in mutexwaits) {
+	printf("Mutex %d %s %s thread %d wait times in nanoseconds\n",
+	    mutex, excl ? "exclusive" : "shared", alloc_id, tid);
+	print(@hist_log(mutexwaits[mutex, excl, alloc_id, tid]))
+	}
+	print("Aggregate mutex wait times grouped by (alloc_id, mode)\n");
+	foreach ([class, excl] in classwaits) {
+		printf("Mutex class %s %s wait times in nanoseconds\n", class,
+		    excl ? "exclusive" : "shared");
+		print(@hist_log(classwaits[class, excl]));
+	}
+}

@@ -1,0 +1,148 @@
+#-------------------------------------------------------------------------------
+
+!SRCDIR=@NEW_FIREBIRD_DIR@
+
+i pkginfo=Pkginfo
+i preinstall=Preinstall
+i postinstall=Postinstall
+i postremove=Postremove
+i prototype=Prototype
+
+!default 755 root root
+d none  /usr         ? ? ?
+d none  /usr/lib     ? ? ?
+
+d none @prefix@ 0755 root root
+
+v CONFIG.prsv @prefix@/security2.fdb=$SRCDIR/security2.fdb  0666 root root
+f none @prefix@/firebird.msg=$SRCDIR/firebird.msg  0644 root root
+f none @prefix@/de_DE.msg=$SRCDIR/de_DE.msg  0644 root root
+f none @prefix@/fr_FR.msg=$SRCDIR/fr_FR.msg  0644 root root
+f none @prefix@/ja_JP.msg=$SRCDIR/ja_JP.msg  0644 root root
+v CONFIG.prsv @prefix@/firebird.conf=$SRCDIR/misc/firebird.conf  0644 root root
+
+d none @prefix@/bin  0755 root root
+
+#f none @prefix@/bin/CSchangeRunUser.sh=$SRCDIR/bin/CSchangeRunUser.sh  0555 root root
+#f none @prefix@/bin/CSrestoreRootRunUser.sh=$SRCDIR/bin/CSrestoreRootRunUser.sh  0555 root root
+#f none @prefix@/bin/build_file=$SRCDIR/bin/build_file  0755 root root
+#f none @prefix@/bin/changeDBAPassword.sh=$SRCDIR/bin/changeDBAPassword.sh  0555 root root
+#f none @prefix@/bin/change_messages=$SRCDIR/bin/change_messages  0755 root root
+#f none @prefix@/bin/check_messages=$SRCDIR/bin/check_messages  0755 root root
+#f none @prefix@/bin/create_db=$SRCDIR/bin/create_db  0755 root root
+#f none @prefix@/bin/enter_messages=$SRCDIR/bin/enter_messages  0755 root root
+f none @prefix@/bin/fb_inet_server=$SRCDIR/bin/fb_inet_server  0755 root root
+f none @prefix@/bin/gbak=$SRCDIR/bin/gbak  0755 root root
+#f none @prefix@/bin/gbak_static=$SRCDIR/bin/gbak_static  0755 root root
+f none @prefix@/bin/gdef=$SRCDIR/bin/gdef  0755 root root
+f none @prefix@/bin/gds_drop=$SRCDIR/bin/gds_drop  0755 root root
+#f none @prefix@/bin/gds_lock_mgr=$SRCDIR/bin/gds_lock_mgr  0755 root root
+f none @prefix@/bin/gds_relay=$SRCDIR/bin/gds_relay  0755 root root
+f none @prefix@/bin/gfix=$SRCDIR/bin/gfix  0755 root root
+f none @prefix@/bin/gpre=$SRCDIR/bin/gpre  0755 root root
+#f none @prefix@/bin/gpre_boot=$SRCDIR/bin/gpre_boot  0755 root root
+#s none @prefix@/bin/gpre_current=gpre_static
+#f none @prefix@/bin/gpre_static=$SRCDIR/bin/gpre_static  0755 root root
+f none @prefix@/bin/gsec=$SRCDIR/bin/gsec  0755 root root
+f none @prefix@/bin/gstat=$SRCDIR/bin/gstat  0755 root root
+f none @prefix@/bin/isql=$SRCDIR/bin/isql  0755 root root
+#f none @prefix@/bin/isql_static=$SRCDIR/bin/isql_static  0755 root root
+#f none @prefix@/bin/modify_messages=$SRCDIR/bin/modify_messages  0755 root root
+f none @prefix@/bin/qli=$SRCDIR/bin/qli  0755 root root
+f none @prefix@/bin/fb_lock_print=$SRCDIR/bin/fb_lock_print  0755 root root
+
+d none @prefix@/examples  0755 root root
+d none @prefix@/examples/v5  0755 root root
+f none @prefix@/examples/v5/employee.gbk=$SRCDIR/examples/v5/employee.gbk 0644 root root
+f none @prefix@/examples/v5/employee.fdb=$SRCDIR/examples/v5/employee.fdb 0644 root root
+f none @prefix@/examples/v5/readme=$SRCDIR/examples/v5/readme 0644 root root
+f none @prefix@/examples/v5/align.h=$SRCDIR/examples/v5/align.h 0644 root root
+f none @prefix@/examples/v5/api1.c=$SRCDIR/examples/v5/api1.c 0644 root root
+f none @prefix@/examples/v5/api10.c=$SRCDIR/examples/v5/api10.c 0644 root root
+f none @prefix@/examples/v5/api11.c=$SRCDIR/examples/v5/api11.c 0644 root root
+f none @prefix@/examples/v5/api12.c=$SRCDIR/examples/v5/api12.c 0644 root root
+f none @prefix@/examples/v5/api13.c=$SRCDIR/examples/v5/api13.c 0644 root root
+f none @prefix@/examples/v5/api14.e=$SRCDIR/examples/v5/api14.e 0644 root root
+f none @prefix@/examples/v5/api15.c=$SRCDIR/examples/v5/api15.c 0644 root root
+f none @prefix@/examples/v5/api16.c=$SRCDIR/examples/v5/api16.c 0644 root root
+f none @prefix@/examples/v5/api16t.c=$SRCDIR/examples/v5/api16t.c 0644 root root
+f none @prefix@/examples/v5/api2.c=$SRCDIR/examples/v5/api2.c 0644 root root
+f none @prefix@/examples/v5/api3.c=$SRCDIR/examples/v5/api3.c 0644 root root
+f none @prefix@/examples/v5/api4.c=$SRCDIR/examples/v5/api4.c 0644 root root
+f none @prefix@/examples/v5/api5.c=$SRCDIR/examples/v5/api5.c 0644 root root
+f none @prefix@/examples/v5/api6.c=$SRCDIR/examples/v5/api6.c 0644 root root
+f none @prefix@/examples/v5/api7.c=$SRCDIR/examples/v5/api7.c 0644 root root
+f none @prefix@/examples/v5/api8.c=$SRCDIR/examples/v5/api8.c 0644 root root
+f none @prefix@/examples/v5/api9.c=$SRCDIR/examples/v5/api9.c 0644 root root
+f none @prefix@/examples/v5/api9f.c=$SRCDIR/examples/v5/api9f.c 0644 root root
+f none @prefix@/examples/v5/apifull.c=$SRCDIR/examples/v5/apifull.c 0644 root root
+f none @prefix@/examples/v5/employe2.sql=$SRCDIR/examples/v5/employe2.sql 0644 root root
+f none @prefix@/examples/v5/dyn1.e=$SRCDIR/examples/v5/dyn1.e 0644 root root
+f none @prefix@/examples/v5/dyn2.e=$SRCDIR/examples/v5/dyn2.e 0644 root root
+f none @prefix@/examples/v5/dyn3.e=$SRCDIR/examples/v5/dyn3.e 0644 root root
+f none @prefix@/examples/v5/dyn4.e=$SRCDIR/examples/v5/dyn4.e 0644 root root
+f none @prefix@/examples/v5/dyn5.e=$SRCDIR/examples/v5/dyn5.e 0644 root root
+f none @prefix@/examples/v5/dynfull.e=$SRCDIR/examples/v5/dynfull.e 0644 root root
+f none @prefix@/examples/v5/example.h=$SRCDIR/examples/v5/example.h 0644 root root
+f none @prefix@/examples/v5/api9f.sql=$SRCDIR/examples/v5/api9f.sql 0644 root root
+f none @prefix@/examples/v5/stat1.e=$SRCDIR/examples/v5/stat1.e 0644 root root
+f none @prefix@/examples/v5/stat10.e=$SRCDIR/examples/v5/stat10.e 0644 root root
+f none @prefix@/examples/v5/stat11.e=$SRCDIR/examples/v5/stat11.e 0644 root root
+f none @prefix@/examples/v5/stat12.e=$SRCDIR/examples/v5/stat12.e 0644 root root
+f none @prefix@/examples/v5/stat12t.e=$SRCDIR/examples/v5/stat12t.e 0644 root root
+f none @prefix@/examples/v5/stat2.e=$SRCDIR/examples/v5/stat2.e 0644 root root
+f none @prefix@/examples/v5/stat3.e=$SRCDIR/examples/v5/stat3.e 0644 root root
+f none @prefix@/examples/v5/stat4.e=$SRCDIR/examples/v5/stat4.e 0644 root root
+f none @prefix@/examples/v5/stat5.e=$SRCDIR/examples/v5/stat5.e 0644 root root
+f none @prefix@/examples/v5/stat6.e=$SRCDIR/examples/v5/stat6.e 0644 root root
+f none @prefix@/examples/v5/stat7.e=$SRCDIR/examples/v5/stat7.e 0644 root root
+f none @prefix@/examples/v5/stat8.e=$SRCDIR/examples/v5/stat8.e 0644 root root
+f none @prefix@/examples/v5/stat9.e=$SRCDIR/examples/v5/stat9.e 0644 root root
+f none @prefix@/examples/v5/udf.sql=$SRCDIR/examples/v5/udf.sql 0644 root root
+f none @prefix@/examples/v5/udflib.c=$SRCDIR/examples/v5/udflib.c 0644 root root
+
+
+
+
+d none @prefix@/help  0755 root root
+f none @prefix@/help/help.fdb=$SRCDIR/help/help.fdb  0444 root root
+
+d none @prefix@/include  0755 root root
+f none @prefix@/include/blr.h=$SRCDIR/include/blr.h  0644 root root
+f none @prefix@/include/gds.h=$SRCDIR/include/gds.h  0644 root root
+f none @prefix@/include/ib_util.h=$SRCDIR/include/ib_util.h  0644 root root
+f none @prefix@/include/ibase.h=$SRCDIR/include/ibase.h  0644 root root
+f none @prefix@/include/iberror.h=$SRCDIR/include/iberror.h  0644 root root
+f none @prefix@/include/perf.h=$SRCDIR/include/perf.h  0644 root root
+
+d none @prefix@/intl  0755 root root
+f none @prefix@/intl/libfbintl.so=$SRCDIR/intl/libfbintl.so  0755 root root
+
+d none @prefix@/lib  0755 root root
+f none @prefix@/lib/libib_util.so=$SRCDIR/lib/libib_util.so  0755 root root
+#f none @prefix@/lib/libfbcommon.a=$SRCDIR/lib/libfbcommon.a  0644 root root
+f none @prefix@/lib/libfbembed.so.1.5.1=$SRCDIR/lib/libfbembed.so.1.5.1  0755 root root
+s none @prefix@/lib/libfbembed.so.1=@prefix@/lib/libfbembed.so.1.5.1
+s none @prefix@/lib/libfbembed.so=@prefix@/lib/libfbembed.so.1
+#f none @prefix@/lib/libfbstatic.a=$SRCDIR/lib/libfbstatic.a  0644 root root
+s none @prefix@/lib/libgds.so.1=@prefix@/lib/libfbembed.so.1
+s none @prefix@/lib/libgds.so=@prefix@/lib/libfbembed.so
+f none @prefix@/lib/libfbclient.so.1.5.1=$SRCDIR/lib/libfbclient.so.1.5.1  0755 root root
+s none @prefix@/lib/libfbclient.so.1=@prefix@/lib/libfbclient.so.1.5.1
+s none @prefix@/lib/libfbclient.so=@prefix@/lib/libfbclient.so.1
+
+
+
+#/usr/lib synlinks for compability with external tools
+
+s none /usr/lib/libgds.so=@prefix@/lib/libfbembed.so
+s none /usr/lib/libfbembed.so=@prefix@/lib/libfbembed.so
+#s none /usr/lib/libgds.so.1=@prefix@/lib/libfbembed.so.1
+s none /usr/lib/libfbclient.so=@prefix@/lib/libfbclient.so
+
+
+d none @prefix@/UDF  0755 root root
+f none @prefix@/UDF/fbudf.so=$SRCDIR/UDF/fbudf.so  0755 root root
+f none @prefix@/UDF/ib_udf.so=$SRCDIR/UDF/ib_udf.so  0755 root root
+s none @prefix@/UDF/fb_udf.so=@prefix@/UDF/fbudf.so
+# EOF

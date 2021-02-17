@@ -1,0 +1,369 @@
+#
+#   Version script to hide private symbols from Firebird libraries
+#   GNU and Solaris linkers should understand it
+#
+#
+#  The contents of this file are subject to the Interbase Public
+#  License Version 1.0 (the "License"); you may not use this file
+#  except in compliance with the License. You may obtain a copy
+#  of the License at http://www.Inprise.com/IPL.html
+# 
+#  Software distributed under the License is distributed on an
+#  "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+#  or implied. See the License for the specific language governing
+#  rights and limitations under the License.
+# 
+#  The Original Code was created by Inprise Corporation
+#  and its predecessors. Portions created by Inprise Corporation are
+#  Copyright (C) Inprise Corporation.
+# 
+#   Created from fbclient.def by Nickolay Samofatov
+#
+#  All Rights Reserved.
+#  Contributor(s): ______________________________________.
+
+#-------------------
+# PRIVATE INTERFACE
+#-------------------
+
+gds__alloc
+gds__attach_database
+gds__blob_info
+gds__blob_size
+gds__cancel_blob
+gds__cancel_events
+gds__close
+gds__close_blob
+gds__commit_retaining
+gds__commit_transaction
+gds__compile_request
+gds__compile_request2
+gds__create_blob
+gds__create_blob2
+gds__create_database
+gds__database_cleanup
+gds__database_info
+gds__ddl
+gds__declare
+gds__decode
+gds__decode_date
+gds__describe
+gds__describe_bind
+gds__detach_database
+gds__disable_subsystem
+gds__dsql_finish
+gds__edit
+gds__enable_subsystem
+gds__encode
+gds__encode_date
+gds__event_block
+gds__event_counts
+gds__event_wait
+gds__execute
+gds__execute_immediate
+gds__fetch
+gds__free
+gds__ftof
+gds__get_prefix
+gds__get_segment
+gds__get_slice
+gds__interprete
+gds__log
+gds__log_status
+gds__map_blobs
+gds__msg_close
+gds__msg_format
+gds__msg_lookup
+gds__msg_open
+gds__msg_put
+gds__open
+gds__open_blob
+gds__open_blob2
+gds__parse_bpb
+gds__parse_bpb2
+gds__prefix
+gds__prefix_lock
+gds__prefix_msg
+gds__prepare
+gds__prepare_transaction
+gds__prepare_transaction2
+gds__print_blr
+gds__print_status
+gds__put_error
+gds__put_segment
+gds__put_slice
+gds__qtoq
+gds__que_events
+gds__receive
+gds__reconnect_transaction
+gds__register_cleanup
+gds__release_request
+gds__request_info
+gds__rollback_transaction
+gds__seek_blob
+gds__send
+gds__set_debug
+gds__sqlcode
+gds__start_and_send
+gds__start_multiple
+gds__start_request
+gds__start_transaction
+gds__temp_file
+gds__thread_enable
+gds__thread_enter
+gds__thread_exit
+gds__thread_start
+gds__to_sqlda
+gds__transaction_cleanup
+gds__transaction_info
+gds__unregister_cleanup
+gds__unwind_request
+gds__validate_lib_path
+gds__vax_integer
+gds__version
+gds__vtof
+gds__vtov
+gds__default_printer
+gds__trace
+gds__trace_raw
+gds__trace_printer
+
+gds__alloc_debug
+
+gds_alloc_flag_unfreed
+gds_alloc_report
+
+perf_format
+perf_get_info
+perf_report
+perf64_format
+perf64_get_info
+perf64_report
+
+#----------------------------
+# PUBLIC INTERFACE, i.e. API
+#----------------------------
+
+# Array functions
+
+isc_array_gen_sdl
+isc_array_get_slice
+isc_array_lookup_bounds
+isc_array_lookup_desc
+isc_array_put_slice
+isc_array_set_desc
+isc_get_slice
+isc_put_slice
+
+# BLOB functions
+
+isc_blob_default_desc
+isc_blob_gen_bpb
+isc_blob_info
+isc_blob_lookup_desc
+isc_blob_set_desc
+isc_cancel_blob
+isc_close_blob
+isc_create_blob
+isc_create_blob2
+isc_get_segment
+isc_open_blob
+isc_open_blob2
+isc_put_segment
+	
+# Database functions
+
+isc_attach_database
+isc_create_database
+isc_database_info
+isc_detach_database
+isc_drop_database
+isc_expand_dpb
+isc_modify_dpb
+isc_version
+isc_get_client_major_version
+isc_get_client_minor_version
+isc_get_client_version
+
+# Conversion functions
+
+isc_decode_date
+isc_decode_sql_date
+isc_decode_sql_time
+isc_decode_timestamp
+isc_encode_date
+isc_encode_sql_date
+isc_encode_sql_time
+isc_encode_timestamp
+isc_portable_integer
+isc_vax_integer
+
+# DSQL functions
+
+isc_dsql_allocate_statement
+isc_dsql_alloc_statement2
+isc_dsql_describe
+isc_dsql_describe_bind
+isc_dsql_execute
+isc_dsql_execute2
+isc_dsql_execute_m
+isc_dsql_execute2_m
+isc_dsql_execute_immediate
+isc_dsql_exec_immed2
+isc_dsql_execute_immediate_m
+isc_dsql_exec_immed2_m
+isc_dsql_exec_immed3_m
+isc_dsql_fetch
+isc_dsql_fetch_a
+isc_dsql_fetch_m
+isc_dsql_finish
+isc_dsql_free_statement
+isc_dsql_insert
+isc_dsql_insert_m
+isc_dsql_prepare
+isc_dsql_prepare_m
+isc_dsql_release
+isc_dsql_set_cursor_name
+isc_dsql_sql_info
+
+# ESQL functions
+
+isc_embed_dsql_close
+isc_embed_dsql_declare
+isc_embed_dsql_describe
+isc_embed_dsql_describe_bind
+isc_embed_dsql_execute
+isc_embed_dsql_execute2
+isc_embed_dsql_execute_immed
+isc_embed_dsql_exec_immed2
+isc_embed_dsql_fetch
+isc_embed_dsql_fetch_a
+isc_embed_dsql_insert
+isc_embed_dsql_open
+isc_embed_dsql_open2
+isc_embed_dsql_prepare
+isc_embed_dsql_release
+
+# Error-handling functions
+
+isc_interprete
+fb_interpret
+isc_print_sqlerror
+isc_print_status
+isc_sqlcode
+isc_sqlcode_s
+isc_sql_interprete
+fb_sqlstate
+
+# Event functions
+
+isc_cancel_events
+isc_event_block
+isc_event_counts
+isc_que_events
+isc_wait_for_event
+
+# Security functions
+
+isc_add_user
+isc_delete_user
+isc_modify_user
+
+# Services functions
+
+isc_service_attach
+isc_service_detach
+isc_service_query
+isc_service_start
+
+# Transaction control functions
+
+isc_commit_retaining
+isc_commit_transaction
+isc_prepare_transaction
+isc_prepare_transaction2
+isc_rollback_retaining
+isc_rollback_transaction
+isc_start_multiple
+isc_start_transaction
+isc_transaction_info
+fb_disconnect_transaction
+
+# Other functions
+
+isc_compile_request
+isc_compile_request2
+isc_ddl
+isc_prepare
+isc_receive
+isc_reconnect_transaction
+isc_release_request
+isc_request_info
+isc_seek_blob
+isc_send
+isc_start_and_send
+isc_start_request
+isc_transact_request
+isc_unwind_request
+fb_cancel_operation
+
+# Other SQL functions
+
+isc_close
+isc_declare
+isc_describe
+isc_describe_bind
+isc_execute
+isc_execute_immediate
+isc_fetch
+isc_fetch_a
+isc_open
+
+# Other BLOB functions
+
+BLOB_close
+BLOB_display
+BLOB_dump
+BLOB_edit
+BLOB_get
+BLOB_load
+BLOB_open
+BLOB_put
+BLOB_text_dump
+BLOB_text_load
+Bopen
+
+# Server shutdown support
+
+fb_shutdown
+fb_shutdown_callback
+fb_ping
+
+# Master firebird object access
+
+fb_get_master_interface
+
+fb_get_database_handle
+fb_get_transaction_handle
+
+fb_database_crypt_callback
+
+# Other misc functions
+
+isc_ftof
+isc_free
+isc_print_blr
+fb_print_blr
+isc_qtoq
+isc_reset_fpe
+isc_set_debug
+isc_to_sqlda
+isc_vtof
+isc_vtov
+
+#-----------------
+# OTHER FUNCTIONS
+#-----------------
+
+KEYWORD_stringIsAToken
+KEYWORD_getTokens

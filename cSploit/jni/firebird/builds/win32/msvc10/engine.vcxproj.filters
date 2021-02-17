@@ -1,0 +1,1040 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="JRD files">
+      <UniqueIdentifier>{908cb401-f8b0-49f4-8427-5563bd6d934f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JRD files\Data Access">
+      <UniqueIdentifier>{9275b77d-951f-43db-9617-a358302fc7f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{44b01586-fa6d-4e08-9fa0-9795798fa07c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JRD files\EXTDS">
+      <UniqueIdentifier>{b822c843-e6f1-409b-bb59-2e142870df72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JRD files\Trace">
+      <UniqueIdentifier>{94e778dd-b8e5-4864-8ae0-31c64dd3f724}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JRD files\GPRE files">
+      <UniqueIdentifier>{95e5aff1-8ee9-4769-aa91-3be6d34a96df}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JRD files\GPRE cpp">
+      <UniqueIdentifier>{f260b1eb-19c9-4092-afdc-e2d6ac8890a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Services">
+      <UniqueIdentifier>{b8aab4da-86a2-4d2c-ac72-d93d0b8133e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lock">
+      <UniqueIdentifier>{cd135cb6-654a-4611-a458-dd2d6ccce267}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{825d3a91-312b-435f-bb14-6d420a52616e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DSQL">
+      <UniqueIdentifier>{9a0dbf17-af8f-4bfb-9ea8-ff3af7d0a873}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DSQL\GPRE files">
+      <UniqueIdentifier>{82c21748-f164-41ab-bd6e-4e56a123fb94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DSQL\preprocesed">
+      <UniqueIdentifier>{f8ad7750-3087-4a0c-9679-a44b5d0f38dd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\WindowedStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\AggregatedStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\BitmapTableScan.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\BufferedStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\Cursor.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\ExternalTableScan.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\FilteredStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\FirstRowsStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\FullOuterJoin.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\FullTableScan.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\HashJoin.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\IndexTableScan.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\LockedStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\MergeJoin.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\NestedLoopJoin.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\ProcedureScan.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\RecordSource.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\RecursiveStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\SingularStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\SkipRowsStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\SortedStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\Union.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\VirtualTableScan.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\WinNodes.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\AggNodes.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\BoolNodes.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\ddl.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\dsql.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\DsqlCompilerScratch.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\DSqlDataTypeUtil.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\errd.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\ExprNodes.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\gen.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\make.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\movd.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\parse.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\Parser.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\pass1.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\StmtNodes.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\utld.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\extds\ExtDS.cpp">
+      <Filter>JRD files\EXTDS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\extds\InternalDS.cpp">
+      <Filter>JRD files\EXTDS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\extds\IscDS.cpp">
+      <Filter>JRD files\EXTDS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\trace\TraceCmdLine.cpp">
+      <Filter>JRD files\Trace</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\trace\TraceConfigStorage.cpp">
+      <Filter>JRD files\Trace</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\trace\TraceLog.cpp">
+      <Filter>JRD files\Trace</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\trace\TraceManager.cpp">
+      <Filter>JRD files\Trace</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\trace\TraceObjects.cpp">
+      <Filter>JRD files\Trace</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\trace\TraceService.cpp">
+      <Filter>JRD files\Trace</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\VirtualTable.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\Attachment.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\blb.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\blob_filter.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\btn.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\btr.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\builtin.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\cch.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\cmp.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\Collation.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\cvt2.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\cvt.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\Database.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\DatabaseSnapshot.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\DataTypeUtil.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\DebugInterface.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\err.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\event.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\evl.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\exe.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\ext.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\ExtEngineManager.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\filters.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\flu.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\GlobalRWLock.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\idx.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\inf.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\intl.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\intl_builtin.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\IntlManager.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\jrd.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\JrdStatement.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\lck.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\mov.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\nbak.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\nodebug.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\ods.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\opt.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\Optimizer.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\pag.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\par.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\PreparedStatement.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\RandomGenerator.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\RecordBuffer.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\RecordSourceNodes.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\Relation.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\ResultSet.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\rlck.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\rpb_chain.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\RuntimeStatistics.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\sdw.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\shut.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\sort.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\sqz.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\status.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\svc.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\svc_tab.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\SysFunction.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\TempSpace.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\tpc.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\tra.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\UserManagement.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\validation.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\vio.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\os\win32\winnt.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\lock\lock.cpp">
+      <Filter>Lock</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\utilities\gsec\gsec.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\utilities\gstat\ppg.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\utilities\nbackup\nbackup.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\jrd\scl.cpp">
+      <Filter>JRD files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\jrd\dfw.cpp">
+      <Filter>JRD files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\jrd\dpm.cpp">
+      <Filter>JRD files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\jrd\dyn_util.cpp">
+      <Filter>JRD files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\jrd\fun.cpp">
+      <Filter>JRD files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\jrd\Function.cpp">
+      <Filter>JRD files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\jrd\grant.cpp">
+      <Filter>JRD files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\jrd\ini.cpp">
+      <Filter>JRD files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\jrd\met.cpp">
+      <Filter>JRD files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\jrd\pcmet.cpp">
+      <Filter>JRD files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\dsql\DdlNodes.cpp">
+      <Filter>DSQL\preprocesed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\dsql\metd.cpp">
+      <Filter>DSQL\preprocesed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\dsql\PackageNodes.cpp">
+      <Filter>DSQL\preprocesed</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\utilities\gstat\dba.cpp">
+      <Filter>Services</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\recsrc\ConditionalStream.cpp">
+      <Filter>JRD files\Data Access</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\GarbageCollector.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\CryptoManager.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\dsql\BlrDebugWriter.cpp">
+      <Filter>DSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\Routine.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\Mapping.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\jrd\recsrc\RecordSource.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\recsrc\Cursor.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\WinNodes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\AggNodes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\BoolNodes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\chars.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\ddl_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\DdlNodes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\dsql.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\dsql_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\DsqlCompilerScratch.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\DSqlDataTypeUtil.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\errd_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\ExprNodes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\gen_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\make_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\metd_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\movd_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\Nodes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\PackageNodes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\Parser.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\pass1_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\sqlda.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\sqlda_pub.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\StmtNodes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\sym.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\utld_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\Visitors.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\extds\ExtDS.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\extds\InternalDS.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\extds\IscDS.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\trace\TraceConfigStorage.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\trace\TraceJrdHelpers.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\trace\TraceDSQLHelpers.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\trace\TraceLog.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\trace\TraceManager.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\trace\TraceObjects.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\trace\TraceService.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\trace\TraceSession.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\trace\traceswi.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\VirtualTable.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\acl.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\align.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\Attachment.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\blb.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\blb_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\blf_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\blob_filter.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\blp.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\blr.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\btn.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\btr.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\btr_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\build_no.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\cch.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\cch_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\cmp_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\Collation.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\constants.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\cvt2_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\cvt_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\Database.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\DatabaseSnapshot.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\DataTypeUtil.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\DebugInterface.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\dflt.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\dfw_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\dpm_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\drq.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\dyn.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\dyn_ut_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\err_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\EngineInterface.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\event.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\event_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\evl_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\evl_string.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\exe.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\exe_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ext.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ext_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ExtEngineManager.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\fields.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\filte_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\flags.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\flu.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\flu_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\fun_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\Function.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\GlobalRWLock.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\grant_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ibase.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ibsetjmp.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\idx.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\idx_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\inf_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\inf_pub.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ini.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ini_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\intl.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\intl_classes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\intl_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\IntlManager.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\irq.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\isc_version.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\jrd.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\jrd_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\JrdStatement.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\lck.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\lck_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\license.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\lls.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\met.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\met_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\mov_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\msg.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\msg_encode.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\names.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\nbak.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ntrace.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\obj.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ods.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ods_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\opt_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\Optimizer.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\pag.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\pag_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\par_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\pcmet_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\PreparedStatement.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\que.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\RandomGenerator.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\RecordBuffer.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\RecordNumber.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\RecordSourceNodes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\Relation.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\relations.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\req.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\ResultSet.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\rlck_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\Routine.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\rpb_chain.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\rse.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\RuntimeStatistics.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\sbm.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\scl.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\scl_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\sdw.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\sdw_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\shut_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\SimilarToMatcher.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\sort.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\sqz.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\status.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\svc.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\svc_tab.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\svc_undoc.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\SysFunction.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\TempSpace.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\thread_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\tpc_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\tra.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\tra_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\trig.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\types.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\UserManagement.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\val.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\val_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\vio_debug.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\vio_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\GarbageCollector.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\CryptoManager.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\include\gen\iberror.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\dsql\BlrDebugWriter.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\jrd\Mapping.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\dsql\DdlNodes.epp">
+      <Filter>DSQL\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\dsql\metd.epp">
+      <Filter>DSQL\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\dsql\PackageNodes.epp">
+      <Filter>DSQL\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\jrd\dfw.epp">
+      <Filter>JRD files\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\jrd\dpm.epp">
+      <Filter>JRD files\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\jrd\dyn_util.epp">
+      <Filter>JRD files\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\jrd\fun.epp">
+      <Filter>JRD files\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\jrd\Function.epp">
+      <Filter>JRD files\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\jrd\grant.epp">
+      <Filter>JRD files\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\jrd\ini.epp">
+      <Filter>JRD files\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\jrd\met.epp">
+      <Filter>JRD files\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\jrd\pcmet.epp">
+      <Filter>JRD files\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\jrd\scl.epp">
+      <Filter>JRD files\GPRE files</Filter>
+    </None>
+    <None Include="..\..\..\src\utilities\gstat\dba.epp">
+      <Filter>Services</Filter>
+    </None>
+    <None Include="..\..\..\src\dsql\parse.y">
+      <Filter>DSQL</Filter>
+    </None>
+    <None Include="..\defs\plugin.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

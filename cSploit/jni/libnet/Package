@@ -1,0 +1,13 @@
+
+set -x
+
+V=$(git describe --tags| sed -es/libnet-//)
+D=$(date --rfc-822)
+
+rm -rf debian
+cp -r ../debian ./
+sed -es"/VERSION/$V/" -es"/DATE/$D/" < ../debian/changelog > debian/changelog
+cat debian/changelog
+
+dpkg-buildpackage -b -us -uc -rfakeroot -i -I.swp
+

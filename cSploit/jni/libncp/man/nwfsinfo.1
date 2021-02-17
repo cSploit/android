@@ -1,0 +1,51 @@
+.TH NWFSINFO 1 07/22/1996 nwfsinfo nwfsinfo
+.SH NAME
+nwfsinfo \- Print some information about the file server
+.SH SYNOPSIS
+\fBnwfsinfo\fP [\fB-h\fP] [\fB-S\fP \fIserver\fP] [\fB-t\fP] [\fB-i\fP] [\fB-d\fP] [\fB-e\fP]
+
+.SH DESCRIPTION
+.B nwfsinfo
+prints some of the information the NetWare servers present without
+logging in. The options control what is printed. You should try the
+different options to find out what is printed when.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+With -h nwfsinfo prints a little help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+is the name of the server you want to know something about.
+.RE
+
+.B -t
+.RS 3
+Print what the file server believes to be the current time.
+.RE
+
+.B -d
+.RS 3
+Print the so-called file server description strings.
+.RE
+
+.B -i
+.RS 3
+Print the extended file server information such as NetWare version,
+maximum connections an others.
+.RE
+
+.B -e
+.RS 3
+List informations about NCP extensions loaded on server.
+.RE
+
+.SH BUGS
+Description strings contain garbage on some Netware versions.
+
+.SH AUTHOR
+This utility was originally written by Volker Lendecke.

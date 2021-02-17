@@ -1,0 +1,10 @@
+# $OpenLDAP$
+# Copyright 2007-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+#
+# README.fonts 
+#
+
+In dia we use:
+
+sans Normal 1.00 #000000

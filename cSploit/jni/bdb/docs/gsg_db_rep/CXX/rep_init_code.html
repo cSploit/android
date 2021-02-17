@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Starting and Stopping Replication</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with Replicated Berkeley DB Applications" />
+    <link rel="up" href="repapp.html" title="Chapter 3. The DB Replication Manager" />
+    <link rel="prev" href="repapp.html" title="Chapter 3. The DB Replication Manager" />
+    <link rel="next" href="repmgr_init_example_c.html" title="Adding the Replication Manager to RepMgr" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">
+        Starting and Stopping Replication
+    </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="repapp.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 3. The DB Replication Manager</th>
+          <td width="20%" align="right"> <a accesskey="n" href="repmgr_init_example_c.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="rep_init_code"></a>
+        Starting and Stopping Replication
+    </h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="rep_init_code.html#election_flags">Managing Election Policies</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="rep_init_code.html#thread_count">Selecting the Number of Threads</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        As described above, you introduce replication to an application by
+        starting with a transactional application, performing some basic
+        replication configuration, and then starting replication using 
+        
+        <span><code class="methodname">DbEnv::repmgr_start()</code>.</span>
+        
+    </p>
+      <p>
+        You stop replication by closing your environment
+        cleanly in the same way you would for any DB application.
+    </p>
+      <p>
+        For example, the following code fragment initializes, then
+        stops and starts replication. Note that other replication
+        activities are omitted for brevity.
+    </p>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+
+/* Use a 10mb cache */
+#define CACHESIZE   (10 * 1024 * 1024)
+
+...
+
+    DbEnv *dbenv;            /* Environment handle. */
+    DbSite *dbsite;          /* Replication manager site handle */
+    const char *progname;     /* Program name. */
+    const char *envHome;      /* Environment home directory. */
+    const char *listen_host;  /* A TCP/IP hostname. */
+    const char *other_host;   /* A TCP/IP hostname. */
+    int is_group_creator;     /* A flag */
+    u_int16 listen_port;      /* A TCP/IP port. */
+    u_int16 other_port;       /* A TCP/IP port. */
+
+    /* Initialize variables */
+    dbenv = NULL;
+    progname = "example_replication";
+    envHome = "ENVIRONMENT_HOME";
+    listen_host = "mymachine.sleepycat.com";
+    listen_port = 5001;
+    other_host = "anothermachine.sleepycat.com";
+    other_port = 4555;
+    is_group_creator = 1; /* This is usually set via a command line 
+                             argument or some other external 
+                             configuration mechanism. */
+
+    try {
+       /* Create the environment handle */
+       dbenv = new DbEnv(0);
+
+       /*
+        * Configure the environment handle. Here we configure 
+        * asynchronous transactional commits for performance reasons. 
+        */
+       dbenv-&gt;set_errfile(stderr);
+       dbenv-&gt;set_errpfx(progname);
+       (void)dbenv-&gt;set_cachesize(0, CACHESIZE, 0);
+       (void)dbenv-&gt;set_flags(DB_TXN_NOSYNC, 1);
+
+       /*
+        * Configure the local address. This is the local hostname 
+        * and port that this replication environment will use to 
+        * receive incoming replication messages. Note that this can
+        * be performed only once for the replication environment. 
+        * It is required.
+
+        * First: Create a DB_SITE handle to identify the site's 
+        * host/port network address.
+        */
+        dbenv-&gt;repmgr_site(listen_host, listen_port, &amp;dbsite, 0);
+
+        /*
+         * Second: Configure this site as the local site within the
+         * replication group.
+         */
+         dbsite-&gt;set_config(DB_LOCAL_SITE, 1);
+
+        /*
+         * Third: Set DB_GROUP_CREATOR if applicable. This can be done
+         * only for the local site. It should also only be peformed
+         * for one and only one site in a replication group, so 
+         * typically this is driven by an externally-supplied
+         * configuration option. 
+         *
+         * DB_GROUP_CREATOR only has meaning if you are starting the
+         * very first site for the very first time in a replication
+         * group. It is otherwise ignored.
+         */
+         if (is_group_creator)
+            dbsite-&gt;set_config(DB_GROUP_CREATOR, 1);
+
+        /*
+         * Having configured the local site, we can immediately
+         * deallocate the DB_SITE handle.
+         */
+         dbsite-&gt;close(dbsite);
+
+        /*
+         * Set this replication environment's priority. This is used 
+         * for elections.
+         *
+         * Set this number to a positive integer, or 0 if you do not want
+         * this site to be able to become a master.
+         */
+         dbenv-&gt;rep_set_priority(100);
+
+        /*
+         * Configure a bootstrap helper. This information is used only 
+         * if the site currently exists, and the local site has never 
+         * been started before. Otherwise, this configuration 
+         * information is ignored.
+         * 
+         */
+         if (!is_group_creator) { 
+            dbenv-&gt;repmgr_site(other_host, other_port, &amp;dbsite, 0);
+            dbsite-&gt;set_config(dbsite, DB_BOOTSTRAP_HELPER, 1);
+
+            /*
+             * Having configured the bootstrap helper site, we can 
+             * immediately deallocate the DB_SITE handle.
+             */
+             dbsite-&gt;close();
+         }
+
+         /* Open the environment handle. Note that we add DB_THREAD and
+          * DB_INIT_REP to the list of flags. These are required.
+          */
+          dbenv-&gt;open(home, DB_CREATE | DB_RECOVER |
+                            DB_INIT_LOCK | DB_INIT_LOG |
+                            DB_INIT_MPOOL | DB_INIT_TXN  |
+                            DB_THREAD | DB_INIT_REP,
+                            0);
+
+       /* 
+        * Start the replication manager such that it uses 3 
+        * threads. 
+        */
+         dbenv-&gt;repmgr_start(3, DB_REP_ELECTION);
+
+       /* Sleep to give ourselves time to find a master */
+        sleep(5);
+
+       /*
+        **********************************************************
+        *** All other application code goes here, including  *****
+        *** database opens                                   *****
+        **********************************************************
+        */
+
+
+    } catch (DbException &amp;de) {
+        /* Error handling goes here */
+    }
+
+    /* Close out the application here.
+    try {
+        /* 
+         * Make sure all your database handles are closed 
+         *  (omitted from this example). 
+         */
+
+        /* Close the environment */
+        if (dbenv != NULL)
+            (void)dbenv-&gt;close(dbenv, 0);
+
+    } catch (DbException &amp;de) {
+        /* Error handling goes here */
+    }
+
+    /* All done */ </pre>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="election_flags"></a>Managing Election Policies</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                Before continuing, it is worth taking a look at the
+
+                <span>
+                startup election flags accepted by 
+                
+                <span><code class="methodname">DbEnv::repgmr_start()</code>.</span>
+                These flags control how your replication application will
+                behave when it first starts up.
+                </span>
+
+                
+            </p>
+        <p>
+                    In the previous example, we specified 
+                        <code class="literal">DB_REP_ELECTION</code>
+                        
+                    when we started replication. This causes the
+                    application to try to find a master upon startup. If it
+                    cannot, it calls for an election. In the event an
+                    election is held, the environment receiving the most number of
+                    votes will become the master.
+            </p>
+        <p>
+                    There's some important points to make here:
+            </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                                    This 
+                                    <span>flag</span> 
+                                     
+                                    only requires that other
+                                    environments in the replication group
+                                    participate in the vote. There is no
+                                    requirement that
+                                    <span class="emphasis"><em>all</em></span> such
+                                    environments participate. In other
+                                    words, if an environment
+                                    starts up, it can call for an
+                                    election, and select a master, even 
+                                    if all other environment have not yet
+                                    joined the  replication group.
+                            </p>
+            </li>
+            <li>
+              <p>
+                                    It only requires a simple majority of
+                                    participating environments to elect a master. 
+                                    This is always true of elections held using the Replication Manager.
+                            </p>
+            </li>
+            <li>
+              <p>
+                                    As always, the environment participating in the election with the most
+                                    up-to-date log files is selected as
+                                    master. If an environment with more recent log files
+                                    has not yet joined the replication
+                                    group, it may not become the master.
+                            </p>
+            </li>
+          </ul>
+        </div>
+        <p>
+                    Any one of these points may be enough to cause a
+                    less-than-optimum environment to be selected as master.
+                    Therefore, to give you a better degree of control over
+                    which environment becomes a master at application startup,
+                    the Replication Manager offers the following start-up
+                                    <span>flags:</span> 
+                                     
+            </p>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Flag</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <code class="literal">DB_REP_MASTER</code>
+                </td>
+                <td>
+                   <p>
+                   The application starts up and declares the environment to be a master
+                   without calling for an election. It is an error for more
+                   than one environment to start up using this flag, or for
+                   an environment
+                   to use this flag when a master already exists. 
+                   </p>
+                   <p>
+                           Note that no replication group should
+                           <span class="emphasis"><em>ever</em></span> operate with more than
+                           one master.
+                   </p>
+                   <p>
+                           In the event that a environment attempts to become a
+                           master when a master already exists, the
+                           replication code will resolve the problem by
+                           holding an election. Note, however, that there
+                           is always a possibility of data loss in the face
+                           of duplicate masters, because once a master is
+                           selected, the environment that loses the election will
+                           have to roll back any transactions committed
+                           until it is in sync with the "real" master.
+                   </p>
+
+                  </td>
+              </tr>
+              <tr>
+                <td>
+                  <code class="literal">DB_REP_CLIENT</code>
+                </td>
+                <td>
+                          <p>
+                                  The application starts up and declares
+                                  the environment to be a replica without calling for
+                                  an election. Note that the environment
+                                  can still become a master if a subsequent
+                                  application starts up, calls for an
+                                  election, and this environment is elected
+                                  master.
+                          </p>
+                  </td>
+              </tr>
+              <tr>
+                <td>
+                  <code class="literal">DB_REP_ELECTION</code>
+                </td>
+                <td>
+                          <p>
+                          As described above, the application starts up,
+                          looks for a master, and if one is not found calls
+                          for an election.
+                          </p>
+                  </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="thread_count"></a>Selecting the Number of Threads</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    Under the hood, the Replication Manager is threaded and you can
+                    control the number of threads used to process messages received from
+                    other replicas. The threads that the Replication Manager uses are:
+            </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                                    Incoming message thread. This thread
+                                    receives messages from the site's
+                                    socket and passes those messages to
+                                    message processing threads (see below)
+                                    for handling.
+                            </p>
+            </li>
+            <li>
+              <p>
+                                    Outgoing message thread. Outgoing
+                                    messages are sent from whatever thread
+                                    performed a write to the database(s).
+                                    That is, the thread that called, for
+                                    example, 
+                                    
+                                    <code class="methodname">Db::put()</code>
+                                    
+                                    is the thread that writes replication messages
+                                    about that fact to the socket. 
+                            </p>
+              <p>
+                                    Note that if this write activity would
+                                    cause the thread to be blocked due to
+                                    some condition on the socket, the Replication Manager
+                                    will hand the outgoing message to the
+                                    incoming message thread, and it will
+                                    then write the message to the socket.
+                                    This prevents your database write
+                                    threads from blocking due to abnormal
+                                    network I/O conditions.
+                            </p>
+            </li>
+            <li>
+              <p>
+                                    Message processing threads are
+                                    responsible for parsing and then
+                                    responding to incoming replication
+                                    messages. Typically, a response will
+                                    include write activity to your
+                                    database(s), so these threads can be
+                                    busy performing disk I/O.
+                            </p>
+            </li>
+          </ul>
+        </div>
+        <p>
+                    Of these threads, the only ones that you have any
+                    configuration control over are the message processing
+                    threads. In this case, you can determine how many
+                    of these threads you want to run.
+            </p>
+        <p>
+                    It is always a bit of an art to decide on a thread count,
+                    but the short answer is you probably do not need more
+                    than three threads here, and it is likely that one will
+                    suffice. That said, the best thing to do is set your
+                    thread count to a fairly low number and then increase
+                    it if it appears that your application will benefit
+                    from the additional threads.
+            </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="repapp.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="repapp.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="repmgr_init_example_c.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 3. The DB Replication Manager </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Adding the Replication Manager to
+                
+                <span>RepMgr</span>
+                
+        </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

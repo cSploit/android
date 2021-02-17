@@ -1,0 +1,42 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+mkdir -p $TESTDIR $DBDIR2
+
+echo "Starting slapd on TCP/IP port $PORT2..."
+. $CONFFILTER $BACKEND < $CONFTWO > $CONF2
+$SLAPD -f $CONF2 -h $URI2 -d $LVL $TIMING > /dev/null 2>&1 &
+PID=$!
+
+echo "Using ldapsearch to retrieve all the entries..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -S "" -b "" -s base -h $LOCALHOST -p $PORT2 > $SERVER2OUT 2>&1
+	RC=$?
+	if test $RC = 1 ; then
+		echo "Waiting 5 seconds for slapd to start..."
+		sleep 5
+	fi
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	exit $RC
+fi
+
+echo ">>>>> Server2 (pid=$PID) started"
+exit 0

@@ -1,0 +1,207 @@
+.TH SLAPD-RELAY 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd\-relay \- relay backend to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The primary purpose of this
+.BR slapd (8)
+backend is to map a naming context defined in a database 
+running in the same 
+.BR slapd (8)
+instance into a virtual naming context, with attributeType
+and objectClass manipulation, if required.
+It requires the
+.BR slapo\-rwm (5)
+overlay.
+.LP
+This backend and the above mentioned overlay are experimental.
+.SH CONFIGURATION
+The following
+.B slapd.conf
+directives apply to the relay backend database.
+That is, they must follow a "database relay" line and come before any
+subsequent "backend" or "database" lines.
+Other database options are described in the
+.BR slapd.conf (5)
+manual page; only the
+.B suffix
+directive is allowed by the 
+.I relay
+backend.
+.TP
+.B relay <real naming context>
+The naming context of the database that is presented 
+under a virtual naming context.
+The presence of this directive implies that one specific database,
+i.e. the one serving the
+.BR "real naming context" ,
+will be presented under a virtual naming context.
+
+.SH MASSAGING
+The
+.B relay
+database does not automatically rewrite the naming context
+of requests and responses.
+For this purpose, the
+.BR slapo\-rwm (5)
+overlay must be explicitly instantiated, and configured
+as appropriate.
+Usually, the
+.B rwm\-suffixmassage
+directive suffices if only naming context rewriting is required.
+
+.SH ACCESS RULES
+One important issue is that access rules are based on the identity
+that issued the operation.
+After massaging from the virtual to the real naming context, the
+frontend sees the operation as performed by the identity in the
+real naming context.
+Moreover, since
+.B back\-relay
+bypasses the real database frontend operations by short-circuiting
+operations through the internal backend API, the original database
+access rules do not apply but in selected cases, i.e. when the
+backend itself applies access control.
+As a consequence, the instances of the relay database must provide
+own access rules that are consistent with those of the original
+database, possibly adding further specific restrictions.
+So, access rules in the
+.B relay
+database must refer to identities in the real naming context.
+Examples are reported in the EXAMPLES section.
+
+.SH SCENARIOS
+.LP
+If no
+.B relay
+directive is given, the 
+.I relay
+database does not refer to any specific database, but the most
+appropriate one is looked-up after rewriting the request DN
+for the operation that is being handled.
+.LP
+This allows to write carefully crafted rewrite rules that
+cause some of the requests to be directed to one database, and
+some to another; e.g., authentication can be mapped to one 
+database, and searches to another, or different target databases
+can be selected based on the DN of the request, and so.
+.LP
+Another possibility is to map the same operation to different 
+databases based on details of the virtual naming context,
+e.g. groups on one database and persons on another.
+.LP
+.SH EXAMPLES
+To implement a plain virtual naming context mapping
+that refers to a single database, use
+.LP
+.nf
+  database                relay
+  suffix                  "dc=virtual,dc=naming,dc=context"
+  relay                   "dc=real,dc=naming,dc=context"
+  overlay                 rwm
+  rwm\-suffixmassage       "dc=real,dc=naming,dc=context"
+.fi
+.LP
+To implement a plain virtual naming context mapping
+that looks up the real naming context for each operation, use
+.LP
+.nf
+  database                relay
+  suffix                  "dc=virtual,dc=naming,dc=context"
+  overlay                 rwm
+  rwm\-suffixmassage       "dc=real,dc=naming,dc=context"
+.fi
+.LP
+This is useful, for instance, to relay different databases that
+share the terminal portion of the naming context (the one that
+is rewritten).
+.LP
+To implement the old-fashioned suffixalias, e.g. mapping
+the virtual to the real naming context, but not the results
+back from the real to the virtual naming context, use
+.LP
+.nf
+  database                relay
+  suffix                  "dc=virtual,dc=naming,dc=context"
+  relay                   "dc=real,dc=naming,dc=context"
+  overlay                 rwm
+  rwm\-rewriteEngine       on
+  rwm\-rewriteContext      default
+  rwm\-rewriteRule         "dc=virtual,dc=naming,dc=context"
+                          "dc=real,dc=naming,dc=context" ":@"
+  rwm\-rewriteContext      searchFilter
+  rwm\-rewriteContext      searchEntryDN
+  rwm\-rewriteContext      searchAttrDN
+  rwm\-rewriteContext      matchedDN
+.fi
+.LP
+Note that the 
+.BR slapo\-rwm (5)
+overlay is instantiated, but the rewrite rules are written explicitly,
+rather than automatically as with the
+.B rwm\-suffixmassage
+statement, to map all the virtual to real naming context data flow,
+but none of the real to virtual.
+.LP
+Access rules:
+.LP
+.nf
+  database                mdb
+  suffix                  "dc=example,dc=com"
+  # skip...
+  access to dn.subtree="dc=example,dc=com"
+          by dn.exact="cn=Supervisor,dc=example,dc=com" write
+          by * read
+
+  database                relay
+  suffix                  "o=Example,c=US"
+  relay                   "dc=example,dc=com"
+  overlay                 rwm
+  rwm\-suffixmassage       "dc=example,dc=com"
+  # skip ...
+  access to dn.subtree="o=Example,c=US"
+          by dn.exact="cn=Supervisor,dc=example,dc=com" write
+          by dn.exact="cn=Relay Supervisor,dc=example,dc=com" write
+          by * read
+.fi
+.LP
+Note that, in both databases, the identities (the 
+.B <who> 
+clause) are in the
+.BR "real naming context" ,
+i.e.
+.BR "`dc=example,dc=com'" ,
+while the targets (the 
+.B <what> 
+clause) are in the
+.B real
+and in the
+.BR "virtual naming context" ,
+respectively.
+.SH ACCESS CONTROL
+The
+.B relay
+backend does not honor any of the access control semantics described in
+.BR slapd.access (5);
+all access control is delegated to the relayed database(s).
+Only
+.B read (=r)
+access to the
+.B entry
+pseudo-attribute and to the other attribute values of the entries
+returned by the
+.B search
+operation is honored, which is performed by the frontend.
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapo\-rwm (5),
+.BR slapd (8).

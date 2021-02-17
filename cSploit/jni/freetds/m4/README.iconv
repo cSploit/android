@@ -1,0 +1,12 @@
+The following files were taken from GNU libiconv-1.9.2 in the hope of 
+simplifying future maintenance.  
+
+
+	iconv.m4
+	lib-ld.m4
+	lib-link.m4
+	lib-prefix.m4
+
+All four are needed for AM_ICONV.
+
+$Id: README.iconv,v 1.1 2006-03-28 00:05:42 jklowden Exp $

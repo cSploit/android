@@ -1,0 +1,326 @@
+#!/bin/sh
+#
+#  This library is part of the FirebirdSQL project
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License, or (at your option) any later version.
+#  You may obtain a copy of the Licence at
+#  http://www.gnu.org/licences/lgpl.html
+#
+#  As a special exception this file can also be included in modules
+#  with other source code as long as that source code has been
+#  released under an Open Source Initiative certificed licence.
+#  More information about OSI certification can be found at:
+#  http://www.opensource.org
+#
+#  This module is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Lesser General Public Licence for more details.
+#
+#  This module was created by members of the firebird development
+#  team.  All individual contributions remain the Copyright (C) of
+#  those individuals and all rights are reserved.  Contributors to
+#  this file are either listed below or can be obtained from a CVS
+#  history command.
+#
+#   Created by: Chris Knight <chris@e-easy.com.au>
+#
+#   Contributor(s):
+#  	James K. Lowden <jklowden@schemamania.org>
+#
+#
+
+#  Install script for FirebirdSQL database engine
+
+#------------------------------------------------------------------------
+
+#
+# Copy file if it exists
+#
+copyIfExists() {
+   OldFile=$1
+   NewFile=$2
+
+   if [ -f $OldFile ]
+     then
+       cp $OldFile $NewFile
+   fi
+
+}
+
+InstallFirebirdPrefix=@prefix@
+InstallPrefix=${InstallFirebirdPrefix%/firebird}
+unset InstallFirebirdPrefix
+
+if [ -d @prefix@ ]; then
+	echo Backing up @prefix@ to $InstallPrefix/firebird.old
+	if [ -d $InstallPrefix/firebird.old ]; then
+		rm -rf $InstallPrefix/firebird.old
+	fi
+	cp -Rp @prefix@ $InstallPrefix/firebird.old
+fi
+
+if [ `id -u` -ne 0 ]; then
+	echo; echo "You must be root to run this step!"; echo; echo
+	exit 1
+fi
+
+#
+#  Establish the values of the Firebird user and group ids
+#
+echo Establishing user 'firebird'
+fbGID=0
+if ! groupinfo -e firebird; then # create the group
+	fbGID=90
+	while [ ! -z `id -gn $fbGID 2>/dev/null` ]
+	do
+		fbGID=$(($fbGID+1))
+	done
+	#  Create the Firebird group
+	groupadd -v -g $fbGID firebird
+else
+	fbGID=$(groupinfo firebird |grep ^gid |awk '{print $2}')
+fi
+
+# make sure we have the group
+groupinfo -e firebird
+if [ $? -eq 0 -a $fbGID -ne 0 ]; then
+	echo "user 'firebird' has gid $fbGID".
+else
+	echo "Unable to create group 'firebird' - please create it manually."
+	echo "You might also wish to create the 'firebird' user at this time, as well."
+	exit 1
+fi
+
+#
+#  Create the Firebird user, if not extant
+#
+fbUID=0
+if ! userinfo -e firebird; then # create the user
+	fbUID=90
+	while [ ! -z `id -un $fbUID 2>/dev/null` ]
+	do
+		fbUID=$(($fbUID+1))
+	done
+	if [ ! -d @prefix@ ]; then
+		$m=-m
+	fi
+	useradd -v -u $fbUID -g $fbGID -s /bin/sh \
+		$m -d @prefix@ \
+		-c "Firebird Database Administrator" \
+		firebird
+else
+	fbUID=`id -u firebird 2>/dev/null`
+fi
+
+# Make sure we have the user.
+userinfo -e firebird
+if [ $? -eq 0 -a $fbUID -ne 0 ]; then
+	echo "user 'firebird' has uid $fbUID".
+else
+	echo "Unable to create user 'firebird' - please create it manually."
+	exit 1
+fi
+
+# Making an assumption that this program is being run in the gen directory
+BuildRootDir=..
+BuiltFBDir=./firebird  # Location of the just-built fb.
+DestDir=@prefix@
+
+# The guts of the tranfer of files and other directories
+# (mkdir -p <dirname> does not elicit an error message if the <dirname> exists.)
+echo Installing binaries
+for D in "bin examples help include intl doc/sql.extensions UDF"
+do
+	mkdir -p $DestDir/$D || exit
+done
+
+cp -f $BuiltFBDir/bin/fb_inet_server $DestDir/bin/fb_smp_server  || exit
+cp $BuiltFBDir/bin/gbak $DestDir/bin/gbak  || exit
+cp $BuiltFBDir/bin/gds_drop $DestDir/bin/gds_drop  || exit
+copyIfExists $BuiltFBDir/bin/fb_lock_mgr $DestDir/bin/fb_lock_mgr  || exit
+copyIfExists $BuiltFBDir/bin/fb_lock_print $DestDir/bin/fb_lock_print  || exit
+copyIfExists $BuiltFBDir/bin/gds_pipe $DestDir/bin/gds_pipe  || exit
+cp $BuiltFBDir/bin/gfix $DestDir/bin/gfix  || exit
+cp $BuiltFBDir/bin/gpre $DestDir/bin/gpre  || exit
+cp $BuiltFBDir/bin/gsec $DestDir/bin/gsec  || exit
+copyIfExists $BuiltFBDir/bin/gsplit $DestDir/bin/gsplit  || exit
+cp $BuiltFBDir/bin/gstat $DestDir/bin/gstat  || exit
+copyIfExists $BuiltFBDir/bin/isc4.gbak $DestDir/bin/isc4.gbk  || exit
+cp $BuiltFBDir/bin/isql $DestDir/bin/isql  || exit
+cp $BuiltFBDir/bin/qli $DestDir/bin/qli  || exit
+
+# Copy examples only if we have them
+exampleFiles=`find $BuiltFBDir/examples/ -type f -print`
+if [ -z "$exampleFiles" ]; then
+	echo "Example files have not been built!"
+else
+	echo Installing examples
+	for i in $exampleFiles
+	do
+		cp $i $DestDir/examples || exit
+	done
+fi
+
+copyIfExists $BuiltFBDir/help/help.gbak $DestDir/help  || exit
+cp $BuiltFBDir/help/help.fdb $DestDir/help  || exit
+
+cp $BuiltFBDir/firebird.msg $DestDir/firebird.msg  || exit
+cp $BuiltFBDir/security2.fdb $DestDir/security2.fdb.sample || exit
+
+cp $BuiltFBDir/include/*.h $DestDir/include || exit
+
+cp -Rf $BuiltFBDir/lib/libfbembed.so* $DestDir/lib || exit
+cp -Rf $BuiltFBDir/lib/libfbclient.so* $DestDir/lib || exit
+
+cp -f $BuiltFBDir/lib/libib_util.so $DestDir/lib/libib_util.so  || exit
+
+cp $BuiltFBDir/intl/libfbintl.so $DestDir/intl/fbintl || exit
+cp $BuiltFBDir/UDF/ib_udf.so $DestDir/UDF/ || exit
+cp $BuiltFBDir/UDF/fbudf.so $DestDir/UDF/ || exit
+
+# Copy the sql-declarations into the UDF-directory
+cp $BuildRootDir/src/extlib/ib_udf.sql $DestDir/UDF/ || exit
+cp $BuildRootDir/src/extlib/fbudf/fbudf.sql $DestDir/UDF/ || exit
+
+# Note that this copies files from outside the build tree.
+echo Installing documentation
+cp $BuildRootDir/doc/README.*  		$DestDir/doc || exit
+cp $BuildRootDir/doc/WhatsNew 		$DestDir || exit
+cp $BuildRootDir/doc/README.user 	$DestDir/README	|| exit
+
+SQLEXTENSIONS=`find $BuildRootDir/doc/sql.extensions ! -type d | grep -v CVS`
+cp ${SQLEXTENSIONS}	$DestDir/doc/sql.extensions || exit
+
+cp $BuiltFBDir/misc/firebird.conf $DestDir/firebird.conf.sample || exit
+
+echo "#" >> $DestDir/databases.conf.sample
+echo "# List of known database aliases" >> $DestDir/databases.conf.sample
+echo "# ------------------------------" >> $DestDir/databases.conf.sample
+echo "#" >> $DestDir/databases.conf.sample
+echo "# Examples:" >> $DestDir/databases.conf.sample
+echo "#" >> $DestDir/databases.conf.sample
+echo "# employee = /$DestDir/examples/employee.fdb" >> $DestDir/databases.conf.sample
+echo "#" >> $DestDir/databases.conf.sample
+
+
+echo Setting ownership and permissions on installed files
+
+chown -R firebird:firebird @prefix@ || exit
+chmod -R o= @prefix@ || exit
+
+# Now fix up the mess.
+
+# fix up directories
+for i in `find @prefix@ -print`
+do
+	FileName=$i
+	if [ -d $FileName ]; then
+		chmod u=rwx,go=rx $FileName || exit
+	fi
+done
+
+# make lib ldconfig-compatible
+chown -R root:wheel @prefix@/lib || exit
+
+# make the following read-only
+chmod -R a=r @prefix@/WhatsNew || exit
+for i in `find @prefix@/doc -type f -print`
+do
+	chmod a=r $i || exit
+done
+
+chmod -R a=r @prefix@/include/* || exit
+chmod -R a=r @prefix@/intl/* || exit
+
+chmod -R ug=rx,o= @prefix@/UDF/* || exit
+chmod -R ug=rx,o= @prefix@/intl/fbintl || exit
+chmod -R a=rx @prefix@/lib/* || exit
+
+
+cd @prefix@/bin
+for i in `ls`
+do
+	chmod ug=rx,o= $i || exit
+done
+
+chmod a=rx isql qli
+
+# SUID is needed for running server programs.
+for i in fb_lock_mgr gds_drop fb_smp_server
+do
+	if [ -f $i ]; then
+		chmod ug=rx,o= $i || exit
+		chmod ug+s $i || exit
+	fi
+done
+
+
+cd @prefix@
+
+# Lock files
+
+for i in fb_guard
+do
+	FileName=$i
+	touch $FileName
+	chmod ug=rw,o= $FileName || exit
+	chown firebird:firebird $FileName || exit
+done
+
+touch firebird.log
+chown firebird:firebird firebird.log || exit
+chmod ug=rw,o= firebird.log || exit
+chmod a=r firebird.msg README || exit
+chown root:wheel *.sample || exit
+chmod ug=r,o= *.sample || exit
+
+# make databases writable by firebird only
+# local database connections are not a good idea
+chmod ug=rw,o= examples/*.fdb || exit
+chmod ug=rw,o= help/*.fdb || exit
+
+# install the samples if they don't exist
+[ -f databases.conf ] || install -o firebird -g firebird -m 440 databases.conf.sample databases.conf
+[ -f firebird.conf ] || install -o firebird -g firebird -m 440 firebird.conf.sample firebird.conf
+[ -f security2.fdb ] || install -o firebird -g firebird -m 660 security2.fdb.sample security2.fdb
+
+#
+# add the gds service, if need be, and restart inetd
+#
+if ! grep ^@FB_SERVICE_NAME@ /etc/services
+then
+echo Adding Firebird Database Remote Protocol to /etc/services
+cat >>/etc/services <<EOF
+@FB_SERVICE_NAME@		@FB_SERVICE_PORT@/tcp  #Firebird Database Remote Protocol
+EOF
+fi
+
+if ! grep ^@FB_SERVICE_NAME@ /etc/inetd.conf
+then
+echo Adding firebird to /etc/inetd.conf
+cat >>/etc/inetd.conf <<EOF
+@FB_SERVICE_NAME@	stream	tcp	nowait	firebird	@prefix@/bin/fb_smp_server  fb_smp_server
+EOF
+fi
+
+if [ -f /var/run/inetd.pid ]
+then
+	echo Reloading inetd
+	/etc/rc.d/inetd reload
+fi
+
+# shared lib startup script
+if [ -d $InstallPrefix/etc/rc.d ]
+then
+	echo Installing $InstallPrefix/etc/rc.d/000.firebird.sh
+	(
+	echo "#! /bin/sh"; echo "[ -d @prefix@/lib ] && /sbin/ldconfig -m @prefix@/lib"
+	) > $InstallPrefix/etc/rc.d/000.firebird.sh
+	chmod a=rx $InstallPrefix/etc/rc.d/000.firebird.sh
+fi
+
+echo Done installing Firebird

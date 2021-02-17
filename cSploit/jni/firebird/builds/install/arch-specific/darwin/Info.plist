@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleGetInfoString</key>
+	<string>_MFB_BUILD_SUFFIX_</string>
+	<key>CFBundleIdentifier</key>
+	<string>org.firebirdsql.Firebird</string>
+	<key>CFBundleName</key>
+	<string>_MFB_BUILD_SUFFIX_</string>
+	<key>CFBundleShortVersionString</key>
+	<string>_SMFB_BUILD_SUFFIX_</string>
+	<key>IFMajorVersion</key>
+	<integer>_MAJOR_VERS_</integer>
+	<key>IFMinorVersion</key>
+	<integer>_MINOR_VERS_</integer>
+	<key>IFPkgFlagAllowBackRev</key>
+	<false/>
+	<key>IFPkgFlagAuthorizationAction</key>
+	<string>AdminAuthorization</string>
+	<key>IFPkgFlagDefaultLocation</key>
+	<string>/Library/Frameworks</string>
+	<key>IFPkgFlagInstallFat</key>
+	<false/>
+	<key>IFPkgFlagIsRequired</key>
+	<true/>
+	<key>IFPkgFlagRelocatable</key>
+	<true/>
+	<key>IFPkgFlagRestartAction</key>
+	<string>NoRestart</string>
+	<key>IFPkgFlagRootVolumeOnly</key>
+	<false/>
+	<key>IFPkgFlagUpdateInstalledLanguages</key>
+	<false/>
+	<key>IFPkgFormatVersion</key>
+	<real>0.10000000149011612</real>
+</dict>
+</plist>

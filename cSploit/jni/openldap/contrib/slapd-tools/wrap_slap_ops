@@ -1,0 +1,162 @@
+#!/usr/bin/perl -wn0777
+# wrap_slap_ops - Help update code to use SLAP_OP() & co.
+#
+# This work is part of OpenLDAP Software <http://www.openldap.org/>.
+#
+# Copyright 2011-2014 The OpenLDAP Foundation.
+# Portions Copyright 2011-2013 Hallvard B. Furuseth.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted only as authorized by the OpenLDAP
+# Public License.
+#
+# A copy of this license is available in the file LICENSE in the
+# top-level directory of the distribution or, alternatively, at
+# <http://www.OpenLDAP.org/license.html>.
+
+use strict;
+
+sub usage() {
+	warn "Usage: $0 {-l | -u | -U<num>} {file | dir}...
+
+Update slapd source code to wrap LDAP operation calls in the debug
+macros SLAP_OP() & co.  They compile like the old code by default.
+Define USE_RS_ASSERT to enable asserts which verify the SlapReply.
+See servers/slapd/result.c.
+
+Options:
+  -u, -U<n> Output unidiffs with n lines of context (-u = default for diff).
+  -l        List files which would change. Show remaining cases on stderr.\n";
+	exit(1);
+}
+
+#### File/option handling. Skips symlinks, handles filenames =~ /\.[ch]+p*$/i.
+
+sub ls_R {
+    map { -l $_ ? () : -d _ ? ls_R(<$_/*>) : /\.[ch]+p*$/i ? $_ : () } @_;
+}
+
+use constant Mode => shift(@ARGV) || "";
+use vars qw($ccnt $rcnt);
+INIT {
+	usage() unless Mode =~ /^-(l|[uU]\d*)$/ && ($ARGV[0]||"") =~ /^[^\-]/;
+	exit(0) unless @ARGV = ls_R(@ARGV); # Expand ARGV, exit if no files
+	$| = 1;
+	$ccnt = $rcnt = 0;
+}
+
+sub file_result( $$ ) {
+	my($contents, $changed) = @_;
+	$ccnt++ if $changed;
+	$rcnt += scalar( my @rest = remaining($contents) );
+	if (Mode eq "-l") {
+		print "$ARGV\n" if $changed;
+		print STDERR "$ARGV:\t$_\n" foreach @rest;
+	} elsif ($changed) {
+		(my $file = "$ARGV") =~ s%^-%./-%;
+		print "Index: $file\n";
+		(open(D, "|-", "diff", Mode, $file, "-")
+		 && (print D $contents)
+		 && (close(D) || $! == 0)) or die "$0: diff failed: $!\n";
+	}
+}
+
+END {
+	print STDERR <<EOMSG;
+$ccnt files to change. $rcnt suspicious lines remain. (Expect three in slapd).
+EOMSG
+}
+
+#### Edit the contents of a file
+
+use vars qw($obj_re %addr %func2op $func_re $todo_re);
+INIT {
+	$obj_re  = qr/(?:\w+ (?:\s* (?:->|\.) \s* \w+)*?)/x;
+	%addr    = ("." => "&", "->" => ""); # x.y => (&x)->y, x->y => x->y
+	%func2op = map { /(\w+) \s+ (?= .*?=>\s* (\w+))/gx } <DATA>;
+	$func_re = '\b(?=b[ei]_)(?:' . join("|", keys %func2op) . ')\b';
+	my %both = (%func2op, reverse %func2op);
+	$todo_re = '\b(?=[bo][eip]_)(?:' . join("|", keys %both) . ')\b';
+}
+next if !/$todo_re/;
+my $orig = "$_";
+
+# x->func(op, rs)  ==>  slap_bi_op( x, <enum op_func>, op, rs)
+# x. func(op, rs)  ==>  slap_bi_op(&x, <enum op_func>, op, rs)
+s%(	                            # 1: entire match: "<delim><function>("
+	((?: [\)!=\;{}\\] | \*/ | \b if\s*\( | \b return \b ) \s*) # 2: delim
+	(\(\s* (?:\* \s*)?)?        # 3: optional "(*" or "(" in (*f)()
+	($obj_re) \s* (->|\.)  \s*  # 4: object,          5: "->" or "."
+	(?=(b[ie]_))($func_re) \s*  # 6: "bi_" or "be_",  7: function
+	(\)\s*)?                    # 8: optional ")" in (*f),
+    (\(\s*)                     # 9: "(" + whitespace
+)% (!$3) == (!$8) ? "$2slap_$6op$9$addr{$5}$4, $func2op{$7}, " : $1 %egox;
+
+# (&x->bi_op_bind)[which](op, rs)  ==>  slap_bi_op(x, which, op, rs)
+#    (&x->be_bind)[which](op, rs)  ==>  slap_be_op(x, which, op, rs)
+s/\(&(\w+)->b(?=([ei]))(?:e|i_op)_bind\)\[\s* (\w+) \s*\] \((\s*) ([^()]*)\)
+ /slap_b$2_op($4$1, $3, $5)/gox;
+
+# slap_bi_op(x->bd_info, which, op, rs)  ==>  slap_be_op( x, which, op, rs)
+# slap_bi_op(x. bd_info, which, op, rs)  ==>  slap_be_op(&x, which, op, rs)
+s/\b slap_bi_op (\(\s*) ($obj_re) \s* (->|\.) \s* bd_info \s*,
+ /slap_be_op$1$addr{$3}$2,/gox;
+
+# slap_be_op(op->o_bd, which, &op, rs)   ==>  SLAP_OP(which,  op, rs)
+# slap_be_op(op. o_bd, which, &op, rs)   ==>  SLAP_OP(which, &op, rs)
+s/\b(slap_be_op (\(\s*) ($obj_re) \s*(->|\.)\s* o_bd, \s (\w+, \s (&?)\3,))
+ / $addr{$4} eq $6 ? "SLAP_OP$2$5" : die "$ARGV: Bad syntax: $1\n" /egox;
+
+my $changed = $_ ne $orig;
+
+# When changing a file, do some whitespace cleanup too
+if ($changed) {
+	s/\b ((SLAP_OP|slap_b[ei](func)?_op) \b .*?) [\ \t]+$ /$1/gmx;
+	s/\A\s*\n//;
+	s/\s*\z/\n/;
+}
+
+file_result($_, $changed);
+
+####
+
+# Return remaining lines that contain operation method names
+sub remaining {
+	my($contents) = @_;
+	return $contents !~ /$func_re/o ? () : grep {
+		!/^\# [ \t]* define \s+ ($func_re|slap_bi_op\b) /x &&
+		# Skip "if ( (&bi->bi_op_bind)[ which ] )" and variants
+		!/^(\} \s* else \s*)? if \s* \( \s*
+			\(& (\w+ | \(\s*\w+\s*=\s*$obj_re\s*\)) -> bi_op_bind\)
+			\s* \[ \s* \w+ \s* \]
+ 			\s* [&|\)]/ox;
+	} $contents =~ m% ^[\ \t]* (?=\S) (
+		# The line contains a member opfunction
+		.*? (?:->|\.) \s* $func_re
+
+		# Skip if the member function is assigned, compared,
+		# 'and/or'ed, followed by a word (this is a comment), or by
+		# ') {' or ') word' (function is the boolean in an if/while).
+		(?! \s* (?: [!=&|\w] | \)\s*[\{\w] ))
+
+		.*?
+	) \s*?$ %gmox;
+}
+
+# %func2op: Member functions => slap_operation_t
+__DATA__
+be_bind             bi_op_bind          => op_bind
+be_unbind           bi_op_unbind        => op_unbind
+be_search           bi_op_search        => op_search
+be_compare          bi_op_compare       => op_compare
+be_modify           bi_op_modify        => op_modify
+be_modrdn           bi_op_modrdn        => op_modrdn
+be_add              bi_op_add           => op_add
+be_delete           bi_op_delete        => op_delete
+be_abandon          bi_op_abandon       => op_abandon
+be_extended         bi_extended         => op_extended
+be_cancel           bi_op_cancel        => op_cancel
+be_operational      bi_operational      => op_aux_operational
+be_chk_referrals    bi_chk_referrals    => op_aux_chk_referrals
+be_chk_controls     bi_chk_controls     => op_aux_chk_controls

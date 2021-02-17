@@ -1,0 +1,39 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 7c1d1c84-647b-4ca5-9d20-057768670fee
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2009-06-29T12:22:48.566680Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 104
+Content-length: 104
+
+K 10
+svn:author
+V 6
+kamesh
+K 8
+svn:date
+V 27
+2009-06-29T12:23:55.134926Z
+K 7
+svn:log
+V 4
+wwww
+PROPS-END
+
+Node-path: full
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 0
+Node-copyfrom-path: 
+
+

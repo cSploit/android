@@ -1,0 +1,50 @@
+#!/usr/bin/perl -lpw
+
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+# USAGE:
+#   sqlite3 .svn/wc.db .dump | $0
+#   $0 /path/to/wc
+#   $0 /path/to/wc/.svn/wc.db
+# DOES:
+#   decodes blobs (eg, property skels) and dates to human-readable form
+# REQUIRES:
+#   sqlite3(1) (second and third usage forms only)
+
+BEGIN {
+  # locate sqlite3
+  my $sqlite3 = $ENV{SQLITE3} || "sqlite3";
+  # set stdin
+  my $file = shift;
+  $file = "." if -t and not $file;
+  if ($file) {
+    $file .= "/.svn/wc.db" if -e "$file/.svn/wc.db";
+    close STDIN;
+    open STDIN, "-|", $sqlite3, $file, '.dump';
+  } else {
+    # filter stdin to stdout
+  }
+}
+
+# X'68656C6C6F' => "hello"
+1 while s/X'([0-9A-F]{2})/chr(hex $1) . q[X']/e;
+s/X''//g;
+s/\n/\\n/g; # multiline props
+
+# 1288312835000000 => "Fri Oct 29 02:40:35 2010"
+s/(?<=,)(\d\d\d\d\d\d\d\d\d\d)\d\d\d\d\d\d(?=,)/sprintf '"%s"', scalar localtime $1/eg;

@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>BFILE C/C++ Objects and Functions</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="bfile-extension.html" title="Appendix A. Using the BFILE Extension" />
+    <link rel="prev" href="bfile-sql.html" title="BFILE SQL Objects and Functions" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">BFILE C/C++ Objects and Functions</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="bfile-sql.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix A. Using the BFILE Extension</th>
+          <td width="20%" align="right"> </td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="bfile-c"></a>BFILE C/C++ Objects and Functions</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-c.html#sqlite3_column_bfile">sqlite3_column_bfile</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-c.html#sqlite3_bfile_open">sqlite3_bfile_open</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-c.html#sqlite3_bfile_close">sqlite3_bfile_close</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-c.html#sqlite3_bfile_is_open">sqlite3_bfile_is_open</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-c.html#sqlite3_bfile_read">sqlite3_bfile_read</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-c.html#sqlite3_bfile_file_exists">sqlite3_bfile_file_exists</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-c.html#sqlite3_bfile_size">sqlite3_bfile_size</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-c.html#sqlite3_bfile_final">sqlite3_bfile_final</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+            The BFILE extension can optionally make available to you some
+            additional C language data types and functions for use with the
+            SQLite C/C++ interface. These are available to you only if
+            you take the proper steps when you compile Berkeley DB. See the
+            <em class="citetitle">Berkeley DB Installation and Build Guide</em> for more information.
+        </p>
+      <p>
+            Once enabled, the BFILE C extension makes the following new
+            structure available to you:
+        </p>
+      <pre class="programlisting">typedef struct sqlite3_bfile sqlite3_bfile;</pre>
+      <p>
+            This structure serves as the BFILE handle when you are using
+            the BFILE extension along with the SQLite C/C++ interface.
+        </p>
+      <p>
+            In addition to the new structure, you can also use the
+            following new C functions:
+        </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="sqlite3_column_bfile"></a>sqlite3_column_bfile</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">int 
+sqlite3_column_bfile(sqlite3_stmt *pStmt, int iCol, 
+                     sqlite3_bfile **ppBfile); </pre>
+        <p>
+                Returns a result set from a query against a column of type
+                BFILE.
+            </p>
+        <p>
+                On success, <code class="literal">SQLITE_OK</code> is returned and
+                the new BFILE handle is written to 
+                <span class="bold"><strong>ppBfile</strong></span>. Otherwise, 
+                <code class="literal">SQLITE_ERROR</code> is returned.
+            </p>
+        <p>
+                Parameters are:
+            </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                        <span class="bold"><strong>pStmt</strong></span>
+                    </p>
+              <p>
+                        Pointer to the prepared statement that the function
+                        is evaluating. The statement is created
+                        using <code class="literal">sqlite3_prepare_v2()</code>
+                        or one of its variants.
+                    </p>
+              <p>
+                        If this statement does not point to a valid row,
+                        the result is undefined.
+                    </p>
+            </li>
+            <li>
+              <p>
+                        <span class="bold"><strong>iCol</strong></span>
+                    </p>
+              <p>
+                        Index of the column for which information should be
+                        returned. The left-most column of the result set
+                        is index <code class="literal">0</code>. Use
+                        <code class="literal">sqlite3_column_count()</code> to discover
+                        the number of columns in the result set.
+                    </p>
+              <p>
+                        If the column index is out of range, the result is
+                        undefined.
+                    </p>
+            </li>
+            <li>
+              <p>
+                        <span class="bold"><strong>ppBfile</strong></span>
+                    </p>
+              <p>
+                        The BFILE handle that you are using for the query.
+                        This pointer is valid only until 
+                        <code class="literal">sqlite3_step()</code>,
+                        <code class="literal">sqlite3_reset()</code> or
+                        <code class="literal">sqlite3_finalize()</code> have been
+                        called.
+                    </p>
+              <p>
+                        The memory space used to hold this handle is freed by 
+                        <a class="xref" href="bfile-c.html#sqlite3_bfile_final" title="sqlite3_bfile_final">sqlite3_bfile_final</a>
+                        Do not pass these pointers to <code class="literal">sqlite3_free()</code>.
+                    </p>
+            </li>
+          </ul>
+        </div>
+        <p>
+                This function can be called successfully only if all of the
+                following conditions are true. If any of the following are
+                not true, the result is undefined:
+            </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                        The most recent call to
+                        <code class="literal">sqlite3_step()</code> has returned
+                        <code class="literal">SQLITE_ROW</code>. 
+                    </p>
+            </li>
+            <li>
+              <p>
+                        Neither <code class="literal">sqlite3_reset()</code> nor
+                        <code class="literal">sqlite3_finalize()</code> have been
+                        called since the last time
+                        <code class="literal">sqlite3_step()</code> was called.
+                    </p>
+            </li>
+            <li>
+              <p>
+                        <code class="literal">sqlite3_step()</code>,
+                        <code class="literal">sqlite3_reset()</code> or
+                        <code class="literal">sqlite3_finalize()</code> have not been
+                        called from a different thread while this routine
+                        is pending.
+                    </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="sqlite3_bfile_open"></a>sqlite3_bfile_open</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">int
+sqlite3_bfile_open(sqlite3_bfile *pBfile); </pre>
+        <p>
+                Opens a file for incremental read.
+            </p>
+        <p>
+                On success, <code class="literal">SQLITE_OK</code> is returned.
+                Otherwise, <code class="literal">SQLITE_ERROR</code> is returned.
+            </p>
+        <p>
+                To avoid a resource leak, every opened BFILE handle should
+                eventually be closed with the
+                <a class="xref" href="bfile-c.html#sqlite3_bfile_close" title="sqlite3_bfile_close">sqlite3_bfile_close</a>
+                function.  Note that <span class="bold"><strong>pBfile</strong></span> 
+                is always initialized such that it is always safe to invoke
+                <code class="literal">sqlite_bfile_close()</code> against it,
+                regardless of the success or failure of this function.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="sqlite3_bfile_close"></a>sqlite3_bfile_close</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">int
+sqlite3_bfile_close(sqlite3_bfile *pBfile); </pre>
+        <p>
+                Closes an open BFILE handle. The BFILE is closed
+                unconditionally. Even if this function returns an error,
+                the BFILE is still closed.
+            </p>
+        <p>
+                Calling this routine with a null pointer (such as would be
+                returned by failed call to sqlite3_column_bfile()) is a
+                harmless non-operation.
+            </p>
+        <p>
+                On success, <code class="literal">SQLITE_OK</code> is returned.
+                Otherwise, <code class="literal">SQLITE_ERROR</code> is returned.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="sqlite3_bfile_is_open"></a>sqlite3_bfile_is_open</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">int
+sqlite3_bfile_is_open(sqlite3_bfile *pBfile, int *open); </pre>
+        <p>
+                Checks whether a BFILE handle is open. The
+                <code class="literal">open</code> parameter is set to 1 if the file
+                is open, otherwise it is 0.
+            </p>
+        <p>
+                On success, <code class="literal">SQLITE_OK</code> is returned.
+                Otherwise, <code class="literal">SQLITE_ERROR</code> is returned.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="sqlite3_bfile_read"></a>sqlite3_bfile_read</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">int 
+sqlite3_bfile_read(sqlite3_bfile *pBfile, void *oBuff, int nSize, 
+                   int iOffset, int *nRead); </pre>
+        <p>
+                This function is used to read data from an opened BFILE
+                handle into a caller-supplied buffer. 
+            </p>
+        <p>
+                On success, <code class="literal">SQLITE_OK</code> is returned, the
+                data that has been read is written to the output buffer,
+                <span class="bold"><strong>oBuff</strong></span>,
+                and the amount of data written to the buffer is recorded in
+                <span class="bold"><strong>nRead</strong></span>.
+                Otherwise, <code class="literal">SQLITE_ERROR</code> is returned.
+            </p>
+        <p>
+                Parameters are:
+            </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                        <span class="bold"><strong>pBfile</strong></span>
+                    </p>
+              <p>
+                        The BFILE handle from which the data is read.
+                    </p>
+              <p>
+                        This function only works on a BFILE handle which
+                        has been created by a prior successful call to 
+                        <a class="xref" href="bfile-c.html#sqlite3_bfile_open" title="sqlite3_bfile_open">sqlite3_bfile_open</a>
+                        and which has not been closed by
+                        <a class="xref" href="bfile-c.html#sqlite3_bfile_close" title="sqlite3_bfile_close">sqlite3_bfile_close</a>.
+                        Passing any other pointer in to this function
+                        results in undefined and probably undesirable
+                        behavior.
+                    </p>
+            </li>
+            <li>
+              <p>
+                        <span class="bold"><strong>oBuff</strong></span>
+                    </p>
+              <p>
+                        The buffer used to contain the data that is read
+                        from <span class="bold"><strong>pBfile</strong></span>. It
+                        must be at least <span class="bold"><strong>nSize</strong></span>
+                        bytes in size.
+                    </p>
+            </li>
+            <li>
+              <p>
+                        <span class="bold"><strong>nSize</strong></span>
+                    </p>
+              <p>
+                        The amount of data, in bytes, to read from the
+                        BFILE.
+                    </p>
+            </li>
+            <li>
+              <p>
+                        <span class="bold"><strong>iOffset</strong></span>
+                    </p>
+              <p>
+                        The offset from the beginning of the file where the
+                        read operation is to begin.
+                    </p>
+            </li>
+            <li>
+              <p>
+                        <span class="bold"><strong>nRead</strong></span>
+                    </p>
+              <p>
+                        Contains the amount of data, in bytes, actually
+                        written to buffer <span class="bold"><strong>oBuff</strong></span>
+                        once the read operation is completed.
+                    </p>
+            </li>
+          </ul>
+        </div>
+        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+          <h3 class="title">Note</h3>
+          <p>
+                    The size of the BFILE can be determined using the
+                    <a class="xref" href="bfile-c.html#sqlite3_bfile_size" title="sqlite3_bfile_size">sqlite3_bfile_size</a>
+                    function.
+                </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="sqlite3_bfile_file_exists"></a>sqlite3_bfile_file_exists</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">int
+sqlite3_bfile_file_exists(sqlite3_bfile *pBfile, int *exist); </pre>
+        <p>
+                Checks whether a BFILE exists. The
+                <code class="literal">exists</code> parameter is set to 1 if the file
+                is exists, otherwise it is 0.
+            </p>
+        <p>
+                On success, <code class="literal">SQLITE_OK</code> is returned.
+                Otherwise, <code class="literal">SQLITE_ERROR</code> is returned.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="sqlite3_bfile_size"></a>sqlite3_bfile_size</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">int
+sqlite3_bfile_size(sqlite3_bfile *pBfile, off_t *size); </pre>
+        <p>
+                Returns the size of the BFILE, in bytes.
+            </p>
+        <p>
+                On success, <code class="literal">SQLITE_OK</code> is returned, and
+                <span class="bold"><strong>size</strong></span> is set to the size of
+                the BFILE, in bytes.
+                Otherwise, <code class="literal">SQLITE_ERROR</code> is returned.
+            </p>
+        <p>
+                This function only works on a BFILE handle which
+                has been created by a prior successful call to 
+                <a class="xref" href="bfile-c.html#sqlite3_column_bfile" title="sqlite3_column_bfile">sqlite3_column_bfile</a>
+                and which has not been finalized by
+                <a class="xref" href="bfile-c.html#sqlite3_bfile_final" title="sqlite3_bfile_final">sqlite3_bfile_final</a>.
+                Passing any other pointer in to this function
+                results in undefined and probably undesirable
+                behavior.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="sqlite3_bfile_final"></a>sqlite3_bfile_final</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">int
+sqlite3_bfile_final(sqlite3_bfile *pBfile); </pre>
+        <p>
+                Frees a BFILE handle.
+            </p>
+        <p>
+                On success, <code class="literal">SQLITE_OK</code> is returned.
+                Otherwise, <code class="literal">SQLITE_ERROR</code> is returned.
+            </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="bfile-sql.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="bfile-extension.html">Up</a>
+          </td>
+          <td width="40%" align="right"> </td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">BFILE SQL Objects and Functions </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

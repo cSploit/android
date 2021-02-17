@@ -1,0 +1,313 @@
+--- extfunc.c.orig	2010-04-09 09:30:28.000000000 +0200
++++ extfunc.c	2010-04-09 09:24:27.000000000 +0200
+@@ -116,7 +116,6 @@
+ #define HAVE_COSH 1
+ #define HAVE_TANH 1
+ #define HAVE_LOG10 1
+-#define HAVE_ISBLANK 1
+ #define SQLITE_SOUNDEX 1
+ #define HAVE_TRIM 1		/* LMH 2007-03-25 if sqlite has trim functions */
+ 
+@@ -127,7 +126,6 @@
+ #include "sqlite3.h"
+ #endif
+ 
+-#include <ctype.h>
+ /* relicoder */
+ #include <math.h>
+ #include <string.h>
+@@ -160,40 +158,39 @@
+ typedef struct map{
+   node *base;
+   cmp_func cmp;
+-  short free;
+ } map;
+ 
+ /*
+ ** creates a map given a comparison function
+ */
+-map map_make(cmp_func cmp);
++static map map_make(cmp_func cmp);
+ 
+ /*
+ ** inserts the element e into map m
+ */
+-void map_insert(map *m, void *e);
++static void map_insert(map *m, void *e);
+ 
+ /*
+ ** executes function iter over all elements in the map, in key increasing order
+ */
+-void map_iterate(map *m, map_iterator iter, void* p);
++static void map_iterate(map *m, map_iterator iter, void* p);
+ 
+ /*
+ ** frees all memory used by a map
+ */
+-void map_destroy(map *m);
++static void map_destroy(map *m);
+ 
+ /*
+ ** compares 2 integers
+ ** to use with map_make
+ */
+-int int_cmp(const void *a, const void *b);
++static int int_cmp(const void *a, const void *b);
+ 
+ /*
+ ** compares 2 doubles
+ ** to use with map_make
+ */
+-int double_cmp(const void *a, const void *b);
++static int double_cmp(const void *a, const void *b);
+ 
+ #endif /* _MAP_H_ */
+ 
+@@ -244,6 +241,26 @@
+ 3, 3, 3, 3, 3, 3, 3, 3,     4, 4, 4, 4, 4, 4, 4, 4,
+ };
+ 
++/*
++** Own (ASCII only) implementation of toupper(), tolower(),
++** and isalpha()
++*/
++
++static int toupper(int c){
++  if ((c>='a') && (c<='z')) return c-0x20;
++  return c;
++}
++
++static int tolower(int c){
++  if ((c>='A') && (c<='Z')) return c+0x20;
++  return c;
++}
++
++static int isalpha(int c){
++  if ((c>='A') && (c<='Z')) return 1;
++  if ((c>='a') && (c<='z')) return 1;
++  return 0;
++}
+ 
+ /*
+ ** This table maps from the number of trailing bytes in a UTF-8 character
+@@ -360,7 +377,7 @@
+       if (errno == 0) {\
+         sqlite3_result_double(context, val);\
+       } else {\
+-        sqlite3_result_error(context, strerror(errno), errno);\
++        sqlite3_result_error(context, "domain error", -1); \
+       }\
+       break;\
+     }\
+@@ -555,7 +572,7 @@
+     if (errno == 0) {
+       sqlite3_result_double(context, val);
+     } else {  
+-      sqlite3_result_error(context, strerror(errno), errno);
++      sqlite3_result_error(context, "domain error", -1);
+     }  
+   }
+ }
+@@ -620,7 +637,7 @@
+   assert( argc==1 );
+   switch( sqlite3_value_type(argv[0]) ){
+     case SQLITE_INTEGER: {
+-      i64 iVal = sqlite3_value_int64(argv[0]);
++      iVal = sqlite3_value_int64(argv[0]);
+       sqlite3_result_int64(context, iVal);
+       break;
+     }
+@@ -645,7 +662,7 @@
+   assert( argc==1 );
+   switch( sqlite3_value_type(argv[0]) ){
+     case SQLITE_INTEGER: {
+-      i64 iVal = sqlite3_value_int64(argv[0]);
++      iVal = sqlite3_value_int64(argv[0]);
+       sqlite3_result_int64(context, iVal);
+       break;
+     }
+@@ -704,16 +721,6 @@
+   }
+ }
+ 
+-/* 
+-** Some systems (win32 among others) don't have an isblank function, this will emulate it.
+-** This function is not UFT-8 safe since it only analyses a byte character.
+-*/
+-#ifndef HAVE_ISBLANK
+-int isblank(char c){
+-  return( ' '==c || '\t'==c );
+-}
+-#endif
+-
+ static void properFunc(sqlite3_context *context, int argc, sqlite3_value **argv){
+   const unsigned char *z;     /* input string */
+   unsigned char *zo;          /* output string */
+@@ -736,7 +743,7 @@
+   zt = zo;
+ 
+   while( (r = *(z++))!=0 ){
+-    if( isblank(r) ){
++    if( (r==' ') || (r=='\t') ){
+       c=1;
+     }else{
+       if( c==1 ){
+@@ -1349,6 +1356,15 @@
+   sqlite3_free(rz);
+ }
+ 
++static void* xcalloc(size_t nmemb, size_t size){
++  void* ret = calloc(nmemb, size);
++  return ret;
++}
++
++static void xfree(void* p){
++  free(p);
++}
++
+ /*
+ ** An instance of the following structure holds the context of a
+ ** stdev() or variance() aggregate computation.
+@@ -1424,7 +1440,7 @@
+   p = sqlite3_aggregate_context(context, sizeof(*p));
+ 
+   if( 0==(p->m) ){
+-    p->m = calloc(1, sizeof(map));
++    p->m = xcalloc(1, sizeof(map));
+     if( type==SQLITE_INTEGER ){
+       /* map will be used for integers */
+       *(p->m) = map_make(int_cmp);
+@@ -1440,12 +1456,12 @@
+ 
+   if( 0==p->is_double ){
+     xi = sqlite3_value_int64(argv[0]);
+-    iptr = (i64*)calloc(1,sizeof(i64));
++    iptr = (i64*)xcalloc(1,sizeof(i64));
+     *iptr = xi;
+     map_insert(p->m, iptr);
+   }else{
+     xd = sqlite3_value_double(argv[0]);
+-    dptr = (double*)calloc(1,sizeof(double));
++    dptr = (double*)xcalloc(1,sizeof(double));
+     *dptr = xd;
+     map_insert(p->m, dptr);
+   }
+@@ -1531,7 +1547,7 @@
+   if( p && p->m ){
+     map_iterate(p->m, modeIterate, p);
+     map_destroy(p->m);
+-    free(p->m);
++    xfree(p->m);
+ 
+     if( 1==p->mn ){
+       if( 0==p->is_double )
+@@ -1552,7 +1568,7 @@
+     p->done=0;
+     map_iterate(p->m, medianIterate, p);
+     map_destroy(p->m);
+-    free(p->m);
++    xfree(p->m);
+ 
+     if( 0==p->is_double )
+       if( 1==p->mn )
+@@ -1705,7 +1721,7 @@
+ ** functions.  This should be the only routine in this file with
+ ** external linkage.
+ */
+-int RegisterExtensionFunctions(sqlite3 *db){
++static int RegisterExtensionFunctions(sqlite3 *db){
+   static const struct FuncDef {
+      char *zName;
+      signed char nArg;
+@@ -1843,28 +1859,18 @@
+ }
+ #endif /* COMPILE_SQLITE_EXTENSIONS_AS_LOADABLE_MODULE */
+ 
+-map map_make(cmp_func cmp){
++static map map_make(cmp_func cmp){
+   map r;
+   r.cmp=cmp;
+   r.base = 0;
+-
+   return r;
+ }
+ 
+-void* xcalloc(size_t nmemb, size_t size, char* s){
+-  void* ret = calloc(nmemb, size);
+-  return ret;
+-}
+-
+-void xfree(void* p){
+-  free(p);
+-}
+-
+-void node_insert(node** n, cmp_func cmp, void *e){
++static void node_insert(node** n, cmp_func cmp, void *e){
+   int c;
+   node* nn;
+   if(*n==0){
+-    nn = (node*)xcalloc(1,sizeof(node), "for node");
++    nn = (node*)xcalloc(1,sizeof(node));
+     nn->data = e;
+     nn->count = 1;
+     *n=nn;
+@@ -1882,11 +1888,11 @@
+   }
+ }
+ 
+-void map_insert(map *m, void *e){
++static void map_insert(map *m, void *e){
+   node_insert(&(m->base), m->cmp, e);
+ }
+ 
+-void node_iterate(node *n, map_iterator iter, void* p){
++static void node_iterate(node *n, map_iterator iter, void* p){
+   if(n){
+     if(n->l)
+       node_iterate(n->l, iter, p);
+@@ -1896,11 +1902,11 @@
+   }
+ }
+ 
+-void map_iterate(map *m, map_iterator iter, void* p){
++static void map_iterate(map *m, map_iterator iter, void* p){
+   node_iterate(m->base, iter, p);
+ }
+ 
+-void node_destroy(node *n){
++static void node_destroy(node *n){
+   if(0!=n){
+     xfree(n->data);
+     if(n->l)
+@@ -1912,11 +1918,11 @@
+   }
+ }
+ 
+-void map_destroy(map *m){
++static void map_destroy(map *m){
+   node_destroy(m->base);
+ }
+ 
+-int int_cmp(const void *a, const void *b){
++static int int_cmp(const void *a, const void *b){
+   int64_t aa = *(int64_t *)(a);
+   int64_t bb = *(int64_t *)(b);
+   /* printf("cmp %d <=> %d\n",aa,bb); */
+@@ -1928,7 +1934,7 @@
+     return 1;
+ }
+ 
+-int double_cmp(const void *a, const void *b){
++static int double_cmp(const void *a, const void *b){
+   double aa = *(double *)(a);
+   double bb = *(double *)(b);
+   /* printf("cmp %d <=> %d\n",aa,bb); */
+@@ -1940,8 +1946,4 @@
+     return 1;
+ }
+ 
+-void print_elem(void *e, int64_t c, void* p){
+-  int ee = *(int*)(e);
+-  printf("%d => %lld\n", ee,c);
+-}
+ 

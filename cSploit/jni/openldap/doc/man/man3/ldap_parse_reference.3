@@ -1,0 +1,61 @@
+.TH LDAP_PARSE_REFERENCE 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_parse_reference \- Extract referrals and controls from a reference message
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_parse_reference( LDAP *ld, LDAPMessage *reference,
+	char ***referralsp, LDAPControl ***serverctrlsp,
+	int freeit )
+.SH DESCRIPTION
+.LP
+The
+.B ldap_parse_reference()
+routine is used to extract referrals and controls from a reference message.
+The \fIreference\fP parameter is a reference message as returned by a
+call to
+.BR ldap_first_reference (3) ,
+.BR ldap_next_reference (3) ,
+.BR ldap_first_message (3) ,
+.BR ldap_next_message (3) ,
+or
+.BR ldap_result (3) .
+.LP
+The \fIreferralsp\fP parameter will be filled in with an allocated array of
+character strings. The strings are copies of the referrals contained in
+the parsed message. The array should be freed by calling
+.BR ldap_value_free (3) .
+If \fIreferralsp\fP is NULL, no referrals are returned.
+If no referrals were returned, \fI*referralsp\fP is set to NULL.
+.LP
+The \fIserverctrlsp\fP parameter will be filled in with an allocated array of
+controls copied from the parsed message. The array should be freed by calling
+.BR ldap_controls_free (3).
+If \fIserverctrlsp\fP is NULL, no controls are returned.
+If no controls were returned, \fI*serverctrlsp\fP is set to NULL.
+.LP
+The \fIfreeit\fP parameter determines whether the parsed message is
+freed or not after the extraction. Any non-zero value will make it
+free the message. The
+.BR ldap_msgfree (3)
+routine can also be used to free the message later.
+.SH ERRORS
+Upon success LDAP_SUCCESS is returned. Otherwise the values of the
+\fIreferralsp\fP and \fIserverctrlsp\fP parameters are undefined.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_first_reference (3),
+.BR ldap_first_message (3),
+.BR ldap_result (3),
+.BR ldap_get_values (3),
+.BR ldap_controls_free (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

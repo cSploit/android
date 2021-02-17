@@ -1,0 +1,28 @@
+dn: o=Esempio,c=IT
+objectClass: organization
+o: Esempio
+o: Esempio S.p.A.
+o: Example
+
+dn: o=Example,c=UK
+objectClass: organization
+o: Example
+o: Example, Ltd.
+
+dn: o=Example,c=US
+objectClass: organization
+o: Example
+o: Example, Inc.
+
+dn: c=IT
+objectClass: country
+c: IT
+
+dn: c=UK
+objectClass: country
+c: UK
+
+dn: c=US
+objectClass: country
+c: US
+

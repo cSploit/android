@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Berkeley DB Concepts</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="dbsqlbasics.html" title="Chapter 1. Berkeley DB SQL: The Absolute Basics" />
+    <link rel="prev" href="miscdiff.html" title="Miscellaneous Differences" />
+    <link rel="next" href="sql_encryption.html" title="Encryption" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Berkeley DB Concepts</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="miscdiff.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 1. Berkeley DB SQL: The Absolute Basics</th>
+          <td width="20%" align="right"> <a accesskey="n" href="sql_encryption.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="bdb-concepts"></a>Berkeley DB Concepts</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                If you are a SQLite user who is migrating to the BDB SQL interface,
+                then there are a few Berkeley DB-specific concepts you might want
+                to know about.
+            </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                        Environments. The directory that is created
+                        alongside your database file, and which ends with
+                        the "-journal" suffix, is actually a Berkeley DB
+                        environment directory.
+                    </p>
+          </li>
+          <li>
+            <p>
+                        The Locking Subsystem
+                    </p>
+            <p>
+                        The Berkeley DB library implements locking in a different
+                        way to SQLite. SQLite implements locking at a database
+                        level - any operation will take a lock on the entire
+                        database. Berkeley DB implements a scheme called page
+                        level locking. The database divides data into relatively
+                        small blocks. Each block corresponds to a page in
+                        database terms. Each block can contain multiple pieces
+                        of user information. Berkeley DB takes locks on
+                        individual pages. This allows for greater concurrency
+                        in applications, but means that applications are more
+                        likely to encounter deadlocks.
+                    </p>
+            <p>
+                        See: 
+                        <a class="xref" href="lockingnotes.html" title="Chapter 2. Locking Notes">Locking Notes</a>
+                        for more information.
+                    </p>
+          </li>
+          <li>
+            <p>
+                        The Journal Subsystem
+                    </p>
+            <p>
+                        The BDB SQL interface implements write ahead logging (WAL),
+                        it stores journal files differently to the SQLite
+                        WAL implementation. BDB SQL interface rolls over journal files
+                        when they get to a certain size (default 10MB). It is
+                        possible for the to be multiple journal files active
+                        at one time with BDB SQL interface.
+                    </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="miscdiff.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="dbsqlbasics.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="sql_encryption.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Miscellaneous Differences </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Encryption</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

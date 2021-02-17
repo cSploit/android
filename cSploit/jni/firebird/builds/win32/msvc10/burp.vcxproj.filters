@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="BURP files">
+      <UniqueIdentifier>{fd99cd9f-613b-4a15-b474-628e56554ec1}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="BURP files\epp files">
+      <UniqueIdentifier>{d70145a9-24c1-4e37-b304-c68ec2bd2554}</UniqueIdentifier>
+      <Extensions>epp</Extensions>
+    </Filter>
+    <Filter Include="BURP files\Generated files">
+      <UniqueIdentifier>{29b1e9b7-aa82-4e3d-a40d-050a52c1a462}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{eb4b34e6-bff2-4f4f-acff-eda9621d223b}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\burp\burp.cpp">
+      <Filter>BURP files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\burp\canonical.cpp">
+      <Filter>BURP files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\burp\misc.cpp">
+      <Filter>BURP files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\burp\mvol.cpp">
+      <Filter>BURP files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\burp\backup.cpp">
+      <Filter>BURP files\Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\burp\OdsDetection.cpp">
+      <Filter>BURP files\Generated files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\burp\restore.cpp">
+      <Filter>BURP files\Generated files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\burp\backup.epp">
+      <Filter>BURP files\epp files</Filter>
+    </None>
+    <None Include="..\..\..\src\burp\OdsDetection.epp">
+      <Filter>BURP files\epp files</Filter>
+    </None>
+    <None Include="..\..\..\src\burp\restore.epp">
+      <Filter>BURP files\epp files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\burp\backu_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\burp\burp.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\burp\burp_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\burp\burpswi.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\burp\canon_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\burp\misc_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\burp\mvol_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\burp\OdsDetection.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\burp\resto_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

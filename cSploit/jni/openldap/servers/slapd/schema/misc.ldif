@@ -1,0 +1,45 @@
+# misc.ldif -- assorted schema definitions
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+# Assorted definitions from several sources, including
+# ''works in progress''.  Contents of this file are
+# subject to change (including deletion) without notice.
+#
+# Not recommended for production use!
+# Use with extreme caution!
+#
+# This file was automatically generated from misc.schema; see that file
+# for complete references.
+#
+dn: cn=misc,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: misc
+olcAttributeTypes: {0}( 2.16.840.1.113730.3.1.13 NAME 'mailLocalAddress' DESC 
+ 'RFC822 email address of this recipient' EQUALITY caseIgnoreIA5Match SYNTAX 1
+ .3.6.1.4.1.1466.115.121.1.26{256} )
+olcAttributeTypes: {1}( 2.16.840.1.113730.3.1.18 NAME 'mailHost' DESC 'FQDN of
+  the SMTP/MTA of this recipient' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4
+ .1.1466.115.121.1.26{256} SINGLE-VALUE )
+olcAttributeTypes: {2}( 2.16.840.1.113730.3.1.47 NAME 'mailRoutingAddress' DES
+ C 'RFC822 routing address of this recipient' EQUALITY caseIgnoreIA5Match SYNT
+ AX 1.3.6.1.4.1.1466.115.121.1.26{256} SINGLE-VALUE )
+olcAttributeTypes: {3}( 1.3.6.1.4.1.42.2.27.2.1.15 NAME 'rfc822MailMember' DES
+ C 'rfc822 mail address of group member(s)' EQUALITY caseIgnoreIA5Match SYNTAX
+  1.3.6.1.4.1.1466.115.121.1.26 )
+olcObjectClasses: {0}( 2.16.840.1.113730.3.2.147 NAME 'inetLocalMailRecipient'
+  DESC 'Internet local mail recipient' SUP top AUXILIARY MAY ( mailLocalAddres
+ s $ mailHost $ mailRoutingAddress ) )
+olcObjectClasses: {1}( 1.3.6.1.4.1.42.2.27.1.2.5 NAME 'nisMailAlias' DESC 'NIS
+  mail alias' SUP top STRUCTURAL MUST cn MAY rfc822MailMember )

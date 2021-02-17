@@ -1,0 +1,515 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 5.  Building Berkeley DB for Windows</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="prev" href="build_android_config.html" title="Android Configuration Options" />
+    <link rel="next" href="win_build64.html" title="Building Berkeley DB for 64-bit Windows" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 5.  Building Berkeley DB for Windows </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="build_android_config.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="win_build64.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="build_win"></a>Chapter 5.  Building Berkeley DB for Windows </h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="build_win.html#win_build32">Building Berkeley DB for 32 bit
+            Windows</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win.html#idp50354696">Visual C++ .NET 2010</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win.html#idp50360864">Visual C++ .NET 2008</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win.html#idp50330632">Visual C++ .NET 2005</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win.html#idp50367120">Build results</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="win_build64.html">Building Berkeley DB for 64-bit
+            Windows</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="win_build64.html#idp50373256">x64 build with Visual Studio 2005 or newer</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="win_build_cygwin.html">Building Berkeley DB with
+            Cygwin</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="win_build_cxx.html">Building the C++ API</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="win_build_stl.html">Building the C++ STL
+            API</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="build_win_java.html">Building the Java API</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="build_win_csharp.html">Building the C# API</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="build_win_sql.html">Building the SQL API</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_sql.html#idp50407728">Binary Compatibility With SQLite</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_sql.html#idp50380592">Setting Encryption</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_sql.html#idp50382040">Changing Compile Options</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_sql.html#idp50330000">Enabling Extensions</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_sql.html#win-disablechecksums">Disabling Log
+                Checksums</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_sql.html#build_jdbc">Building the JDBC Driver</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_sql.html#idp50431536">Using the JDBC Driver</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_sql.html#idp50437400">Building the ODBC Driver</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_sql.html#idp50452776"> Using the ADO.NET Driver </a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="build_win_tcl.html">Building the Tcl API</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="win_build_dist_dll.html">Distributing DLLs</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="win_additional_options.html">Additional build options</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="build_win_small.html">Building a small memory footprint library</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="build_win_test.html">Running the test suite under
+        Windows</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_test.html#idp50508288">Building the software needed by the tests</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_test.html#idp50509368">Running the test suite under Windows</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="build_win_test.html#build_win_test_sql">Building the software needed by the SQL tests</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="build_win_notes.html">Windows notes</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="build_win_faq.html">Windows FAQ</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        This chapter contains general instructions on building
+        Berkeley DB for specific windows platforms using specific
+        compilers. The <a class="xref" href="build_win_faq.html" title="Windows FAQ">Windows FAQ</a> also contains helpful
+        information. 
+    </p>
+      <p> 
+        The <code class="filename">build_windows</code> directory in the
+        Berkeley DB distribution contains project files for Microsoft
+        Visual Studio: 
+    </p>
+      <div class="informaltable">
+        <table border="1" width="80%">
+          <colgroup>
+            <col />
+            <col />
+          </colgroup>
+          <thead>
+            <tr>
+              <th>Project
+                        File</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td align="center">Berkeley_DB.sln</td>
+              <td align="center">Visual Studio 2005 (8.0)
+                        workspace</td>
+            </tr>
+            <tr>
+              <td align="center">*.vcproj</td>
+              <td align="center">Visual Studio 2005 (8.0)
+                        projects</td>
+            </tr>
+            <tr>
+              <td align="center">Berkeley_DB_vs2010.sln</td>
+              <td align="center">Visual Studio 2010
+                        workspace</td>
+            </tr>
+            <tr>
+              <td align="center">*.vcxproj</td>
+              <td align="center">Visual Studio 2010
+                        projects</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        These project files can be used to build Berkeley DB for
+        the following platforms: Windows NT/2K/XP/2003/Vista and
+        Windows7; and 64-bit Windows XP/2003/Vista and Windows7. 
+    </p>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="win_build32"></a>Building Berkeley DB for 32 bit
+            Windows</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <dl>
+            <dt>
+              <span class="sect2">
+                <a href="build_win.html#idp50354696">Visual C++ .NET 2010</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="build_win.html#idp50360864">Visual C++ .NET 2008</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="build_win.html#idp50330632">Visual C++ .NET 2005</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="build_win.html#idp50367120">Build results</a>
+              </span>
+            </dt>
+          </dl>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="idp50354696"></a>Visual C++ .NET 2010</h3>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                    Choose <span class="emphasis"><em>File -&gt; Open -&gt;
+                        Project/Solution...</em></span>. In the
+                    <code class="filename">build_windows</code> directory,
+                    select <code class="filename">Berkeley_DB_vs2010.sln</code>
+                    and click Open.
+                </li>
+              <li>
+                    Choose the desired project configuration
+                    from the drop-down menu on the tool bar (either
+                    Debug or Release).
+                </li>
+              <li>
+                    Choose the desired platform configuration
+                    from the drop-down menu on the tool bar (usually
+                    Win32 or x64).
+                </li>
+              <li>
+                    To build, right-click on the
+                        <code class="filename">Berkeley_DB_vs2010</code>
+                    solution and select Build Solution.
+                </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="idp50360864"></a>Visual C++ .NET 2008</h3>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                    Choose <span class="emphasis"><em>File -&gt; Open -&gt;
+                        Project/Solution...</em></span>. In the
+                        <code class="filename">build_windows</code> directory,
+                    select <code class="filename">Berkeley_DB.sln</code> and
+                    click Open.
+                </li>
+              <li>
+                    The <span class="emphasis"><em>Visual Studio Conversion
+                        Wizard</em></span> will open automatically.
+                    Click the <span class="emphasis"><em>Finish</em></span>
+                    button.
+                </li>
+              <li>
+                    On the next screen click the
+                        <span class="emphasis"><em>Close</em></span> button.
+                </li>
+              <li>
+                    Choose the desired project configuration
+                    from the drop-down menu on the tool bar (either
+                    Debug or Release).
+                </li>
+              <li>
+                    Choose the desired platform configuration
+                    from the drop-down menu on the tool bar (usually
+                    Win32 or x64).
+                </li>
+              <li>
+                    To build, right-click on the Berkeley_DB
+                    solution and select Build Solution.
+                </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="idp50330632"></a>Visual C++ .NET 2005</h3>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                    Choose <span class="emphasis"><em>File -&gt; Open -&gt;
+                        Project/Solution...</em></span>. In the
+                        <code class="filename">build_windows</code> directory,
+                    select <code class="filename">Berkeley_DB.sln</code> and
+                    click Open
+                </li>
+              <li>
+                    Choose the desired project configuration
+                    from the drop-down menu on the tool bar (either
+                    Debug or Release).
+                </li>
+              <li>
+                    Choose the desired platform configuration
+                    from the drop-down menu on the tool bar (usually
+                    Win32 or x64).
+                </li>
+              <li>
+                    To build, right-click on the Berkeley_DB
+                    solution and select Build Solution.
+                </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="idp50367120"></a>Build results</h3>
+              </div>
+            </div>
+          </div>
+          <p> 
+                The results of your build will be placed in one of
+                the following Berkeley DB subdirectories, depending on
+                the configuration that you chose: </p>
+          <table class="simplelist" border="0" summary="Simple list">
+            <tr>
+              <td>
+                <code class="filename">build_windows\Win32\Debug</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code class="filename">build_windows\Win32\Release</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code class="filename">build_windows\Win32\Debug_static</code>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <code class="filename">build_windows\Win32\Release_static</code>
+              </td>
+            </tr>
+          </table>
+          <p>
+                When building your application during
+                development, you should normally use compile options
+                "Debug Multithreaded DLL" and link against
+                    <code class="filename">build_windows\Debug\libdb60d.lib</code>.
+            </p>
+          <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+            <h3 class="title">Note</h3>
+            <p> 
+                    Building your application with the debug
+                    configuration will create a Berkeley DB library
+                    and utilities with debugging symbols, as well as
+                    load various routines that can be called from a
+                    debugger to display pages, cursor queues, and so
+                    forth. If installed, the utilities will not be
+                    stripped. This configuration should not be
+                    specified when building production binaries.
+                </p>
+          </div>
+          <p>
+                You can also build using a release version of the
+                Berkeley DB libraries and tools, which will be placed
+                in
+                    <code class="filename">build_windows\Win32\Release\libdb60.lib</code>.
+                When linking against the release build, you should
+                compile your code with the "Release Multithreaded DLL"
+                compile option. You will also need to add the
+                    <code class="filename">build_windows</code> directory to
+                the list of include directories of your application's
+                project, or copy the Berkeley DB include files to
+                another location. 
+            </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="build_android_config.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="win_build64.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Android Configuration Options </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Building Berkeley DB for 64-bit
+            Windows</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

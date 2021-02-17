@@ -1,0 +1,303 @@
+.TH SLAPD-SOCK 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2007-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd\-sock \- Socket backend/overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The Socket backend to
+.BR slapd (8)
+uses an external program to handle queries, similarly to
+.BR slapd\-shell (5).
+However, in this case the external program listens on a Unix domain socket.
+This makes it possible to have a pool of processes, which persist between
+requests. This allows multithreaded operation and a higher level of
+efficiency. The external program must have been started independently;
+.BR slapd (8)
+itself will not start it.
+
+This module may also be used as an overlay on top of some other database.
+Use as an overlay allows external actions to be triggered in response to
+operations on the main database.
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the SOCK backend database.
+That is, they must follow a "database sock" line and come before any
+subsequent "backend" or "database" lines.
+Other database options are described in the
+.BR slapd.conf (5)
+manual page.
+
+Alternatively, to use this module as an overlay, these directives must
+follow an "overlay sock" line within an existing database definition.
+.TP
+.B extensions      [ binddn | peername | ssf | connid ]*
+Enables the sending of additional meta-attributes with each request.
+.nf
+binddn: <bound DN>
+peername: IP=<address>:<port>
+ssf: <SSF value>
+connid: <connection ID>
+.fi
+.TP
+.B socketpath      <pathname>
+Gives the path to a Unix domain socket to which the commands will
+be sent and from which replies are received.
+
+When used as an overlay, these additional directives are defined:
+.TP
+.B sockops	[ bind | unbind | search | compare | modify | modrdn | add | delete ]*
+Specify which request types to send to the external program. The default is
+empty (no requests are sent).
+.TP
+.B sockresps       [ result | search ]*
+Specify which response types to send to the external program. "result"
+sends just the results of an operation. "search" sends all entries that
+the database returned for a search request. The default is empty
+(no responses are sent).
+
+.SH PROTOCOL
+The protocol is essentially the same as
+.BR slapd\-shell (5)
+with the addition of a newline to terminate the command parameters. The
+following commands are sent:
+.RS
+.nf
+ADD
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+<entry in LDIF format>
+<blank line>
+.fi
+.RE
+.PP
+.RS
+.nf
+BIND
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <DN>
+method: <method number>
+credlen: <length of <credentials>>
+cred: <credentials>
+<blank line>
+.fi
+.RE
+.PP
+.RS
+.nf
+COMPARE
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <DN>
+<attribute>: <value>
+<blank line>
+.fi
+.RE
+.PP
+.RS
+.nf
+DELETE
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <DN>
+<blank line>
+.fi
+.RE
+.PP
+.RS
+.nf
+MODIFY
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <DN>
+<repeat {
+    <"add"/"delete"/"replace">: <attribute>
+    <repeat { <attribute>: <value> }>
+    \-
+}>
+<blank line>
+.fi
+.RE
+.PP
+.RS
+.nf
+MODRDN
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <DN>
+newrdn: <new RDN>
+deleteoldrdn: <0 or 1>
+<if new superior is specified: "newSuperior: <DN>">
+<blank line>
+.fi
+.RE
+.PP
+.RS
+.nf
+SEARCH
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+base: <base DN>
+scope: <0-2, see ldap.h>
+deref: <0-3, see ldap.h>
+sizelimit: <size limit>
+timelimit: <time limit>
+filter: <filter>
+attrsonly: <0 or 1>
+attrs: <"all" or space-separated attribute list>
+<blank line>
+.fi
+.RE
+.PP
+.RS
+.nf
+UNBIND
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+<blank line>
+.fi
+.RE
+.LP
+The commands - except \fBunbind\fP - should output:
+.RS
+.nf
+RESULT
+code: <integer>
+matched: <matched DN>
+info: <text>
+.fi
+.RE
+where only RESULT is mandatory, and then close the socket.
+The \fBsearch\fP RESULT should be preceded by the entries in LDIF
+format, each entry followed by a blank line.
+Lines starting with `#' or `DEBUG:' are ignored.
+
+When used as an overlay, the external program should return a
+CONTINUE response if request processing should continue normally, or
+a regular RESULT response if the external program wishes to bypass the
+underlying database.
+
+If the overlay is configured to send response messages to the external
+program, they will appear as an extended RESULT message or as an
+ENTRY message, defined below. The RESULT message is similar to
+the one above, but also includes the msgid and any configured
+extensions:
+.RS
+.nf
+RESULT
+msgid: <message id>
+code: <integer>
+matched: <matched DN>
+info: <text>
+<blank line>
+.fi
+.RE
+
+Typically both the msgid and the connid will be needed to match
+a result message to a request. The ENTRY message has the form
+.RS
+.nf
+ENTRY
+msgid: <message id>
+<entry in LDIF format>
+<blank line>
+.fi
+.RE
+
+.SH ACCESS CONTROL
+The
+.B sock
+backend does not honor all ACL semantics as described in
+.BR slapd.access (5).
+In general, access to objects is checked by using a dummy object
+that contains only the DN, so access rules that rely on the contents
+of the object are not honored.
+In detail:
+.LP
+The
+.B add
+operation does not require
+.B write (=w)
+access to the 
+.B children
+pseudo-attribute of the parent entry.
+.LP
+The
+.B bind
+operation requires 
+.B auth (=x)
+access to the 
+.B entry
+pseudo-attribute of the entry whose identity is being assessed;
+.B auth (=x)
+access to the credentials is not checked, but rather delegated 
+to the underlying program.
+.LP
+The
+.B compare
+operation requires 
+.B compare (=c)
+access to the 
+.B entry
+pseudo-attribute
+of the object whose value is being asserted;
+.B compare (=c)
+access to the attribute whose value is being asserted is not checked.
+.LP
+The
+.B delete
+operation does not require
+.B write (=w)
+access to the 
+.B children
+pseudo-attribute of the parent entry.
+.LP
+The
+.B modify
+operation requires
+.B write (=w)
+access to the 
+.B entry 
+pseudo-attribute;
+.B write (=w)
+access to the specific attributes that are modified is not checked.
+.LP
+The
+.B modrdn
+operation does not require
+.B write (=w)
+access to the 
+.B children
+pseudo-attribute of the parent entry, nor to that of the new parent,
+if different;
+.B write (=w)
+access to the distinguished values of the naming attributes
+is not checked.
+.LP
+The
+.B search 
+operation does not require
+.B search (=s)
+access to the 
+.B entry
+pseudo_attribute of the searchBase;
+.B search (=s)
+access to the attributes and values used in the filter is not checked.
+
+.SH EXAMPLE
+There is an example script in the slapd/back\-sock/ directory
+in the OpenLDAP source tree.
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd (8).
+.SH AUTHOR
+Brian Candler, with enhancements by Howard Chu

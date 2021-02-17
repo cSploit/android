@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# $Id: sybase_tests,v 1.6 2010-07-27 07:19:18 freddy77 Exp $
+# these commands build dblib and ctlib tests using Sybase libraries
+
+errore() {
+	echo $* >&2
+	exit 1
+}
+
+test -x configure || errore "configure not found, go to main directory"
+test -d "$SYBASE" || errore "SYBASE environment not defined"
+MAINDIR="`pwd`"
+cd "$SYBASE"
+OCSDIR=`echo OCS-*`
+cd "$MAINDIR"
+test -d "$SYBASE/$OCSDIR" || errore "OCS directory not found"
+
+if test "$LD_RUN_PATH" != ""; then
+	export LD_RUN_PATH="$SYBASE/$OCSDIR/lib:$LD_RUN_PATH"
+else
+	export LD_RUN_PATH="$SYBASE/$OCSDIR/lib"
+fi
+
+# build
+trap 'echo Error at line $LINENO' ERR
+set -e
+make
+
+# rebuild tests
+for dir in src/dblib/unittests src/ctlib/unittests; do
+	cd $dir
+	export LD_RUN_PATH="$SYBASE/$OCSDIR/lib"
+	if test ! -r Makefile.no_sybase -o Makefile -nt Makefile.no_sybase; then
+		rm -f Makefile.no_sybase
+		echo '#include <sybfront.h>' > sqlfront.h
+		echo '#include <sybdb.h>' > sqldb.h
+		perl -pi.no_sybase -e "\$_ =~ s{ -I\\\$\\(top_(build|src)dir\\)/include}{ -I$SYBASE/$OCSDIR/include -I\\\$(top_builddir)/include} if (/^(DEFAULT_INCLUDES|AM_CPPFLAGS)\s*=/);
+\$_ =~ s{../libsybdb.la}{-lsybdb -lsybunic} if (/^LIBS\s*=/);
+\$_ =~ s{../libct.la}{-lsybct -lsybcs -lsybblk} if (/^LIBS\s*=/);
+\$_ =~ s{-L../.libs -R \\\$\\(abs_builddir\\)/../.libs}{-L$SYBASE/$OCSDIR/lib} if (/^AM_LDFLAGS\s*=/);
+" Makefile
+		touch Makefile.no_sybase
+		rm -f *.o *.exe
+		make clean
+	fi
+	make clean
+	TESTS_ENVIRONMENT=true make check
+	cd ../../..
+done
+

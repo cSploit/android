@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 14. Upgrading Berkeley DB 4.7 applications to Berkeley DB 4.8</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="prev" href="changelog_5_0.html" title="Berkeley DB 11g Release 2 Change Log" />
+    <link rel="next" href="upgrade_4_8_dpl.html" title="Registering DPL Secondary Keys" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 14. Upgrading Berkeley DB 4.7 applications to Berkeley DB 4.8</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="changelog_5_0.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="upgrade_4_8_dpl.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="upgrade_4_8_toc"></a>Chapter 14. Upgrading Berkeley DB 4.7 applications to Berkeley DB 4.8</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_8_toc.html#upgrade_4_8_intro">Introduction</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_8_dpl.html">Registering DPL Secondary Keys</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_8_mpool.html">Minor Change in Behavior of DB_MPOOLFILE-&gt;get</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_8_fcntl.html">Dropped Support for fcntl System Calls</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_8_disk.html">Upgrade Requirements</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="changelog_4_8.html">Berkeley DB 4.8.28 Change Log</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51374344">
+Changes between 4.8.26 and 4.8.28:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51444080">
+Known bugs in 4.8 </a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51386032">
+Changes between 4.8.24 and 4.8.26:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51378080">
+Changes between 4.8.21 and 4.8.24:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51415992">
+Changes between 4.7 and 4.8.21:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51457048">
+Database or Log File On-Disk Format Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51227488">
+New Features:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51336976">
+Database Environment Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51459848">
+Concurrent Data Store Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51460248">
+General Access Method Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51465248">
+Btree Access Method Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51462744">
+Hash Access Method Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51473408">
+Queue Access Method Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51410984">
+Recno Access Method Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51470976">
+C-specific API Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51489200">
+C++-specific API Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51486464">
+Java-specific API Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51479344">
+
+ Direct Persistence Layer (DPL), Bindings and Collections API:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51479616">
+
+ Tcl-specific API Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51486216">
+RPC-specific Client/Server Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51493280">
+Replication Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51473832">
+XA Resource Manager Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51495000">
+Locking Subsystem Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51488408">
+Logging Subsystem Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51505600">
+Memory Pool Subsystem Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51505992">
+Mutex Subsystem Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51488112">
+Test Suite Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51497048">
+Transaction Subsystem Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51519056">
+Utility Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_8.html#idp51521440">
+Configuration, Documentation, Sample Application, Portability and Build Changes:</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+        </dl>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="upgrade_4_8_intro"></a>Introduction</h2>
+            </div>
+          </div>
+        </div>
+        <p>The following pages describe how to upgrade applications coded against
+the Berkeley DB 4.7 release interfaces to the Berkeley DB 4.8 release interfaces.
+This information does not describe how to upgrade Berkeley DB 1.85 release
+applications.</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="changelog_5_0.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="upgrade_4_8_dpl.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Berkeley DB 11g Release 2 Change Log </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Registering DPL Secondary Keys</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

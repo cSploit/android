@@ -1,0 +1,40 @@
+# Makefile.in for shell-backends
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+PROGRAMS = passwd-shell
+
+SRCS = passwd-shell.c shellutil.c
+XSRCS = pwd-version.c
+OBJS = passwd-shell.o shellutil.o
+
+LDAP_INCDIR= ../../../include       
+LDAP_LIBDIR= ../../../libraries
+
+BUILD_OPT = "--enable-shell"
+BUILD_SRV = @BUILD_SHELL@
+
+all-local-srv: $(PROGRAMS)
+
+# create programs also when using modules
+depend-mod: depend-yes
+all-mod: all-yes
+install-mod: install-yes
+
+passwd-shell:	pwd-version.o
+	$(CC) $(LDFLAGS) -o $@ $(OBJS) pwd-version.o $(LIBS)
+
+pwd-version.c: $(OBJS) $(LDAP_LIBDEPEND)
+	@-$(RM) $@
+	$(MKVERSION) passwd-shell > $@

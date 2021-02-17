@@ -1,0 +1,23 @@
+Copyright 2004-2014 The OpenLDAP Foundation. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+This directory contains a native slapd plugin, dsaschema, that permits the
+loading of DSA-specific schema from configuration files (including operational
+attributes).
+
+To use the plugin, add:
+
+moduleload dsaschema.so
+	/etc/openldap/schema/foo1.schema
+	...etc...
+	/etc/openldap/schema/fooN.schema
+
+to your slapd configuration file.
+
+Use Makefile to compile this plugin or use a command line similar to:
+
+gcc -shared -I../../../include -Wall -g -o dsaschema.so dsaschema.c
+

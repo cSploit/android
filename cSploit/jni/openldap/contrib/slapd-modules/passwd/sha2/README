@@ -1,0 +1,144 @@
+SHA-2 OpenLDAP support
+----------------------
+
+slapd-sha2.c provides support for SSHA-512, SSHA-384, SSHA-256,
+SHA-512, SHA-384 and SHA-256 hashed passwords in OpenLDAP. For
+instance, one could have the LDAP attribute:
+
+userPassword: {SHA512}vSsar3708Jvp9Szi2NWZZ02Bqp1qRCFpbcTZPdBhnWgs5WtNZKnvCXdhztmeD2cmW192CF5bDufKRpayrW/isg==
+
+or:
+
+userPassword: {SHA384}WKd1ukESvjAFrkQHznV9iP2nHUBJe7gCbsrFTU4//HIyzo3jq1rLMK45dg/ufFPt
+
+or:
+
+userPassword: {SHA256}K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol/pe/Unols=
+
+all of which encode the password 'secret'.
+
+
+Building
+--------
+
+1) Customize the OPENLDAP variable in Makefile to point to the OpenLDAP
+source root.
+
+For initial testing you might also want to edit DEFS to define
+SLAPD_SHA2_DEBUG, which enables logging to stderr (don't leave this on
+in production, as it prints passwords in cleartext).
+
+2) Run 'make' to produce slapd-sha2.so
+
+3) Copy slapd-sha2.so somewhere permanent.
+
+4) Edit your slapd.conf (eg. /etc/ldap/slapd.conf), and add:
+
+moduleload ...path/to/slapd-sha2.so
+
+5) Restart slapd.
+
+
+Configuring
+-----------
+
+The {SSHA256}, {SSHA384}, {SSHA512}, {SSHA256}, {SHA384} and {SHA512}
+password schemes should now be recognised.
+
+You can also tell OpenLDAP to use one of these new schemes when processing LDAP
+Password Modify Extended Operations, thanks to the password-hash option in
+slapd.conf. For example:
+
+password-hash	{SSHA512}
+
+
+Testing
+-------
+
+A quick way to test whether it's working is to customize the rootdn and
+rootpw in slapd.conf, eg:
+
+rootdn          "cn=admin,dc=example,dc=com"
+# This encrypts the string 'secret'
+
+rootpw  {SHA256}K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol/pe/Unols=
+
+Then to test, run something like:
+
+ldapsearch -b "dc=example,dc=com" -D "cn=admin,dc=example,dc=com" -x -w secret
+
+
+-- Test hashes:
+
+Test hashes can be generated with openssl:
+
+$ echo -n "secret" | openssl dgst -sha256 -binary | openssl enc -base64
+K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol/pe/Unols=
+$ echo -n "secret" | openssl dgst -sha384 -binary | openssl enc -base64
+WKd1ukESvjAFrkQHznV9iP2nHUBJe7gCbsrFTU4//HIyzo3jq1rLMK45dg/ufFPt
+$ echo -n "secret" | openssl dgst -sha512 -binary | openssl enc -base64
+vSsar3708Jvp9Szi2NWZZ02Bqp1qRCFpbcTZPdBhnWgs5WtNZKnvCXdhztmeD2cm
+W192CF5bDufKRpayrW/isg==
+
+(join those lines up to form the full hash)
+
+
+
+Alternatively we could modify an existing user's password with
+ldappasswd, and then test binding as that user:
+
+$ ldappasswd -D "cn=admin,dc=example,dc=com" -x -W -S uid=jturner,ou=People,dc=example,dc=com
+New password: secret
+Re-enter new password: secret
+Enter LDAP Password: <cn=admin's password>
+
+$ ldapsearch -b "dc=example,dc=com" -D "uid=jturner,ou=People,dc=example,dc=com" -x -w secret
+
+
+Debugging (SHA-512, SHA-384 and SHA-256 only)
+---------------------------------------------
+
+To see what's going on, recompile with SLAPD_SHA2_DEBUG (use the
+commented-out DEFS in Makefile), and then run slapd from the console
+to see stderr:
+
+$ sudo /etc/init.d/slapd stop
+Stopping OpenLDAP: slapd.
+$ sudo /usr/sbin/slapd -f /etc/ldap/slapd.conf -h ldap://localhost:389 -d stats
+@(#) $OpenLDAP$
+        buildd@palmer:/build/buildd/openldap2.3-2.4.9/debian/build/servers/slapd
+slapd starting
+...
+Validating password
+  Hash scheme:		{SHA256}
+  Password to validate:	secret
+  Password hash:	K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol/pe/Unols=
+  Stored password hash: K7gNU3sdo+OL0wNhqoVWhr3g6s1xYv72ol/pe/Unols=
+  Result:		match
+conn=0 op=0 BIND dn="cn=admin,dc=example,dc=com" mech=SIMPLE ssf=0
+conn=0 op=0 RESULT tag=97 err=0 text=
+conn=0 op=1 SRCH base="dc=example,dc=com" scope=2 deref=0 filter="(objectClass=*)"
+conn=0 fd=12 closed (connection lost)
+
+---
+
+This work is part of OpenLDAP Software <http://www.openldap.org/>.
+
+Copyright 2009-2014 The OpenLDAP Foundation.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in the file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+<http://www.OpenLDAP.org/license.html>.
+
+---
+
+ACKNOWLEDGEMENT:
+This work was initially developed by Jeff Turner for inclusion in
+OpenLDAP Software, based upon the SHA-2 implementation independently
+developed by Aaron Gifford.
+

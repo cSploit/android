@@ -1,0 +1,42 @@
+***************************************************************
+* This code is LGPL. You CAN make commercial solutions using  *
+* LGPL software.                                              *
+***************************************************************
+
++-------------------------------------------------------------+
+| unixODBC                                                    |
+| Drivers                                                     |
++-------------------------------------------------------------+
+
+Some unixODBC drivers have been coded from scratch while others
+have been integerated (tweeked to compile and tested) into
+unixODBC.
+
+It is unlikely that you have all of the required
+libs to build all of these drivers so edit the Makefile
+in this dir... comment out any unwanted drivers.
+
+Getting all drivers up to the latest ODBC Level (ie 3.51) is
+an ongoing effort. You will find that each driver will implement
+a different level of compliance but, hopefully, enough to be
+quite usefull.
+
+If you develop a new driver than please let us know. We have
+created a Template to help you (see template dir).
+
+Drivers which are under development or are currently being
+tested with unixODBC may not be included in this distribution
+and some others may have to be downloaded from the DBMS vendor.
+
+The txt and nn drivers are good candidates for testing when
+you do not want to install a full DBMS. The txt driver will 
+use a text file based database which may take a bit of time
+to understand in terms of setting it up. The nn driver uses
+internet News Servers as a data server so it is, perhaps, the
+easiest to get started with.
+
++-------------------------------------------------------------+
+| Peter Harvey pharvey@codebydesign.com                       |
+| www.genix.net/unixODBC                                      |
++-------------------------------------------------------------+
+

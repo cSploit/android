@@ -1,0 +1,116 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Connecting </TITLE>
+<LINK REL="StyleSheet" Href="odbc.css">
+</HEAD>
+<BODY bgcolor="white">
+
+<table width="90%" cols="3" border="0">
+<TR>
+   <TD colspan="3" class="big">Connecting to a Datasource</TD>
+</TR>
+<TR>
+  <TD colspan="3"><P>First thing you will need is a variable of type <CODE>SQLHENV</CODE>. This is
+  a handle (pointer) to an internal ODBC structure which holds all informationen about the
+  ODBC environment. Without a handle of that kind you won't be able do to very much.
+  To get this handle you call <CODE><A HREF="gloss.html#alloc">SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE, &amp;V_OD_Env)</A></CODE>.
+  <CODE>V_OD_Erg</CODE> is a variable of type <CODE>SQLHENV</CODE> which holds the allocated environment handle.</P>
+  <P>
+  If you have allocated the handle you need to define which version of ODBC to use. Therefore 
+  you should call <CODE><A HREF="gloss.html#envattr">SQLSetEnvAttr(V_OD_Env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0)</A></CODE>.
+  The constant <CODE>SQL_ATTR_ODBC_VERSION</CODE> defines that the needed version of ODBC will be defined
+  and <CODE>SQL_OV_ODBC3</CODE> says that the program will need ODBC 3.0.
+  </P>
+  <P>Next thing to do is to create a handle for the database connection which is of the type <CODE>SQLHDBC</CODE>. Once again you call
+  <CODE>SQLAllocHandle</CODE> this time with <CODE>SQL_HANDLE_DBC</CODE> and the variable to the environment returned by the first call to
+  <CODE>SQLAllocHandle</CODE>.
+  </P><P>
+  Then you may choose to modify the connection attributes, mainly the timeout for any given
+  action on the connection. You do this by calling <CODE><A HREF="gloss.html#conattr">SQLSetConnectAttr</A></CODE>
+  with the connection handle, attribute and value pointer and the string length (if available).</P>
+  <P>
+  Finally we are able to connect to the database via <CODE><A href="gloss.html#conn">SQLConnect</A></CODE>, which needs the name of the data source,
+  the username and password as parameters. For each parameter you need to specify how long the string is or just gib <COde>SQL_NTS</CODE> which
+  says that it is a string which length has to be determined by <CODE>SQLConnect</CODE>
+  </P>
+  That's it, we are connected to the database. Please note, that all functions mentioned on this page return either <CODE>SQL_SUCCESS</CODE>, <CODE>SQL_SUCCESS_WITH_INFO</CODE> 
+  if all went smoothly or <CODE>SQL_ERROR</CODE> or <CODE>SQL_INVALID_HANDLE</CODE> in case of an error. We will have a look on how to get diagnostic messages a little later.
+  <P>
+  So let's have a look at the code:
+</TD>
+</TR>
+</TABLE>
+<TABLE>
+<TR>
+<TD>
+  <PRE><CODE class="list">
+<A NAME="list"></A>  
+/* odbc.c
+
+    testing unixODBC
+*/
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;odbc/sql.h&gt;
+#include &lt;odbc/sqlext.h&gt;
+#include &lt;odbc/sqltypes.h&gt;
+
+SQLHENV			 V_OD_Env;     <FONT COLOR="green">// Handle ODBC environment</FONT>
+long			 V_OD_erg;     <FONT COLOR="green">// result of functions</FONT>
+SQLHDBC			 V_OD_hdbc;    <FONT COLOR="green">// Handle connection</FONT>
+
+char			 V_OD_stat[10]; <FONT COLOR="green">// Status SQL</FONT>
+SQLINTEGER		 V_OD_err,V_OD_rowanz,V_OD_id;
+SQLSMALLINT		 V_OD_mlen;
+char             V_OD_msg[200],V_OD_buffer[200];
+
+
+int main(int argc,char *argv[])
+{
+	<FONT COLOR="green">// 1. allocate Environment handle and register version </FONT>
+	V_OD_erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&V_OD_Env);
+	if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+	{
+		printf("Error AllocHandle\n");
+		exit(0);
+	}
+	V_OD_erg=SQLSetEnvAttr(V_OD_Env, SQL_ATTR_ODBC_VERSION, 
+                               (void*)SQL_OV_ODBC3, 0); 
+	if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+	{
+		printf("Error SetEnv\n");
+		SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+		exit(0);
+	}
+	<FONT COLOR="green">// 2. allocate connection handle, set timeout</FONT>
+	V_OD_erg = SQLAllocHandle(SQL_HANDLE_DBC, V_OD_Env, &V_OD_hdbc); 
+	if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+	{
+		printf("Error AllocHDB %d\n",V_OD_erg);
+		SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+		exit(0);
+	}
+	SQLSetConnectAttr(V_OD_hdbc, SQL_LOGIN_TIMEOUT, (SQLPOINTER *)5, 0);
+	<FONT COLOR="green">// 3. Connect to the datasource "web" </FONT>
+	V_OD_erg = SQLConnect(V_OD_hdbc, (SQLCHAR*) "web", SQL_NTS,
+                                     (SQLCHAR*) "christa", SQL_NTS,
+                                     (SQLCHAR*) "", SQL_NTS);
+	if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+	{
+		printf("Error SQLConnect %d\n",V_OD_erg);
+		SQLGetDiagRec(SQL_HANDLE_DBC, V_OD_hdbc,1, 
+		              V_OD_stat, &V_OD_err,V_OD_msg,100,&V_OD_mlen);
+		printf("%s (%d)\n",V_OD_msg,V_OD_err);
+		SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+		exit(0);
+	}
+	printf("Connected !\n");
+	<FONT COLOR="green">/* continued on next page */</FONT>
+  </CODE>
+  </PRE>
+  </TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>

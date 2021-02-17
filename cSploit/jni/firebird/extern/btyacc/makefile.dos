@@ -1,0 +1,71 @@
+# Makefile for MS-DOS using Borland C (by P. Foggia)
+#
+DEST          = .
+
+HDRS          = defs.h mstring.h
+
+CFLAGS        = -ml -c
+
+LDFLAGS       =   /c
+
+# Change LIBDIR to your compiler's library path
+LIBDIR        = L:\bc\lib
+C0            = $(LIBDIR)\c0l.obj
+CLIB          = $(LIBDIR)\cl.lib
+
+LIBS          =
+
+LINKER        = tlink
+CC        = bcc
+
+MAKEFILE      = Makefile.dos
+
+OBJS1  = closure.obj error.obj lalr.obj lr0.obj main.obj mkpar.obj output.obj
+OBJS2  = mstring.obj reader.obj skeleton.obj symtab.obj verbose.obj warshall.obj
+OBJS   = $(OBJS1) $(OBJS2)
+
+
+PROGRAM       = btyacc.exe
+
+SRCS          = closure.c error.c lalr.c lr0.c main.c mkpar.c output.c  \
+                mstring.c reader.c skeleton.c symtab.c verbose.c warshall.c
+
+OTHERS        = README README.BYACC \
+                Makefile btyaccpa.ske empty.y skel2c manpage
+
+all:            $(PROGRAM)
+
+$(PROGRAM):     $(OBJS) $(LIBS)
+        @echo Linking $(PROGRAM) ...
+        @echo $(LDFLAGS) $(C0) + > link.lst
+        @echo $(OBJS1) + >> link.lst
+        @echo $(OBJS2)  >> link.lst
+        @echo $(PROGRAM) >>link.lst
+        @echo nul >> link.lst
+        @echo $(CLIB) >> link.lst
+        @$(LINKER) @link.lst
+        @echo ... done
+
+
+
+
+program:        $(PROGRAM)
+
+
+skeleton.c: btyaccpa.ske
+        awk -f skel2c btyaccpa.ske >skeleton.c
+
+###
+closure.o: defs.h
+error.o: defs.h
+lalr.o: defs.h
+lr0.o: defs.h
+main.o: defs.h
+mkpar.o: defs.h
+mstring.o: mstring.h
+output.o: defs.h
+reader.o: defs.h mstring.h
+skeleton.o: defs.h
+symtab.o: defs.h
+verbose.o: defs.h
+warshall.o: defs.h

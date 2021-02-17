@@ -1,0 +1,64 @@
+Tools           ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+ldapcompare      * DE**HI** MNOPQR  UVWXYZ   de *h*** *nop*    vwxyz
+ldapdelete       *CDE**HI** MNOPQR  UVWXYZ  cdef*h*** *nop*    vwxyz
+ldapexop         * D **HI**  NO QR  UVWXYZ   de *h*** *nop     vwxy
+ldapmodify       *CDE**HI** MNOPQRS UVWXYZabcde *h*** *nop*r t vwxy
+ldapmodrdn       *CDE**HI** MNOPQR  UVWXYZ  cdef*h*** *nop*rs  vwxy
+ldappasswd      A*CDE**HI**  NO QRS UVWXYZa  def*h*** * o * s  vwxy  
+ldapsearch      A*CDE**HI**LMNOPQRSTUVWXYZab def*h***l*nop* stuvwxyz
+ldapurl          *  E**H **       S       ab   f*h*** *  p* s
+ldapvc           * DE**HI**  NO QRS UVWXYZa cdef*h*** *nop*    vwxy 
+ldapwhoami       * DE**HI**  NO QR  UVWXYZ   def*h*** *nop*    vwxy 
+
+
+* reserved
+	BFGJgijmq01235789
+
+* General flags:
+	-C Chase Referrals
+	-D Bind DN
+	-E Tool-specific Extensions	(e.g., -E <[!]oid[=options]>*)
+	-e General Extensions		(e.g., -e <[!]oid[=options]>*)
+	-f file
+	-H URI
+	-P protocol version
+	-V version information
+	-W prompt for bind password
+	-d debug
+	-h host
+	-n no-op
+	-N no (SASLprep) normalization of simple bind password
+	-o general options (currently nettimeout and ldif-wrap only)
+	-p port
+	-v verbose
+	-V version
+	-x simple bind
+	-y Bind password-file
+	-w Bind password
+
+Not used
+	-4 IPv4 only
+	-6 IPv6 only
+
+
+* LDAPv3 Only 
+	-M ManageDSAIT
+	-Z StartTLS
+
+	-Y SASL Mechanism (defaults to "best")
+	-R SASL Realm (defaults to empty)
+	-O SASL Security Options (defaults to "noanonymous,noplain")
+	-U SASL Authentication Identity (defaults to USER)
+	-X SASL Authorization Identity (defaults to empty)
+
+	-I SASL interactive mode (default: automatic)
+	-Q SASL quiet mode (default: automatic)
+
+
+* LDAPv2+ Only (REMOVED)
+	-K LDAPv2 Kerberos Bind (Step 1 only)
+	-k LDAPv2 Kerberos Bind
+
+
+---
+$OpenLDAP$

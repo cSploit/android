@@ -1,0 +1,128 @@
+#
+#  The contents of this file are subject to the Initial
+#  Developer's Public License Version 1.0 (the "License");
+#  you may not use this file except in compliance with the
+#  License. You may obtain a copy of the License at
+#  http://www.ibphoenix.com/main.nfs?a=ibphoenix&page=ibp_idpl.
+#
+#  Software distributed under the License is distributed AS IS,
+#  WITHOUT WARRANTY OF ANY KIND, either express or implied.
+#  See the License for the specific language governing rights
+#  and limitations under the License.
+#
+#  The Original Code was created by Mark O'Donohue
+#  for the Firebird Open Source RDBMS project.
+#
+#  Copyright (c) Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#  and all contributors signed below.
+#
+#  All Rights Reserved.
+#  Contributor(s): ______________________________________.
+#
+# 
+#
+ROOT=..
+
+
+
+include     $(ROOT)/gen/make.defaults
+include     $(ROOT)/gen/make.platform
+include     $(ROOT)/gen/make.rules
+include     $(ROOT)/gen/make.shared.variables
+
+
+ @SET_MAKE@
+
+.PHONY: install dist packages tarfile
+.PHONY: buildTarDir buildImageDir buildRoot buildDebugInfo
+
+# Some of these targets are run from the root tree of the build.
+# those need to know where the install subdirectory is kept.
+# Others are run locally these need to know the path back to the
+# root of the build tree.
+
+BuildRoot=$(GEN_ROOT)
+
+InstallRoot=.
+
+BuildVersion=$(FirebirdVersion).$(BuildNum)
+
+Version=$(BuildVersion)-$(PackageVersion)
+
+
+
+# This means something like: FirebirdCS-*.0.0-*.i386.tar.gz
+
+TarDir= Firebird-$(Version).$(CpuType)
+TarFile=Firebird-$(Version).$(CpuType).tar.gz
+DebugDir=Firebird-debuginfo-$(Version).$(CpuType)
+DebugFile=Firebird-debuginfo-$(Version).$(CpuType).tar.gz
+
+
+PkgSrcDir=$(InstallRoot)/$(ArchType)
+ScriptDir=$(GEN_ROOT)/install/scripts/
+MiscDir=@FB_MISCDIR@
+DebugManifest=manifest_debug.txt
+
+
+TarInstallDir=$(GEN_ROOT)/install
+
+#Curses library
+TermLib=@TERMLIB@.so
+
+
+dist : packages
+
+packages: tarfile debugfile
+
+tarfile:  $(TarFile)
+
+$(TarFile) :  buildTarDir
+	(cd $(GEN_ROOT); tar -czf $(TarFile) $(TarDir))
+
+debugfile:  $(DebugFile)
+
+$(DebugFile) :  buildImageDir
+	(cd $(GEN_ROOT)/$(DebugDir); tar -czf ../$(DebugFile) .)
+
+buildRoot:
+	(cd $(GEN_ROOT); ./install/makeInstallImage.sh)
+
+buildDebugInfo: buildRoot
+	mkdir -p $(GEN_ROOT)/$(DebugDir)
+	for x in `(cd $(GEN_ROOT)/buildroot; find)`; do \
+        FIL=$(GEN_ROOT)/buildroot/$$x; \
+        D_FIL=$(GEN_ROOT)/$(DebugDir)/`dirname $${x}`/.debug/`basename $${x}`.debug; \
+        if [ ! -h $$FIL ] && readelf -h $$FIL > /dev/null 2> /dev/null; then \
+            mkdir -p $(GEN_ROOT)/$(DebugDir)/`dirname $$x`/.debug; \
+            echo Generating external debug info for $$x; \
+            cp $${FIL} $${D_FIL}; \
+            objcopy --add-gnu-debuglink=$${D_FIL} $${FIL}; \
+            echo Stripping unneeded symbols from $${x}; \
+            objcopy --strip-debug --strip-unneeded $${FIL}; \
+        fi; \
+    done
+	(cd $(GEN_ROOT)/$(DebugDir); mkdir -p ./$(MiscDir); \
+		find . -type f -name '*.debug' -print >./$(MiscDir)/$(DebugManifest))
+
+# Use this line if you don't want to use separate debug info
+#buildImageDir: buildRoot
+buildImageDir: buildDebugInfo
+
+
+buildTarDir: buildImageDir
+	mkdir -p $(GEN_ROOT)/$(TarDir)
+	cp -r $(GEN_ROOT)/install/scripts $(GEN_ROOT)/$(TarDir)
+	cp -r $(GEN_ROOT)/install/scripts/tarMainInstall.sh $(GEN_ROOT)/$(TarDir)/install.sh
+	chmod a+x $(GEN_ROOT)/$(TarDir)/install.sh $(GEN_ROOT)/$(TarDir)/scripts/*sh
+	(cd $(GEN_ROOT)/$(TarDir); tar -C ../buildroot -czf buildroot.tar.gz . )
+	(cd $(GEN_ROOT)/$(TarDir); tar -tzf buildroot.tar.gz > manifest.txt )
+
+
+install: buildTarDir
+	(cd $(GEN_ROOT)/$(TarDir); FIREBIRD= FIREBIRD_LOCK= ./install.sh)
+	cp -r $(GEN_ROOT)/$(DebugDir)/* /
+
+silent_install: buildTarDir
+	(cd $(GEN_ROOT)/$(TarDir); FIREBIRD= FIREBIRD_LOCK= ./install.sh -silent)
+	cp -r $(GEN_ROOT)/$(DebugDir)/* /

@@ -1,0 +1,839 @@
+--- libnet.orig/doc/man/man3/libnet-functions.h.3
++++ libnet/doc/man/man3/libnet-functions.h.3
+@@ -485,7 +485,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-1 on success, -1 on failure 
++1 on success, \-1 on failure
+ .RE
+ .PP
+ 
+@@ -504,7 +504,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-1 on success, -1 on failure 
++1 on success, \-1 on failure
+ .RE
+ .PP
+ 
+@@ -535,7 +535,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-the number of bytes written, or -1 on failure 
++the number of bytes written, or \-1 on failure
+ .RE
+ .PP
+ 
+@@ -560,7 +560,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -579,7 +579,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -606,7 +606,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -627,7 +627,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -654,7 +654,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -675,7 +675,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -706,7 +706,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -741,7 +741,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -768,7 +768,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -795,7 +795,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -826,7 +826,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -853,7 +853,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -892,13 +892,14 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+ .SS "libnet_ptag_t libnet_build_bgp4_header (u_int8_t marker[LIBNET_BGP4_MARKER_SIZE], u_int16_t len, u_int8_t type, u_int8_t * payload, u_int32_t payload_s, libnet_t * l, libnet_ptag_t ptag)"
+ .PP
+-Builds an RFC 1771 Border Gateway Protocol 4 (BGP-4) header. The primary function of a BGP speaking system is to exchange network reachability information with other BGP systems. This network reachability information includes information on the list of Autonomous Systems (ASs) that reachability information traverses. This information is sufficient to construct a graph of AS connectivity from which routing loops may be pruned and some policy decisions at the AS level may be enforced. This function builds the base BGP header which is used as a preamble before any other BGP header. For example, a BGP KEEPALIVE message may be built with only this function, while an error notification requires a subsequent call to libnet_build_bgp4_notification. 
++Builds an RFC 1771 Border Gateway Protocol 4 (BGP-4) header. The primary function of a BGP speaking system is to exchange network reachability
++information with other BGP systems. This network reachability information includes information on the list of Autonomous Systems (ASs) that reachability information traverses. This information is sufficient to construct a graph of AS connectivity from which routing loops may be pruned and some policy decisions at the AS level may be enforced. This function builds the base BGP header which is used as a preamble before any other BGP header. For example, a BGP KEEPALIVE message may be built with only this function, while an error notification requires a subsequent call to libnet_build_bgp4_notification.
+ .PP
+ \fBParameters:\fP
+ .RS 4
+@@ -919,7 +920,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -944,7 +945,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -975,7 +976,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1008,7 +1009,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1027,7 +1028,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1060,7 +1061,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1081,7 +1082,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1100,7 +1101,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1133,13 +1134,13 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+ .SS "libnet_ptag_t libnet_build_egre (u_int16_t fv, u_int16_t type, u_int16_t sum, u_int16_t offset, u_int32_t key, u_int32_t seq, u_int16_t len, u_int8_t * payload, u_int32_t payload_s, libnet_t * l, libnet_ptag_t ptag)"
+ .PP
+-Generic Routing Encapsulation (GRE - RFC 1701) is used to encapsulate any protocol. Hence, the IP part of the packet is usually referred as 'delivery header'. It is then followed by the GRE header and finally the encapsulated packet (IP or whatever). As GRE is very modular, the first GRE header describes the structure of the header, using bits and flag to specify which fields will be present in the header. 
++Generic Routing Encapsulation (GRE \- RFC 1701) is used to encapsulate any protocol. Hence, the IP part of the packet is usually referred as 'delivery header'. It is then followed by the GRE header and finally the encapsulated packet (IP or whatever). As GRE is very modular, the first GRE header describes the structure of the header, using bits and flag to specify which fields will be present in the header.
+ .PP
+ \fBParameters:\fP
+ .RS 4
+@@ -1168,7 +1169,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1195,7 +1196,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1228,13 +1229,13 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+ .SS "libnet_ptag_t libnet_build_gre (u_int16_t fv, u_int16_t type, u_int16_t sum, u_int16_t offset, u_int32_t key, u_int32_t seq, u_int16_t len, u_int8_t * payload, u_int32_t payload_s, libnet_t * l, libnet_ptag_t ptag)"
+ .PP
+-Generic Routing Encapsulation (GRE - RFC 1701) is used to encapsulate any protocol. Hence, the IP part of the packet is usually referred as 'delivery header'. It is then followed by the GRE header and finally the encapsulated packet (IP or whatever). As GRE is very modular, the first GRE header describes the structure of the header, using bits and flag to specify which fields will be present in the header. 
++Generic Routing Encapsulation (GRE \- RFC 1701) is used to encapsulate any protocol. Hence, the IP part of the packet is usually referred as 'delivery header'. It is then followed by the GRE header and finally the encapsulated packet (IP or whatever). As GRE is very modular, the first GRE header describes the structure of the header, using bits and flag to specify which fields will be present in the header.
+ .PP
+ \fBParameters:\fP
+ .RS 4
+@@ -1263,7 +1264,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1282,7 +1283,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1301,7 +1302,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1332,7 +1333,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1365,7 +1366,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1406,7 +1407,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1449,7 +1450,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1486,7 +1487,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1527,7 +1528,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1556,7 +1557,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1589,7 +1590,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1616,7 +1617,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1643,7 +1644,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1682,7 +1683,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1703,7 +1704,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1738,7 +1739,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1763,7 +1764,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1792,7 +1793,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1817,7 +1818,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1844,7 +1845,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1883,7 +1884,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1912,7 +1913,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -1941,7 +1942,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2000,7 +2001,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2019,7 +2020,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2038,7 +2039,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2057,7 +2058,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2076,7 +2077,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2095,7 +2096,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2114,7 +2115,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2133,7 +2134,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2152,7 +2153,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2171,7 +2172,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2190,7 +2191,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2229,7 +2230,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2243,7 +2244,7 @@
+ .br
+ \fIxid\fP transaction identifier used to link calls and replies 
+ .br
+-\fIprog_num\fP remote program specification typically between 0 - 1fffffff 
++\fIprog_num\fP remote program specification typically between 0 \- 1fffffff
+ .br
+ \fIprog_vers\fP remote program version specification 
+ .br
+@@ -2272,7 +2273,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2315,7 +2316,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2360,7 +2361,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2387,7 +2388,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2422,7 +2423,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2443,7 +2444,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2482,7 +2483,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2511,7 +2512,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2523,7 +2524,7 @@
+ .RS 4
+ \fIversion\fP VRRP version (should be 2) 
+ .br
+-\fItype\fP VRRP packet type (should be 1 -- ADVERTISEMENT) 
++\fItype\fP VRRP packet type (should be 1 \-\- ADVERTISEMENT)
+ .br
+ \fIvrouter_id\fP virtual router identification 
+ .br
+@@ -2531,7 +2532,7 @@
+ .br
+ \fIip_count\fP number of IPv4 addresses contained in this advertisement 
+ .br
+-\fIauth_type\fP type of authentication (0, 1, 2 -- see RFC) 
++\fIauth_type\fP type of authentication (0, 1, 2 \-\- see RFC)
+ .br
+ \fIadvert_int\fP interval between advertisements 
+ .br
+@@ -2548,7 +2549,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2575,7 +2576,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-1 on success, -1 on failure 
++1 on success, \-1 on failure
+ .RE
+ .PP
+ 
+@@ -2757,7 +2758,7 @@
+ 
+ .SS "u_int32_t libnet_get_ipaddr4 (libnet_t * l)"
+ .PP
+-Returns the IP address for the device libnet was initialized with. If libnet was initialized without a device (in raw socket mode) the function will attempt to find one. If the function fails and returns -1 a call to libnet_geterrror() will tell you why. 
++Returns the IP address for the device libnet was initialized with. If libnet was initialized without a device (in raw socket mode) the function will attempt to find one. If the function fails and returns \-1 a call to libnet_geterrror() will tell you why.
+ .PP
+ \fBParameters:\fP
+ .RS 4
+@@ -2766,7 +2767,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-a big endian IP address suitable for use in a libnet_build function or -1 
++a big endian IP address suitable for use in a libnet_build function or \-1
+ .RE
+ .PP
+ 
+@@ -2787,7 +2788,7 @@
+ 
+ .SS "u_int32_t libnet_get_prand (int mod)"
+ .PP
+-Generates an unsigned psuedo-random value within the range specified by mod. LIBNET_PR2 0 - 1 LIBNET_PR8 0 - 255 LIBNET_PR16 0 - 32767 LIBNET_PRu16 0 - 65535 LIBNET_PR32 0 - 2147483647 LIBNET_PRu32 0 - 4294967295
++Generates an unsigned psuedo-random value within the range specified by mod. LIBNET_PR2 0 \- 1 LIBNET_PR8 0 \- 255 LIBNET_PR16 0 \- 32767 LIBNET_PRu16 0 \- 65535 LIBNET_PR32 0 \- 2147483647 LIBNET_PRu32 0 \- 4294967295
+ .PP
+ \fBParameters:\fP
+ .RS 4
+@@ -2796,7 +2797,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-1 on success, -1 on failure 
++1 on success, \-1 on failure
+ .RE
+ .PP
+ 
+@@ -2860,7 +2861,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-protocol tag value on success, -1 on error 
++protocol tag value on success, \-1 on error
+ .RE
+ .PP
+ 
+@@ -2964,7 +2965,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-network byte ordered IPv4 address or -1 (2^32 - 1) on error 
++network byte ordered IPv4 address or \-1 (2^32 \- 1) on error
+ .RE
+ .PP
+ 
+@@ -2998,7 +2999,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-1 on success, -1 on failure 
++1 on success, \-1 on failure
+ .RE
+ .PP
+ 
+@@ -3028,13 +3029,13 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-1 on success, -1 on failure 
++1 on success, \-1 on failure
+ .RE
+ .PP
+ 
+ .SS "int libnet_plist_chain_new (libnet_t * l, libnet_plist_t ** plist, char * token_list)"
+ .PP
+-Creates a new port list. Port list chains are useful for TCP and UDP-based applications that need to send packets to a range of ports (contiguous or otherwise). The port list chain, which token_list points to, should contain a series of int8_tacters from the following list: '0123456789,-' of the general format 'x - y, z', where 'xyz' are port numbers between 0 and 65,535. plist points to the front of the port list chain list for use in further libnet_plist_chain() functions. Upon success, the function returns 1. Upon failure, the function returns -1 and \fBlibnet_geterror()\fP can tell you why. 
++Creates a new port list. Port list chains are useful for TCP and UDP-based applications that need to send packets to a range of ports (contiguous or otherwise). The port list chain, which token_list points to, should contain a series of int8_tacters from the following list: '0123456789,\-' of the general format 'x \- y, z', where 'xyz' are port numbers between 0 and 65,535. plist points to the front of the port list chain list for use in further libnet_plist_chain() functions. Upon success, the function returns 1. Upon failure, the function returns \-1 and \fBlibnet_geterror()\fP can tell you why.
+ .PP
+ \fBParameters:\fP
+ .RS 4
+@@ -3047,13 +3048,13 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-1 on success, -1 on failure 
++1 on success, \-1 on failure
+ .RE
+ .PP
+ 
+ .SS "int libnet_plist_chain_next_pair (libnet_plist_t * plist, u_int16_t * bport, u_int16_t * eport)"
+ .PP
+-Returns the next port list chain pair from the port list chain plist. bport and eport contain the starting port number and ending port number, respectively. Upon success, the function returns 1 and fills in the port variables; however, if the list is empty, the function returns 0 and sets both port variables to 0. Upon failure, the function returns -1. 
++Returns the next port list chain pair from the port list chain plist. bport and eport contain the starting port number and ending port number, respectively. Upon success, the function returns 1 and fills in the port variables; however, if the list is empty, the function returns 0 and sets both port variables to 0. Upon failure, the function returns \-1.
+ .PP
+ \fBParameters:\fP
+ .RS 4
+@@ -3066,7 +3067,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-1 on success, 0 if empty, -1 on failure 
++1 on success, 0 if empty, \-1 on failure
+ .RE
+ .PP
+ 
+@@ -3081,7 +3082,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-1 on success, -1 on failure 
++1 on success, \-1 on failure
+ .RE
+ .PP
+ 
+@@ -3112,7 +3113,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-1 on success, -1 on failure 
++1 on success, \-1 on failure
+ .RE
+ .PP
+ 
+@@ -3127,7 +3128,7 @@
+ .PP
+ \fBReturns:\fP
+ .RS 4
+-the number of bytes written, -1 on error 
++the number of bytes written, \-1 on error
+ .RE
+ .PP
+ 

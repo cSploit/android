@@ -1,0 +1,80 @@
+This is an index of RFC contained in this directory:
+
+rfc2079.txt X.500 Attribute Type and an Object Class to Hold URIs (PS)
+rfc2247.txt Using Domains in LDAP DNs (PS)
+rfc2293.txt Tables and Subtrees in the X.500 Directory (PS)
+rfc2294.txt O/R Address hierarchy in the X.500 DIT (PS)
+rfc2307.txt LDAP Network Information Services Schema (E)
+rfc2377.txt LDAP Naming Plan (I)
+rfc2589.txt LDAPv3: Dynamic Directory Services Extensions (PS)
+rfc2649.txt LDAPv3 Operational Signatures (E)
+rfc2696.txt LDAP Simple Paged Result Control (I)
+rfc2713.txt LDAP Java schema (I)
+rfc2714.txt LDAP CORBA schema (I)
+rfc2798.txt LDAP inetOrgPerson schema (I)
+rfc2849.txt LDIFv1 (PS)
+rfc2891.txt LDAPv3: Server Side Sorting of Search Results (PS)
+rfc2926.txt LDAP: Conversion of LDAP Schemas to and from SLP Templates (I)
+rfc3045.txt Storing Vendor Information in the LDAP root DSE (I)
+rfc3062.txt LDAP Password Modify Extended Operation (PS)
+rfc3088.txt OpenLDAP Root Service (E)
+rfc3112.txt LDAP Authentication Password Schema (I)
+rfc3296.txt Named Subordinate References in LDAP (PS)
+rfc3663.txt Domain Administrative Data in LDAP (E)
+rfc3671.txt Collective Attributes in LDAP (PS)
+rfc3672.txt Subentries in LDAP (PS)
+rfc3673.txt LDAPv3: All Operational Attributes (PS)
+rfc3687.txt LDAP Component Matching Rules (PS)
+rfc3698.txt LDAP: Additional Matching Rules (PS)
+rfc3703.txt LDAP: Schema for Policy Core (PS)
+rfc3712.txt LDAP: Schema for Printer Services (I)
+rfc3727.txt ASN.1 Module for LDAP Component Matching Rules (PS)
+rfc3829.txt LDAP Authorization Identity Controls (I)
+rfc3866.txt Language Tag and Ranges in LDAP (PS)
+rfc3876.txt Returning Matched Values with LDAP (PS)
+rfc3909.txt LDAP Cancel Operation (PS)
+rfc3928.txt LDAP Client Update Protocol (PS)
+rfc4013.txt SASLprep (PS)
+rfc4370.txt LDAP Proxied Authorization Control (PS)
+rfc4373.txt LBURP (I)
+rfc4403.txt LDAP Schema for UDDI (I)
+rfc4510.txt LDAP Technical Specification Roadmap (PS)
+rfc4511.txt LDAP: The Protocol (PS)
+rfc4512.txt LDAP: Directory Information Models (PS)
+rfc4513.txt LDAP: Authentication Methods and Security Mechanisms (PS)
+rfc4514.txt LDAP: DN (PS)
+rfc4515.txt LDAP: Search Filters (PS)
+rfc4516.txt LDAP: URL (PS)
+rfc4517.txt LDAP: Syntaxes and Matching Rules (PS)
+rfc4518.txt LDAP: Internationalized String Preparation (PS)
+rfc4519.txt LDAP: User Applications Schema (PS)
+rfc4520.txt IANA Considerations for LDAP (BCP)
+rfc4521.txt Considerations for LDAP Extensions (BCP)
+rfc4522.txt LDAP: Binary Encoding Option (PS)
+rfc4523.txt LDAP: X.509 Certificate Schema (PS)
+rfc4524.txt LDAP: COSINE Schema (PS)
+rfc4525.txt LDAP: Modify-Increment Extension (I)
+rfc4526.txt LDAP: Absolute True and False Filters (PS)
+rfc4527.txt LDAP: Read Entry Controls (PS)
+rfc4528.txt LDAP: Assertion Control (PS)
+rfc4529.txt LDAP: Requesting Attributes by Object Class
+rfc4530.txt LDAP: entryUUID (PS)
+rfc4531.txt LDAP Turn Operation (E)
+rfc4532.txt LDAP Who am I? Operation (PS)
+rfc4533.txt LDAP Content Sync Operation (E)
+rfc5020.txt LDAP 'entryDN' operational attribute (PS)
+rfc5805.txt LDAP Transactions (E)
+rfc6171.txt LDAP dontUseCopy control (PS)
+
+Legend:
+STD	Standard
+DS	Draft Standard
+PS	Proposed Standard
+I	Information
+E	Experimental
+FYI	For Your Information 
+BCP	Best Common Practice
+
+Please see http://www.rfc-editor.org/ for up-to-date status information.
+
+$OpenLDAP$

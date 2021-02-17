@@ -1,0 +1,232 @@
+#!/bin/sh
+#  This library is part of the FirebirdSQL project
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License, or (at your option) any later version.
+#  You may obtain a copy of the Licence at
+#  http://www.gnu.org/licences/lgpl.html
+#
+#  As a special exception this file can also be included in modules
+#  with other source code as long as that source code has been
+#  released under an Open Source Initiative certificed licence.
+#  More information about OSI certification can be found at:
+#  http://www.opensource.org
+#
+#  This module is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Lesser General Public Licence for more details.
+#
+#  This module was created by members of the firebird development
+#  team.  All individual contributions remain the Copyright (C) of
+#  those individuals and all rights are reserved.  Contributors to
+#  this file are either listed below or can be obtained from a CVS
+#  history command.
+#
+#   Created by:  Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#
+#   Contributor(s):
+#
+#
+
+# Script to copy install files from the build/transport area
+
+
+# This script builds an image of the installed system into
+# the gen/buildroot directory.
+
+
+# Making an assumption that this program is being run in the gen directory
+BuildRootDir=..
+BuiltFBDir=./firebird  # Where the just built fb exists.
+
+TargetDir=buildroot    # Where we want to build the install image
+
+RealRootDir=@prefix@   # Where it will be installed on new machine
+FBRootDir=${RealRootDir#/}   # strip off leading /
+DestDir=$TargetDir/$FBRootDir
+
+
+#------------------------------------------------------------------------
+# addLibs
+# Add required libraries in the beginning of the script
+# Place it to target directory
+
+addLibs() {
+	libSdir=$1
+	libScript=$2
+	libTdir=$3
+	libTarget=$libTdir/$libScript
+
+	rm -f $libTarget
+	touch $libTarget
+	for i in posixLibrary.sh classicLibrary.sh hpuxLibrary.sh
+	do
+		echo "# $i" >>$libTarget
+		cat $libSdir/$i >>$libTarget
+		echo "" >>$libTarget	# avoid missing linefeed
+	done
+	cat $libSdir/$libScript >>$libTarget
+}
+
+
+#-------------------------------------------------------------------
+# copyIfExists
+# Copy file if it exists
+#
+
+copyIfExists() {
+   OldFile=$1
+   NewFile=$2
+
+   if [ -f $OldFile ]
+     then
+       cp $OldFile $NewFile
+   fi
+
+}
+
+
+#------------------------------------------------------------------------
+#  copyFiles
+# This function copies all the files for a classic distribution into a
+# directory heirachy mirroring the installation.
+
+copyFiles() {
+# The guts of the tranfer of files and other directories
+
+    if [ -d $TargetDir ]
+      then
+        rm -fr $TargetDir
+    fi
+    mkdir -p $DestDir
+    mkdir $DestDir/bin
+    mkdir $DestDir/examples
+    mkdir $DestDir/help
+    mkdir $DestDir/include
+    mkdir $DestDir/intl
+    mkdir $DestDir/lib
+    mkdir $DestDir/doc
+    mkdir $DestDir/doc/sql.extensions
+    mkdir $DestDir/UDF
+    mkdir $DestDir/misc
+    mkdir $DestDir/misc/upgrade
+    for i in ib_udf metadata security; do
+        mkdir $DestDir/misc/upgrade/$i
+    done
+
+    mkdir -p $TargetDir@libdir@
+    mkdir -p $TargetDir/usr/include
+
+    cp -f $BuiltFBDir/bin/fb_smp_server $DestDir/bin/fb_smp_server
+
+    cp $BuiltFBDir/bin/gbak $DestDir/bin/gbak
+    cp $BuiltFBDir/bin/gds_drop $DestDir/bin/gds_drop
+    copyIfExists $BuiltFBDir/bin/fb_lock_mgr $DestDir/bin/fb_lock_mgr
+    copyIfExists $BuiltFBDir/bin/fb_lock_print $DestDir/bin/fb_lock_print
+    copyIfExists $BuiltFBDir/bin/gds_pipe $DestDir/bin/gds_pipe
+    cp $BuiltFBDir/bin/gfix $DestDir/bin/gfix
+    cp $BuiltFBDir/bin/gpre $DestDir/bin/gpre
+    cp $BuiltFBDir/bin/gsec $DestDir/bin/gsec
+    cp $BuiltFBDir/bin/nbackup $DestDir/bin/nbackup
+    copyIfExists $BuiltFBDir/bin/gsplit $DestDir/bin/gsplit
+    cp $BuiltFBDir/bin/gstat $DestDir/bin/gstat
+    copyIfExists $BuiltFBDir/bin/isc4.gbak $DestDir/bin/isc4.gbak
+    cp $BuiltFBDir/bin/isql $DestDir/bin/isql
+    cp $BuiltFBDir/bin/qli $DestDir/bin/qli
+
+#   Append libraries to scripts
+    addLibs $BuiltFBDir/bin changedbaPassword.sh $DestDir/bin
+    addLibs $BuiltFBDir/bin changegdslibrarycompatibleLink.sh $DestDir/bin
+
+    addLibs $BuiltFBDir/bin tarmainInstall.sh $BuildRootDir/gen/install/scripts
+    addLibs $BuiltFBDir/bin tarInstall.sh $BuildRootDir/gen/install/scripts
+    addLibs $BuiltFBDir/bin preInstall.sh $BuildRootDir/gen/install/scripts
+    addLibs $BuiltFBDir/bin postInstall.sh $BuildRootDir/gen/install/scripts
+    addLibs $BuiltFBDir/bin preUninstall.sh $BuildRootDir/gen/install/scripts
+    addLibs $BuiltFBDir/bin postUninstall.sh $BuildRootDir/gen//install/scripts
+    addLibs $BuiltFBDir/bin tarUninstall.sh $BuildRootDir/gen/install/scripts
+    addLibs $BuiltFBDir/bin tarmainUninstall.sh $BuildRootDir/gen/install/scripts
+
+#   These scripts do not need libraries
+    cp $BuildRootDir/gen/firebird/bin/createaliasDB.sh $DestDir/bin
+    cp $BuiltFBDir/bin/fb_config $DestDir/bin
+
+    cp $BuildRootDir/gen/install/misc/firebird.init.d.hpux $DestDir/misc
+    cp $BuildRootDir/gen/install/misc/rc.config.firebird.hpux $DestDir/misc
+
+    # Copy examples only if we have them
+
+    if [ -f "$BuiltFBDir/examples/README" ]
+      then
+	(cd $BuiltFBDir/examples; tar cf - .) | (cd $DestDir/examples; tar xf -)
+      else
+        echo "Example files have not been built!"
+    fi
+
+    copyIfExists $BuiltFBDir/help/help.gbak $DestDir/help
+    cp $BuiltFBDir/help/help.fdb $DestDir/help
+
+    #cp -r $BuildSrcDir/doc $DestDir
+    #cp -r $BuiltFBDir/doc $DestDir
+
+    cp $BuiltFBDir/firebird.msg $DestDir/firebird.msg
+    cp $BuiltFBDir/$SecurityDatabase $DestDir/$SecurityDatabase
+
+    cp $BuiltFBDir/include/*.h $DestDir/include
+
+    ((cd $BuiltFBDir/lib; tar cf - *.sl*) | (cd $DestDir/lib; tar xf -))
+
+    cp $BuiltFBDir/intl/libfbintl.sl $DestDir/intl/fbintl
+
+    cp $BuiltFBDir/UDF/ib_udf.sl $DestDir/UDF/
+    cp $BuiltFBDir/UDF/fbudf.sl $DestDir/UDF/
+
+#   Note that the following items copy files from outside the build tree
+
+#   Copy the sql-declarations into the UDF-directory
+    cp $BuildRootDir/src/extlib/ib_udf.sql $DestDir/UDF/
+    cp $BuildRootDir/src/extlib/ib_udf2.sql $DestDir/UDF/
+    cp $BuildRootDir/src/extlib/fbudf/fbudf.sql $DestDir/UDF/
+
+#   Copy various documentation
+    ls $BuildRootDir/doc/*.pdf >/dev/null 2>&1 && cp $BuildRootDir/doc/*.pdf $DestDir/doc
+    cp $BuildRootDir/doc/README.* $DestDir/doc
+    cp $BuildRootDir/doc/sql.extensions/README* $DestDir/doc/sql.extensions
+    cp $BuildRootDir/doc/WhatsNew $DestDir/WhatsNew
+    cp $BuildRootDir/doc/README.user $DestDir/README
+
+#   Copy various upgrade stuff
+    cp $BuildRootDir/src/misc/intl.sql                          $DestDir/misc/
+    cp $BuildRootDir/src/misc/upgrade/v2/ib_udf*                $DestDir/misc/upgrade/ib_udf/
+    cp $BuildRootDir/src/misc/upgrade/v2/security_database*     $DestDir/misc/upgrade/security/
+    cp $BuildRootDir/src/misc/upgrade/v2.1/metadata_charset*    $DestDir/misc/upgrade/metadata/
+
+#   Misc config files
+    cp $BuildRootDir/gen/install/misc/firebird.conf $DestDir/
+    cp $BuildRootDir/gen/install/misc/databases.conf $DestDir/
+    cp $BuildRootDir/gen/install/misc/fbintl.conf $DestDir/intl/
+
+#   Create links from @libdir@ to install area.
+    origDir=`pwd`
+    cd $DestDir/lib
+    for i in libfb*.sl*; do ln -s /$FBRootDir/lib/$i $origDir/$TargetDir@libdir@/$i; done
+    cd $origDir
+    ln -s /$FBRootDir/lib/libib_util.sl $TargetDir@libdir@/libib_util.sl
+
+#   Link include files to /usr/include
+    for i in iberror.h ibase.h ib_util.h; do
+        ln -s ../../$FBRootDir/include/$i $TargetDir/usr/include/$i
+    done
+
+}
+
+
+
+#=== MAIN ====================================================================
+
+SecurityDatabase=security2.fdb
+
+copyFiles

@@ -1,0 +1,107 @@
+#
+# Makefile for the linux ncp-filesystem routines.
+#
+
+top_srcdir = @top_srcdir@
+top_builddir = ..
+this_srcdir = ${top_srcdir}/sutil
+
+include ${top_builddir}/Make.rules
+
+vpath %.c ${this_srcdir}
+
+USE_KERNEL = @USE_KERNEL@
+NDS_SUPPORT = @NDS_SUPPORT@
+
+LIBS = @INTLLIBS@ @LIBS@
+
+# environ in ncpmount
+CCFLAGS += -D_GNU_SOURCE
+
+O_UTILS := nwsfind.o
+ifeq ($(USE_KERNEL),1)
+O_UTILS += ncpmount.o ncpumount.o
+ifeq ($(NDS_SUPPORT),1)
+O_UTILS += ncplogin.o
+endif
+endif
+UTILS := $(O_UTILS:%.o=%)
+ifeq ($(USE_KERNEL),1)
+ifeq ($(NDS_SUPPORT),1)
+UTILS += ncpmap
+endif
+endif
+
+CFLAGS_ncpmount.o = -DNCPMOUNT=1 -DMAKE_NCPLIB
+CFLAGS_ncpmap.o = -DNCPMAP=1 -DMAKE_NCPLIB
+CFLAGS_ncplogin.o = -DMAKE_NCPLIB
+CFLAGS_ncpm_common.o = -DNWMSG=\"$(sbindir)/nwmsg\"
+LDFLAGS_ncpmount = ncpm_common.o mount_login.o
+LDFLAGS_ncplogin = ncpm_common.o mount_login.o
+LDFLAGS_ncpmap = ncpm_common.o
+
+.PHONY : all install install-dev dep clean mrproper distclean
+.PHONY : default
+
+default:
+	make -C ..
+
+all: $(UTILS)
+
+install: all
+	${INSTALL} -d $(DESTDIR)$(bindir)
+	${INSTALL} -d $(DESTDIR)/sbin
+	${INSTALL} -m 4755 $(UTILS) $(DESTDIR)$(bindir)
+ifeq ($(USE_KERNEL),1)
+	ln -sf ..$(bindir)/ncpmount $(DESTDIR)/sbin/mount.ncp
+	ln -sf ..$(bindir)/ncpmount $(DESTDIR)/sbin/mount.ncpfs
+	ln -sf ncpumount $(DESTDIR)$(bindir)/ncplogout
+endif
+
+install-dev:
+
+$(O_UTILS): %.o: %.c
+	$(CC) $(CFLAGS) $(CCFLAGS) $(CFLAGS_$@) -o $@ -c $<
+
+$(O_UTILS:.o=.d): %.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+ncpmap.o: %.o: ncplogin.c
+	$(CC) $(CFLAGS) $(CCFLAGS) $(CFLAGS_$@) -o $@ -c $<
+
+ncpmap.d: %.d: ncplogin.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+ncpm_common.o mount_login.o: %.o: %.c
+	$(CC) $(CFLAGS) $(CCFLAGS) $(CFLAGS_$@) -o $@ -c $<
+
+ncpm_common.d mount_login.d: %.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+$(UTILS): %: %.o ../lib/libncp.a ncpm_common.o mount_login.o
+	$(CC) @GC_SECTIONS@-o $@ $(addsuffix .o,$@) $(LDFLAGS_$@) ../lib/libncp.a ${LIBS}
+
+../lib/libncp.a:
+	make -C ../lib libncp.a
+
+dep:
+
+clean:
+	rm -f *.o *~ core $(UTILS)
+
+mrproper: clean
+	rm -f *.d
+
+distclean: mrproper
+
+ifeq ($(NEED_DEP),yes)
+include $(UTILS:%=%.d)
+include ncpm_common.d
+endif
+

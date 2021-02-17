@@ -1,0 +1,18 @@
+--- test/eqp.test
++++ test/eqp.test
+@@ -502,6 +502,7 @@
+ # documentation page eqp.html works. The C code is duplicated in test1.c
+ # and wrapped in Tcl command [print_explain_query_plan] 
+ #
++db close
+ set boilerplate {
+   proc explain_query_plan {db sql} {
+     set stmt [sqlite3_prepare_v2 db $sql -1 DUMMY]
+@@ -537,6 +538,7 @@
+ 0 0 0 COMPOUND SUBQUERIES 1 AND 2 (EXCEPT)
+ }]
+ 
++sqlite3 db test.db
+ #-------------------------------------------------------------------------
+ # The following tests - eqp-7.* - test that queries that use the OP_Count
+ # optimization return something sensible with EQP.

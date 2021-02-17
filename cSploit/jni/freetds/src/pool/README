@@ -1,0 +1,68 @@
+TDS Connection Pooling v0.01
+
+Introduction
+------------
+The purpose of the TDS Connection Pool is to share a limited number of actual 
+database connections among a larger group of virtual database clients.
+
+The advantages are twofold.  First, a dataserver with a limited number of 
+licenses can be used with the tdspool program to support a large number of 
+client connections.  For instance if you have a database with a 10 concurrent
+license limit and 35 Apache/PHP children, which access the database 
+infrequently, you could share those 10 real connections among all the apache 
+children.
+
+Secondly, TDS Connection Pool acts as a sort of persistant connect for it's 
+clients.  This works because logins to the connection pool are very quick in 
+comparision to logins into the dataserver.  Connections to the dataserver are 
+maintained for the life of the tdspool program.
+
+Terminology
+-----------
+Pool Server, the tdspool program.
+
+Client, the application using TDS (generally through freetds dblib or ctlib) to 
+connect to the Connection Pooling Server.
+
+DataServer, the Sybase or MS SQL Server database.
+
+Pool User, the connection from the client to the Pool Server.
+
+Pool Member,  a connection to the dataserver maintained by the tdspool program.
+
+How It Works
+------------
+
+On start up the Pool Server opens a predefined number of connections (Members) to the DataServer.
+
+It then opens a listening socket on the configured port and goes into its main 
+loop.
+
+When a Client connects, the Pool Server accepts the connection, creates a User 
+and sets its state to TDS_SRV_LOGIN, and returns to the main loop.
+
+When a Client in the TDS_SRV_LOGIN state sends a login packet, the packet is 
+parsed and if the login information matches, a TDS login acknowledgement stream 
+is forged by the Pool Server and sent to the Client.  The User structure then 
+goes to the TDS_SRV_IDLE state. The Pool Server then returns to the main loop.
+
+When the Client in the TDS_SRV_IDLE state sends a query, the member list is 
+searched for a Member with its TDS socket in the TDS_COMPLETED state. This 
+Member is then allocated to the User. The User is then switched to the 
+TDS_SRV_QUERY state. If no free Member is found, the User is placed in the 
+TDS_SRV_WAIT state and the search will be reattempted the next time the server 
+is woken up by activity (such as a Member completing).  When a User is placed 
+in a wait, a message is logged to let the administrator know that the number of
+Members may need to be adjusted upwards.
+
+When results are recieved from the DataServer, they are forwarded to the User 
+that currently has that Member allocated. The Pool Server processes through the
+results prior to forwarding, looking for the end token.  When it is found the 
+Member is deallocated from the User. The Member returns to the idle list and 
+the User is returned to the TDS_SRV_IDLE state.
+
+One caveat to this is that querys that contain stateful information, such as
+the need to query @@identity after inserting, will not work.  I am currently,
+thinking of adding a "lock connection" command that will be intercepted by the
+Pool Server and will cause it to allocate a Member to that User until an 
+"unlock connection" command is received.

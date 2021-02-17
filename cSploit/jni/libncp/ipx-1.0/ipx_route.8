@@ -1,0 +1,24 @@
+.TH IPX_ROUTE 8 "IPX Utilities" "Caldera, Inc." 
+.SH NAME
+ipx_route \- add or delete IPX route
+.SH SYNOPSIS
+.B ipx_route
+add target_network router_network router_node
+.LP
+.B ipx_route
+del target_network
+.SH DESCRIPTION
+.B ipx_route
+adds or deletes an IPX route.
+The kernel IPX stores only one route per target network at a time.
+.SS OPTIONS
+.TP
+.I add
+This option is used to set up the route to a target network.
+.TP
+.I del
+This option is used to delete the route to a target network.
+.SH FILES
+.I /proc/net/ipx_interface /proc/net/ipx_route
+.SH AUTHOR
+Greg Page <greg.page@caldera.com>

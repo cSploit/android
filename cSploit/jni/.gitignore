@@ -1,0 +1,8 @@
+libs
+*.[oda]
+*.l[oa]
+*.ao
+*.so[^.]*
+*.so
+build.log
+!.gitignore

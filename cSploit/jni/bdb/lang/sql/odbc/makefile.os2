@@ -1,0 +1,77 @@
+#
+# os/2 makfile
+#
+
+# change these to point to your installation directories
+# location of the sqlite.h and sqlite.lib
+SQLITELIB=../sqliteodbc/sqlitelib
+#location of the unixodbc odbcinst directory
+UNIXODBCROOT=/uodbc/unixodbc
+#location to copy the sqlite sqllodbc.dll file
+KITDLL=\uodbc\dll
+
+CC = gcc
+CCFLAGS = -Zomf -c
+LINKFLAGS = -Zomf -Zdll -Wall
+
+DEFINEITS = -D_POSIX_SOURCE \
+	-DHAVE_STDLIB_H \
+	-DHAVE_SQL_H -DHAVE_SQLEXT_H \
+	-DHAVE_SQLGETPRIVATEPROFILESTRING -DHAVE_ODBCINST_H -DHAVE_STRCASECMP \
+	-DHAVE_PWD_H \
+	-DUNIXODBC \
+	-D_UNIX_ \
+	-DWITH_UNIXODBC \
+	-DHAVE_UNIXODBC \
+	-DHAVE_DIRENT_H \
+	-D__OS2__ -DOS2 \
+	-DHAVE_ULONG \
+	-DHAVE_LIBVERSION=1 \
+	-DHAVE_MEMCPY -DHAVE_MEMMOVE -DHAVE_STRNLEN
+
+DEFFILE = sqliteodbcos2.def
+
+.SUFFIXES: .c .obj .dll
+
+
+LIBADD = \
+	$(UNIXODBCROOT)/odbcinst/odbccp.lib \
+	$(SQLITELIB)/sqlite.lib
+
+INCLUDES = -I $(UNIXODBCROOT)/include \
+	-I $(UNIXODBCROOT)/odbcinst \
+	-I $(SQLITELIB)
+
+RESOURCEFILES	= sqliteodbcos2.rc
+
+HEADERS = \
+	sqliteodbc.h \
+	resourceos2.h 
+	
+DEPENDENCIES = $(HEADERS) $(RESOURCEFILES)
+
+SOURCES		= \
+		sqliteodbc.c
+		
+
+OBJECTS		= \
+		sqliteodbc.obj
+
+
+all:  sqllodbc.dll
+
+
+sqllodbc.dll: $(OBJECTS) $(DEPENDENCIES)
+	@echo Linking sqllite.DLL
+	$(CC) $(LINKFLAGS) -o sqllODBC.dll $(OBJECTS) $(LIBADD) $(DEFFILE)
+	@rc -p sqliteodbcos2.rc sqllODBC.dll
+	@copy sqllODBC.dll $(KITDLL)
+
+
+.c.obj: 
+	@echo Compiling $<
+	$(CC) $(CCFLAGS) $(INCLUDES) $(DEFINEITS) -o $@ $<
+
+clean:
+	@del *.obj
+	@del *.dll

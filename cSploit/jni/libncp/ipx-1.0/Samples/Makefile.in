@@ -1,0 +1,35 @@
+
+top_srcdir = @top_srcdir@
+top_builddir = ../..
+
+include ${top_builddir}/Make.rules
+
+UTILS = ipxrcv ipxsend rip sap
+
+all: $(UTILS)
+
+dep:
+
+clean:
+	rm -f $(UTILS) *.o
+
+mrproper: clean
+	rm -f *.d
+
+distclean: mrproper
+
+%.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(CCFLAGS) $(CFLAGS_$@) -o $@ -c $<
+
+%: %.o
+	$(CC) $(CFLAGS) -o $@ $(addsuffix .o,$@)
+
+ifeq ($(NEED_DEP),yes)
+include $(UTILS:%=%.d)
+endif
+

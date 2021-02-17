@@ -1,0 +1,16 @@
+1999-05-03  Peter Harvey <pharvey@codebydesign.com>
+
+	* SQLColAttribute: Returned SQL_ERROR even when all was ok.
+	
+1999-04-03  Peter Harvey <pharvey@codebydesign.com>
+
+	* SQLSpecialColumns: Mostly implemented. Simply returns _rowid. Quick and dirty.
+	
+1999-04-02  Peter Harvey <pharvey@codebydesign.com>
+
+	* SQLFetchScroll: Mostly implemented
+	* SQLExecDirect: Created _Execute
+	* SQLPrepare: Created _Prepare
+	
+
+

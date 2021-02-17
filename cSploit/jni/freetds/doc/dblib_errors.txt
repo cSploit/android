@@ -1,0 +1,335 @@
+#! /usr/pkg/bin/perl 
+# can be used to generate the C struct
+# $Id: dblib_errors.txt,v 1.4 2005-10-03 02:52:56 jklowden Exp $
+print "= {\n";
+
+while(<DATA>) {
+	last if /^UNUSED/;
+
+	@F = split /\t/;
+	next unless @F >= 3; 
+	
+	$F[2] =~ s/\.\s*\d*$//; 
+	chomp $F[2]; 
+
+	# reformat text message into chunks that aren't too wide 
+	$chunk_size = 130 - 48;
+	$nchunks = int(length ($F[2]) / $chunk_size);
+	for( $c=0; $c < $nchunks; $c++ ) {
+		last if index( $F[2], ' ', $chunk_size * $nchunks ) == -1; # don't bother if there's only one more word. 
+		$i = rindex( $F[2], ' ', $chunk_size * ($nchunks - $c) );
+		last if $i == -1;
+		substr(  $F[2], ++$i, 0, qq("") );
+		substr(  $F[2], ++$i, 0, qq(\n) . qq(\t) x 6 );
+	}
+	printf qq(\t, { %-16s%13s,\t"%s" }\n), "$F[0],", @F[1,2];
+}
+
+# select error, cast(description as varchar(150))  from sysmessages where error between 2400 and 2450
+__DATA__ 
+SYBEICONVIU	EXCONVERSION	Some character(s) could not be converted into client's character set. 
+SYBEICONVAVAIL	EXCONVERSION	Character set conversion is not available between client character set '%.*s' and server character set '%.*s'.
+SYBEICONVO	EXCONVERSION	Error converting characters into server's character set. Some character(s) could not be converted.
+SYBEICONVI	EXCONVERSION	Some character(s) could not be converted into client's character set.  Unconverted bytes were changed to question marks ('?').
+SYBEICONV2BIG	EXCONVERSION	Buffer overflow converting characters from client into server's character set.
+2405	EXCONVERSION	Internal error occurred while converting characters.
+2406	EXCONVERSION	Cannot use SET CHAR_CONVERT ON, since this session has never had codeset conversions turned on.
+2407	EXCONVERSION	Cannot use the requested character set since the character set cache is full.
+2408	EXCONVERSION	Cannot find the requested character set in Syscharsets:  id = %d.
+2409	EXCONVERSION	Cannot find the requested character set in Syscharsets:  name = '%.*s'.
+2410	EXCONVERSION	Unexpected error returned from the Character Set Manager:  return value = %d.
+2411	EXCONVERSION	No conversions will be done.
+2412	EXCONVERSION	Existing character conversions (if any) will remain in effect.
+2414	EXCONVERSION	Since only 7-bit ASCII characters are allowed with the special character set 'ascii_7', the language for this session is being forced to 'us_english'.
+2415	EXCONVERSION	Due to previous errors, the language for this session is being forced to 'us_english'.
+2416	EXCONVERSION	Due to codeset conversion errors in the remote servername/password list of the LOGINREC, remote procedure calls to other servers may not work.
+2417	EXCONVERSION	Unable to use Unicode-based character set conversion - client character set '%.*s' and server character set '%.*s' are incompatible.
+2418	EXCONVERSION	Unable to load Unicode-based character set conversion table '%.*s' - table not found.
+2419	EXCONVERSION	Unable to load Unicode-based character set conversion table '%.*s' - the conversion table is corrupted.
+2420	EXCONVERSION	Unable to load Unicode-based character set conversion table '%.*s' - Unicode conversion cache is full.
+2421	EXCONVERSION	Unable to use Unicode-based character set conversion - The requested character set is not supported: id = %d.
+2422	EXCONVERSION	Unable to use Unicode-based character set conversion - The requested character set is not supported: name = '%.*s'.
+2423	EXCONVERSION	Unexpected error returned from Unilib functions: return value = %d.
+2424	EXCONVERSION	TEXT data not supported when data size is changing between the '%.*s' and '%.*s' character sets due to character set conversion.
+2425	EXCONVERSION	Unable to use Unicode-based character set conversion - Can not get conversion handle for server's default character set.
+2426	EXCONVERSION	LONGCHAR datatype not allowed on output because client does not support it.
+2427	EXCONVERSION	LONGCHAR datatype not allowed on output because unicode conversions have not been enabled.
+2428	EXCONVERSION	Unrecongnized server or client unilib character set ID. Expansion factor is set to 1.
+2429	EXCONVERSION	No matched unilib character set ID for the server or client character set ID. Expansion factor is set to 1.
+2431	EXCONVERSION	Some character(s) in the source string are considered illegal bytes in server's character set. All bytes after the first illegal bytes are truncated.
+2432	EXCONVERSION	Illegal byte sequence encountered in Unicode data during %S_MSG conversion of %s value '%s' to a %s field.
+2433	EXCONVERSION	Illegal byte sequence encountered in Unicode data.
+SYBEAAMT	EXPROGRAM	User attempted a dbaltbind with mismatched column and variable types.
+SYBEABMT	EXPROGRAM	User attempted a dbbind with mismatched column and variable types.
+SYBEABNC	EXPROGRAM	Attempt to bind to a non-existent column.
+SYBEABNP	EXPROGRAM	Attempt to bind using NULL pointers.
+SYBEABNV	EXPROGRAM	Attempt to bind to a NULL program variable.
+SYBEACNV	EXCONVERSION	Attempt to do data-conversion with NULL destination variable..
+SYBEADST	EXCONSISTENCY	International Release: Error in attempting to determine the size of a pair of translation tables.
+SYBEAICF	EXCONSISTENCY	International Release: Error in attempting to install custom format.
+SYBEALTT	EXCONSISTENCY	International Release: Error in attempting to load a pair of translation tables.
+SYBEAOLF	EXRESOURCE	International Release: Error in attempting to open a localization file.
+SYBEAPCT	EXCONSISTENCY	International Release: Error in attempting to perform a character set translation.
+SYBEAPUT	EXPROGRAM	Attempt to print unknown token.
+SYBEARDI	EXRESOURCE	International Release: Error in attempting to read datetime information from a localization file.
+SYBEARDL	EXRESOURCE	International Release: Error in attempting to read the dblib.loc localization file.
+SYBEASEC	EXPROGRAM	Attempt to send an empty command buffer to the server.
+SYBEASNL	EXPROGRAM	Attempt to set fields in a null LOGINREC.
+SYBEASTL	EXPROGRAM	Synchronous I/O attempted at AST level.
+SYBEASUL	EXPROGRAM	Attempt to set unknown LOGINREC field.
+SYBEAUTN	EXPROGRAM	Attempt to update the timestamp of a table that has no timestamp column.
+SYBEBADPK	EXINFO	Packet size of %1 not supported-size of %2 used instead!
+SYBEBBCI	EXINFO	Batch successfully bulk copied to the server.
+SYBEBBL	EXPROGRAM	Bad bindlen parameter passed to dbsetnull. 388
+SYBEBCBC	EXPROGRAM	bcp_columns must be called before bcp_colfmt and bcp_colfmt_ps.
+SYBEBCBNPR	EXPROGRAM	bcp_bind: if varaddr is NULL, prefixlen must be 0 and no terminator should be specified.
+SYBEBCBNTYP	EXPROGRAM	bcp_bind: if varaddr i s NULL and varlen greater than 0, the table column type must be SYBTEXT or SYBIMAGE and the program variable type must be SYBTEXT, SYBCHAR, SYBIMAGE or SYBBINARY.
+SYBEBCBPREF	EXPROGRAM	Illegal prefix length. Legal values are 0, 1, 2 or 4.
+SYBEBCFO	EXUSER	bcp host files must contain at least one column.
+SYBEBCHLEN	EXPROGRAM	host_collen should be greater than or equal to -1.
+SYBEBCIS	EXCONSISTENCY	Attempt to bulk copy an illegally-sized column value to the server.
+SYBEBCIT	EXPROGRAM	It is illegal to use BCP terminators with program variables other than SYBCHAR, SYBBINARY, SYBTEXT, or SYBIMAGE.
+SYBEBCITBLEN	EXPROGRAM	bcp_init: tblname parameter is too long.
+SYBEBCITBNM	EXPROGRAM	bcp_init: tblname parameter cannot be NULL.
+SYBEBCMTXT	EXPROGRAM	bcp_moretext may be used only when there is at least one text or image column in the server table.
+SYBEBCNL	EXNONFATAL	Negative length-prefix found in BCP data-file.
+SYBEBCNN	EXUSER	Attempt to bulk copy a NULL value into a Server column which does not accept null values.
+SYBEBCNT	EXUSER	Attempt to use Bulk Copy with a non-existent Server table.
+SYBEBCOR	EXCONSISTENCY	Attempt to bulk copy an oversized row to the server. 389
+SYBEBCPB	EXPROGRAM	bcp_bind, bcp_moretext and bcp_sendrow may not be used after bcp_init has been passed a non-NULL input file name.
+SYBEBCPCTYP	EXPROGRAM	bcp_colfmt: If table_colnum is 0, host_type cannot be 0.
+SYBEBCPI	EXPROGRAM	bcp_init must be called before any other bcp routines.
+SYBEBCPN	EXPROGRAM	bcp_bind, bcp_collen, bcp_colptr, bcp_moretext and bcp_sendrow may be used only after bcp_init has been called with the copy direction set to DB_IN.
+SYBEBCPREC	EXNONFATAL	Column %1!: Illegal precision value encountered.
+SYBEBCPREF	EXPROGRAM	Illegal prefix length. Legal values are -1, 0, 1, 2 or 4.
+SYBEBCRE	EXNONFATAL	I/O error while reading bcp datafile.
+SYBEBCRO	EXINFO	The BCP hostfile '%1!' contains only %2! rows. It was impossible to read the requested %3! rows.
+SYBEBCSA	EXUSER	The BCP hostfile '%1!' contains only %2! rows. Skipping all of these rows is not allowed.
+SYBEBCSET	EXCONSISTENCY	Unknown character-set encountered.
+SYBEBCSI	EXPROGRAM	Host-file columns may be skipped only when copying into the Server.
+SYBEBCSNDROW	EXPROGRAM	bcp_sendrow may not be called unless all text data for the previous row has been sent using bcp_moretext.
+SYBEBCSNTYP	EXPROGRAM	column number %1!: if varaddr is NULL and varlen greater than 0, the table column type must be SYBTEXT or SYBIMAGE and the program variable type must be SYBTEXT, SYBCHAR, SYBIMAGE or SYBBINARY.
+SYBEBCUC	EXRESOURCE	bcp: Unable to close host datafile.
+SYBEBCUO	EXRESOURCE	bcp: Unable to open host datafile. 390
+SYBEBCVH	EXPROGRAM	bcp_exec may be called only after bcp_init has been passed a valid host file.
+SYBEBCVLEN	EXPROGRAM	varlen should be greater than or equal to -1.
+SYBEBCWE	EXNONFATAL	I/O error while writing bcp datafile.
+SYBEBDIO	EXPROGRAM	Bad bulk copy direction. Must be either IN or OUT.
+SYBEBEOF	EXNONFATAL	Unexpected EOF encountered in bcp datafile.
+SYBEBIHC	EXPROGRAM	Incorrect host-column number found in bcp format file.
+SYBEBIVI	EXPROGRAM	bcp_columns, bcp_colfmt and bcp_colfmt_ps may be used only after bcp_init has been passed a valid input file.
+SYBEBNCR	EXPROGRAM	Attempt to bind user variable to a non-existent compute row.
+SYBEBNUM	EXPROGRAM	Bad numbytes parameter passed to dbstrcpy.
+SYBEBPKS	EXPROGRAM	In DBSETLPACKET, the packet size parameter must be between 0 and 999999.
+SYBEBPREC	EXPROGRAM	Illegal precision specified.
+SYBEBPROBADDEF	EXCONSISTENCY	bcp protocol error: illegal default column id received.
+SYBEBPROCOL	EXCONSISTENCY	bcp protocol error: returned column count differs from the actual number of columns received.
+SYBEBPRODEF	EXCONSISTENCY	bcp protocol error: expected default information and got none.
+SYBEBPRODEFID	EXCONSISTENCY	bcp protocol error: default column id and actual column id are not same
+SYBEBPRODEFTYP	EXCONSISTENCY	bcp protocol error: default value datatype differs from column datatype. 391
+SYBEBPROEXTDEF	EXCONSISTENCY	bcp protocol error: more than one row of default information received.
+SYBEBPROEXTRES	EXCONSISTENCY	bcp protocol error: unexpected set of results received.
+SYBEBPRONODEF	EXCONSISTENCY	bcp protocol error: default value received for column that does not have default.
+SYBEBPRONUMDEF	EXCONSISTENCY	bcp protocol error: expected number of defaults differs from the actual number of defaults received.
+SYBEBRFF	EXRESOURCE	I/O error while reading bcp format file.
+SYBEBSCALE	EXPROGRAM	Illegal scale specified.
+SYBEBTMT	EXPROGRAM	Attempt to send too much text data via the bcp_moretext call.
+SYBEBTOK	EXCOMM	Bad token from the server: Datastream processing out of sync.
+SYBEBTYP	EXPROGRAM	Unknown bind type passed to DB-Library function.
+SYBEBTYPSRV	EXPROGRAM	Datatype is not supported by the server.
+SYBEBUCE	EXRESOURCE	bcp: Unable to close error file.
+SYBEBUCF	EXPROGRAM	bcp: Unable to close format file.
+SYBEBUDF	EXPROGRAM	bcp: Unrecognized datatype found in format file.
+SYBEBUFF	EXPROGRAM	bcp: Unable to create format file.
+SYBEBUFL	EXCONSISTENCY	DB-Library internal error-send buffer length corrupted.
+SYBEBUOE	EXRESOURCE	bcp: Unable to open error file.
+SYBEBUOF	EXPROGRAM	bcp: Unable to open format file.
+SYBEBWEF	EXNONFATAL	I/O error while writing bcp error file.
+SYBEBWFF	EXRESOURCE	I/O error while writing bcp format file.
+SYBECAP	EXCOMM	DB-Library capabilities not accepted by the Server.
+SYBECAPTYP	EXCOMM	Unexpected capability type in CAPABILITY datastream. 392
+SYBECDNS	EXCONSISTENCY	Datastream indicates that a compute column is derived from a non-existent select list member.
+SYBECDOMAIN	EXCONVERSION	Source field value is not within the domain of legal values.
+SYBECINTERNAL	EXCONVERSION	Internal Conversion error.
+SYBECLOS	EXCOMM	Error in closing network connection.
+SYBECLPR	EXCONVERSION	Data conversion resulted in loss of precision.
+SYBECNOR	EXPROGRAM	Column number out of range.
+SYBECNOV	EXCONVERSION	Attempt to set variable to NULL resulted in overflow.
+SYBECOFL	EXCONVERSION	Data conversion resulted in overflow.
+SYBECONN	EXCOMM	Unable to connect: Adaptive Server is unavailable or does not exist.
+SYBECRNC	EXPROGRAM	The current row is not a result of compute clause %1!, so it is illegal to attempt to extract that data from this row.
+SYBECRSAGR	EXPROGRAM	Aggregate functions are not allowed in a cursor statement.
+SYBECRSBROL	EXPROGRAM	Backward scrolling cannot be used in a forward scrolling cursor.
+SYBECRSBSKEY	EXPROGRAM	Keyset cannot be scrolled backward in mixed cursors with a previous fetch type.
+SYBECRSBUFR	EXPROGRAM	Row buffering should not be turned on when using cursor APIs.
+SYBECRSDIS	EXPROGRAM	Cursor statement contains one of the disallowed phrases compute, union, for browse, or select into.
+SYBECRSFLAST	EXPROGRAM	Fetch type LAST requires fully keyset driven cursors.
+SYBECRSFRAND	EXPROGRAM	Fetch types RANDOM and RELATIVE can only be used within the keyset of keyset driven cursors. 393
+SYBECRSFROWN	EXPROGRAM	Row number to be fetched is outside valid range.
+SYBECRSFTYPE	EXRESOURCE	Unknown fetch type.
+SYBECRSINV	EXPROGRAM	Invalid cursor statement.
+SYBECRSINVALID	EXRESOURCE	The cursor handle is invalid.
+SYBECRSMROWS	EXRESOURCE	Multiple rows are returned, only one is expected while retrieving dbname.
+SYBECRSNOBIND	EXPROGRAM	Cursor bind must be called prior to dbcursor invocation.
+SYBECRSNOCOUNT	EXPROGRAM	The DBNOCOUNT option should not be turned on when doing updates or deletes with dbcursor.
+SYBECRSNOFREE	EXPROGRAM	The DBNOAUTOFREE option should not be turned on when using cursor APIs.
+SYBECRSNOIND	EXPROGRAM	One of the tables involved in the cursor statement does not have a unique index.
+SYBECRSNOKEYS	EXRESOURCE	The entire keyset must be defined for KEYSET type cursors.
+SYBECRSNOLEN	EXRESOURCE	No unique index found.
+SYBECRSNOPTCC	EXRESOURCE	No OPTCC was found.
+SYBECRSNORDER	EXRESOURCE	The order of clauses must be from, where, and order by.
+SYBECRSNORES	EXPROGRAM	Cursor statement generated no results.
+SYBECRSNROWS	EXRESOURCE	No rows returned, at least one is expected.
+SYBECRSNOTABLE	EXRESOURCE	Table name is NULL.
+SYBECRSNOUPD	EXPROGRAM	Update or delete operation did not affect any rows.
+SYBECRSNOWHERE	EXPROGRAM	A WHERE clause is not allowed in a cursor update or insert.
+SYBECRSNUNIQUE	EXRESOURCE	No unique keys associated with this view.
+SYBECRSORD	EXPROGRAM	Only fully keyset driven cursors can have order by, group by, or having phrases. 394
+SYBECRSRO	EXPROGRAM	Data locking or modifications cannot be made in a READONLY cursor.
+SYBECRSSET	EXPROGRAM	A SET clause is required for a cursor update or insert.
+SYBECRSTAB	EXPROGRAM	Table name must be determined in operations involving data locking or modifications.
+SYBECRSVAR	EXRESOURCE	There is no valid address associated with this bind.
+SYBECRSVIEW	EXPROGRAM	A view cannot be joined with another table or a view in a cursor statement.
+SYBECRSVIIND	EXPROGRAM	The view used in the cursor statement does not include all the unique index columns of the underlying tables.
+SYBECRSUPDNB	EXPROGRAM	Update or insert operations cannot use bind variables when binding type is NOBIND.
+SYBECRSUPDTAB	EXPROGRAM	Update or insert operations using bind variables require single table cursors.
+SYBECSYN	EXCONVERSION	Attempt to convert data stopped by syntax error in source field.
+SYBECUFL	EXCONVERSION	Data conversion resulted in underflow.
+SYBEDBPS	EXRESOURCE	Maximum number of DBPROCESSes already allocated.
+SYBEDDNE	EXINFO	DBPROCESS is dead or not enabled.
+SYBEDIVZ	EXUSER	Attempt to divide by $0.00 in function %1!.
+SYBEDNTI	EXPROGRAM	Attempt to use dbtxtsput to put a new text timestamp into a column whose datatype is neither SYBTEXT nor SYBIMAGE.
+SYBEDPOR	EXPROGRAM	Out-of-range datepart constant.
+SYBEDVOR	EXPROGRAM	Day values must be between 1 and 7. 395
+SYBEECAN	EXINFO	Attempted to cancel unrequested event notification.
+SYBEEINI	EXINFO	Must call dbreginit before dbregexec.
+SYBEETD	EXPROGRAM	Failure to send the expected amount of TEXT or IMAGE data via dbmoretext.
+SYBEEUNR	EXCOMM	Unsolicited event notification received.
+SYBEEVOP	EXINFO	Called dbregwatch with a bad options parameter.
+SYBEEVST	EXINFO	Must initiate a transaction before calling dbregparam.
+SYBEFCON	EXCOMM	Adaptive Server connection failed.
+SYBEFRES	EXFATAL	Challenge-Response function failed.
+SYBEFSHD	EXRESOURCE	Error in attempting to find the Sybase home directory.
+SYBEFUNC	EXPROGRAM	Functionality not supported at the specified version level.
+SYBEICN	EXPROGRAM	Invalid computeid or compute column number.
+SYBEIDCL	EXCONSISTENCY	Illegal datetime column length returned by Adaptive Server. Legal datetime lengths are 4 and 8 bytes.
+SYBEIDECCL	EXCONSISTENCY	Invalid decimal column length returned by the server.
+SYBEIFCL	EXCONSISTENCY	Illegal floating-point column length returned by Adaptive Server. Legal floating-point lengths are 4 and 8 bytes.
+SYBEIFNB	EXPROGRAM	Illegal field number passed to bcp_control.
+SYBEIICL	EXCONSISTENCY	Illegal integer column length returned by Adaptive Server. Legal integer lengths are 1, 2, and 4 bytes.
+SYBEIMCL	EXCONSISTENCY	Illegal money column length returned by Adaptive Server. Legal money lengths are 4 and 8 bytes. 396
+SYBEINLN	EXUSER	Interface file: unexpected end-of-line.
+SYBEINTF	EXUSER	Server name not found in interface file.
+SYBEINUMCL	EXCONSISTENCY	Invalid numeric column length returned by the server.
+SYBEIPV	EXINFO	%1! is an illegal value for the %2! parameter of %3!.
+SYBEISOI	EXCONSISTENCY	International Release: Invalid sort-order information found.
+SYBEISRVPREC	EXCONSISTENCY	Illegal precision value returned by the server.
+SYBEISRVSCL	EXCONSISTENCY	Illegal scale value returned by the server.
+SYBEITIM	EXPROGRAM	Illegal timeout value specified.
+SYBEIVERS	EXPROGRAM	Illegal version level specified.
+SYBEKBCI	EXINFO	1000 rows sent to the server.
+SYBEKBCO	EXINFO	1000 rows successfully bulk copied to host file.
+SYBEMEM	EXRESOURCE	Unable to allocate sufficient memory.
+SYBEMOV	EXUSER	Money arithmetic resulted in overflow in function %1!.
+SYBEMPLL	EXUSER	Attempt to set maximum number of DBPROCESSes lower than 1.
+SYBEMVOR	EXPROGRAM	Month values must be between 1 and 12.
+SYBENBUF	EXINFO	Called dbsendpassthru with a NULL buf parameter.
+SYBENBVP	EXPROGRAM	Cannot pass dbsetnull a NULL bindval pointer.
+SYBENDC	EXPROGRAM	Cannot have negative component in date in numeric form.
+SYBENDTP	EXPROGRAM	Called dbdatecrack with NULL datetime parameter.
+SYBENEG	EXCOMM	Negotiated login attempt failed.
+SYBENHAN	EXINFO	Called dbrecvpassthru with a NULL handle parameter.
+SYBENMOB	EXPROGRAM	No such member of order by clause. 397
+SYBENOEV	EXINFO	DBPOLL can not be called when registered procedure notifications have been disabled.
+SYBENPRM	EXPROGRAM	NULL parameter not allowed for this dboption.
+SYBENSIP	EXPROGRAM	Negative starting index passed to dbstrcpy.
+SYBENTLL	EXUSER	Name too long for LOGINREC field.
+SYBENTTN	EXPROGRAM	Attempt to use dbtxtsput to put a new text timestamp into a non-existent data row.
+SYBENULL	EXINFO	NULL DBPROCESS pointer passed to DB-Library.
+SYBENULP	EXPROGRAM	Called %s with a NULL %s parameter.
+SYBENXID	EXNONFATAL	The Server did not grant us a distributed-transaction ID.
+SYBEONCE	EXPROGRAM	Function can be called only once.
+SYBEOOB	EXCOMM	Error in sending out-of-band data to the server.
+SYBEOPIN	EXNONFATAL	Could not open interface file.
+SYBEOPNA	EXNONFATAL	Option is not available with current server.
+SYBEOREN	EXINFO	International Release: Warning: an out-of-range error-number was encountered in dblib.loc. The maximum permissible error-number is defined as DBERRCOUNT in sybdb.h.
+SYBEORPF	EXUSER	Attempt to set remote password would overflow the login record's remote password field.
+SYBEPOLL	EXINFO	There is already an active dbpoll.
+SYBEPRTF	EXINFO	dbtracestring may only be called from a printfunc.
+SYBEPWD	EXUSER	Login incorrect.
+SYBERDCN	EXCONVERSION	Requested data conversion does not exist.
+SYBERDNR	EXPROGRAM	Attempt to retrieve data from a non-existent row. 398
+SYBEREAD	EXCOMM	Read from the server failed.
+SYBERESP	EXPROGRAM	Response function address passed to dbresponse must be non-NULL.
+SYBERPCS	EXINFO	Must call dbrpcinit before dbrpcparam or dbrpcsend.
+SYBERPIL	EXPROGRAM	It is illegal to pass -1 to dbrpcparam for the datalen of parameters which are of type SYBCHAR, SYBVARCHAR, SYBBINARY, or SYBVARBINARY.
+SYBERPNA	EXNONFATAL	The RPC facility is available only when using a server whose version number is 4.0 or later.
+SYBERPND	EXPROGRAM	Attempt to initiate a new Adaptive Server operation with results pending.
+SYBERPNULL	EXPROGRAM	value parameter for dbrpcparam can be NULL, only if the datalen parameter is 0.
+SYBERPTXTIM	EXPROGRAM	RPC parameters cannot be of type text or image.
+SYBERPUL	EXPROGRAM	When passing a SYBINTN, SYBDATETIMN, SYBMONEYN, or SYBFLTN parameter via dbrpcparam, it is necessary to specify the parameter's maximum or actual length so that DB-Library can recognize it as a SYINT1, SYBINT2, SYBINT4, SYBMONEY, SYBMONEY4, and so on.
+SYBERTCC	EXPROGRAM	dbreadtext may not be used to receive the results of a query that contains a COMPUTE clause.
+SYBERTSC	EXPROGRAM	dbreadtext may be used only to receive the results of a query that contains a single result column.
+SYBERXID	EXNONFATAL	The Server did not recognize our distributed-transaction ID. 399
+SYBESECURE	EXPROGRAM	Secure SQL Server function not supported in this version.
+SYBESEFA	EXPROGRAM	DBSETNOTIFS cannot be called if connections are present.
+SYBESEOF	EXCOMM	Unexpected EOF from the server.
+SYBESFOV	EXPROGRAM	International Release: dbsafestr overflowed its destination buffer.
+SYBESMSG	EXSERVER	General Adaptive Server error: Check messages from the server.
+SYBESOCK	EXCOMM	Unable to open socket.
+SYBESPID	EXPROGRAM	Called dbspid with a NULL dbproc.
+SYBESYNC	EXCOMM	Read attempted while out of synchronization with Adaptive Server.
+SYBETEXS	EXINFO	Called dbmoretext with a bad size parameter.
+SYBETIME	EXTIME	Adaptive Server connection timed out.
+SYBETMCF	EXPROGRAM	Attempt to install too many custom formats via dbfmtinstall.
+SYBETMTD	EXPROGRAM	Attempt to send too much TEXT data via the dbmoretext call.
+SYBETPAR	EXPROGRAM	No SYBTEXT or SYBIMAGE parameters were defined.
+SYBETPTN	EXUSER	Syntax error: only two periods are permitted in table names.
+SYBETRAC	EXINFO	Attempted to turn off a trace flag that was not on.
+SYBETRAN	EXINFO	DBPROCESS is being used for another transaction.
+SYBETRAS	EXINFO	DB-Library internal error - trace structure not found.
+SYBETRSN	EXINFO	Bad numbytes parameter passed to dbtracestring.
+SYBETSIT	EXINFO	Attempt to call dbtsput with an invalid timestamp. 400
+SYBETTS	EXUSER	The table which bulk copy is attempting to copy to a host file is shorter than the number of rows which bulk copy was instructed to skip.
+SYBETYPE	EXINFO	Invalid argument type given to Hyper/DB-Library.
+SYBEUCPT	EXUSER	Unrecognized custom-format parameter-type encountered in dbstrbuild.
+SYBEUCRR	EXCONSISTENCY	Internal software error: Unknown connection result reported by dbpasswd.
+SYBEUDTY	EXCONSISTENCY	Unknown datatype encountered.
+SYBEUFDS	EXUSER	Unrecognized format encountered in dbstrbuild.
+SYBEUFDT	EXCONSISTENCY	Unknown fixed-length datatype encountered.
+SYBEUHST	EXUSER	Unknown host machine name.
+SYBEUMSG	EXCOMM	Unknown message-id in MSG datastream.
+SYBEUNAM	EXFATAL	Unable to get current user name from operating system.
+SYBEUNOP	EXNONFATAL	Unknown option passed to dbsetopt.
+SYBEUNT	EXUSER	Unknown network type found in interface file.
+SYBEURCI	EXRESOURCE	International Release: Unable to read copyright information from the DB-Library localization file.
+SYBEUREI	EXRESOURCE	International Release: Unable to read error information from the DB-Library localization file.
+SYBEUREM	EXRESOURCE	International Release: Unable to read error mnemonic from the DB-Library localization file.
+SYBEURES	EXRESOURCE	International Release: Unable to read error string from the DB-Library localization file. 401 Error severities
+SYBEURMI	EXRESOURCE	International Release: Unable to read money-format information from the DB-Library localization file.
+SYBEUSCT	EXCOMM	Unable to set communications timer.
+SYBEUTDS	EXCOMM	Unrecognized TDS version received from the server.
+SYBEUVBF	EXPROGRAM	Attempt to read an unknown version of bcp format file.
+SYBEUVDT	EXCONSISTENCY	Unknown variable-length datatype encountered.
+SYBEVDPT	EXUSER	For bulk copy, all variable-length data must have either a length-prefix or a terminator specified.
+SYBEWAID	EXCONSISTENCY	DB-Library internal error: ALTFMT following ALTNAME has wrong id.
+SYBEWRIT	EXCOMM	Write to the server failed.
+SYBEXOCI	EXNONFATAL	International Release: A character-set translation overflowed its destination buffer while using bcp to copy data from a host-file to the server.
+SYBEXTDN	EXPROGRAM	Warning: the xlt_todisp parameter to dbfree_xlate was NULL. The space associated with the xlt_tosrv parameter has been freed.
+SYBEXTN	EXPROGRAM	The xlt_tosrv and xlt_todisp parameters to dbfree_xlate were NULL.
+SYBEXTSN	EXPROGRAM	Warning: the xlt_tosrv parameter to dbfree_xlate was NULL. The space associated with the xlt_todisp parameter has been freed.
+SYBEZTXT	EXINFO	Attempt to send zero length TEXT or IMAGE to dataserver via dbwritetext. 
+UNUSED 	EXINFO This error number is unused. 
+
+The following table lists the meanings for each symbolic error severity value. 
+EXINFO 		 1	 Informational, non-error. 
+EXUSER 		 2	 User error. 
+EXNONFATAL 	 3	 Non-fatal error. 
+EXCONVERSION 	 4	 Error in DB-Library data conversion. 
+EXSERVER 	 5	 The Server has returned an error flag. 
+EXTIME 		 6	 We have exceeded our timeout period while waiting for a response from the Server; the DBPROCESS is still alive. 
+EXPROGRAM 	 7	 Coding error in user program. 
+EXRESOURCE 	 8	 Running out of resources; the DBPROCESS may be dead. 
+EXCOMM 		 9	 Failure in communication with Server the DBPROCESS is dead. 
+EXFATAL 	10	 Fatal error the DBPROCESS is dead. 
+EXCONSISTENCY 	11	 Internal software error; notify Sybase Technical Support.

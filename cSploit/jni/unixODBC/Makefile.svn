@@ -1,0 +1,16 @@
+svn:
+	@echo "*** Retrieving configure tests needed by configure.in"
+	@libtoolize --copy --ltdl
+	@aclocal
+	@echo "*** Building Makefile templates (step one)"
+	@automake --add-missing
+	@automake
+	@echo "*** Building config.h"
+	@autoheader
+	@echo "*** Building configure"
+	@autoconf
+	@echo "*** Finished"
+	@echo "    Don't forget to run ./configure"
+	@echo "    If you haven't done so in a while, run ./configure --help"
+
+

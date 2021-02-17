@@ -1,0 +1,4860 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ncpfs-2.2.4\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-04-23 22:12+0200\n"
+"PO-Revision-Date: 2004-12-08 16:41+0000\n"
+"Last-Translator: Craig Jeffares <cjeffares@novell.com>\n"
+"Language-Team: Novell Language <language@novell.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ipx-1.0/ipx_configure.c:37
+#, c-format
+msgid ""
+"Usage: %s --auto_primary=[on|off]\n"
+"Usage: %s --auto_interface=[on|off]\n"
+"Usage: %s --help\n"
+"Usage: %s\n"
+msgstr ""
+"用法：%s --auto_primary=[on|off]\n"
+"Usage:%s --auto_interface=[on|off]\n"
+"用法：%s --help\n"
+"用法：%s\n"
+
+#: ipx-1.0/ipx_configure.c:85 ipx-1.0/ipx_interface.c:155
+#: ipx-1.0/ipx_interface.c:233 ipx-1.0/ipx_interface.c:324
+#: ipx-1.0/ipx_interface.c:383 ipx-1.0/ipx_internal_net.c:81
+#: ipx-1.0/ipx_internal_net.c:139 ipx-1.0/ipx_route.c:104
+#: ipx-1.0/ipx_route.c:170
+#, c-format
+msgid "%s: socket: %s\n"
+msgstr "%s：套接字：%s\n"
+
+#: ipx-1.0/ipx_configure.c:88 ipx-1.0/ipx_interface.c:159 util/ipx_probe.c:207
+#: util/ipx_probe.c:373
+msgid "Probably you have no IPX support in your kernel\n"
+msgstr "可能在您的内核中不具有 IPX 支持\n"
+
+#: ipx-1.0/ipx_configure.c:116 ipx-1.0/ipx_configure.c:139
+#: ipx-1.0/ipx_configure.c:152 ipx-1.0/ipx_interface.c:210
+#: ipx-1.0/ipx_interface.c:289 ipx-1.0/ipx_interface.c:351
+#: ipx-1.0/ipx_interface.c:416 ipx-1.0/ipx_internal_net.c:115
+#: ipx-1.0/ipx_internal_net.c:156 ipx-1.0/ipx_route.c:128
+#: ipx-1.0/ipx_route.c:190
+#, c-format
+msgid "%s: ioctl: %s\n"
+msgstr "%s：ioctl：%s\n"
+
+#: ipx-1.0/ipx_configure.c:158
+#, c-format
+msgid ""
+"Auto Primary Select is %s\n"
+"Auto Interface Create is %s\n"
+msgstr ""
+"自动主选择为 %s\n"
+"自动接口创建为 %s\n"
+
+#: ipx-1.0/ipx_configure.c:160 ipx-1.0/ipx_configure.c:161
+msgid "ON"
+msgstr "ON"
+
+#: ipx-1.0/ipx_configure.c:160 ipx-1.0/ipx_configure.c:161
+msgid "OFF"
+msgstr "OFF"
+
+#: ipx-1.0/ipx_interface.c:32
+#, c-format
+msgid ""
+"Usage: %s add [-p] device frame_type [net_number[:node]]\n"
+"Usage: %s del device frame_type\n"
+"Usage: %s delall\n"
+"Usage: %s check device frame_type\n"
+msgstr ""
+"用法：%s add [-p] device frame_type [net_number[:node]]\n"
+"用法：%s del device frame_type\n"
+"用法：%s delall\n"
+"用法：%s check device frame_type\n"
+
+#: ipx-1.0/ipx_interface.c:84
+#, c-format
+msgid "%s: Frame type must be"
+msgstr "%s：框架类型必须是"
+
+#: ipx-1.0/ipx_interface.c:88
+msgid " or "
+msgstr " 或"
+
+#: ipx-1.0/ipx_interface.c:143 ipx-1.0/ipx_internal_net.c:66
+#: ipx-1.0/ipx_route.c:63 ipx-1.0/ipx_route.c:87
+#, c-format
+msgid "%s: Inappropriate network number %08lX\n"
+msgstr "%s：不适当的网络编号 %08lX\n"
+
+#: ipx-1.0/ipx_interface.c:181 ipx-1.0/ipx_internal_net.c:102
+#, c-format
+msgid "%s: Primary network already selected.\n"
+msgstr "%s：已选择主网络。\n"
+
+#: ipx-1.0/ipx_interface.c:185 ipx-1.0/ipx_internal_net.c:106
+#, c-format
+msgid "%s: Network number (%08X) already in use.\n"
+msgstr "%s：网络编号 (%08X) 已在使用中。\n"
+
+#: ipx-1.0/ipx_interface.c:189 ipx-1.0/ipx_interface.c:277
+#: ipx-1.0/ipx_interface.c:339 ipx-1.0/ipx_interface.c:404
+#, c-format
+msgid "%s: Invalid frame type (%s).\n"
+msgstr "%s：无效的框架类型 (%s)。\n"
+
+#: ipx-1.0/ipx_interface.c:193 ipx-1.0/ipx_interface.c:281
+#: ipx-1.0/ipx_interface.c:343 ipx-1.0/ipx_interface.c:408
+#, c-format
+msgid "%s: No such device (%s).\n"
+msgstr "%s：没有此类设备 (%s)。\n"
+
+#: ipx-1.0/ipx_interface.c:197
+#, c-format
+msgid "%s: Requested device (%s) is down.\n"
+msgstr "%s：请求的设备 (%s) 被关闭。\n"
+
+#: ipx-1.0/ipx_interface.c:201
+#, c-format
+msgid "%s: Invalid device (%s).\n"
+msgstr "%s：无效的设备 (%s)。\n"
+
+#: ipx-1.0/ipx_interface.c:206
+#, c-format
+msgid "%s: Insufficient memory to create interface.\n"
+msgstr "%s：内存不足，无法创建接口。\n"
+
+#: ipx-1.0/ipx_interface.c:245
+#, c-format
+msgid "%s: Unable to open \"%s.\"\n"
+msgstr "%s：无法打开 \"%s。\"\n"
+
+#: ipx-1.0/ipx_interface.c:285 ipx-1.0/ipx_interface.c:347
+#: ipx-1.0/ipx_interface.c:412
+#, c-format
+msgid "%s: No such IPX interface %s %s.\n"
+msgstr "%s：没有此类 IPX 接口 %s %s。\n"
+
+#: ipx-1.0/ipx_interface.c:393
+#, c-format
+msgid "IPX Address for (%s, %s) is %08X:%02X%02X%02X%02X%02X%02X.\n"
+msgstr "(%s, %s) 的 IPX 地址是 %08X:%02X%02X%02X%02X%02X%02X。\n"
+
+#: ipx-1.0/ipx_internal_net.c:29
+#, c-format
+msgid ""
+"Usage: %s add net_number(hex) node(hex)\n"
+"Usage: %s del\n"
+msgstr ""
+"用法：%s add net_number(hex) node(hex)\n"
+"用法：%s del\n"
+
+#: ipx-1.0/ipx_internal_net.c:50
+#, c-format
+msgid "%s: Invalid internal network address %s\n"
+msgstr "%s：无效的内部网络地址 %s\n"
+
+#: ipx-1.0/ipx_internal_net.c:58
+#, c-format
+msgid "%s: Invalid internal network node %s\n"
+msgstr "%s：无效的内部网络节点 %s\n"
+
+#: ipx-1.0/ipx_internal_net.c:73
+#, c-format
+msgid "%s: Node is invalid.\n"
+msgstr "%s：节点无效。\n"
+
+#: ipx-1.0/ipx_internal_net.c:111
+#, c-format
+msgid "%s: Insufficient memory to create internal net.\n"
+msgstr "%s：内存不足，无法创建内部网。\n"
+
+#: ipx-1.0/ipx_internal_net.c:153
+#, c-format
+msgid "%s: No internal network configured.\n"
+msgstr "%s：没有配置的内部网络。\n"
+
+#: ipx-1.0/ipx_route.c:32
+#, c-format
+msgid ""
+"Usage: %s add network(hex) router_network(hex) router_node(hex)\n"
+"Usage: %s del network(hex)\n"
+msgstr ""
+"用法：%s add network(hex) router_network(hex) router_node(hex)\n"
+"用法：%s del network(hex)\n"
+
+#: ipx-1.0/ipx_route.c:56 ipx-1.0/ipx_route.c:154
+#, c-format
+msgid "%s: Invalid network number %s\n"
+msgstr "%s：无效的网络编号 %s\n"
+
+#: ipx-1.0/ipx_route.c:72
+#, c-format
+msgid "%s: Invalid router address %s\n"
+msgstr "%s：无效的路由器地址 %s\n"
+
+#: ipx-1.0/ipx_route.c:79
+#, c-format
+msgid "%s: Invalid router node %s\n"
+msgstr "%s：无效的路由器节点 %s\n"
+
+#: ipx-1.0/ipx_route.c:98
+#, c-format
+msgid "%s: Node (%s) is invalid.\n"
+msgstr "%s：节点 (%s) 无效。\n"
+
+#: ipx-1.0/ipx_route.c:124
+#, c-format
+msgid "%s: Router network (%08X) not reachable.\n"
+msgstr "%s：路由器网络 (%08X) 不可访问。\n"
+
+#: ipx-1.0/ipx_route.c:161
+#, c-format
+msgid "%s: Inappropriate network number %08lX.\n"
+msgstr "%s：不适当的网络编号 %08lX。\n"
+
+#: ipx-1.0/ipx_route.c:182
+#, c-format
+msgid "%s: Route not found for network %08lX.\n"
+msgstr "%s：未找到网络 %08lX 的路由。\n"
+
+#: ipx-1.0/ipx_route.c:186
+#, c-format
+msgid "%s: Network %08lX is directly connected.\n"
+msgstr "%s：网络 %08lX 被直接连接。\n"
+
+#: lib/ncplib.c:1034 lib/ncplib.c:1065 lib/ncplib.c:1102
+#, c-format
+msgid "ncp_request_error: %d\n"
+msgstr "ncp_request_error：%d\n"
+
+#: lib/ncplib.c:1641 lib/ncplib.c:3671 sutil/ncpmount.c:560
+#: sutil/ncpmount.c:580 sutil/ncplogin.c:878 sutil/ncplogin.c:896
+msgid "Your password has expired\n"
+msgstr "您的口令已经过期\n"
+
+#: lib/ncplib.c:2333
+#, c-format
+msgid "Logging into %s as %s\n"
+msgstr "正在将 %s 登录为 %s\n"
+
+#: lib/ncplib.c:2336
+msgid "Password: "
+msgstr "口令："
+
+#: lib/ncplib.c:2583
+#, c-format
+msgid "ncpfs: string too long: %s\n"
+msgstr "ncpfs：字符串太长：%s\n"
+
+#: lib/ncplib.c:3677 sutil/ncpmount.c:586 sutil/ncplogin.c:901
+#, c-format
+msgid "You have %d login attempts left\n"
+msgstr "您还可以尝试登录 %d 次\n"
+
+#: lib/ncplib.c:3798
+msgid "Error in ncp_request\n"
+msgstr "ncp_request 中的错误\n"
+
+#: lib/ncplib.c:3804
+msgid "Fragment too short\n"
+msgstr "片段太短\n"
+
+#: lib/ncplib.c:3822
+#, c-format
+msgid "Fragment too large, len=%d, max=%d\n"
+msgstr "片断太长，len=%d，max=%d\n"
+
+#: lib/ncplib.c:3835
+msgid "Why next fragment?\n"
+msgstr "为什么是下一个片断？\n"
+
+#: lib/ncplib.c:3841
+msgid "Fragmented\n"
+msgstr "分段\n"
+
+#: lib/ncplib.c:3845
+#, c-format
+msgid "InBufLen after request=%d, FirstReply=%d\n"
+msgstr "InBufLen（在 request=%d、FirstReply=%d 后）\n"
+
+#: lib/ncplib.c:3850
+#, c-format
+msgid "NDS error %d\n"
+msgstr "NDS 错误 %d\n"
+
+#: lib/filemgmt.c:127
+#, c-format
+msgid "ncpfs: volume name too long: %d\n"
+msgstr "ncpfs：卷名称太长：%d\n"
+
+#: lib/ndslib.c:1344
+#, c-format
+msgid ""
+"User %s not found in current context.\n"
+"Trying server context...\n"
+msgstr ""
+"在当前上下文中未找到用户 %s。\n"
+"正在尝试在服务器上下文中查找...\n"
+
+#: lib/ndslib.c:1366
+#, c-format
+msgid "error %d logging in\n"
+msgstr "%d 登录时出错\n"
+
+#: lib/ndslib.c:1374
+#, c-format
+msgid "error %d authenticating\n"
+msgstr "%d 鉴定时出错\n"
+
+#: lib/strops.c:65
+msgid "Not enough memory"
+msgstr "内存不足"
+
+#: lib/strops.c:67
+msgid "Bad key passed to NWDS{Get|Set}Context"
+msgstr "将错误的密钥传递给了 NWDS{Get|Set}Context"
+
+#: lib/strops.c:69
+msgid "Invalid context handle"
+msgstr "无效的上下文句柄"
+
+#: lib/strops.c:71
+msgid "Buffer full"
+msgstr "缓冲区已满"
+
+#: lib/strops.c:74
+msgid "Bad syntax"
+msgstr "语法错误"
+
+#: lib/strops.c:76
+msgid "Buffer empty"
+msgstr "缓冲区为空"
+
+#: lib/strops.c:78
+msgid "Bad verb"
+msgstr "错误的动词"
+
+#: lib/strops.c:80
+msgid "Expected identifier"
+msgstr "预期的标识符"
+
+#: lib/strops.c:83
+msgid "Attribute type expected"
+msgstr "预期的特性类型"
+
+#: lib/strops.c:85
+msgid "Attribute type not expected"
+msgstr "不是预期的特性类型"
+
+#: lib/strops.c:87
+msgid "Filter tree empty"
+msgstr "过滤器树为空"
+
+#: lib/strops.c:89
+msgid "Invalid object name"
+msgstr "无效的对象名"
+
+#: lib/strops.c:91
+msgid "Expected RDN delimiter"
+msgstr "预期的 RDN 分界符"
+
+#: lib/strops.c:93
+msgid "Too many tokens"
+msgstr "令牌过多"
+
+#: lib/strops.c:95
+msgid "Inconsistent multiava"
+msgstr "不一致的 multiava"
+
+#: lib/strops.c:97
+msgid "Country name too long"
+msgstr "国家/地区名称太长"
+
+#: lib/strops.c:99
+msgid "System error"
+msgstr "系统错误"
+
+#: lib/strops.c:102
+msgid "Invalid iteration handle"
+msgstr "无效的迭代句柄"
+
+#: lib/strops.c:104
+msgid "Empty buffer passed to API"
+msgstr "向 API 传递了空缓冲区"
+
+#: lib/strops.c:107
+msgid "Cannot create context"
+msgstr "无法创建上下文"
+
+#: lib/strops.c:110
+msgid "Invalid server response"
+msgstr "无效的服务器响应"
+
+#: lib/strops.c:112
+msgid "NULL pointer seen"
+msgstr "看到了空指针"
+
+#: lib/strops.c:115
+msgid "No connection exists"
+msgstr "不存在任何连接"
+
+#: lib/strops.c:117
+msgid "RDN too long"
+msgstr "RDN 太长"
+
+#: lib/strops.c:119
+msgid "Duplicate type"
+msgstr "类型重复"
+
+#: lib/strops.c:122
+msgid "Not logged in"
+msgstr "未登录"
+
+#: lib/strops.c:124
+msgid "Invalid password characters"
+msgstr "口令字符无效"
+
+#: lib/strops.c:127
+msgid "Bad transport"
+msgstr "错误的传输"
+
+#: lib/strops.c:129
+msgid "No such syntax"
+msgstr "没有此类语法"
+
+#: lib/strops.c:131
+msgid "Invalid DS name"
+msgstr "无效的 DS 名称"
+
+#: lib/strops.c:134
+msgid "Required unicode translation not available"
+msgstr "必需的 unicode 转换不可用"
+
+#: lib/strops.c:137
+msgid "DN too long"
+msgstr "DN 太长"
+
+#: lib/strops.c:139
+msgid "Rename not allowed"
+msgstr "不允许重命名"
+
+#: lib/strops.c:142
+msgid "No such entry"
+msgstr "没有此类条目"
+
+#: lib/strops.c:145
+msgid "No such attribute"
+msgstr "没有此类特性"
+
+#: lib/strops.c:148
+msgid "Transport failure"
+msgstr "传输失败"
+
+#: lib/strops.c:150
+msgid "All referrals failed"
+msgstr "所有参照均失败"
+
+#: lib/strops.c:153
+msgid "No referrals"
+msgstr "没有任何参照"
+
+#: lib/strops.c:155
+msgid "Remote failure"
+msgstr "远程失败"
+
+#: lib/strops.c:157
+msgid "Unreachable server"
+msgstr "不可接入服务器"
+
+#: lib/strops.c:160
+msgid "Invalid request"
+msgstr "无效的请求"
+
+#: lib/strops.c:163
+msgid "Crucial replica"
+msgstr "重要复本"
+
+#: lib/strops.c:166
+msgid "Time not synchronized"
+msgstr "时间未同步"
+
+#: lib/strops.c:169
+msgid "Invalid password"
+msgstr "口令无效"
+
+#: lib/strops.c:172
+msgid "Alias of an alias"
+msgstr "别名的别名"
+
+#: lib/strops.c:175
+msgid "Invalid API version"
+msgstr "无效的 API 版本"
+
+#: lib/strops.c:177
+msgid "Packet signatures required"
+msgstr "必需的包签名"
+
+#: lib/strops.c:180
+msgid "Obsolete API"
+msgstr "不再使用的 API"
+
+#: lib/strops.c:183
+msgid "Invalid signature"
+msgstr "无效的签名"
+
+#: lib/strops.c:188
+msgid "Unknown NDS error"
+msgstr "未知 NDS 错误"
+
+#: lib/strops.c:209
+msgid "Invalid file mode"
+msgstr "无效的文件模式"
+
+#: lib/strops.c:211
+msgid "Information not known"
+msgstr "信息未知"
+
+#: lib/strops.c:213
+msgid "Namespace information format is not valid"
+msgstr "名称空间信息格式无效"
+
+#: lib/strops.c:215
+msgid "Referral needed"
+msgstr "需要参照"
+
+#: lib/strops.c:217
+msgid "Permanent connection broken"
+msgstr "永久连接断开"
+
+#: lib/strops.c:219
+msgid "Password required"
+msgstr "必需的口令"
+
+#: lib/strops.c:224
+msgid "Unknown ncpfs error"
+msgstr "未知 ncpfs 错误"
+
+#: lib/strops.c:245
+msgid "Too many request/reply fragments"
+msgstr "过多的请求/答复片断"
+
+#: lib/strops.c:248
+msgid "Server reply too long"
+msgstr "服务器答复过长"
+
+#: lib/strops.c:250
+msgid "Connection to specified server does not exist"
+msgstr "与指定服务器的连接不存在"
+
+#: lib/strops.c:253
+msgid "Scan complete"
+msgstr "扫描完成"
+
+#: lib/strops.c:255
+msgid "Unsupported name format type"
+msgstr "不支持的名称格式类型"
+
+#: lib/strops.c:258
+msgid "Invalid NCP packet length"
+msgstr "无效的 NCP 包长度"
+
+#: lib/strops.c:261
+msgid "Invalid buffer length"
+msgstr "无效的缓冲区长度"
+
+#: lib/strops.c:263
+msgid "User name is not specified"
+msgstr "用户名未指定"
+
+#: lib/strops.c:266
+msgid "Invalid parameter"
+msgstr "无效的参数"
+
+#: lib/strops.c:269
+msgid "Server not found"
+msgstr "未找到服务器"
+
+#: lib/strops.c:272
+msgid "Signature level conflict"
+msgstr "签名级别冲突"
+
+#: lib/strops.c:275
+msgid "Invalid information level"
+msgstr "无效的信息级别"
+
+#: lib/strops.c:278
+msgid "Unsupported transport type"
+msgstr "不支持的传输类型"
+
+#: lib/strops.c:281
+msgid "Unsupported authenticator"
+msgstr "不支持的鉴定器"
+
+#: lib/strops.c:286
+msgid "Unknown Requester error"
+msgstr "未知请求程序错误"
+
+#: lib/strops.c:307
+msgid "Invalid volume"
+msgstr "无效的卷"
+
+#: lib/strops.c:310
+msgid "Invalid directory handle"
+msgstr "无效的目录句柄"
+
+#: lib/strops.c:313
+msgid "Intruder detection lockout"
+msgstr "入侵者检测锁定"
+
+#: lib/strops.c:316
+msgid "No job in queue"
+msgstr "在队列中没有任何作业"
+
+#: lib/strops.c:318
+msgid "Password unencrypted"
+msgstr "口令未加密"
+
+#: lib/strops.c:320
+msgid "Password not unique"
+msgstr "口令不是唯一的"
+
+#: lib/strops.c:322
+msgid "Password too short"
+msgstr "口令太短"
+
+#: lib/strops.c:324
+msgid "Connection limit count exceeded"
+msgstr "超过了连接限制计数"
+
+#: lib/strops.c:326
+msgid "Unauthorized time"
+msgstr "未授权的时间"
+
+#: lib/strops.c:328
+msgid "Unauthorized station"
+msgstr "未授权的工作站"
+
+#: lib/strops.c:330
+msgid "Account disabled"
+msgstr "帐户被禁用"
+
+#: lib/strops.c:333
+msgid "Password really expired"
+msgstr "口令实际已经过期"
+
+#: lib/strops.c:335
+msgid "Password expired"
+msgstr "口令已过期"
+
+#: lib/strops.c:338
+msgid "Member already exists"
+msgstr "成员已存在"
+
+#: lib/strops.c:341
+msgid "NCP not supported"
+msgstr "不支持 NCP"
+
+#: lib/strops.c:343
+msgid "Unknown user"
+msgstr "未知用户"
+
+#: lib/strops.c:345
+msgid "Invalid connection number"
+msgstr "无效的连接数"
+
+#: lib/strops.c:348
+msgid "Server failure"
+msgstr "服务器失败"
+
+#: lib/strops.c:353
+msgid "Unknown Server error"
+msgstr "未知服务器错误"
+
+#: lib/strops.c:384
+#, c-format
+msgid "Unknown error %d (0x%X)"
+msgstr "未知错误 %d (0x%X)"
+
+#: sutil/ncpmount.c:137
+#, c-format
+msgid "Specified tree name `%s' is too long\n"
+msgstr "指定的树名称 `%s' 太长\n"
+
+#: sutil/ncpmount.c:283 sutil/ncplogin.c:457
+#, c-format
+msgid "Unknown namespace \"%s\"\n"
+msgstr "未知名称空间 \"%s\"\n"
+
+#: sutil/ncpmount.c:322 sutil/ncplogin.c:499
+#, c-format
+msgid "ncpfs version %s\n"
+msgstr "ncpfs 版本 %s\n"
+
+#: sutil/ncpmount.c:339
+msgid "Both tree and server name were specified. It is not allowed.\n"
+msgstr "树和服务器名均已指定。这是不允许的。\n"
+
+#: sutil/ncpmount.c:343 sutil/ncpumount.c:428 sutil/ncplogin.c:343
+#, c-format
+msgid "%s must be installed suid root\n"
+msgstr "%s 必须是安装的 suid 根\n"
+
+#: sutil/ncpmount.c:354 sutil/ncplogin.c:705
+#, c-format
+msgid "Could not find mount point %s: %s\n"
+msgstr "无法找到装入点 %s：%s\n"
+
+#: sutil/ncpmount.c:359
+#, c-format
+msgid "Cannot to mount on %s: %s\n"
+msgstr "无法在 %s 上装入：%s\n"
+
+#: sutil/ncpmount.c:367 sutil/ncplogin.c:525
+#, c-format
+msgid "Cannot impersonate as requested: %s\n"
+msgstr "无法按请求冒充：%s\n"
+
+#: sutil/ncpmount.c:378
+msgid "You must specify NDS volume name if you specified tree name.\n"
+msgstr "如果指定了树名，则必须指定 NDS 卷名。\n"
+
+#: sutil/ncpmount.c:382
+msgid "in create context"
+msgstr "在创建上下文中"
+
+#: sutil/ncpmount.c:394
+msgid "in tree search"
+msgstr "在树搜索中"
+
+#: sutil/ncpmount.c:401 sutil/ncpmount.c:554
+msgid "in nds login"
+msgstr "在 nds 登录中"
+
+#: sutil/ncpmount.c:411
+msgid "in volume search"
+msgstr "在卷搜索中"
+
+#: sutil/ncpmount.c:428 sutil/ncplogin.c:176
+#, c-format
+msgid "Volume path `%s' is invalid: `%s'\n"
+msgstr "卷路径 `%s' 无效：`%s'\n"
+
+#: sutil/ncpmount.c:436 sutil/ncplogin.c:184
+#, c-format
+msgid "Volume name `%s' is too long\n"
+msgstr "卷名 `%s' 太长\n"
+
+#: sutil/ncpmount.c:446 sutil/ncplogin.c:723
+msgid "in find_conn_spec"
+msgstr "在 find_conn_spec 中"
+
+#: sutil/ncpmount.c:483 sutil/ncpmount.c:513
+#, c-format
+msgid ""
+"You already have mounted server %s\n"
+"as user %s\n"
+"on mount point %s\n"
+msgstr ""
+"您已将服务器 %s\n"
+"装入为用户 %s\n"
+"（在装入点 %s 上）\n"
+
+#: sutil/ncpmount.c:496 sutil/ncplogin.c:766
+#, c-format
+msgid "Get host address `%s': %s\n"
+msgstr "获取主机地址 `%s'：%s\n"
+
+#: sutil/ncpmount.c:520 sutil/ncplogin.c:783 sutil/ncplogin.c:791
+#, c-format
+msgid "when trying to find %s"
+msgstr "在尝试查找 %s 时"
+
+#: sutil/ncpmount.c:540
+msgid "in mount(2)"
+msgstr "在 mount(2) 中"
+
+#: sutil/ncpmount.c:555 sutil/ncplogin.c:872
+msgid "Login denied.\n"
+msgstr "登录被拒绝。\n"
+
+#: sutil/ncpmount.c:574 sutil/ncplogin.c:889
+msgid "in login"
+msgstr "在登录中"
+
+#: sutil/ncpmount.c:575 sutil/ncplogin.c:890
+msgid "Login denied\n"
+msgstr "登录被拒绝\n"
+
+#: sutil/ncpmount.c:597 sutil/ncplogin.c:931
+#, c-format
+msgid "Cannot access path \"%s\": %s\n"
+msgstr "无法访问路径 \"%s\"：%s\n"
+
+#: sutil/ncpmount.c:609 sutil/ncplogin.c:947
+#, c-format
+msgid "usage: %s [options] mount-point\n"
+msgstr "用法：%s [options] mount-point\n"
+
+#: sutil/ncpmount.c:610 sutil/ncplogin.c:951
+#, c-format
+msgid "Try `%s -h' for more information\n"
+msgstr "尝试 `%s -h' 以获得详细信息\n"
+
+#: sutil/ncpmount.c:616 sutil/ncplogin.c:961
+#, c-format
+msgid ""
+"\n"
+"usage: %s [options] mount-point\n"
+msgstr ""
+"\n"
+"用法：%s [options] mount-point\n"
+
+#: sutil/ncpmount.c:620
+#, c-format
+msgid ""
+"\n"
+"-S server      Server name to be used\n"
+"-A dns_name    DNS server name to be used when mounting over TCP or UDP\n"
+"-U username    Username sent to server\n"
+"-V volume      Volume to mount, for NFS re-export\n"
+"-u uid         uid the mounted files get\n"
+"-g gid         gid the mounted files get\n"
+"-f mode        permission the files get (octal notation)\n"
+"-d mode        permission the dirs get (octal notation)\n"
+"-c uid         uid to identify the connection to mount on\n"
+"               Only makes sense for root\n"
+"-t time_out    Waiting time (in 1/100s) to wait for\n"
+"               an answer from the server. Default: 60\n"
+"-r retry_count Number of retry attempts. Default: 5\n"
+"-C             Don't convert password to uppercase\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"               If neither -P nor -n are given, you are\n"
+"               asked for a password.\n"
+"-s             Enable renaming/deletion of read-only files\n"
+"-h             print this help text\n"
+"-v             print ncpfs version number\n"
+"%s%s-m             Allow multiple logins to server\n"
+"-N os2,nfs     Do not use specified namespaces on mounted volume\n"
+"-y charset     character set used for input and display\n"
+"-p codepage    codepage used on volume, including letters `cp'\n"
+"\n"
+msgstr ""
+"\n"
+"-S server      要被使用的服务器名\n"
+"-A dns_name    通过 TCP 或 UDP 装入时要被使用的 DNS 服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-V volume      用于 NFS 重新导出的要装入的卷\n"
+"-u uid         装入的文件获取的 uid\n"
+"-g gid         装入的文件获取的 gid\n"
+"-f mode        文件获取的权限（八进制表示法）\n"
+"-d mode        dirs 获取的权限（八进制表示法）\n"
+"-c uid         用于标识要装入的连接的 uid\n"
+"               只对根有意义\n"
+"-t time_out    用来等待来自服务器\n"
+"               的回答的等待时间（以 1/100 秒为单位）。默认值：60\n"
+"-r retry_count 重试尝试的次数。默认值：5\n"
+"-C             不将口令转换为大写\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"               如果 -P 和 -n 均未给出，则要求\n"
+"               您提供口令。\n"
+"-s             启用只读文件的重命名/删除\n"
+"-h             打印此帮助文本\n"
+"-v             打印 ncpfs 版本号\n"
+"%s%s-m             允许多次登录到服务器\n"
+"-N os2,nfs     在装入的卷上不使用指定的名称空间\n"
+"-y charset     用于输入和显示的字符集\n"
+"-p codepage    在卷上使用的代码页，包括字母 `cp'\n"
+"\n"
+
+#: sutil/ncpmount.c:649
+msgid "-b             Force bindery login to NDS servers\n"
+msgstr "-b             强制平构数据库登录到 NDS 服务器\n"
+
+#: sutil/ncpmount.c:655 sutil/ncplogin.c:1003
+msgid ""
+"-i level       Signature level, 0=never, 1=supported, 2=preferred, "
+"3=required\n"
+msgstr ""
+"-i level       Signature level, 0=never, 1=supported, 2=preferred, "
+"3=required\n"
+
+#: sutil/ncpumount.c:83 sutil/ncplogin.c:949 util/ipx_probe.c:51
+#: util/ipx_probe.c:61 util/nwauth.c:51 util/nwauth.c:58 util/nwbocreate.c:44
+#: util/nwbocreate.c:51 util/nwbols.c:49 util/nwboprops.c:39
+#: util/nwboprops.c:46 util/nwborm.c:39 util/nwbpadd.c:43 util/nwbpcreate.c:44
+#: util/nwbpset.c:40 util/nwbpvalues.c:52 util/nwdpvalues.c:49
+#: util/nwfsctrl.c:47 util/nwgrant.c:58 util/nwpasswd.c:39 util/nwrevoke.c:50
+#: util/nwrights.c:44
+#, c-format
+msgid "usage: %s [options]\n"
+msgstr "用法：%s [options]\n"
+
+#: sutil/ncpumount.c:84 util/nwmsg.c:81 contrib/tknwmsg/nwmsg.c:81
+#, c-format
+msgid "usage: %s mount-point\n"
+msgstr "用法：%s mount-point\n"
+
+#: sutil/ncpumount.c:90
+#, c-format
+msgid ""
+"\n"
+"usage: %s [options]\n"
+"       %s mount-point\n"
+msgstr ""
+"\n"
+"用法：%s [options]\n"
+"       %s mount-point\n"
+
+#: sutil/ncpumount.c:93
+msgid ""
+"\n"
+"mount-point    Disconnect specified mount-point\n"
+"-a             Disconnect all my connections (NDS and Bindery)\n"
+"-S servername  Disconnect all connections (NDS and/or Bindery) to specified\n"
+"                       server\n"
+"-T treename    Disconnect all NDS connections to specified tree\n"
+"-g             Disconnect all connections to Netware for all users! (only\n"
+"                       root can use this flag)\n"
+"-h             Print this help text\n"
+"\n"
+msgstr ""
+"\n"
+"mount-point    断开指定装入点的连接\n"
+"-a             断开所有我的连接（NDS 和平构数据库）\n"
+"-S servername  断开所有与指定服务器的连接（NDS 和/或\n"
+"                       平构数据库）\n"
+"-T treename    断开所有与指定树的 NDS 连接\n"
+"-g             断开所有用户与 Netware 的所有连接！（只有根\n"
+"                       才能使用此标志）\n"
+"-h             打印此帮助文本\n"
+"\n"
+
+#: sutil/ncpumount.c:146 sutil/ncpumount.c:152
+#, c-format
+msgid "Can't open %s: %s\n"
+msgstr "无法打开 %s：%s\n"
+
+#: sutil/ncpumount.c:173
+#, c-format
+msgid "Error changing mode of %s: %s\n"
+msgstr "更改 %s 的模式时出错：%s\n"
+
+#: sutil/ncpumount.c:180
+#, c-format
+msgid "Cannot rename %s to %s: %s\n"
+msgstr "无法将 %s 重命名为 %s：%s\n"
+
+#: sutil/ncpumount.c:199
+#, c-format
+msgid "Can't get %s~ lock file: %s\n"
+msgstr "无法获取 %s~ 锁定文件：%s\n"
+
+#: sutil/ncpumount.c:209
+#, c-format
+msgid "Can't lock lock file %s~: %s\n"
+msgstr "无法锁定锁定文件 %s~：%s\n"
+
+#: sutil/ncpumount.c:209
+msgid "Lock timed out"
+msgstr "锁定超时"
+
+#: sutil/ncpumount.c:226
+#, c-format
+msgid "Can't remove %s~"
+msgstr "无法删除 %s~"
+
+#: sutil/ncpumount.c:239
+#, c-format
+msgid "Could not open %s: %s\n"
+msgstr "无法打开 %s：%s\n"
+
+#: sutil/ncpumount.c:245
+#, c-format
+msgid "%s probably not ncp-filesystem\n"
+msgstr "%s 可能不是 ncp 文件系统\n"
+
+#: sutil/ncpumount.c:251
+#, c-format
+msgid "You are not allowed to umount %s\n"
+msgstr "不允许您卸载 %s\n"
+
+#: sutil/ncpumount.c:257
+#, c-format
+msgid "Could not umount %s: %s\n"
+msgstr "无法卸载 %s：%s\n"
+
+#: sutil/ncpumount.c:281
+#, c-format
+msgid "NWCC_INFO_MOUNT_POINT failed: %s\n"
+msgstr "NWCC_INFO_MOUNT_POINT 失败：%s\n"
+
+#: sutil/ncpumount.c:289
+msgid "Not enough memory for strdup()\n"
+msgstr "对于 strdup() 没有足够的内存\n"
+
+#: sutil/ncpumount.c:293
+#, c-format
+msgid "Successfully logged out from %s\n"
+msgstr "已成功从 %s 注销\n"
+
+#: sutil/ncpumount.c:349
+#, c-format
+msgid "Successfully logged out from tree %s (%d server(s))\n"
+msgstr "已成功从树 %s 注销（%d 个服务器）\n"
+
+#: sutil/ncpumount.c:351
+msgid "Successfully logged out from all trees.\n"
+msgstr "已成功从所有树注销。\n"
+
+#: sutil/ncpumount.c:354
+#, c-format
+msgid "Not logged to tree %s\n"
+msgstr "未登录到树 %s\n"
+
+#: sutil/ncpumount.c:356
+msgid "Not logged in\n"
+msgstr "未登录\n"
+
+#: sutil/ncpumount.c:359
+#, c-format
+msgid ""
+"Unsuccessfully logged out from tree %s (%d server(s) Ok and %d failure(s))\n"
+msgstr "未成功从树 %s 注销（%d 个服务器正常，%d 个服务器失败）\n"
+
+#: sutil/ncpumount.c:361
+#, c-format
+msgid ""
+"Unsuccessfully logged out from all trees (%d server(s) Ok and %d failure"
+"(s))\n"
+msgstr "未成功从所有树注销（%d 个服务器正常，%d 个服务器失败）\n"
+
+#: sutil/ncpumount.c:388
+#, c-format
+msgid "Invalid mount point: %s\n"
+msgstr "无效的装入点：%s\n"
+
+#: sutil/ncpumount.c:448
+msgid "Only super-user can use the -g flag\n"
+msgstr "只有超级用户才能使用 -g 标志\n"
+
+#: sutil/ncpumount.c:474
+msgid ""
+"You must specify either a server, a tree, a mount point, or all "
+"connections.\n"
+msgstr "必须指定服务器、树、装入点或所有连接。\n"
+
+#: sutil/ncpumount.c:478
+msgid "You cannot specify a server or a tree with -a or -g option.\n"
+msgstr "不能用 -a 或 -g 选项指定服务器或树。\n"
+
+#: sutil/ncpumount.c:482
+msgid "You cannot specify both a server and a tree together.\n"
+msgstr "不能一起指定服务器和树。\n"
+
+#: sutil/ncpumount.c:503
+#, c-format
+msgid "NWCXGetPermConnList failed: %s\n"
+msgstr "NWCXGetPermConnList 失败：%s\n"
+
+#: sutil/ncpumount.c:519
+#, c-format
+msgid "No NCP connections to tree %s.\n"
+msgstr "没有与树 %s 的 NCP 连接。\n"
+
+#: sutil/ncpumount.c:521
+#, c-format
+msgid "No NCP connections to server %s.\n"
+msgstr "没有与服务器 %s 的 NCP 连接。\n"
+
+#: sutil/ncpumount.c:523
+msgid "No NCP connections.\n"
+msgstr "没有 NCP 连接。\n"
+
+#: sutil/nwsfind.c:59
+#, c-format
+msgid "usage: %s [server]\n"
+msgstr "用法：%s [server]\n"
+
+#: sutil/nwsfind.c:65
+#, c-format
+msgid ""
+"\n"
+"usage: %s [server]\n"
+msgstr ""
+"\n"
+"用法：%s [server]\n"
+
+#: sutil/nwsfind.c:67
+msgid ""
+"\n"
+"-t             Server type, default: File server\n"
+"-a             server is in form <net>:<node>:<socket>\n"
+"-h             Print this help text\n"
+"\n"
+msgstr ""
+"\n"
+"-t             服务器类型，默认值：File server\n"
+"-a             服务器采用格式 <net>:<node>:<socket>\n"
+"-h             打印此帮助文本\n"
+"\n"
+
+#: sutil/nwsfind.c:144
+#, c-format
+msgid "%s: Server name too long\n"
+msgstr "%s：服务器名太长\n"
+
+#: sutil/nwsfind.c:153 util/nwauth.c:144 util/nwauth.c:150
+msgid "when trying to find server"
+msgstr "在尝试查找服务器时"
+
+#: sutil/ncplogin.c:205
+#, c-format
+msgid "Context name `%s' is too long\n"
+msgstr "上下文名称 `%s' 太长\n"
+
+#: sutil/ncplogin.c:486
+#, c-format
+msgid "invalid option: %c\n"
+msgstr "无效的选项：%c\n"
+
+#: sutil/ncplogin.c:534
+msgid "You must specify a volume to mount using -V option.\n"
+msgstr "必须使用 -V 选项指定要装入的卷。\n"
+
+#: sutil/ncplogin.c:538
+msgid "Cannot have both -T tree and -S server options\n"
+msgstr "不能同时具有 -T 树和 -S 服务器选项\n"
+
+#: sutil/ncplogin.c:545
+#, c-format
+msgid "Unable to open connection to %s.\n"
+msgstr "无法打开与 %s 的连接。\n"
+
+#: sutil/ncplogin.c:550
+#, c-format
+msgid "%s is not a NDS server, so background authentication will fail.\n"
+msgstr "%s 不是 NDS 服务器，因此后台鉴定将失败。\n"
+
+#: sutil/ncplogin.c:552
+#, c-format
+msgid "%s is not a NDS server, so NDS authentication will fail.\n"
+msgstr "%s 不是 NDS 服务器，因此 NDS 鉴定将失败。\n"
+
+#: sutil/ncplogin.c:558 sutil/ncplogin.c:591
+#, c-format
+msgid "Cannot create NDS context handle: %s\n"
+msgstr "无法创建 NDS 上下文句柄：%s\n"
+
+#: sutil/ncplogin.c:563
+#, c-format
+msgid "Server %s belong to tree %s and you are not authenticated to it.\n"
+msgstr "服务器 %s 属于树 %s，并且未向它对您进行鉴定。\n"
+
+#: sutil/ncplogin.c:568
+#, c-format
+msgid "Server %s belong to tree %s and you are already authenticated to it.\n"
+msgstr "服务器 %s 属于树 %s，并且已向它对您进行鉴定。\n"
+
+#: sutil/ncplogin.c:596
+#, c-format
+msgid "You are not authenticated to tree %s.\n"
+msgstr "未向树 %s 对您进行鉴定。\n"
+
+#: sutil/ncplogin.c:601
+#, c-format
+msgid "You are already authenticated to tree %s.\n"
+msgstr "已向树 %s 对您进行鉴定。\n"
+
+#: sutil/ncplogin.c:613
+#, c-format
+msgid "NWDSGetContext/NWDSSetContext (DCK_FLAGS) failed: %s.\n"
+msgstr "NWDSGetContext/NWDSSetContext (DCK_FLAGS) 失败：%s。\n"
+
+#: sutil/ncplogin.c:622
+#, c-format
+msgid "NWDSSetContext(DCK_NAME_CTX) failed: %s\n"
+msgstr "NWDSSetContext(DCK_NAME_CTX) 失败：%s\n"
+
+#: sutil/ncplogin.c:633
+#, c-format
+msgid "Cannot resolve volume name %s on tree %s (using context %s). Err:%s\n"
+msgstr "无法解析卷名 %s（在树 %s 上，使用上下文 %s）。错误：%s\n"
+
+#: sutil/ncplogin.c:647
+#, c-format
+msgid "Cannot attach to tree %s. Err:%s\n"
+msgstr "无法附加到树 %s。错误：%s\n"
+
+#: sutil/ncplogin.c:653
+#, c-format
+msgid "Cannot get server name from connection to tree %s. Err:%s\n"
+msgstr "无法从与树 %s 的连接获取服务器名。错误：%s\n"
+
+#: sutil/ncplogin.c:671
+msgid "No user name found in cmd line nor in env\n"
+msgstr "在 cmd 行和 env 中均未找到用户名\n"
+
+#: sutil/ncplogin.c:696
+#, c-format
+msgid "Could not autocreate mount point %s: %s\n"
+msgstr "无法自动创建装入点 %s：%s\n"
+
+#: sutil/ncplogin.c:712
+#, c-format
+msgid "Cannot mount on %s: %s\n"
+msgstr "无法在 %s 上装入：%s\n"
+
+#: sutil/ncplogin.c:841
+#, c-format
+msgid "NWDSWhoAmi returned %s\n"
+msgstr "NWDSWhoAmi 返回了 %s\n"
+
+#: sutil/ncplogin.c:850
+#, c-format
+msgid "already mounted:%s\n"
+msgstr "已装入：%s\n"
+
+#: sutil/ncplogin.c:852
+msgid "failed in mount(2)"
+msgstr "在 mount(2) 中失败"
+
+#: sutil/ncplogin.c:871
+msgid "failed in nds login"
+msgstr "在 nds 登录中失败"
+
+#: sutil/ncplogin.c:912
+#, c-format
+msgid "Cannot attach connection to context: %s\n"
+msgstr "无法附加与上下文的连接：%s\n"
+
+#: sutil/ncplogin.c:920
+#, c-format
+msgid "Cannot authenticate connection: %s\n"
+msgstr "无法鉴定连接：%s\n"
+
+#: sutil/ncplogin.c:939
+#, c-format
+msgid "mounted on:%s\n"
+msgstr "装入在：%s\n"
+
+#: sutil/ncplogin.c:964 util/ncptest.c:317 util/nwborm.c:45
+#: util/nwbpcreate.c:50 util/nwbprm.c:46 util/nwbpvalues.c:58
+#: util/nwfsinfo.c:51 util/nwfstime.c:52 util/nwpasswd.c:45
+#: util/nwtrustee.c:48 util/nwuserlist.c:80 util/nwvolinfo.c:47
+#: util/pserver.c:65
+#, c-format
+msgid ""
+"\n"
+"usage: %s [options]\n"
+msgstr ""
+"\n"
+"用法：%s [options]\n"
+
+#: sutil/ncplogin.c:968
+msgid " mount_point is optional if -a option specified\n"
+msgstr " 如果指定 -a 选项，则 mount_point 是可选的\n"
+
+#: sutil/ncplogin.c:972
+#, c-format
+msgid ""
+"\n"
+"%s-T tree        Tree name to be used\n"
+"-S server      Server name to be used\n"
+"                 these two options are exclusive\n"
+"-X name_ctx    Default name context to be used\n"
+"-E             Echo value of final mount_point\n"
+msgstr ""
+"\n"
+"%s-T tree        要被使用的树名\n"
+"-S server      要被使用的服务器名\n"
+"                 这两个选项是互斥的\n"
+"-X name_ctx    要被使用的默认名称上下文\n"
+"-E             最后 mount_point 的回应值\n"
+
+#: sutil/ncplogin.c:982
+msgid ""
+"\n"
+"-U username    Username sent to server\n"
+"-u uid         uid the mounted files get\n"
+"-g gid         gid the mounted files get\n"
+"-c uid         uid to identify the connection to mount on\n"
+"               Only makes sense for root\n"
+"-C             Don't convert password to uppercase\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"               If neither -P nor -n are given, you are\n"
+"               asked for a password.\n"
+msgstr ""
+"\n"
+"-U username    发送到服务器的用户名\n"
+"-u uid         装入的文件获取的 uid\n"
+"-g gid         装入的文件获取的 gid\n"
+"-c uid         用于标识要装入的连接的 uid\n"
+"               只对根有意义\n"
+"-C             不将口令转换为大写\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"               如果 -P 和 -n 均未给出，则要求\n"
+"               您提供口令。\n"
+
+#: sutil/ncplogin.c:995
+msgid ""
+"\n"
+"-V volume      Volume to mount\n"
+"                 must be in bindery format if -S server\n"
+"                 or in NDS format if -T tree\n"
+"-R path        Path in volume to 'map root'\n"
+msgstr ""
+"\n"
+"-V volume      要装入的卷\n"
+"                 如果为 -S 服务器，则必须采用平构格式\n"
+"                 或者，如果为 -T 树，则为 NDS 格式\n"
+"-R path        卷中用于\"映射根\"的路径\n"
+
+#: sutil/ncplogin.c:1008
+msgid ""
+"-a             Autocreate mounting point if needed in ~/ncp/SERVER/VOLUME\n"
+msgstr "-a             如果在 ~/ncp/SERVER/VOLUME 中需要，则自动创建装入点\n"
+
+#: sutil/ncplogin.c:1012
+#, c-format
+msgid ""
+"\n"
+"-f mode        permission the files get (octal notation)\n"
+"-d mode        permission the dirs get (octal notation)\n"
+"-t time_out    Waiting time (in 1/100s) to wait for\n"
+"               an answer from the server. Default: 60\n"
+"-r retry_count Number of retry attempts. Default: 5\n"
+"-s             Enable renaming/deletion of read-only files\n"
+"-h             print this help text\n"
+"-v             print ncpfs version number\n"
+"%s-N os2,nfs     Do not use specified namespaces on mounted volume\n"
+"-y charset     character set used for input and display\n"
+"-p codepage    codepage used on volume, including letters `cp'\n"
+"-B bcast       Broadcast mode =0 all 1= console 2= none (default=all)\n"
+"%s-l             Autocreate mounting point if needed in /mnt/ncp/SERVER/"
+"VOLUME\n"
+"\n"
+msgstr ""
+"\n"
+"-f mode        文件获取的权限（八进制表示法）\n"
+"-d mode        dirs 获取的权限（八进制表示法）\n"
+"-t time_out    用来等待来自服务器\n"
+"               的回答的等待时间（以 1/100 秒为单位）。默认值：60\n"
+"-r retry_count 重试尝试的次数。默认值：5\n"
+"-s             启用只读文件的重命名/删除\n"
+"-h             打印此帮助文本\n"
+"-v             打印 ncpfs 版本号\n"
+"%s-N os2,nfs     在装入的卷上不使用指定的名称空间\n"
+"-y charset     用于输入和显示的字符集\n"
+"-p codepage    在卷上使用的代码页，包括字母 `cp'\n"
+"-B bcast       广播模式，值为 0 表示所有，值为 1 表示控制台，值为 2 表示无"
+"（默认值是 all）\n"
+"%s-l             如果需要则在 /mnt/ncp/SERVER/VOLUME 自动创建装入点\n"
+"\n"
+
+#: sutil/ncpm_common.c:193
+msgid "Error: \"/proc/filesystems\" could not be read:"
+msgstr "错误：\"/proc/filesystems\" 无法被读取："
+
+#: sutil/ncpm_common.c:247
+msgid "Cannot get kernel release\n"
+msgstr "无法获取内核版本\n"
+
+#: sutil/ncpm_common.c:250
+#, c-format
+msgid "Cannot convert kernel release \"%s\" to number\n"
+msgstr "无法将内核版本 \"%s\" 转换为编号\n"
+
+#: sutil/ncpm_common.c:446 sutil/ncpm_common.c:491
+#, c-format
+msgid "Could not create pipe: %s\n"
+msgstr "无法创建管道：%s\n"
+
+#: sutil/ncpm_common.c:450 sutil/ncpm_common.c:497
+#, c-format
+msgid "Could not fork: %s\n"
+msgstr "无法分叉：%s\n"
+
+#: sutil/ncpm_common.c:606
+#, c-format
+msgid "Unsupported mount protocol version %d\n"
+msgstr "不支持的装入协议版本 %d\n"
+
+#: sutil/ncpm_common.c:656
+msgid ""
+"Remote directory is specified but kernel does not support subdir mounts\n"
+msgstr "指定了远程目录，但内核不支持 subdir 装入\n"
+
+#: sutil/ncpm_common.c:659
+msgid ""
+"Remote directory is specified but ncpmount does not support subdir mounts\n"
+msgstr "指定了远程目录，但 ncpmount 不支持 subdir 装入\n"
+
+#: sutil/ncpm_common.c:1359
+#, c-format
+msgid "Can't get %s~ lock file\n"
+msgstr "无法获取 %s~ 锁定文件\n"
+
+#: sutil/ncpm_common.c:1365
+#, c-format
+msgid "Can't open %s\n"
+msgstr "无法打开 %s\n"
+
+#: sutil/ncpm_common.c:1369
+msgid "Can't write mount entry\n"
+msgstr "无法写入装入条目\n"
+
+#: sutil/ncpm_common.c:1373
+#, c-format
+msgid "Can't set perms on %s\n"
+msgstr "无法设置对 %s 的权限\n"
+
+#: sutil/ncpm_common.c:1379
+#, c-format
+msgid "Can't remove %s~\n"
+msgstr "无法删除 %s~\n"
+
+#: sutil/ncpm_common.c:1397
+#, c-format
+msgid "Value `%s' for option `%s' is not a number\n"
+msgstr "值 `%s'（对于选项 `%s'）不是数字\n"
+
+#: sutil/ncpm_common.c:1401
+#, c-format
+msgid "Ignoring unneeded value for option `%s'\n"
+msgstr "忽略选项 `%s' 的不需要的值\n"
+
+#: sutil/ncpm_common.c:1406
+#, c-format
+msgid "Required parameter for option `%s' missing\n"
+msgstr "缺少选项 `%s' 的必需参数\n"
+
+#: sutil/ncpm_common.c:1426
+msgid "Remounting not supported, sorry\n"
+msgstr "十分抱歉，不支持重新装入\n"
+
+#: sutil/ncpm_common.c:1435
+msgid "Timeout must be between 1 and 900 secs inclusive\n"
+msgstr "超时必须介于 1 和 900 秒（含）之间\n"
+
+#: sutil/ncpm_common.c:1442
+msgid "Retry count must be between 1 and 65536 inclusive\n"
+msgstr "重试计数必须介于 1 和 65536（含）之间\n"
+
+#: sutil/ncpm_common.c:1473
+#, c-format
+msgid "Specified server name `%s' is too long\n"
+msgstr "指定的服务器名称 `%s' 太长\n"
+
+#: sutil/ncpm_common.c:1484
+#, c-format
+msgid "NCP signature level must be number between 0 and 3. You specified %u\n"
+msgstr "NCP 签名级别必须是介于 0 和 3 之间的数字，但您指定了 %u\n"
+
+#: sutil/ncpm_common.c:1491
+#, c-format
+msgid "NCP cache time to live must be less than 20000 ms. You specified %u\n"
+msgstr "NCP 超速缓存时间必须小于 20000 ms 才能生效，但您指定了 %u\n"
+
+#: sutil/ncpm_common.c:1501
+#, c-format
+msgid "File mode `%s' is not valid octal number\n"
+msgstr "文件模式 `%s' 不是有效的八进制数字\n"
+
+#: sutil/ncpm_common.c:1510
+#, c-format
+msgid "Directory mode `%s' is not valid octal number\n"
+msgstr "目录模式 `%s' 不是有效的八进制数字\n"
+
+#: sutil/ncpm_common.c:1516
+#, c-format
+msgid "I/O charset name `%s' is too long\n"
+msgstr "I/O 字符集名称 `%s' 太长\n"
+
+#: sutil/ncpm_common.c:1523
+#, c-format
+msgid "Codepage name `%s' is too long\n"
+msgstr "代码页名称 `%s' 太长\n"
+
+#: sutil/ncpm_common.c:1598
+#, c-format
+msgid "Unknown option `%s', ignoring it\n"
+msgstr "未知选项 `%s'，忽略它\n"
+
+#: sutil/ncpm_common.c:1607
+msgid "attempt to open mount point"
+msgstr "尝试打开装入点"
+
+#: sutil/ncpm_common.c:1627
+msgid ""
+"Your kernel does not support character mapping. You should upgrade to latest "
+"version.\n"
+msgstr "您的内核不支持字符映射。应升级到最新的版本。\n"
+
+#: sutil/ncpm_common.c:1629
+msgid "Warning: Unable to load NLS charsets"
+msgstr "警告：无法装载 NLS 字符集"
+
+#: sutil/ncpm_common.c:1636
+msgid ""
+"Your kernel does not support filename caching. You should upgrade to latest "
+"kernel version.\n"
+msgstr "您的内核不支持文件名超速缓存。应升级到最新的内核版本。\n"
+
+#: sutil/ncpm_common.c:1638
+#, c-format
+msgid "Warning: Cannot enable filename caching: %s\n"
+msgstr "警告：无法启用文件名超速缓存：%s\n"
+
+#: sutil/ncpm_common.c:1650
+#, c-format
+msgid "Unable to negotiate requested security level: %s\n"
+msgstr "无法协商请求的安全级别：%s\n"
+
+#: sutil/ncpm_common.c:1666 sutil/ncpm_common.c:1689 sutil/ncpm_common.c:1709
+msgid "opening ncp_socket"
+msgstr "正在打开 ncp_socket"
+
+#: sutil/ncpm_common.c:1682 sutil/ncpm_common.c:1702
+msgid "Invalid transport requested"
+msgstr "请求了无效的传输"
+
+#: sutil/ncpm_common.c:1715
+#, c-format
+msgid "%s: Could not open wdog socket: %s\n"
+msgstr "%s：无法打开 wdog 套接字：%s\n"
+
+#: sutil/ncpm_common.c:1726
+msgid "No transport available\n"
+msgstr "没有可用的传输\n"
+
+#: sutil/ncpm_common.c:1731
+#, c-format
+msgid "bind failed: %s\n"
+msgstr "绑定失败：%s\n"
+
+#: sutil/ncpm_common.c:1733
+msgid ""
+"\n"
+"Maybe you want to use \n"
+"ipx_configure --auto_interface=on --auto_primary=on\n"
+"and try again after waiting a minute.\n"
+"\n"
+msgstr ""
+"\n"
+"可能您要使用 \n"
+"ipx_configure --auto_interface=on --auto_primary=on\n"
+"并在等待一分钟后重试。\n"
+"\n"
+
+#: sutil/ncpm_common.c:1746
+msgid "getsockname ncp socketfailed"
+msgstr "getsockname ncp 套接字失败"
+
+#: sutil/ncpm_common.c:1755
+#, c-format
+msgid "bind(wdog_sock, ): %s\n"
+msgstr "bind(wdog_sock, )：%s\n"
+
+#: sutil/ncpm_common.c:1763
+#, c-format
+msgid "Could not open message socket: %s\n"
+msgstr "无法打开讯息套接字：%s\n"
+
+#: sutil/ncpm_common.c:1771
+#, c-format
+msgid "bind(message_sock, ): %s\n"
+msgstr "bind(message_sock, )：%s\n"
+
+#: sutil/ncpm_common.c:1780
+#, c-format
+msgid "connect(ncp_fd, ): %s\n"
+msgstr "connect(ncp_fd, )：%s\n"
+
+#: sutil/mount_login.c:86
+msgid "Cannot retrieve password from non-blocking file descriptor\n"
+msgstr "无法从非阻塞文件描述符检索口令\n"
+
+#: sutil/mount_login.c:88
+#, c-format
+msgid "Cannot retrieve password from file descriptor: %s\n"
+msgstr "无法从文件描述符检索口令：%s\n"
+
+#: sutil/mount_login.c:91
+msgid "Cannot retrieve password from file descriptor\n"
+msgstr "无法从文件描述符检索口令\n"
+
+#: sutil/mount_login.c:97 util/nwauth.c:160 util/nwauth.c:169
+#: util/nwpasswd.c:141 util/nwpasswd.c:149 util/nwpasswd.c:157
+msgid "Password too long\n"
+msgstr "口令太长\n"
+
+#: sutil/mount_login.c:122
+#, c-format
+msgid "owner parameter `%s' is not valid decimal number\n"
+msgstr "所有者参数 `%s' 不是有效的十进制数字\n"
+
+#: sutil/mount_login.c:128 sutil/mount_login.c:150
+#, c-format
+msgid "User `%s' does not exist on this machine\n"
+msgstr "用户 `%s' 在此计算机上不存在\n"
+
+#: sutil/mount_login.c:135
+#, c-format
+msgid "You are not allowed to set owner to `%s'\n"
+msgstr "不允许您将所有者设置为 `%s'\n"
+
+#: sutil/mount_login.c:144
+#, c-format
+msgid "uid parameter `%s' is not valid decimal number\n"
+msgstr "uid 参数 `%s' 不是有效的十进制数字\n"
+
+#: sutil/mount_login.c:157
+#, c-format
+msgid "You are not allowed to set uid to `%s'\n"
+msgstr "不允许您将 uid 设置为 `%s'\n"
+
+#: sutil/mount_login.c:168
+#, c-format
+msgid "gid parameter `%s' is not valid decimal number\n"
+msgstr "gid 参数 `%s' 不是有效的十进制数字\n"
+
+#: sutil/mount_login.c:174
+#, c-format
+msgid "Group `%s' does not exist on this machine\n"
+msgstr "组 `%s' 在此计算机上不存在\n"
+
+#: sutil/mount_login.c:186
+msgid "Cannot retrieve list of groups you are in\n"
+msgstr "无法检索您所在的组的列表\n"
+
+#: sutil/mount_login.c:194
+msgid "Not enough memory for list of groups\n"
+msgstr "没有足够的内存来用于组列表\n"
+
+#: sutil/mount_login.c:207
+#, c-format
+msgid "You are not allowed to set gid to `%s'\n"
+msgstr "不允许您将 gid 设置为 `%s'\n"
+
+#: sutil/mount_login.c:219
+msgid "Specified password is too long\n"
+msgstr "指定的口令太长\n"
+
+#: sutil/mount_login.c:226
+msgid "Not enough memory for copy of password\n"
+msgstr "没有足够的内存来复制口令\n"
+
+#: util/ipx_probe.c:52
+#, c-format
+msgid "type '%s -h' for help\n"
+msgstr "键入 '%s -h' 以获得帮助信息\n"
+
+#: util/ipx_probe.c:58
+msgid ""
+"\n"
+"Probe an interface for ipx networks\n"
+"\n"
+msgstr ""
+"\n"
+"探测 ipx 网络的接口\n"
+"\n"
+
+#: util/ipx_probe.c:62
+msgid ""
+"\n"
+"-v              Verbose output\n"
+"-i interface    Interface to probe, default: eth0\n"
+"-t timeout      Seconds to wait for answer, default: 3\n"
+"-h              Print this help text\n"
+"\n"
+msgstr ""
+"\n"
+"-v              冗长输出\n"
+"-i interface    要探测的接口，默认值为：eth0\n"
+"-t timeout      等待回答的秒数，默认值为：3\n"
+"-h              打印此帮助文本\n"
+"\n"
+
+#: util/ipx_probe.c:194
+#, c-format
+msgid "probing %s on %s -- "
+msgstr "正在探测 %s（在 %s 上）--"
+
+#: util/ipx_probe.c:203 util/ipx_probe.c:369
+#, c-format
+msgid "%s: socket"
+msgstr "%s：套接字"
+
+#: util/ipx_probe.c:290
+#, c-format
+msgid "%s: Could not find socket address\n"
+msgstr "%s：无法找到套接字地址\n"
+
+#: util/ipx_probe.c:307
+#, c-format
+msgid "%s: could not delete interface\n"
+msgstr "%s：无法删除接口\n"
+
+#: util/ipx_probe.c:315
+msgid "no network found\n"
+msgstr "未找到网络\n"
+
+#: util/ipx_probe.c:321
+#, c-format
+msgid "found IPX network %8.8lX\n"
+msgstr "找到了 IPX 网络 %8.8lX\n"
+
+#: util/ipx_probe.c:379
+#, c-format
+msgid "%s: ioctl"
+msgstr "%s：ioctl"
+
+#: util/ipx_probe.c:443
+#, c-format
+msgid "%s must be run with no interfaces configured. Found %d interface%s.\n"
+msgstr "%s 必须在没有配置任何接口的情况下运行。找到了 %d 接口 %s。\n"
+
+#: util/ipx_probe.c:451
+#, c-format
+msgid "%s: %s\n"
+msgstr "%s：%s\n"
+
+#: util/ipx_probe.c:463 util/ipx_probe.c:468 util/ipx_probe.c:473
+#: util/ipx_probe.c:478
+#, c-format
+msgid "%s %8.8lX\n"
+msgstr "%s %8.8lX\n"
+
+#: util/ncopy.c:115
+#, c-format
+msgid "usage: %s [-V]\n"
+msgstr "用法：%s [-V]\n"
+
+#: util/ncopy.c:116
+#, c-format
+msgid "       %s [-vmMnppt] [-s amt] sourcefile destinationfile|directory\n"
+msgstr "       %s [-vmMnppt] [-s amt] sourcefile destinationfile|directory\n"
+
+#: util/ncopy.c:117
+#, c-format
+msgid "       %s [-vmMnppt] [-s amt] sourcefile [...] directory\n"
+msgstr "       %s [-vmMnppt] [-s amt] sourcefile [...] directory\n"
+
+#: util/ncopy.c:118
+#, c-format
+msgid "       %s [-vmMnppt] [-s amt] -r sourcedir directory\n"
+msgstr "       %s [-vmMnppt] [-s amt] -r sourcedir directory\n"
+
+#: util/ncopy.c:157 util/ncopy.c:874
+msgid "not a directory"
+msgstr "不是目录"
+
+#: util/ncopy.c:191
+#, c-format
+msgid "%s: -s option requires positive numeric argument > 0\n"
+msgstr "%s：-s 选项要求大于 0 的正数参数\n"
+
+#: util/ncopy.c:240
+#, c-format
+msgid "%s: No arguments specified.\n"
+msgstr "%s：未指定任何参数。\n"
+
+#: util/ncopy.c:245
+#, c-format
+msgid "%s: No destination specified.\n"
+msgstr "%s：未指定任何目标。\n"
+
+#: util/ncopy.c:250 util/ncopy.c:874
+#, c-format
+msgid "%s: %s: %s\n"
+msgstr "%s：%s：%s\n"
+
+#: util/ncopy.c:272
+#, c-format
+msgid "Cannot convert ID %08X to name: %s\n"
+msgstr "无法将 ID %08X 转换为名称：%s\n"
+
+#: util/ncopy.c:278
+#, c-format
+msgid "Cannot convert name %s(%04X) to ID: %s\n"
+msgstr "无法将名称 %s(%04X) 转换为 ID：%s\n"
+
+#: util/ncopy.c:326 util/ncopy.c:410
+#, c-format
+msgid "%s: %s -> %s %5.1f%%"
+msgstr "%s：%s -> %s %5.1f%%"
+
+#: util/ncopy.c:328 util/ncopy.c:413
+#, c-format
+msgid "%s: %s -> %s %lld"
+msgstr "%s：%s -> %s %lld"
+
+#: util/ncopy.c:376
+#, c-format
+msgid "%s: Cannot read %s\n"
+msgstr "%s：无法读取 %s\n"
+
+#: util/ncopy.c:398
+#, c-format
+msgid "%s: Cannot write %s\n"
+msgstr "%s：无法写入 %s\n"
+
+#: util/ncopy.c:416
+#, c-format
+msgid "  %d retries"
+msgstr "  %d 次重试"
+
+#: util/ncopy.c:442 util/ncopy.c:469
+#, c-format
+msgid "%s: Unable to open source file: %s\n"
+msgstr "%s：无法打开源文件：%s\n"
+
+#: util/ncopy.c:450
+#, c-format
+msgid "%s: Unable to stat source file: %s\n"
+msgstr "%s：无法启动源文件：%s\n"
+
+#: util/ncopy.c:485
+#, c-format
+msgid "%s: Unable to open output file: %s\n"
+msgstr "%s：无法打开输出文件：%s\n"
+
+#: util/ncopy.c:493
+#, c-format
+msgid "%s: Unable to stat destination file: %s\n"
+msgstr "%s：无法 stat 目标文件：%s\n"
+
+#: util/ncopy.c:506
+#, c-format
+msgid "%s: Unable to open destination file: %s\n"
+msgstr "%s：无法打开目标文件：%s\n"
+
+#: util/ncopy.c:552
+msgid "NetWare copy"
+msgstr "NetWare 复制"
+
+#: util/ncopy.c:558 util/ncopy.c:566
+#, c-format
+msgid "%s: Close failed for %s\n"
+msgstr "%s：%s 关闭失败\n"
+
+#: util/ncopy.c:590
+#, c-format
+msgid "MAC namespace is not supported on source %s: %s\n"
+msgstr "在源 %s 上不支持 MAC 名称空间：%s\n"
+
+#: util/ncopy.c:602
+#, c-format
+msgid "Unable to open MAC resource fork on source %s: %s\n"
+msgstr "无法打开源 %s 上的 MAC 资源分叉：%s\n"
+
+#: util/ncopy.c:641
+#, c-format
+msgid "MAC namespace is not supported on destination %s: %s\n"
+msgstr "在目标 %s 上不支持 MAC 名称空间：%s\n"
+
+#: util/ncopy.c:651
+#, c-format
+msgid "Unable to create MAC resource fork on destination %s: %s\n"
+msgstr "无法在目标 %s 上创建 MAC 资源分叉：%s\n"
+
+#: util/ncopy.c:664
+#, c-format
+msgid ""
+"Unable to copy MAC resource fork of %s because of %s does not support "
+"resource forks\n"
+msgstr "无法复制 %s 的 MAC 资源分叉，因为 %s 不支持资源分叉\n"
+
+#: util/ncopy.c:691
+#, c-format
+msgid "Unable to copy MAC resource fork: %s: %s\n"
+msgstr "无法复制 MAC 资源分叉：%s：%s\n"
+
+#: util/ncopy.c:700
+msgid "NetWare copy (resource fork)"
+msgstr "NetWare 复制（资源分叉）"
+
+#: util/ncopy.c:732 util/ncopy.c:750
+#, c-format
+msgid "Cannot set trustees on %s because of %s\n"
+msgstr "无法对 %s 设置受托者，因为 %s\n"
+
+#: util/ncopy.c:734 util/ncopy.c:761
+msgid "not NetWare filesystem"
+msgstr "不是 NetWare 文件系统"
+
+#: util/ncopy.c:759 util/ncopy.c:799
+#, c-format
+msgid "Cannot set file attributes on %s because of %s\n"
+msgstr "无法对 %s 设置文件特性，因为 %s\n"
+
+#: util/ncopy.c:842
+#, c-format
+msgid ""
+"Param Src   '%s'\n"
+"Param Dest  '%s'\n"
+msgstr ""
+"Param Src   '%s'\n"
+"Param Dest  '%s'\n"
+
+#: util/ncopy.c:849
+#, c-format
+msgid "%s: Cannot open %s, %s\n"
+msgstr "%s：无法打开 %s，%s\n"
+
+#: util/ncopy.c:855
+#, c-format
+msgid "%s: Cannot stat %s, %s\n"
+msgstr "%s：无法 stat %s，%s\n"
+
+#: util/ncopy.c:881
+#, c-format
+msgid "%s: Cannot chmod %s: %s\n"
+msgstr "%s：无法 chmod %s：%s\n"
+
+#: util/ncopy.c:888
+#, c-format
+msgid "%s: Cannot create %s: %s\n"
+msgstr "%s：无法创建 %s：%s\n"
+
+#: util/ncopy.c:898 util/ncopy.c:965
+#, c-format
+msgid "%s: Cannot create %s, %s\n"
+msgstr "%s：无法创建 %s，%s\n"
+
+#: util/ncopy.c:911
+#, c-format
+msgid "%s: Cannot read %s: %s\n"
+msgstr "%s：无法读取 %s：%s\n"
+
+#: util/ncopy.c:938
+#, c-format
+msgid "%s: %s: omitting directory\n"
+msgstr "%s：%s：省略目录\n"
+
+#: util/ncopy.c:1052
+#, c-format
+msgid "%s: Reset to ignore SIGHUP signal failed: %s"
+msgstr "%s：重置以忽略 SIGHUP 信号失败：%s"
+
+#: util/ncopy.c:1059
+#, c-format
+msgid "%s: Reset to ignore SIGINT signal failed: %s"
+msgstr "%s：重置以忽略 SIGINT 信号失败：%s"
+
+#: util/ncopy.c:1066
+#, c-format
+msgid "%s: Reset to ignore SIGQUIT signal failed: %s"
+msgstr "%s：重置以忽略 SIGQUIT 信号失败：%s"
+
+#: util/ncopy.c:1073
+#, c-format
+msgid "%s: Reset to ignore SIGTERM signal failed: %s"
+msgstr "%s：重置以忽略 SIGTERM 信号失败：%s"
+
+#: util/ncopy.c:1085
+#, c-format
+msgid "%s: unclean close of output file"
+msgstr "%s：关闭输出文件不彻底"
+
+#: util/ncopy.c:1104
+#, c-format
+msgid "%s: Get HANGUP signal action failed: %s"
+msgstr "%s：获取 HANGUP 信号操作失败：%s"
+
+#: util/ncopy.c:1111
+#, c-format
+msgid "%s: Reset HANGUP signal action failed: %s"
+msgstr "%s：重置 HANGUP 信号操作失败：%s"
+
+#: util/ncopy.c:1117
+#, c-format
+msgid "%s: Get INTERRUPT signal action failed: %s"
+msgstr "%s：获取 INTERRUPT 信号操作失败：%s"
+
+#: util/ncopy.c:1124
+#, c-format
+msgid "%s: Reset INTERRUPT signal action failed: %s"
+msgstr "%s：重置 INTERRUPT 信号操作失败：%s"
+
+#: util/ncopy.c:1130
+#, c-format
+msgid "%s: Get QUIT signal action failed: %s"
+msgstr "%s：获取 QUIT 信号操作失败：%s"
+
+#: util/ncopy.c:1137
+#, c-format
+msgid "%s: Reset QUIT signal action failed: %s"
+msgstr "%s：重置 QUIT 信号操作失败：%s"
+
+#: util/ncopy.c:1143
+#, c-format
+msgid "%s: Get TERMINATE signal action failed: %s"
+msgstr "%s：获取 TERMINATE 信号操作失败：%s"
+
+#: util/ncopy.c:1150
+#, c-format
+msgid "%s: Reset TERMINATE signal action failed: %s"
+msgstr "%s：重置 TERMINATE 信号操作失败：%s"
+
+#: util/ncopy.c:1181
+#, c-format
+msgid "%s version %s\n"
+msgstr "%s 版本 %s\n"
+
+#: util/ncptest.c:109
+msgid ""
+"\n"
+"test_create:\n"
+msgstr ""
+"\n"
+"test_create：\n"
+
+#: util/ncptest.c:112 util/ncptest.c:176 util/ncptest.c:278
+#, c-format
+msgid "Volume %s not found! error %ld.\n"
+msgstr "未找到卷 %s！错误 %ld。\n"
+
+#: util/ncptest.c:117
+msgid "lookup public error\n"
+msgstr "查找公共错误\n"
+
+#: util/ncptest.c:123
+msgid "alloc_dir_handle error\n"
+msgstr "alloc_dir_handle 错误\n"
+
+#: util/ncptest.c:129
+msgid "create error\n"
+msgstr "创建错误\n"
+
+#: util/ncptest.c:134
+msgid "dealloc error\n"
+msgstr "dealloc 错误\n"
+
+#: util/ncptest.c:137
+msgid "test_create: Passed.\n"
+msgstr "test_create：已通过。\n"
+
+#: util/ncptest.c:173
+msgid ""
+"\n"
+"test_readdir:\n"
+msgstr ""
+"\n"
+"test_readdir：\n"
+
+#: util/ncptest.c:181
+msgid "lookup blub error\n"
+msgstr "查找 blub 错误\n"
+
+#: util/ncptest.c:186
+msgid "init error\n"
+msgstr "init 错误\n"
+
+#: util/ncptest.c:192
+#, c-format
+msgid "\tfound\t\t: %s\n"
+msgstr "\t已找到\t\t：%s\n"
+
+#: util/ncptest.c:200 util/ncptest.c:248
+#, c-format
+msgid "\tnfs name\t: %s\n"
+msgstr "\tnfs 名称\t：%s\n"
+
+#: util/ncptest.c:209 util/ncptest.c:259
+#, c-format
+msgid "\tos2 name\t: %s\n"
+msgstr "\tos2 名称\t：%s\n"
+
+#: util/ncptest.c:222
+msgid "path translation error\n"
+msgstr "路径转换错误\n"
+
+#: util/ncptest.c:225
+msgid "Search in subdir '"
+msgstr "在 subdir 中搜索 ' "
+
+#: util/ncptest.c:225
+#, c-format
+msgid "' on volume '%s'\n"
+msgstr "' 在卷 '%s' 上\n"
+
+#: util/ncptest.c:231
+msgid "init search2 error\n"
+msgstr "init search2 错误\n"
+
+#: util/ncptest.c:237
+#, c-format
+msgid "\tfound %s\t: %s\n"
+msgstr "\t已找到 %s\t：%s\n"
+
+#: util/ncptest.c:264
+msgid "test_readdir: Passed.\n"
+msgstr "test_readdir：已通过。\n"
+
+#: util/ncptest.c:275
+msgid ""
+"\n"
+"test_rights:\n"
+msgstr ""
+"\n"
+"test_rights：\n"
+
+#: util/ncptest.c:283
+msgid "lookup me error\n"
+msgstr "查找用户错误\n"
+
+#: util/ncptest.c:290
+msgid "get sys rights error\n"
+msgstr "获取 sys 权限错误\n"
+
+#: util/ncptest.c:293
+#, c-format
+msgid "%s right: %4.4x\n"
+msgstr "%s 权限：%4.4x\n"
+
+#: util/ncptest.c:299
+msgid "get me rights error\n"
+msgstr "获取用户权限错误\n"
+
+#: util/ncptest.c:302
+#, c-format
+msgid "me right: %4.4x\n"
+msgstr "用户权限：%4.4x\n"
+
+#: util/ncptest.c:303
+msgid "test_rights: Passed.\n"
+msgstr "test_rights：已通过。\n"
+
+#: util/ncptest.c:310 util/nwbols.c:41 util/nwtrustee.c:41 util/nwvolinfo.c:40
+#, c-format
+msgid "usage: %s [options] pattern\n"
+msgstr "用法：%s [options] pattern\n"
+
+#: util/ncptest.c:319
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-v volume      volume name\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-v volume      卷名\n"
+"\n"
+
+#: util/ncptest.c:346
+msgid "in ncp_initialize"
+msgstr "在 ncp_initialize 中"
+
+#: util/nprint.c:95
+msgid "when initializing connection"
+msgstr "在初始化连接时"
+
+#: util/nprint.c:110 util/pserver.c:191
+msgid "No Description"
+msgstr "无说明"
+
+#: util/nprint.c:156
+#, c-format
+msgid "invalid line number: %s\n"
+msgstr "无效的行号：%s\n"
+
+#: util/nprint.c:167
+#, c-format
+msgid "invalid row number: %s\n"
+msgstr "无效的行号：%s\n"
+
+#: util/nprint.c:178
+#, c-format
+msgid "invalid copies: %s\n"
+msgstr "无效的副本：%s\n"
+
+#: util/nprint.c:189
+#, c-format
+msgid "invalid tab size: %s\n"
+msgstr "无效的选项卡大小：%s\n"
+
+#: util/nprint.c:208
+#, c-format
+msgid "invalid form number: %s\n"
+msgstr "无效的表单号：%s\n"
+
+#: util/nprint.c:251
+msgid "could not open file"
+msgstr "无法打开文件"
+
+#: util/nprint.c:270
+#, c-format
+msgid "Could not find queue %s\n"
+msgstr "无法查找队列 %s\n"
+
+#: util/nprint.c:279
+#, c-format
+msgid "Cannot create print job: %s\n"
+msgstr "无法创建打印作业：%s\n"
+
+#: util/nprint.c:307
+#, c-format
+msgid "Cannot start print job: %s\n"
+msgstr "无法启动打印作业：%s\n"
+
+#: util/nprint.c:318 util/nprint.c:325 util/pserver.c:59
+#, c-format
+msgid "usage: %s [options] file\n"
+msgstr "用法：%s [options] file\n"
+
+#: util/nprint.c:326
+msgid ""
+"\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"-q queue name  Name of the printing queue to use\n"
+"-d job desc    Job description\n"
+"-p pathname    Pathname to appear on banner (up to 79 chars)\n"
+"-B username    Username to appear on banner (up to 12 chars)\n"
+"-f filename    Filename to appear on banner (up to 12 chars)\n"
+"-s             Supress banner page\n"
+"-l lines       Number of lines per page\n"
+"-r rows        Number of rows per page\n"
+"-t tab         Number of spaces per tab\n"
+"-T             Print server tab expantion\n"
+"-N             Surpress print server form feeds\n"
+"-F form #      Form number to print on\n"
+"-h             print this help text\n"
+"\n"
+msgstr ""
+"\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令d\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"-q queue name  要使用的打印队列的名称\n"
+"-d job desc    作业说明\n"
+"-p pathname    要在标题页上出现的路径名（最多 79 个字符）\n"
+"-B username    要在标题页上出现的用户名（最多 12 个字符）\n"
+"-f filename    要在标题页上出现的文件名（最多 12 个字符）\n"
+"-s             禁止显示标题页\n"
+"-l lines       每页的行数\n"
+"-r rows        每页的行数\n"
+"-t tab         每个选项卡的空间数\n"
+"-T             打印服务器选项卡扩展\n"
+"-N             禁止打印服务器走纸\n"
+"-F form #      要打印上的表单号\n"
+"-h             打印此帮助文本\n"
+"\n"
+
+#: util/nsend.c:62
+#, c-format
+msgid "Unable to send message to %s/%s: %s\n"
+msgstr "无法将讯息发送到 %s/%s：%s\n"
+
+#: util/nsend.c:72
+msgid "Illegal station number"
+msgstr "非法的工作站编号"
+
+#: util/nsend.c:73
+msgid "Client not logged in"
+msgstr "客户程序未登录"
+
+#: util/nsend.c:74
+msgid "Client not accepting messages"
+msgstr "客户程序未接受讯息"
+
+#: util/nsend.c:75
+msgid "Client already has message"
+msgstr "客户程序已具有讯息"
+
+#: util/nsend.c:80
+#, c-format
+msgid "Message was not sent to %s/%s (station %d): %s\n"
+msgstr "讯息未被发送到 %s/%s（工作站 %d）：%s\n"
+
+#: util/nsend.c:83
+#, c-format
+msgid "Message sent to %s/%s (station %d)\n"
+msgstr "讯息已被发送到 %s/%s（工作站 %d）\n"
+
+#: util/nsend.c:97
+#, c-format
+msgid "Unable to get connection list for %s: %s\n"
+msgstr "无法获取 %s 的连接列表：%s\n"
+
+#: util/nsend.c:110
+#, c-format
+msgid "No connection found for %s/%s\n"
+msgstr "未找到用于 %s/%s 的连接\n"
+
+#: util/nsend.c:115 util/nsend.c:120
+#, c-format
+msgid "usage: %s [options] [user|group] message\n"
+msgstr "用法：%s [options] [user|group] message\n"
+
+#: util/nsend.c:121
+msgid ""
+"\n"
+"-h              Prints this help text\n"
+"-S server       Server name to be used\n"
+"-U user         Username sent to server\n"
+"-P password     Use this password\n"
+"-n              Do not use any password\n"
+"-C              Do not convert password to uppercase\n"
+"\n"
+"-o object_name  Recipient name\n"
+"-t object_type  Recipient type (default=any)\n"
+"-c connid       Recipient connection number\n"
+"-i object_ID    Recipient object ID\n"
+"-a              Do not prepend 'From xxx[x]:' to message\n"
+"\n"
+msgstr ""
+"\n"
+"-h              打印此帮助文本\n"
+"-S server       要被使用的服务器名\n"
+"-U user         发送到服务器的用户名\n"
+"-P password     使用此口令\n"
+"-n              不使用任何口令\n"
+"-C              不将口令转换为大写\n"
+"\n"
+"-o object_name  收件人名称\n"
+"-t object_type  收件人类型（默认值为 any）\n"
+"-c connid       收件人连接号\n"
+"-i object_ID    收件人对象 ID\n"
+"-a              不预先考虑到讯息的 'From xxx[x]:'\n"
+"\n"
+
+#: util/nsend.c:162 util/nwbocreate.c:115 util/nwboprops.c:83 util/nwborm.c:80
+#: util/nwbpadd.c:95 util/nwbpcreate.c:119 util/nwbprm.c:83 util/nwbpset.c:91
+#: util/nwfsinfo.c:132 util/nwfstime.c:86 util/nwrights.c:102
+#: util/nwtrustee.c:98 util/nwuserlist.c:201 util/pqlist.c:176 util/pqrm.c:59
+#: util/pqstat.c:138 util/pserver.c:365
+msgid "when initializing"
+msgstr "在初始化时"
+
+#: util/nsend.c:171 util/nsend.c:200
+#, c-format
+msgid "%s: multiple -%c are not allowed\n"
+msgstr "%s：不允许多个 -%c\n"
+
+#: util/nsend.c:173 util/nsend.c:184 util/nsend.c:202
+#, c-format
+msgid "%s: -%c cannot be used together with -%c\n"
+msgstr "%s：-%c 不能与 -%c 一起使用\n"
+
+#: util/nsend.c:246
+#, c-format
+msgid "From %s[%d]: %s"
+msgstr "自 %s[%d]：%s"
+
+#: util/nsend.c:257
+#, c-format
+msgid "%s: Unable to get connection list for %08X: %s\n"
+msgstr "%s：无法获取 %08X 的连接列表：%s\n"
+
+#: util/nsend.c:271
+#, c-format
+msgid "No connection found for %s/%08X\n"
+msgstr "未找到用于 %s/%08X 的连接\n"
+
+#: util/nsend.c:301
+#, c-format
+msgid "%s: Cannot convert member ID 0x%08lX to name: %s\n"
+msgstr "%s：无法将成员 ID 0x%08lX 转换为名称：%s\n"
+
+#: util/nsend.c:308
+#, c-format
+msgid "%s: Cannot read members of group %s: %s\n"
+msgstr "%s：无法读取组 %s 的成员：%s\n"
+
+#: util/nwauth.c:59
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-t type        Object type (decimal value)\n"
+"-P password    User password\n"
+"-b             Bindery only mode\n"
+"-D             Daemon authentication, ignore process uid\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-t type        对象类型（十进制值）\n"
+"-P password    用户口令\n"
+"-b             仅限平构数据库模式\n"
+"-D             守护程序鉴定，忽略进程 uid\n"
+"\n"
+
+#: util/nwauth.c:165
+msgid "Enter password: "
+msgstr "输入口令："
+
+#: util/nwauth.c:183 util/nwpasswd.c:175
+msgid "when trying to open connection"
+msgstr "在尝试打开连接时"
+
+#: util/nwbocreate.c:52
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-o object_name Name of created object\n"
+"-t type        Object type (decimal value)\n"
+"-r read-flag   Read security\n"
+"-w write-flag  Write security\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-o object_name 所创建的对象的名称\n"
+"-t type        对象类型（十进制值）\n"
+"-r read-flag   读取安全性\n"
+"-w write-flag  写入安全性\n"
+"\n"
+
+#: util/nwbocreate.c:134 util/nwbpcreate.c:151
+#, c-format
+msgid ""
+"%s: Wrong read security\n"
+"Must be one of anyone, logged, object, supervisor or netware\n"
+msgstr ""
+"%s：错误的读取安全性\n"
+"必须是任何人、已登录、对象、超级用户或 netware 之一\n"
+
+#: util/nwbocreate.c:146 util/nwbpcreate.c:163
+#, c-format
+msgid ""
+"%s: Wrong write security\n"
+"Must be one of anyone, logged, object, supervisor or netware\n"
+msgstr ""
+"%s：错误的写入安全性\n"
+"必须是任何人、已登录、对象、超级用户或 netware 之一\n"
+
+#: util/nwbocreate.c:165 util/nwboprops.c:112 util/nwborm.c:106
+#: util/nwbpadd.c:137 util/nwbpcreate.c:182 util/nwbprm.c:119
+#: util/nwbpvalues.c:157
+#, c-format
+msgid "%s: You must specify an object type\n"
+msgstr "%s：必须指定对象类型\n"
+
+#: util/nwbocreate.c:171 util/nwboprops.c:118 util/nwborm.c:112
+#: util/nwbpadd.c:143 util/nwbpcreate.c:188 util/nwbprm.c:125
+#: util/nwbpvalues.c:163 util/nwgrant.c:142 util/nwrevoke.c:124
+#, c-format
+msgid "%s: You must specify an object name\n"
+msgstr "%s：必须指定对象名称\n"
+
+#: util/nwbocreate.c:178
+#, c-format
+msgid "%s: Could not create the object\n"
+msgstr "%s：无法创建该对象\n"
+
+#: util/nwbols.c:50
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-t type        Object type to be listed (decimal)\n"
+"-o object      Object pattern\n"
+"-v             Verbose listing\n"
+"-a             Alternative output format\n"
+"-d             Show object type in decimal\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-t type        要被列出的对象类型（十进制）\n"
+"-o object      对象模式\n"
+"-v             冗长列表\n"
+"-a             替代输出格式\n"
+"-d             以十进制显示对象类型\n"
+"\n"
+
+#: util/nwbols.c:131
+#, c-format
+msgid "%s: %s is not on ncpfs filesystem\n"
+msgstr "%s：%s 不在 ncpfs 文件系统上\n"
+
+#: util/nwboprops.c:47
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-o object_name Name of object inspected\n"
+"-t type        Object type (decimal value)\n"
+"-v             Verbose listing\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-o object_name 查看的对象的名称\n"
+"-t type        对象类型（十进制值）\n"
+"-v             冗长列表\n"
+"\n"
+
+#: util/nwborm.c:47
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-o object_name Name of object to be removed\n"
+"-t type        Object type (decimal value)\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-o object_name 要删除的对象的名称\n"
+"-t type        对象类型（十进制值）\n"
+"\n"
+
+#: util/nwborm.c:118
+#, c-format
+msgid "%s: Could not delete the object\n"
+msgstr "%s：无法删除该对象\n"
+
+#: util/nwbpadd.c:49 util/nwbpset.c:46
+#, c-format
+msgid ""
+"\n"
+"usage: %s [options] [values]\n"
+msgstr ""
+"\n"
+"用法：%s [options] [values]\n"
+
+#: util/nwbpadd.c:51
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-o object_name Name of accessed object\n"
+"-t type        Object type (decimal value)\n"
+"-p property    Name of property to be touched\n"
+"value          value to be added\n"
+"\n"
+"If property is of type SET, value is an object id (hex)\n"
+"Otherwise, value is either a string value to be written, or\n"
+"a count of bytes to be written. The latter is assumed if\n"
+"more than one value argument is given. The count is decimal,\n"
+"and the following arguments are interpreted as bytes in\n"
+"hexadecimal notation.\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-o object_name 所访问对象的名称\n"
+"-t type        对象类型（十进制值）\n"
+"-p property    要涉及的属性的名称\n"
+"value          要被添加的值\n"
+"\n"
+"如果属性为 SET 类型，则值是对象 ID（十六进制）\n"
+"否则，值或者是要被写入的字符串值，或者\n"
+"是要被写入的字节计数。如果提供了多个参数值，\n"
+"则认为值为后者。该计数是十进制的，\n"
+"并且以下参数被解释为十六进制\n"
+"表示法形式的字节。\n"
+"\n"
+
+#: util/nwbpadd.c:113 util/nwbpcreate.c:137 util/nwbprm.c:101
+#: util/nwbpvalues.c:121
+#, c-format
+msgid "%s: Property Name too long\n"
+msgstr "%s：属性名太长\n"
+
+#: util/nwbpadd.c:149 util/nwbpcreate.c:194 util/nwbprm.c:131
+#: util/nwbpvalues.c:169
+#, c-format
+msgid "%s: You must specify a property name\n"
+msgstr "%s：必须指定属性名称\n"
+
+#: util/nwbpadd.c:155
+#, c-format
+msgid "%s: You must specify a property value\n"
+msgstr "%s：必须指定属性值\n"
+
+#: util/nwbpadd.c:165
+#, c-format
+msgid "%s: Could not find property\n"
+msgstr "%s：无法找到属性\n"
+
+#: util/nwbpadd.c:176
+#, c-format
+msgid "%s: For the SET property %s, you must specify an object id as value\n"
+msgstr "%s：对于 SET 属性 %s，必须将对象 ID 指定为值\n"
+
+#: util/nwbpadd.c:188
+#, c-format
+msgid "%s: %s is not a valid object id\n"
+msgstr "%s：%s 不是有效的对象 ID\n"
+
+#: util/nwbpadd.c:196
+#, c-format
+msgid "%s: could not add object %s\n"
+msgstr "%s：无法添加对象 %s\n"
+
+#: util/nwbpadd.c:215 util/nwbpadd.c:227
+#, c-format
+msgid "%s: Value too long\n"
+msgstr "%s：值太长\n"
+
+#: util/nwbpadd.c:233
+#, c-format
+msgid "%s: Byte count does not match number of bytes\n"
+msgstr "%s：字节计数与字节数目不匹配\n"
+
+#: util/nwbpadd.c:263
+#, c-format
+msgid "%s: Could not write property\n"
+msgstr "%s：无法写入属性\n"
+
+#: util/nwbpcreate.c:52
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-o object_name Name of object\n"
+"-t type        Object type (decimal value)\n"
+"-p property    Name of property to be created\n"
+"-s             Property is SET, default: ITEM\n"
+"-r read-flag   Read security\n"
+"-w write-flag  Write security\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-o object_name 对象的名称\n"
+"-t type        对象类型（十进制值）\n"
+"-p property    要被创建的属性的名称\n"
+"-s             属性为 SET，默认值为：ITEM\n"
+"-r read-flag   读取安全性\n"
+"-w write-flag  写入安全性\n"
+"\n"
+
+#: util/nwbpcreate.c:203
+#, c-format
+msgid "%s: Could not create the property\n"
+msgstr "%s：无法创建该属性\n"
+
+#: util/nwbprm.c:40 util/pqlist.c:182
+#, c-format
+msgid "usage: %s [options] [pattern]\n"
+msgstr "用法：%s [options] [pattern]\n"
+
+#: util/nwbprm.c:48
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-o object_name Name of object\n"
+"-t type        Object type (decimal value)\n"
+"-p property    Name of property to be deleted\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-o object_name 对象的名称\n"
+"-t type        对象类型（十进制值）\n"
+"-p property    要被删除的属性的名称\n"
+"\n"
+
+#: util/nwbprm.c:138
+#, c-format
+msgid "%s: Could not delete the property\n"
+msgstr "%s：无法删除该属性\n"
+
+#: util/nwbpset.c:48
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+
+#: util/nwbpset.c:111 util/nwbpset.c:119 util/nwbpset.c:125 util/nwbpset.c:131
+#: util/nwbpset.c:139 util/nwbpset.c:235
+msgid "Illegal format on stdin\n"
+msgstr "stdin 上的非法格式\n"
+
+#: util/nwbpset.c:151
+#, c-format
+msgid "Tried to write %s property\n"
+msgstr "已尝试写入 %s 属性\n"
+
+#: util/nwbpset.c:153
+msgid "SET over existing ITEM"
+msgstr "对现有 ITEM 进行 SET"
+
+#: util/nwbpset.c:154
+msgid "ITEM over existing SET"
+msgstr "对现有 SET 进行 ITEM"
+
+#: util/nwbpset.c:164
+msgid "Could not change property security\n"
+msgstr "无法更改属性安全性\n"
+
+#: util/nwbpset.c:175
+msgid "Could not create property\n"
+msgstr "无法创建属性 \n"
+
+#: util/nwbpset.c:217
+msgid "Could not write property\n"
+msgstr "无法写入属性\n"
+
+#: util/nwbpset.c:246
+msgid "Could not add object to set\n"
+msgstr "无法将对象添加到集合\n"
+
+#: util/nwbpvalues.c:60
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-o object_name Name of object\n"
+"-t type        Object type (decimal value)\n"
+"-p property    Name of property to be listed\n"
+"-v             Verbose object listing\n"
+"-c             Canonical output, for use with nwbpadd\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-o object_name 对象的名称\n"
+"-t type        对象类型（十进制值）\n"
+"-p property    要被列出的属性的名称\n"
+"-v             冗长对象列表\n"
+"-c             规范输出，用于 nwbpadd\n"
+"\n"
+
+#: util/nwbpvalues.c:151 util/nwdpvalues.c:143
+#, c-format
+msgid "%s: %s is not ncpfs file or directory\n"
+msgstr "%s：%s 不是 ncpfs 文件或目录\n"
+
+#: util/nwbpvalues.c:179
+msgid "No such property"
+msgstr "没有此类属性"
+
+#: util/nwbpvalues.c:183
+#, c-format
+msgid "%s: Could not find property: %s\n"
+msgstr "%s：无法找到属性：%s\n"
+
+#: util/nwbpvalues.c:205
+#, c-format
+msgid "%s: Could not read property value: %s\n"
+msgstr "%s：无法读取属性值：%s\n"
+
+#: util/nwbpvalues.c:372
+#, c-format
+msgid "Last Login: %x, %X"
+msgstr "上一次登录时间：%x, %X"
+
+#: util/nwbpvalues.c:376
+msgid "Never logged in\n"
+msgstr "永不登录\n"
+
+#: util/nwbpvalues.c:380
+msgid " --- Account disabled ---\n"
+msgstr " --- 帐户被禁用 ---\n"
+
+#: util/nwbpvalues.c:395
+#, c-format
+msgid "Account expires on: %x"
+msgstr "帐户到期时间：%x"
+
+#: util/nwbpvalues.c:411
+#, c-format
+msgid "Password expires on: %x"
+msgstr "口令到期时间：%x"
+
+#: util/nwbpvalues.c:413
+#, c-format
+msgid ""
+"GraceLogins left: %d\n"
+"of max.         : %d\n"
+msgstr ""
+"GraceLogins 剩余：%d\n"
+"最大         ：%d\n"
+
+#: util/nwbpvalues.c:415
+#, c-format
+msgid "PasswortChangeInterval   : %d days\n"
+msgstr "PasswortChangeInterval   ：%d 天\n"
+
+#: util/nwbpvalues.c:420
+msgid "New password must be different when changing\n"
+msgstr "在更改时新口令必须不同\n"
+
+#: util/nwbpvalues.c:424
+msgid "User is not allowed to change password\n"
+msgstr "不允许用户更改口令\n"
+
+#: util/nwbpvalues.c:426
+#, c-format
+msgid "Minimal password length  : %d\n"
+msgstr "最小口令长度：%d\n"
+
+#: util/nwbpvalues.c:429
+#, c-format
+msgid "Maximum no of connections: %d\n"
+msgstr "最大连接数：%d\n"
+
+#: util/nwbpvalues.c:434
+#, c-format
+msgid "Maximum DiskQuota : %8d blocks\n"
+msgstr "最大 DiskQuota：%8d 个块\n"
+
+#: util/nwbpvalues.c:437
+#, c-format
+msgid "Failed Logins: %5d\n"
+msgstr "失败的登录次数：%5d\n"
+
+#: util/nwbpvalues.c:441
+#, c-format
+msgid "Account disabled still %8d seconds\n"
+msgstr "帐户仍禁用了 %8d 秒\n"
+
+#: util/nwbpvalues.c:446
+#, c-format
+msgid "Last 'intruder' address: %s\n"
+msgstr "上一个\"入侵者\"地址：%s\n"
+
+#: util/nwbpvalues.c:452
+#, c-format
+msgid "RestrictionMask : %02X\n"
+msgstr "RestrictionMask：%02X\n"
+
+#: util/nwbpvalues.c:466
+msgid "Time restrictions:         1 1 1 1 1 1 1 1 1 1 2 2 2 2 ]\n"
+msgstr "时间限制：    1 1 1 1 1 1 1 1 1 1 2 2 2 2 ]\n"
+
+#: util/nwbpvalues.c:467
+msgid "  Day [0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 ]\n"
+msgstr "  天 [0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 ]\n"
+
+#: util/nwbpvalues.c:507
+#, c-format
+msgid "Segment: %03d\n"
+msgstr "段：%03d\n"
+
+#: util/nwdir.c:203
+msgid "Nobody"
+msgstr "没有人"
+
+#: util/nwdir.c:212
+msgid "Unknown:N/A"
+msgstr "未知：不适用"
+
+#: util/nwdir.c:218
+#, c-format
+msgid "Unknown:<%s>"
+msgstr "未知：<%s>"
+
+#: util/nwdir.c:223
+msgid "User:"
+msgstr "用户："
+
+#: util/nwdir.c:224
+msgid "Group:"
+msgstr "组："
+
+#: util/nwdir.c:225
+msgid "FileServer:"
+msgstr "文件服务器："
+
+#: util/nwdir.c:226
+#, c-format
+msgid "Unknown(%04X):"
+msgstr "未知 (%04X)："
+
+#: util/nwdir.c:267
+msgid "never"
+msgstr "永远不"
+
+#: util/nwdir.c:307
+#, c-format
+msgid ""
+"Extended attributes: %u attributes\n"
+"                     %u bytes in keys, %u bytes in data\n"
+msgstr ""
+"扩展的特性：%u 个特性\n"
+"                     在密钥中 %u 个字节，在数据中 %u 个字节\n"
+
+#: util/nwdir.c:323
+#, c-format
+msgid ""
+"  Key %u:\n"
+"    Name:         %s\n"
+"    Access Flag:  0x%08X\n"
+"    Value Length: %u\n"
+msgstr ""
+"  密钥 %u：\n"
+"    名称：    %s\n"
+"    访问标志：0x%08X\n"
+"    值长度：%u\n"
+
+#: util/nwdir.c:361 util/nwdir.c:384
+#, c-format
+msgid "  Cannot determine file size: %s\n"
+msgstr "  无法确定文件大小：%s\n"
+
+#: util/nwdir.c:363 util/nwdir.c:413
+#, c-format
+msgid "  File size:       %10Lu"
+msgstr "  文件大小：  %10Lu"
+
+#: util/nwdir.c:368 util/nwdir.c:419
+#, c-format
+msgid " (allocated %Lu)"
+msgstr " （已分配 %Lu）"
+
+#: util/nwdir.c:386
+msgid "  No datastream exist\n"
+msgstr "  不存在数据流\n"
+
+#: util/nwdir.c:410
+#, c-format
+msgid "  Stream %3u size: %10Lu"
+msgstr "  流 %3u 大小：%10Lu"
+
+#: util/nwdir.c:441
+#, c-format
+msgid "Cannot retrieve file attributes: %s\n"
+msgstr "无法检索文件特性：%s\n"
+
+#: util/nwdir.c:447
+#, c-format
+msgid "Cannot retrieve file number: %s\n"
+msgstr "无法检索文件号：%s\n"
+
+#: util/nwdir.c:453
+#, c-format
+msgid "Cannot retrieve file name: %s\n"
+msgstr "无法检索文件名：%s\n"
+
+#: util/nwdir.c:458
+msgid "Directory:\n"
+msgstr "目录：\n"
+
+#: util/nwdir.c:460
+msgid "File:\n"
+msgstr "文件：\n"
+
+#: util/nwdir.c:474
+msgid "  DOS:  "
+msgstr "  DOS："
+
+#: util/nwdir.c:479
+msgid " OS/2:  "
+msgstr " OS/2："
+
+#: util/nwdir.c:485
+msgid "  NFS:  "
+msgstr "  NFS："
+
+#: util/nwdir.c:491
+msgid "  MAC:  "
+msgstr "  MAC："
+
+#: util/nwdir.c:500
+msgid "Rights:\n"
+msgstr "权限：\n"
+
+#: util/nwdir.c:501
+msgid "  Inherited: "
+msgstr "  继承的："
+
+#: util/nwdir.c:505 util/nwdir.c:524 util/nwdir.c:540 util/nwdir.c:558
+#: util/nwdir.c:566 util/nwdir.c:573 util/nwdir.c:582
+#, c-format
+msgid "Cannot determine: %s\n"
+msgstr "无法确定：%s\n"
+
+#: util/nwdir.c:522
+msgid "  Effective: "
+msgstr "  有效："
+
+#: util/nwdir.c:536
+msgid "Owning namespace: "
+msgstr "拥有名称空间："
+
+#: util/nwdir.c:553
+msgid "Miscellaneous NetWare Information:\n"
+msgstr "其他 NetWare 信息：\n"
+
+#: util/nwdir.c:554
+msgid "  Last update:    "
+msgstr "  最后更新时间："
+
+#: util/nwdir.c:562
+msgid "  Last archived:  "
+msgstr "  最后存档时间："
+
+#: util/nwdir.c:571
+msgid "  Last accessed:  "
+msgstr "  最后访问时间："
+
+#: util/nwdir.c:578
+msgid "  Created/Copied: "
+msgstr "  创建/复制时间："
+
+#: util/nwdir.c:586
+#, c-format
+msgid "  Flags:          [%s%s%s%s]"
+msgstr "  标志：     [%s%s%s%s]"
+
+#: util/nwdir.c:636
+msgid "Trustees:\n"
+msgstr "受托者：\n"
+
+#: util/nwdir.c:662
+msgid "File Usage:\n"
+msgstr "文件用法：\n"
+
+#: util/nwdir.c:663
+#, c-format
+msgid ""
+"  Use Count:              %5u  Open Count:              %5u\n"
+"  Open For Reading Count: %5u  Open For Writting Count: %5u\n"
+"  Deny Read Count:        %5u  Deny Write Count:        %5u\n"
+"  Locked:       %-15s  Fork Count:              %5u\n"
+msgstr ""
+"  使用计数：         %5u  打开计数：         %5u\n"
+"  打开用于读取计数：%5u  打开用于写入计数：%5u\n"
+"  拒绝读取计数：   %5u  拒绝写入计数：   %5u\n"
+"  锁定：  %-15s  分叉计数：         %5u\n"
+
+#: util/nwdir.c:670
+#, c-format
+msgid "  Connection Count:  %10u\n"
+msgstr "  连接计数：%10u\n"
+
+#: util/nwdir.c:674 util/nwdir.c:766
+#, c-format
+msgid "    Connection: %u/%u"
+msgstr "    连接：%u/%u"
+
+#: util/nwdir.c:677 util/nwdir.c:769
+msgid ", "
+msgstr ", "
+
+#: util/nwdir.c:682 util/nwuserlist.c:380
+msgid "locked"
+msgstr "锁定"
+
+#: util/nwdir.c:682 util/nwuserlist.c:380
+msgid "open shareable"
+msgstr "打开可共享"
+
+#: util/nwdir.c:683 util/nwuserlist.c:381
+msgid "logged"
+msgstr "记录"
+
+#: util/nwdir.c:683 util/nwuserlist.c:381
+msgid "open normal"
+msgstr "打开常规"
+
+#: util/nwdir.c:684 util/nwdir.c:689 util/nwuserlist.c:382
+#: util/nwuserlist.c:387
+msgid "rsvd"
+msgstr "保留的"
+
+#: util/nwdir.c:685 util/nwuserlist.c:383
+msgid "TTS locked"
+msgstr "TTS 锁定"
+
+#: util/nwdir.c:685 util/nwuserlist.c:383
+msgid "TTS"
+msgstr "TTS"
+
+#: util/nwdir.c:686 util/nwuserlist.c:384
+msgid "read"
+msgstr "读"
+
+#: util/nwdir.c:686 util/nwuserlist.c:384
+msgid "write"
+msgstr "写"
+
+#: util/nwdir.c:687 util/nwuserlist.c:385
+msgid "deny read"
+msgstr "拒绝读取"
+
+#: util/nwdir.c:687 util/nwuserlist.c:385
+msgid "deny write"
+msgstr "拒绝写入"
+
+#: util/nwdir.c:688 util/nwuserlist.c:386
+msgid "detached"
+msgstr "分离的"
+
+#: util/nwdir.c:688 util/nwuserlist.c:386
+msgid "TTS holding detach"
+msgstr "TTS 持有分离"
+
+#: util/nwdir.c:689 util/nwuserlist.c:387
+msgid "TTS holding open"
+msgstr "TTS 持有打开"
+
+#: util/nwdir.c:710 util/nwdir.c:732 util/nwuserlist.c:409
+#: util/nwuserlist.c:432
+msgid "unlocked"
+msgstr "解锁的"
+
+#: util/nwdir.c:713 util/nwuserlist.c:412
+msgid "Not locked"
+msgstr "未锁定"
+
+#: util/nwdir.c:714 util/nwuserlist.c:413
+msgid "Locked by a file lock"
+msgstr "由文件锁定锁定"
+
+#: util/nwdir.c:715 util/nwuserlist.c:414
+msgid "Locked by Begin Share File Set"
+msgstr "由开始共享文件集锁定"
+
+#: util/nwdir.c:716 util/nwuserlist.c:415
+msgid "Unknown lock state"
+msgstr "未知锁定状态"
+
+#: util/nwdir.c:735
+#, c-format
+msgid "          Lock:   (%02X) %s\n"
+msgstr "          锁定：(%02X) %s\n"
+
+#: util/nwdir.c:736
+#, c-format
+msgid "                  (%02X) %s\n"
+msgstr "                  (%02X) %s\n"
+
+#: util/nwdir.c:737
+#, c-format
+msgid "          Access: (%02X) %s\n"
+msgstr "          访问：(%02X) %s\n"
+
+#: util/nwdir.c:739
+#, c-format
+msgid "          Lock:   %s\n"
+msgstr "          锁定：%s\n"
+
+#: util/nwdir.c:740
+#, c-format
+msgid "                  %s\n"
+msgstr "                  %s\n"
+
+#: util/nwdir.c:741
+#, c-format
+msgid "          Access: %s\n"
+msgstr "          访问：%s\n"
+
+#: util/nwdir.c:762
+msgid "File Physical Locks:\n"
+msgstr "文件物理锁定：\n"
+
+#: util/nwdir.c:773
+#, c-format
+msgid "    Range: 0x%08LX-0x%08LX\n"
+msgstr "    范围：0x%08LX-0x%08LX\n"
+
+#: util/nwdir.c:791
+#, c-format
+msgid "Unable to begin scandir: 0x%04X\n"
+msgstr "无法开始 scandir：0x%04X\n"
+
+#: util/nwdir.c:803
+#, c-format
+msgid "Unexpected error in NextDir: %s\n"
+msgstr "NextDir 中出现意外错误：%s\n"
+
+#: util/nwdir.c:821
+msgid ""
+"nwdir [options] [path]\n"
+"\n"
+"      -d    List information about directory itself instead\n"
+"            of directory content\n"
+"      -l    List namespace informations\n"
+"      -e    List extended attributes informations\n"
+"      -v    Verbose listing\n"
+"      -f    List connections using file\n"
+"      -p    List physical locks on file\n"
+"      -t    Technical - show values and their meaning\n"
+"      -h    This help\n"
+"      path  Path to list, may contain wildcards\n"
+"\n"
+"(c) 1998 Milan Vandrovec for ncpfs-2.0.12.8\n"
+msgstr ""
+"nwdir [options] [path]\n"
+"\n"
+"      -d    列出有关目录本身\n"
+"            而不是目录内容的信息\n"
+"      -l    列出名称空间信息\n"
+"      -e    列出扩展特性信息\n"
+"      -v    冗长列表\n"
+"      -f    列出使用文件的连接\n"
+"      -p    列出对文件的物理锁定\n"
+"      -t    Technical - 显示值及其意义\n"
+"      -h    此帮助\n"
+"      path  要列出的路径，可以包含通配符\n"
+"\n"
+"(c) 1998 Milan Vandrovec for ncpfs-2.0.12.8\n"
+
+#: util/nwdir.c:899
+#, c-format
+msgid "Unable to initialize: 0x%04X\n"
+msgstr "无法初始化：0x%04X\n"
+
+#: util/nwdir.c:932
+#, c-format
+msgid "Invalid path: %s\n"
+msgstr "无效路径：%s\n"
+
+#: util/nwdir.c:936
+msgid "Specified path is not remote\n"
+msgstr "指定了不是远程的路径\n"
+
+#: util/nwdir.c:948
+#, c-format
+msgid "Directory %s\n"
+msgstr "目录 %s\n"
+
+#: util/nwdir.c:954
+#, c-format
+msgid "Path does not exist: %s\n"
+msgstr "路径不存在：%s\n"
+
+#: util/nwdir.c:1002
+#, c-format
+msgid "Cannot retrieve info: %s\n"
+msgstr "无法检索信息：%s\n"
+
+#: util/nwdpvalues.c:55
+#, c-format
+msgid ""
+"\n"
+"usage: %s [options] [ncp filesystem]\n"
+msgstr ""
+"\n"
+"用法：%s [options] [ncp filesystem]\n"
+
+#: util/nwdpvalues.c:57
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-o object_name Object name to be converted to ID\n"
+"-q objectID    Object ID to convert to name\n"
+"-c context     Base context name (use/return abbreviated names)\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-o object_name 要被转换为 ID 的对象名\n"
+"-q objectID    要转换为名称的对象 ID\n"
+"-c context     基本上下文名称（使用/返回缩写名称）\n"
+"\n"
+
+#: util/nwfsctrl.c:54
+#, c-format
+msgid ""
+"\n"
+"usage: %s [options] command\n"
+msgstr ""
+"\n"
+"用法：%s [options] command\n"
+
+#: util/nwfsctrl.c:56
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"-p path        Permanent connection to server to be used\n"
+"\n"
+"command is one of:\n"
+"load XXX       load module XXX\n"
+"unload XXX     unload module XXX\n"
+"mount XXX      mount volume XXX\n"
+"dismount XXX   dismount volume XXX\n"
+"down [force]   down fileserver\n"
+"open bindery   open bindery\n"
+"close bindery  close bindery\n"
+"disable login  disable login to fileserver\n"
+"enable login   enable login to fileserver\n"
+"disable tts    disable TTS\n"
+"enable tts     enable TTS\n"
+"set XXX=YYY    set server variable XXX to value YYY\n"
+"clear station XXX   log-outs specified connection\n"
+"XXX            try execute XXX as .NCF file\n"
+"\n"
+"Warning: If you do not have sufficient priviledge level,\n"
+"         some of commands (load, unload, mount, dismount,\n"
+"         set, run .NCF) will emit server console broadcast\n"
+"         to all conected users!\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"-p path        要被使用的与服务器的永久连接\n"
+"\n"
+"命令是以下命令之一：\n"
+"load XXX       装载模块 XXX\n"
+"unload XXX     卸载模块 XXX\n"
+"mount XXX      装入卷 XXX\n"
+"dismount XXX   卸装卷 XXX\n"
+"down [force]   关闭文件服务器\n"
+"open bindery   打开平构数据库\n"
+"close bindery  关闭平构数据库\n"
+"disable login  禁用对文件服务器的登录\n"
+"enable login   启用对文件服务器的登录\n"
+"disable tts    禁用 TTS\n"
+"enable tts     启用 TTS\n"
+"set XXX=YYY    将服务器变量 XXX 设置为值 YYY\n"
+"clear station XXX   注销指定的连接\n"
+"XXX            尝试将 XXX 作为 .NCF 文件执行\n"
+"\n"
+"警告：如果您不具有足够的权限级别，\n"
+"         某些命令（load、unload、mount、dismount、\n"
+"         set、run .NCF）会向所有连接的用户\n"
+"         发出服务器控制台广播！\n"
+"\n"
+
+#: util/nwfsctrl.c:112
+#, c-format
+msgid "%s: \"%s\" what?\n"
+msgstr "%s：\"%s\" 什么？\n"
+
+#: util/nwfsctrl.c:129
+#, c-format
+msgid "%s: Unable to load `%s', error 0x%04X (%u)\n"
+msgstr "%s：无法装载 `%s'，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:141
+#, c-format
+msgid "%s: Unable to unload `%s', error 0x%04X (%u)\n"
+msgstr "%s：无法卸载 `%s'，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:154
+#, c-format
+msgid "%s: Unable to mount `%s', error 0x%04X (%u)\n"
+msgstr "%s：无法装入 `%s'，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:158
+#, c-format
+msgid "Volume `%s' was mounted as #%u\n"
+msgstr "卷 `%s' 已作为 #%u 装入\n"
+
+#: util/nwfsctrl.c:167
+#, c-format
+msgid "%s: Unable to dismount `%s', error 0x%04X (%u)\n"
+msgstr "%s：无法卸装 `%s'，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:179
+#, c-format
+msgid "%s: Unable to down file server, error 0x%04X (%u)\n"
+msgstr "%s：无法关闭文件服务器，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:191
+#, c-format
+msgid "%s: Unable to execute `%s', error 0x%04X (%u)\n"
+msgstr "%s：无法执行 `%s'，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:209
+#, c-format
+msgid "%s: Syntax error in `set' command\n"
+msgstr "%s：`set' 命令中的语法错误\n"
+
+#: util/nwfsctrl.c:246 util/nwfsctrl.c:254
+#, c-format
+msgid "%s: Unable to set variable `%s' to value `%s', error 0x%04X (%u)\n"
+msgstr "%s：无法将变量 `%s' 设置为值 `%s'，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:270
+#, c-format
+msgid "%s: Unable to %s file server login, error 0x%04X (%u)\n"
+msgstr "%s：无法 %s 文件服务器登录，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:271 util/nwfsctrl.c:283
+msgid "enable"
+msgstr "启用"
+
+#: util/nwfsctrl.c:271 util/nwfsctrl.c:283
+msgid "disable"
+msgstr "禁用"
+
+#: util/nwfsctrl.c:282
+#, c-format
+msgid "%s: Unable to %s TTS, error 0x%04X (%u)\n"
+msgstr "%s：无法 %s TTS，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:293
+#, c-format
+msgid "%s: Warning: Bindery cannot be closed by temporary connection\n"
+msgstr "%s：警告：平构数据库不能被临时连接关闭\n"
+
+#: util/nwfsctrl.c:297
+#, c-format
+msgid "%s: Unable to %s bindery, error 0x%04X (%u)\n"
+msgstr "%s：无法 %s 平构数据库，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:298
+msgid "open"
+msgstr "打开"
+
+#: util/nwfsctrl.c:298
+msgid "close"
+msgstr "关闭"
+
+#: util/nwfsctrl.c:319
+#, c-format
+msgid "%s: Unable to clear station %u, error 0x%04X (%u)\n"
+msgstr "%s：无法清除工作站 %u，错误 0x%04X (%u)\n"
+
+#: util/nwfsctrl.c:325
+#, c-format
+msgid "%s: `%.*s' is not a number, skipping\n"
+msgstr "%s：`%.*s' 不是数字，正在跳过\n"
+
+#: util/nwfsctrl.c:334
+#, c-format
+msgid "%s: What is `%s'?\n"
+msgstr "%s：什么是 `%s'？\n"
+
+#: util/nwfsctrl.c:432
+msgid "-p and -S are incompatible\n"
+msgstr "-p 和 -S 不兼容\n"
+
+#: util/nwfsctrl.c:436 util/nwvolinfo.c:121
+#, c-format
+msgid "%s: %s is not Netware directory/file\n"
+msgstr "%s：%s 不是 Netware 目录/文件\n"
+
+#: util/nwfsctrl.c:447
+#, c-format
+msgid "%s: You must specify connection to server\n"
+msgstr "%s：必须指定与服务器的连接\n"
+
+#: util/nwfsctrl.c:452
+msgid "Compatibility option entered, rest of commandline ignored\n"
+msgstr "输入了兼容性选项，忽略其余命令行\n"
+
+#: util/nwfsctrl.c:479
+#, c-format
+msgid "%s: Out of memory!\n"
+msgstr "%s：内存不足！\n"
+
+#: util/nwfsctrl.c:497
+#, c-format
+msgid "%s: Missing command\n"
+msgstr "%s：缺少命令\n"
+
+#: util/nwfsinfo.c:45 util/nwfstime.c:46 util/nwuserlist.c:62 util/slist.c:54
+#, c-format
+msgid "usage: %s [pattern]\n"
+msgstr "用法：%s [pattern]\n"
+
+#: util/nwfsinfo.c:53
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"\n"
+"-d             Print Description Strings\n"
+"-t             Print File Server's time\n"
+"-i             Print File Server Information\n"
+"-e             List Server's NCP Extensions\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"\n"
+"-d             打印说明字符串\n"
+"-t             打印文件服务器的时间\n"
+"-i             打印文件服务器信息\n"
+"-e             列出服务器的 NCP 扩展\n"
+"\n"
+
+#: util/nwfsinfo.c:66
+msgid "no"
+msgstr "否"
+
+#: util/nwfsinfo.c:67
+msgid "yes"
+msgstr "是"
+
+#: util/nwfsinfo.c:69
+#, c-format
+msgid "unknown (%02X)"
+msgstr "未知 (%02X)"
+
+#: util/nwfsinfo.c:78
+#, c-format
+msgid ""
+"\n"
+"Fileservername    %-48s\n"
+"\n"
+msgstr ""
+"\n"
+"文件服务器名称    %-48s\n"
+"\n"
+
+#: util/nwfsinfo.c:80
+#, c-format
+msgid "Version           %d.%d Revision %c\n"
+msgstr "版本           %d.%d 修订版 %c\n"
+
+#: util/nwfsinfo.c:83
+#, c-format
+msgid "Max. Connections  %d\n"
+msgstr "最大连接数  %d\n"
+
+#: util/nwfsinfo.c:85
+#, c-format
+msgid "currently in use  %d\n"
+msgstr "当前正在使用中  %d\n"
+
+#: util/nwfsinfo.c:87
+#, c-format
+msgid "peak connections  %d\n"
+msgstr "峰值连接数  %d\n"
+
+#: util/nwfsinfo.c:89
+#, c-format
+msgid "Max. Volumes      %d\n"
+msgstr "最大卷数      %d\n"
+
+#: util/nwfsinfo.c:91
+#, c-format
+msgid "SFTLevel          %d\n"
+msgstr "SFT 级别          %d\n"
+
+#: util/nwfsinfo.c:93
+#, c-format
+msgid "TTSLevel          %d\n"
+msgstr "TTS 级别          %d\n"
+
+#: util/nwfsinfo.c:95
+#, c-format
+msgid "Accountversion    %d\n"
+msgstr "帐户版本    %d\n"
+
+#: util/nwfsinfo.c:97
+#, c-format
+msgid "Queueversion      %d\n"
+msgstr "队列版本      %d\n"
+
+#: util/nwfsinfo.c:99
+#, c-format
+msgid "Printversion      %d\n"
+msgstr "打印版本      %d\n"
+
+#: util/nwfsinfo.c:101
+#, c-format
+msgid "Virt.Consolvers.  %d\n"
+msgstr "Virt.Consolvers.%d\n"
+
+#: util/nwfsinfo.c:103
+#, c-format
+msgid "RestrictionLevel  %d\n"
+msgstr "限制级别  %d\n"
+
+#: util/nwfsinfo.c:105
+#, c-format
+msgid "VAP Version       %d\n"
+msgstr "VAP 版本       %d\n"
+
+#: util/nwfsinfo.c:106
+#, c-format
+msgid "Internet Bridge   %d\n"
+msgstr "因特网网桥   %d\n"
+
+#: util/nwfsinfo.c:107
+#, c-format
+msgid "Mixed Mode Path   %s\n"
+msgstr "固定模式路径   %s\n"
+
+#: util/nwfsinfo.c:108
+#, c-format
+msgid "Local Login Code  0x%02X\n"
+msgstr "本地登录代码  0x%02X\n"
+
+#: util/nwfsinfo.c:109
+#, c-format
+msgid "Product Version   %u.%u.%u\n"
+msgstr "产品版本   %u.%u.%u\n"
+
+#: util/nwfsinfo.c:111
+#, c-format
+msgid "OS Language       %u\n"
+msgstr "操作系统语言       %u\n"
+
+#: util/nwfsinfo.c:112
+#, c-format
+msgid "Large files       %s\n"
+msgstr "最大文件       %s\n"
+
+#: util/nwfsinfo.c:152
+msgid "could not get strings"
+msgstr "无法获取字符串"
+
+#: util/nwfsinfo.c:176
+msgid "could not get server time"
+msgstr "无法获取服务器时间"
+
+#: util/nwfsinfo.c:198 util/nwuserlist.c:257
+msgid "Could not get server information"
+msgstr "无法获取服务器信息"
+
+#: util/nwfsinfo.c:219
+msgid ""
+"Installed NCP Extensions:\n"
+"  Name                                Number    Version\n"
+"  -------------------------------------------------------\n"
+msgstr ""
+"安装了 NCP 扩展：\n"
+"  名称                                编号    版本\n"
+"  -------------------------------------------------------\n"
+
+#: util/nwfsinfo.c:224
+#, c-format
+msgid "  %-33s   %08X  %u.%u.%u\n"
+msgstr "  %-33s   %08X  %u.%u.%u\n"
+
+#: util/nwfsinfo.c:227
+msgid "No NCP Extensions registered\n"
+msgstr "未注册任何 NCP 扩展\n"
+
+#: util/nwfstime.c:54
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-a             Be more accurate about reading the time\n"
+"-g             Update local time from file server\n"
+"-s             Set file server's time from local time\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-a             更精确地读取时间\n"
+"-g             从文件服务器更新本地时间\n"
+"-s             根据本地时间设置文件服务器的时间\n"
+"\n"
+
+#: util/nwfstime.c:119
+msgid "when setting file server time"
+msgstr "在设置文件服务器时间时"
+
+#: util/nwfstime.c:129
+msgid "when getting file server time"
+msgstr "在获取文件服务器时间时"
+
+#: util/nwgrant.c:64 util/nwrevoke.c:56 util/nwrights.c:50
+#, c-format
+msgid ""
+"\n"
+"usage: %s [options] file/directory\n"
+msgstr ""
+"\n"
+"用法：%s [options] file/directory\n"
+
+#: util/nwgrant.c:66
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-o object_name Name of object added as trustee\n"
+"-t type        Object type (decimal value)\n"
+"-r rights      Rights mask (see manual page)\n"
+"\n"
+"directory\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-o object_name 作为受托者添加的对象的名称\n"
+"-t type        对象类型（十进制值）\n"
+"-r rights      权限掩码（请参见手册页）\n"
+"\n"
+"目录\n"
+"\n"
+
+#: util/nwgrant.c:148
+#, c-format
+msgid "%s: You must give a valid rights string\n"
+msgstr "%s：必须提供有效的权限字符串\n"
+
+#: util/nwgrant.c:154
+#, c-format
+msgid "%s: You must specify a rights mask\n"
+msgstr "%s：必须指定权限掩码\n"
+
+#: util/nwgrant.c:162 util/nwrevoke.c:131
+#, c-format
+msgid "%s: You must specify a directory\n"
+msgstr "%s：必须指定目录\n"
+
+#: util/nwgrant.c:176 util/nwrevoke.c:145
+#, c-format
+msgid "%s: Could not find directory %s\n"
+msgstr "%s：无法找到目录 %s\n"
+
+#: util/nwgrant.c:192 util/nwgrant.c:210 util/nwgrant.c:217
+#: util/nwrevoke.c:161 util/nwrevoke.c:180 util/nwrevoke.c:187
+#, c-format
+msgid "%s: Could not find object %s: %s\n"
+msgstr "%s：无法找到对象 %s：%s\n"
+
+#: util/nwgrant.c:224 util/nwrevoke.c:194
+#, c-format
+msgid "%s: Invalid path: %s\n"
+msgstr "%s：无效路径：%s\n"
+
+#: util/nwgrant.c:234
+#, c-format
+msgid "%s: Could not add trustee rights: %s\n"
+msgstr "%s：无法添加受托者权限：%s\n"
+
+#: util/nwmsg.c:88 util/nwpurge.c:136 contrib/tknwmsg/nwmsg.c:88
+msgid "in ncp_open_mount"
+msgstr "在 ncp_open_mount 中"
+
+#: util/nwmsg.c:93 contrib/tknwmsg/nwmsg.c:93
+#, c-format
+msgid "%s: could not get broadcast message\n"
+msgstr "%s：无法获取广播讯息\n"
+
+#: util/nwmsg.c:101 contrib/tknwmsg/nwmsg.c:101
+msgid "no message"
+msgstr "没有任何讯息"
+
+#: util/nwmsg.c:105 contrib/tknwmsg/nwmsg.c:105
+#, c-format
+msgid "message: %s"
+msgstr "讯息：%s"
+
+#: util/nwmsg.c:109 contrib/tknwmsg/nwmsg.c:109
+#, c-format
+msgid "%s: could not get uid on connection: %s\n"
+msgstr "%s：无法获取有关连接的 uid：%s\n"
+
+#: util/nwmsg.c:115 contrib/tknwmsg/nwmsg.c:115
+msgid "<unknown>"
+msgstr "<未知>"
+
+#: util/nwmsg.c:121 contrib/tknwmsg/nwmsg.c:121
+#, c-format
+msgid "%s: user %d not known\n"
+msgstr "%s：用户 %d 未知\n"
+
+#: util/nwmsg.c:131 contrib/tknwmsg/nwmsg.c:131
+#, c-format
+msgid "%s: cannot open %s: %s\n"
+msgstr "%s：无法打开 %s：%s\n"
+
+#: util/nwmsg.c:135 contrib/tknwmsg/nwmsg.c:135
+#, fuzzy, c-format
+msgid ""
+"\r\n"
+"Message from NetWare Server: %s\r\n"
+"%s\r\n"
+msgstr ""
+"\r\n"
+"___来自 NetWare 服务器的讯息：%s\r\n"
+"%s\r\n"
+
+#: util/nwmsg.c:156 contrib/tknwmsg/nwmsg.c:162
+#, c-format
+msgid "write: %s: %s\n"
+msgstr "写：%s：%s\n"
+
+#: util/nwmsg.c:186 contrib/tknwmsg/nwmsg.c:192
+msgid "utmp"
+msgstr "utmp"
+
+#: util/nwmsg.c:217 contrib/tknwmsg/nwmsg.c:223
+#, c-format
+msgid "nwmsg: %s is not logged in\n"
+msgstr "nwmsg：%s 未被登录\n"
+
+#: util/nwmsg.c:222 contrib/tknwmsg/nwmsg.c:228
+#, c-format
+msgid "nwmsg: %s ignores messages\n"
+msgstr "nwmsg：%s 忽略讯息\n"
+
+#: util/nwpasswd.c:47
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-O objectname  Object name to change, default username\n"
+"-t type        Object type (decimal value)\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-O objectname  要更改的对象名，默认的用户名\n"
+"-t type        对象类型（十进制值）\n"
+"\n"
+
+#: util/nwpasswd.c:113
+msgid "trying to find server"
+msgstr "正在尝试查找服务器"
+
+#: util/nwpasswd.c:127
+#, c-format
+msgid "Changing password for user %s on server %s\n"
+msgstr "更改用户 %s（在服务器 %s 上）的口令\n"
+
+#: util/nwpasswd.c:132
+msgid "Enter old password: "
+msgstr "输入旧口令："
+
+#: util/nwpasswd.c:136
+#, c-format
+msgid "Enter password for %s: "
+msgstr "输入 %s 的口令："
+
+#: util/nwpasswd.c:146
+msgid "Enter new password: "
+msgstr "输入新口令："
+
+#: util/nwpasswd.c:154
+msgid "Re-Enter new password: "
+msgstr "重新输入新口令："
+
+#: util/nwpasswd.c:168
+msgid "You mistype the new password, try again\n"
+msgstr "您键入了错误的新口令，请重试\n"
+
+#: util/nwpasswd.c:187
+msgid "not own password"
+msgstr "不是自己的口令"
+
+#: util/nwpasswd.c:196
+msgid "trying to change password"
+msgstr "尝试更改口令"
+
+#: util/nwpurge.c:38
+msgid ""
+"usage: nwpurge [options] [directory]\n"
+"\n"
+"-h         Print this help text\n"
+"-a         Purge files in subdirectories\n"
+"-l         Do not purge files\n"
+"-s         Silent mode\n"
+"\n"
+"directory  Directory to purge\n"
+"\n"
+msgstr ""
+"用法：nwpurge [options] [directory]\n"
+"\n"
+"-h         打印此帮助文本\n"
+"-a         清除子目录中的文件\n"
+"-l         不清除文件\n"
+"-s         无提示模式\n"
+"\n"
+"directory  要清除的目录\n"
+"\n"
+
+#: util/nwpurge.c:83
+#, c-format
+msgid "%8s-- failed (%s)\n"
+msgstr "%8s-- 失败 (%s)\n"
+
+#: util/nwpurge.c:125
+#, c-format
+msgid "Unexpected option `-%c'\n"
+msgstr "意外的选项 `-%c'\n"
+
+#: util/nwpurge.c:141 util/nwrights.c:107
+msgid "when retrieving root entry"
+msgstr "在检索根条目时"
+
+#: util/nwpurge.c:148
+msgid "No files were purged from server.\n"
+msgstr "未从服务器清除任何文件。\n"
+
+#: util/nwpurge.c:150
+msgid "1 file was purged from server.\n"
+msgstr "从服务器清除了 1 个文件。\n"
+
+#: util/nwpurge.c:152
+#, c-format
+msgid "%d files were purged from server.\n"
+msgstr "从服务器清除了 %d 个文件。\n"
+
+#: util/nwpurge.c:156
+msgid "1 file was not purged due to error.\n"
+msgstr "由于错误未清除一个文件。\n"
+
+#: util/nwpurge.c:158
+#, c-format
+msgid "%d files were not purged due to errors.\n"
+msgstr "由于错误未清除 %d 个文件。\n"
+
+#: util/nwrevoke.c:58
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-o object_name Name of object removed as trustee\n"
+"-t type        Object type (decimal value)\n"
+"\n"
+"file/directory\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-o object_name 作为受托者删除的对象的名称\n"
+"-t type        对象类型（十进制值）\n"
+"\n"
+"文件/目录\n"
+"\n"
+
+#: util/nwrevoke.c:202
+#, c-format
+msgid "%s: Could not remove trustee rights: %s\n"
+msgstr "%s：无法删除受托者权限：%s\n"
+
+#: util/nwrights.c:52
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"\n"
+"file/directory\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"\n"
+"文件/目录\n"
+"\n"
+
+#: util/nwrights.c:116
+msgid "when finding rights"
+msgstr "在查找权限时"
+
+#: util/nwrights.c:119
+#, c-format
+msgid "Your effective rights for %s are: %s\n"
+msgstr "您的对于 %s 的有效权限是：%s\n"
+
+#: util/nwrights.c:125
+msgid "(S): You have SUPERVISOR rights\n"
+msgstr "(S)：您具有 SUPERVISOR 权限\n"
+
+#: util/nwrights.c:129
+msgid "(R): You may READ from files\n"
+msgstr "(R)：您可以读取文件\n"
+
+#: util/nwrights.c:133
+msgid "(W): You may WRITE to files\n"
+msgstr "(W)：您可以写入文件\n"
+
+#: util/nwrights.c:137
+msgid "(C): You may CREATE files\n"
+msgstr "(C)：您可以创建文件\n"
+
+#: util/nwrights.c:141
+msgid "(E): You may ERASE files\n"
+msgstr "(E)：您可以删除文件\n"
+
+#: util/nwrights.c:145
+msgid "(M): You may MODIFY directory\n"
+msgstr "(M)：您可以修改目录\n"
+
+#: util/nwrights.c:149
+msgid "(F): You may SCAN for files\n"
+msgstr "(F)：您可以扫描文件\n"
+
+#: util/nwrights.c:153
+msgid "(A): You may change ACCESS control\n"
+msgstr "(A)：您可以更改访问控制\n"
+
+#: util/nwtrustee.c:50
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-l volumeid    Volume id to be searched\n"
+"-L volname     Volume name instead of id\n"
+"-O objectid    Object id\n"
+"-o objname     Object name ( type must be specified )\n"
+"-t type        Object type\n"
+"-v             Verbose listing\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-l volumeid    要被搜索的卷 ID\n"
+"-L volname     搜索卷名，而不是 ID\n"
+"-O objectid    对象 ID\n"
+"-o objname     对象名（必须指定类型）\n"
+"-t type        对象类型\n"
+"-v             冗长列表\n"
+"\n"
+
+#: util/nwtrustee2.c:45
+#, c-format
+msgid "usage: %s [options] [file/directory...]\n"
+msgstr "用法：%s [options] [file/directory...]\n"
+
+#: util/nwtrustee2.c:51
+#, c-format
+msgid ""
+"\n"
+"usage: %s [options] [file/directory...]\n"
+msgstr ""
+"\n"
+"用法：%s [options] [file/directory...]\n"
+
+#: util/nwtrustee2.c:53
+msgid ""
+"\n"
+"-v             Verbose\n"
+"\n"
+"file/directory List of files to scan for trustees\n"
+"\n"
+msgstr ""
+"\n"
+"-v             Verbose\n"
+"\n"
+" 要扫描受托者的文件/文件的目录列表\n"
+"\n"
+
+#: util/nwtrustee2.c:138
+#, c-format
+msgid "%s: Could not find directory %s: %s\n"
+msgstr "%s：无法找到目录 %s：%s\n"
+
+#: util/nwtrustee2.c:144
+#, c-format
+msgid "%s: Could not find Netware information about directory %s: %s\n"
+msgstr "%s：无法找到有关目录 %s 的 Netware 信息:%s\n"
+
+#: util/nwtrustee2.c:199
+#, c-format
+msgid "Trustee scan failed, %s\n"
+msgstr "受托者扫描失败，%s\n"
+
+#: util/nwuserlist.c:82
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-a             Print Station's addr\n"
+"-q             Print object ID\n"
+"-f             List open files\n"
+"-ft            Print raw information about open files\n"
+"-fd            Print detailed information about each open file\n"
+"-fD            Print DOS filename\n"
+"-s             List open semaphores\n"
+"-i             List statistical information\n"
+"-ih            List read/written bytes in human readable format (e.g. 1K, "
+"234M)\n"
+"-iH            Same as above, but use units of 1000 bytes instead of 1024\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-a             打印工作站的地址\n"
+"-q             打印对象 ID\n"
+"-f             列出打开的文件\n"
+"-ft            打印与打开的文件有关的原始信息\n"
+"-fd            打印与每个打开的文件有关的详细信息\n"
+"-fD            打印 DOS 文件名\n"
+"-s             列出打开的信号\n"
+"-i             列出统计信息\n"
+"-ih            以用户可读的格式列出读取/写入的字节（例如 1K, 234M）\n"
+"-iH            与前一个选项相同，只是单位是 1000 个字节，而不是 1024 个字节\n"
+"\n"
+
+#: util/nwuserlist.c:104
+msgid "Unknown"
+msgstr "未知"
+
+#: util/nwuserlist.c:117
+msgid "logged in"
+msgstr "已登录"
+
+#: util/nwuserlist.c:118
+msgid "being aborted"
+msgstr "正被取消"
+
+#: util/nwuserlist.c:119
+msgid "audited"
+msgstr "已审计"
+
+#: util/nwuserlist.c:120
+msgid "needs security change"
+msgstr "需要更改安全性"
+
+#: util/nwuserlist.c:121
+msgid "MAC station"
+msgstr "MAC 工作站"
+
+#: util/nwuserlist.c:122
+msgid "temporary authenticated"
+msgstr "临时鉴定的"
+
+#: util/nwuserlist.c:123
+msgid "audit connection recorded"
+msgstr "记录的审计连接"
+
+#: util/nwuserlist.c:124
+msgid "DS audit connection recorded"
+msgstr "记录的 DS 审计连接"
+
+#: util/nwuserlist.c:125
+msgid "???"
+msgstr "???"
+
+#: util/nwuserlist.c:126
+msgid "none"
+msgstr "无"
+
+#: util/nwuserlist.c:152
+#, c-format
+msgid "        %-21s%llu %s\n"
+msgstr "        %-21s%llu %s\n"
+
+#: util/nwuserlist.c:166
+#, c-format
+msgid "        %-21s%5llu %s\n"
+msgstr "        %-21s%5llu %s\n"
+
+#: util/nwuserlist.c:168
+#, c-format
+msgid "        %-21s%5llu %c%s\n"
+msgstr "        %-21s%5llu %c%s\n"
+
+#: util/nwuserlist.c:266
+#, c-format
+msgid ""
+"\n"
+"%-6s%-21s%-12s\n"
+"---------------------------------------------------\n"
+msgstr ""
+"\n"
+"%-6s%-21s%-12s\n"
+"---------------------------------------------------\n"
+
+#: util/nwuserlist.c:269 util/nwuserlist.c:277 util/nwuserlist.c:286
+#: util/nwuserlist.c:295
+msgid "Conn"
+msgstr "连接"
+
+#: util/nwuserlist.c:270 util/nwuserlist.c:278 util/nwuserlist.c:288
+#: util/nwuserlist.c:297
+msgid "User name"
+msgstr "用户名"
+
+#: util/nwuserlist.c:271 util/nwuserlist.c:280 util/nwuserlist.c:289
+#: util/nwuserlist.c:299
+msgid "Login time"
+msgstr "登录时间"
+
+#: util/nwuserlist.c:274
+#, c-format
+msgid ""
+"\n"
+"%-6s%-21s%-27s%-12s\n"
+"------------------------------------------------------------------------------\n"
+msgstr ""
+"\n"
+"%-6s%-21s%-27s%-12s\n"
+"------------------------------------------------------------------------------\n"
+
+#: util/nwuserlist.c:279 util/nwuserlist.c:298
+msgid "Station Address"
+msgstr "工作站地址"
+
+#: util/nwuserlist.c:283
+#, c-format
+msgid ""
+"\n"
+"%-6s%-9s%-21s%-12s\n"
+"------------------------------------------------------------\n"
+msgstr ""
+"\n"
+"%-6s%-9s%-21s%-12s\n"
+"------------------------------------------------------------\n"
+
+#: util/nwuserlist.c:287 util/nwuserlist.c:296
+msgid "ObjectID"
+msgstr "对象 ID"
+
+#: util/nwuserlist.c:292
+#, c-format
+msgid ""
+"\n"
+"%-6s%-9s%-21s%-27s%-12s\n"
+"---------------------------------------------------------------------------------------\n"
+msgstr ""
+"\n"
+"%-6s%-9s%-21s%-27s%-12s\n"
+"---------------------------------------------------------------------------------------\n"
+
+#: util/nwuserlist.c:315
+#, c-format
+msgid "%4d: %08X %-20s "
+msgstr "%4d：%08X %-20s "
+
+#: util/nwuserlist.c:317
+#, c-format
+msgid "%4d: %-20s "
+msgstr "%4d：%-20s "
+
+#: util/nwuserlist.c:343
+msgid "Unknown format"
+msgstr "未知格式"
+
+#: util/nwuserlist.c:375
+#, c-format
+msgid "        File: (%02X:%08X) %s\n"
+msgstr "        文件：(%02X:%08X) %s\n"
+
+#: util/nwuserlist.c:377
+#, c-format
+msgid "        File: %s\n"
+msgstr "        文件：%s\n"
+
+#: util/nwuserlist.c:435
+#, c-format
+msgid "          Task: %-5u             Lock:   (%02X) %s\n"
+msgstr "          任务：%-5u             锁定：(%02X) %s\n"
+
+#: util/nwuserlist.c:436
+#, c-format
+msgid "          Fork count: %-3u                 (%02X) %s\n"
+msgstr "          分叉计数：%-3u                 (%02X) %s\n"
+
+#: util/nwuserlist.c:437
+#, c-format
+msgid "          Namespace:  (%02X) %-5s  Access: (%02X) %s\n"
+msgstr "          名称空间：(%02X) %-5s  Access:(%02X) %s\n"
+
+#: util/nwuserlist.c:439
+#, c-format
+msgid "          Task: %-5u        Lock:   %s\n"
+msgstr "          任务：%-5u             锁定：%s\n"
+
+#: util/nwuserlist.c:440
+#, c-format
+msgid "          Fork count: %-3u            %s\n"
+msgstr "          分叉计数：%-3u            %s\n"
+
+#: util/nwuserlist.c:441
+#, c-format
+msgid "          Namespace:  %-5s  Access: %s\n"
+msgstr "          名称空间：%-5s  访问：%s\n"
+
+#: util/nwuserlist.c:453
+#, c-format
+msgid "        Semaphore: %s\n"
+msgstr "        信号：%s\n"
+
+#: util/nwuserlist.c:455
+#, c-format
+msgid "          Task: %-5u     Value: %-5d     Open Count: %-5u\n"
+msgstr "          任务：%-5u     值：%-5d     打开计数：%-5u\n"
+
+#: util/nwuserlist.c:467
+#, c-format
+msgid "        Type: (%02X) %-9.9s Status: (%08X) %s\n"
+msgstr "        类型：(%02X) %-9.9s 状态：(%08X) %s\n"
+
+#: util/nwuserlist.c:470
+#, c-format
+msgid "        Use count: %-9u ExpTime: %08X  ObjType: %08X\n"
+msgstr "        使用计数：%-9u 到期时间：%08X  对象类型：%08X\n"
+
+#: util/nwuserlist.c:472
+#, c-format
+msgid "        Transaction flag: %9u  Filler: %18u\n"
+msgstr "        事务标志：%9u  填充程序：%18u\n"
+
+#: util/nwuserlist.c:474
+#, c-format
+msgid "        Logical lock threshold: %3u  Record lock threshold: %3u\n"
+msgstr "        逻辑锁定阈值：%3u  记录锁定阈值：%3u\n"
+
+#: util/nwuserlist.c:476
+#, c-format
+msgid "        File write flags:      0x%02X  File write state:     0x%02X\n"
+msgstr "        文件写入标志： 0x%02X  文件写入状态：0x%02X\n"
+
+#: util/nwuserlist.c:478
+#, c-format
+msgid "        File lock count: %10u  Record lock count: %7u\n"
+msgstr "        文件锁定计数：%10u  记录锁定计数：%7u\n"
+
+#: util/nwuserlist.c:481
+#, c-format
+msgid "        Type: %-14s Status: %s\n"
+msgstr "        类型：%-14s 状态：%s\n"
+
+#: util/nwuserlist.c:485
+msgid "Bytes read:"
+msgstr "读取的字节数："
+
+#: util/nwuserlist.c:485 util/nwuserlist.c:486 util/nwuserlist.c:489
+#: util/nwuserlist.c:490
+msgid "B"
+msgstr "B"
+
+#: util/nwuserlist.c:486
+msgid "Bytes written:"
+msgstr "写入的字节数："
+
+#: util/nwuserlist.c:487
+msgid "Requests:"
+msgstr "请求："
+
+#: util/nwuserlist.c:489
+msgid "Held bytes read:"
+msgstr "读取的持有字节数："
+
+#: util/nwuserlist.c:490
+msgid "Held bytes written:"
+msgstr "写入的持有字节数："
+
+#: util/nwuserlist.c:491
+msgid "Held requests:"
+msgstr "持有请求："
+
+#: util/nwvolinfo.c:49
+msgid ""
+"\n"
+"-h             Print this help text\n"
+"-S server      Server name to be used\n"
+"-U username    Username sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"\n"
+"-v volume      volume name\n"
+"-N             Numeric format\n"
+"\n"
+msgstr ""
+"\n"
+"-h             打印此帮助文本\n"
+"-S server      要被使用的服务器名\n"
+"-U username    发送到服务器的用户名\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"\n"
+"-v volume      卷名\n"
+"-N             数字格式\n"
+"\n"
+
+#: util/nwvolinfo.c:130
+#, c-format
+msgid "%s: Volume %s does not exist\n"
+msgstr "%s：卷 %s 不存在\n"
+
+#: util/nwvolinfo.c:135
+#, c-format
+msgid "%s: Unable to get volume information\n"
+msgstr "%s：无法获取卷信息\n"
+
+#: util/nwvolinfo.c:151
+#, c-format
+msgid "Total    : %dK\n"
+msgstr "总计    ：%dK\n"
+
+#: util/nwvolinfo.c:152
+#, c-format
+msgid "Free     : %dK\n"
+msgstr "可用     ：%dK\n"
+
+#: util/nwvolinfo.c:153
+#, c-format
+msgid "Purgable : %dK\n"
+msgstr "可清除：%dK\n"
+
+#: util/nwvolinfo.c:154
+#, c-format
+msgid "No Purg. : %dK\n"
+msgstr "不可清除：%dK\n"
+
+#: util/nwvolinfo.c:155
+#, c-format
+msgid "Dirs     : %d\n"
+msgstr "目录     ：%d\n"
+
+#: util/nwvolinfo.c:156
+#, c-format
+msgid "Free dirs: %d\n"
+msgstr "可用目录：%d\n"
+
+#: util/pqlist.c:203
+#, c-format
+msgid ""
+"\n"
+"Server: Unknown (%s)\n"
+msgstr ""
+"\n"
+"服务器：未知 (%s)\n"
+
+#: util/pqlist.c:205
+#, c-format
+msgid ""
+"\n"
+"Server: %s\n"
+msgstr ""
+"\n"
+"服务器：%s\n"
+
+#: util/pqlist.c:209
+msgid "Print queue name"
+msgstr "打印队列名称"
+
+#: util/pqlist.c:210
+msgid "Queue ID"
+msgstr "队列 ID"
+
+#: util/pqlist.c:231
+msgid "No queues found\n"
+msgstr "未找到任何队列\n"
+
+#: util/pqrm.c:65
+#, fuzzy, c-format
+msgid "usage: %s <queue> <jobID> [<jobID> ...]\n"
+msgstr "用法：%s [-B] <queue> [<qlen>]\n"
+
+#: util/pqrm.c:85 util/pqstat.c:182
+#, c-format
+msgid "Queue \"%s\" on server %s not found.\n"
+msgstr "未找到队列 \"%s\"（在服务器 %s 上）。\n"
+
+#: util/pqrm.c:99
+#, c-format
+msgid "Cannot parse \"%s\" - jobID must be hexadecimal number\n"
+msgstr ""
+
+#: util/pqrm.c:105
+#, fuzzy, c-format
+msgid "Job %08X does not exist\n"
+msgstr "%s：卷 %s 不存在\n"
+
+#: util/pqrm.c:107
+#, fuzzy, c-format
+msgid "You have not rights to cancel job %08X\n"
+msgstr "您没有足够的权限来列出队列作业\n"
+
+#: util/pqrm.c:109
+#, fuzzy, c-format
+msgid "Cannot cancel job %08X: %s\n"
+msgstr "无法创建打印作业：%s\n"
+
+#: util/pqstat.c:113
+#, c-format
+msgid "usage: %s [-B] <queue> [<qlen>]\n"
+msgstr "用法：%s [-B] <queue> [<qlen>]\n"
+
+#: util/pqstat.c:203
+#, c-format
+msgid ""
+"\n"
+"Server: %s\tQueue: %s\tQueue ID: %8.8X\n"
+msgstr ""
+"\n"
+"服务器：%s\t队列：%s\t队列 ID：%8.8X\n"
+
+#: util/pqstat.c:205
+#, c-format
+msgid ""
+" %5s  %-12s  %-32s  %-7s  %-4s  %-8s\n"
+"-------------------------------------------------------------------------------\n"
+msgstr ""
+" %5s  %-12s  %-32s  %-7s  %-4s  %-8s\n"
+"-------------------------------------------------------------------------------\n"
+
+#: util/pqstat.c:208
+msgid "Seq"
+msgstr "Seq"
+
+#: util/pqstat.c:208
+msgid "Name"
+msgstr "名称"
+
+#: util/pqstat.c:209
+msgid "Description"
+msgstr "说明"
+
+#: util/pqstat.c:209
+msgid "Status"
+msgstr "状态"
+
+#: util/pqstat.c:209
+msgid "Form"
+msgstr "自"
+
+#: util/pqstat.c:209
+msgid "Job ID"
+msgstr "作业 ID"
+
+#: util/pqstat.c:216
+msgid "You have insufficient rights to list queue jobs\n"
+msgstr "您没有足够的权限来列出队列作业\n"
+
+#: util/pqstat.c:218
+msgid ": cannot get queue length"
+msgstr ": 无法获取队列长度"
+
+#: util/pqstat.c:231
+#, c-format
+msgid "Error getting queue jobs ids: %ld\n"
+msgstr "获取队列作业 ID 时出错：%ld\n"
+
+#: util/pqstat.c:252
+msgid "Held"
+msgstr "持有"
+
+#: util/pqstat.c:254
+msgid "Adding"
+msgstr "添加"
+
+#: util/pqstat.c:256
+msgid "Active"
+msgstr "活动"
+
+#: util/pqstat.c:260
+msgid "Ready"
+msgstr "就绪"
+
+#: util/pqstat.c:269
+msgid "Waiting"
+msgstr "等待"
+
+#: util/pqstat.c:273
+#, c-format
+msgid " %5d  %-12s  %-32.32s  %-7s  %4d  %08X\n"
+msgstr " %5d  %-12s  %-32.32s  %-7s  %4d  %08X\n"
+
+#: util/pserver.c:67
+msgid ""
+"\n"
+"-S server      Server name to be used\n"
+"-U username    Print Server name sent to server\n"
+"-P password    Use this password\n"
+"-n             Do not use any password\n"
+"-C             Don't convert password to uppercase\n"
+"-q queue name  Name of the printing queue to use\n"
+"-c command     Name of print command, default: 'lpr'\n"
+"-j job type    Type of job (Form number) to service\n"
+"-t timeout     Polling interval, default: 30 sec\n"
+"-d             Debug: don't daemonize\n"
+"-h             print this help text\n"
+"\n"
+msgstr ""
+"\n"
+"要被使用的服务器名\n"
+"-U username    发送到服务器的打印服务器名称\n"
+"-P password    使用此口令\n"
+"-n             不使用任何口令\n"
+"-C             不将口令转换为大写\n"
+"-q queue name  要使用的打印队列的名称\n"
+"-c command     打印命令的名称，默认值：'lpr'\n"
+"-j job type    要提供服务的作业类型（表单编号）\n"
+"-t timeout     巡回检测间隔，默认值：30 sec\n"
+"-d             调试：不进行后台处理\n"
+"-h             打印此帮助文本\n"
+"\n"
+
+#: util/pserver.c:132
+#, c-format
+msgid "Queue %s not found: %s\n"
+msgstr "队列 %s 未找到：%s\n"
+
+#: util/pserver.c:141
+#, c-format
+msgid "Could not attach to queue %s: %s\n"
+msgstr "无法附加到队列 %s：%s\n"
+
+#: util/pserver.c:221
+#, c-format
+msgid "Cannot service print job: %s\n"
+msgstr "无法为打印作业提供服务：%s\n"
+
+#: util/pserver.c:239
+msgid "<Unknown>"
+msgstr "<未知>"
+
+#: util/pserver.c:244
+#, c-format
+msgid "pipe error: %m"
+msgstr "管道错误：%m"
+
+#: util/pserver.c:249
+#, c-format
+msgid "fork error: %m"
+msgstr "分叉错误：%m"
+
+#: util/pserver.c:275
+#, c-format
+msgid "waitpid: %m\n"
+msgstr "waitpid：%m\n"
+
+#: util/pserver.c:289
+#, c-format
+msgid "dup2 error: %m\n"
+msgstr "dup2 错误：%m\n"
+
+#: util/pserver.c:299
+#, c-format
+msgid "exec error: %m\n"
+msgstr "执行错误：%m\n"
+
+#: util/pserver.c:404
+msgid "You must specify a queue\n"
+msgstr "必须指定队列\n"
+
+#: util/slist.c:68
+msgid "in ncp_open"
+msgstr "在 ncp_open 中"
+
+#: util/slist.c:76
+msgid "Known NetWare File Servers"
+msgstr "已知的 NetWare 文件服务器"
+
+#: util/slist.c:77
+msgid "Network"
+msgstr "网络"
+
+#: util/slist.c:78
+msgid "Node Address"
+msgstr "节点地址"
+
+#: util/slist.c:107
+msgid "No servers found\n"
+msgstr "未找到服务器\n"
+
+#: contrib/tknwmsg/nwmsg.c:141
+#, c-format
+msgid ""
+"Message from Netware Server: %s\n"
+"%s"
+msgstr ""
+"来自 Netware 服务器的讯息：%s\n"
+"%s"
+
+#~ msgid "opening mount %s"
+#~ msgstr "正在打开装入 %s"
+
+#~ msgid "retrieving user name"
+#~ msgstr "正在检索用户名"
+
+#~ msgid "in authenticate connection"
+#~ msgstr "在鉴定连接中"
+
+#~ msgid "in free context"
+#~ msgstr "在可用上下文中"
+
+#~ msgid "You are not allowed to clear nosuid and nodev flags\n"
+#~ msgstr "不允许您清除 nosuid 和 nodev 标志\n"
+
+#~ msgid "You are not allowed to clear noexec flag\n"
+#~ msgstr "不允许您清除 noexec 标志\n"

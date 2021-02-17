@@ -1,0 +1,29 @@
+***************************************************************
+* This code is LGPL. You CAN make commercial solutions using  *
+* LGPL software.                                              *
+*                                                             *
+* Peter Harvey 21.FEB.99 pharvey@codebydesign.com             *
+***************************************************************
+
++-------------------------------------------------------------+
+| unixODBC                                                    |
+| Driver Template                                             |
++-------------------------------------------------------------+
+
+Use this template as a starting point when creating a new
+driver. You can also reference existing unixODBC drivers.
+
+This template provides the infrastructure for a 3.51 compliant
+ODBC driver.
+
+A driver created from this template, and in the unixODBC framework
+should be easy to port to other platforms. In fact, the Drivers
+are the only component which one may want to ensure portability
+... the remaining components (including the DriverManager)
+strive for interoperability but not portability.
+
++-------------------------------------------------------------+
+| Please visit;                                               |
+| www.genix.net/unixODBC                                      |
++-------------------------------------------------------------+
+

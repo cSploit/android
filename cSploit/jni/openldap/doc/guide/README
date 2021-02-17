@@ -1,0 +1,16 @@
+This module contains OpenLDAP guides in Simple Document Format (SDF).
+
+SDF is a freely available documentation system.  Based on a
+simple, readable markup language, SDF generates high quality
+output in multiple formats.
+
+    cd admin                # OpenLDAP Administrator's Guide
+    sdf -2topics index.sdf  # generate HTML for WWW publishing
+    sdf -2html guide.sdf    # generate HTML for release
+    sdf -2txt guide.sdf     # generate TXT for release
+
+More information about STF can be obtained from the CPAN at:
+	http://search.cpan.org/src/IANC/sdf-2.001/doc/catalog.html
+
+SDF itself can be obtained at:
+	http://search.cpan.org/~ianc/sdf-2.001/

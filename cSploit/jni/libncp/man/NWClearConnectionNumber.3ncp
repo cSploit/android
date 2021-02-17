@@ -1,0 +1,38 @@
+.TH NWCLEARCONNECTIONNUMBER 3NCP 04/13/1999 "libncp (>= 2.2.0.14)" 
+.\" Netware Calls Library
+.SH NAME
+NWClearConnectionNumber \- Logs out the specified connection
+.SH SYNOPSIS
+.B #include <nwcalls.h>
+
+.BI "NWCCODE NWClearConnectionNumber(NWCONN_HANDLE " conn ", NWCONN_NUM " num ");"
+
+.SH DESCRIPTION
+This function logs out specified connection from server.
+You must have \fISUPERVISOR\fP rights to server.
+
+.B conn
+.RS 3
+\fBconn\fP contains connection handle obtained from \fIncp_open\fP(3ncp) or
+\fINWParsePath\fP(3ncp).
+.RE
+
+.B num
+.RS 3
+\fBnum\fP contains connection number.
+.RE
+
+.SH "RETURN VALUE"
+Function returns \fBzero\fP on success and \fBnon-zero\fP on failure.
+.TP
+.B NWE_CONSOLE_NO_PRIV
+You have not enough rights.
+
+See \fInwerrors\fP(3ncp) for complete list of  error codes.
+
+
+.SH BUGS
+None known.
+
+.SH SEE ALSO
+.BR "nwerrors" (3ncp)

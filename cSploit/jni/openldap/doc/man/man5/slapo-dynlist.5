@@ -1,0 +1,212 @@
+.TH SLAPO-DYNLIST 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation, All Rights Reserved.
+.\" Copying restrictions apply.  See the COPYRIGHT file.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-dynlist \- Dynamic List overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The
+.B dynlist
+overlay to
+.BR slapd (8)
+allows expansion of dynamic groups and more.
+Any time an entry with a specific objectClass (defined in the overlay configuration) is being returned,
+the LDAP URI-valued occurrences of a specific attribute (also defined in the overlay configuration) are
+expanded into the corresponding entries, and the values
+of the attributes listed in the URI are added to the original
+entry.
+No recursion is allowed, to avoid potential infinite loops.
+
+Since the resulting entry is dynamically constructed,
+it does not exist until it is constructed while being returned.
+As a consequence, dynamically added attributes do not participate
+in the filter matching phase of the search request handling.
+In other words, \fIfiltering for dynamically added attributes always fails\fP.
+
+The resulting entry must comply with the LDAP data model, so constraints
+are enforced.
+For example, if a \fISINGLE\-VALUE\fP attribute is listed,
+only the first value found during the list expansion appears in the final entry.
+The above described behavior is disabled when the \fImanageDSAit\fP
+control (RFC 3296) is used.
+In that case, the contents of the dynamic group entry is returned;
+namely, the URLs are returned instead of being expanded.
+
+.SH CONFIGURATION
+The config directives that are specific to the
+.B dynlist
+overlay must be prefixed by
+.BR dynlist\- ,
+to avoid potential conflicts with directives specific to the underlying 
+database or to other stacked overlays.
+
+.TP
+.B overlay dynlist
+This directive adds the dynlist overlay to the current database,
+or to the frontend, if used before any database instantiation; see
+.BR slapd.conf (5)
+for details.
+
+.LP
+This
+.B slapd.conf
+configuration option is defined for the dynlist overlay. It may have multiple 
+occurrences, and it must appear after the
+.B overlay
+directive.
+.TP
+.B dynlist\-attrset <group-oc> [<URI>] <URL-ad> [[<mapped-ad>:]<member-ad> ...]
+The value 
+.B group\-oc
+is the name of the objectClass that triggers the dynamic expansion of the
+data.
+
+The optional
+.B URI
+restricts expansion only to entries matching the \fIDN\fP,
+the \fIscope\fP and the \fIfilter\fP portions of the URI.
+
+The value
+.B URL-ad
+is the name of the attributeDescription that contains the URI that is 
+expanded by the overlay; if none is present, no expansion occurs.
+If the intersection of the attributes requested by the search operation 
+(or the asserted attribute for compares) and the attributes listed 
+in the URI is empty, no expansion occurs for that specific URI.
+It must be a subtype of \fIlabeledURI\fP.
+
+The value
+.B member-ad
+is optional; if present, the overlay behaves as a dynamic group: this
+attribute will list the DN of the entries resulting from the internal search.
+In this case, the \fIattrs\fP portion of the URIs in the
+.B URL-ad
+attribute must be absent, and the \fIDN\fPs 
+of all the entries resulting from the expansion of the URIs are listed
+as values of this attribute.
+Compares that assert the value of the
+.B member-ad
+attribute of entries with 
+.B group-oc
+objectClass apply as if the DN of the entries resulting from the expansion 
+of the URI were present in the 
+.B group-oc 
+entry as values of the
+.B member-ad
+attribute.
+
+Alternatively, 
+.B mapped-ad
+can be used to remap attributes obtained through expansion. 
+.B member-ad
+attributes are not filled by expanded DN, but are remapped as
+.B mapped-ad 
+attributes.  Multiple mapping statements can be used.
+
+.LP
+The dynlist overlay may be used with any backend, but it is mainly 
+intended for use with local storage backends.
+In case the URI expansion is very resource-intensive and occurs frequently
+with well-defined patterns, one should consider adding a proxycache
+later on in the overlay stack.
+
+.SH AUTHORIZATION
+By default the expansions are performed using the identity of the current
+LDAP user.
+This identity may be overridden by setting the
+.B dgIdentity
+attribute in the group's entry to the DN of another LDAP user.
+In that case the dgIdentity will be used when expanding the URIs in the object.
+Setting the dgIdentity to a zero-length string will cause the expansions
+to be performed anonymously.
+Note that the dgIdentity attribute is defined in the
+.B dyngroup
+schema, and this schema must be loaded before the dgIdentity
+authorization feature may be used.
+If the
+.B dgAuthz
+attribute is also present in the group's entry, its values are used
+to determine what identities are authorized to use the
+.B dgIdentity
+to expand the group.
+Values of the 
+.B dgAuthz
+attribute must conform to the (experimental) \fIOpenLDAP authz\fP syntax.
+
+.SH EXAMPLE
+This example collects all the email addresses of a database into a single
+entry; first of all, make sure that slapd.conf contains the directives:
+
+.LP
+.nf
+    include /path/to/dyngroup.schema
+    # ...
+
+    database <database>
+    # ...
+
+    overlay dynlist
+    dynlist\-attrset groupOfURLs memberURL
+.fi
+.LP
+and that slapd loads dynlist.la, if compiled as a run-time module;
+then add to the database an entry like
+.LP
+.nf
+    dn: cn=Dynamic List,ou=Groups,dc=example,dc=com
+    objectClass: groupOfURLs
+    cn: Dynamic List
+    memberURL: ldap:///ou=People,dc=example,dc=com?mail?sub?(objectClass=person)
+.fi
+
+If no <attrs> are provided in the URI, all (non-operational) attributes are
+collected.
+
+This example implements the dynamic group feature on the 
+.B member
+attribute:
+
+.LP
+.nf
+    include /path/to/dyngroup.schema
+    # ...
+
+    database <database>
+    # ...
+
+    overlay dynlist
+    dynlist\-attrset groupOfURLs memberURL member
+.fi
+.LP
+
+A dynamic group with dgIdentity authorization could be created with an
+entry like
+.LP
+.nf
+    dn: cn=Dynamic Group,ou=Groups,dc=example,dc=com
+    objectClass: groupOfURLs
+    objectClass: dgIdentityAux
+    cn: Dynamic Group
+    memberURL: ldap:///ou=People,dc=example,dc=com??sub?(objectClass=person)
+    dgIdentity: cn=Group Proxy,ou=Services,dc=example,dc=com
+.fi
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd (8).
+The
+.BR slapo\-dynlist (5)
+overlay supports dynamic configuration via
+.BR back-config .
+.SH ACKNOWLEDGEMENTS
+.P
+This module was written in 2004 by Pierangelo Masarati for SysNet s.n.c.
+.P
+Attribute remapping was contributed in 2008 by Emmanuel Dreyfus.

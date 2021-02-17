@@ -1,0 +1,11 @@
+--- test/malloc.test
++++ test/malloc.test
+@@ -718,7 +718,7 @@
+ #
+ do_malloc_test 31 -sqlprep {
+   PRAGMA journal_mode = persist;
+-  PRAGMA journal_size_limit = 1024;
++  PRAGMA journal_size_limit = 8192;
+   CREATE TABLE t1(a PRIMARY KEY, b);
+ } -sqlbody {
+   INSERT INTO t1 VALUES(1, 2);

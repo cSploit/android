@@ -1,0 +1,118 @@
+.TH NWBOPROPS 1 7/9/1996 nwboprops nwboprops
+.SH NAME
+nwboprops \- List properies of a NetWare Bindery Object
+.SH SYNOPSIS
+.B nwboprops
+[
+.B -h
+] [
+.B -S
+.I server
+] [
+.B -U
+.I user name
+] [
+.B -P
+.I password
+|
+.B -n
+] [
+.B -C
+] [
+.B -o
+.I object name
+] [
+.B -t
+.I type
+] [
+.B -v
+]
+
+.SH DESCRIPTION
+.B nwboprops
+lists all the properties of the specified NetWare Bindery Objects.
+
+.B nwboprops
+looks up the file
+.I $HOME/.nwclient
+to find a file server, a user name and possibly a password. See
+nwclient(5) for more information. Please note that the access
+permissions of $HOME/.nwclient MUST be 600 for security reasons.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user
+.RS 3
+.B user
+is the user name to use for login.
+.RE
+
+.B -P
+.I password
+.RS 3
+.B password
+is the password to use for login. If neither
+.B -n
+nor
+.B -P
+are given, and the user has no open connection to the server, nwboprops
+prompts for a password.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given if no password is required for the login.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.B -o
+.I object name
+.RS 3
+The name of the object to be inspected.
+.RE
+
+.B -t
+.I object type
+.RS 3
+The type of the object.
+.I Object type
+must be specified as a decimal value. Common values are 1 for user
+objects, 2 for group objects and 3 for print queues. Other values are
+allowed, but are usually used for specialized applications.
+.RE
+
+.B -v
+.RS 3
+By default, only the property name is listed. In verbose mode,
+activated by 
+.B -v,
+the property flag, the property security byte and the value flag are
+also listed.
+.RE
+
+.SH AUTHORS
+nwboprops was written by Volker Lendecke with the corresponding
+Caldera utility in mind. See the Changes file of ncpfs for other
+contributors.

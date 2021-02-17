@@ -1,0 +1,8 @@
+help (?, h): Describe the usage of this program or its subcommands.
+usage: help [SUBCOMMAND...]
+
+Valid options:
+  --version                : print client version info
+  -q [--quiet]             : print nothing, or only summary information
+  --config-dir ARG         : read user configuration files from directory ARG
+

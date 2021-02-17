@@ -1,0 +1,28 @@
+==============================================================================
+==============================================================================
+
+                                    libwdg
+                                    
+                       a collection of widgets for ncurses
+
+                           Copyright 2003-2004 ALoR
+
+==============================================================================
+==============================================================================
+
+I've started to write this library to "make the things easier" for me while
+coding the ettercap NG curses interface.
+While coding this collection of widgets, I've decided to make it a separate
+library from ettercap, and I've removed any dependency on it. Only the
+configure script is shared.
+
+Someday, probably I'll distribute this library as a separate project. For now,
+I don't have time to maintain another projects with all the consequences that
+this implies.
+
+No documentation is provided, sorry. But if you understand how to use these
+functions looking at the ettercap code, you can use the library in your own
+projects. Drop me an email if you are interested in this project.
+                              
+==============================================================================
+vim:ts=3:expandtab

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>set_shm_key</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="configuration_reference.html" title="Appendix B. DB_CONFIG Parameter Reference" />
+    <link rel="prev" href="set_open_flags_parameter.html" title="set_open_flags" />
+    <link rel="next" href="set_thread_count_parameter.html" title="set_thread_count" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">set_shm_key</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="set_open_flags_parameter.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix B. DB_CONFIG Parameter Reference</th>
+          <td width="20%" align="right"> <a accesskey="n" href="set_thread_count_parameter.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="set_shm_key_parameter"></a>set_shm_key</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                Configures the database environment's base segment ID.
+                This base segment ID will be used when Berkeley DB shared
+                memory regions are first created.  It will be incremented a
+                small integer value each time a new shared memory region is
+                created; that is, if the base ID is 35, the first shared
+                memory region created will have a segment ID of 35, and the
+                next one will have a segment ID between 36 and 40 or so. 
+			</p>
+      <p>
+			See <a href="../../programmer_reference/env_region.html" class="olink">Shared Memory Regions</a> for more information.
+			</p>
+      <p>
+                The syntax of the entry in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file is a single
+                line with the string <code class="literal">set_shm_key</code> one or
+                more whitespace characters, and the ID.
+            </p>
+      <p>For more information, see <a class="xref" href="envset_shm_key.html" title="DbEnv::set_shm_key()">DbEnv::set_shm_key()</a>. </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="set_open_flags_parameter.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="configuration_reference.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="set_thread_count_parameter.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">set_open_flags </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> set_thread_count</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

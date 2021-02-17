@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbChannel::close()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 11.  Replication Methods" />
+    <link rel="prev" href="db_channel.html" title="The DbChannel Handle" />
+    <link rel="next" href="dbchannel_send_msg.html" title="DbChannel::send_msg()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbChannel::close()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="db_channel.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 11. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbchannel_send_msg.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbchannel_close"></a>DbChannel::close()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+
+int 
+DbChannel::close(u_int32_t flags);</pre>
+      <p>
+        The <code class="methodname">DbChannel::close()</code> method 
+        closes the DbChannel handle, freeing any resources
+        allocated to the handle. All DbChannel handles must be
+        closed before the encompassing environment handle is closed.
+        Also, all on-going messaging operations on the channel should be
+        allowed to complete before attempting to close the channel handle.
+    </p>
+      <p>
+         After <code class="methodname">DbChannel::close()</code> has been
+         called, regardless of its return, the DbChannel handle may
+         not be accessed again.
+    </p>
+      <p>
+         The <code class="methodname">DbChannel::close()</code> <span>
+            
+            <span>
+                method either returns a non-zero error value or throws an
+                exception that encapsulates a non-zero error value on
+                failure, and returns 0 on success.
+            </span>
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp3713928"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp3889568"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  This parameter is currently unused, and must be
+                  set to 0.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp3859120"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            The <code class="methodname">DbChannel::close()</code>
+            <span>
+            
+            <span>
+                method may fail and throw a <a class="link" href="dbexception.html" title="Chapter 6. The DbException Class">DbException</a> 
+                exception, encapsulating one of the following non-zero errors, or return one
+                of the following non-zero errors:
+            </span>
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp3911496"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If this method is called from a Base API application, 
+                or if an invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp3910416"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a>,
+            <a class="link" href="db_channel.html" title="The DbChannel Handle">DbChannel</a>
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp3889784"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="rep.html#replist" title="Replication and Related Methods">Replication and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="db_channel.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbchannel_send_msg.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">The DbChannel Handle </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbChannel::send_msg()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

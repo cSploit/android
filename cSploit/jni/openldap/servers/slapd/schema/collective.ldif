@@ -1,0 +1,48 @@
+# collective.ldif -- Collective attribute schema
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+## Portions Copyright (C) The Internet Society (2003).
+## Please see full copyright statement below.
+#
+# From RFC 3671 [portions trimmed]:
+# 	Collective Attributes in LDAP
+#
+# This file was automatically generated from collective.schema; see that file
+# for complete references.
+#
+dn: cn=collective,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: collective
+olcAttributeTypes: {0}( 2.5.4.7.1 NAME 'c-l' SUP l COLLECTIVE )
+olcAttributeTypes: {1}( 2.5.4.8.1 NAME 'c-st' SUP st COLLECTIVE )
+olcAttributeTypes: {2}( 2.5.4.9.1 NAME 'c-street' SUP street COLLECTIVE )
+olcAttributeTypes: {3}( 2.5.4.10.1 NAME 'c-o' SUP o COLLECTIVE )
+olcAttributeTypes: {4}( 2.5.4.11.1 NAME 'c-ou' SUP ou COLLECTIVE )
+olcAttributeTypes: {5}( 2.5.4.16.1 NAME 'c-PostalAddress' SUP postalAddress CO
+ LLECTIVE )
+olcAttributeTypes: {6}( 2.5.4.17.1 NAME 'c-PostalCode' SUP postalCode COLLECTI
+ VE )
+olcAttributeTypes: {7}( 2.5.4.18.1 NAME 'c-PostOfficeBox' SUP postOfficeBox CO
+ LLECTIVE )
+olcAttributeTypes: {8}( 2.5.4.19.1 NAME 'c-PhysicalDeliveryOfficeName' SUP phy
+ sicalDeliveryOfficeName COLLECTIVE )
+olcAttributeTypes: {9}( 2.5.4.20.1 NAME 'c-TelephoneNumber' SUP telephoneNumbe
+ r COLLECTIVE )
+olcAttributeTypes: {10}( 2.5.4.21.1 NAME 'c-TelexNumber' SUP telexNumber COLLE
+ CTIVE )
+olcAttributeTypes: {11}( 2.5.4.23.1 NAME 'c-FacsimileTelephoneNumber' SUP facs
+ imileTelephoneNumber COLLECTIVE )
+olcAttributeTypes: {12}( 2.5.4.25.1 NAME 'c-InternationalISDNNumber' SUP inter
+ nationalISDNNumber COLLECTIVE )

@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Replication views</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="rep.html" title="Chapter 12.  Berkeley DB Replication" />
+    <link rel="prev" href="group_membership.html" title="Managing Replication Manager group membership" />
+    <link rel="next" href="rep_filename.html" title="Managing replication directories and files" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Replication views</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="group_membership.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 12. 
+		Berkeley DB Replication
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="rep_filename.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="rep_partview"></a>Replication views</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+        A <span class="bold"><strong>view</strong></span> is a replication site
+        that maintains a copy of the replication group's data without
+        incurring other overhead from participating in the replication
+        group.  Views are useful for applications that require read
+        scalability, are geographically distributed, have slow network
+        connections to some sites, or require only a subset of replicated
+        databases at some sites.
+    </p>
+      <p>
+        A client is a <span class="bold"><strong>participant</strong></span> in the
+        replication group because it helps to determine the master and
+        contributes to transaction durability.  A view receives its copy of
+        the replicated data without participating in the replication group
+        in these other ways.  Specifically, a view cannot ever become master,
+        a view does not vote in elections, and a view does not contribute
+        to transaction durability.  A view is similar to an unelectable client
+        because neither can become master.  They differ because an unelectable
+        client participates in the replication group by voting and
+        contributing to transaction durability.
+    </p>
+      <p>
+        A <span class="bold"><strong>full view</strong></span> contains a copy of
+        all replicated databases.  You define a full view by calling the
+        <a href="../api_reference/C/repset_view.html" class="olink">DB_ENV-&gt;rep_set_view()</a> method before opening the environment and supplying a
+        NULL value for the  <span class="bold"><strong>partial_func</strong></span>
+        parameter.  You can then complete any other environment configuration,
+        open the environment, and eventually start replication using the
+        <a href="../api_reference/C/repmgrstart.html#repmgrstart_DB_REP_CLIENT" class="olink">DB_REP_CLIENT</a> flags value.
+    </p>
+      <p>
+        A <span class="bold"><strong>partial view</strong></span> contains a subset
+        of the replicated databases.  You define a partial view using the
+        same steps used to define a full view, except that you supply a
+        <span class="bold"><strong>partial_func</strong></span> callback to the
+        <a href="../api_reference/C/repset_view.html" class="olink">DB_ENV-&gt;rep_set_view()</a> method.  The partial function uses application-specific
+        logic to determine the names of the database files to replicate.
+        The partial function should set its
+        <span class="bold"><strong>result</strong></span> output parameter to 0 to
+        reject a database file or to a non-zero value to replicate it.
+        Note that named in-memory databases are always replicated to partial
+        views regardless of partial function logic.
+    </p>
+      <p>
+        The decision about whether to replicate a particular database file
+        to a partial view is made at the time the database file is first
+        created.  It is possible to change the partial function to replicate
+        a different set of database files.  However, any database file that
+        was already being replicated will continue to be replicated
+        regardless of the new partial function logic because it already exists
+        at that site.
+    </p>
+      <p>
+        Recovery on a partial view should always be performed using the
+        <a href="../api_reference/C/envopen.html#envopen_DB_RECOVER" class="olink">DB_RECOVER</a> flag to the <a href="../api_reference/C/envopen.html" class="olink">DB_ENV-&gt;open()</a> method after calling the
+        <a href="../api_reference/C/repset_view.html" class="olink">DB_ENV-&gt;rep_set_view()</a> method to supply the partial function.  You should not use
+        the <a href="../api_reference/C/db_recover.html" class="olink">db_recover</a> utility to recover a partial view because it cannot use a
+        partial function.
+    </p>
+      <p>
+        Defining a site as a view is a permanent decision; once a site is
+        defined as a view it can never be transformed into a participant.
+        This means that on a view site, the <a href="../api_reference/C/repset_view.html" class="olink">DB_ENV-&gt;rep_set_view()</a> method must always be
+        called before opening the environment.
+    </p>
+      <p>
+        An existing participant can be permanently demoted to a view at any
+        time by calling the <a href="../api_reference/C/repset_view.html" class="olink">DB_ENV-&gt;rep_set_view()</a> method before opening its environment
+        and starting replication.
+        Demoting a participant to a view can fail when starting replication
+        and return
+        <code class="literal">DB_REP_UNAVAIL</code> if the master is unavailable or
+        there are insufficient participants to acknowledge this operation.
+        You can pause and retry starting replication until it succeeds.
+    </p>
+      <p>
+        A view cannot become master and does not vote in elections,
+        but elections among the participant sites need to know the
+        number of participants in the replication group.  Replication Manager
+        automatically manages elections and tracks the number of participants.
+        In Base API applications, the number of sites in the replication
+        group set by the <a href="../api_reference/C/repnsites.html" class="olink">DB_ENV-&gt;rep_set_nsites()</a> method should only count participant
+        sites.  Similarly, when a participant site calls the <a href="../api_reference/C/repelect.html" class="olink">DB_ENV-&gt;rep_elect()</a> method,
+        the <span class="bold"><strong>nsites</strong></span> value should only count
+        participant sites.  A view should never call the <a href="../api_reference/C/repelect.html" class="olink">DB_ENV-&gt;rep_elect()</a> method.
+    </p>
+      <p>
+        A transaction's durability within a replication group is based on
+        its replication to other sites that can potentially take over as master
+        if the current master fails.  A view cannot become master, so it cannot
+        contribute to transaction durabilty.  As a result, Replication Manager
+        views do not send acknowledgements.  Base API applications should not
+        count messages returning <a href="../api_reference/C/repmessage.html#repmsg_DB_REP_ISPERM" class="olink">DB_REP_ISPERM</a> from a view as contributing
+        to transaction durability.
+     </p>
+      <p>
+        Replication Manager views participate in replication group-aware
+        log archiving.  A view can also be configured as a client-to-client
+        peer of another site in the replication group.  If a partial view does
+        not contain the information requested, Replication Manager will
+        redirect the request to the master.
+    </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="group_membership.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="rep_filename.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Managing Replication Manager group membership </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Managing replication directories and files</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

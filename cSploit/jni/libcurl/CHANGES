@@ -1,0 +1,15 @@
+                                  _   _ ____  _
+                              ___| | | |  _ \| |
+                             / __| | | | |_) | |
+                            | (__| |_| |  _ <| |___
+                             \___|\___/|_| \_\_____|
+
+                                  Changelog
+
+This file no longer holds the changelog. Now you can generate it yourself
+like this:
+
+$ git log --pretty=fuller --no-color --date=short --decorate=full | \
+  ./log2changes.pl
+
+The older, manually edited, changelog is found in git named CHANGES.0

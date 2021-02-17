@@ -1,0 +1,128 @@
+; The contents of this file are subject to the Interbase Public
+; License Version 1.0 (the "License"); you may not use this file
+; except in compliance with the License. You may obtain a copy
+; of the License at http://www.Inprise.com/IPL.html
+;
+; Software distributed under the License is distributed on an
+; "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+; or implied. See the License for the specific language governing
+; rights and limitations under the License.
+;
+; The Original Code was created by Inprise Corporation
+; and its predecessors. Portions created by Inprise Corporation are
+; Copyright (C) Inprise Corporation.
+;
+; All Rights Reserved.
+; Contributor(s): ______________________________________.
+
+EXPORTS
+
+	fb_interpret@12				PRIVATE
+	fb_sqlstate@8				PRIVATE
+	fb_cancel_operation@12		PRIVATE
+	fb_shutdown_callback@16		PRIVATE
+	fb_disconnect_transaction@8	PRIVATE
+
+	isc_attach_database@24		PRIVATE
+	isc_blob_default_desc@12	PRIVATE
+	isc_blob_gen_bpb@24			PRIVATE
+	isc_blob_info@24			PRIVATE
+	isc_blob_lookup_desc@28		PRIVATE
+	isc_close_blob@8			PRIVATE
+	isc_commit_transaction@8	PRIVATE
+	isc_commit_retaining@8		PRIVATE
+	isc_compile_request@20		PRIVATE
+	isc_compile_request2@20		PRIVATE
+	isc_create_blob@20			PRIVATE
+	isc_create_blob2@28			PRIVATE
+	isc_create_database@28		PRIVATE
+	isc_database_info@24		PRIVATE
+	isc_ddl@20					PRIVATE
+	isc_decode_date@8			PRIVATE
+	isc_decode_sql_date@8		PRIVATE
+	isc_decode_sql_time@8		PRIVATE
+	isc_decode_timestamp@8		PRIVATE
+	isc_detach_database@8		PRIVATE
+	isc_drop_database@8			PRIVATE
+	isc_dsql_allocate_statement@12	PRIVATE
+	isc_dsql_alloc_statement2@12	PRIVATE
+	isc_dsql_describe@16		PRIVATE
+	isc_dsql_describe_bind@16	PRIVATE
+	isc_dsql_exec_immed2@32		PRIVATE
+	isc_dsql_execute@20			PRIVATE
+	isc_dsql_execute2@24		PRIVATE
+	isc_dsql_execute_immediate@28	PRIVATE
+	isc_dsql_fetch@16			PRIVATE
+	isc_dsql_free_statement@12	PRIVATE
+	isc_dsql_prepare@28			PRIVATE
+	isc_dsql_sql_info@24		PRIVATE
+	isc_encode_date@8			PRIVATE
+	isc_encode_sql_date@8		PRIVATE
+	isc_encode_sql_time@8		PRIVATE
+	isc_encode_timestamp@8		PRIVATE
+	isc_free@4					PRIVATE
+	isc_ftof@16					PRIVATE
+	isc_get_segment@20			PRIVATE
+	isc_get_slice@44			PRIVATE
+	isc_open_blob@20			PRIVATE
+	isc_open_blob2@28			PRIVATE
+	isc_portable_integer@8		PRIVATE
+	isc_prepare_transaction@8	PRIVATE
+	isc_print_blr@16			PRIVATE
+	fb_print_blr@20				PRIVATE
+	isc_print_status@4			PRIVATE
+	isc_put_segment@16			PRIVATE
+	isc_put_slice@40			PRIVATE
+	isc_receive@24				PRIVATE
+	isc_reconnect_transaction@20	PRIVATE
+	isc_release_request@8		PRIVATE
+	isc_request_info@28			PRIVATE
+	isc_rollback_transaction@8	PRIVATE
+	isc_send@24					PRIVATE
+	isc_service_attach@24		PRIVATE
+	isc_service_detach@8		PRIVATE
+	isc_service_query@36		PRIVATE
+	isc_service_start@20		PRIVATE
+	isc_set_debug@4				PRIVATE
+	isc_sqlcode@4				PRIVATE
+	isc_start_and_send@28		PRIVATE
+	isc_start_request@16		PRIVATE
+	isc_unwind_request@12		PRIVATE
+	isc_vax_integer@8			PRIVATE
+	isc_version@12				PRIVATE
+	isc_vtof@12					PRIVATE
+	isc_vtov@12					PRIVATE
+
+	gds_alloc_flag_unfreed@4	PRIVATE
+	gds_alloc_report@12			PRIVATE
+	gds__alloc@4				PRIVATE
+	gds__alloc_debug@12			PRIVATE
+	gds__blob_size@16			PRIVATE
+	gds__edit@8					PRIVATE
+	gds__free@4					PRIVATE
+	gds__get_prefix@8			PRIVATE
+	gds__log@0					PRIVATE
+	gds__msg_format@40			PRIVATE
+	gds__msg_lookup@24			PRIVATE
+	gds__prefix@8				PRIVATE
+	gds__prefix_lock@8			PRIVATE
+	gds__prefix_msg@8			PRIVATE
+	gds__print_blr@16			PRIVATE
+	gds__print_status@4			PRIVATE
+	gds__register_cleanup@8		PRIVATE
+	gds__thread_start@20		PRIVATE
+	gds__vax_integer@8			PRIVATE
+	gds__vtov@12				PRIVATE
+
+	perf_format@20				PRIVATE
+	perf_get_info@8				PRIVATE
+
+	Bopen@16					PRIVATE
+	BLOB_close@4				PRIVATE
+	BLOB_dump@16				PRIVATE
+	BLOB_edit@16				PRIVATE
+	BLOB_load@16				PRIVATE
+	BLOB_put@8					PRIVATE
+	BLOB_text_load@16			PRIVATE
+
+	_ZN6Config17getGuardianOptionEv PRIVATE

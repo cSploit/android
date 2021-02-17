@@ -1,0 +1,122 @@
+
+Why authenticate Linux users against a Netware box?
+--------------------------------------------------
+
+The pam_ncp_auth module is designed for use in environments where users have 
+already been given Netware accounts and the requirement to have two separate
+passwords would be a barrier to the deployment of Linux. 
+
+A pam_ncp_passwd module allowing users to also change their passwords is also 
+planned.
+
+
+How come it only took a few hours to put it together from scratch?
+-----------------------------------------------------------------
+
+This module is based on the ncpfs utilities developed by Volker Lendecke,
+and is dynamically linked to the library routines contained therein. Therefore,
+the ncpfs utilities are a prerequisite for compiling this module.
+
+The most up-to-date version of the utilities can generally be found at 
+	ftp://platan.vc.cvut.cz/pub/linux/ncpfs/latest
+
+It is my intention to make this module stand alone, for simplicity and for
+licensing reasons.
+
+
+Configuration
+-------------
+
+The pam_ncp_auth module recognises one option, which is required (and may
+be repeated):
+	"server=<ServerName>" or "server=<ServerName>/<GroupName>"
+Except that, it recoginzes couple of options:
+	-d : turn on debugging output
+	-v : display reasons login failures on terminal (default)
+	-q : do not display login failures
+	-s : disallow SUPERVISOR from logging-in
+	-S : disallow SUPERVISOR equivalent from logging-in (NYI)
+	-uMIN,MAX,CFLAGS,MFLAGS : parameters for user creation
+	-gMIN,MAX,CFLAGS : parameters for group creation
+	
+If you are using variant "server=<ServerName>/<GroupName>", <GroupName>
+must be fully distinguished name of Group and <ServerName> must have
+at least read-only replica of logging-in user (to be fixed...).
+
+This module is designed to run alongside locally stored passwords. For example,
+my /etc/pam.d/login file during testing looked like this:
+
+auth       required     /lib/security/pam_securetty.so
+auth       requisite    /lib/security/pam_nologin.so
+auth       sufficient   /lib/security/pam_pwdb.so shadow nullok
+auth       required     /lib/security/pam_ncp_auth.so use_first_pass server=ROB-SERVER
+
+This has the effect that users are only looked up on the Netware server if the
+password they type fails to match the locally stored password. Hence local-only
+users (such as root) are supported in this configuration.
+
+David Woodhouse <Dave@imladris.demon.co.uk>
+4/3/98
+
+Users and groups creation
+-------------------------
+
+User creation is enabled by non-empty CFLAGS option in -u parameter.
+CFLAGS can consist of one or more following letters:
+  r : When creating user, it must take uid from UNIX:UID property. If uid
+      is already used, or object does not have UNIX:UID property, user is
+      not allowed to login.
+  p : When creating user, preffer uid from UNIX:UID property.
+  n : When inventing uid for new user, take one which is one greater than
+      highest used uid in MIN,MAX range.
+  f : When inventing uid for new user, take first unused in MIN,MAX range.
+If you specify both 'r' and 'p', or both 'n' and 'f', behavior is undefined.
+
+User modification is enabled by non-empty MFLAGS option in -u parameter.
+MFLAGS can consist of one or more following letters:
+  g : Update user's primary gid according to NDS database.
+  c : Update user's gecos (comment, full name) according to NDS database.
+  d : Update user's home directory according to NDS database.
+  s : Update user's shell according to NDS database.
+  
+NDS background
+--------------
+
+If -g,,r or -g,,p is specified, group's UNIX:GID attribute is read from
+NDS. If attribute does not exist, and 'r' was not used, new gid is invented
+according to min, max and n/f values in -g option.
+
+If -u,,r or -u,,p is specified, user's UNIX:UID attribute is read from
+NDS. If attribute does not exist, and 'r' was not used, new uid is invented
+according to min, max and n/f values in -g option.
+
+During user creation, home directory is retrieved from UNIX:Home Directory,
+login shell from UNIX:Login Shell. If UNIX:Home Directory does not exist,
+/home/$cn is used as home directory for user. If UNIX:Login Shell does not
+exist, /bin/bash is used.
+ 
+OK, to get it to work on my Debian - potato box, I have to use following
+items in /etc/pam.d/login:
+
+#%PAM-1.0
+#[For version 1.0 syntax, the above header is optional]
+#
+# The PAM configuration file for the `login' service
+#
+auth       requisite  pam_securetty.so
+auth	   required   pam_env.so
+auth	   required   pam_nologin.so
+auth       optional   pam_group.so
+auth       sufficient pam_unix.so
+auth	   sufficient pam_ncp_auth.so use_first_pass server=CDROM/VANA.LINUXES.VC.CVUT.CZ
+auth	   required   pam_deny.so
+account    requisite  pam_time.so
+account    required   pam_unix.so
+session    required   pam_unix.so
+session    optional   pam_motd.so
+session    optional   pam_mail.so
+session    optional   pam_lastlog.so
+password   required   pam_unix.so
+
+Petr Vandrovec <vandrove@vc.cvut.cz>
+9/23/99

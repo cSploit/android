@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 13.  Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="prev" href="changelog_5_1.html" title="Berkeley DB Library Version 11.2.5.1 Change Log" />
+    <link rel="next" href="upgrade_11gr2_dbsqlcodegen.html" title="db_sql Renamed to db_sql_codegen" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 13. 
+        Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0
+    </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="changelog_5_1.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="upgrade_11gr2_dbsqlcodegen.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="upgrade_11gr2_toc"></a>Chapter 13. 
+        Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0
+    </h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_toc.html#upgrade_11gr2_intro">Introduction</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_dbsqlcodegen.html">db_sql Renamed to db_sql_codegen</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_autoinit.html">DB_REP_CONF_NOAUTOINIT Replaced</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_repmgr.html">Support for Multiple Client-to-Client Peers</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="build_unix_encrypt.html">Cryptography Support</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="build_unix_db_nosync.html">DB_NOSYNC Flag to Flush Files</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_remsupp.html">Dropped Support</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="build_unix_stacksize.html">Changing Stack Size</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="changelog_5_0.html">Berkeley DB 11g Release 2 Change Log</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_0.html#idp51372752">Changes between 11.2.5.0.26  and 11.2.5.0.32</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_0.html#idp51373656">Changes between 11.2.5.0.21  and 11.2.5.0.26</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_0.html#idp51351832">Changes between 4.8 and 11.2.5.0.21</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_0.html#idp51378624">Known Bugs</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+        </dl>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="upgrade_11gr2_intro"></a>Introduction</h2>
+            </div>
+          </div>
+        </div>
+        <p>The following pages describe how to upgrade applications coded against
+    the Berkeley DB 4.8 release interfaces to the Berkeley DB
+    11<span class="emphasis"><em>g</em></span> Release 2 interfaces. (Library version
+    11.2.5.0).
+    This information does not describe how to upgrade Berkeley DB 1.85
+    release applications.</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="changelog_5_1.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="upgrade_11gr2_dbsqlcodegen.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Berkeley DB Library Version 11.2.5.1 Change Log </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> db_sql Renamed to db_sql_codegen</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

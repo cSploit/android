@@ -1,0 +1,366 @@
+.\"  etterlog -- log analyzer for ettercap log files
+.\"
+.\"  This program is free software; you can redistribute it and/or modify
+.\"  it under the terms of the GNU General Public License as published by
+.\"  the Free Software Foundation; either version 2 of the License, or
+.\"  (at your option) any later version.
+.\"
+.\"  This program is distributed in the hope that it will be useful,
+.\"  but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"  GNU General Public License for more details.
+.\"
+.\"  You should have received a copy of the GNU General Public License
+.\"  along with this program; if not, write to the Free Software
+.\"  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.\"
+.\"  $Id: etterlog.8.in,v 1.21 2004/05/19 13:17:27 alor Exp $
+.\"
+.de Sp
+.if n .sp
+.if t .sp 0.4
+..
+.TH ETTERLOG "8" "" "ettercap NG-0.7.3"
+.SH NAME
+.B etterlog NG-0.7.3 \- Log analyzer for ettercap log files
+
+.SH SYNOPSIS
+.B etterlog
+[\fIOPTIONS\fR] \fIFILE\fR
+
+
+.SH DESCRIPTION
+Etterlog is the log analyzer for logfiles created by ettercap. It can handle
+both compressed (created with -Lc) or uncompressed logfiles. With this tool you
+can manipulate binary files as you like and you can print data in
+different ways all the times you want (in contrast with the previous logging
+system which was used to dump in a single static manner).
+.br
+You will be able to dump traffic from only one connection of your choice, from 
+only one or more hosts, print data in hex, ascii, binary etc...
+.Sp
+TIP: All unuseful messages are printed to stderr, so you can save the
+output from etterlog with the following command:
+.TP
+\fIetterlog [options] logfile > outfile\fR
+.Sp
+Thus you can dump for example a binary file from an ftp connection if you print
+the data in binary mode, without headers and selecting only the ftp server as the 
+source of the communication.
+
+.TP
+.B GENERAL OPTIONS
+.TP
+\fB\-a\fR, \fB\-\-analyze\fR
+Analyze a log file and display some interesting statistics.
+
+.TP
+\fB\-c\fR, \fB\-\-connections\fR
+Parse the log file and print a table of unique connections (port to port).
+This option can be used only on LOG_PACKET logfiles. On LOG_INFO logfiles it is
+useless.
+.Sp
+TIP: you can search for a particular host by using the following command:
+.Sp
+etterlog -c logfile.ecp | grep 10.0.0.1
+
+.TP
+\fB\-f\fR, \fB\-\-filter <TARGET>\fR
+Print only packets coming from or going to TARGET. The TARGET specification is
+the same as in ettercap.
+.br
+\fITARGET\fR is in the form \fIMAC/IPs/PORTs\fR. Omitting one or more of its 
+parts will be equivalent to set them to ANY. 
+.Sp
+If the log type is LOG_INFO the target is used to display hosts matching
+the mac, ip and having the specified port(s) open. For example the target //80
+will display only information about hosts with a running web server.
+
+.TP
+\fB\-r\fR, \fB\-\-reverse\fR
+Reverse the matching in the TARGET selection. It means not(TARGET). All but the
+selected TARGET.
+
+.TP
+\fB\-t\fR, \fB\-\-proto <PROTO>\fR
+Sniff only PROTO packets (default is TCP + UDP).
+This option is only useful in "simple" mode. If you start ettercap in interactive mode
+both TCP and UDP are sniffed.
+.br
+PROTO can be "tcp", "udp" or "all" for both.
+
+
+.TP
+\fB\-F\fR, \fB\-\-filcon <CONNECTION>\fR
+Print packets belonging only to this CONNECTION. 
+.br
+CONNECTION is in the form PROTO:SOURCE:DEST. SOURCE and DEST are in the form IP:PORT.
+.Sp
+example:
+.Sp
+etterlog -F TCP:10.0.0.23:3318:198.182.196.56:80
+
+.TP
+\fB\-s\fR, \fB\-\-only-source\fR
+Display only packets that are sent by the source of the selected CONNECTION.
+This option makes sense only in conjunction with the -F option. 
+.Sp
+TIP: if you want to save a file transferred in an HTTP or FTP connection, you can
+use the following command:
+.Sp
+etterlog -B -s -n -F TCP:10.0.0.1:20:10.0.0.2:35426 logfile.ecp >
+example.tar.gz
+  
+.TP
+\fB\-d\fR, \fB\-\-only-dest\fR
+Same as --only-source but it filters on the destination host.
+
+
+.TP
+\fB\-n\fR, \fB\-\-no-headers\fR
+Do not print the header of each packet. This option is useful if you want to
+save a file in binary format (-B option). Without the headers you can redirect
+the output to a file and you will get the original stream.
+.Sp
+NOTE: the time stamp in the header is in the form: Thu Mar 27 23:03:31 2003
+[169396], the value in the square brackets is expressed in microseconds
+
+.TP
+\fB\-m\fR, \fB\-\-show-mac\fR
+In the headers show also the mac addresses corresponding to the ip
+addresses.
+
+.TP
+\fB\-k\fR, \fB\-\-color\fR
+If used in conjunction with -F it displays the source and dest of the connection
+using different colors. If used with a LOG_INFO file it prints LAN hosts in green, 
+REMOTE hosts in blue and GATEWAYS in red.
+
+.TP
+\fB\-l\fR, \fB\-\-only-local\fR
+Used displaying an INFO file, it displays information only about local hosts.
+  
+.TP
+\fB\-L\fR, \fB\-\-only-remote\fR
+Used displaying an INFO file, it displays information only about remote hosts.
+
+
+.TP
+.B SEARCH OPTIONS
+
+.TP
+\fB\-e\fR, \fB\-\-regex <REGEX>\fR
+Display only packets matching the regex <REGEX>. 
+.br
+If this option is used agains a LOG_PACKET logfile, the regex is executed on the
+payload of the packet. If the type is LOG_INFO, the regex is executed on all
+the fields of the host profile (OS, banners, service and ethernet adapter).
+.br
+NOTE: the regex is compiled with the REG_ICASE flag (case insensitive).
+
+.TP
+\fB\-u\fR, \fB\-\-user <USER>\fR
+Display information about this user. The search is performed over all the
+user/pass couples collected across all hosts.
+
+.TP
+\fB\-p\fR, \fB\-\-passwords\fR
+Print only the collected account information for each host. This prevents 
+the huge profile output. It can be used in conjunction with the -u option 
+to filter the users. An asterisk '*' used in front of an account represents
+a failed login attempt.
+
+.TP
+\fB\-i\fR, \fB\-\-show-client\fR
+Show the client ip address when displaying the collected users and
+passwords. It may be useful when ACLs are in place.
+
+.TP
+\fB\-I\fR, \fB\-\-client <IP>\fR
+Show passwords only coming from a specific <IP>. This is useful to view all the
+usernames and passwords of a client.
+
+
+
+.TP
+.B EDITING OPTIONS
+
+.TP
+\fB\-C\fR, \fB\-\-concat\fR
+Use this option to concatenate two (or more) files into one single file. This
+is useful if you have collected ettercap log files from multiple sources and
+want to have an unified report. The output file must be specified with the -o
+option and the input files are listed as normal arguments.
+.Sp
+example:
+.br 
+etterlog -C -o outfile input1 input2 input3
+
+.TP
+\fB\-o\fR, \fB\-\-outfile <FILE>\fR
+specifies the output file for a concatenation.
+
+
+
+.TP
+.B VISUALIZATION METHOD
+  
+.TP
+\fB\-B\fR, \fB\-\-binary\fR
+Print data as they are, in binary form. Useful to dump binary data to a file
+(as described above).
+
+.TP
+\fB\-X\fR, \fB\-\-hex\fR
+Print the packets in hex format.
+.Sp
+example:
+.Sp
+the string  "HTTP/1.1 304 Not Modified"  becomes:
+.Sp
+0000: 4854 5450 2f31 2e31 2033 3034 204e 6f74  HTTP/1.1 304 Not
+.br
+0010: 204d 6f64 6966 6965 64                    Modified
+    
+
+.TP
+\fB\-A\fR, \fB\-\-ascii\fR
+Print only "printable" characters, the others are displayed as dots '.'
+
+.TP
+\fB\-T\fR, \fB\-\-text\fR
+Print only the "printable" characters and skip the others.
+
+.TP
+\fB\-E\fR, \fB\-\-ebcdic\fR
+Convert an EBCDIC text to ASCII.
+
+.TP
+\fB\-H\fR, \fB\-\-html\fR
+Strip all html tags from the text. A tag is every string between '<' and '>'.
+.Sp
+example:
+.Sp
+<title>This is the title</title>, but the following <string> will not be
+displayed.
+.Sp
+This is the title, but the following will not be displayed.
+
+.TP
+\fB\-U\fR, \fB\-\-utf8 <encoding>\fR
+Print the packets in UTF-8 format. The <encoding> parameter specifies the
+encoding to be used while performing the conversion. Use the `iconv --list`
+command to obtain a list of all supported encodings.
+
+.TP
+\fB\-Z\fR, \fB\-\-zero\fR
+Print always the void string. i.e. print only header information and no packet
+content will be printed.
+                           
+.TP
+\fB\-x\fR, \fB\-\-xml\fR
+Print the host information in xml form, so you can parse it with your favourite
+program.
+.Sp
+The DTD associated with the xml output is in share/etterlog.dtd
+                           
+.TP
+.B STANDARD OPTIONS
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Print the version and exit.
+
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print the help screen with a short summary of the available options.
+
+
+
+.SH EXAMPLES
+Here are some examples of using etterlog.
+.TP
+.B etterlog -k -l dump.eci
+.Sp
+Displays information about local hosts in different colors.
+
+.TP
+.B etterlog -X dump.ecp
+.Sp
+Prints packets in HEX mode with full headers.
+
+.TP
+.B etterlog -c dump.ecp
+.Sp
+Displays the list of connections logged in the file.
+
+.TP
+.B etterlog -Akn -F TCP:10.0.0.1:13423:213.203.143.52:6666 dump.ecp
+.Sp
+Displays the IRC traffic made by 10.0.0.1 in ASCII mode, without headers
+information and in colored mode.
+
+.TP
+.B etterlog -H -t tcp -f //80 dump.ecp
+.Sp
+Dumps all HTTP traffic and strips html tags.
+
+.TP
+.B etterlog -Z -r -f /10.0.0.2/22 dump.ecp
+.Sp
+Displays only the headers of all connections except ssh on host 10.0.0.2
+
+.TP
+.B etterlog -A -e 'user' -f //110 dump.ecp
+.Sp
+Displays only POP packets containing the 'user' regexp (case insensitive).
+
+.TP
+.B etterlog -u root dump.eci
+.Sp
+Displays information about all the accounts of the user 'root'.
+
+.TP
+.B etterlog -e Apache dump.eci
+.Sp
+Displays information about all the hosts running 'Apache'.
+
+.TP
+.B etterlog -e Linux dump.eci
+.Sp
+Displays information about all the hosts with the 'Linux' operating system.
+
+.TP
+.B etterlog -t tcp -f //110 dump.eci
+.Sp
+Displays information about all the hosts with the tcp port 110 open.
+
+.TP
+.B etterlog -t udp dump.eci
+.Sp
+Displays information about all the hosts with at least one UDP port open.
+
+.TP
+.B etterlog -B -s -n -F TCP:10.0.0.1:20:10.0.0.2:35426 logfile.ecp > example.tar.gz
+.Sp
+Dumps in binary form the data sent by 10.0.0.1 over the data port of FTP. Since
+the headers are omitted, you will get the file as it was.
+
+
+
+.SH AUTHORS
+Alberto Ornaghi (ALoR) <alor@users.sf.net>
+.br
+Marco Valleri (NaGA) <naga@antifork.org>
+
+
+
+.SH "SEE ALSO"
+.I "ettercap(8)"
+.I "etterfilter(8)"
+.I "etter.conf(5)"
+.I "ettercap_curses(8)"
+.I "ettercap_plugins(8)"
+.LP
+
+
+

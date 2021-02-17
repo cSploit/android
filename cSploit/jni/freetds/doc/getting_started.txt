@@ -1,0 +1,124 @@
+Introduction
+------------
+
+This document is intended for people who want to help on the FreeTDS project
+and/or are interested in how the code works.
+
+TDS is a fairly simple request/response protocol. It comes in three major
+flavors: 4.2, 5.0 and 7.0.  Microsoft SQL-Server versions through 6.5 still
+use the 4.2 version as do Sybase servers before 10.0. MS SQL 7.0 introduced
+TDS 7.0. No version of MS SQL uses 5.0 and Sybase does not use 7.0, but both
+still support 4.2. TDS 5.0 allows for negotiation of quite a few parameters
+at connection time, many of these are documented in the cap.txt file in this
+directory.
+
++--------------------------------------------------------------------------+
+|     | MS SQL                      |    Sybase ASE      |   Sybase ASA    |
++--------------------------------------------------------------------------+
+|ver  |6.5 |7.0 |2000|2005|2008|2012| <10.x   | >11.0    |<5.5.03|5.5*|>6.0|
++-----+----+----+----+----+----+----+---------+----------+-------+----+----+
+| 4.2 | X  | X  |  X |  X |  X |  X |    X    |    X     |       |    |    |
+| 5.0 |    |    |    |    |    |    |         |    X     |       | X  | X  |
+| 7.0 |    | X  |  X |  X |  X |  X |         |          |       |    |    |
+| 7.1 |    |    |  X |  X |  X |  X |         |          |       |    |    |
+| 7.2 |    |    |    |  X |  X |  X |         |          |       |    |    |
+| 7.3 |    |    |    |    |  X |  X |         |          |       |    |    |
+| 7.4 |    |    |    |    |    |  X |         |          |       |    |    |
++-----+----+----+----+----+----+----+---------+----------+-------+----+----+
+
+* Sybase ASA 5.5 requires 5.5.03 or better with the OpenServer Gateway
+(OSG).
+
+
+Layers
+------
+
+The FreeTDS code is broken down into two layers.
+
+The TDS layer handles the bulk of the processing of the protocol and dealing
+with the network, etc... Any code dealing with protocol issues should reside
+in this directory (src/tds). A related directory src/server has routines that
+are used only for server side processes. Actually server is not updated.
+
+On top of this layer is a thin layer specific to the 'Call Level Interface'
+(CLI).  A CLI is an API intended to be used by client programs.
+The core FreeTDS has three CLIs: dblib, the original Sybase API; ctlib, the
+newer Sybase API; and ODBC, the non-database specific API.
+
+Currently dblib and ODBC are the most robust CLIs we have, followed by ctlib,
+which is quite usable none-the-less.
+The ODBC CLI is built using a driver manager (either iODBC or unixODBC), so
+you will need one of those to build it with.
+
+Outside of these there is also a JDBC driver for Java and a DBI driver for 
+Perl which do not reside atop the TDS layer. (FreeTDS/JDBC is a pure Java
+driver).  This document does not currently cover these libraries.  Those wishing
+to use Perl are also encouraged to look at DBD::Sybase which uses ctlib and
+works well with the FreeTDS libraries.
+
+The Nitty Gritty
+----------------
+
+The first thing a CLI does is allocate a login structure for TDS.  Such as:
+
+	TDS_LOGIN *login = tds_alloc_login();
+
+It can then call any of the tds_set_*() functions to initialize this TDS_LOGIN 
+structure.  Please refer to src/tds/login.c for a complete listing of options.
+
+Once username, password, server, and other options are set a call can be made to
+tds_connect(). This will allocate a TDS_SOCKET structure and open a socket 
+connection to the specified server (or NULL on failure). The TDS_SOCKET is then
+passed as an argument to all future TDS functions.
+
+At this point the only really useful thing to do is to call tds_submit_query()
+and then process the returning rows using tds_process_results() and company.
+
+This should get us to the routines in src/tds/token.c which are responsible for
+reading the results back from the server and doing something with them.  The 
+logic in these routines should not be hard to follow.  The return stream is 
+broken up into a series of 'messages' (not to be confused with actual messages
+returned from the server). Each one starts with a marker (marker is my word for
+it, not Sybase's or anyone else's).  include/tds.h defines all the markers and in
+general there will be one tds_process_*() function for each marker unless it is
+not worth looking at, in which case tds_process_default_tokens() will read past
+it. 
+
+libTDS
+------
+
+libTDS (src/tds) is the core of this projects
+
+Files details (not exaustive):
+* convert.c  Handles conversion between types;
+* bulk.c  Handles bulk transfer;
+* config.c  Handles configuration files;
+* data.c  Handles handling different column types;
+* numeric.c  Handles specific numeric stuff;
+* net.c  Low level network stuff including socket and SSL;
+* packet.c  Handles network stream at packet level, all TDS communication
+  is encapsulated in packets (TDS packets, do not confuse with network
+  ones);
+* locale.c  Deals with locale information;
+* log.c  Handles logging;
+* mem.c  Handles allocation and freeing of structures;
+* login.c  Handles login with server (contains tds_connect);
+* read.c, write.c  Handle reading and writing to TDS packets;
+* query.c  Contains all routines to send requests;
+* token.c  Contains all routines to get reply from server;
+* tds_checks.c, tds_checks.h  Internal checks;
+* iconv.c, alternative_character_sets.h, character_sets.h
+  and sybase_character_sets.h  Handle character conversions;
+* tdsstring.c  Dynamic string management;
+* challenge.c, des.c, gssapi.c, hmac_md5.c, md4.c, md5.c,
+  sspi.c  Deals with various authentications;
+* stream.c  Deals with large stream of data;
+* threadsafe.c  Utilities for thread safe.
+
+Misc
+----
+
+Please send fixes and updates to this document to the mailing list (you can find
+the link on www.freetds.org).
+I (Brian Bruns) realize it's a little rough right now but I wanted to at least
+put something out.

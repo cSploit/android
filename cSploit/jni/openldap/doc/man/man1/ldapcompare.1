@@ -1,0 +1,252 @@
+.TH LDAPCOMPARE 1 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldapcompare \- LDAP compare tool
+.SH SYNOPSIS
+.B ldapcompare
+[\c
+.BR \-V [ V ]]
+[\c
+.BI \-d \ debuglevel\fR]
+[\c
+.BR \-n ]
+[\c
+.BR \-v ]
+[\c
+.BR \-z ]
+[\c
+.BR \-M [ M ]]
+[\c
+.BR \-x ]
+[\c
+.BI \-D \ binddn\fR]
+[\c
+.BR \-W ]
+[\c
+.BI \-w \ passwd\fR]
+[\c
+.BI \-y \ passwdfile\fR]
+[\c
+.BI \-H \ ldapuri\fR]
+[\c
+.BI \-h \ ldaphost\fR]
+[\c
+.BI \-p \ ldapport\fR]
+[\c
+.BR \-P \ { 2 \||\| 3 }]
+[\c
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BI \-o \ opt \fR[= optparam \fR]]
+[\c
+.BI \-O \ security-properties\fR]
+[\c
+.BR \-I ]
+[\c
+.BR \-Q ]
+[\c
+.BR \-N ]
+[\c
+.BI \-U \ authcid\fR]
+[\c
+.BI \-R \ realm\fR]
+[\c
+.BI \-X \ authzid\fR]
+[\c
+.BI \-Y \ mech\fR]
+[\c
+.BR \-Z [ Z ]]
+.IR DN
+{\c
+.BI attr: value
+|
+.BI attr:: b64value\fR}
+.SH DESCRIPTION
+.I ldapcompare
+is a shell-accessible interface to the
+.BR ldap_compare_ext (3)
+library call.
+.LP
+.B ldapcompare
+opens a connection to an LDAP server, binds, and performs a compare
+using specified parameters.   The \fIDN\fP should be a distinguished
+name in the directory.  \fIAttr\fP should be a known attribute.  If
+followed by one colon, the assertion \fIvalue\fP should be provided
+as a string.  If followed by two colons, the base64 encoding of the
+value is provided.  The result code of the compare is provided as
+the exit code and, unless ran with \fB\-z\fP, the program prints
+TRUE, FALSE, or UNDEFINED on standard output.
+.LP
+.SH OPTIONS
+.TP
+.BR \-V [ V ]
+Print version info.
+If \fB\-VV\fP is given, only the version information is printed.
+.TP
+.BI \-d \ debuglevel
+Set the LDAP debugging level to \fIdebuglevel\fP.
+.B ldapcompare
+must be compiled with LDAP_DEBUG defined for this option to have any effect.
+.TP
+.B \-n
+Show what would be done, but don't actually perform the compare.  Useful for
+debugging in conjunction with \fB\-v\fP.
+.TP
+.B \-v
+Run in verbose mode, with many diagnostics written to standard output.
+.TP
+.B \-z
+Run in quiet mode, no output is written.  You must check the return
+status.  Useful in shell scripts.
+.TP
+.BR \-M [ M ]
+Enable manage DSA IT control.
+.B \-MM
+makes control critical.
+.TP
+.B \-x 
+Use simple authentication instead of SASL.
+.TP
+.BI \-D \ binddn
+Use the Distinguished Name \fIbinddn\fP to bind to the LDAP directory.
+For SASL binds, the server is expected to ignore this value.
+.TP
+.B \-W
+Prompt for simple authentication.
+This is used instead of specifying the password on the command line.
+.TP
+.BI \-w \ passwd
+Use \fIpasswd\fP as the password for simple authentication.
+.TP
+.BI \-y \ passwdfile
+Use complete contents of \fIpasswdfile\fP as the password for
+simple authentication.
+Note that \fIcomplete\fP means that any leading or trailing whitespaces,
+including newlines, will be considered part of the password and,
+unlike other software, they will not be stripped.
+As a consequence, passwords stored in files by commands like
+.BR echo (1)
+will not behave as expected, since
+.BR echo (1)
+by default appends a trailing newline to the echoed string.
+The recommended portable way to store a cleartext password in a file
+for use with this option is to use
+.BR slappasswd (8)
+with \fI{CLEARTEXT}\fP as hash and the option \fB\-n\fP.
+.TP
+.BI \-H \ ldapuri
+Specify URI(s) referring to the ldap server(s); only the protocol/host/port
+fields are allowed; a list of URI, separated by whitespace or commas
+is expected.
+.TP
+.BI \-h \ ldaphost
+Specify an alternate host on which the ldap server is running.
+Deprecated in favor of \fB\-H\fP.
+.TP
+.BI \-p \ ldapport
+Specify an alternate TCP port where the ldap server is listening.
+Deprecated in favor of \fB\-H\fP.
+.TP
+.BR \-P \ { 2 \||\| 3 }
+Specify the LDAP protocol version to use.
+.TP
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+.TP
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+
+Specify general extensions with \fB\-e\fP and compare extensions with \fB\-E\fP.
+\'\fB!\fP\' indicates criticality.
+
+General extensions:
+.nf
+  [!]assert=<filter>    (an RFC 4515 Filter)
+  !authzid=<authzid>    ("dn:<dn>" or "u:<user>")
+  [!]bauthzid           (RFC 3829 authzid control)
+  [!]chaining[=<resolve>[/<cont>]]
+  [!]manageDSAit
+  [!]noop
+  ppolicy
+  [!]postread[=<attrs>] (a comma-separated attribute list)
+  [!]preread[=<attrs>]  (a comma-separated attribute list)
+  [!]relax
+  sessiontracking[=<username>]
+  abandon,cancel,ignore (SIGINT sends abandon/cancel,
+  or ignores response; if critical, doesn't wait for SIGINT.
+  not really controls)
+.fi
+
+Compare extensions:
+.nf
+  !dontUseCopy
+.fi
+.TP
+.BI \-o \ opt \fR[= optparam \fR]
+
+Specify general options.
+
+General options:
+.nf
+  nettimeout=<timeout>  (in seconds, or "none" or "max")
+  ldif-wrap=<width>     (in columns, or "no" for no wrapping)
+.fi
+.TP
+.BI \-O \ security-properties
+Specify SASL security properties.
+.TP
+.B \-I
+Enable SASL Interactive mode.  Always prompt.  Default is to prompt
+only as needed.
+.TP
+.B \-Q
+Enable SASL Quiet mode.  Never prompt.
+.TP
+.B \-N
+Do not use reverse DNS to canonicalize SASL host name.
+.TP
+.BI \-U \ authcid
+Specify the authentication ID for SASL bind. The form of the ID
+depends on the actual SASL mechanism used.
+.TP
+.BI \-R \ realm
+Specify the realm of authentication ID for SASL bind. The form of the realm
+depends on the actual SASL mechanism used.
+.TP
+.BI \-X \ authzid
+Specify the requested authorization ID for SASL bind.
+.I authzid
+must be one of the following formats:
+.BI dn: "<distinguished name>"
+or
+.BI u: <username>
+.TP
+.BI \-Y \ mech
+Specify the SASL mechanism to be used for authentication. If it's not
+specified, the program will choose the best mechanism the server knows.
+.TP
+.BR \-Z [ Z ]
+Issue StartTLS (Transport Layer Security) extended operation. If you use
+\fB\-ZZ\fP, the command will require the operation to be successful.
+.SH EXAMPLES
+.nf
+    ldapcompare "uid=babs,dc=example,dc=com"  sn:Jensen
+    ldapcompare "uid=babs,dc=example,dc=com"  sn::SmVuc2Vu
+.fi
+are all equivalent.
+.SH LIMITATIONS
+Requiring the value be passed on the command line is limiting
+and introduces some security concerns.  The command should support
+a mechanism to specify the location (file name or URL) to read
+the value from.
+.SH "SEE ALSO"
+.BR ldap.conf (5),
+.BR ldif (5),
+.BR ldap (3),
+.BR ldap_compare_ext (3)
+.SH AUTHOR
+The OpenLDAP Project <http://www.openldap.org/>
+.SH ACKNOWLEDGEMENTS
+.so ../Project

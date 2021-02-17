@@ -1,0 +1,5 @@
+ldap_perror.3
+ld_errno.3
+ldap_result2error.3
+ldap_errlist.3
+ldap_err2string.3

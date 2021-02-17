@@ -1,0 +1,957 @@
+SVN-fs-dump-format-version: 2
+
+UUID: eda9b9eb-8c2e-4c01-b01a-54a4cc957143
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2008-02-27T17:13:55.257227Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 136
+Content-length: 136
+
+K 7
+svn:log
+V 34
+Add trunk/tags/branches structure.
+K 10
+svn:author
+V 7
+jrandom
+K 8
+svn:date
+V 27
+2008-02-27T17:13:55.515853Z
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 131
+Content-length: 131
+
+K 7
+svn:log
+V 29
+Import greek tree into trunk.
+K 10
+svn:author
+V 7
+jrandom
+K 8
+svn:date
+V 27
+2008-02-27T17:13:55.675119Z
+PROPS-END
+
+Node-path: trunk/A
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/A/B
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/A/B/E
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/A/B/E/alpha
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 26
+Text-content-md5: d1fa4a3ced98961674a441930a51f2d3
+Content-length: 36
+
+PROPS-END
+This is the file 'alpha'.
+
+
+Node-path: trunk/A/B/E/beta
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 25
+Text-content-md5: 67c756078f24f946f6ec2d00d02f50e1
+Content-length: 35
+
+PROPS-END
+This is the file 'beta'.
+
+
+Node-path: trunk/A/B/F
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/A/B/lambda
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 27
+Text-content-md5: 911c7a8d869b8c1e566f57da54d889c6
+Content-length: 37
+
+PROPS-END
+This is the file 'lambda'.
+
+
+Node-path: trunk/A/C
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/A/D
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/A/D/G
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/A/D/G/pi
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 23
+Text-content-md5: adddfc3e6b605b5f90ceeab11b4e8ab6
+Content-length: 33
+
+PROPS-END
+This is the file 'pi'.
+
+
+Node-path: trunk/A/D/G/rho
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: 82f2211cf4ab22e3555fc7b835fbc604
+Content-length: 34
+
+PROPS-END
+This is the file 'rho'.
+
+
+Node-path: trunk/A/D/G/tau
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: 9936e2716e469bb686deb98c280ead58
+Content-length: 34
+
+PROPS-END
+This is the file 'tau'.
+
+
+Node-path: trunk/A/D/H
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/A/D/H/chi
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: 8f5ebad6d1f7775c2682e54417cbe4d3
+Content-length: 34
+
+PROPS-END
+This is the file 'chi'.
+
+
+Node-path: trunk/A/D/H/omega
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 26
+Text-content-md5: fe4ec8bdd3d2056db4f55b474a10fadc
+Content-length: 36
+
+PROPS-END
+This is the file 'omega'.
+
+
+Node-path: trunk/A/D/H/psi
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 24
+Text-content-md5: e81f8f68ba50e749c200cb3c9ce5d2b1
+Content-length: 34
+
+PROPS-END
+This is the file 'psi'.
+
+
+Node-path: trunk/A/D/gamma
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 26
+Text-content-md5: 412138bd677d64cd1c32fafbffe6245d
+Content-length: 36
+
+PROPS-END
+This is the file 'gamma'.
+
+
+Node-path: trunk/A/mu
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 23
+Text-content-md5: baf78ae06a2d5b7d9554c5f1280d3fa8
+Content-length: 33
+
+PROPS-END
+This is the file 'mu'.
+
+
+Node-path: trunk/iota
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 25
+Text-content-md5: 2d18c5e57e84c5b8a5e9a6e13fa394dc
+Content-length: 35
+
+PROPS-END
+This is the file 'iota'.
+
+
+Revision-number: 3
+Prop-content-length: 133
+Content-length: 133
+
+K 7
+svn:log
+V 29
+Create branches/a from trunk.
+K 10
+svn:author
+V 9
+jconstant
+K 8
+svn:date
+V 27
+2008-02-27T17:13:55.989541Z
+PROPS-END
+
+Node-path: branches/a
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 2
+Node-copyfrom-path: trunk
+Prop-content-length: 34
+Content-length: 34
+
+K 13
+svn:mergeinfo
+V 0
+
+PROPS-END
+
+
+Revision-number: 4
+Prop-content-length: 154
+Content-length: 154
+
+K 7
+svn:log
+V 52
+Add the file 'upsilon', and change some other files.
+K 10
+svn:author
+V 7
+jrandom
+K 8
+svn:date
+V 27
+2008-02-27T17:13:56.112332Z
+PROPS-END
+
+Node-path: branches/a/A/mu
+Node-kind: file
+Node-action: change
+Text-content-length: 62
+Text-content-md5: 41abd6f55814bc3c17876d9e697691c0
+Content-length: 62
+
+This is the file 'mu'.
+Don't forget to look at 'upsilon', too.
+
+Node-path: branches/a/A/upsilon
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 28
+Text-content-md5: 6b763098e647d6ca29998d04d27464f1
+Content-length: 38
+
+PROPS-END
+This is the file 'upsilon'.
+
+
+Node-path: branches/a/iota
+Node-kind: file
+Node-action: change
+Text-content-length: 48
+Text-content-md5: 8e14aba230a0cb7f59c3855696f85f53
+Content-length: 48
+
+This is the file 'iota'.
+'A' has changed a bit.
+
+
+Revision-number: 5
+Prop-content-length: 133
+Content-length: 133
+
+K 7
+svn:log
+V 29
+Create branches/c from trunk.
+K 10
+svn:author
+V 9
+jconstant
+K 8
+svn:date
+V 27
+2008-02-27T17:13:56.311268Z
+PROPS-END
+
+Node-path: branches/c
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 2
+Node-copyfrom-path: trunk
+Prop-content-length: 34
+Content-length: 34
+
+K 13
+svn:mergeinfo
+V 0
+
+PROPS-END
+
+
+Revision-number: 6
+Prop-content-length: 131
+Content-length: 131
+
+K 7
+svn:log
+V 27
+Merged branches/a to trunk.
+K 10
+svn:author
+V 9
+jconstant
+K 8
+svn:date
+V 27
+2008-02-27T17:13:56.458011Z
+PROPS-END
+
+Node-path: trunk
+Node-kind: dir
+Node-action: change
+Prop-content-length: 59
+Content-length: 59
+
+K 13
+svn:mergeinfo
+V 24
+/branches/a:3-5
+/trunk:2
+PROPS-END
+
+
+Node-path: trunk/A/mu
+Node-kind: file
+Node-action: change
+Text-content-length: 62
+Text-content-md5: 41abd6f55814bc3c17876d9e697691c0
+Content-length: 62
+
+This is the file 'mu'.
+Don't forget to look at 'upsilon', too.
+
+Node-path: trunk/A/upsilon
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 5
+Node-copyfrom-path: branches/a/A/upsilon
+Text-copy-source-md5: 6b763098e647d6ca29998d04d27464f1
+
+
+Node-path: trunk/iota
+Node-kind: file
+Node-action: change
+Text-content-length: 48
+Text-content-md5: 8e14aba230a0cb7f59c3855696f85f53
+Content-length: 48
+
+This is the file 'iota'.
+'A' has changed a bit.
+
+
+Revision-number: 7
+Prop-content-length: 168
+Content-length: 168
+
+K 7
+svn:log
+V 66
+Add omicron to branches/a.  It will be blocked from merging in r8.
+K 10
+svn:author
+V 7
+jrandom
+K 8
+svn:date
+V 27
+2008-02-27T17:13:56.617126Z
+PROPS-END
+
+Node-path: branches/a/blocked
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/a/blocked/omicron
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 28
+Text-content-md5: 2382ae13e13c366fc9a82363f996450a
+Content-length: 38
+
+PROPS-END
+This is the file 'omicron'.
+
+
+Revision-number: 8
+Prop-content-length: 135
+Content-length: 135
+
+K 7
+svn:log
+V 31
+Block r7 from merging to trunk.
+K 10
+svn:author
+V 9
+jconstant
+K 8
+svn:date
+V 27
+2008-02-27T17:13:56.724555Z
+PROPS-END
+
+Node-path: trunk
+Node-kind: dir
+Node-action: change
+Prop-content-length: 61
+Content-length: 61
+
+K 13
+svn:mergeinfo
+V 26
+/branches/a:3-5,7
+/trunk:2
+PROPS-END
+
+
+Revision-number: 9
+Prop-content-length: 123
+Content-length: 123
+
+K 7
+svn:log
+V 21
+Wording change in mu.
+K 10
+svn:author
+V 7
+jrandom
+K 8
+svn:date
+V 27
+2008-02-27T17:13:56.791017Z
+PROPS-END
+
+Node-path: trunk/A/mu
+Node-kind: file
+Node-action: change
+Text-content-length: 66
+Text-content-md5: 48fe73eab8d2afb75f211829fc355262
+Content-length: 66
+
+This is the file 'mu'.
+Don't forget to look at 'upsilon', as well.
+
+Revision-number: 10
+Prop-content-length: 132
+Content-length: 132
+
+K 7
+svn:log
+V 28
+Create branches/b from trunk
+K 10
+svn:author
+V 9
+jconstant
+K 8
+svn:date
+V 27
+2008-02-27T17:13:56.992398Z
+PROPS-END
+
+Node-path: branches/b
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 9
+Node-copyfrom-path: trunk
+
+
+Revision-number: 11
+Prop-content-length: 153
+Content-length: 153
+
+K 7
+svn:log
+V 51
+Added 'xi' to branches/a, made a few other changes.
+K 10
+svn:author
+V 7
+jrandom
+K 8
+svn:date
+V 27
+2008-02-27T17:13:57.119412Z
+PROPS-END
+
+Node-path: branches/a/A/upsilon
+Node-kind: file
+Node-action: change
+Text-content-length: 56
+Text-content-md5: 9512ef80be96d05c0348bd70ba14aee7
+Content-length: 56
+
+This is the file 'upsilon'.
+There is also the file 'xi'.
+
+Node-path: branches/a/A/xi
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 23
+Text-content-md5: b1f53247c73296e74ab55bb07f2be3c7
+Content-length: 33
+
+PROPS-END
+This is the file 'xi'.
+
+
+Node-path: branches/a/iota
+Node-kind: file
+Node-action: change
+Text-content-length: 73
+Text-content-md5: 95c7dab647127712924ad00f82af6362
+Content-length: 73
+
+This is the file 'iota'.
+'A' has changed a bit, with 'upsilon', and 'xi'.
+
+Revision-number: 12
+Prop-content-length: 136
+Content-length: 136
+
+K 7
+svn:log
+V 32
+Merged branches/a to branches/b.
+K 10
+svn:author
+V 9
+jconstant
+K 8
+svn:date
+V 27
+2008-02-27T17:13:57.257403Z
+PROPS-END
+
+Node-path: branches/b
+Node-kind: dir
+Node-action: change
+Prop-content-length: 60
+Content-length: 60
+
+K 13
+svn:mergeinfo
+V 25
+/branches/a:3-11
+/trunk:2
+PROPS-END
+
+
+Node-path: branches/b/A/upsilon
+Node-kind: file
+Node-action: change
+Text-content-length: 56
+Text-content-md5: 9512ef80be96d05c0348bd70ba14aee7
+Content-length: 56
+
+This is the file 'upsilon'.
+There is also the file 'xi'.
+
+Node-path: branches/b/A/xi
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 11
+Node-copyfrom-path: branches/a/A/xi
+Text-copy-source-md5: b1f53247c73296e74ab55bb07f2be3c7
+
+
+Node-path: branches/b/iota
+Node-kind: file
+Node-action: change
+Text-content-length: 73
+Text-content-md5: 95c7dab647127712924ad00f82af6362
+Content-length: 73
+
+This is the file 'iota'.
+'A' has changed a bit, with 'upsilon', and 'xi'.
+
+Revision-number: 13
+Prop-content-length: 131
+Content-length: 131
+
+K 7
+svn:log
+V 29
+Modify 'gamma' on branches/b.
+K 10
+svn:author
+V 7
+jrandom
+K 8
+svn:date
+V 27
+2008-02-27T17:13:57.329550Z
+PROPS-END
+
+Node-path: branches/b/A/D/gamma
+Node-kind: file
+Node-action: change
+Text-content-length: 49
+Text-content-md5: 428ec57501f86e7cf0ae0af6aee8fbab
+Content-length: 49
+
+This is the file 'gamma'.
+Watch out for the rays!
+
+Revision-number: 14
+Prop-content-length: 131
+Content-length: 131
+
+K 7
+svn:log
+V 27
+Merged branches/b to trunk.
+K 10
+svn:author
+V 9
+jconstant
+K 8
+svn:date
+V 27
+2008-02-27T17:13:57.466247Z
+PROPS-END
+
+Node-path: trunk
+Node-kind: dir
+Node-action: change
+Prop-content-length: 80
+Content-length: 80
+
+K 13
+svn:mergeinfo
+V 45
+/branches/a:3-11
+/branches/b:10-13
+/trunk:3-9
+PROPS-END
+
+
+Node-path: trunk/A/D/gamma
+Node-kind: file
+Node-action: change
+Text-content-length: 49
+Text-content-md5: 428ec57501f86e7cf0ae0af6aee8fbab
+Content-length: 49
+
+This is the file 'gamma'.
+Watch out for the rays!
+
+Node-path: trunk/A/upsilon
+Node-kind: file
+Node-action: change
+Text-content-length: 56
+Text-content-md5: 9512ef80be96d05c0348bd70ba14aee7
+Content-length: 56
+
+This is the file 'upsilon'.
+There is also the file 'xi'.
+
+Node-path: trunk/A/xi
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 13
+Node-copyfrom-path: branches/b/A/xi
+Text-copy-source-md5: b1f53247c73296e74ab55bb07f2be3c7
+
+
+Node-path: trunk/iota
+Node-kind: file
+Node-action: change
+Text-content-length: 73
+Text-content-md5: 95c7dab647127712924ad00f82af6362
+Content-length: 73
+
+This is the file 'iota'.
+'A' has changed a bit, with 'upsilon', and 'xi'.
+
+Revision-number: 15
+Prop-content-length: 143
+Content-length: 143
+
+K 7
+svn:log
+V 39
+Bring branches/c up to date with trunk.
+K 10
+svn:author
+V 9
+jconstant
+K 8
+svn:date
+V 27
+2008-02-27T17:13:57.606672Z
+PROPS-END
+
+Node-path: branches/c
+Node-kind: dir
+Node-action: change
+Prop-content-length: 81
+Content-length: 81
+
+K 13
+svn:mergeinfo
+V 46
+/branches/a:3-11
+/branches/b:10-13
+/trunk:3-14
+PROPS-END
+
+
+Node-path: branches/c/A/D/gamma
+Node-kind: file
+Node-action: change
+Text-content-length: 49
+Text-content-md5: 428ec57501f86e7cf0ae0af6aee8fbab
+Content-length: 49
+
+This is the file 'gamma'.
+Watch out for the rays!
+
+Node-path: branches/c/A/mu
+Node-kind: file
+Node-action: change
+Text-content-length: 66
+Text-content-md5: 48fe73eab8d2afb75f211829fc355262
+Content-length: 66
+
+This is the file 'mu'.
+Don't forget to look at 'upsilon', as well.
+
+Node-path: branches/c/A/upsilon
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 14
+Node-copyfrom-path: trunk/A/upsilon
+Text-copy-source-md5: 9512ef80be96d05c0348bd70ba14aee7
+
+
+Node-path: branches/c/A/xi
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 14
+Node-copyfrom-path: trunk/A/xi
+Text-copy-source-md5: b1f53247c73296e74ab55bb07f2be3c7
+
+
+Node-path: branches/c/iota
+Node-kind: file
+Node-action: change
+Text-content-length: 73
+Text-content-md5: 95c7dab647127712924ad00f82af6362
+Content-length: 73
+
+This is the file 'iota'.
+'A' has changed a bit, with 'upsilon', and 'xi'.
+
+Revision-number: 16
+Prop-content-length: 128
+Content-length: 128
+
+K 7
+svn:log
+V 26
+Modify 'mu' on branches/c.
+K 10
+svn:author
+V 7
+jrandom
+K 8
+svn:date
+V 27
+2008-02-27T17:13:57.681839Z
+PROPS-END
+
+Node-path: branches/c/A/mu
+Node-kind: file
+Node-action: change
+Text-content-length: 100
+Text-content-md5: 103bea7d6bc222508bbfec7e6aab8a65
+Content-length: 100
+
+This is the file 'mu'.
+Don't forget to look at 'upsilon', as well.
+This is yet more content in 'mu'.
+
+Revision-number: 17
+Prop-content-length: 160
+Content-length: 160
+
+K 7
+svn:log
+V 56
+Merge branches/c to trunk, resolving a conflict in 'mu'.
+K 10
+svn:author
+V 9
+jconstant
+K 8
+svn:date
+V 27
+2008-02-27T17:13:57.850151Z
+PROPS-END
+
+Node-path: trunk
+Node-kind: dir
+Node-action: change
+Prop-content-length: 97
+Content-length: 97
+
+K 13
+svn:mergeinfo
+V 62
+/branches/a:3-11
+/branches/b:10-13
+/branches/c:3-16
+/trunk:2-9
+PROPS-END
+
+
+Node-path: trunk/A/mu
+Node-kind: file
+Node-action: change
+Text-content-length: 100
+Text-content-md5: 103bea7d6bc222508bbfec7e6aab8a65
+Content-length: 100
+
+This is the file 'mu'.
+Don't forget to look at 'upsilon', as well.
+This is yet more content in 'mu'.
+

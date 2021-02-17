@@ -1,0 +1,9 @@
+*.so
+*.test
+_*
+dnet.h
+recoded-*.pcap
+passed-*.pcap
+cap0.pcap
+out-*.pcap
+T

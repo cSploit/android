@@ -1,0 +1,43 @@
+                 NDS CLIENT  suite v 0.90
+         Patrick Pollet <patrick.pollet@insa-lyon.fr>
+
+  This set of applications was written to help our students to get access to their
+  NDS based home directories when using Linux boxes and ncpfs.
+
+  These TCL/tk front ends takes care of everything.
+
+-----------------------------------------------------
+ndslogin: Just login and mount a permanent ncp connection in a
+~/ncp/SERVER/SYS directory in your home.
+a KDE window will open right in your home if you set openhome_onlogin in
+the ndsclient.conf file. Otherwise, use ndshome to open it later.
+----------------------------------------------------
+ndslogout.tcl: Get out of Netware, and forget about me !
+It is important to use it since your Netware connections ARE NOT
+closed automatically when you logout of Linux.
+---------------------------------------------------
+ndshome.tcl: Search  your NDS home directory, mount it and open a
+Kde window, if you are already logged. Otherwise, call ndslogin.
+--------------------------------------------------
+ndswhoami.tcl: You guessed it ;-)
+--------------------------------------------------
+ndspasswd.tcl: Change you NDS passwords in a quite friendly way.
+-------------------------------------------------
+ndsspace.tcl: Display available space on your Netware based home directory
+-------------------------------------------------
+ndsmount.tcl: Mounts extra NDS volumes in your Linux box.
+Only volumes belonging to trees to which you are authenticated
+will be shown.
+------------------------------------------------
+ncpmount.tcl: Mounts extra Netware volumes in your Linux box.
+All Netware servers will be displayed. Still you must be authenticated
+before to access their volumes.
+------------------------------------------------
+
+
+This work was inspired by the Now-Well graphical login for bindery
+based servers by Erwin Preuner<asterix-55@gmx.net>
+I did stole from his work a lot of bitmaps, and chunk of TCL/tk code....
+The good work was Erwin's... all added bugs are mine ;-)
+
+PP February 2001.

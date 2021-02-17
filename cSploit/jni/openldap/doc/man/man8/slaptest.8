@@ -1,0 +1,117 @@
+.TH SLAPTEST 8C "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2004-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slaptest \- Check the suitability of the OpenLDAP slapd configuration
+.SH SYNOPSIS
+.B SBINDIR/slaptest
+[\c
+.BI \-d \ debug-level\fR]
+[\c
+.BI \-f \ slapd.conf\fR]
+[\c
+.BI \-F \ confdir\fR]
+[\c
+.BI \-n dbnum\fR]
+[\c
+.BI \-o \ option\fR[ = value\fR]]
+[\c
+.BR \-Q ]
+[\c
+.BR \-u ]
+[\c
+.BR \-v ]
+.LP
+.SH DESCRIPTION
+.LP
+.B Slaptest
+is used to check the conformance of the
+.BR slapd (8)
+configuration.
+It opens the
+.BR slapd.conf (5)
+configuration file or the 
+.BR slapd\-config (5) 
+backend, and parses it according to the general and the backend-specific 
+rules, checking its sanity.
+.LP
+.SH OPTIONS
+.TP
+.BI \-d \ debug-level
+enable debugging messages as defined by the specified
+.IR debug-level ;
+see
+.BR slapd (8)
+for details.
+.TP
+.BI \-f \ slapd.conf
+specify an alternative
+.BR slapd.conf (5)
+file.
+.TP
+.BI \-F \ confdir
+specify a config directory.
+If both
+.B \-f
+and
+.B \-F
+are specified, the config file will be read and converted to
+config directory format and written to the specified directory.
+If neither option is specified, slaptest will attempt to read the
+default config directory before trying to use the default
+config file. If a valid config directory exists then the
+default config file is ignored. If dry-run mode is also specified,
+no conversion will occur.
+.TP
+.BI \-n \ dbnum
+Just open and test the \fIdbnum\fR-th database listed in the
+configuration file. 
+To only test the config database
+.BR slapd\-config (5),
+use 
+.B \-n 0
+as it is always the first database.
+.TP
+.BI \-o \ option\fR[ = value\fR]
+Specify an
+.I option
+with a(n optional)
+.IR value .
+Possible generic options/values are:
+.LP
+.nf
+              syslog=<subsystems>  (see `\-s' in slapd(8))
+              syslog\-level=<level> (see `\-S' in slapd(8))
+              syslog\-user=<user>   (see `\-l' in slapd(8))
+
+.fi
+.TP
+.BI \-Q
+Be extremely quiet: only the exit code indicates success (0) or not 
+(any other value).
+.TP
+.B \-u
+enable dry-run mode (i.e. don't fail if databases cannot be opened,
+but config is fine).
+.TP
+.B \-v
+enable verbose mode.
+.SH EXAMPLES
+To check a 
+.BR slapd.conf (5)
+give the command:
+.LP
+.nf
+.ft tt
+	SBINDIR/slaptest \-f /ETCDIR/slapd.conf \-v
+.ft
+.fi
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR slapd (8),
+.BR slapdn (8)
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

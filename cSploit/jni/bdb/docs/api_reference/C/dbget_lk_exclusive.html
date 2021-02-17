@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB-&gt;get_lk_exclusive()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="db.html" title="Chapter 2.  The DB Handle" />
+    <link rel="prev" href="dbget_heap_regionsize.html" title="DB-&gt;get_heap_regionsize()" />
+    <link rel="next" href="dbget_lorder.html" title="DB-&gt;get_lorder()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB-&gt;get_lk_exclusive()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbget_heap_regionsize.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 2. 
+                The DB Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbget_lorder.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbget_lk_exclusive"></a>DB-&gt;get_lk_exclusive()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB-&gt;get_lk_exclusive(DB *db, int *onoff, int *nowait);  </pre>
+      <p>
+         Returns whether the database handle is configured to obtain a write lock on the
+         entire database. This can be set using the
+         <a class="xref" href="dbset_lk_exclusive.html" title="DB-&gt;set_lk_exclusive()">DB-&gt;set_lk_exclusive()</a>
+         method.
+    </p>
+      <p>
+         The <code class="methodname">DB-&gt;get_lk_exclusive()</code> method may be
+         called at any time during the life of the application.
+    </p>
+      <p>
+         The <code class="methodname">DB-&gt;get_lk_exclusive()</code> always
+         returns <code class="literal">0</code>.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp49697696"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp49697888"></a>onoff</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 Indicates whether the handle is configured for exclusive
+                 database locking. If <code class="literal">0</code>, it is not
+                 configured for exclusive locking. If <code class="literal">1</code>,
+                 then it is configured for exclusive locking.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp49693192"></a>nowait</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 Indicates whether the handle is configured for immediate
+                 locking. If <code class="literal">0</code>, then the locking
+                 operation will block until it can obtain an exclusive
+                 database lock. If <code class="literal">1</code>, then the locking
+                 operation will error out if it cannot immediately obtain
+                 an exclusive lock.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp49709968"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                <a class="link" href="db.html" title="Chapter 2.  The DB Handle">DB</a>  
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp49705216"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="xref" href="db.html#dblist" title="Database and Related Methods">Database and Related Methods</a>,
+            <a class="xref" href="dbset_lk_exclusive.html" title="DB-&gt;set_lk_exclusive()">DB-&gt;set_lk_exclusive()</a>
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbget_heap_regionsize.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="db.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbget_lorder.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB-&gt;get_heap_regionsize() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB-&gt;get_lorder()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

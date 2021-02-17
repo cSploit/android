@@ -1,0 +1,33 @@
+.TH NWMSG 8 02/29/1996 nwmsg nwmsg
+.SH NAME
+nwmsg \- Deliver NetWare user broadcast messages
+.SH SYNOPSIS
+.B nwmsg
+.I mount-point
+.SH DESCRIPTION
+.B nwmsg
+is called by kerneld when a broadcast message arrives from a NetWare
+server.
+.B nwmsg
+fetches this message via the mount point and delivers it to
+the user using the same way write(1) uses. 
+
+Please note that 
+.I kerneld
+must run when broadcast messages should be delivered to users.
+
+NetWare servers can send asynchronous broadcast messages to users,
+either on explicit request by another user, or when the server is
+shutdown. The client workstation is informed about this event by an
+IPX packet on a special socket, the message socket.
+
+This can happen at any time, so the user has to be informed about this
+event whenever it appears. I chose to use the kerneld feature of the
+Linux kernel to call the program nwmsg. For nwmsg, I used the relevant
+parts of the 
+.I write
+program, so you can expect the NetWare broadcast
+messages to appear where user messages would appear.
+
+.SH SEE ALSO
+ncpmount(8), kerneld(8), write(1)

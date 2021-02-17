@@ -1,0 +1,57 @@
+.TH SLAPO-SSSVLV 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2009-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copyright 2009 Symas Corporation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-sssvlv \- Server Side Sorting and Virtual List View overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+This overlay implements the LDAP Server Side Sorting (RFC2891) control
+as well as the Virtual List View control. It also replaces the default
+implementation of the LDAP PagedResults (RFC2696) control, to ensure
+that it works with Sorting. The overlay can be used with any backend
+or globally for all backends.
+
+Since a complete result set must be generated in memory before sorting can
+be performed, processing sort requests can have a large impact on the
+server's memory use. As such, any connection is limited to having only
+a limited number of sort requests active at a time. Additional limits may
+be configured as described below.
+
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the SSSVLV overlay.
+They should appear after the
+.B overlay
+directive.
+.TP
+.B sssvlv\-max <num>
+Set the maximum number of concurrent sort requests allowed across all
+connections. The default is one half of the number of server threads.
+.TP
+.B sssvlv\-maxkeys <num>
+Set the maximum number of keys allowed in a sort request. The default is 5.
+.TP
+.B sssvlv\-maxperconn <num>
+Set the maximum number of concurrent paged search requests per connection. The default is 5. The number of concurrent requests remains limited by
+.B sssvlv-max.
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.TP
+ETCDIR/slapd.d
+default slapd configuration directory
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5).
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.LP
+IETF LDAP Virtual List View proposal by D. Boreham, J. Sermersheim,
+and A. Kashi in IETF document "draft-ietf-ldapext-ldapv3-vlv-09.txt".
+.SH AUTHOR
+Howard Chu

@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+
+<Include>
+
+	<!-- This is  bad - we really should not be hard coding this
+		 version string, but for now it will have to do. .-->
+	<?define MS_CRT_VER = "8.0.50727.42" ?>
+
+	<?define DESCRIPTION = "MSI to redistribute VS2005 CRT libraries" ?>
+
+	<?define COMMENTS = "This MSI specially created for Firebird." ?>
+
+	<?define MMDIR = "C:\Program Files (x86)\Common Files\Merge Modules" ?>
+
+	<?define MANUFACTURER = "The Firebird Project" ?>
+
+</Include>

@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB-&gt;close()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="db.html" title="Chapter 2.  The DB Handle" />
+    <link rel="prev" href="dbassociate_foreign.html" title="DB-&gt;associate_foreign()" />
+    <link rel="next" href="dbcompact.html" title="DB-&gt;compact()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB-&gt;close()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbassociate_foreign.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 2. 
+                The DB Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbcompact.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbclose"></a>DB-&gt;close()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB-&gt;close(DB *db, u_int32_t flags);  </pre>
+      <p>
+         The <code class="methodname">DB-&gt;close()</code> method flushes cached database information to
+         disk, closes any open cursors, frees allocated resources, and
+         closes underlying files. When the close operation for a cursor fails, 
+         the method returns a non-zero error value for the first instance of such an error, 
+         and continues to close the rest of the cursors and database handles.
+    </p>
+      <p>
+         Although closing a database handle will close any open cursors, it
+         is recommended that applications explicitly close all their
+         <a class="link" href="dbc.html" title="Chapter 3.  The DBcursor Handle">DBcursor</a> handles
+         before closing the database. The reason why is that when
+         the cursor is explicitly closed, the memory allocated for it is
+         reclaimed; however, this will <span class="emphasis"><em>not</em></span> happen if
+         you close a database while cursors are still opened.
+     </p>
+      <p>
+         The same rule, for the same reasons, hold true for 
+         <a class="link" href="txn.html" title="Chapter 12.  The DB_TXN Handle">DB_TXN</a>
+         handles. Simply make sure you close all your transaction handles
+         before closing your database handle.
+     </p>
+      <p>
+         Because key/data pairs are cached in memory, applications should
+         make a point to always either close database handles or sync their
+         data to disk (using the <a class="xref" href="dbsync.html" title="DB-&gt;sync()">DB-&gt;sync()</a> 
+         method) before exiting, to ensure that any data cached in main memory are
+         reflected in the underlying file system.
+    </p>
+      <p>
+         When called on a database that is the primary database for a secondary
+         index, the primary database should be closed only after all secondary
+         indices referencing it have been closed.
+    </p>
+      <p>
+             When multiple threads are using the <a class="link" href="db.html" title="Chapter 2.  The DB Handle">DB</a>
+             concurrently, only a single thread may call the <code class="methodname">DB-&gt;close()</code> method.
+    </p>
+      <p>
+         The <a class="link" href="db.html" title="Chapter 2.  The DB Handle">DB</a>  handle may not be
+         accessed again after <code class="methodname">DB-&gt;close()</code> is called, regardless of its return.
+    </p>
+      <p>
+     	If you do not close the <a class="link" href="db.html" title="Chapter 2.  The DB Handle">DB</a> handle explicitly, it will be closed when
+     	the environment handle that owns the <a class="link" href="db.html" title="Chapter 2.  The DB Handle">DB</a> handle is closed.
+    </p>
+      <p>
+         The <code class="methodname">DB-&gt;close()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+         The error values that <code class="methodname">DB-&gt;close()</code> method returns include the error values of <code class="methodname">DBcursor-&gt;close()</code> and the following:
+    </p>
+      <div class="sect3" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h4 class="title"><a id="idp49242352"></a>DB_LOCK_DEADLOCK</h4>
+            </div>
+          </div>
+        </div>
+        <p>
+                A transactional database environment operation was selected to resolve
+                a deadlock.
+            </p>
+      </div>
+      <div class="sect3" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h4 class="title"><a id="idp49375872"></a>DB_LOCK_NOTGRANTED</h4>
+            </div>
+          </div>
+        </div>
+        <p>
+                A Berkeley DB Concurrent Data Store database environment configured
+                for lock timeouts was unable to grant a lock in the allowed time.
+            </p>
+        <p>
+                You attempted to open a database handle that is configured
+                for no waiting exclusive locking, but the exclusive lock could not be
+                immediately obtained. See
+                <a class="xref" href="dbset_lk_exclusive.html" title="DB-&gt;set_lk_exclusive()">DB-&gt;set_lk_exclusive()</a>
+                for more information.
+            </p>
+      </div>
+      <div class="sect3" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h4 class="title"><a id="idp49264360"></a>EINVAL</h4>
+            </div>
+          </div>
+        </div>
+        <p>
+                If the cursor is already closed; or if an invalid flag
+                value or parameter was specified.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp49391328"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp49391520"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          The <span class="bold"><strong>flags</strong></span> parameter must be set to 0
+                          or be set to the following value:
+                     </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p><a id="dbclose_DB_NOSYNC"></a>
+                          <code class="literal">DB_NOSYNC</code>
+                    </p>
+                <p>
+                         Do not flush cached information to disk.  This flag is a
+                         dangerous option. It should be set only if the application is doing
+                         logging (with transactions) so that the database is recoverable after
+                         a system or application crash, or if the database is always generated
+                         from scratch after any system or application crash.
+                    </p>
+                <p>
+                         <span class="bold"><strong>It is important to understand that flushing
+                         cached information to disk only minimizes the window of opportunity
+                         for corrupted data.</strong></span> Although unlikely, it is possible for
+                         database corruption to happen if a system or application crash occurs
+                         while writing data to the database.  To ensure that database
+                         corruption never occurs, applications must either: use transactions
+                         and logging with automatic recovery; use logging and
+                         application-specific recovery; or edit a copy of the database, and
+                         once all applications using the database have successfully called
+                         <code class="methodname">DB-&gt;close()</code>, atomically replace the original database with the
+                         updated copy.
+                    </p>
+                <p>
+                        Note that this flag only works when the database
+                        has been opened using an environment. 
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp49396000"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            The <code class="methodname">DB-&gt;close()</code> <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp49410120"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                An invalid flag value or parameter was specified.
+            </p>
+        </div>
+        <p>
+	The error messages returned for the first error encountered when <code class="methodname">DB-&gt;close()</code> method closes any open cursors include:
+	</p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp49358840"></a>DB_LOCK_DEADLOCK</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                A transactional database environment operation was selected to resolve
+                a deadlock.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp49395264"></a>DB_LOCK_NOTGRANTED</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                A Berkeley DB Concurrent Data Store database environment configured
+                for lock timeouts was unable to grant a lock in the allowed time.
+            </p>
+          <p>
+                You attempted to open a database handle that is configured
+                for no waiting exclusive locking, but the exclusive lock could not be
+                immediately obtained. See
+                <a class="xref" href="dbset_lk_exclusive.html" title="DB-&gt;set_lk_exclusive()">DB-&gt;set_lk_exclusive()</a>
+                for more information.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp49404544"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If the cursor is already closed; or if an invalid flag
+                value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp49400240"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                <a class="link" href="db.html" title="Chapter 2.  The DB Handle">DB</a>  
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp49405744"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="xref" href="db.html#dblist" title="Database and Related Methods">Database and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbassociate_foreign.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="db.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbcompact.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB-&gt;associate_foreign() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB-&gt;compact()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

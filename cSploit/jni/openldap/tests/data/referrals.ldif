@@ -1,0 +1,29 @@
+dn: c=US
+c: US
+objectclass: country
+
+dn: o=ABC,c=US
+o: ABC
+ref: ldap://hostA/o=abc,c=us HostA
+ref: ldap://hostB HostB
+objectclass: referral
+objectclass: extensibleObject
+
+dn: o=XYZ,c=US
+o: XYZ
+ref: ldap://hostC/o=xyz,c=us HostC
+objectclass: referral
+objectclass: extensibleObject
+
+dn: o=Example,c=US
+o: Example
+objectclass: organization
+
+dn: cn=Manager,o=Example,c=US
+cn: Manager
+cn: Directory Manager
+cn: Dir Man
+sn: Manager
+description: Manager of the directory
+userpassword:: c2VjcmV0
+objectclass: person

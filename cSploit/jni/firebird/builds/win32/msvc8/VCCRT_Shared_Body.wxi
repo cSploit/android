@@ -1,0 +1,43 @@
+
+<Include>
+
+	<Product Id='$(var.PRODUCT_ID)'
+
+		Name='MSI to redistribute MS VS2005 CRT libraries'
+		Language='1033'
+		Version='$(var.MS_CRT_VER)'
+		Manufacturer='$(var.MANUFACTURER)'>
+
+		<Package Id='$(var.PACKAGE_ID)'
+			Description='$(var.DESCRIPTION)'
+			Comments='$(var.COMMENTS)'
+			Manufacturer='$(var.MANUFACTURER)'
+			InstallerVersion='300'
+			Compressed='yes'
+		/>
+
+		<Media Id='1' Cabinet='VCCRT.cab' EmbedCab='yes'
+		/>
+
+		<Directory Id='TARGETDIR' Name='SourceDir'>
+			<Merge Id='CRT' Language='0' src='$(var.MMDIR)\$(var.MSM)' DiskId='1' />
+			<Merge Id='CRT Policy' Language='0' src='$(var.MMDIR)\$(var.POLICY)' DiskId='1' />
+		</Directory>
+
+		<Feature Id='CRT_WinSXS' Title='CRT WinSXS' Level='1'>
+			<MergeRef Id='CRT' />
+			<MergeRef Id='CRT Policy' />
+		</Feature>
+
+		<InstallExecuteSequence>
+			<RemoveRegistryValues/>
+			<RemoveFiles/>
+			<InstallFiles/>
+			<WriteRegistryValues/>
+		</InstallExecuteSequence>
+
+   </Product>
+
+</Include>
+
+

@@ -1,0 +1,62 @@
+#!/usr/bin/stap
+/*
+ * Copyright (c) 2012, 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * showerror.stp - Capture context about certain DB errors.
+ *
+ * This shows the stack when a variant of DB->err() is called.
+ * Specify the target process on the command line as
+ *	-p <pid> or
+ *	-c "<program> [<args>..]"
+ *
+ * This script does not require DWARF symbols in libdb.
+ */
+
+global errors, errorcount, maxlimit;
+
+probe begin
+{
+	errorcount = 0;
+	maxlimit = -1;
+	%( $# >= 2 %? maxlimit = $2 %)
+	printf("Display DB stack when "); 
+	if (pid() == 0)
+		printf("an application using %s", @1)
+	else
+		printf("process %d", pid());
+	printf(" prints a DB internal error message: limit %d\n", maxlimit);
+}
+
+/* __db_err(ENV *, int errorcode, char *message, ...) */
+probe process(@1).function("__db_err").call
+{
+	message = user_string(pointer_arg(3));
+	printf("DB error %d message \"%s\"(%x,...) from:\n",
+	    int_arg(2), message, ulong_arg(4));
+	print_backtrace();
+	errors[message, backtrace()] <<< 1;
+	if (++errorcount == maxlimit)
+		exit();
+}
+
+/* __db_errx(ENV *, char *message, ...) */
+probe process(@1).function("__db_errx").call
+{
+	message = user_string(pointer_arg(2));
+	printf("DB error message \"%s\"(%x,...) parms %s from:\n", message,
+	    int_arg(3), $$parms);
+	print_backtrace();
+	errors[message, backtrace()] <<< 1;
+	if (++errorcount == maxlimit)
+		exit();
+}
+
+
+/* __env_panic(ENV *, int errorcode) */
+probe process(@1).function("__env_panic").call
+{
+	printf("DB panic with error code %d from:\n", int_arg(2));
+	print_backtrace();
+	if (++errorcount == maxlimit)
+		exit();
+}

@@ -1,0 +1,116 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 47c84ee7-0005-0410-843c-81123ebdd4be
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2005-11-07T22:09:05.681726Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 115
+Content-length: 115
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-07T22:09:30.282710Z
+K 7
+svn:log
+V 14
+initial layout
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 111
+Content-length: 111
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-07T22:09:44.146564Z
+K 7
+svn:log
+V 10
+add a file
+PROPS-END
+
+Node-path: trunk/foo.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 16
+Text-content-md5: 98475036dc73d318982805bf4b16e8b2
+Text-content-sha1: d7dff2b1ef48b9c20c23d7b3a08b557957cec3c9
+Content-length: 26
+
+PROPS-END
+This is a file.
+
+
+Revision-number: 3
+Prop-content-length: 113
+Content-length: 113
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-07T22:10:03.753668Z
+K 7
+svn:log
+V 12
+make a tag.
+
+PROPS-END
+
+Node-path: tags/a-tag
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 2
+Node-copyfrom-path: trunk
+
+

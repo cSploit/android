@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+	<!ENTITY rfc2119	PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+	 <!ENTITY rfc822 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.0822.xml'>
+	 <!ENTITY rfc2222 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2222.xml'>
+	 <!ENTITY rfc2251 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2251.xml'>
+	 <!ENTITY rfc2252 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2252.xml'>
+	 <!ENTITY rfc2254 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2254.xml'>
+	 <!ENTITY rfc2255 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2255.xml'>
+	<!ENTITY rfc3377 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3377.xml'>
+	<!ENTITY rfc3383 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3383.xml'>
+
+]>
+<?xml-stylesheet type='text/xsl' href='http://www.greenbytes.de/tech/webdav/rfc2629.xslt' ?>
+<?rfc toc="yes" ?>
+<?rfc tocdepth="2" ?>
+<?rfc tocindent="no" ?>
+<?rfc symrefs="yes" ?>
+<?rfc sortrefs="yes"?>
+<?rfc iprnotified="no" ?>
+<?rfc strict="yes" ?>
+<rfc ipr="full3978" docName="draft-chu-ldap-xordered-00.txt">
+	<front>
+		<title abbrev="LDAP Ordering Extension">Ordered Entries and Values in LDAP</title>
+		<author initials="H" fullname="Howard Chu" surname="Chu">
+			<organization>Symas Corp.</organization>
+			<address>
+				<postal>
+					<street>18740 Oxnard Street, Suite 313A</street>
+					<city>Tarzana</city>
+					<region>California</region>
+					<code>91356</code>
+					<country>USA</country>
+				</postal>
+				<phone>+1 818 757-7087</phone>
+				<email>hyc@symas.com</email>
+			</address>
+		</author>
+		<date year="2006" month="May"/>
+		<abstract>
+			<t>As LDAP is used more extensively for managing various
+kinds of data, one often encounters a need to preserve both the
+ordering and the content of data, despite the inherently unordered
+structure of entries and attribute values in the directory. This
+document describes a scheme to attach ordering information to
+attributes in a directory so that the ordering may be
+preserved and propagated to other LDAP applications.</t>
+		</abstract>
+	</front>
+
+	<middle>
+
+		<section title="Introduction">
+			<t>Information in LDAP directories is usually handled by
+applications in the form of ordered lists, which tends to encourage
+application developers to
+assume they are maintained as such, i.e., it is assumed that information
+stored in a particular order will always be retrieved and presented in
+that same order. The fact that directory attributes actually store sets of
+values, which are inherently unordered, often causes grief to users
+migrating their data into LDAP. Similar concerns arise over the order
+in which entries themselves are stored and retrieved from the directory.</t>
+			<t>This document describes a schema extension that may be
+used in LDAP attribute definitions to store ordering information along
+with the attribute values, so that the ordering can be recovered when
+retrieved by an LDAP client. The extension also provides automated
+management of this ordering information to ease manipulation of the
+ordered values.</t>
+		</section>
+
+		<section title="Conventions">
+			<t>Imperative keywords defined in <xref target="RFC2119"/> are used
+in this document, and carry the meanings described there.</t>
+		</section>
+
+		<section title="Ordering Extension">
+			<section title="Overview">
+		<t>The "X-ORDERED" schema extension is added to an
+AttributeTypeDescription to signify the use of this ordering mechanism. The
+extension has two variants, selected by either the 'VALUES' or 'SIBLINGS'
+qdstrings. In general this extension is only compatible with AttributeTypes
+that have a string-oriented syntax.</t>
+		<t>The "X-ORDERED 'VALUES'" extension is used with multi-valued
+attributes to maintain the order of multiple values of a given attribute.
+For example, this feature is useful for storing data such as access control
+rules, which must be evaluated in a specific order. If the access control
+information is stored in a multi-valued attribute without a means of
+preserving the the order of the rules, the access control rules cannot be
+evaluated properly. As the use of LDAP to store security policy and access
+control information becomes more prevalent, the necessity of this feature
+continues to grow.</t>
+		<t>
+The "X-ORDERED 'SIBLINGS'" extension is used with single-valued attributes
+to maintain the order of all the onelevel children of a parent entry. That is,
+ordering will be maintained for all the child entries whose RDNs are all of
+the same AttributeType. The motivation for this feature is much the same
+as for the 'VALUES' feature. Sometimes the information with the ordering
+dependency is too complex or highly structured to be conveniently stored
+in values of a multi-valued attribute. For example, one could store a
+prioritized list of servers as a set of separate entries, each entry
+containing separate attributes for a URL, a set of authentication
+credentials, and various other parameters. Using the 'SIBLINGS' feature
+with the attribute in the entries' RDNs would ensure that when obtaining
+the list of these entries, the list is returned in the intended order.
+		</t>
+			</section>
+			<section title="Encoding">
+		<t>Ordering information is encoded by prepending a value's ordinal
+index to each value, enclosed in braces. The following BNF specifies the
+encoding. It uses elements defined in <xref target="RFC2252"/>.
+	<list style="empty">
+	<t>d = "0" / "1" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9"</t>
+	<t>numericstring = 1*d</t>
+	<t>ordering-prefix = "{" numericstring "}"</t>
+	<t>value = &lt;any sequence of octets&gt;</t>
+	<t>ordered-value = ordering-prefix value</t>
+	</list></t>
+		<t>The ordinals are zero-based and increment by one for each value.</t>
+		<t>Note that when storing ordered-values into the directory, the
+ordering-prefix can usually be omitted as it will be generated automatically.
+But if the original value already begins with a sequence of characters in
+the form of an ordering-prefix, then an ordering-prefix must always be
+provided with that value, otherwise the value will be processed and
+stored incorrectly.</t>
+		<t>Using this extension on an attribute requires that ordering-prefix
+is a legal value of the LDAP syntax of that attribute.</t>
+		</section>
+		<section title="Ordering Properties">
+		<t>Since the ordering-prefix is stored with the attribute values,
+it will be propagated to any clients or servers that access the data.</t>
+		<t>Servers implementing this scheme SHOULD sort the values according
+to their ordering-prefix before returning them in search results.</t>
+		<t>The presence of the ordering extension alters the matching rules
+that apply to the attribute:
+	<list>
+	<t>When presented with an AssertionValue that does not have an
+ordering-prefix, the ordering-prefix in the AttributeValue is ignored.</t>
+	<t>When presented with an AssertionValue that consists solely of an
+ordering-prefix, only the ordering-prefix of the AttributeValue is compared;
+the remainder of the value is ignored.</t>
+	<t>When presented with an AssertionValue containing both the
+ordering-prefix and a value, both components are compared to determine a match.</t>
+	</list></t>
+	<t>A side effect of these properties is that even attributes that
+normally would have no equality matching rule can be matched by an
+ordering-prefix.</t>
+		<t>The ordering-prefix may also be used in Modification requests to
+specify which values to delete, and in which position values should be added.
+When processing deletions and insertions, all of the ordinals are recounted
+after each individual modification.</t>
+		<t>If a value being added does not have
+an ordering-prefix, it is simply appended to the list and the appropriate
+ordering-prefix is automatically generated. Likewise if an ordering-prefix
+is provided that is greater than or equal to the number of existing values.</t>
+		<t>See the examples in the next section.</t>
+			</section>
+		</section>
+		<section title="Examples">
+			<section title="Sample Schema">
+			<t>This schema is used for all of the examples:</t>
+			<t>( EXAMPLE_AT.1 NAME 'olcDatabase'<vspace/>
+			EQUALITY caseIgnoreMatch<vspace/>
+			SYNTAX 1.3.6.1.4.1.1466.115.121.1.15<vspace/>
+			SINGLE-VALUE X-ORDERED 'SIBLINGS' )</t>
+			<t>( EXAMPLE_AT.2 NAME 'olcSuffix'<vspace/>
+			EQUALITY distinguishedNameMatch<vspace/>
+			SYNTAX 1.3.6.1.4.1.1466.115.121.1.12<vspace/>
+			X-ORDERED 'VALUES' )</t>
+			<t>(  EXAMPLE_OC.1 NAME 'olcDatabaseConfig' <vspace/>
+			SUP top STRUCTURAL<vspace/>
+			MAY ( olcDatabase $ olcSuffix ) )</t>
+			</section>
+			<section title="Ordered Values">
+			<t>Given this entry:</t>
+			<t>dn: olcDatabase={1}bdb,cn=config<vspace/>
+			olcDatabase: {1}bdb<vspace/>
+			objectClass: olcDatabaseConfig<vspace/>
+			olcSuffix: {0}dc=example,dc=com<vspace/>
+			olcSuffix: {1}o=example.com<vspace/>
+			olcSuffix: {2}o=The Example Company<vspace/>
+			olcSuffix: {3}o=example,c=us</t>
+
+			<t>We can perform these Modify operations:
+			<list style="numbers">
+
+			<t>dn: olcDatabase={1}bdb,cn=config<vspace/>
+			changetype: modify<vspace/>
+			delete: olcSuffix<vspace/>
+			olcSuffix: {0}<vspace/>
+			-<vspace/>
+			This operation deletes the first olcSuffix, regardless of its
+			value. All other values are bumped up one position. The olcSuffix
+			attribute will end up containing:<vspace/>
+			olcSuffix: {0}o=example.com<vspace/>
+			olcSuffix: {1}o=The Example Company<vspace/>
+			olcSuffix: {2}o=example,c=us</t>
+
+			<t>Starting from the original entry, we could issue this change
+			instead:<vspace/>
+			delete: olcSuffix<vspace/>
+			olcSuffix: o=example.com<vspace/>
+			-<vspace/>
+			This operation deletes the olcSuffix that matches the value,
+			regardless of its ordering-prefix. The olcSuffix attribute will contain:<vspace/>
+			olcSuffix: {0}dc=example,dc=com<vspace/>
+			olcSuffix: {1}o=The Example Company<vspace/>
+			olcSuffix: {2}o=example,c=us</t>
+
+			<t>Again, starting from the original entry, we could issue this
+			change:<vspace/>
+			delete: olcSuffix<vspace/>
+			olcSuffix: {2}o=The Example Company<vspace/>
+			-<vspace/>
+			Here both the ordering-prefix and the value must match, otherwise
+			the Modify would fail with noSuchAttribute. In this case the
+			olcSuffix attribute results in:<vspace/>
+			olcSuffix: {0}dc=example,dc=com<vspace/>
+			olcSuffix: {1}o=example.com<vspace/>
+			olcSuffix: {2}o=example,c=us</t>
+
+			<t>Adding a new value without an ordering-prefix simply appends:<vspace/>
+			add: olcSuffix<vspace/>
+			olcSuffix: o=example.org<vspace/>
+			-<vspace/>
+			The resulting attribute would be:<vspace/>
+			olcSuffix: {0}dc=example,dc=com<vspace/>
+			olcSuffix: {1}o=example.com<vspace/>
+			olcSuffix: {2}o=The Example Company<vspace/>
+			olcSuffix: {3}o=example,c=us<vspace/>
+			olcSuffix: {4}o=example.org</t>
+
+			<t>Adding a new value with an ordering-prefix inserts into the
+			specified position:<vspace/>
+			add: olcSuffix<vspace/>
+			olcSuffix: {0}o=example.org<vspace/>
+			-<vspace/>
+			The resulting attribute would be:<vspace/>
+			olcSuffix: {0}o=example.org<vspace/>
+			olcSuffix: {1}dc=example,dc=com<vspace/>
+			olcSuffix: {2}o=example.com<vspace/>
+			olcSuffix: {3}o=The Example Company<vspace/>
+			olcSuffix: {4}o=example,c=us</t>
+
+			<t>Modifying multiple values in one operation:<vspace/>
+			add: olcSuffix<vspace/>
+			olcSuffix: {0}ou=Dis,o=example.com<vspace/>
+			olcSuffix: {0}ou=Dat,o=example,com<vspace/>
+			-<vspace/>
+			delete: olcSuffix:<vspace/>
+			olcSuffix: {2}<vspace/>
+			olcSuffix: {1}<vspace/>
+			-<vspace/>
+			The resulting attribute would be:<vspace/>
+			olcSuffix: {0}ou=Dat,o=example,com<vspace/>
+			olcSuffix: {1}dc=example,dc=com<vspace/>
+			olcSuffix: {2}o=example.com<vspace/>
+			olcSuffix: {3}o=The Example Company<vspace/>
+			olcSuffix: {4}o=example,c=us</t>
+
+			<t>If the Adds and Deletes in the previous example were done
+			in the opposite order:<vspace/>
+			delete: olcSuffix:<vspace/>
+			olcSuffix: {2}<vspace/>
+			olcSuffix: {1}<vspace/>
+			-<vspace/>
+			add: olcSuffix<vspace/>
+			olcSuffix: {0}ou=Dis,o=example.com<vspace/>
+			olcSuffix: {0}ou=Dat,o=example,com<vspace/>
+			-<vspace/>
+			The result would be:<vspace/>
+			olcSuffix: {0}ou=Dat,o=example,com<vspace/>
+			olcSuffix: {1}ou=Dis,o=example.com<vspace/>
+			olcSuffix: {2}o=example.org<vspace/>
+			olcSuffix: {3}o=The Example Company<vspace/>
+			olcSuffix: {4}o=example,c=us</t>
+			</list>
+
+			</t>
+			<t>Note that matching against an ordering-prefix can also
+			be done in Compare operations and Search filters. E.g., 
+			the filter "(olcSuffix={4})" would match all entries with
+			at least 5 olcSuffix values.</t>
+			</section>
+			<section title="Ordered Siblings">
+			<t>The rules for Ordered Siblings are basically the same
+as for Ordered Values, except instead of working primarily with the Modify
+request, the operations of interest here are Add, Delete, and ModRDN.</t>
+			<t>Given these entries:</t>
+			<t>dn: olcDatabase={0}config,cn=config<vspace/>
+			olcDatabase: {0}config<vspace/>
+			objectClass: olcDatabaseConfig<vspace/>
+			olcSuffix: {0}cn=config</t>
+
+			<t>dn: olcDatabase={1}bdb,cn=config<vspace/>
+			olcDatabase: {1}bdb<vspace/>
+			objectClass: olcDatabaseConfig<vspace/>
+			olcSuffix: {0}dc=example,dc=com</t>
+
+			<t>We can perform these operations:
+			<list style="numbers">
+			<t>Add a new entry with no ordering-prefix:<vspace/>
+			dn: olcDatabase=hdb,cn=config<vspace/>
+			changetype: add<vspace/>
+			olcDatabase: hdb<vspace/>
+			objectClass: olcDatabaseConfig<vspace/>
+			olcSuffix: {0}dc=example,dc=org<vspace/>
+			The resulting entry will be:<vspace/>
+			dn: olcDatabase={2}hdb,cn=config<vspace/>
+			olcDatabase: {2}hdb<vspace/>
+			objectClass: olcDatabaseConfig<vspace/>
+			olcSuffix: {0}dc=example,dc=org</t>
+
+			<t>Continuing on with these three entries, we can add another
+			entry with a specific ordering-prefix:<vspace/>
+			dn: olcDatabase={1}ldif,cn=config<vspace/>
+			changetype: add<vspace/>
+			olcDatabase: {1}ldif<vspace/>
+			objectClass: olcDatabaseConfig<vspace/>
+			olcSuffix: {0}o=example.com<vspace/>
+			<vspace/>This would give us four entries, whose DNs are:
+			<list style="empty">
+			<t>dn: olcDatabase={0}config,cn=config</t>
+			<t>dn: olcDatabase={1}ldif,cn=config</t>
+			<t>dn: olcDatabase={2}bdb,cn=config</t>
+			<t>dn: olcDatabase={3}hdb,cn=config</t>
+			</list>
+			</t>
+
+			<t>Issuing a ModRDN request will cause multiple entries to
+			be renamed:<vspace/>
+			dn: olcDatabase={1}ldif,cn=config<vspace/>
+			changetype: modrdn<vspace/>
+			newrdn: olcDatabase={99}ldif<vspace/>
+			deleteoldrdn: 1<vspace/>
+			<vspace/>The resulting entries would be named:
+			<list style="empty">
+			<t>dn: olcDatabase={0}config,cn=config</t>
+			<t>dn: olcDatabase={1}bdb,cn=config</t>
+			<t>dn: olcDatabase={2}hdb,cn=config</t>
+			<t>dn: olcDatabase={3}ldif,cn=config</t>
+			</list>
+			</t>
+
+			<t>As may be expected, a Delete request will also rename the
+			remaining entries:<vspace/>
+			dn: olcDatabase={1}bdb,cn=config<vspace/>
+			changetype: delete<vspace/>
+			<vspace/>The remaining entries would be named:
+			<list style="empty">
+			<t>dn: olcDatabase={0}config,cn=config</t>
+			<t>dn: olcDatabase={1}hdb,cn=config</t>
+			<t>dn: olcDatabase={2}ldif,cn=config</t>
+			</list>
+			</t>
+			</list>
+			</t>
+			</section>
+
+		</section>
+		<section title="Security Considerations">
+		<t>General LDAP security considerations <xref target="RFC3377"/>
+		apply.</t>
+		</section>
+	</middle>
+
+	<back>
+		<references title="Normative References">
+			&rfc2119;
+			&rfc2252;
+			&rfc3377;
+			&rfc3383;
+			<reference anchor="X680">
+				<front>
+					<title>Abstract Syntax Notation One (ASN.1): Specification of basic notation</title>
+					<author>
+						<organization>International Telecommunications Union</organization>
+					</author>
+					<date month="July" year="2002"/>
+				</front>
+				<seriesInfo name="ITU-T" value="Recommendation X.680"/>
+			</reference>
+		</references>
+
+		<section title="IANA Considerations">
+			<t>In accordance with <xref target="RFC3383"/> (what needs to be done here?) . We probably need an OID for advertising in supportedFeatures.
+			</t>
+
+		</section>
+	</back>
+</rfc>

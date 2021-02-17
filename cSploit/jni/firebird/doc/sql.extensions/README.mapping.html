@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice 4.0.1  (Unix)">
+	<META NAME="AUTHOR" CONTENT="irina ">
+	<META NAME="CREATED" CONTENT="20140325;10305100">
+	<META NAME="CHANGEDBY" CONTENT="Alex Peshkoff">
+	<META NAME="CHANGED" CONTENT="20140408;14452800">
+	<META NAME="CHANGEDBY" CONTENT="Alex Peshkoff">
+	<META NAME="CHANGEDBY" CONTENT="Alex Peshkoff">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		P { margin-bottom: 0.08in }
+		A:link { so-language: zxx }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="ru-RU" DIR="LTR">
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>SQL Language
+Extension: CREATE/ALTER/CREATE_OR_ALTER/DROP MAPPING</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Implements
+capability to control mapping of security objects to and between
+databases.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Author:</FONT></P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4><SPAN LANG="en-US">Alex
+Peshkoff &lt;<A HREF="mailto:peshkoff@mail.ru">peshkoff@mail.ru</A>&gt;</SPAN></FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Preamble:</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Firebird 3
+supports multiple security databases. This is great feature, but it
+raises some problems, missing in systems with single security
+database. Clusters of databases, using same security database, are
+efficiently separated and this is what we typically want to achieve
+using different security databases. But in some cases we need
+controlled limited interaction between such clusters. As an examples
+can be provided EXECUTE STATEMENT ON EXTERNAL DATA SOURCE when some
+data exchange between clusters is required and letting server-wide
+SYSDBA access databases from other clusters using services. More or
+less similar problems were already known in windows version of
+firebird since v. 2.1 due to presence of trusted windows
+authentication &ndash; we had 2 separate lists of users (in security
+database and OS) and sometimes it was needed to make them be related.
+For example it appears to be good idea to automatically assign to
+windows users from some group appropriate firebird role.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Single
+solution for all this problems is MAPPING login information, assigned
+to user when it connected to firebird server, to internal security
+objects in database &ndash; current_user and current_role. Mapping
+rule contains 4 parts of information: </FONT>
+</P>
+<UL>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>mapping
+	scope (is mapping local for current database or affects all
+	databases in cluster, including security database),</FONT></P>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>mapping
+	name (mappings are named like all the other objects in database), </FONT>
+	</P>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>from
+	what we map </FONT>
+	</P>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>to what
+	we map.</FONT></P>
+</UL>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>Here it's necessary to
+mention that all versions of firebird had one hardcoded global
+default rule &ndash; users authenticated in security database are
+always mapped into any database one-to-one. This rule is safe - if we
+have some security database it makes no use not to trust itself.
+Therefore (and due to backward compatibility) this rule is kept as is
+in firebird 3. What about mapping windows users to current_user
+(which was enabled by default in 2.1 &amp; 2.5 when trusted
+authentication enabled) in firebird 3 it must be done explicitly.
+This is required for systems with multiple security databases - not
+all of them need/use windows trusted authentication.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>'From' part
+of mapping has 4 items:</FONT></P>
+<UL>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>authentication
+	source (plugin name or result of mapping in other database or use of
+	serverwide authentication or any method),</FONT></P>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>name of
+	database where authentication succeeded, </FONT>
+	</P>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>name
+	from which mapping is performed,</FONT></P>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>type of
+	that name (username, role, OS group &ndash; this depends upon plugin
+	which added that name during authentication).</FONT></P>
+</UL>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Each item may
+be ignored (any item is accepted) except type &ndash; it's definitely
+bad idea to mix different types of security objects.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>'To' part has
+2 items:</FONT></P>
+<UL>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>name to
+	which mapping is performed,</FONT></P>
+	<LI><P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>type of
+	that name (only USER/ROLE are accepted here).</FONT></P>
+</UL>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Mappings are
+defined using SQL (DDL) commands.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Syntax:</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-left: 0.46in; margin-bottom: 0in; page-break-before: auto; page-break-after: auto">
+<FONT SIZE=4>{CREATE | ALTER | CREATE OR ALTER} [GLOBAL] MAPPING name</FONT></P>
+<P LANG="en-US" STYLE="margin-left: 0.86in; margin-bottom: 0in; page-break-before: auto; page-break-after: auto">
+<FONT SIZE=4>USING {PLUGIN name [IN database] | </FONT>
+</P>
+<P LANG="en-US" STYLE="margin-left: 1.6in; margin-bottom: 0in; page-break-before: auto; page-break-after: auto">
+<FONT SIZE=4>ANY PLUGIN [IN database | SERVERWIDE] | </FONT>
+</P>
+<P LANG="en-US" STYLE="margin-left: 1.6in; margin-bottom: 0in"><FONT SIZE=4>MAPPING
+[IN database] | </FONT>
+</P>
+<P LANG="en-US" STYLE="margin-left: 1.6in; margin-bottom: 0in"><FONT SIZE=4>'*'
+[IN database]}</FONT></P>
+<P LANG="en-US" STYLE="margin-left: 0.88in; margin-bottom: 0in; page-break-before: auto; page-break-after: auto">
+<FONT SIZE=4>FROM {ANY type | type name}</FONT></P>
+<P LANG="en-US" STYLE="margin-left: 0.88in; margin-bottom: 0in"><FONT SIZE=4>TO
+{USER | ROLE} [name]</FONT></P>
+<P STYLE="margin-left: 0.46in; margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-left: 0.46in; margin-bottom: 0in"><FONT SIZE=4>DROP
+[GLOBAL] MAPPING name</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Description:</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Each mapping
+may be tagged as GLOBAL. Pay attention that global and local maps
+with same name may exist and they are different objects!</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Create, alter
+and create or alter commands use same set of options. Name of mapping
+is used to identify it in former DDL commands. USING clause has a
+most complicated set of options. One can provide explicit plugin
+name, making it work only for given plugin, or make it use any plugin
+(but not a result of previous mappings), or make it work only with
+server-wide plugins, or make it work only with previous mapping
+results, or let it use any method using asterisk. In almost all cases
+(except server-wide authentication which is not related with
+databases) one can also provide name of database in which name from
+which mapping is performed was &ldquo;born&rdquo;. FROM clause must
+set required parameter &ndash; type of name from which mapping is
+done. When mapping names from plugins type is defined by plugin, when
+previous mapping results - type can be only user or role. One can
+provide explicit name which will be taken into an account by this
+mapping or use ANY keyword to work with any name of given type. In TO
+clause USER or ROLE (to what mapping is done) must be specified, name
+is optional - when it is not provided original name (from what
+mapping is done) is used.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Samples:</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>All sample
+are provided for CREATE command, use of ALTER is exactly the same,
+use of DROP is obvious.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Enable use of
+windows trusted authentication in all databases that use current
+security database:</FONT></P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>CREATE GLOBAL
+MAPPING TRUSTED_AUTH USING PLUGIN WIN_SSPI FROM ANY USER TO USER;</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Enable
+SYSDBA-like access for windows admins in current database:</FONT></P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>CREATE
+MAPPING WIN_ADMINS USING PLUGIN WIN_SSPI FROM Predefined_Group
+DOMAIN_ANY_RID_ADMINS TO ROLE RDB$ADMIN;</FONT></P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>(there is no
+group DOMAIN_ANY_RID_ADMINS in windows, but such name is added by
+win_sspi plugin to provide exact backwards compatibility)</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Enable
+particular user from other database access current database with
+other name:</FONT></P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>CREATE
+MAPPING FROM_RT USING PLUGIN SRP IN &quot;rt&quot; FROM USER U1 TO
+USER U2;</FONT></P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>(providing
+database names/aliases in double quotes is important for operating
+systems that have case-sensitive file names)</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Enable
+server's SYSDBA (from main security database) access current database
+(assuming it has non-default security database):</FONT></P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>CREATE
+MAPPING DEF_SYSDBA USING PLUGIN SRP IN &quot;security.db&quot; FROM
+USER SYSDBA TO USER;</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Force people
+who logged in using legacy authentication plugin have not too much
+rights:</FONT></P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>CREATE
+MAPPING LEGACY_2_GUEST USING PLUGIN legacy_auth FROM ANY USER TO USER
+GUEST;</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Notice:</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en-US" STYLE="margin-bottom: 0in"><FONT SIZE=4>Global
+mapping works best if firebird 3 or higher version database is used
+as security database. If you plan to use other database as security
+one (using for example your own provider) please create in it table
+RDB$MAP with structure repeating one in firebird 3 database and
+SYSDBA-only write access.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+</BODY>
+</HTML>

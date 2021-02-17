@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>set_timeout</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="configuration_reference.html" title="Appendix B. DB_CONFIG Parameter Reference" />
+    <link rel="prev" href="set_thread_count_parameter.html" title="set_thread_count" />
+    <link rel="next" href="set_tmp_dir_parameter.html" title="set_tmp_dir" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">set_timeout</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="set_thread_count_parameter.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix B. DB_CONFIG Parameter Reference</th>
+          <td width="20%" align="right"> <a accesskey="n" href="set_tmp_dir_parameter.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="set_timeout_parameter"></a>set_timeout</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+            Sets timeout values for locks or transactions in
+			the database environment, and the wait time for a process to exit the environment when
+			DB_REGISTER recovery is needed.
+            </p>
+      <p>
+                The syntax for setting timeout value for database
+                environment's lock, before recovery is started, and
+                transaction is as follows:
+            </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            DB_SET_LOCK_TIMEOUT
+            <p>
+                Configures the database environment's lock timeout value.
+                The syntax of the entry in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file is a single
+                line with the string <code class="literal">set_lock_timeout</code>,
+                one or more whitespace characters, and the lock timeout
+                value.         
+            </p></li>
+          <li>
+            DB_SET_REG_TIMEOUT
+            <p>
+                Sets the timeout value on how long to wait for processes to
+                exit the environment before recovery is started.  The
+                syntax of the entry in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file is a single
+                line with the string <code class="literal">set_reg_timeout</code>,
+                one or more whitespace characters, and the wait timeout
+                value.         
+            </p></li>
+          <li>
+            DB_SET_TXN_TIMEOUT
+            <p>
+                Sets the timeout value for transactions in this database
+                environment. The syntax of the entry in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a>
+                file is a single line with the string
+                <code class="literal">set_txn_timeout</code>, one or more whitespace
+                characters, and the transaction timeout value
+            </p></li>
+        </ul>
+      </div>
+      <p>For more information, see <a class="xref" href="envset_timeout.html" title="DbEnv::set_timeout()">DbEnv::set_timeout()</a>. </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="set_thread_count_parameter.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="configuration_reference.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="set_tmp_dir_parameter.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">set_thread_count </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> set_tmp_dir</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

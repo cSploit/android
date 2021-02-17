@@ -1,0 +1,970 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Performance Event Monitoring</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="program.html" title="Chapter 15.  Programmer Notes" />
+    <link rel="prev" href="program_runtime.html" title="Run-time configuration" />
+    <link rel="next" href="program_faq.html" title="Programmer notes FAQ" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Performance Event Monitoring</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="program_runtime.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 15. 
+		Programmer Notes
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="program_faq.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="program_perfmon"></a>Performance Event Monitoring</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="program_perfmon.html#program_perfmon_dtrace">Using the DTrace Provider</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="program_perfmon.html#program_perfmon_stap">Using SystemTap</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="program_perfmon.html#program_perfmon_examples">Example Scripts</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="program_perfmon.html#program_perfmon_probes">Performance Events Reference</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+    The Performance Event Monitoring feature uses Solaris DTrace or
+    Linux SystemTap to "publish" interesting events as they occur
+    inside of Berkeley DB.
+    The operating system utilities <span class="command"><strong>dtrace</strong></span> or
+    <span class="command"><strong>stap</strong></span> run scripts which select, analyze,
+    and display events. There is no need to modify the application.
+    Any application which uses that Berkeley DB library can be monitored.
+    For more information about these instrumentation tools refer to the
+    following pages:
+    </p>
+      <div class="variablelist">
+        <dl>
+          <dt>
+            <span class="term">DTrace</span>
+          </dt>
+          <dd>
+            <a class="ulink" href="http://www.oracle.com/technetwork/server-storage/solaris11/technologies/dtrace-1930301.html" target="_top">http://www.oracle.com/technetwork/server-storage/solaris11/technologies/dtrace-1930301.html</a>
+          </dd>
+          <dt>
+            <span class="term">SystemTap</span>
+          </dt>
+          <dd>
+            <a class="ulink" href="http://sourceware.org/systemtap/" target="_top">http://sourceware.org/systemtap/</a>
+          </dd>
+        </dl>
+      </div>
+      <p>
+</p>
+      <p>
+    Performance Event Monitoring is available for operating systems where
+    DTrace or SystemTap supports static probe points in user applications,
+    such as Solaris 10 and OpenSolaris, some versions of Linux,
+    and Mac OS X 10.6 and later.
+    By including --enable-dtrace to the configuration options, the resulting
+    libraries will include probe points for these event categories:
+    </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+	    database operations: opening a database or
+	    cursor, get, put, delete.
+	</li>
+          <li>
+	    internal operations regarding disk allocation, transactions,
+	    concurrency control, and caching.
+	</li>
+          <li>
+	    the beginning and ending of waiting periods due to conflicting
+	    transactional consistency locks (for example, page locks),
+	    mutexes, or shared latches.
+	</li>
+          <li>
+	    timing dependent code paths which are expected to be infrequent.
+	    These could raise concerns if they were to happen too often.
+	</li>
+        </ul>
+      </div>
+      <p>
+    These probe points are implemented as user-level statically defined traces
+    (USDT's) for DTrace, and static userspace markers for SystemTap.
+</p>
+      <p>
+    To monitor the statistics values as they are updated include
+    the --enable-perfmon-statistics configuration option.
+    This option generates probe points for updates to many of the counters
+    whose values are displayed by the db_stat utility
+    or returned by the various statistics functions.
+    The "cache" example script uses a few of these probe points.
+</p>
+      <p>
+    Performance Event Monitoring is intended to be suitable for production
+    applications. Running Berkeley DB with DTrace or SystemTap support
+    built in has little effect on execution speed until probes are enabled
+    at runtime by the <span class="command"><strong>dtrace</strong></span>
+    or <span class="command"><strong>stap</strong></span> programs.
+</p>
+      <p>
+    The list of available events may be displayed by running 'make listprobes'
+    after building the libdb-6.0 shared library.
+</p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="program_perfmon_dtrace"></a>Using the DTrace Provider</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+	 The DTrace probe provider for Berkeley DB is named 'bdb'. A simple
+	 dtrace command to monitor all dtrace-enabled Berkeley DB activity
+	 in the system is:
+    </p>
+        <p>
+	 <code class="code">
+	 dtrace -Zn 'bdb*::: { printf("%s", probename); }'
+	 </code>
+	 </p>
+        <p>
+	DTrace requires elevated privileges in order to run. On Solaris you can
+	avoid running as root by giving any users who need to run
+	<span class="command"><strong>dtrace</strong></span> the dtrace_proc or dtrace_user
+	privilege in <span class="command"><strong>/etc/user_attr</strong></span>. 
+    </p>
+        <p>
+	DTrace works on both 32 and 64 bit applications. However, when tracing
+	a 32-bit application on a 64-bit processor it might be necessary to pass
+	a "32 bit" option to <span class="command"><strong>dtrace</strong></span>. Without this option
+	the D language  might use a pointer size of 8 bytes, which could cause
+	pointer values (and structures containing them) to be processed incorrectly.
+	Use the <code class="code">-32</code> option on Solaris; on Mac OS X use <code class="code">-arch i386</code>. 
+    </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="program_perfmon_stap"></a>Using SystemTap</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+	SystemTap looks up its static userspace markers in the library name
+	specified in the <span class="command"><strong>stap</strong></span> script.
+	A simple <span class="command"><strong>stap</strong></span> command to list the probes
+	of the default Berkeley DB installation is:
+    </p>
+        <p>
+	 <code class="code">
+	 stap -l 'process("/usr/local/BerkeleyDB.6.0/lib/libdb-6.0.so").mark("*")'
+	 </code>
+	 </p>
+        <p>
+    Berkeley DB supports SystemTap version 1.1 or later.  Building with
+    userspace marker support requires <code class="filename">sys/sdt.h</code>,
+    which is often available in the package <code class="filename">systemtap-sdt-devel</code>.
+    Running <span class="command"><strong>stap</strong></span> with userspace markers requires that the 
+    kernel have "utrace" support; see
+    <a class="ulink" href="http://sourceware.org/systemtap/wiki/utrace" target="_top">http://sourceware.org/systemtap/wiki/utrace</a> for more information.
+    </p>
+        <p>
+    SystemTap needs elevated privileges in order to run. You can avoid running as
+    root by adding the users who need to run <span class="command"><strong>stap</strong></span>
+    to the group stapdev.
+    </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="program_perfmon_examples"></a>Example Scripts</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+    Berkeley DB includes several example scripts, in both DTrace and SystemTap versions.
+    The DTrace examples end with a <code class="filename">.d</code> suffix and are located in
+    <code class="filename">util/dtrace</code>. The SystemTap examples have a
+    <code class="filename">.stp</code> suffix and can found be in
+    <code class="filename">util/systemtap</code>. The Berkeley DB shared library name,
+    including any necessary path,
+    is expected as the first parameter to the SystemTap examples.
+    </p>
+        <div class="variablelist">
+          <dl>
+            <dt>
+              <span class="term">apicalls</span>
+            </dt>
+            <dd>
+		This script graphs the count of the main API calls. The result
+		is grouped by thread of the target process.
+	    </dd>
+            <dt>
+              <span class="term">apitimes</span>
+            </dt>
+            <dd>
+		 This script graphs the time spent in the main API calls,
+		 grouped by thread.
+	    </dd>
+            <dt>
+              <span class="term"> apitrace </span>
+            </dt>
+            <dd> 
+		 This script displays the entry to and return from each of the
+		 main API calls.
+	    </dd>
+            <dt>
+              <span class="term"> cache </span>
+            </dt>
+            <dd>
+	    	This script displays overall and per-file buffer cache statistics
+		every <span class="emphasis"><em>N</em></span> (default: 1) seconds for
+		<span class="emphasis"><em>M</em></span> (default: 60) intervals.
+		It prints the number of cache hits, misses, and evictions for
+		each file with any activity during the interval.
+	    </dd>
+            <dt>
+              <span class="term"> dbdefs</span>
+            </dt>
+            <dd>
+     		This contains DTrace-compatible declarations of Berkeley DB
+		data structures returned from probe points.
+		There is no Linux equivalent; SystemTap can obtain type
+		information directly from the debugging symbols compiled
+		into the libdb*-6.0.so shared library.
+	    </dd>
+            <dt>
+              <span class="term"> locktimes </span>
+            </dt>
+            <dd>
+		 This script graphs the time spent waiting for DB page locks.
+		 The result times in nanoseconds are grouped by filename,
+		 pgno, and lock_mode.  The optional integer maxcount parameter
+		 directs the script to exit once that many page lock waits
+		 have been measured.
+	    </dd>
+            <dt>
+              <span class="term"> locktimesid </span>
+            </dt>
+            <dd>
+		 This is similar to the locktimes script above, except that it displays
+		 the 20 byte file identifier rather than the file name. This can be 
+		 useful when there are several environments involved, or when database
+		 files are recreated during the monitoring period.
+	    </dd>
+            <dt>
+              <span class="term"> mutex </span>
+            </dt>
+            <dd>
+		This script measures mutex wait periods, summarizing the results two ways.
+		<div class="itemizedlist"><ul type="disc"><li>
+		    The first grouping is by mutex, mode (exclusive or shared),
+		    and thread id.
+		</li><li>
+		    The second grouping is by the mutex category and
+		    mode (exclusive or shared).
+		    The mutex categories are the MTX_XXX definitions in
+		    <code class="filename">dbinc/mutex.h</code>.
+		</li></ul></div></dd>
+            <dt>
+              <span class="term"> showerror </span>
+            </dt>
+            <dd>
+	    This script displays the application stack when the basic error
+	    routines are called. It provides additional information about
+	    an error, beyond the string sent to the diagnostic output.
+	    </dd>
+          </dl>
+        </div>
+        <p>
+</p>
+        <p>
+    These examples are designed to trace a single process. They run until
+    interrupted, or the monitored process exits, or the limit as given
+    in an optional 'maximum count' argument has been reached.
+    </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="program_perfmon_probes"></a>Performance Events Reference</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+	The events are described below as if they were functions with ANSI C-style
+	signatures. The values each event provides to DTrace or SystemTap are
+	the arguments to the functions.
+    </p>
+        <p>
+
+</p>
+        <div class="variablelist">
+          <dl>
+            <dt>
+              <span class="term">
+alloc
+</span>
+            </dt>
+            <dd>
+              <p>
+The alloc class covers the allocation of "on disk" database pages.
+</p>
+              <div class="variablelist">
+                <dl>
+                  <dt>
+                    <span class="term">alloc-new (char *file, char *db, unsigned pgno, unsigned type,
+    	struct _db_page *pg, int ret);
+</span>
+                  </dt>
+                  <dd>
+An attempt to allocate a database page of type 'type' for database 'db'
+returned 'ret'. If the allocation succeeded then ret is 0, pgno is the
+location of the new page, and pg is the address of the new page.
+Details of the page can be extracted from the pg pointer.
+</dd>
+                  <dt>
+                    <span class="term">
+alloc-free (char *file, char *db, unsigned pgno, unsigned ret);
+</span>
+                  </dt>
+                  <dd>
+An attempt to free the page 'pgno' of 'db' returned 'ret'.
+When successful the page is returned to the free list
+or the file is truncated.
+</dd>
+                  <dt>
+                    <span class="term">alloc-btree_split (char *file, char *db, unsigned pgno, unsigned parent,
+    	unsigned level);
+</span>
+                  </dt>
+                  <dd>
+A btree split of pgno in db is being attempted. The parent page number
+and the level in the btree are also provided.
+</dd>
+                </dl>
+              </div>
+            </dd>
+            <dt>
+              <span class="term">
+db
+</span>
+            </dt>
+            <dd>
+              <p>
+These DB API calls provide the name of the file and database being accessed.
+In-memory databases will have a NULL (0) file name address. The db name will
+be null unless subdatabases are in use.
+</p>
+              <div class="variablelist">
+                <dl>
+                  <dt>
+                    <span class="term">
+db-open (char *file, char *db, unsigned flags, uint8_t *fileid);
+</span>
+                  </dt>
+                  <dd>
+The database or file name was opened. The 20 byte unique fileid can be
+used to keep track of databases as they are created and destroyed.
+</dd>
+                  <dt>
+                    <span class="term">
+db-close (char *file, char *db, unsigned flags, uint8_t *fileid);
+</span>
+                  </dt>
+                  <dd>
+The database or file name was closed.
+</dd>
+                  <dt>
+                    <span class="term">db-cursor (char *file, char *db, unsigned txnid, unsigned flags,
+    	uint8_t *fileid);
+</span>
+                  </dt>
+                  <dd>
+An attempt is being made to open a cursor on the database or file.
+</dd>
+                  <dt>
+                    <span class="term">db-get (char *file, char *db, unsigned txnid, DBT *key, DBT *data,
+    	unsigned flags);
+</span>
+                  </dt>
+                  <dd>
+An attempt is being made to get data from a db.
+</dd>
+                  <dt>
+                    <span class="term">db-put (char *file, char *db, unsigned txnid, DBT *key, DBT *data,
+    	unsigned flags);
+</span>
+                  </dt>
+                  <dd>
+An attempt is being made to put data to a db.
+</dd>
+                  <dt>
+                    <span class="term">
+db-del (char *file, char *db, unsigned txnid, DBT *key, unsigned flags);
+</span>
+                  </dt>
+                  <dd>
+An attempt is being made to delete data from a db.
+</dd>
+                </dl>
+              </div>
+            </dd>
+            <dt>
+              <span class="term">
+lock
+</span>
+            </dt>
+            <dd>
+              <p>
+The lock class monitors the transactional consistency locks: page, record,
+and database. It also monitors the non-transactional file handle locks.
+</p>
+              <div class="variablelist">
+                <dl>
+                  <dt>
+                    <span class="term">
+lock-suspend (DBT *lock, db_lockmode_t lock_mode);
+</span>
+                  </dt>
+                  <dd>
+The thread is about to suspend itself because another locker already has
+a conflicting lock on object 'lock'.  The lock DBT's data points to
+a __db_ilock structure, except for the atypical program which uses
+application specific locking.
+</dd>
+                  <dt>
+                    <span class="term">
+lock-resume (DBT *lock, db_lockmode_t lock_mode);
+</span>
+                  </dt>
+                  <dd>
+The thread is awakening from a suspend.
+</dd>
+                  <dt>
+                    <span class="term">
+lock-put (struct __sh_dbt *lock, unsigned flags);
+</span>
+                  </dt>
+                  <dd>
+The lock is being freed.
+</dd>
+                  <dt>
+                    <span class="term">
+lock-put_reduce_count (struct __sh_dbt *lock, unsigned flags);
+</span>
+                  </dt>
+                  <dd>
+The lock would have been freed except that its refcount was greater
+than 1.
+</dd>
+                </dl>
+              </div>
+              <p>
+These lock counters are included by --enable-perfmon-statistics.
+</p>
+              <div class="variablelist">
+                <dl>
+                  <dt>
+                    <span class="term">lock-deadlock (unsigned st_ndeadlocks, unsigned locker_id,
+        struct __sh_dbt *lock_obj);
+</span>
+                  </dt>
+                  <dd>
+The locker_id's lock request in lock_obj is about to be aborted in
+order to resolve a deadlock. The lock region's st_ndeadlocks has
+been incremented.
+</dd>
+                  <dt>
+                    <span class="term">
+lock-nowait_notgranted (unsigned count, DBT *lock, unsigned locker_id);
+</span>
+                  </dt>
+                  <dd>
+A DB_LOCK_NOWAIT lock request by locker_id would have had to wait.
+The lock regions's st_lock_nowait has been incremented and
+the request returns DB_LOCK_NOTGRANTED.
+</dd>
+                  <dt>
+                    <span class="term">
+lock-steal (unsigned st_locksteals, unsigned from, unsigned to);
+</span>
+                  </dt>
+                  <dd>
+A lock is being stolen from one partition for another one.
+The 'from' lock partition's st_locksteals has been incremented.
+</dd>
+                  <dt>
+                    <span class="term">
+lock-object_steal (unsigned st_objectsteals, unsigned from, unsigned to);
+</span>
+                  </dt>
+                  <dd>
+A lock object is being stolen from one partition for another one.
+The 'from' lock partition's st_objectsteals has been incremented.
+</dd>
+                  <dt>
+                    <span class="term">
+lock-locktimeout (unsigned st_nlocktimeouts, const DBT *lock);
+</span>
+                  </dt>
+                  <dd>
+A lock wait expired due to the lock request timeout.
+</dd>
+                  <dt>
+                    <span class="term">
+lock-txntimeout (unsigned st_ntxntimeouts, const DBT *lock);
+</span>
+                  </dt>
+                  <dd>
+A lock wait expired due to the transaction's timeout.
+</dd>
+                  <dt>
+                    <span class="term">
+lock-nlockers (unsigned active, unsigned locker_id);
+</span>
+                  </dt>
+                  <dd>
+The allocation or deallocation of the locker id changed the number
+of active locker identifiers.
+</dd>
+                  <dt>
+                    <span class="term">
+lock-maxnlockers (unsigned new_max_active, unsigned locker_id);
+</span>
+                  </dt>
+                  <dd>
+The allocation of the locker id set a new maximum
+number of active locker identifiers.
+</dd>
+                </dl>
+              </div>
+            </dd>
+            <dt>
+              <span class="term">
+mpool
+</span>
+            </dt>
+            <dd>
+              <p>
+The mpool class monitors the allocation and management of memory,
+including the cache.
+</p>
+              <div class="variablelist">
+                <dl>
+                  <dt>
+                    <span class="term">
+mpool-read (char *file, unsigned pgno, struct __bh *buf);
+</span>
+                  </dt>
+                  <dd>
+Read a page from file into buf.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-write (char *file, unsigned pgno, struct __bh *buf);
+</span>
+                  </dt>
+                  <dd>
+Write a page from buf to file.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-env_alloc (unsigned size, unsigned region_id, unsigned reg_type);
+</span>
+                  </dt>
+                  <dd>
+This is an attempt to allocate size bytes from region_id.
+The reg_type is one of the reg_type_t enum values.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-evict (char *file, unsigned pgno, struct __bh *buf);
+</span>
+                  </dt>
+                  <dd>
+The page is about to be removed from the cache.
+</dd>
+                  <dt>
+                    <span class="term">mpool-alloc_wrap (unsigned alloc_len, int region_id, int wrap_count,
+    	int put_counter);
+</span>
+                  </dt>
+                  <dd>
+The memory allocator has incremented wrap_count after searching through
+the entire region without being able to fulfill the request for
+alloc_len bytes. As wrap_count increases the library makes more effort
+to allocate space.
+</dd>
+                </dl>
+              </div>
+              <p>
+These mpool counters are included by --enable-perfmon-statistics.
+</p>
+              <div class="variablelist">
+                <dl>
+                  <dt>
+                    <span class="term">
+mpool-clean_eviction (unsigned st_ro_evict, unsigned region_id);
+</span>
+                  </dt>
+                  <dd>
+The eviction of a clean page from a cache incremented st_ro_evict.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-dirty_eviction (unsigned st_rw_evict, unsigned region_id);
+</span>
+                  </dt>
+                  <dd>
+The eviction of a dirty page from a cache incremented st_rw_evict.
+The page has already been written out.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-fail (unsigned failure_count, unsigned alloc_len, unsigned region_id);
+</span>
+                  </dt>
+                  <dd>
+An attempt to allocate memory from region_id failed.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-hash_search (unsigned st_hash_searches, char *file, unsigned pgno);
+</span>
+                  </dt>
+                  <dd>
+A search for pgno of file incremented st_hash_searches.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-hash_examined (unsigned st_hash_examined, char *file, unsigned pgno);
+</span>
+                  </dt>
+                  <dd>
+A search for pgno of file increased st_hash_examined by the number
+of hash buckets examined.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-hash_longest (unsigned st_hash_longest, char *file, unsigned pgno);
+</span>
+                  </dt>
+                  <dd>
+A search for pgno of file set a new maximum st_hash_longest value.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-map (unsigned st_map, char *file, unsigned pgno);
+</span>
+                  </dt>
+                  <dd>
+A file's st_map count was incremented after a page was mapped into
+memory.  The mapping might have caused disk I/O.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-hit (unsigned st_cache_hit, char *file, unsigned pgno);
+</span>
+                  </dt>
+                  <dd>
+The hit count was incremented because pgno from file was found
+in the cache.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-miss (unsigned st_cache_miss, char *file, unsigned pgno);
+</span>
+                  </dt>
+                  <dd>
+The miss count was incremented because pgno from file was
+not already present in the cache.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-page_create (unsigned st_page_create, char *file, unsigned pgno);
+</span>
+                  </dt>
+                  <dd>
+The st_page_create field was incremented because
+the pgno of file was created in the cache.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-page_in (unsigned st_page_in, char *file, unsigned pgno);
+</span>
+                  </dt>
+                  <dd>
+The st_page_in field was incremented because
+the pgno from file was read into the cache.
+</dd>
+                  <dt>
+                    <span class="term">
+mpool-page_out (unsigned st_page_out, char *file, unsigned pgno);
+</span>
+                  </dt>
+                  <dd>
+The st_page_out field was incremented because
+the pgno from file was written out.
+</dd>
+                </dl>
+              </div>
+            </dd>
+            <dt>
+              <span class="term">
+mutex
+</span>
+            </dt>
+            <dd>
+              <p>
+The mutex category monitors includes shared latches.  The alloc_id value
+is one of the MTX_XXX definitions from dbinc/mutex.h
+</p>
+              <div class="variablelist">
+                <dl>
+                  <dt>
+                    <span class="term">mutex-suspend (unsigned mutex, unsigned excl, unsigned alloc_id,
+    	struct __db_mutex_t *mutexp);
+</span>
+                  </dt>
+                  <dd>
+This thread is about to suspend itself because a thread has the
+mutex or shared latch locked in a mode which conflicts with the
+this request.
+</dd>
+                  <dt>
+                    <span class="term">mutex-resume (unsigned mutex, unsigned excl, unsigned alloc_id,
+    	struct __db_mutex_t *mutexp);
+</span>
+                  </dt>
+                  <dd>
+The thread is returning from a suspend and will attempt to obtain
+the mutex or shared latch again. It might need to suspend again.
+</dd>
+                </dl>
+              </div>
+              <p>
+These mutex counters are included by --enable-perfmon-statistics.
+</p>
+              <div class="variablelist">
+                <dl>
+                  <dt>
+                    <span class="term">
+mutex-set_nowait (unsigned mutex_set_nowait, unsigned mutex);
+</span>
+                  </dt>
+                  <dd>
+Increment the count of times that the mutex was free when trying
+to lock it.
+</dd>
+                  <dt>
+                    <span class="term">
+mutex-set_wait (unsigned mutex_set_wait, unsigned mutex);
+</span>
+                  </dt>
+                  <dd>
+Increment the count of times that the mutex was busy when trying
+to lock it.
+</dd>
+                  <dt>
+                    <span class="term">
+mutex-set_rd_nowait (unsigned mutex_set_rd_nowait, unsigned mutex);
+</span>
+                  </dt>
+                  <dd>
+Increment the count of times that the shared latch was free
+when trying to get a shared lock on it.
+</dd>
+                  <dt>
+                    <span class="term">
+mutex-set_rd_wait (unsigned mutex_set_rd_wait, unsigned mutex);
+</span>
+                  </dt>
+                  <dd>
+Increment the count of times that the shared latch was already
+exclusively latched when trying to get a shared lock on it.
+</dd>
+                  <dt>
+                    <span class="term">
+mutex-hybrid_wait (unsigned hybrid_wait, unsigned mutex);
+</span>
+                  </dt>
+                  <dd>
+Increment the count of times that a hybrid mutex had to block
+on its condition variable.  n a busy system this might happen
+several times before the corresponding hybrid_wakeup.
+</dd>
+                  <dt>
+                    <span class="term">
+mutex-hybrid_wakeup (unsigned hybrid_wakeup, unsigned mutex);
+</span>
+                  </dt>
+                  <dd>
+Increment the count of times that a hybrid mutex finished
+one or more waits for its condition variable.
+</dd>
+                </dl>
+              </div>
+            </dd>
+            <dt>
+              <span class="term">
+txn
+</span>
+            </dt>
+            <dd>
+              <p>
+The txn category covers the basic transaction operations.
+</p>
+              <div class="variablelist">
+                <dl>
+                  <dt>
+                    <span class="term">
+txn-begin (unsigned txnid, unsigned flags);
+</span>
+                  </dt>
+                  <dd>
+A transaction was successfully begun.
+</dd>
+                  <dt>
+                    <span class="term">
+txn-commit (unsigned txnid, unsigned flags);
+</span>
+                  </dt>
+                  <dd>
+A transaction is starting to commit.
+</dd>
+                  <dt>
+                    <span class="term">
+txn-prepare (unsigned txnid, uint8_t *gid);
+</span>
+                  </dt>
+                  <dd>
+The transaction is starting to prepare, flushing the log
+so that a future commit can be guaranteed to succeed.
+The global identifier field is 128 bytes long.
+</dd>
+                  <dt>
+                    <span class="term">
+txn-abort (unsigned txnid);
+</span>
+                  </dt>
+                  <dd>
+The transaction is about to abort.
+</dd>
+                </dl>
+              </div>
+              <p>
+These txn counters are included by --enable-perfmon-statistics.
+</p>
+              <div class="variablelist">
+                <dl>
+                  <dt>
+                    <span class="term">
+txn-nbegins (unsigned st_nbegins, unsigned txnid);
+</span>
+                  </dt>
+                  <dd>
+Beginning the transaction incremented st_nbegins.
+</dd>
+                  <dt>
+                    <span class="term">
+txn-naborts (unsigned st_nbegins, unsigned txnid);
+</span>
+                  </dt>
+                  <dd>
+Aborting the transaction incremented st_naborts.
+</dd>
+                  <dt>
+                    <span class="term">
+txn-ncommits (unsigned st_ncommits, unsigned txnid);
+</span>
+                  </dt>
+                  <dd>
+Committing the transaction incremented st_ncommits.
+</dd>
+                  <dt>
+                    <span class="term">
+txn-nactive (unsigned st_nactive, unsigned txnid);
+</span>
+                  </dt>
+                  <dd>
+Beginning or ending the transaction updated the number of active
+transactions.
+</dd>
+                  <dt>
+                    <span class="term">
+txn-maxnactive (unsigned st_maxnactive, unsigned txnid);
+</span>
+                  </dt>
+                  <dd>
+The creation of the transaction set a new maximum number
+of active transactions.
+</dd>
+                </dl>
+              </div>
+            </dd>
+          </dl>
+        </div>
+        <p>
+
+    </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="program_runtime.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="program.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="program_faq.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Run-time configuration </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Programmer notes FAQ</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

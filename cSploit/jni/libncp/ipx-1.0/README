@@ -1,0 +1,65 @@
+This file contains a very short introduction to the IPX implementation
+on Linux.  Feel free to forward comments (especially suggested additions)
+to greg@caldera.com.
+
+The following are important definitions in understanding the descriptions
+in this README file.
+
+IPX Interface - This is the item to which IPX sockets are bound.
+An IPX interface corresponds to an IPX Network Number which corresponds 
+to a physical device and frame type.  A sample IPX Interface would be:
+Network Number: 0x00ABCDEF
+Device: Eth0 
+Frame Type: 802.2.
+The particular interface is selected during binding by using the
+Network Number (see sample code below).
+
+Primary Interface - The interface that is selected by default when
+binding a socket.  This is selected when binding by using
+a network number of 0 (see sample code below).
+
+Internal Network - This is a special kind of IPX interface that does
+not have a physical device or frame type.  It is used to provide
+a route-independent address for service providers.   Internal network
+numbers are optional; however, when one is present it is also the
+Primary Interface.
+
+This tar file contains the following IPX utilities:
+
+ipx_interface.c
+This program is used to create an IPX interface.  
+
+ipx_internal_net.c
+This program is used to create an IPX Internal Network number.  
+
+ipx_route.c
+This program creates an IPX route.
+
+ipx_configure.c
+This program is used to read/write two configuration parameters:
+	AUTO INTERFACE CREATE - IPX should/shouldn't automatically create
+		an IPX interface when it discovers one that has not been
+		registered via ipx_interface above.
+	AUTO PRIMARY SELECT - IPX should/shouldn't automatically select
+		a primary interface when it one an interface exists and
+		none are designated as the primary.  Manual designation
+		is performed via ipx_interface.
+
+By default, these are both turned off.
+				
+The following are sample IPX programs (found in directory Samples):
+
+ipxrcv.c and ipxsend.c 
+ipxsend will send a single packet to an instance of ipxrcv running on the 
+same machine.  It uses getsockname(2) to determine the address to which to 
+send the packet.  
+rip.c
+rip passively monitors the rip traffic on the attached IPX network.
+sap.c
+sap passively monitors the sap traffic on the attached IPX network.
+
+There are three files in /proc/net that relate to IPX.
+ipx_interface contains the list of IPX interfaces.
+ipx_route contains the list of IPX routes.
+ipx contains the list of IPX sockets in use.
+

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Windows Mobile notes</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="build_wince.html" title="Chapter 6.  Building Berkeley DB for Windows Mobile" />
+    <link rel="prev" href="build_wince.html" title="Chapter 6.  Building Berkeley DB for Windows Mobile" />
+    <link rel="next" href="build_wince_faq.html" title="Windows Mobile FAQ" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Windows Mobile notes</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="build_wince.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 6. 
+		Building Berkeley DB for Windows Mobile
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="build_wince_faq.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="build_wince_notes"></a>Windows Mobile notes</h2>
+          </div>
+        </div>
+      </div>
+      <div class="orderedlist">
+        <ol type="1">
+          <li>The C++ API is not supported on Windows Mobile. The file stream and
+exception handling functionality provided by the Berkeley DB C++ API are not
+supported by Windows Mobile.  It is possible to build a C++ application
+against the Berkeley DB C API.</li>
+          <li>The Java API is not currently supported on Windows Mobile.</li>
+          <li>Tcl support is not currently supported on Windows Mobile.</li>
+          <li>Berkeley DB is shipped with support for the Pocket PC 2003 and Smartphone 2003 target platforms. It is possible to build Berkeley DB for different target platforms using Visual Studio's Configuration Manager.
+<p>This can be done using the following steps:</p><div class="orderedlist"><ol type="a"><li>Open Visual Studio, and load the <code class="filename">build_wince/Berkeley_DB.sln</code> solution file.</li><li>Select the <span class="emphasis"><em>Build-&gt;Configuration Manager...</em></span> menu item.</li><li>In the <span class="emphasis"><em>Active Solution Platform...</em></span> dropdown, select <span class="emphasis"><em>New...</em></span></li><li>Select the desired target platform (you must have the desired Microsoft Platform SDK installed for it to appear in the list). Choose to copy settings from either the Pocket PC 2003 or Smartphone 2003 platforms.</li></ol></div><p>Before building the wce_tpcb sample application for the new platform, you will need to complete the following steps:</p><div class="orderedlist"><ol type="a"><li>Open the project properties page for wce_tpcb. Do this by: Right click <span class="emphasis"><em>wce_tpcb</em></span> in the <span class="emphasis"><em>Solution Explorer</em></span> then select <span class="emphasis"><em>Properties</em></span></li><li>Select <span class="emphasis"><em>Configuration Properties-&gt;Linker-&gt;Input</em></span></li><li>Remove <code class="filename">secchk.lib</code> and <code class="filename">crtti.lib</code> from the <span class="emphasis"><em>Additional Dependencies</em></span> field.</li></ol></div><p>NOTE: These steps are based on Visual Studio 2005, and might vary slightly depending on which version of Visual Studio being used.</p></li>
+        </ol>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="build_wince.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="build_wince.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="build_wince_faq.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 6. 
+		Building Berkeley DB for Windows Mobile
+         </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Windows Mobile FAQ</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

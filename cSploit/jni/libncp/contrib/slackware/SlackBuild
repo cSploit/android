@@ -1,0 +1,114 @@
+#!/bin/sh
+# ncpfs build script for Slackware Linux
+# Jacek Lipkowski <sq5bpf@andra.com.pl>
+
+# Set initial variables:
+CWD=`pwd`
+if [ "x$TMP" = "x" ]; then
+  TMP=/tmp
+fi
+
+if [ "x$CFLAGS" = "x" ]; then
+export CFLAGS=-O2
+fi
+
+PKG=$TMP/package-ncpfs
+
+VERSION=2.2.3
+ARCH=i386
+BUILD=1
+DOCDIR=/usr/doc/ncpfs-$VERSION
+
+if [ ! -d $TMP ]; then
+  mkdir -p $TMP # location to build the source
+fi
+if [ ! -d $PKG ]; then
+  mkdir -p $PKG # place for the package to be built
+fi
+
+# Explode the package framework:
+cd $PKG
+explodepkg $CWD/_ncpfs.tar.gz
+
+echo "+=======================+"
+echo "| ncpfs-$VERSION |"
+echo "+=======================+"
+
+
+cd $TMP
+tar xvzf $CWD/ncpfs-$VERSION.tar.gz
+cd ncpfs-$VERSION
+
+./configure --prefix=/usr
+
+make
+
+#why isn't this built by default?
+( cd ipxdump ; make )
+
+#do ipx-1.0/
+for i in ipx_configure ipx_interface ipx_internal_net ipx_route ipx_cmd
+do
+cat ipx-1.0/$i > $PKG/usr/sbin/$i
+cat ipx-1.0/$i.8.gz > $PKG/usr/man/man8/$i.8.gz
+done
+
+#do lib/
+cat lib/libncp.so.2.3.0 > $PKG/usr/lib/libncp.so.2.3.0
+
+#do sutil/
+for i in ncplogin ncpmap ncpmount ncpumount nwsfind 
+do
+cat sutil/$i > $PKG/usr/bin/$i
+done
+
+#do util/
+for i in ncopy ncptest nprint nsend nwauth nwbocreate nwbols nwboprops \
+nwborm nwbpadd nwbpcreate nwbprm nwbpset nwbpvalues nwdir nwdpvalues \
+nwfsctrl nwfsinfo nwfstime nwgrant nwpasswd nwpurge nwrevoke nwrights \
+nwtrustee nwtrustee2 nwuserlist nwvolinfo pqlist pqrm pqstat pserver slist
+do
+cat util/$i > $PKG/usr/bin/$i
+done
+cat util/nwmsg > $PKG/usr/sbin/nwmsg
+
+#do ipxdump
+cat ipxdump/ipxdump > $PKG/usr/sbin/ipxdump
+cat ipxdump/ipxparse > $PKG/usr/sbin/ipxparse
+
+#do locale files
+cat po/cs.gmo > $PKG/usr/share/locale/cs/LC_MESSAGES/ncpfs.mo
+cat po/de.gmo > $PKG/usr/share/locale/de/LC_MESSAGES/ncpfs.mo
+
+#do man pages
+for s in 1 5 8
+do 
+for i in man/*.$s.gz
+do
+cat $i > $PKG/usr/man/man$s/`basename $i`
+done
+done
+
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+cat $CWD/rc.ipx > $PKG/etc/rc.d/rc.ipx
+
+#install docs
+mkdir -p $PKG/$DOCDIR
+cp ncpfs* README.NDS README FAQ INSTALL ConfigFile Changes COPYING BUGS \
+ABOUT-NLS $PKG/$DOCDIR
+cp ipxdump/README $PKG/$DOCDIR/README.ipxdump
+chmod 644 $PKG/$DOCDIR/*
+chown root.root $PKG/$DOCDIR/*
+
+# Build the package:
+cd $PKG
+echo "n" | makepkg $TMP/ncpfs-$VERSION-$ARCH-$BUILD.tgz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/ncpfs-$VERSION
+  rm -rf $PKG
+fi
+

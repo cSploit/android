@@ -1,0 +1,29 @@
+This directory contains a SLAPI plugin, addrdnvalues, which will add to
+an entry any attribute values that appear in the entry's RDN but not in
+the entry. This is necessary for compliance with some "broken" clients.
+
+To use the plugin, add:
+
+plugin preoperation libaddrdnvalues-plugin.so addrdnvalues_preop_init
+
+to your slapd configuration file.
+
+No Makefile is provided. Use a command line similar to:
+
+gcc -shared -I../../../include -Wall -g -o libaddrdnvalues-plugin.so addrdnvalues.c
+
+to compile this plugin.
+
+---
+This work is part of OpenLDAP Software <http://www.openldap.org/>.
+
+Copyright 2003-2014 The OpenLDAP Foundation. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in the file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+<http://www.OpenLDAP.org/license.html>.
+

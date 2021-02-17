@@ -1,0 +1,53 @@
+
+                                   A                       iota
+          _______________________//|\
+         /         ______________/ | \_____________
+        mu        /                |               \
+                 /                 |                \
+                B                  C                 D
+          _____/|\_____                _____________/|\
+         /      |      \              /              | \
+        /       |       \            /              /   \___
+     lambda     |        F          /              /        \
+                E                gamma            /          \
+               / \                               /            |
+              /   \                     ________/             |
+          alpha   beta                 /                      H
+                                      /               _______/|\______
+                                     /               /        |       \
+                                    G               /         |        \
+                           ________/|\_______     chi        psi      omega
+                          /         |        \
+                         /          |         \
+                        /           |          \
+                       pi          rho         tau
+
+
+The Greek Tree is the standard Subversion testing tree.  Capital
+letters are directories and greek letter names are files.  By
+convention, the initial content of each file is a single line, such as
+"This is the file 'iota'.", followed by a newline.
+
+<============================< Same as... >================================>
+
+            /
+            /iota
+            /A/
+            /A/mu
+            /A/B/
+            /A/B/lambda
+            /A/B/E/
+            /A/B/E/alpha
+            /A/B/E/beta
+            /A/B/F/
+            /A/C/
+            /A/D/
+            /A/D/gamma
+            /A/D/H/
+            /A/D/H/chi
+            /A/D/H/psi
+            /A/D/H/omega
+            /A/D/G/
+            /A/D/G/pi
+            /A/D/G/rho
+            /A/D/G/tau

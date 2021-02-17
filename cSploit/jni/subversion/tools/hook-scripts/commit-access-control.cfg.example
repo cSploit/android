@@ -1,0 +1,74 @@
+# This is a sample configuration file for commit-access-control.pl.
+#
+# $Id: commit-access-control.cfg.example 845362 2003-03-12 05:56:21Z kfogel $
+#
+# This file uses the Windows ini style, where the file consists of a
+# number of sections, each section starts with a unique section name
+# in square brackets.  Parameters in each section are specified as
+# Name = Value.  Any spaces around the equal sign will be ignored.  If
+# there are multiple sections with exactly the same section name, then
+# the parameters in those sections will be added together to produce
+# one section with cumulative parameters.
+#
+# The commit-access-control.pl script reads these sections in order,
+# so later sections may overwrite permissions granted or removed in
+# previous sections.
+#
+# Each section has three valid parameters.  Any other parameters are
+# ignored.
+#   access = (read-only|read-write)
+#
+#     This parameter is a required parameter.  Valid values are
+#     `read-only' and `read-write'.
+#
+#      The access rights to apply to modified files and directories
+#      that match the `match' regular expression described later on.
+#
+#   match = PERL_REGEX
+#
+#     This parameter is a required parameter and its value is a Perl
+#     regular expression.
+#
+#     To help users that automatically write regular expressions that
+#     match the beginning of absolute paths using ^/, the script
+#     removes the / character because subversion paths, while they
+#     start at the root level, do not begin with a /.
+#
+#  users = username1 [username2 [username3 [username4 ...]]]
+#    or
+#  users = username1 [username2]
+#  users = username3 username4
+#
+#     This parameter is optional.  The usernames listed here must be
+#     exact usernames.  There is no regular expression matching for
+#     usernames.  You may specify all the usernames that apply on one
+#     line or split the names up on multiple lines.
+#
+#     The access rights from `access' are applied to ALL modified
+#     paths that match the `match' regular expression only if NO
+#     usernames are specified in the section or if one of the listed
+#     usernames matches the author of the commit.
+#
+# By default, because you're using commit-access-control.pl in the
+# first place to protect your repository, the script sets the
+# permissions to all files and directories in the repository to
+# read-only, so if you want to open up portions of the repository,
+# you'll need to edit this file.
+#
+# NOTE: NEVER GIVE DIFFERENT SECTIONS THE SAME SECTION NAME, OTHERWISE
+# THE PARAMETERS FOR THOSE SECTIONS WILL BE MERGED TOGETHER INTO ONE
+# SECTION AND YOUR SECURITY MAY BE COMPROMISED.
+
+[Make everything read-only for all users]
+match   = .*
+access  = read-only
+
+[Make project1 read-write for users Jane and Joe]
+match  = ^(branches|tags|trunk)/project1
+users  = jane joe
+access = read-write
+
+[However, we don't trust Joe with project1's Makefile]
+match  = ^(branches|tags|trunk)/project1/Makefile
+users  = joe
+access = read-only

@@ -1,0 +1,66 @@
+dn: cn=Abandon,cn=Operations,cn=Monitor
+structuralObjectClass: monitorOperation
+monitorOpInitiated: 0
+monitorOpCompleted: 0
+entryDN: cn=Abandon,cn=Operations,cn=Monitor
+
+dn: cn=Add,cn=Operations,cn=Monitor
+structuralObjectClass: monitorOperation
+monitorOpInitiated: 0
+monitorOpCompleted: 0
+entryDN: cn=Add,cn=Operations,cn=Monitor
+
+dn: cn=Bind,cn=Operations,cn=Monitor
+structuralObjectClass: monitorOperation
+monitorOpInitiated: 5
+monitorOpCompleted: 5
+entryDN: cn=Bind,cn=Operations,cn=Monitor
+
+dn: cn=Compare,cn=Operations,cn=Monitor
+structuralObjectClass: monitorOperation
+monitorOpInitiated: 0
+monitorOpCompleted: 0
+entryDN: cn=Compare,cn=Operations,cn=Monitor
+
+dn: cn=Delete,cn=Operations,cn=Monitor
+structuralObjectClass: monitorOperation
+monitorOpInitiated: 0
+monitorOpCompleted: 0
+entryDN: cn=Delete,cn=Operations,cn=Monitor
+
+dn: cn=Extended,cn=Operations,cn=Monitor
+structuralObjectClass: monitorOperation
+monitorOpInitiated: 0
+monitorOpCompleted: 0
+entryDN: cn=Extended,cn=Operations,cn=Monitor
+
+dn: cn=Modify,cn=Operations,cn=Monitor
+structuralObjectClass: monitorOperation
+monitorOpInitiated: 0
+monitorOpCompleted: 0
+entryDN: cn=Modify,cn=Operations,cn=Monitor
+
+dn: cn=Modrdn,cn=Operations,cn=Monitor
+structuralObjectClass: monitorOperation
+monitorOpInitiated: 0
+monitorOpCompleted: 0
+entryDN: cn=Modrdn,cn=Operations,cn=Monitor
+
+dn: cn=Operations,cn=Monitor
+structuralObjectClass: monitorContainer
+monitorOpInitiated: 14
+monitorOpCompleted: 13
+entryDN: cn=Operations,cn=Monitor
+
+dn: cn=Search,cn=Operations,cn=Monitor
+structuralObjectClass: monitorOperation
+monitorOpInitiated: 5
+monitorOpCompleted: 4
+entryDN: cn=Search,cn=Operations,cn=Monitor
+
+dn: cn=Unbind,cn=Operations,cn=Monitor
+structuralObjectClass: monitorOperation
+monitorOpInitiated: 4
+monitorOpCompleted: 4
+entryDN: cn=Unbind,cn=Operations,cn=Monitor
+

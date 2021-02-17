@@ -1,0 +1,46 @@
+# Makefile.in for back-perl
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## Portions Copyright 1999 John C. Quillan.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+SRCS	= init.c search.c close.c config.c bind.c compare.c \
+		modify.c add.c modrdn.c delete.c
+OBJS	= init.lo search.lo close.lo config.lo bind.lo compare.lo \
+		modify.lo add.lo modrdn.lo delete.lo
+
+LDAP_INCDIR= ../../../include       
+LDAP_LIBDIR= ../../../libraries
+
+BUILD_OPT = "--enable-perl"
+BUILD_MOD = @BUILD_PERL@
+PERL_CPPFLAGS = @PERL_CPPFLAGS@
+
+mod_DEFS = -DSLAPD_IMPORT
+MOD_DEFS = $(@BUILD_PERL@_DEFS)
+MOD_LIBS = @MOD_PERL_LDFLAGS@
+
+shared_LDAP_LIBS = $(LDAP_LIBLDAP_R_LA) $(LDAP_LIBLBER_LA)
+NT_LINK_LIBS = -L.. -lslapd $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+UNIX_LINK_LIBS = $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+
+LIBBASE = back_perl
+
+XINCPATH = -I.. -I$(srcdir)/..
+XDEFS = $(PERL_CPPFLAGS) $(MODULES_CPPFLAGS)
+
+all-local-lib:	../.backend
+
+../.backend: lib$(LIBBASE).a
+	@touch $@
+

@@ -1,0 +1,8 @@
+cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com
+mail: bj@mailgw.example.com
+cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com
+cn: Björn
+cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com
+displayname: James Jones
+cn=ITD Staff,ou=Groups,dc=example,dc=com
+uniquemember: cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com

@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# @sysconfdir@/config.ipx	Config file for IPX networking
+#
+# Author: Roumen Petrov (RYP) <rpetrov@usa.net>, sep 1998.
+
+IPX_DEVICE=eth0
+IPX_FRAME0=802.3
+IPX_FRAME1=802.2
+
+#IPX_INTERNAL_NET=yes
+IPX_INTERNAL_NET=no
+
+#IPX_NETNUM=333
+IPX_NETNUM=0
+
+IPX_NODE=1
+
+IPX_CONFIGURED=yes

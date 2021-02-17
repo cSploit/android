@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>dbsql</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="utilities.html" title="Appendix A.  Berkeley DB Command Line Utilities" />
+    <link rel="prev" href="db_sql_codegen.html" title="db_sql_codegen" />
+    <link rel="next" href="db_stat.html" title="db_stat" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">dbsql</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="db_sql_codegen.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix A. 
+                Berkeley DB Command Line Utilities
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="db_stat.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbsql"></a>dbsql</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">dbsql [OPTIONS] FILENAME SQL </pre>
+      <p>
+    <code class="literal">dbsql</code> is a command line tool that provides access to the Berkeley DB
+    SQL interface. 
+</p>
+      <p>
+    To build this tool, run the configure script with the
+    <code class="literal">--enable-sql </code>option when you are building the
+    Berkeley DB SQL interface.  For more information on building this tool,
+    see 
+    <a href="../../installation/build_unix.html#build_unix_intro" class="olink">"Building for UNIX/POSIX"</a>.
+ </p>
+      <p>FILENAME is the name of a Berkeley DB database file created with the SQL interface. A new database is created
+if the file does not exist.
+ The options are as follows:
+ </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+              <span class="bold"><strong>-init filename</strong></span>
+            </p>
+            <p>
+                 Reads/processes named file.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-echo</strong></span>
+            </p>
+            <p>
+                 Prints commands before execution.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-[no]header</strong></span>
+            </p>
+            <p>
+                 Turns headers on or off.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-bail</strong></span>
+            </p>
+            <p>
+                 Stops after hitting an error.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-interactive</strong></span>
+            </p>
+            <p>
+                 Forces interactive I/O.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-batch</strong></span>
+            </p>
+            <p>
+                 Forces batch I/O.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-column</strong></span>
+            </p>
+            <p>
+                 Sets output mode to column.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-csv</strong></span>
+            </p>
+            <p>
+                 Sets output mode to csv.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-html</strong></span>
+            </p>
+            <p>
+                 Sets output mode to HTML.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-line</strong></span>
+            </p>
+            <p>
+                 Sets output mode to line.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-list</strong></span>
+            </p>
+            <p>
+                 Sets output mode to list.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-separator 'x'</strong></span>
+            </p>
+            <p>
+                 Sets output field separator (|).
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-nullvalue 'text'</strong></span>
+            </p>
+            <p>
+                 Sets text string for NULL values.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-version</strong></span>
+            </p>
+            <p>
+                 Shows SQLite version.
+            </p>
+          </li>
+        </ul>
+      </div>
+      <p>
+            The <code class="literal">dbsql</code> executable provides the same interface as the <code class="literal">sqlite3</code>
+            executable that is part of SQLite. For more information on how
+            to use dbsql see the 
+            <a class="ulink" href="http://www.sqlite.org/sqlite.html" target="_top">SQLite Documentation page.</a> 
+        </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="dbsql_command_feature"></a>Command Line Features Unique to dbsql</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+        This section describes pre-defined query statements that can be
+        executed from the <code class="literal">dbsql</code> command line. These queries take the form
+        of:
+    </p>
+        <pre class="programlisting"> .stat <span class="emphasis"><em>ITEM</em></span></pre>
+        <p>
+        where <code class="literal">ITEM</code> is an optional parameter that indicates
+        what statistics to print.  If <code class="literal">ITEM</code> is not
+        specified, then this command prints statistics for the Berkeley DB
+        environment, followed by statistics for all tables and indexes
+        within the database. 
+     </p>
+        <p>
+        If <code class="literal">ITEM</code> is the name of a table or index, then this
+        command prints statistics for the table or index using the 
+        <a class="xref" href="dbstat_print.html" title="DB-&gt;stat_print()">DB-&gt;stat_print()</a> 
+        
+            method.
+    </p>
+        <p>
+        Otherwise, <code class="literal">ITEM</code> can be one of several keywords.
+        They are:
+    </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                <code class="literal">:env:</code>
+            </p>
+              <pre class="programlisting">dbsql&gt; .stat :env:</pre>
+              <p>
+                Causes this command to print statistics for the Berkeley DB
+                environment using the 
+                <a class="xref" href="envstat.html" title="DB_ENV-&gt;stat_print()">DB_ENV-&gt;stat_print()</a>. 
+                
+                method.
+            </p>
+            </li>
+            <li>
+              <p>
+                <code class="literal">:rep:</code>
+            </p>
+              <pre class="programlisting">dbsql&gt; .stat :rep:</pre>
+              <p>
+                Causes this command to print a summary of replication
+                statistics.
+            </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="db_sql_codegen.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="utilities.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="db_stat.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">db_sql_codegen </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> db_stat</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

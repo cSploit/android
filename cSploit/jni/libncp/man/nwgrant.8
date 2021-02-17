@@ -1,0 +1,163 @@
+.TH NWGRANT 8 5/19/2000 nwgrant nwgrant
+.SH NAME
+nwgrant \- Add Trustee Rights to a directory
+.SH SYNOPSIS
+.B nwgrant
+[
+.B -h
+] [
+.B -S
+.I server
+] [
+.B -U
+.I user name
+] [
+.B -P
+.I password
+|
+.B -n
+] [
+.B -C
+] [
+.B -o
+.I object name
+] [
+.B -t
+.I type
+] [
+.B -r
+.I rights
+]
+.B file/directory
+
+.SH DESCRIPTION
+.B nwgrant
+adds the specified bindery object with the corresponding trustee
+rights to the directory.
+
+.B nwgrant
+looks up the file
+.I $HOME/.nwclient
+to find a file server, a user name and possibly a password. See
+nwclient(5) for more information. Please note that the access
+permissions of $HOME/.nwclient MUST be 600 for security reasons.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user
+.RS 3
+.B user
+is the user name to use for login.
+.RE
+
+.B -P
+.I password
+.RS 3
+.B password
+is the password to use for login. If neither
+.B -n
+nor
+.B -P
+are given, and the user has no open connection to the server, nwgrant
+prompts for a password.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given if no password is required for the login.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.B -o
+.I object name
+.RS 3
+The name of the object to be added as trustee.
+.RE
+
+.B -t
+.I object type
+.RS 3
+The type of the object.
+.I Object type
+must be specified as a decimal value. Common values are 1 for user
+objects, 2 for group objects and 3 for print queues. Other values are
+allowed, but are usually used for specialized applications. If you
+do not specify \fIobject type\fP, \fIobject name\fP is taken as
+NDS name.
+.RE
+
+.B -r
+.I rights
+.RS 3
+You must tell
+.B nwgrant
+which rights it should grant to the bindery object.
+The new rights for the object is specified by
+.I rights,
+which can be either a hexadecimal number representing the sum of all
+the individual rights to be granted or a string containing characters
+representing each right.  If rights are represented in string format
+then the string must be bounded with square brackets.  Characters
+within the brackets may be in any order and in either case.  Spaces are
+allowed between the brackets - in which case the entire string should be
+quoted.
+Hexadecimal and character values for the rights are shown in this table:
+
+    00 = no access
+    01 = read access        = R
+    02 = write access       = W
+    08 = create access      = C
+    10 = delete access      = E
+    20 = ownership access   = A
+    40 = search access      = F
+    80 = modify access      = M
+   100 = supervisory access = S
+
+for a possible total of "1fb" or "[SRWCEMFA]" for all rights.
+.RE
+
+.B file/directory
+.RS 3
+You must specify the directory to which to add the object as
+trustee. This has to be done in fully qualified NetWare notation.
+
+Example:
+
+nwgrant -S NWSERVER -o linus -t 1 -r fb 'data:home\\linus'
+
+With this example, user linus is given all rights except supervisory
+to his home directory on the data volume. This example assumes the 
+existence of the file $HOME/.nwclient.
+
+nwgrant -o linus -t 1 -r fb /home/linus/ncpfs/data/home/linus
+
+With this example, user linus is given all rights except supervisory
+to his home directory on the data volume. This example assumes that
+NWSERVER is already mounted on /home/linus/ncpfs mountpoint.
+
+.SH AUTHORS
+nwgrant was written by Volker Lendecke with the corresponding NetWare
+utility in mind. See the Changes file of ncpfs for other contributors.
+

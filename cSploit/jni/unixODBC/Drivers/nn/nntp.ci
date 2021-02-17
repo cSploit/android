@@ -1,0 +1,22 @@
+#include	<nntp.h>
+
+# define	MSGHEAD 	"[INN][NNRP server]"
+
+static struct {
+	int	code;
+	char*	msg;
+} nntp_msg[] = {
+	NNTP_POSTING,		MSGHEAD "Article in posting",
+	NNTP_SERVICE_DOWN,	MSGHEAD "NNTP Server down",
+	NNTP_INVALID_GROUP,	MSGHEAD "No such news group on this server",
+	NNTP_NOT_IN_GROUP,	MSGHEAD "Not in a news group",
+	NNTP_NOT_IN_ARTICLE,	MSGHEAD "Not in a article",
+	NNTP_END_OF_GROUP,	MSGHEAD "End of news group",
+	NNTP_TOP_OF_GROUP,	MSGHEAD "Top of news group",
+	NNTP_INVALID_MSGNUM,	MSGHEAD "Invalid article number",
+	NNTP_INVALID_MSGID,	MSGHEAD "Invalid article ID",
+	NNTP_UNWANTED_MSG,	MSGHEAD "Unwanted article",
+	NNTP_REJECTED_MSG,	MSGHEAD "Article rejected",
+	NNTP_CANNOT_POST,	MSGHEAD "Can't post",
+	NNTP_POSTING_FAILED,	MSGHEAD "NNTP Posting failed"
+};

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+#V=`svn info . | grep Revision | sed -e's/.*: //'`
+#sed -e"s/%SVNREVISION%/$V/" < debian/changelog.template > debian/changelog
+dpkg-buildpackage -b -us -uc -rfakeroot -i -I.svn -I.swp
+

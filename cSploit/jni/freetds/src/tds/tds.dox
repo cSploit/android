@@ -1,0 +1,12 @@
+PROJECT_NAME     = "LibTDS API"
+OUTPUT_DIRECTORY = ../../doc/libtds
+GENERATE_LATEX   = NO
+GENERATE_MAN     = NO
+GENERATE_RTF     = NO
+CASE_SENSE_NAMES = NO
+INPUT            = $(srcdir) \
+		   $(TOP_SRCDIR)/include/freetds
+QUIET            = YES
+JAVADOC_AUTOBRIEF = YES
+PREDEFINED 	 = HAVE_SSL
+EXAMPLE_PATH = $(SRCDIR)/example

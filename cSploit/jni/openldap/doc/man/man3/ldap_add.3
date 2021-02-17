@@ -1,0 +1,81 @@
+.TH LDAP_ADD 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_add_ext, ldap_add_ext_s \- Perform an LDAP add operation
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+.nf
+int ldap_add_ext(
+.RS
+.ft B
+LDAP *\fIld,
+const char *\fIdn\fB,
+LDAPMod **\fIattrs\fB,
+LDAPControl **\fIsctrls\fB,
+LDAPControl **\fIcctrls\fB,
+int *\fImsgidp\fB );
+.RE
+.LP
+.ft B
+.nf
+int ldap_add_ext_s(
+.RS
+LDAP *\fIld\fB,
+const char *\fIdn\fB,
+LDAPMod **\fIattrs\fB,
+LDAPControl *\fIsctrls\fB,
+LDAPControl *\fIcctrls\fB );
+.RE
+.fi
+.SH DESCRIPTION
+The
+.B ldap_add_ext_s()
+routine is used to perform an LDAP add operation.
+It takes \fIdn\fP, the DN of the entry to add, and \fIattrs\fP, a
+null-terminated array of the entry's attributes.  The LDAPMod structure
+is used to represent attributes, with the \fImod_type\fP and
+\fImod_values\fP fields being used as described under
+.BR ldap_modify_ext (3),
+and the \fIldap_op\fP field being used only if you need to specify
+the LDAP_MOD_BVALUES option. Otherwise, it should be set to zero.
+.LP
+Note that all entries except that
+specified by the last component in the given DN must already exist.
+.B ldap_add_ext_s()
+returns an code indicating success or, in the case of failure,
+indicating the nature of failure of the operation.  See
+.BR ldap_error (3)
+for more details.
+.LP
+The
+.B ldap_add_ext()
+routine works just like
+.BR ldap_add_ext_s() ,
+but it is asynchronous.  It returns the message id of the request it
+initiated.  The result of this operation can be obtained by calling
+.BR ldap_result (3).
+.SH DEPRECATED INTERFACES
+The
+.BR ldap_add ()
+and
+.BR ldap_add_s ()
+routines are deprecated in favor of the
+.BR ldap_add_ext ()
+and
+.BR ldap_add_ext_s ()
+routines, respectively.
+.LP
+.so Deprecated
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_error (3),
+.BR ldap_modify (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

@@ -1,0 +1,177 @@
+I.    Installation
+
+      mod_authz_svn will be installed alongside mod_dav_svn when the regular
+      installation instructions are followed.
+
+      NOTE: the module is functional, but you should consider it experimental.
+      Some configurations may or may not have the desired effect.  Be sure
+      to test if your configuration works as intended.
+
+
+II.   Configuration
+
+   1. Configuring Apache
+
+      Modify your httpd.conf.  Add the following line _after_ the one that
+      loads mod_dav_svn:
+
+        LoadModule authz_svn_module   modules/mod_authz_svn.so
+
+      There are several ways to setup access checking for your subversion
+      location.  These are simple examples, for more complex configuration
+      of authentication/authorization with Apache, please refer to the
+      documentation: http://httpd.apache.org/docs-2.0/.
+
+      A. Example 1: Anonymous access only
+
+         This configuration will allow access only to the directories everyone
+         has permissions to do the operation performed.  All other access is
+         denied.  See section II.2 on how to set up permissions.
+
+         <Location /svn>
+           DAV svn
+           SVNPath /path/to/repos
+
+           AuthzSVNAccessFile /path/to/access/file
+         </Location>
+
+      B. Example 2: Mixed anonymous and authenticated access
+
+         This configuration checks to see if anonymous access is allowed
+         first, if not, it falls back to checking if the authenticated
+         user has permissions to do the operation performed.
+
+         <Location /svn>
+           DAV svn
+           SVNPath /path/to/repos
+
+           AuthType Basic
+           AuthName "Subversion repository"
+           AuthUserFile /path/to/htpasswd/file
+
+           AuthzSVNAccessFile /path/to/access/file
+
+           # The following line will allow to fall back to authenticated
+           # access when anonymous fails.
+           Satisfy Any
+           Require valid-user
+         </Location>
+
+      C. Example 3: Authenticated access only
+
+         This configuration requires everyone accessing the repository to be
+         authenticated.
+
+         <Location /svn>
+           DAV svn
+           SVNPath /path/to/repos
+
+           AuthType Basic
+           AuthName "Subversion repository"
+           AuthUserFile /path/to/htpasswd/file
+
+           AuthzSVNAccessFile /path/to/access/file
+
+           Require valid-user
+         </Location>
+
+         NOTE: Because there is no 'Satisfy Any' line, the module acts as if
+         though AuthzSVNAnonymous was set to 'No'.  The AuthzSVNAnonymous
+         directive prevents the anonymous access check from being run.
+
+      D. Example 4: Per-repository access file
+
+         This configuration allows to use SVNParentPath but have
+         different authz files per repository.
+
+         <Location /svn>
+           DAV svn
+           SVNParentPath /path/to/reposparent
+
+           AuthType Basic
+           AuthName "Subversion repository"
+           AuthUserFile /path/to/htpasswd/file
+
+           AuthzSVNReposRelativeAccessFile filename
+
+           Require valid-user
+         </Location>
+
+         NOTE: AuthzSVNReposRelativeAccessFile filename causes the authz file
+         to be read from <repo path>/conf/<filename>
+
+   2. Specifying permissions
+
+      The file format of the access file looks like this:
+
+        [groups]
+        <groupname> = <user>[,<user>...]
+        ...
+
+        [<path in repository>]
+        @<group> = [rw|r]
+        <user> = [rw|r]
+        * = [rw|r]
+
+        [<repository name>:<path in repository>]
+        @<group> = [rw|r]
+        <user> = [rw|r]
+        * = [rw|r]
+
+      An example (line continued lines are supposed to be on one line):
+
+        [groups]
+        subversion = jimb,sussman,kfogel,gstein,brane,joe,ghudson,fitz, \
+                     daniel,cmpilato,kevin,philip,jerenkrantz,rooneg, \
+                     bcollins,blair,striker,naked,dwhedon,dlr,kraai,mbk, \
+                     epg,bdenny,jaa
+        subversion-doc = nsd,zbrown,fmatias,dimentiy,patrick
+        subversion-bindings = xela,yoshiki,morten,jespersm,knacke
+        subversion-rm = mprice
+        ...and so on and so on...
+
+        [/]
+        # Allow everyone read on the entire repository
+        * = r
+        # Allow devs with blanket commit to write to the entire repository
+        @subversion = rw
+
+        [/trunk/doc]
+        @subversion-doc = rw
+
+        [/trunk/subversion/bindings]
+        @subversion-bindings = rw
+
+        [/branches]
+        @subversion-rm = rw
+
+        [/tags]
+        @subversion-rm = rw
+
+        [/branches/issue-650-ssl-certs]
+        mass = rw
+
+        [/branches/pluggable-db]
+        gthompson = rw
+
+        ...
+
+        [/secrets]
+        # Just for demonstration
+        * =
+        @subversion = rw
+
+        # In case of SVNParentPath we can specify which repository we are
+        # referring to.  If no matching repository qualified section is found,
+        # the general unqualified section is tried.
+        #
+        # NOTE: This will work in the case of using SVNPath as well, only the
+        # repository name (the last element of the url) will always be the
+        # same.
+        [dark:/]
+        * =
+        @dark = rw
+
+        [light:/]
+        @light = rw
+

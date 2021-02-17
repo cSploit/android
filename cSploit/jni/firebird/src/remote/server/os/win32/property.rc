@@ -1,0 +1,54 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+#include "property.rh"
+
+GENERAL_DLG DIALOG 6, 15, 202, 174
+STYLE DS_MODALFRAME | 0x4L | WS_CHILD | WS_VISIBLE | WS_DLGFRAME
+FONT 8, "MS Sans Serif"
+{
+ ICON IDI_IBSVR, IDC_IBSVR_ICON, 12, 12, 18, 20
+ LTEXT "", IDC_PRODNAME, 46, 16, 140, 12
+ LTEXT "Location:", IDC_LOCATION_TEXT, 14, 49, 40, 12
+ LTEXT "Version:", IDC_VERSION_TEXT, 14, 69, 40, 12
+ LTEXT "Capabilities:", IDC_CAPABILITIES_TEXT, 14, 89, 40, 12
+ LTEXT "", IDC_PATH, 60, 49, 130, 24
+ LTEXT "", IDC_STAT1, 60, 69, 120, 24
+ LTEXT "", IDC_PROTOCOLS, 60, 89, 120, 32
+ LTEXT "Number of attachments:", IDC_NUM_ATTACH_TEXT, 14, 133, 100, 12
+ LTEXT "Number of databases:", IDC_NUM_DB_TEXT, 14, 145, 160, 12
+ LTEXT "Number of active services:", IDC_NUM_SVC_TEXT, 14, 157, 100, 12
+ LTEXT "", IDC_STAT2, 108, 133, 28, 12
+ LTEXT "", IDC_STAT3, 108, 145, 28, 12
+ LTEXT "", IDC_STAT4, 108, 157, 28, 12
+ CONTROL "", -1, "STATIC", SS_GRAYRECT | 0x1000L | NOT WS_GROUP, 12, 41, 180, 1
+ CONTROL "", -1, "STATIC", SS_GRAYRECT | 0x1000L | NOT WS_GROUP, 12, 124, 180, 1
+ PUSHBUTTON "&Refresh", IDC_REFRESH, 138, 133, 53, 13
+}
+
+STRINGTABLE
+BEGIN
+ IDS_TCP, "TCP/IP Client Support"
+ IDS_IPC, "Local Client Support"
+ IDS_NP, "NetBEUI Client Support"
+ IDS_SUPER, "Multithreaded Server"
+ IDS_SERVERPROD_NAME, "Firebird SQL Server for Windows"
+ IDS_LOCALPROD_NAME, "Local Firebird Server"
+END
+
+IDI_IBSVR ICON "server.ico"

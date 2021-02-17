@@ -1,0 +1,152 @@
+.TH PSERVER 1 10/22/1996 pserver pserver
+.SH NAME
+pserver \- NetWare print server
+.SH SYNOPSIS
+.B pserver
+[
+.B -S
+.I server
+] [
+.B -h
+] [
+.B -U
+.I user name
+] [
+.B -P
+.I password
+|
+.B -n
+] [
+.B -C
+] [
+.B -q
+.I queue name
+] [
+.B -c
+.I command
+] [
+.B -j
+.I job type
+] [
+.B -t
+.I timeout
+] [
+.B -d
+]
+
+.SH DESCRIPTION
+.B pserver
+is a program that connects to print queues on NetWare servers and
+feeds incoming print jobs to the Linux printing system.
+
+.SH OPTIONS
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user
+.RS 3
+.B user
+is the print server name at the server.
+.RE
+
+.B -P
+.I password
+.RS 3
+.B password
+is the password to use for the print server at the server. If neither
+.B -n
+nor
+.B -P
+are given, and the user has no open connection to the server, pserver
+prompts for a password.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given if the print server does not require a password.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.B -q
+.I queue name
+.RS 3
+.B queue name 
+is the name of the print queue you want to service.
+.RE
+
+.B -c
+.I command
+.RS 3
+When a job is received from the print queue, pserver forks off a new
+process, and feeds the job file to stdin.
+.I command
+is the printing command that is executed for each job. The default
+command is 'lpr'.
+
+You can insert several flags into the command, preceded by %. These
+are replaced with values retrieved from the queue structure for the
+print job.
+
+%u: This field will be replaced by the name of the user who posted
+this print job.
+
+%d: This field will be replaced by the job description field of 
+this print job.
+.RE
+
+.B -j
+.I job type
+.RS 3
+Each job in a NetWare print queue has a job type. For print jobs, this
+corresponds to the number of the form the job should be printed
+on. You can tell pserver that it should only receive jobs for one
+specific form from the queue. The default is -1, which means that
+everything is received.
+.RE
+
+.B -t 
+.I timeout
+.RS 3
+Pserver is not informed by NetWare servers when new jobs arrive. So a
+polling scheme has to be used. When there are no jobs to service, 
+.I timeout
+tells pserver how long to wait between two requests. The default is 30
+seconds. When a job is finished, pserver asks the NetWare server
+immediately for a new job, and does not wait
+.I timeout
+seconds.
+.RE
+
+.B -d
+.RS 3
+Normally, pserver daemonizes itself. 
+.B -d
+tells it not to do so. This is useful if you want to see the
+diagnostic messages that are printed when a error occurs.
+.RE
+
+
+.SH SEE ALSO
+.B nwclient(5), slist(1), pqlist(1), ncpmount(8), ncpumount(8)
+
+.SH CREDITS
+pserver was written by Volker Lendecke (lendecke@math.uni-goettingen.de)

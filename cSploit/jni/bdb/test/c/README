@@ -1,0 +1,91 @@
+
+The C test cases are currently (loosly) based on the CuTest harness. Loosely
+because the harness has been heavily modified from the original version.
+
+There are still a few old test cases in the source tree. Those will be
+converted to run within CuTest at some stage. New tests should all work within
+the CuTest structure.
+
+=================== BUILDING ================
+
+To build CuTest on POSIX (*nix) run "make cutest"
+
+To build CuTest on Windows load the test_cutest.vcproj project into the 
+Berkeley DB solution file, and build the resulting project. It should depend
+on the Berkeley DB library (db).
+
+
+=================== RUNNING  ================
+
+To run CuTest on POSIX (*nix) run:
+./cutest
+from the build_unix directory.
+
+To run CuTest on Windows run:
+
+./test_cutest.exe
+from the build_windows/Win32/Debug directory.
+
+=================== WRITING  ================
+
+To write a new test case, open the relevant test suite source file under
+test/c/suites/
+
+Create a new function, with a name that begins with "Test", that returns an int
+and takes a CuTest * argument. For example:
+
+int TestExampleFunction(CuTest *ct)
+
+
+To write a new test suite (to test a different type of functionality):
+	* Create a source file in test/c/suites the name beginning with Test.
+          Of course, as with any new source file, it needs to be
+          mentioned in dist/Makefile.in and the corresponding Windows files.
+	* Include "CuTest.h" in that source file
+	* Probably include "test_util.h" in the new source file, to access
+	  shared utility functions and macros.
+	* Add any test cases, conforming to the test case guidelines above.
+	* Optionally specify setup and teardown functions for the suite.
+	  Named <SuiteName>SuiteSetup and <SuiteName>SuiteTeardown respectively.
+	* Optionally specify setup and teardown functions for each test case
+	  in the suite. Named <SuiteName>TestSetup and <SuiteName>TestTeardown
+	  respectively.
+	* Use the CuAssertXXX macros to validate behavior.
+	* See TestEnvConfig.c for an example of good practice.
+
+
+When adding a new test case or a new test suite, it's necessary to run the a
+script to regenerate the test harness wrapper. You'll need a shell script to
+do that. The script is:
+test/c/cutest/gen_tester.sh
+
+It should be run as:
+$ cd test/c/cutest
+$ ./gen_tester.sh > CuTests.c
+
+
+NOTE: A comment on naming.
+
+All tests and suites should be clearly named. Long names are fine, and more
+descriptive is generally better.
+
+A test suite should be named to reflect the component and functionality that
+is being tested.
+An individual test case should be named to identify the specific functionality
+being tested.
+It's best to avoid including SR numbers in test and suite names. Relevant SRs
+should be referenced in comments.
+
+=================== FUTURES  ================a
+
+ * Add a configuration object to the setup and teardown functions, so they can
+   pass and maintain state.
+ * Fix the naming so that it's more Berkeley DB compatible (not camel case).
+ * Implement the RunTest and RunSuite functionality in test/c/cutest/CuTest.c,
+   so that it's possible to run parts of the test suite. The format will be:
+
+./cutest -s TestSuiteName -s TestSuiteName -t TestSuiteName:TestCase
+ * Implement more shared functionality in test/c/common, move the function
+   implementations from the header file in there, so shared library builds will
+   work.
+

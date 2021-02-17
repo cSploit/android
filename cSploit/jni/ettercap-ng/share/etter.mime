@@ -1,0 +1,56 @@
+############################################################################
+#                                                                          #
+#  ettercap -- etter.mime -- mime types for thief plugin                   #
+#                                                                          #
+#  Copyright (C) ALoR & NaGA                                               #
+#                                                                          #
+#  This program is free software; you can redistribute it and/or modify    #
+#  it under the terms of the GNU General Public License as published by    #
+#  the Free Software Foundation; either version 2 of the License, or       #
+#  (at your option) any later version.                                     #
+#                                                                          #
+############################################################################
+#
+#  format:
+#
+#   mime_type<space to pad to 34>extension
+#
+
+
+# MIME type                      Extension
+
+application/mac-binhex40         hqx
+application/msword               doc
+application/octet-stream         bin
+application/pdf                  pdf
+application/postscript           ps
+application/rtf                  rtf
+application/x-cpio               cpio
+application/x-gtar               gtar
+application/x-gzip               gz
+application/x-javascript         js
+application/x-latex              latex
+application/x-shockwave-flash    swf
+application/x-tar                tar
+application/zip                  zip
+audio/basic                      au
+audio/midi                       midi
+audio/mpeg                       mp3
+audio/x-aiff                     aif
+audio/x-pn-realaudio             ram
+audio/x-pn-realaudio-plugin      rpm
+audio/x-realaudio                ra
+audio/x-wav                      wav
+image/gif                        gif
+image/jpeg                       jpg
+image/png                        png
+image/tiff                       tiff
+image/x-xbitmap                  xbm
+image/x-xpixmap                  xpm
+text/css                         css
+text/plain                       txt
+text/xml                         xml
+video/mpeg                       mpeg
+video/quicktime                  mov
+video/x-msvideo                  avi
+

@@ -1,0 +1,19 @@
+/*
+ * $Id: userguide.css,v 1.1 2005-10-03 02:52:29 jklowden Exp $
+ */
+
+/* Set the screen background to gray */
+.SCREEN {
+	background-color: #F0F0F0;
+}
+
+/* Render user input as boldface */
+.USERINPUT {
+  font-weight: bold;
+}
+
+/* Make filenames green (why not?) */
+.FILENAME {
+	color: #007a00;
+}
+

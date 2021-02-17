@@ -1,0 +1,891 @@
+/*
+ *	PROGRAM:	JRD Command Oriented Query Language
+ *	MODULE:		proc.epp
+ *	DESCRIPTION:	Procedure maintenance routines
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ *
+ * 2002.10.30 Sean Leyne - Removed support for obsolete "PC_PLATFORM" define
+ *
+ */
+
+#include "firebird.h"
+#include "dyn_consts.h"
+#include <string.h>
+#include "../jrd/ibase.h"
+#include "../qli/dtr.h"
+#include "../qli/parse.h"
+#include "../qli/compile.h"
+#include "../qli/err_proto.h"
+#include "../qli/lex_proto.h"
+#include "../qli/meta_proto.h"
+#include "../qli/parse_proto.h"
+#include "../qli/proc_proto.h"
+#include "../jrd/constants.h"
+
+using MsgFormat::SafeArg;
+
+
+DATABASE DB1 = EXTERN FILENAME "yachts.lnk";
+DATABASE DB = EXTERN FILENAME "yachts.lnk";
+
+static int clear_out_qli_procedures(qli_dbb*);
+static void create_qli_procedures(qli_dbb*);
+static void probe(qli_dbb*, const TEXT*);
+static int upcase_name(const TEXT*, TEXT*);
+
+static const UCHAR tpb[] =
+{
+	isc_tpb_version1, isc_tpb_write,
+	isc_tpb_concurrency
+};
+
+static const UCHAR dyn_gdl1[] =
+{
+#include "../qli/procddl1.h"
+};
+static const UCHAR dyn_gdl2[] =
+{
+#include "../qli/procddl2.h"
+};
+static const UCHAR dyn_gdl3[] =
+{
+#include "../qli/procddl3.h"
+};
+static const UCHAR dyn_gdl4[] =
+{
+#include "../qli/procddl4.h"
+};
+
+
+void PRO_close( qli_dbb* database, FB_API_HANDLE blob)
+{
+/**************************************
+ *
+ *	P R O _ c l o s e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Close out an open procedure blob.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+	if (database && isc_close_blob(status_vector, &blob))
+		ERRQ_database_error(database, status_vector);
+}
+
+
+void PRO_commit( qli_dbb* database)
+{
+/**************************************
+ *
+ *	P R O _ c o m m i t
+ *
+ **************************************
+ *
+ * Functional description
+ *	Commit the procedure transaction.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+	if ((database->dbb_capabilities & DBB_cap_multi_trans) && !(LEX_active_procedure()))
+	{
+		if (isc_commit_transaction(status_vector, &database->dbb_proc_trans))
+		{
+			PRO_rollback(database);
+			ERRQ_database_error(database, status_vector);
+		}
+	}
+}
+
+
+void PRO_copy_procedure(qli_dbb* old_database, const TEXT* old_name,
+						qli_dbb* new_database, const TEXT* new_name)
+{
+/**************************************
+ *
+ *	P R O _ c o p y _  p r o c e d u r e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Create a new copy of an existing
+ *	procedure.  Search databases for the
+ *	existing procedure.
+ *
+ **************************************/
+	if (!new_database)
+		new_database = QLI_databases;
+
+	FB_API_HANDLE old_blob;
+	if (!old_database)
+	{
+		for (old_database = QLI_databases; old_database; old_database = old_database->dbb_next)
+		{
+			if (old_blob = PRO_fetch_procedure(old_database, old_name))
+				break;
+		}
+	}
+	else
+		old_blob = PRO_fetch_procedure(old_database, old_name);
+
+	if (!old_blob)
+		ERRQ_print_error(70, old_name);
+	// Msg 70 procedure \"%s\" is undefined
+
+	if (new_database != old_database)
+		PRO_setup(new_database);
+
+	FB_API_HANDLE new_blob = 0;
+	FB_API_HANDLE store_request = 0;
+	probe(new_database, new_name);
+
+	DB1 = new_database->dbb_handle;
+
+	// create blob parameter block since procedure is a text blob
+	// But nothing was done! The bpb is empty.
+
+	UCHAR bpb[20];
+	UCHAR* p = bpb;
+	USHORT bpb_length = p - bpb;
+	ISC_STATUS_ARRAY status_vector;
+	TEXT buffer[255];
+
+	STORE(REQUEST_HANDLE store_request TRANSACTION_HANDLE new_database->dbb_proc_trans)
+		NEW IN DB1.QLI$PROCEDURES USING
+
+        strcpy(NEW.QLI$PROCEDURE_NAME, new_name);
+		if (isc_create_blob2(status_vector, &new_database->dbb_handle,
+							 &new_database->dbb_proc_trans, &new_blob, &NEW.QLI$PROCEDURE,
+							 bpb_length, reinterpret_cast<const char*>(bpb)))
+		{
+			ERRQ_database_error(new_database, status_vector);
+		}
+		USHORT length;
+		while (!(isc_get_segment(status_vector, &old_blob, &length, sizeof(buffer), buffer)))
+		{
+			buffer[length] = 0;
+			if (isc_put_segment(status_vector, &new_blob, length, buffer))
+				ERRQ_database_error(new_database, status_vector);
+		}
+		PRO_close(old_database, old_blob);
+		PRO_close(new_database, new_blob);
+	END_STORE;
+
+	// Release the FOR and STORE requests
+	isc_release_request(gds_status, &store_request);
+	PRO_commit(new_database);
+}
+
+
+void PRO_create( qli_dbb* database, const TEXT* name)
+{
+/**************************************
+ *
+ *	P R O _ c r e a t e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Create a new procedure, assuming, of course, it doesn't already
+ *	exist.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+	UCHAR bpb[20];
+
+	// See if procedure is already in use
+
+	probe(database, name);
+
+	FB_API_HANDLE blob = 0;
+	const SLONG start = QLI_token->tok_position;
+	SLONG stop = start;
+
+	UCHAR* p = bpb;
+
+	USHORT bpb_length = p - bpb;
+
+	PRO_setup(database);
+
+	// Store record in QLI$PROCEDURES.  Eat tokens until we run into
+	// END_PROCEDURE, then have LEX store the procedure in blobs.
+
+	STORE(REQUEST_HANDLE database->dbb_store_blob) X IN DB.QLI$PROCEDURES
+		isc_vtof(name, X.QLI$PROCEDURE_NAME, sizeof(X.QLI$PROCEDURE_NAME));
+
+		if (isc_create_blob2(status_vector, &database->dbb_handle, &gds_trans,
+							  &blob, &X.QLI$PROCEDURE, bpb_length,
+							  reinterpret_cast<const char*>(bpb)))
+		{
+			ERRQ_database_error(database, status_vector);
+		}
+		while (!PAR_match(KW_END_PROCEDURE))
+		{
+			if (QLI_token->tok_type == tok_eof)
+				ERRQ_syntax(350);
+			if (QLI_token->tok_type != tok_eol)
+				stop = QLI_token->tok_position + QLI_token->tok_length;
+			LEX_token();
+		}
+
+		LEX_put_procedure(blob, start, stop);
+		isc_close_blob(status_vector, &blob);
+	END_STORE;
+
+	// Commit the procedure transaction, if there is one
+
+	PRO_commit(database);
+}
+
+
+int PRO_delete_procedure( qli_dbb* database, const TEXT* name)
+{
+/**************************************
+ *
+ *	P R O _ d e l e t e _ p r o c e d u r e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Delete a procedure.
+ *
+ **************************************/
+	FB_API_HANDLE request = 0;
+	USHORT count = 0;
+
+	PRO_setup(database);
+
+	FOR(REQUEST_HANDLE request) X IN DB.QLI$PROCEDURES WITH
+		X.QLI$PROCEDURE_NAME EQ name
+        ERASE X;
+		count++;
+	END_FOR;
+
+	isc_release_request(gds_status, &request);
+
+	// Commit the procedure transaction, if there is one
+
+	PRO_commit(database);
+
+	return count;
+}
+
+
+void PRO_edit_procedure( qli_dbb* database, const TEXT* name)
+{
+/**************************************
+ *
+ *	P R O _ e d i t _ p r o c e d u r e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Edit a procedure, using the token stream to get the name of
+ *	the procedure.
+ *
+ **************************************/
+
+	PRO_setup(database);
+	bool changed = false;
+
+	FOR(REQUEST_HANDLE database->dbb_edit_blob) X IN DB.QLI$PROCEDURES WITH
+		X.QLI$PROCEDURE_NAME EQ name
+		MODIFY X USING
+			if (!BLOB_edit(&X.QLI$PROCEDURE, database->dbb_handle, gds_trans, name))
+			{
+				return;
+			}
+		END_MODIFY
+		changed = true;
+	END_FOR
+
+	if (changed)
+	{
+		PRO_commit(database);
+		return;
+	}
+
+	STORE(REQUEST_HANDLE database->dbb_edit_store) X IN DB.QLI$PROCEDURES
+		X.QLI$PROCEDURE = gds_blob_null;
+		if (!BLOB_edit(&X.QLI$PROCEDURE, database->dbb_handle, gds_trans, name))
+		{
+			return;
+		}
+		isc_vtof(name, X.QLI$PROCEDURE_NAME, sizeof(X.QLI$PROCEDURE_NAME));
+	END_STORE
+
+	// Commit the procedure transaction, if there is one
+
+	PRO_commit(database);
+}
+
+
+FB_API_HANDLE PRO_fetch_procedure( qli_dbb* database, const TEXT* proc)
+{
+/**************************************
+ *
+ *	P R O _ f e t c h _ p r o c e d u r e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Fetch a procedure.  Look up a name and return an open blob.
+ *	If the name doesn't exit, return NULL.
+ *
+ **************************************/
+	TEXT name[MAX_SQL_IDENTIFIER_SIZE];
+
+	upcase_name(proc, name);
+	PRO_setup(database);
+	FB_API_HANDLE blob = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_lookup_blob) X IN DB.QLI$PROCEDURES WITH
+		X.QLI$PROCEDURE_NAME EQ name
+        blob = PRO_open_blob(database, X.QLI$PROCEDURE);
+	END_FOR
+
+	return blob;
+}
+
+
+bool PRO_get_line(FB_API_HANDLE blob, TEXT* buffer, USHORT size)
+{
+/**************************************
+ *
+ *	P R O _ g e t _ l i n e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Get the next segment of procedure blob.  If there are
+ *	no more segments, return false.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+	USHORT length;
+
+	isc_get_segment(status_vector, &blob, &length, size, buffer);
+
+	if (status_vector[1] && status_vector[1] != isc_segment)
+		return false;
+
+	TEXT* p = buffer + length;
+
+	if (p[-1] != '\n' && !status_vector[1])
+		*p++ = '\n';
+
+	*p = 0;
+
+	return true;
+}
+
+
+void PRO_invoke( qli_dbb* database, const TEXT* name)
+{
+/**************************************
+ *
+ *	P R O _ i n v o k e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Invoke a procedure.  The qualified procedure
+ *	block may include the database we want, or
+ *	we may have to loop through databases.  Whatever...
+ *
+ **************************************/
+	FB_API_HANDLE blob = 0;
+	if (database)
+	{
+		if (!(blob = PRO_fetch_procedure(database, name)))
+		{
+			ERRQ_print_error(71, SafeArg() << name << database->dbb_symbol->sym_string);
+		}
+	// Msg 71 procedure \"%s\" is undefined in database %s
+	}
+	else
+		for (database = QLI_databases; database; database = database->dbb_next)
+		{
+			if (blob = PRO_fetch_procedure(database, name))
+				break;
+		}
+
+	if (!blob)
+		ERRQ_print_error(72, name);
+	// Msg 72 procedure \"%s\" is undefined
+
+	LEX_procedure((qli_dbb*)database, blob);
+	LEX_token();
+}
+
+
+FB_API_HANDLE PRO_open_blob( qli_dbb* database, ISC_QUAD& blob_id)
+{
+/**************************************
+ *
+ *	P R O _ o p e n _ b l o b
+ *
+ **************************************
+ *
+ * Functional description
+ *	Open a procedure blob.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+	UCHAR bpb[20];
+
+	FB_API_HANDLE blob = 0;
+	UCHAR* p = bpb;
+
+	USHORT bpb_length = p - bpb;
+
+	if (isc_open_blob2(status_vector, &database->dbb_handle, &database->dbb_proc_trans,
+						&blob, &blob_id, bpb_length, bpb))
+	{
+		ERRQ_database_error(database, status_vector);
+	}
+
+	return blob;
+}
+
+
+int PRO_rename_procedure( qli_dbb* database, const TEXT* old_name, const TEXT* new_name)
+{
+/**************************************
+ *
+ *	P R O _ r e n a m e _ p r o c e d u r e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Change the name of a procedure.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+	FB_API_HANDLE request = 0;
+	PRO_setup(database);
+
+	probe(database, new_name);
+
+	USHORT count = 0;
+	FOR(REQUEST_HANDLE request) X IN DB.QLI$PROCEDURES WITH
+		X.QLI$PROCEDURE_NAME EQ old_name count++;
+		MODIFY X USING
+			isc_vtof(new_name, X.QLI$PROCEDURE_NAME, sizeof(X.QLI$PROCEDURE_NAME));
+		END_MODIFY
+		ON_ERROR
+			isc_release_request(gds_status, &request);
+			ERRQ_database_error(database, status_vector);
+		END_ERROR;
+	END_FOR;
+
+	isc_release_request(gds_status, &request);
+
+	// Commit the procedure transaction, if there is one
+
+	PRO_commit(database);
+
+	return count;
+}
+
+
+void PRO_rollback( qli_dbb* database)
+{
+/**************************************
+ *
+ *	P R O _ r o l l b a c k
+ *
+ **************************************
+ *
+ * Functional description
+ *	Rollback the procedure transaction,
+ *	if there is one.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+	if (database->dbb_capabilities & DBB_cap_multi_trans)
+	{
+		isc_rollback_transaction(status_vector, &database->dbb_proc_trans);
+
+		gds_trans = 0;
+	}
+}
+
+
+void PRO_scan( qli_dbb* database, extract_fn_t routine, void* arg)
+{
+/**************************************
+ *
+ *	P R O _ s c a n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Loop thru procedures calling given routine.
+ *
+ **************************************/
+	PRO_setup(database);
+
+	FOR(REQUEST_HANDLE database->dbb_scan_blobs) X IN DB.QLI$PROCEDURES
+		SORTED BY X.QLI$PROCEDURE_NAME
+
+        TEXT* p = X.QLI$PROCEDURE_NAME;
+        // This loop didn't have any effect. However, the logic can't handle
+        // dialect 3 names. At least it's now correct for dialect 1.
+		while (*p && *p != ' ') {
+			p++;
+		}
+        (*routine) (arg, X.QLI$PROCEDURE_NAME, p - X.QLI$PROCEDURE_NAME, database, X.QLI$PROCEDURE);
+	END_FOR
+}
+
+
+void PRO_setup( qli_dbb* dbb)
+{
+/**************************************
+ *
+ *	 P R O _ s e t u p
+ *
+ **************************************
+ *
+ * Functional description
+ *	Prepare for a DML operation on a database.  Start a procedure
+ *	transaction is one hasn't been started and the database
+ *	system will start multiple transactions.  Otherwise use
+ *	the default transaction.
+ *
+ **************************************/
+
+	if (!dbb)
+		IBERROR(77);
+	// Msg 77 database handle required
+
+	DB = dbb->dbb_handle;
+
+	if (dbb->dbb_flags & DBB_procedures)
+	{
+		gds_trans = PRO_transaction(dbb, false);
+		return;
+	}
+
+	// Sigh.  Relation doesn't exist.  So make it exist.
+
+	create_qli_procedures(dbb);
+
+	gds_trans = PRO_transaction(dbb, false);
+}
+
+
+FB_API_HANDLE PRO_transaction( qli_dbb* database, bool update_flag)
+{
+/**************************************
+ *
+ *	P R O _ t r a n s a c t i o n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Setup transaction for procedure or form operation.
+ *
+ *	In any event, we will set up the met_transaction because
+ *	it's widely used and somebody is going to forget to test
+ *	that the database is multi_transaction before using it.
+ *	We have to be careful about committing or rolling back
+ *	because we ould affect user data.
+ *
+ **************************************/
+	if (!database)
+		IBERROR(248);			// Msg248 no active database for operation
+
+	FB_API_HANDLE transaction = (database->dbb_capabilities & DBB_cap_multi_trans) ?
+		database->dbb_proc_trans : 0;
+
+	DB = database->dbb_handle;
+
+	// If we don't know whether or not the database can handle
+	// multiple transactions, find out now
+
+	ISC_STATUS_ARRAY status_vector;
+	if (!transaction &&
+		((database->dbb_capabilities & DBB_cap_multi_trans) ||
+			!(database->dbb_capabilities & DBB_cap_single_trans)))
+	{
+		if (isc_start_transaction(status_vector, &transaction, 1,
+									&database->dbb_handle, sizeof(tpb), tpb))
+		{
+			database->dbb_capabilities |= DBB_cap_single_trans;
+		}
+		else
+			database->dbb_capabilities |= DBB_cap_multi_trans;
+	}
+
+	// If we already have a procedure transaction, there's more nothing to do
+
+	gds_trans = transaction;
+
+	// If we only support a single transaction, use the data transaction
+
+	if (!gds_trans && (database->dbb_capabilities & DBB_cap_single_trans))
+	{
+		if (update_flag)
+			IBERROR(249);		// Msg249 Interactive metadata updates are not available on Rdb
+		if (!(gds_trans = database->dbb_transaction))
+			gds_trans = MET_transaction(nod_start_trans, database);
+	}
+	else if (!gds_trans)
+	{
+		// otherwise make one more effort to start the transaction
+		START_TRANSACTION
+		ON_ERROR
+			ERRQ_database_error(database, status_vector);
+		END_ERROR;
+	}
+
+	database->dbb_proc_trans = gds_trans;
+
+	return gds_trans;
+}
+
+
+static int clear_out_qli_procedures( qli_dbb* dbb)
+{
+/**************************************
+ *
+ *	c l e a r _ o u t  _ q l i _ p r o c e d u r e s
+ *
+ **************************************
+ *
+ * Functional description
+ *	The procedures relation can't be found.  Poke
+ *	around and delete any trash lying around.
+ *	Before cleaning out the trash, see if somebody
+ *	else has set up for us.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+	FB_API_HANDLE req = 0;
+	int count = 0;
+
+	FOR(REQUEST_HANDLE req) R IN DB.RDB$RELATIONS CROSS
+		F IN DB.RDB$FIELDS CROSS RFR IN DB.RDB$RELATION_FIELDS WITH
+			RFR.RDB$RELATION_NAME = R.RDB$RELATION_NAME AND
+			RFR.RDB$FIELD_NAME = F.RDB$FIELD_NAME AND
+			R.RDB$RELATION_NAME = "QLI$PROCEDURES"
+        count++;
+	END_FOR
+	ON_ERROR
+		isc_release_request(status_vector, &req);
+		ERRQ_database_error(dbb, gds_status);
+	END_ERROR;
+	isc_release_request(status_vector, &req);
+
+	if (count >= 2)
+	{
+		dbb->dbb_flags |= DBB_procedures;
+		return 0;
+	}
+
+	count = 0;
+
+	FOR(REQUEST_HANDLE req) X IN DB.RDB$INDICES
+	WITH X.RDB$INDEX_NAME = "QLI$PROCEDURES_IDX1"
+		ERASE X;
+		count++;
+	END_FOR
+	ON_ERROR
+		isc_release_request(status_vector, &req);
+		ERRQ_database_error(dbb, gds_status);
+	END_ERROR;
+	isc_release_request(status_vector, &req);
+
+	FOR(REQUEST_HANDLE req) X IN DB.RDB$INDEX_SEGMENTS
+	WITH X.RDB$INDEX_NAME = "QLI$PROCEDURES_IDX1"
+		ERASE X;
+		count++;
+	END_FOR
+	ON_ERROR
+		isc_release_request(status_vector, &req);
+		ERRQ_database_error(dbb, gds_status);
+	END_ERROR;
+	isc_release_request(status_vector, &req);
+
+	FOR(REQUEST_HANDLE req) X IN DB.RDB$RELATION_FIELDS
+		WITH X.RDB$FIELD_NAME = "QLI$PROCEDURE_NAME" OR
+			X.RDB$FIELD_NAME = "QLI$PROCEDURE"
+        ERASE X;
+		count++;
+	END_FOR
+	ON_ERROR
+		isc_release_request(status_vector, &req);
+		ERRQ_database_error(dbb, gds_status);
+	END_ERROR;
+	isc_release_request(gds_status, &req);
+
+	FOR(REQUEST_HANDLE req) X IN DB.RDB$FIELDS
+		WITH X.RDB$FIELD_NAME = "QLI$PROCEDURE_NAME" OR
+			X.RDB$FIELD_NAME = "QLI$PROCEDURE"
+        ERASE X;
+		count++;
+	END_FOR
+	ON_ERROR
+		isc_release_request(status_vector, &req);
+		ERRQ_database_error(dbb, gds_status);
+	END_ERROR;
+	isc_release_request(gds_status, &req);
+
+	FOR(REQUEST_HANDLE req) X IN DB.RDB$RELATIONS
+		WITH X.RDB$RELATION_NAME = "QLI$PROCEDURES"
+        ERASE X;
+		count++;
+	END_FOR
+	ON_ERROR
+		isc_release_request(status_vector, &req);
+		ERRQ_database_error(dbb, gds_status);
+	END_ERROR;
+	isc_release_request(gds_status, &req);
+
+	return count;
+}
+
+
+static void create_qli_procedures( qli_dbb* dbb)
+{
+/**************************************
+ *
+ *	c r e a t e _ q l i _ p r o c e d u r e s
+ *
+ **************************************
+ *
+ * Functional description
+ *	The procedures relation can't be found.  Clean
+ *      out residual trash and (re)create the relation.
+ *	Before cleaning out the trash, see if somebody
+ *	else has set up for us.
+ *
+ **************************************/
+
+	gds_trans = PRO_transaction(dbb, true);
+
+	if (clear_out_qli_procedures(dbb))
+	{
+		PRO_commit(dbb);
+		gds_trans = PRO_transaction(dbb, true);
+	}
+
+	if (dbb->dbb_flags & DBB_procedures)
+		return;
+
+	if (isc_ddl(gds_status, &DB, &gds_trans, sizeof(dyn_gdl1),
+				 reinterpret_cast<const char*>(dyn_gdl1)))
+	{
+		PRO_rollback(dbb);
+		IBERROR(73);
+		// Msg 73 Could not create QLI$PROCEDURE_NAME field
+	}
+
+	if (isc_ddl(gds_status, &DB, &gds_trans, sizeof(dyn_gdl2),
+				 reinterpret_cast<const char*>(dyn_gdl2)))
+	{
+		PRO_rollback(dbb);
+		IBERROR(74);
+		// Msg 74 Could not create QLI$PROCEDURE field
+	}
+
+	if (isc_ddl(gds_status, &DB, &gds_trans, sizeof(dyn_gdl3),
+				 reinterpret_cast<const char*>(dyn_gdl3)))
+	{
+		PRO_rollback(dbb);
+		IBERROR(75);
+		// Msg 75 Could not create QLI$PROCEDURES relation
+	}
+
+	if (isc_ddl(gds_status, &DB, &gds_trans, sizeof(dyn_gdl4),
+				 reinterpret_cast<const char*>(dyn_gdl4)))
+	{
+		PRO_rollback(dbb);
+		IBERROR(409);
+		// msg 409  Could not create QLI$PROCEDURES index
+	}
+
+	dbb->dbb_flags |= DBB_procedures;
+	PRO_commit(dbb);
+}
+
+
+static void probe( qli_dbb* database, const TEXT* name)
+{
+/**************************************
+ *
+ *	p r o b e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Check whether a procedure name is already in
+ *	use in a particular database.  IBERROR and don't
+ *	return if it is.
+ *
+ **************************************/
+	// Probe to see if procedure is already in use
+
+	FB_API_HANDLE blob = PRO_fetch_procedure(database, name);
+	if (blob)
+	{
+		ISC_STATUS_ARRAY status_vector;
+		isc_close_blob(status_vector, &blob);
+		ERRQ_print_error(76, SafeArg() << name << database->dbb_symbol->sym_string);
+		// Msg 76 procedure name \"%s\" in use in database %s
+	}
+}
+
+
+static int upcase_name(const TEXT* name, TEXT* buffer)
+{
+/**************************************
+ *
+ *	u p c a s e _ n a m e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Upcase a null terminated string and return its length.  If the
+ *	length is greater than 31 bytes, barf.
+ *
+ **************************************/
+	USHORT l = 0;
+
+	while (true)
+	{
+		const TEXT c = *name++;
+		*buffer++ = UPPER(c);
+		if (!c)
+			return l;
+		if (++l > MAX_SQL_IDENTIFIER_LEN)
+			IBERROR(79);		// Msg 79 procedure name over 31 characters
+
+	}
+}
+
+

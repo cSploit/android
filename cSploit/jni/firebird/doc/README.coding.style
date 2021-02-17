@@ -1,0 +1,39 @@
+  Writing FB code every coder should keep in mind these rules:
+
+- Configure your editor to use 4 position for tabstop.
+- indent: 1 tab
+- space after e.g. if/for/while/switch - do "if (", not "if(".
+- no spaces allowed between function name and leading left paren - do
+"foo()", not "foo ()".
+- spaces around operation - do "c = a + b;"
+- spaces between function's parameters
+- no spaces with pointer sign - do "*p++ = *q++" and "char *a".
+- Mandatory braces around scoped code. Closing brace always aligned to the
+first char of the keyword introducing the scope - i.e.
+
+	if (foo) {
+		// code
+	}
+
+or 
+
+	if (foo)
+	{
+		//code
+	}
+
+first form is not allowed if condition exeeds one line. Braces may be omitted 
+only if condition doesn't exceed one line and conditional statement also doesn't 
+exceed one line.
+
+- No spaces in C++ cast expressions. Do "static_cast<type*>(ptr)", not
+"static_cast < type * > ( ptr )".
+- Prefer to keep lines shorter than 80 chars.
+- Prefer initialization over assignment.
+- Don't break the build. Before commiting do full build cycle from
+scratch (on all available platforms).
+- Always end source files, including headers, with a newline.
+- Prefer C++ style for comments
+- Use abstract datatypes (UCHAR, SSHORT, ULONG etc) instead of generic
+ones (unsigned char, short, unsigned long resp) because generic types
+can be changed unexpectedly (long int become 64 bits for example).

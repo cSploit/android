@@ -1,0 +1,13 @@
+--- libnet.orig/src/libnet_build_ntp.c
++++ libnet/src/libnet_build_ntp.c
+@@ -85,8 +85,8 @@
+     ntp_hdr.ntp_ref_ts.fraction     = htonl(ref_ts_frac);
+     ntp_hdr.ntp_orig_ts.integer     = htonl(orig_ts_int);
+     ntp_hdr.ntp_orig_ts.fraction    = htonl(orig_ts_frac);
+-    ntp_hdr.ntp_rec_ts.integer      = htonl(orig_ts_int);
+-    ntp_hdr.ntp_rec_ts.fraction     = htonl(orig_ts_frac);
++    ntp_hdr.ntp_rec_ts.integer      = htonl(rec_ts_int);
++    ntp_hdr.ntp_rec_ts.fraction     = htonl(rec_ts_frac);
+     ntp_hdr.ntp_xmt_ts.integer      = htonl(xmt_ts_int);
+     ntp_hdr.ntp_xmt_ts.fraction     = htonl(xmt_ts_frac);
+ 

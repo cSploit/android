@@ -1,0 +1,360 @@
+                      (-*- text -*-)
+
+               Subversion Commandline Client:  Test Suite
+               ==========================================
+
+The cmdline client test suite doesn't use the C-level testing
+framework, but is structured similarly.  Instead of testing library
+APIs, it drives the client just like a user would, examining the
+output and the on-disk results (i.e., the working copy) carefully as
+it goes.  In other words, this is "black box" testing of the
+command-line client.  It has no access to code internals; it never
+looks inside the .svn/ directory; it only performs actions that a
+human user would do.
+
+These tests require Python 2.4 or later.
+
+  [ For more general information on Subversion's testing system,
+    please read the README in subversion/tests/. ]
+
+
+How To Run The Tests
+====================
+
+To run a test script over ra_local, invoke it from THIS DIRECTORY.
+
+   $ cd subversion/tests/cmdline/
+
+Invoke the script with no arguments to run all the tests in that
+script:
+
+   $ ./basic_tests.py
+
+Invoke with one or more numeric arguments to run those particular tests:
+
+   $ ./basic_tests.py 7 13 17
+
+Invoke with one or more function names to run those particular tests:
+
+   $ ./basic_tests.py basic_mkdir_wc_with_parents basic_switch basic_import
+
+And invoke with the "--list" option to list information about some or
+all tests available in that script:
+
+   $ ./basic_tests.py --list 2 3 4
+   $ ./basic_tests.py --list
+
+Note: if you are building Subversion in a directory other than the source
+directory (q.v. INSTALL), you will have to invoke the tests from within
+the build directory:
+
+   $ cd obj/subversion/tests/cmdline
+   $ ../../../../svn/subversion/tests/cmdline/basic_tests.py
+
+
+Running over mod_dav_svn
+------------------------
+
+Running a script over mod_dav_svn is basically the same, but you have to
+set up httpd 2.0 first (on the same machine, since the tests create
+repositories on the fly), and pass a URL argument to the test scripts.
+
+Assuming you have httpd 2.0 installed in /usr/local/apache2, just add
+two Location directives to /usr/local/apache2/conf/httpd.conf, with
+paths adjusted appropriately:
+
+   <Location /svn-test-work/repositories>
+     DAV svn
+     SVNParentPath /home/yourusernamehere/projects/svn/subversion/tests/cmdline/svn-test-work/repositories
+     AuthzSVNAccessFile /home/yourusernamehere/projects/svn/subversion/tests/cmdline/svn-test-work/authz
+     AuthType Basic
+     AuthName "Subversion Repository"
+     AuthUserFile /usr/local/apache2/conf/users
+     Require valid-user
+   </Location>
+
+   <Location /svn-test-work/local_tmp/repos>
+     DAV svn
+     SVNPath /home/yourusernamehere/projects/svn/subversion/tests/cmdline/svn-test-work/local_tmp/repos
+     AuthzSVNAccessFile /home/yourusernamehere/projects/svn/subversion/tests/cmdline/svn-test-work/authz
+     AuthType Basic
+     AuthName "Subversion Repository"
+     AuthUserFile /usr/local/apache2/conf/users
+     Require valid-user
+   </Location>
+
+   RedirectMatch permanent ^/svn-test-work/repositories/REDIRECT-PERM-(.*)$ /svn-test-work/repositories/$1
+   RedirectMatch           ^/svn-test-work/repositories/REDIRECT-TEMP-(.*)$ /svn-test-work/repositories/$1
+
+Httpd should be running on port 80.  You may also need to ensure that
+it's running as you, so it has read/write access to the repositories
+that are probably living in your Subversion working copy.  To do this,
+set the User and Group directives in httpd.conf, something like this:
+
+   User yourusernamehere
+   Group users
+
+You need to run the tests over mod_dav_svn with authentication enabled, so
+just drop the following 2-line snippet into the
+/usr/local/apache2/conf/users file [1]:
+
+----------------------------
+jrandom:xCGl35kV9oWCY
+jconstant:xCGl35kV9oWCY
+----------------------------
+
+Now, (re)start Apache and run the tests over mod_dav_svn.
+
+You can run a test script over DAV:
+
+   $ ./basic_tests.py --url http://localhost
+   $ ./basic_tests.py --url http://localhost 3
+
+or 
+
+   $ ./basic_tests.py --url=http://localhost
+   $ ./basic_tests.py --url=http://localhost 3
+
+If you run httpd on a port other than 80, you can specify the port in
+the URL: "http://localhost:15835" for example.
+
+To run all tests over DAV, pass BASE_URL when running 'make check'
+from the top of the build dir:
+
+   $ make check BASE_URL=http://localhost
+
+BASE_URL=URL can also be used when running individual tests:
+
+   $ ./basic_tests.py BASE_URL=http://localhost
+   $ ./basic_tests.py BASE_URL=http://localhost 3
+
+
+Note [1]: It would be quite too much to expect those password entries
+          to work on Windows... Apache httpd on Windows doesn't
+          understand crypted passwords, but it does understand
+          MD5-hashed passwords.  The correct password entries for
+          Windows are:
+
+          ----------------------------
+          jrandom:$apr1$3p1.....$FQW6RceW5QhJ2blWDQgKn0
+          jconstant:$apr1$jp1.....$Usrqji1c9H6AbOxOGAzzb0
+          ----------------------------
+
+
+[If you want to test with serf instead of neon:
+
+  $ ./basic_tests.py --url=http://localhost --http-library=serf
+
+  or
+
+  $ make check BASE_URL=http://localhost HTTP_LIBRARY=serf
+]
+
+
+
+Running over ra_svn
+-------------------
+
+It's also easy to run the tests against a local svnserve:
+
+$ subversion/svnserve/svnserve -d -r `pwd`/subversion/tests/cmdline
+$ make check BASE_URL=svn://localhost
+
+or, to run individual tests,
+
+$ ./basic_tests.py --url=svn://localhost 3
+
+To enable Cyrus SASL on the server side you should either set the
+ENABLE_SASL variable when calling make:
+
+$ make check BASE_URL=svn://localhost ENABLE_SASL=true
+
+or if you're running an individual test,
+
+$ ./basic_tests.py --url=svn://localhost --enable-sasl 3
+
+Note that to do this you'll have to have a subversion.conf file in your
+SASL lib dir (i.e. something like /usr/lib/sasl2/subversion.conf), it
+should contain something like:
+
+pwcheck_method: auxprop
+mech_list: CRAM-MD5
+
+And then you'll have to add the users jrandom and jconstant to your
+SASL password db,
+
+$ saslpasswd2 -c -u svntest jrandom
+$ saslpasswd2 -c -u svntest jconstant
+
+As usual, both users should use the password 'rayjandom'.
+
+
+Running tests in a RAM disk
+--------------------------
+
+Test execution can be dramatically sped up by keeping Subversion test
+data on a RAM disk. On a Linux system, you can mount a RAM disk on the
+fly with the command:
+
+ mount -t tmpfs tmpfs /path/to/src/subversion/tests/cmdline/svn-test-work \
+  -o uid=$USER,mode=770,size=32m
+
+Or, for a more permanent solution, add lines like the following in your
+/etc/fstab file:
+
+ tmpfs /path/to/src/svn/subversion/tests/cmdline/svn-test-work tmpfs defaults,user,noauto,exec,size=32m
+
+The minimum required size for testing ramdisk is approximately 700MB.
+However, flagging your test targets for cleanup dramatically reduces
+the space requirements (as shown in the example configuration above),
+and thus your memory usage. Cleanup means more I/O, but since test
+data is in-memory, there will be no performance degradation. Example:
+
+  make check CLEANUP=true 
+
+See http://svn.haxx.se/dev/archive-2003-02/0068.shtml for the original
+authoritative discussion on use of RAM disks.
+
+
+Directory Contents
+==================
+
+   *.py                  The tests themselves.
+
+   svntest/              Python package, provides test suite framework
+
+          /main.py:         Global vars, utility routines; exports
+                            run_tests(), the main test routine.
+
+          /tree.py:         Infrastructure for SVNTreeNode class.
+                              - tree constructors, tree comparison routines.
+                              - routines to parse subcommand output into
+                                specific kinds of trees.
+                              - routines to parse a working copy and
+                                entries files into specific kinds of trees.
+
+          /wc.py:           Functions for interacting with a working
+                            copy, and converting to/from trees.
+
+          /actions.py:      Main API for driving subversion client and
+                            using trees to verify results. 
+
+          /verify.py:       Verifies output from Subversion.
+
+          /entry.py:        Parse an `entries' file (### not used yet)
+
+
+
+What the Python Tests are Doing
+===============================
+
+I.  Theory
+
+  A. Types of Verification
+
+   The point of this test system is that it's *automated*: that is,
+   each test can algorithmically verify the results and indicate "PASS"
+   or "FAIL".
+
+   We've identified two broad classes of verification:
+
+   1.  Verifying svn subcommand output.
+
+      Most important subcommands (co, up, ci, im, st) print results to
+      stdout as a list of paths.  Even though the paths may be printed
+      out in an unpredictable order, we still want to make sure this
+      list is exactly the *set* of lines we expect to get.
+
+   2.  Verifying the working copy itself.
+
+      Every time a subcommand could potentially change something on
+      disk, we need to inspect the working copy.  Specifically, this
+      means we need to make sure the working copy has exactly the
+      tree-structure we expect, and each file has exactly the contents
+      and properties we expect.
+
+
+II.  Practice:  Trees
+
+  Sam TH <sam@uchicago.edu> proposed and began work on a solution
+  whereby all important, inspectable information is parsed into a
+  general, in-memory tree representation.  By comparing actual
+  vs. expected tree structures, we get automated verification.
+
+  A.  Tree node structure
+
+      Each "tree node" in a tree has these fields:
+
+      - name :  the name of the node
+      - children:  list of child nodes (if the node is a dir)
+      - contents:  textual contents (if the node is a file)
+      - properties:  a hash to hold subversion props
+      - atts:        a hash of meta-information about tree nodes themselves
+
+
+  B.  Parsing subcommand output into a tree
+
+      Special parsers examine lines printed by subcommands, and
+      convert them into a tree of tree-nodes.  The 'contents' and
+      'properties' fields are empty; but prepending on the subcommand,
+      specific attributes in the 'atts' field are set in tree-nodes:
+
+       - svn co/up:        a 'status' attribute is set to a two-character
+                           value from the set (A, D, G, U, C, _, ' ') or
+                           a 'verb' attribute is set to ('Restored')
+
+       - svn status:       a 'status' attribute (as above), plus 'wc_rev'
+                           and 'repos_rev' attributes to hold the wc
+                           and repos revision numbers.
+
+       - svn ci/im:        a 'verb' attribute is set to one of
+                           (Adding, Sending, Deleting)
+
+
+  C.  Parsing a working copy into a tree
+
+     We also have a routines that walks a regular working copy and
+     returns a tree representing disk contents and props.  In this
+     case the 'atts' hash in each node is empty, but the 'contents'
+     and 'props' fields are filled in.
+
+
+
+How to Write New Tests
+======================
+
+If you'd like to write a new python test, first decide which file it
+might fit into; test scripts each contain collections of tests grouped
+by rough categories.  (Is it testing a new subcommand?  New
+enhancement?  Tricky use-case?  Regression test?)
+
+Next, read the long documentation comment at the top of
+svntest/tree.py.  It will explain the general API that most tests use.
+
+Finally, try copying-and-pasting a simple test and then edit from
+there.  Don't forget to add your test to the 'test_list' variable at
+the bottom of the file. To avoid renumbering of existing tests, you
+should add new tests to the end of the list.
+
+
+Testing Compatability With Previous Release
+===========================================
+
+You can run the Python test suite against older installed versions of
+the Subversion servers.  This mail fragment introduces the ability:
+
+   Message-ID: <1ea387f60804091828q48c9d18ah7bf8d89ef7d39461@mail.gmail.com>
+   Date: Wed, 9 Apr 2008 18:28:40 -0700
+   From: "David Glasser" <glasser@davidglasser.net>
+   To: "Subversion Developers" <dev@subversion.tigris.org>
+   Subject:  backwards-compatibility testing!
+   
+   I've updated the expectations on trunk so that you can cleanly run the
+   test suite against 1.4.x svnserve or DAV.  You do this by adding
+   SERVER_MINOR_VERSION=4 with make check, or --server-minor-version 4 to
+   run_tests.py or a specific Python test.
+   
+   [...]
+
+We expect that post-1.5, this support will expand in the obvious ways
+(allowing "--server-minor-version 5" and SERVER_MINOR_VERSION=5).

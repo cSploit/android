@@ -1,0 +1,41 @@
+# Makefile.in for back-ldif
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 2005-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+SRCS = ldif.c
+OBJS = ldif.lo
+
+LDAP_INCDIR= ../../../include       
+LDAP_LIBDIR= ../../../libraries
+
+BUILD_OPT = "--enable-ldif"
+BUILD_MOD = yes
+
+mod_DEFS = -DSLAPD_IMPORT
+MOD_DEFS = $(yes_DEFS)
+
+shared_LDAP_LIBS = $(LDAP_LIBLDAP_R_LA) $(LDAP_LIBLBER_LA)
+NT_LINK_LIBS = -L.. -lslapd $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+UNIX_LINK_LIBS = $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+
+LIBBASE = back_ldif
+
+XINCPATH = -I.. -I$(srcdir)/..
+XDEFS = $(MODULES_CPPFLAGS)
+
+all-local-lib:	../.backend
+
+../.backend: lib$(LIBBASE).a
+	@touch $@
+

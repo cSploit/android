@@ -1,0 +1,73 @@
+Configuration files for ncpfs
+=============================
+
+There are two configuration files for ncpfs, local and global. Local 
+configuration file lives in ${HOME}/.nwclient, global one lives in 
+/etc/ncpfs.conf. File is in UTF8 encoding.
+
+Local configuration file is split into two parts - non-sectioned and sectioned.
+Non-sectioned contains old contents of .nwclient file - "server/user password" 
+triplets (eventually with user or password ommited).
+
+Sectioned part (and whole /etc/ncpfs.conf file) contains couple of sections. 
+Each section is started with "[Section Name]" line, lines in section are in 
+format "Key Name = value". If value contains hash (#) or semicolon (;), you
+must either prefix these characters with backslash (\) or enclose value into 
+quotes (') or double quotes ("). If value contains backslash (\), you must 
+prefix it with backslash. If value in quotes contains same quote, you must prefix 
+it with backslash. Code knows two special values, "\n" for LF and "\r" for CR 
+- although currently there is no reason for embed them into values.
+
+Comments begin with hash (#) or semicolon (;) and can occur on any place 
+outside quotes.
+
+Following four examples mean same thing:
+Strange Value = Strange Value "1
+Strange Value = Strange\ Value\ "1
+Strange Value = "Strange Value \"1"
+Strange Value = 'Strange Value "1'
+
+Currently known configuration options:
+
+[Requester]
+
+Local Charset = <charset name>
+			Charset name is in internal system form, for glibc 2.1 
+			it is codepage name with two trailing slashes ("//").
+			On non-iconv systems (such as libc5/libc6.0) you can 
+			use only "WCHAR_T//", "ISO-8859-1//" and "UTF-8//" 
+			charsets.
+			On glibc2.1 systems, you must add line
+			"alias WCHAR_T// INTERNAL" at the end of
+			"/usr/lib/gconv/gconv-modules" file. Without this,
+			iconv will not work on little-endian machines, such
+			as ix86.
+			On glibc2.2 systems you can use any encoding reported
+			by "iconv -l".
+			If you'll use encoding which can contain zero bytes
+			in the middle of string (such as UTF-16, UCS2 or
+			UCS4), supplied utilities may not work correctly.
+			Also, output of utilities is based on localization
+			files and not on selected codepage.
+		Default: "ISO-8859-1//"
+
+Default Tree Name = <tree name>
+			Tree name is specified without trailing underscores.
+		Default: no default, system will complain when trying to use
+			default tree name
+
+Default Name Context = <default name context>
+			Default name context is specified relative to [Root].
+		Default: "[Root]"
+
+NetWare Protocol = <authenticators>
+			List of authenticators, separated by spaces or commas.
+			Currently two authenticators are known, "NDS" and "BIND".
+		Default: "NDS BIND"
+		
+[Tree <tree name>]
+
+Default Name Context = <default name context>
+			Default name context is specified relative to [Root].
+		Default: value specified for Default Name Context in 
+			[Requester] section.

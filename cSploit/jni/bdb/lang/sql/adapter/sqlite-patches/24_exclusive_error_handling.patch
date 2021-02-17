@@ -1,0 +1,47 @@
+--- src/prepare.c
++++ src/prepare.c
+@@ -249,6 +249,10 @@
+   */
+   for(i=0; i<ArraySize(meta); i++){
+     sqlite3BtreeGetMeta(pDb->pBt, i+1, (u32 *)&meta[i]);
++    if ( rc == SQLITE_OK && db->errCode == SQLITE_BUSY ) {
++      rc = db->errCode;
++      goto initone_error_out;
++    }
+   }
+   pDb->pSchema->schema_cookie = meta[BTREE_SCHEMA_VERSION-1];
+ 
+@@ -480,7 +484,10 @@
+     ** set Parse.rc to SQLITE_SCHEMA. */
+     sqlite3BtreeGetMeta(pBt, BTREE_SCHEMA_VERSION, (u32 *)&cookie);
+     assert( sqlite3SchemaMutexHeld(db, iDb, 0) );
+-    if( cookie!=db->aDb[iDb].pSchema->schema_cookie ){
++    if( pParse->rc == SQLITE_OK && db->errCode == SQLITE_BUSY )
++      pParse->rc = db->errCode;
++    if( pParse->rc != SQLITE_BUSY &&
++      cookie!=db->aDb[iDb].pSchema->schema_cookie ){
+       sqlite3ResetOneSchema(db, iDb);
+       pParse->rc = SQLITE_SCHEMA;
+     }
+--- src/vdbe.c
++++ src/vdbe.c
+@@ -2999,6 +2999,8 @@
+   assert( (p->btreeMask & (((yDbMask)1)<<iDb))!=0 );
+ 
+   sqlite3BtreeGetMeta(db->aDb[iDb].pBt, iCookie, (u32 *)&iMeta);
++  if ( rc == SQLITE_OK && db->errCode == SQLITE_BUSY )
++    rc = db->errCode;
+   pOut->u.i = iMeta;
+   break;
+ }
+@@ -3071,6 +3073,10 @@
+   pBt = db->aDb[pOp->p1].pBt;
+   if( pBt ){
+     sqlite3BtreeGetMeta(pBt, BTREE_SCHEMA_VERSION, (u32 *)&iMeta);
++    if (db->errCode == SQLITE_BUSY) {
++      rc = db->errCode;
++      break;
++    }
+     iGen = db->aDb[pOp->p1].pSchema->iGeneration;
+   }else{
+     iGen = iMeta = 0;

@@ -1,0 +1,66 @@
+#!/bin/sh -
+#
+# $Id$
+#
+# Run the collections/bind test suite.
+
+# NOTES:
+# This test requires one JAR not included with the Berkeley DB
+# distribution:  JUnit (junit.jar) I've been using the 8/31/2002 version
+# of JUnit.  You can download this JAR from http://jakarta.apache.org/
+#
+# JUNIT_JAR=/Users/gburd/Unix/opt/junit/junit.jar
+
+[ "x$JUNIT_JAR" = "x" ] && {
+	echo 'FAIL: unset environment variable JUNIT_JAR for junit.jar.'
+	exit 1
+}
+
+[ -f $JUNIT_JAR ] || {
+	echo 'FAIL: JUNIT_JAR not a valid path to the junit.jar.'
+	exit 1
+}
+
+case `uname` in
+	*CYGWIN*WOW64*)
+	d=../../../build_windows/x64/Debug
+	DB_LIB_DIR="$d"
+	REQUIRED_JARS="`cygpath -m $JUNIT_JAR`"
+	CP_SEP=";"
+	PATH="`pwd`/$DB_LIB_DIR:$PATH"
+	export PATH;;
+	*CYGWIN*)
+	d=../../../build_windows/Win32/Debug
+	DB_LIB_DIR="$d"
+	REQUIRED_JARS="`cygpath -m $JUNIT_JAR`"
+	CP_SEP=";"
+	PATH="`pwd`/$DB_LIB_DIR:$PATH"
+	export PATH;;
+	*)
+	d=../../../build_unix
+	DB_LIB_DIR="$d/.libs"
+	REQUIRED_JARS=$JUNIT_JAR
+	CP_SEP=":"
+	LD_LIBRARY_PATH="`pwd`/$DB_LIB_DIR:$LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH
+	# Systems like Darwin use DYLD_LIBRARY_PATH.
+	DYLD_LIBRARY_PATH="`pwd`/$DB_LIB_DIR:$DYLD_LIBRARY_PATH"
+	export DYLD_LIBRARY_PATH
+	;;
+esac
+DB_JAR="$d/db.jar"
+CLASSPATH="${REQUIRED_JARS}${CP_SEP}${CLASSPATH}"
+export DB_JAR
+export REQUIRED_JARS
+export CP_SEP
+export CLASSPATH
+
+ANT=${ANT:-ant}
+
+$ANT -Ddb.jar=$DB_JAR clean
+$ANT -Ddb.jar=$DB_JAR test
+
+$ANT -Ddb.jar=$DB_JAR clean
+$ANT -Ddb.jar=$DB_JAR examples
+
+exit 0

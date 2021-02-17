@@ -1,0 +1,71 @@
+# dyngroup.schema -- Dynamic Group schema
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+# Dynamic Group schema (experimental), as defined by Netscape.  See
+# http://www.redhat.com/docs/manuals/ent-server/pdf/esadmin611.pdf
+# page 70 for details on how these groups were used.
+#
+# A description of the objectclass definition is available here:
+# http://www.redhat.com/docs/manuals/dir-server/schema/7.1/oc_dir.html#1303745
+#
+# depends upon:
+#       core.schema
+#
+# These definitions are considered experimental due to the lack of
+# a formal specification (e.g., RFC).
+#
+# NOT RECOMMENDED FOR PRODUCTION USE!  USE WITH CAUTION!
+#
+# The Netscape documentation describes this as an auxiliary objectclass
+# but their implementations have always defined it as a structural class.
+# The sloppiness here is because Netscape-derived servers don't actually
+# implement the X.500 data model, and they don't honor the distinction
+# between structural and auxiliary classes. This fact is noted here:
+# http://forum.java.sun.com/thread.jspa?threadID=5016864&messageID=9034636
+#
+# In accordance with other existing implementations, we define it as a
+# structural class.
+#
+# Our definition of memberURL also does not match theirs but again
+# their published definition and what works in practice do not agree.
+# In other words, the Netscape definitions are broken and interoperability
+# is not guaranteed.
+#
+# Also see the new DynGroup proposed spec at
+# http://tools.ietf.org/html/draft-haripriya-dynamicgroup-02
+dn: cn=dyngroup,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: dyngroup
+olcObjectIdentifier: {0}NetscapeRoot 2.16.840.1.113730
+olcObjectIdentifier: {1}NetscapeLDAP NetscapeRoot:3
+olcObjectIdentifier: {2}NetscapeLDAPattributeType NetscapeLDAP:1
+olcObjectIdentifier: {3}NetscapeLDAPobjectClass NetscapeLDAP:2
+olcObjectIdentifier: {4}OpenLDAPExp11 1.3.6.1.4.1.4203.666.11
+olcObjectIdentifier: {5}DynGroupBase OpenLDAPExp11:8
+olcObjectIdentifier: {6}DynGroupAttr DynGroupBase:1
+olcObjectIdentifier: {7}DynGroupOC DynGroupBase:2
+olcAttributeTypes: {0}( NetscapeLDAPattributeType:198 NAME 'memberURL' DESC 'I
+ dentifies an URL associated with each member of a group. Any type of labeled 
+ URL can be used.' SUP labeledURI )
+olcAttributeTypes: {1}( DynGroupAttr:1 NAME 'dgIdentity' DESC 'Identity to use
+  when processing the memberURL' SUP distinguishedName SINGLE-VALUE )
+olcAttributeTypes: {2}( DynGroupAttr:2 NAME 'dgAuthz' DESC 'Optional authoriza
+ tion rules that determine who is allowed to assume the dgIdentity' EQUALITY a
+ uthzMatch SYNTAX 1.3.6.1.4.1.4203.666.2.7 X-ORDERED 'VALUES' )
+olcObjectClasses: {0}( NetscapeLDAPobjectClass:33 NAME 'groupOfURLs' SUP top S
+ TRUCTURAL MUST cn MAY ( memberURL $ businessCategory $ description $ o $ ou $
+  owner $ seeAlso ) )
+olcObjectClasses: {1}( DynGroupOC:1 NAME 'dgIdentityAux' SUP top AUXILIARY MAY
+  ( dgIdentity $ dgAuthz ) )

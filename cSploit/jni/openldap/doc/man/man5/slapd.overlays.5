@@ -1,0 +1,174 @@
+.TH SLAPD.OVERLAYS 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2006-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd.overlays \- overlays for slapd, the stand-alone LDAP daemon
+.SH DESCRIPTION
+The
+.BR slapd (8)
+daemon can use a variety of different overlays to alter or extend
+the normal behavior of a database backend.
+Overlays may be compiled statically into slapd, or when module support
+is enabled, they may be dynamically loaded. Most of the overlays
+are only allowed to be configured on individual databases, but some
+may also be configured globally.
+
+Configuration options for each overlay are documented separately in the
+corresponding
+.BR slapo\-<overlay> (5)
+manual pages.
+.TP
+.B accesslog
+Access Logging.
+This overlay can record accesses to a given backend database on another
+database.
+.TP
+.B auditlog
+Audit Logging.
+This overlay records changes on a given backend database to an LDIF log
+file.
+By default it is not built.
+.TP
+.B chain
+Chaining.
+This overlay allows automatic referral chasing when a referral would
+have been returned, either when configured by the server or when 
+requested by the client.
+.TP
+.B collect
+Collective Attributes.
+This overlay implements RFC 3671 collective attributes; these
+attributes share common values over all the members of the collection
+as inherited from an ancestor entry.
+.TP
+.B constraint
+Constraint.
+This overlay enforces a regular expression constraint on all values
+of specified attributes. It is used to enforce a more rigorous
+syntax when the underlying attribute syntax is too general.
+.TP
+.B dds
+Dynamic Directory Services.
+This overlay supports dynamic objects, which have a limited life after
+which they expire and are automatically deleted.
+.TP
+.B dyngroup
+Dynamic Group.
+This is a demo overlay which extends the Compare operation to detect
+members of a dynamic group.
+It has no effect on any other operations.
+.TP
+.B dynlist
+Dynamic List.
+This overlay allows expansion of dynamic groups and more.
+.TP
+.B memberof
+MemberOf.
+This overlay maintains automatic reverse group membership values,
+typically stored in an attribute called memberOf.
+.TP
+.B pbind
+Proxybind.
+This overlay forwards simple bind requests on a local database to a
+remote LDAP server.
+.TP
+.B pcache
+Proxycache.
+This overlay allows caching of LDAP search requests in a local database.
+It is most often used with the
+.BR slapd\-ldap (5)
+or
+.BR slapd\-meta (5)
+backends.
+.TP
+.B ppolicy
+Password Policy.
+This overlay provides a variety of password control mechanisms,
+e.g. password aging, password reuse and duplication control, mandatory
+password resets, etc.
+.TP
+.B refint
+Referential Integrity.
+This overlay can be used with a backend database such as
+.BR slapd\-bdb (5)
+to maintain the cohesiveness of a schema which utilizes reference
+attributes.
+.TP
+.B retcode
+Return Code.
+This overlay is useful to test the behavior of clients when
+server-generated erroneous and/or unusual responses occur.
+.TP
+.B rwm
+Rewrite/remap.
+This overlay is experimental.
+It performs basic DN/data rewrite and
+objectClass/attributeType mapping.
+.TP
+.B sssvlv
+Server Side Sorting and Virtual List Views.
+This overlay implements the RFC2891 server-side sorting control and
+virtual list view controls, and replaces the RFC2696 paged-results
+implementation to ensure it works with the sorting technique.
+.TP
+.B syncprov
+Syncrepl Provider.
+This overlay implements the provider-side support for
+.B syncrepl
+replication, including persistent search functionality.
+.TP
+.B translucent
+Translucent Proxy.
+This overlay can be used with a backend database such as
+.BR slapd\-bdb (5)
+to create a "translucent proxy".
+Content of entries retrieved from a remote LDAP server can be partially
+overridden by the database.
+.TP
+.B unique
+Attribute Uniqueness.
+This overlay can be used with a backend database such as
+.BR slapd\-bdb (5)
+to enforce the uniqueness of some or all attributes within a subtree.
+.TP
+.B valsort
+Value Sorting.
+This overlay can be used to enforce a specific order for the values
+of an attribute when it is returned in a search.
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.TP
+ETCDIR/slapd.d
+default slapd configuration directory
+.SH SEE ALSO
+.BR ldap (3),
+.BR slapo\-accesslog (5),
+.BR slapo\-auditlog (5),
+.BR slapo\-chain (5),
+.BR slapo\-collect (5),
+.BR slapo\-constraint (5),
+.BR slapo\-dds (5),
+.BR slapo\-dyngroup (5),
+.BR slapo\-dynlist (5),
+.BR slapo\-memberof (5),
+.BR slapo\-pbind (5),
+.BR slapo\-pcache (5),
+.BR slapo\-ppolicy (5),
+.BR slapo\-refint (5),
+.BR slapo\-retcode (5),
+.BR slapo\-rwm (5),
+.BR slapo\-sssvlv (5),
+.BR slapo\-syncprov (5),
+.BR slapo\-translucent (5),
+.BR slapo\-unique (5).
+.BR slapo\-valsort (5).
+.BR slapd\-config (5),
+.BR slapd.conf (5),
+.BR slapd.backends (5),
+.BR slapd (8).
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

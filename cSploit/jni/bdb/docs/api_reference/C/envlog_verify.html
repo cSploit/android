@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_ENV-&gt;log_verify()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="env.html" title="Chapter 5.  The DB_ENV Handle" />
+    <link rel="prev" href="envget_verbose.html" title="DB_ENV-&gt;get_verbose()" />
+    <link rel="next" href="envlsn_reset.html" title="DB_ENV-&gt;lsn_reset()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_ENV-&gt;log_verify()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envget_verbose.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. 
+                The DB_ENV Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envlsn_reset.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envlog_verify"></a>DB_ENV-&gt;log_verify()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+int
+DB_ENV-&gt;log_verify(DB_ENV *dbenv, const DB_LOG_VERIFY_CONFIG *config); 
+    </pre>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;log_verify()</code> method verifies the integrity 
+         of the log records of an environment and writes both error 
+         and normal messages to the error/message output facility of the database environment handle.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;log_verify()</code>  method does not perform the 
+         locking function, even in Berkeley DB environments that are configured with a
+         locking subsystem. Because this function does not access any database files, you can call it even when the environment has other threads of control
+         attached and running.
+         
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;log_verify()</code>  method is the underlying method used by the 
+         <code class="methodname">DB_ENV-&gt; db_log_verify</code> utility. See the
+          <code class="methodname">DB_ENV-&gt; db_log_verify</code> utility 
+         source code for an example of using <code class="methodname">DB_ENV-&gt;log_verify()</code> in a IEEE/ANSI Std
+         1003.1 (POSIX) environment.
+    </p>
+      <p> 
+         The <code class="methodname">DB_ENV-&gt;log_verify()</code> method returns DB_LOG_VERIFY_BAD when either log errors 
+         are detected or the internal data storage layer does not work. 
+         It returns EINVAL if you specify wrong configurations.
+
+         Unless otherwise specified, the <code class="methodname">DB_ENV-&gt;log_verify()</code> 
+         <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51662872"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51672528"></a>config </h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                     	The configuration parameter of type DB_LOG_VERIFY_CONFIG is for the verification of log files. 
+                     	A struct variable of this type must be memset to 0 before setting any configurations to it.
+                     </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51664688"></a>DB_LOG_VERIFY_CONFIG members</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">
+struct __db_logvrfy_config {
+int continue_after_fail, verbose;
+u_int32_t cachesize;
+const char *temp_envhome;
+const char *dbfile, *dbname;
+DB_LSN start_lsn, end_lsn;
+time_t start_time, end_time;
+};
+</pre>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51643688"></a>continue_after_fail</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          The <span class="bold"><strong>continue_after_fail</strong></span> parameter specifies whether or not continue the verification process when an error in the log is detected. 
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51623432"></a>verbose</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          The <span class="bold"><strong>verbose</strong></span> parameter specifies whether or not to display verbose output during the verification process.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51650088"></a>cachesize</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          The <span class="bold"><strong>cachesize</strong></span> parameter specifies the size of the cache of the temporary internal environment in bytes.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51634720"></a> temp_envhome</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          The <span class="bold"><strong>temp_envhome</strong></span> parameter is the home directory of the temporary database environment that is used internally during the verification. It can be NULL, meaning the environment and all databases are in-memory.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51666856"></a>dbfile</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          The <span class="bold"><strong>dbfile</strong></span> parameter specifies that for log records involving a database file, only those related to this database file are verified. Log records not involving database files are verified regardless of this parameter.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51672592"></a>dbname</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          The <span class="bold"><strong>dbname</strong></span> parameter specifies that for log records involving a database file, only those related to this database file are verified. Log records not involving database files are verified regardless of this parameter.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51673656"></a>start_lsn and end_lsn </h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          The <span class="bold"><strong>start_lsn</strong></span>
+                          and <span class="bold"><strong>end_lsn </strong></span> parameters specify the range of log records from the entire log set, that must be verified. Either of them can be [0][0], to specify an open ended range. If both of them are [0][0] (by default) the entire log is verified.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51675976"></a>start_time and end_time </h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          The <span class="bold"><strong>start_time</strong></span>
+                          and <span class="bold"><strong>end_time </strong></span>
+                          parameters specify range of log records from the entire log set that must be verified for a time range. Either of them can be 0, to specify an open ended range. If both of them are 0 (by default), the entire log is verified. 
+                    </p>
+          <p>
+                    Note that the time range specified is not precise, because such a time range is converted to an lsn range based on the time points we know from transaction commits and checkpoints. 
+                    </p>
+          <p>
+                    You can specify either an lsn range or a time range. You can neither specify both nor specify an lsn and a time as a range.
+                     </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51677312"></a>Environment Variables</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                         If the database is opened within a database environment, the
+                         environment variable <code class="literal">DB_HOME</code> can be used as the path of the
+                         database environment home.
+                    </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51645960"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                         The <code class="methodname">DB_ENV-&gt;log_verify()</code> <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+                    </p>
+        <p>EINVAL or DB_LOG_VERIFY_BAD.</p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51665888"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a>  
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51682792"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                     <a class="xref" href="env.html#envlist" title="Database Environments and Related Methods">Database Environments and Related Methods</a> 
+                </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envget_verbose.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="env.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envlsn_reset.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_ENV-&gt;get_verbose() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_ENV-&gt;lsn_reset()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

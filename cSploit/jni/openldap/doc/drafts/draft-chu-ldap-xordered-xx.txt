@@ -1,0 +1,952 @@
+
+
+
+Network Working Group                                             H. Chu
+Internet-Draft                                               Symas Corp.
+Intended status: Informational                                  May 2006
+Expires: November 2, 2006
+
+
+                   Ordered Entries and Values in LDAP
+                     draft-chu-ldap-xordered-00.txt
+
+Status of this Memo
+
+   By submitting this Internet-Draft, each author represents that any
+   applicable patent or other IPR claims of which he or she is aware
+   have been or will be disclosed, and any of which he or she becomes
+   aware will be disclosed, in accordance with Section 6 of BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on November 2, 2006.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2006).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu                     Expires November 2, 2006                [Page 1]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+Abstract
+
+   As LDAP is used more extensively for managing various kinds of data,
+   one often encounters a need to preserve both the ordering and the
+   content of data, despite the inherently unordered structure of
+   entries and attribute values in the directory.  This document
+   describes a scheme to attach ordering information to attributes in a
+   directory so that the ordering may be preserved and propagated to
+   other LDAP applications.
+
+
+Table of Contents
+
+   1.          Introduction . . . . . . . . . . . . . . . . . . . . .  3
+   2.          Conventions  . . . . . . . . . . . . . . . . . . . . .  4
+   3.          Ordering Extension . . . . . . . . . . . . . . . . . .  5
+   3.1.        Overview . . . . . . . . . . . . . . . . . . . . . . .  5
+   3.2.        Encoding . . . . . . . . . . . . . . . . . . . . . . .  5
+   3.3.        Ordering Properties  . . . . . . . . . . . . . . . . .  6
+   4.          Examples . . . . . . . . . . . . . . . . . . . . . . .  8
+   4.1.        Sample Schema  . . . . . . . . . . . . . . . . . . . .  8
+   4.2.        Ordered Values . . . . . . . . . . . . . . . . . . . .  8
+   4.3.        Ordered Siblings . . . . . . . . . . . . . . . . . . . 10
+   5.          Security Considerations  . . . . . . . . . . . . . . . 13
+   6.          Normative References . . . . . . . . . . . . . . . . . 14
+   Appendix A. IANA Considerations  . . . . . . . . . . . . . . . . . 15
+               Author's Address . . . . . . . . . . . . . . . . . . . 16
+               Intellectual Property and Copyright Statements . . . . 17
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu                     Expires November 2, 2006                [Page 2]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+1.  Introduction
+
+   Information in LDAP directories is usually handled by applications in
+   the form of ordered lists, which tends to encourage application
+   developers to assume they are maintained as such, i.e., it is assumed
+   that information stored in a particular order will always be
+   retrieved and presented in that same order.  The fact that directory
+   attributes actually store sets of values, which are inherently
+   unordered, often causes grief to users migrating their data into
+   LDAP.  Similar concerns arise over the order in which entries
+   themselves are stored and retrieved from the directory.
+
+   This document describes a schema extension that may be used in LDAP
+   attribute definitions to store ordering information along with the
+   attribute values, so that the ordering can be recovered when
+   retrieved by an LDAP client.  The extension also provides automated
+   management of this ordering information to ease manipulation of the
+   ordered values.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu                     Expires November 2, 2006                [Page 3]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+2.  Conventions
+
+   Imperative keywords defined in [RFC2119] are used in this document,
+   and carry the meanings described there.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu                     Expires November 2, 2006                [Page 4]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+3.  Ordering Extension
+
+3.1.  Overview
+
+   The "X-ORDERED" schema extension is added to an
+   AttributeTypeDescription to signify the use of this ordering
+   mechanism.  The extension has two variants, selected by either the
+   'VALUES' or 'SIBLINGS' qdstrings.  In general this extension is only
+   compatible with AttributeTypes that have a string-oriented syntax.
+
+   The "X-ORDERED 'VALUES'" extension is used with multi-valued
+   attributes to maintain the order of multiple values of a given
+   attribute.  For example, this feature is useful for storing data such
+   as access control rules, which must be evaluated in a specific order.
+   If the access control information is stored in a multi-valued
+   attribute without a means of preserving the the order of the rules,
+   the access control rules cannot be evaluated properly.  As the use of
+   LDAP to store security policy and access control information becomes
+   more prevalent, the necessity of this feature continues to grow.
+
+   The "X-ORDERED 'SIBLINGS'" extension is used with single-valued
+   attributes to maintain the order of all the onelevel children of a
+   parent entry.  That is, ordering will be maintained for all the child
+   entries whose RDNs are all of the same AttributeType.  The motivation
+   for this feature is much the same as for the 'VALUES' feature.
+   Sometimes the information with the ordering dependency is too complex
+   or highly structured to be conveniently stored in values of a multi-
+   valued attribute.  For example, one could store a prioritized list of
+   servers as a set of separate entries, each entry containing separate
+   attributes for a URL, a set of authentication credentials, and
+   various other parameters.  Using the 'SIBLINGS' feature with the
+   attribute in the entries' RDNs would ensure that when obtaining the
+   list of these entries, the list is returned in the intended order.
+
+3.2.  Encoding
+
+   Ordering information is encoded by prepending a value's ordinal index
+   to each value, enclosed in braces.  The following BNF specifies the
+   encoding.  It uses elements defined in [RFC2252].
+
+      d = "0" / "1" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9"
+
+      numericstring = 1*d
+
+      ordering-prefix = "{" numericstring "}"
+
+      value = <any sequence of octets>
+
+
+
+
+Chu                     Expires November 2, 2006                [Page 5]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+      ordered-value = ordering-prefix value
+
+   The ordinals are zero-based and increment by one for each value.
+
+   Note that when storing ordered-values into the directory, the
+   ordering-prefix can usually be omitted as it will be generated
+   automatically.  But if the original value already begins with a
+   sequence of characters in the form of an ordering-prefix, then an
+   ordering-prefix must always be provided with that value, otherwise
+   the value will be processed and stored incorrectly.
+
+   Using this extension on an attribute requires that ordering-prefix is
+   a legal value of the LDAP syntax of that attribute.
+
+3.3.  Ordering Properties
+
+   Since the ordering-prefix is stored with the attribute values, it
+   will be propagated to any clients or servers that access the data.
+
+   Servers implementing this scheme SHOULD sort the values according to
+   their ordering-prefix before returning them in search results.
+
+   The presence of the ordering extension alters the matching rules that
+   apply to the attribute:
+
+      When presented with an AssertionValue that does not have an
+      ordering-prefix, the ordering-prefix in the AttributeValue is
+      ignored.
+
+      When presented with an AssertionValue that consists solely of an
+      ordering-prefix, only the ordering-prefix of the AttributeValue is
+      compared; the remainder of the value is ignored.
+
+      When presented with an AssertionValue containing both the
+      ordering-prefix and a value, both components are compared to
+      determine a match.
+
+   A side effect of these properties is that even attributes that
+   normally would have no equality matching rule can be matched by an
+   ordering-prefix.
+
+   The ordering-prefix may also be used in Modification requests to
+   specify which values to delete, and in which position values should
+   be added.  When processing deletions and insertions, all of the
+   ordinals are recounted after each individual modification.
+
+   If a value being added does not have an ordering-prefix, it is simply
+   appended to the list and the appropriate ordering-prefix is
+
+
+
+Chu                     Expires November 2, 2006                [Page 6]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+   automatically generated.  Likewise if an ordering-prefix is provided
+   that is greater than or equal to the number of existing values.
+
+   See the examples in the next section.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu                     Expires November 2, 2006                [Page 7]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+4.  Examples
+
+4.1.  Sample Schema
+
+   This schema is used for all of the examples:
+
+   ( EXAMPLE_AT.1 NAME 'olcDatabase'
+   EQUALITY caseIgnoreMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+   SINGLE-VALUE X-ORDERED 'SIBLINGS' )
+
+   ( EXAMPLE_AT.2 NAME 'olcSuffix'
+   EQUALITY distinguishedNameMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+   X-ORDERED 'VALUES' )
+
+   ( EXAMPLE_OC.1 NAME 'olcDatabaseConfig'
+   SUP top STRUCTURAL
+   MAY ( olcDatabase $ olcSuffix ) )
+
+4.2.  Ordered Values
+
+   Given this entry:
+
+   dn: olcDatabase={1}bdb,cn=config
+   olcDatabase: {1}bdb
+   objectClass: olcDatabaseConfig
+   olcSuffix: {0}dc=example,dc=com
+   olcSuffix: {1}o=example.com
+   olcSuffix: {2}o=The Example Company
+   olcSuffix: {3}o=example,c=us
+
+   We can perform these Modify operations:
+
+   1.  dn: olcDatabase={1}bdb,cn=config
+       changetype: modify
+       delete: olcSuffix
+       olcSuffix: {0}
+       -
+       This operation deletes the first olcSuffix, regardless of its
+       value.  All other values are bumped up one position.  The
+       olcSuffix attribute will end up containing:
+       olcSuffix: {0}o=example.com
+       olcSuffix: {1}o=The Example Company
+       olcSuffix: {2}o=example,c=us
+
+   2.  Starting from the original entry, we could issue this change
+       instead:
+
+
+
+Chu                     Expires November 2, 2006                [Page 8]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+       delete: olcSuffix
+       olcSuffix: o=example.com
+       -
+       This operation deletes the olcSuffix that matches the value,
+       regardless of its ordering-prefix.  The olcSuffix attribute will
+       contain:
+       olcSuffix: {0}dc=example,dc=com
+       olcSuffix: {1}o=The Example Company
+       olcSuffix: {2}o=example,c=us
+
+   3.  Again, starting from the original entry, we could issue this
+       change:
+       delete: olcSuffix
+       olcSuffix: {2}o=The Example Company
+       -
+       Here both the ordering-prefix and the value must match, otherwise
+       the Modify would fail with noSuchAttribute.  In this case the
+       olcSuffix attribute results in:
+       olcSuffix: {0}dc=example,dc=com
+       olcSuffix: {1}o=example.com
+       olcSuffix: {2}o=example,c=us
+
+   4.  Adding a new value without an ordering-prefix simply appends:
+       add: olcSuffix
+       olcSuffix: o=example.org
+       -
+       The resulting attribute would be:
+       olcSuffix: {0}dc=example,dc=com
+       olcSuffix: {1}o=example.com
+       olcSuffix: {2}o=The Example Company
+       olcSuffix: {3}o=example,c=us
+       olcSuffix: {4}o=example.org
+
+   5.  Adding a new value with an ordering-prefix inserts into the
+       specified position:
+       add: olcSuffix
+       olcSuffix: {0}o=example.org
+       -
+       The resulting attribute would be:
+       olcSuffix: {0}o=example.org
+       olcSuffix: {1}dc=example,dc=com
+       olcSuffix: {2}o=example.com
+       olcSuffix: {3}o=The Example Company
+       olcSuffix: {4}o=example,c=us
+
+   6.  Modifying multiple values in one operation:
+       add: olcSuffix
+       olcSuffix: {0}ou=Dis,o=example.com
+
+
+
+Chu                     Expires November 2, 2006                [Page 9]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+       olcSuffix: {0}ou=Dat,o=example,com
+       -
+       delete: olcSuffix:
+       olcSuffix: {2}
+       olcSuffix: {1}
+       -
+       The resulting attribute would be:
+       olcSuffix: {0}ou=Dat,o=example,com
+       olcSuffix: {1}dc=example,dc=com
+       olcSuffix: {2}o=example.com
+       olcSuffix: {3}o=The Example Company
+       olcSuffix: {4}o=example,c=us
+
+   7.  If the Adds and Deletes in the previous example were done in the
+       opposite order:
+       delete: olcSuffix:
+       olcSuffix: {2}
+       olcSuffix: {1}
+       -
+       add: olcSuffix
+       olcSuffix: {0}ou=Dis,o=example.com
+       olcSuffix: {0}ou=Dat,o=example,com
+       -
+       The result would be:
+       olcSuffix: {0}ou=Dat,o=example,com
+       olcSuffix: {1}ou=Dis,o=example.com
+       olcSuffix: {2}o=example.org
+       olcSuffix: {3}o=The Example Company
+       olcSuffix: {4}o=example,c=us
+
+   Note that matching against an ordering-prefix can also be done in
+   Compare operations and Search filters.  E.g., the filter
+   "(olcSuffix={4})" would match all entries with at least 5 olcSuffix
+   values.
+
+4.3.  Ordered Siblings
+
+   The rules for Ordered Siblings are basically the same as for Ordered
+   Values, except instead of working primarily with the Modify request,
+   the operations of interest here are Add, Delete, and ModRDN.
+
+   Given these entries:
+
+   dn: olcDatabase={0}config,cn=config
+   olcDatabase: {0}config
+   objectClass: olcDatabaseConfig
+   olcSuffix: {0}cn=config
+
+
+
+
+Chu                     Expires November 2, 2006               [Page 10]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+   dn: olcDatabase={1}bdb,cn=config
+   olcDatabase: {1}bdb
+   objectClass: olcDatabaseConfig
+   olcSuffix: {0}dc=example,dc=com
+
+   We can perform these operations:
+
+   1.  Add a new entry with no ordering-prefix:
+       dn: olcDatabase=hdb,cn=config
+       changetype: add
+       olcDatabase: hdb
+       objectClass: olcDatabaseConfig
+       olcSuffix: {0}dc=example,dc=org
+       The resulting entry will be:
+       dn: olcDatabase={2}hdb,cn=config
+       olcDatabase: {2}hdb
+       objectClass: olcDatabaseConfig
+       olcSuffix: {0}dc=example,dc=org
+
+   2.  Continuing on with these three entries, we can add another entry
+       with a specific ordering-prefix:
+       dn: olcDatabase={1}ldif,cn=config
+       changetype: add
+       olcDatabase: {1}ldif
+       objectClass: olcDatabaseConfig
+       olcSuffix: {0}o=example.com
+       This would give us four entries, whose DNs are:
+
+          dn: olcDatabase={0}config,cn=config
+
+          dn: olcDatabase={1}ldif,cn=config
+
+          dn: olcDatabase={2}bdb,cn=config
+
+          dn: olcDatabase={3}hdb,cn=config
+
+   3.  Issuing a ModRDN request will cause multiple entries to be
+       renamed:
+       dn: olcDatabase={1}ldif,cn=config
+       changetype: modrdn
+       newrdn: olcDatabase={99}ldif
+       deleteoldrdn: 1
+       The resulting entries would be named:
+
+          dn: olcDatabase={0}config,cn=config
+
+          dn: olcDatabase={1}bdb,cn=config
+
+
+
+
+Chu                     Expires November 2, 2006               [Page 11]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+          dn: olcDatabase={2}hdb,cn=config
+
+          dn: olcDatabase={3}ldif,cn=config
+
+   4.  As may be expected, a Delete request will also rename the
+       remaining entries:
+       dn: olcDatabase={1}bdb,cn=config
+       changetype: delete
+       The remaining entries would be named:
+
+          dn: olcDatabase={0}config,cn=config
+
+          dn: olcDatabase={1}hdb,cn=config
+
+          dn: olcDatabase={2}ldif,cn=config
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu                     Expires November 2, 2006               [Page 12]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+5.  Security Considerations
+
+   General LDAP security considerations [RFC3377] apply.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu                     Expires November 2, 2006               [Page 13]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+6.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC2252]  Wahl, M., Coulbeck, A., Howes, T., and S. Kille,
+              "Lightweight Directory Access Protocol (v3): Attribute
+              Syntax Definitions", RFC 2252, December 1997.
+
+   [RFC3377]  Hodges, J. and R. Morgan, "Lightweight Directory Access
+              Protocol (v3): Technical Specification", RFC 3377,
+              September 2002.
+
+   [RFC3383]  Zeilenga, K., "Internet Assigned Numbers Authority (IANA)
+              Considerations for the Lightweight Directory Access
+              Protocol (LDAP)", RFC 3383, September 2002.
+
+   [X680]     International Telecommunications Union, "Abstract Syntax
+              Notation One (ASN.1): Specification of basic notation",
+              ITU-T Recommendation X.680, July 2002.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu                     Expires November 2, 2006               [Page 14]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+Appendix A.  IANA Considerations
+
+   In accordance with [RFC3383] (what needs to be done here?) .  We
+   probably need an OID for advertising in supportedFeatures.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu                     Expires November 2, 2006               [Page 15]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+Author's Address
+
+   Howard Chu
+   Symas Corp.
+   18740 Oxnard Street, Suite 313A
+   Tarzana, California  91356
+   USA
+
+   Phone: +1 818 757-7087
+   Email: hyc@symas.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu                     Expires November 2, 2006               [Page 16]
+
+Internet-Draft           LDAP Ordering Extension                May 2006
+
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2006).
+
+   This document is subject to the rights, licenses and restrictions
+   contained in BCP 78, and except as set forth therein, the authors
+   retain all their rights.
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Intellectual Property
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+Acknowledgment
+
+   Funding for the RFC Editor function is provided by the IETF
+   Administrative Support Activity (IASA).
+
+
+
+
+
+Chu                     Expires November 2, 2006               [Page 17]
+

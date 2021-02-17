@@ -1,0 +1,48 @@
+SVN-fs-dump-format-version: 3
+
+UUID: b760f8ea-7608-0410-b9cc-88a00389c87b
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2005-12-21T23:12:28.152181Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 105
+Content-length: 105
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-12-21T23:12:58.931794Z
+K 7
+svn:log
+V 5
+blah
+
+PROPS-END
+
+Node-path: 
+Node-kind: dir
+Node-action: change
+Prop-delta: true
+Prop-content-length: 37
+Content-length: 37
+
+K 10
+svn:ignore
+V 6
+stuff
+
+PROPS-END
+
+

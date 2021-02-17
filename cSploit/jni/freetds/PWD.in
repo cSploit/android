@@ -1,0 +1,19 @@
+# $Id: PWD.in,v 1.1 2002-09-12 15:24:20 castellano Exp $
+#
+# This file was taken from DBD::Sybase :-) It is used by 'make check' to test
+# the installation
+#
+# UID: the username of a user to connect with
+# PWD: the password for that user
+# SRV: the symbolic server name from the freetds.conf (or interfaces) file. 
+#      Note: if you use a hostname/IP here instead, freetds will attempt to 
+#      connect using the compiletime default port (4000 for TDS 5.0, 1433 for 
+#      4.2 or 7.0) which is usually not right.
+# DB:  Database in which to create tables used in the tests.  For those new to 
+#      Sybase or MS SQL server, there may be many database per server.  tempdb
+#      is a good default choice if unsure.
+#
+UID=guest
+PWD=sybase
+SRV=JDBC
+DB=tempdb

@@ -1,0 +1,326 @@
+.TH LDAP_SYNC 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 2006-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_sync_init, ldap_sync_init_refresh_only, ldap_sync_init_refresh_and_persist, ldap_sync_poll \- LDAP sync routines
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.B #include <ldap.h>
+.LP
+.BI "int ldap_sync_init(ldap_sync_t *" ls ", int " mode ");"
+.LP
+.BI "int ldap_sync_init_refresh_only(ldap_sync_t *" ls ");"
+.LP
+.BI "int ldap_sync_init_refresh_and_persist(ldap_sync_t *" ls  ");"
+.LP
+.BI "int ldap_sync_poll(ldap_sync_t *" ls ");"
+.LP
+.BI "ldap_sync_t * ldap_sync_initialize(ldap_sync_t *" ls ");"
+.LP
+.BI "void ldap_sync_destroy(ldap_sync_t *" ls ", int " freeit ");"
+.LP
+.BI "typedef int (*" ldap_sync_search_entry_f ")(ldap_sync_t *" ls ","
+.RS
+.BI "LDAPMessage *" msg ", struct berval *" entryUUID ","
+.BI "ldap_sync_refresh_t " phase ");"
+.RE
+.LP
+.BI "typedef int (*" ldap_sync_search_reference_f ")(ldap_sync_t *" ls ","
+.RS
+.BI "LDAPMessage *" msg ");"
+.RE
+.LP
+.BI "typedef int (*" ldap_sync_intermediate_f ")(ldap_sync_t *" ls ","
+.RS
+.BI "LDAPMessage *" msg ", BerVarray " syncUUIDs ","
+.BI "ldap_sync_refresh_t " phase ");"
+.RE
+.LP
+.BI "typedef int (*" ldap_sync_search_result_f ")(ldap_sync_t *" ls ","
+.RS
+.BI "LDAPMessage *" msg ", int " refreshDeletes ");"
+.RE
+.SH DESCRIPTION
+.LP
+These routines provide an interface to the LDAP Content Synchronization 
+operation (RFC 4533).
+They require an
+.BR ldap_sync_t
+structure to be set up with parameters required for various phases
+of the operation; this includes setting some handlers for special events.
+All handlers take a pointer to the \fBldap_sync_t\fP structure as the first
+argument, and a pointer to the \fBLDAPMessage\fP structure as received
+from the server by the client library, plus, occasionally, other specific
+arguments.
+
+The members of the \fBldap_sync_t\fP structure are:
+.TP
+.BI "char *" ls_base
+The search base; by default, the
+.B BASE
+option in
+.BR ldap.conf (5).
+.TP
+.BI "int " ls_scope
+The search scope (one of 
+.BR LDAP_SCOPE_BASE ,
+.BR LDAP_SCOPE_ONELEVEL ,
+.BR LDAP_SCOPE_SUBORDINATE
+or
+.BR LDAP_SCOPE_SUBTREE ;
+see
+.B ldap.h
+for details).
+.TP
+.BI "char *" ls_filter
+The filter (RFC 4515); by default, 
+.BR (objectClass=*) .
+.TP
+.BI "char **" ls_attrs
+The requested attributes; by default
+.BR NULL ,
+indicating all user attributes.
+.TP
+.BI "int " ls_timelimit
+The requested time limit (in seconds); by default
+.BR 0 ,
+to indicate no limit.
+.TP
+.BI "int " ls_sizelimit
+The requested size limit (in entries); by default
+.BR 0 ,
+to indicate no limit.
+.TP
+.BI "int " ls_timeout
+The desired timeout during polling with
+.BR ldap_sync_poll (3).
+A value of
+.BR \-1
+means that polling is blocking, so 
+.BR ldap_sync_poll (3)
+will not return until a message is received; a value of
+.BR 0
+means that polling returns immediately, no matter if any response
+is available or not; a positive value represents the timeout the
+.BR ldap_sync_poll (3)
+function will wait for response before returning, unless a message
+is received; in that case, 
+.BR ldap_sync_poll (3)
+returns as soon as the message is available.
+.TP
+.BI "ldap_sync_search_entry_f " ls_search_entry
+A function that is called whenever an entry is returned.
+The
+.BR msg
+argument is the
+.BR LDAPMessage
+that contains the searchResultEntry; it can be parsed using the regular 
+client API routines, like 
+.BR ldap_get_dn (3),
+.BR ldap_first_attribute (3),
+and so on.
+The
+.BR entryUUID
+argument contains the entryUUID of the entry.
+The
+.BR phase
+argument indicates the type of operation: one of
+.BR LDAP_SYNC_CAPI_PRESENT ,
+.BR LDAP_SYNC_CAPI_ADD ,
+.BR LDAP_SYNC_CAPI_MODIFY ,
+.BR LDAP_SYNC_CAPI_DELETE ;
+in case of
+.BR LDAP_SYNC_CAPI_PRESENT
+or
+.BR LDAP_SYNC_CAPI_DELETE ,
+only the DN is contained in the 
+.IR LDAPMessage ;
+in case of 
+.BR LDAP_SYNC_CAPI_MODIFY ,
+the whole entry is contained in the 
+.IR LDAPMessage ,
+and the application is responsible of determining the differences
+between the new view of the entry provided by the caller and the data
+already known.
+.TP
+.BI "ldap_sync_search_reference_f " ls_search_reference
+A function that is called whenever a search reference is returned.
+The
+.BR msg
+argument is the
+.BR LDAPMessage
+that contains the searchResultReference; it can be parsed using 
+the regular client API routines, like 
+.BR ldap_parse_reference (3).
+.TP
+.BI "ldap_sync_intermediate_f " ls_intermediate
+A function that is called whenever something relevant occurs during 
+the refresh phase of the search, which is marked by
+an \fIintermediateResponse\fP message type.
+The
+.BR msg
+argument is the
+.BR LDAPMessage
+that contains the intermediate response; it can be parsed using 
+the regular client API routines, like 
+.BR ldap_parse_intermediate (3).
+The
+.BR syncUUIDs
+argument contains an array of UUIDs of the entries that depends
+on the value of the
+.BR phase
+argument.
+In case of
+.BR LDAP_SYNC_CAPI_PRESENTS ,
+the "present" phase is being entered;
+this means that the following sequence of results will consist
+in entries in "present" sync state.
+In case of
+.BR LDAP_SYNC_CAPI_DELETES ,
+the "deletes" phase is being entered;
+this means that the following sequence of results will consist
+in entries in "delete" sync state.
+In case of
+.BR LDAP_SYNC_CAPI_PRESENTS_IDSET ,
+the message contains a set of UUIDs of entries that are present;
+it replaces a "presents" phase.
+In case of
+.BR LDAP_SYNC_CAPI_DELETES_IDSET ,
+the message contains a set of UUIDs of entries that have been deleted;
+it replaces a "deletes" phase.
+In case of
+.BR LDAP_SYNC_CAPI_DONE,
+a "presents" phase with "refreshDone" set to "TRUE" has been returned
+to indicate that the refresh phase of refreshAndPersist is over, and
+the client should start polling.
+Except for the
+.BR LDAP_SYNC_CAPI_PRESENTS_IDSET
+and
+.BR LDAP_SYNC_CAPI_DELETES_IDSET
+cases,
+.BR syncUUIDs
+is NULL.
+.BR
+.TP
+.BI "ldap_sync_search_result_f " ls_search_result
+A function that is called whenever a searchResultDone is returned.
+In refreshAndPersist this can only occur when the server decides
+that the search must be interrupted.
+The
+.BR msg
+argument is the
+.BR LDAPMessage
+that contains the response; it can be parsed using 
+the regular client API routines, like 
+.BR ldap_parse_result (3).
+The
+.BR refreshDeletes
+argument is not relevant in this case; it should always be \-1.
+.TP
+.BI "void *" ls_private
+A pointer to private data.  The client may register here
+a pointer to data the handlers above may need.
+.TP
+.BI "LDAP *" ls_ld
+A pointer to a LDAP structure that is used to connect to the server.
+It is the responsibility of the client to initialize the structure
+and to provide appropriate authentication and security in place.
+
+.SH "GENERAL USE"
+A
+.B ldap_sync_t
+structure is initialized by calling
+.BR ldap_sync_initialize(3).
+This simply clears out the contents of an already existing
+.B ldap_sync_t
+structure, and sets appropriate values for some members.
+After that, the caller is responsible for setting up the
+connection (member
+.BR ls_ld ),
+eventually setting up transport security (TLS),
+for binding and any other initialization.
+The caller must also fill all the documented search-related fields
+of the
+.B ldap_sync_t
+structure.
+
+At the end of a session, the structure can be cleaned up by calling
+.BR ldap_sync_destroy (3),
+which takes care of freeing all data assuming it was allocated by
+.BR ldap_mem* (3)
+routines.
+Otherwise, the caller should take care of destroying and zeroing out
+the documented search-related fields, and call
+.BR ldap_sync_destroy (3)
+to free undocumented members set by the API.
+
+.SH "REFRESH ONLY"
+The
+.BR refreshOnly
+functionality is obtained by periodically calling
+.BR ldap_sync_init (3)
+with mode set to
+.BR LDAP_SYNC_REFRESH_ONLY ,
+or, which is equivalent, by directly calling
+.BR ldap_sync_init_refresh_only (3).
+The state of the search, and the consistency of the search parameters,
+is preserved across calls by passing the 
+.B ldap_sync_t
+structure as left by the previous call.
+
+.SH "REFRESH AND PERSIST"
+The
+.BR refreshAndPersist
+functionality is obtained by calling
+.BR ldap_sync_init (3)
+with mode set to
+.BR LDAP_SYNC_REFRESH_AND_PERSIST ,
+or, which is equivalent, by directly calling
+.BR ldap_sync_init_refresh_and_persist (3)
+and, after a successful return, by repeatedly polling with
+.BR ldap_sync_poll (3)
+according to the desired pattern.
+
+A client may insert a call to 
+.BR ldap_sync_poll (3)
+into an external loop to check if any modification was returned;
+in this case, it might be appropriate to set
+.BR ls_timeout
+to 0, or to set it to a finite, small value.
+Otherwise, if the client's main purpose consists in waiting for
+responses, a timeout of \-1 is most suitable, so that the function
+only returns after some data has been received and handled.
+
+.SH ERRORS
+All routines return any LDAP error resulting from a lower-level error
+in the API calls they are based on, or LDAP_SUCCESS in case of success.
+.BR ldap_sync_poll (3) 
+may return 
+.BR LDAP_SYNC_REFRESH_REQUIRED
+if a full refresh is requested by the server.
+In this case, it is appropriate to call
+.BR ldap_sync_init (3)
+again, passing the same
+.B ldap_sync_t
+structure as resulted from any previous call.
+.SH NOTES
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_search_ext (3),
+.BR ldap_result (3) ;
+.B RFC 4533
+(http://www.rfc-editor.org),
+.SH AUTHOR
+Designed and implemented by Pierangelo Masarati, based on RFC 4533
+and loosely inspired by syncrepl code in
+.BR slapd (8).
+.SH ACKNOWLEDGEMENTS
+Initially developed by
+.BR "SysNet s.n.c."
+.B OpenLDAP
+is developed and maintained by The OpenLDAP Project (http://www.openldap.org/).
+.B OpenLDAP
+is derived from University of Michigan LDAP 3.3 Release.  

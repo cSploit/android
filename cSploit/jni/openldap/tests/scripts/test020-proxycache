@@ -1,0 +1,654 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+PCACHETTL=${PCACHETTL-"1m"}
+PCACHENTTL=${PCACHENTTL-"1m"}
+PCACHESTTL=${PCACHESTTL-"1m"}
+PCACHE_ENTRY_LIMIT=${PCACHE_ENTRY_LIMIT-"6"}
+PCACHE_CCPERIOD=${PCACHE_CCPERIOD-"2"}
+PCACHETTR=${PCACHETTR-"2"}
+PCACHEBTTR=${PCACHEBTTR-"5"}
+
+. $SRCDIR/scripts/defines.sh
+
+if test $PROXYCACHE = pcacheno; then 
+	echo "Proxy cache overlay not available, test skipped"
+	exit 0
+fi 
+
+if test $BACKLDAP = "ldapno" ; then 
+	echo "LDAP backend not available, test skipped"
+	exit 0
+fi 
+
+if test $BACKEND = ldif ; then
+	# The (mail=example.com*) queries hit a sizelimit, so which
+	# entry is returned depends on the ordering in the backend.
+	echo "Test does not support $BACKEND backend, test skipped"
+	exit 0
+fi
+
+mkdir -p $TESTDIR $DBDIR1 $DBDIR2
+
+# Test proxy caching:
+# - start master
+# - start proxy cache
+# - populate master 
+# - perform first set of searches at the proxy
+# - verify cacheability
+# - perform second set of searches at the proxy 
+# - verify answerability
+
+echo "Starting master slapd on TCP/IP port $PORT1..."
+. $CONFFILTER < $CACHEMASTERCONF > $CONF1
+$SLAPD -f $CONF1 -h $URI1 -d $LVL > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+	echo PID $PID
+	read foo
+fi
+KILLPIDS="$PID"
+
+sleep 1
+
+echo "Using ldapsearch to check that master slapd is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT1 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapadd to populate the master directory..."
+$LDAPADD -x -D "$MANAGERDN" -h $LOCALHOST -p $PORT1 -w $PASSWD < \
+	$LDIFORDERED > /dev/null 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting proxy cache on TCP/IP port $PORT2..."
+. $CONFFILTER < $PROXYCACHECONF | sed \
+	-e "s/@TTL@/${PCACHETTL}/"			\
+	-e "s/@NTTL@/${PCACHENTTL}/"		\
+	-e "s/@STTL@/${PCACHENTTL}/"		\
+	-e "s/@TTR@/${PCACHETTR}/"			\
+	-e "s/@ENTRY_LIMIT@/${PCACHE_ENTRY_LIMIT}/"	\
+	-e "s/@CCPERIOD@/${PCACHE_CCPERIOD}/"			\
+	-e "s/@BTTR@/${PCACHEBTTR}/"			\
+	> $CONF2
+
+$SLAPD -f $CONF2 -h $URI2 -d $LVL -d pcache > $LOG2 2>&1 &
+CACHEPID=$!
+if test $WAIT != 0 ; then
+	echo CACHEPID $CACHEPID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $CACHEPID"
+
+sleep 1
+
+echo "Using ldapsearch to check that proxy slapd is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT2 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+cat /dev/null > $SEARCHOUT
+
+echo "Making queries on the proxy cache..." 
+CNT=0
+
+CNT=`expr $CNT + 1`
+FILTER="(sn=Jon)"
+echo "Query $CNT: filter:$FILTER attrs:all (expect nothing)" 
+echo "# Query $CNT: filter:$FILTER attrs:all (expect nothing)" >> $SEARCHOUT
+$LDAPSEARCH -x -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# ITS#4491, if debug messages are unavailable, we can't verify the tests.
+grep "query template" $LOG2 > /dev/null
+RC=$?
+if test $RC != 0 ; then
+	echo "Debug messages unavailable, remaining test skipped..."
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS && wait
+	exit 0
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(|(cn=*Jon*)(sn=Jon*))"
+ATTRS="cn sn title uid"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -x -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(sn=Smith*)"
+ATTRS="cn sn uid"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(sn=Doe*)"
+ATTRS="cn sn title uid"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(uid=johnd)"
+ATTRS="mail postaladdress telephonenumber cn uid"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(mail=*@mail.alumni.example.com)"
+ATTRS="cn sn title uid"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(mail=*)"
+ATTRS="cn sn title uid"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(mail=*example.com)"
+ATTRS="cn sn title uid"
+USERDN="cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com"
+UPASSWD="bjorn"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	-D "$USERDN" -w "$UPASSWD" \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+case $RC in
+0)
+	echo "ldapsearch should have failed!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+	;;
+4)
+	echo "ldapsearch failed ($RC)"
+	;;
+*)
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+	;;
+esac
+
+CNT=`expr $CNT + 1`
+FILTER="(uid=b*)"
+ATTRS="mail"
+USERDN="cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com"
+UPASSWD="bjorn"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	-D "$USERDN" -w "$UPASSWD" \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+case $RC in
+0)
+	echo "ldapsearch should have failed!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+	;;
+4)
+	echo "ldapsearch failed ($RC)"
+	;;
+*)
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+	;;
+esac
+
+CNT=`expr $CNT + 1`
+FILTER="(|(cn=All Staff)(sn=All Staff))"
+ATTRS="sn cn title uid undefinedAttr"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+FIRST=$CNT
+
+# queries 2-6,8-10 are cacheable
+CACHEABILITY=0111110111
+grep CACHEABLE $LOG2 | awk '{ 
+		if ($3 == "NOT") 
+			printf "Query %d not cacheable\n",NR
+		else 
+			printf "Query %d cacheable\n",NR
+	}' 
+CACHED=`grep CACHEABLE $LOG2 | awk '{ 
+		if ($3 == "NOT") 
+			printf "0" 
+		else 
+			printf "1" 
+	}'`
+
+if test "$CACHEABILITY" = "$CACHED" ; then
+	echo "Successfully verified cacheability"
+else 
+	echo "Error in verifying cacheability"
+	echo "$CACHED"
+	echo "$CACHEABILITY"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(|(cn=*Jones)(sn=Jones))"
+ATTRS="cn sn title uid"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -x -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(sn=Smith)"
+ATTRS="cn sn title uid"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(uid=bjorn)"
+ATTRS="mail postaladdress telephonenumber cn uid"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(mail=jaj@mail.alumni.example.com)"
+ATTRS="cn sn title uid"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+CNT=`expr $CNT + 1`
+FILTER="(mail=*example.com)"
+ATTRS="cn sn title uid"
+USERDN="cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com"
+UPASSWD="bjorn"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	-D "$USERDN" -w "$UPASSWD" \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+case $RC in
+0)
+	echo "ldapsearch should have failed!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+	;;
+4)
+	echo "ldapsearch failed ($RC)"
+	;;
+*)
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+	;;
+esac
+
+CNT=`expr $CNT + 1`
+FILTER="(uid=b*)"
+ATTRS="mail"
+USERDN="cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com"
+UPASSWD="bjorn"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	-D "$USERDN" -w "$UPASSWD" \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+case $RC in
+0)
+	echo "ldapsearch should have failed!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+	;;
+4)
+	echo "ldapsearch failed ($RC)"
+	;;
+*)
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+	;;
+esac
+
+CNT=`expr $CNT + 1`
+FILTER="(|(cn=All Staff)(sn=All Staff))"
+ATTRS="sn cn title uid undefinedAttr"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS"  
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#queries 11-13,16-17 are answerable, 14-15 are not
+#actually, 14 would be answerable, but since 8 made mail=*example.com
+#not answerable because of sizelimit, queries contained in it are no longer
+#answerable as well
+ANSWERABILITY=1110011
+grep ANSWERABLE $LOG2 | awk "BEGIN {FIRST=$FIRST}"'{ 
+		if (NR > FIRST) { 
+			if ($3 == "NOT") 
+				printf "Query %d not answerable\n",NR
+			else 
+				printf "Query %d answerable\n",NR 
+		}
+	}' 
+ANSWERED=`grep ANSWERABLE $LOG2 | awk "BEGIN {FIRST=$FIRST}"'{ 
+		if (NR > FIRST) { 
+			if ($3 == "NOT") 
+				printf "0" 
+			else 
+				printf "1"
+		} 
+	}'`
+
+if test "$ANSWERABILITY" = "$ANSWERED" ; then
+	echo "Successfully verified answerability"
+else 
+	echo "Error in verifying answerability"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Filtering ldapsearch results..."
+$LDIFFILTER -s ldif=a < $SEARCHOUT > $SEARCHFLT
+echo "Filtering original ldif..."
+$LDIFFILTER -s ldif=a < $PROXYCACHEOUT > $LDIFFLT
+echo "Comparing filter output..."
+$CMP $SEARCHFLT $LDIFFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "Comparison failed"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo ""
+echo "Testing cache refresh"
+
+CNT=`expr $CNT + 1`
+FILTER="(&(objectclass=person)(uid=dots))"
+ATTRS="cn mail telephonenumber"
+echo "Query $CNT: filter:$FILTER attrs:$ATTRS" 
+echo "# Query $CNT: filter:$FILTER attrs:$ATTRS" >> $SEARCHOUT
+$LDAPSEARCH -x -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDAPMODIFY -x -D "$MANAGERDN" -h $LOCALHOST -p $PORT1 -w $PASSWD <<EOF \
+	> /dev/null 2>&1
+dn: cn=Dorothy Stevens,ou=Alumni Association,ou=People,dc=example,dc=com
+changetype: modify
+replace: mail
+mail: dots@admin.example2.com
+-
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+SLEEP=`expr $PCACHETTR + $PCACHE_CCPERIOD + 1`
+echo "Waiting $SLEEP seconds for cache to refresh"
+
+sleep $SLEEP
+
+echo "Checking entry again"
+$LDAPSEARCH -x -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	"$FILTER" $ATTRS >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+grep "^mail: dots@admin" $SEARCHOUT > /dev/null
+RC=$?
+if test $RC != 0 ; then
+	echo "Refresh failed"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS && wait
+	exit 1
+fi
+
+echo ""
+echo "Testing Bind caching"
+
+CNT=`expr $CNT + 1`
+USERDN="cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com"
+UPASSWD="jaj"
+echo "Query $CNT: $USERDN"
+echo "# Query $CNT: $USERDN" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "" -s base -h $LOCALHOST -p $PORT2 \
+	-D "$USERDN" -w "$UPASSWD" >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+grep "CACHING BIND" $LOG2 > /dev/null
+RC=$?
+if test $RC != 0 ; then
+	echo "Refresh failed"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS && wait
+	exit 1
+fi
+
+CNT=`expr $CNT + 1`
+USERDN="cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com"
+UPASSWD="jaj"
+echo "Query $CNT: (Bind should be cached)"
+echo "# Query $CNT: (Bind should be cached)" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "" -s base -h $LOCALHOST -p $PORT2 \
+	-D "$USERDN" -w "$UPASSWD" >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+grep "CACHED BIND" $LOG2 > /dev/null
+RC=$?
+if test $RC != 0 ; then
+	echo "Refresh failed"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS && wait
+	exit 1
+fi
+
+echo ""
+echo "Testing pwdModify"
+$LDAPPASSWD -h $LOCALHOST -p $PORT2 \
+	-D "$MANAGERDN" -w "$PASSWD" -s newpw "$USERDN" >> $TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldappasswd failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+RC=`grep "CACH.* BIND" $LOG2 | wc -l`
+if test $RC != 3 ; then
+	echo "ldappasswd didn't update the cache"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS && wait
+	exit 1
+fi
+
+CNT=`expr $CNT + 1`
+USERDN="cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com"
+UPASSWD=newpw
+echo "Query $CNT: (Bind should be cached)"
+echo "# Query $CNT: (Bind should be cached)" >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "" -s base -h $LOCALHOST -p $PORT2 \
+	-D "$USERDN" -w "$UPASSWD" >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+RC=`grep "CACH.* BIND" $LOG2 | wc -l`
+if test $RC != 4 ; then
+	echo "Bind wasn't answered from cache"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS && wait
+	exit 1
+fi
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

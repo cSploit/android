@@ -1,0 +1,77 @@
+This VERSION of the snapin is for uses on pré-DS8 
+shcemas
+It *may* uses the following Unix properties 
+that must be created with Schemax
+with the following names and syntaxes
+and associated to USER and GROUP classes.
+
+If you don't like extending the schema, don't create
+theses attributes and stuff everything in L ( Location
+attribute) visible on the Identification page of NWADmin.
+
+For USERS:
+
+"LINUX:UID"     		SYN_INTEGER
+"LINUX:Primary GroupName"	SYN_DIST_NAME
+"LINUX:Primary GroupID"   	SYN_INTEGER
+"LINUX:GID"		  	SYN_INTEGER	
+"LINUX:Login Shell"		SYN_CE_STRING
+"LINUX:Home Directory"		SYN_CE_STRING
+"LINUX:Comments"		SYN_CI_STRING
+
+for GROUPS:
+"LINUX:GID"			SYN_INTEGER
+
+
+
+// Either way , the snapin will always try to get *missing* data
+// from the L attribute
+// Of course NDS8 real or dummy attributes have priority, that is
+// if both exists "NDS8" attribute will keep their values and the
+// L attribute value will be erased when saving back the NDS.
+So you can migrate slowly...
+
+ User:
+	 U:nnn       Unix UID
+	 G:nnn       Unix GID
+	 S:/.../...  Unix Shell
+	 H:/.../.... Unix Home
+  Group:
+	  G:nnn      Unix GID
+
+ Currently the following attributes recognized by the PAM module
+ are NOT modifiable by this snapin. You should modify them
+ using the "built-in" string editor of NWADmin under the Identification Page
+  ( Location attribute):
+  User:
+	  O: Unix or NDS name of other group ( if that group is a NDS name
+			and has a N:nnnn attribute, this value will be used for
+			 translation to Unix name, otherwise, a "proper Unix name"
+			 will be made from the NDS one ( remove context part,
+			 skip all spaces and illegal chars and prepend a Z if its
+			 starts by a digit (  this is required by useradd/usermod
+			 that misbehave with a group name starting with a digit)
+		C: Unix comment, added to the Gecos field after the full name
+		(-comma separator added)
+		P: Primary group name. So far the snapin works with the numeric
+			  Primary Group ID for user's. It may change in the next release.
+
+ Of course any other L (location) strings is left untouched by the snapin
+  ( no error message)!
+
+
+
+
+
+
+
+
+
+
+Patrick Pollet  
+Feb 05/02/2001
+
+
+
+
+

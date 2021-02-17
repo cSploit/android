@@ -1,0 +1,411 @@
+#!/usr/bin/env perl
+
+# ====================================================================
+# commit-access-control.pl: check if the user that submitted the
+# transaction TXN-NAME has the appropriate rights to perform the
+# commit in repository REPOS using the permissions listed in the
+# configuration file CONF_FILE.
+#
+# $HeadURL: http://svn.apache.org/repos/asf/subversion/branches/1.7.x/tools/hook-scripts/commit-access-control.pl.in $
+# $LastChangedDate: 2009-11-16 19:07:17 +0000 (Mon, 16 Nov 2009) $
+# $LastChangedBy: hwright $
+# $LastChangedRevision: 880911 $
+#
+# Usage: commit-access-control.pl REPOS TXN-NAME CONF_FILE
+#    
+# ====================================================================
+#    Licensed to the Apache Software Foundation (ASF) under one
+#    or more contributor license agreements.  See the NOTICE file
+#    distributed with this work for additional information
+#    regarding copyright ownership.  The ASF licenses this file
+#    to you under the Apache License, Version 2.0 (the
+#    "License"); you may not use this file except in compliance
+#    with the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing,
+#    software distributed under the License is distributed on an
+#    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#    KIND, either express or implied.  See the License for the
+#    specific language governing permissions and limitations
+#    under the License.
+# ====================================================================
+
+# Turn on warnings the best way depending on the Perl version.
+BEGIN {
+  if ( $] >= 5.006_000)
+    { require warnings; import warnings; }                      
+  else  
+    { $^W = 1; }               
+}           
+
+use strict;
+use Carp;
+use Config::IniFiles 2.27;
+
+######################################################################
+# Configuration section.
+
+# Svnlook path.
+my $svnlook = "@SVN_BINDIR@/svnlook";
+
+# Since the path to svnlook depends upon the local installation
+# preferences, check that the required program exists to insure that
+# the administrator has set up the script properly.
+{
+  my $ok = 1;
+  foreach my $program ($svnlook)
+    {
+      if (-e $program)
+        {
+          unless (-x $program)
+            {
+              warn "$0: required program `$program' is not executable, ",
+                   "edit $0.\n";
+              $ok = 0;
+            }
+        }
+      else
+        {
+          warn "$0: required program `$program' does not exist, edit $0.\n";
+          $ok = 0;
+        }
+    }
+  exit 1 unless $ok;
+}
+
+######################################################################
+# Initial setup/command-line handling.
+
+&usage unless @ARGV == 3;
+
+my $repos        = shift;
+my $txn          = shift;
+my $cfg_filename = shift;
+
+unless (-e $repos)
+  {
+    &usage("$0: repository directory `$repos' does not exist.");
+  }
+unless (-d $repos)
+  {
+    &usage("$0: repository directory `$repos' is not a directory.");
+  }
+unless (-e $cfg_filename)
+  {
+    &usage("$0: configuration file `$cfg_filename' does not exist.");
+  }
+unless (-r $cfg_filename)
+  {
+    &usage("$0: configuration file `$cfg_filename' is not readable.");
+  }
+
+# Define two constant subroutines to stand for read-only or read-write
+# access to the repository.
+sub ACCESS_READ_ONLY  () { 'read-only' }
+sub ACCESS_READ_WRITE () { 'read-write' }
+
+######################################################################
+# Load the configuration file and validate it.
+my $cfg = Config::IniFiles->new(-file => $cfg_filename);
+unless ($cfg)
+  {
+    die "$0: error in loading configuration file `$cfg_filename'",
+         @Config::IniFiles::errors ? ":\n@Config::IniFiles::errors\n"
+                                   : ".\n";
+  }
+
+# Go through each section of the configuration file, validate that
+# each section has the required parameters and complain about unknown
+# parameters.  Compile any regular expressions.
+my @sections = $cfg->Sections;
+{
+  my $ok = 1;
+  foreach my $section (@sections)
+    {
+      # First check for any unknown parameters.
+      foreach my $param ($cfg->Parameters($section))
+        {
+          next if $param eq 'match';
+          next if $param eq 'users';
+          next if $param eq 'access';
+          warn "$0: config file `$cfg_filename' section `$section' parameter ",
+               "`$param' is being ignored.\n";
+          $cfg->delval($section, $param);
+        }
+
+      my $access = $cfg->val($section, 'access');
+      if (defined $access)
+        {
+          unless ($access eq ACCESS_READ_ONLY or $access eq ACCESS_READ_WRITE)
+            {
+              warn "$0: config file `$cfg_filename' section `$section' sets ",
+                "`access' to illegal value `$access'.\n";
+              $ok = 0;
+            }
+        }
+      else
+        {
+          warn "$0: config file `$cfg_filename' section `$section' does ",
+            "not set `access' parameter.\n";
+          $ok = 0;
+        }
+
+      my $match_regex = $cfg->val($section, 'match');
+      if (defined $match_regex)
+        {
+          # To help users that automatically write regular expressions
+          # that match the beginning of absolute paths using ^/,
+          # remove the / character because subversion paths, while
+          # they start at the root level, do not begin with a /.
+          $match_regex =~ s#^\^/#^#;
+
+          my $match_re;
+          eval { $match_re = qr/$match_regex/ };
+          if ($@)
+            {
+              warn "$0: config file `$cfg_filename' section `$section' ",
+                   "`match' regex `$match_regex' does not compile:\n$@\n";
+              $ok = 0;
+            }
+          else
+            {
+              $cfg->newval($section, 'match_re', $match_re);
+            }
+        }
+      else
+        {
+          warn "$0: config file `$cfg_filename' section `$section' does ",
+               "not set `match' parameter.\n";
+          $ok = 0;
+        }
+    }
+  exit 1 unless $ok;
+}
+
+######################################################################
+# Harvest data using svnlook.
+
+# Change into /tmp so that svnlook diff can create its .svnlook
+# directory.
+my $tmp_dir = '/tmp';
+chdir($tmp_dir)
+  or die "$0: cannot chdir `$tmp_dir': $!\n";
+
+# Get the author from svnlook.
+my @svnlooklines = &read_from_process($svnlook, 'author', $repos, '-t', $txn);
+my $author = shift @svnlooklines;
+unless (length $author)
+  {
+    die "$0: txn `$txn' has no author.\n";
+  }
+
+# Figure out what directories have changed using svnlook..
+my @dirs_changed = &read_from_process($svnlook, 'dirs-changed', $repos,
+                                      '-t', $txn);
+
+# Lose the trailing slash in the directory names if one exists, except
+# in the case of '/'.
+my $rootchanged = 0;
+for (my $i=0; $i<@dirs_changed; ++$i)
+  {
+    if ($dirs_changed[$i] eq '/')
+      {
+        $rootchanged = 1;
+      }
+    else
+      {
+        $dirs_changed[$i] =~ s#^(.+)[/\\]$#$1#;
+      }
+  }
+
+# Figure out what files have changed using svnlook.
+my @files_changed;
+foreach my $line (&read_from_process($svnlook, 'changed', $repos, '-t', $txn))
+  {
+    # Split the line up into the modification code and path, ignoring
+    # property modifications.
+    if ($line =~ /^..  (.*)$/)
+      {
+        push(@files_changed, $1);
+      }
+  }
+
+# Create the list of all modified paths.
+my @changed = (@dirs_changed, @files_changed);
+
+# There should always be at least one changed path.  If there are
+# none, then there maybe something fishy going on, so just exit now
+# indicating that the commit should not proceed.
+unless (@changed)
+  {
+    die "$0: no changed paths found in txn `$txn'.\n";
+  }
+
+######################################################################
+# Populate the permissions table.
+
+# Set a hash keeping track of the access rights to each path.  Because
+# this is an access control script, set the default permissions to
+# read-only.
+my %permissions;
+foreach my $path (@changed)
+  {
+    $permissions{$path} = ACCESS_READ_ONLY;
+  }
+
+foreach my $section (@sections)
+  {
+    # Decide if this section should be used.  It should be used if
+    # there are no users listed at all for this section, or if there
+    # are users listed and the author is one of them.
+    my $use_this_section;
+
+    # If there are any users listed, then check if the author of this
+    # commit is listed in the list.  If not, then delete the section,
+    # because it won't apply.
+    #
+    # The configuration file can list users like this on multiple
+    # lines:
+    #   users = joe@mysite.com betty@mysite.com
+    #   users = bob@yoursite.com
+
+    # Because of the way Config::IniFiles works, check if there are
+    # any users at all with the scalar return from val() and if there,
+    # then get the array value to get all users.
+    my $users = $cfg->val($section, 'users');
+    if (defined $users and length $users)
+      {
+        my $match_user = 0;
+        foreach my $entry ($cfg->val($section, 'users'))
+          {
+            unless ($match_user)
+              {
+                foreach my $user (split(' ', $entry))
+                  {
+                    if ($author eq $user)
+                      {
+                        $match_user = 1;
+                        last;
+                      }
+                  }
+              }
+          }
+
+        $use_this_section = $match_user;
+      }
+    else
+      {
+        $use_this_section = 1;
+      }
+
+    next unless $use_this_section;
+
+    # Go through each modified path and match it to the regular
+    # expression and set the access right if the regular expression
+    # matches.
+    my $access   = $cfg->val($section, 'access');
+    my $match_re = $cfg->val($section, 'match_re');
+    foreach my $path (@changed)
+      {
+        $permissions{$path} = $access if $path =~ $match_re;
+      }
+  }
+
+# Go through all the modified paths and see if any permissions are
+# read-only.  If so, then fail the commit.
+my @failed_paths;
+foreach my $path (@changed)
+  {
+    if ($permissions{$path} ne ACCESS_READ_WRITE)
+      {
+        push(@failed_paths, $path);
+      }
+  }
+
+if (@failed_paths)
+  {
+    warn "$0: user `$author' does not have permission to commit to ",
+         @failed_paths > 1 ? "these paths:\n  " : "this path:\n  ",
+         join("\n  ", @failed_paths), "\n"; 
+    exit 1;
+  }
+else
+  {
+    exit 0;
+  }
+
+sub usage
+{
+  warn "@_\n" if @_;
+  die "usage: $0 REPOS TXN-NAME CONF_FILE\n";
+}
+
+sub safe_read_from_pipe
+{
+  unless (@_)
+    {
+      croak "$0: safe_read_from_pipe passed no arguments.\n";
+    }
+  print "Running @_\n";
+  my $pid = open(SAFE_READ, '-|');
+  unless (defined $pid)
+    {
+      die "$0: cannot fork: $!\n";
+    }
+  unless ($pid)
+    {
+      open(STDERR, ">&STDOUT")
+        or die "$0: cannot dup STDOUT: $!\n";
+      exec(@_)
+        or die "$0: cannot exec `@_': $!\n";
+    }
+  my @output;
+  while (<SAFE_READ>)
+    {
+      chomp;
+      push(@output, $_);
+    }
+  close(SAFE_READ);
+  my $result = $?;
+  my $exit   = $result >> 8;
+  my $signal = $result & 127;
+  my $cd     = $result & 128 ? "with core dump" : "";
+  if ($signal or $cd)
+    {
+      warn "$0: pipe from `@_' failed $cd: exit=$exit signal=$signal\n";
+    }
+  if (wantarray)
+    {
+      return ($result, @output);
+    }
+  else
+    {
+      return $result;
+    }
+}
+
+sub read_from_process
+  {
+  unless (@_)
+    {
+      croak "$0: read_from_process passed no arguments.\n";
+    }
+  my ($status, @output) = &safe_read_from_pipe(@_);
+  if ($status)
+    {
+      if (@output)
+        {
+          die "$0: `@_' failed with this output:\n", join("\n", @output), "\n";
+        }
+      else
+        {
+          die "$0: `@_' failed with no output.\n";
+        }
+    }
+  else
+    {
+      return @output;
+    }
+}

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+if [ -x /usr/bin/odbcinst ]; then
+    odbcinst -u -d -n SQLITE
+    odbcinst -u -d -n SQLITE3
+fi
+
+#DEBHELPER#

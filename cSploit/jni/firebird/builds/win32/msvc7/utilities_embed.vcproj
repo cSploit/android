@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="utilities_embed" ProjectGUID="{B0833E27-BCB2-4D0D-B6D2-F4621224CFD8}">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Debug|Win32" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" PreprocessorDefinitions="_DEBUG,_LIB,EMBEDDED,WIN32,DEV_BUILD" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLinkerTool" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+    </Configuration>
+    <Configuration Name="Release|Win32" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="2" InlineFunctionExpansion="1" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" PreprocessorDefinitions="NDEBUG,_LIB,EMBEDDED,WIN32" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLinkerTool" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="UTILITIES files" Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+      <File RelativePath="..\..\..\src\utilities\gsec\call_service.cpp">
+      </File>
+      <Filter Name="epp files" Filter="epp">
+        <File RelativePath="..\..\..\src\utilities\gstat.epp">
+        </File>
+        <File RelativePath="..\..\..\src\utilities\rmet.epp">
+        </File>
+        <File RelativePath="..\..\..\src\utilities\rstore.epp">
+        </File>
+      </Filter>
+    </Filter>
+    <Filter Name="Header files" Filter="h;hpp;hxx;hm;inl">
+      <File RelativePath="..\..\..\src\utilities\gsec\gsec.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\install\registry.h">
+      </File>
+    </Filter>
+  </Files>
+</VisualStudioProject>

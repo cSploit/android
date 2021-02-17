@@ -1,0 +1,1420 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+## FIXME: need to exclude legal but wrong results...
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+if test $BACKEND = null; then
+	echo "Limits irrelevant to $BACKEND backend, test skipped"
+	exit 0
+fi
+
+mkdir -p $TESTDIR $DBDIR1
+
+echo "Running slapadd to build slapd database..."
+. $CONFFILTER $BACKEND $MONITORDB < $LIMITSCONF > $ADDCONF
+$SLAPADD -f $ADDCONF -l $LDIFLIMITS
+RC=$?
+if test $RC != 0 ; then
+	echo "slapadd failed ($RC)!"
+	exit $RC
+fi
+
+echo "Running slapindex to index slapd database..."
+. $CONFFILTER $BACKEND $MONITORDB < $LIMITSCONF > $CONF1
+$SLAPINDEX -f $CONF1
+RC=$?
+if test $RC != 0 ; then
+	echo "warning: slapindex failed ($RC)"
+	echo "  assuming no indexing support"
+fi
+
+echo "Starting slapd on TCP/IP port $PORT1..."
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID"
+
+sleep 1
+
+echo "Testing slapd searching..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT1 \
+		'(objectclass=*)' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+cat /dev/null > $SEARCHOUT
+
+echo ""
+echo "Testing regular search limits"
+echo ""
+
+echo "Testing no limits requested for unlimited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Unlimited User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' >$SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...success (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limits requested for rootdn=$MANAGERDN..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D "$MANAGERDN" \
+	'(objectClass=*)' >$SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...success (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=4
+echo "Testing limit requested for rootdn=$MANAGERDN..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D "$MANAGERDN" \
+	'(objectClass=*)' >$SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" -gt "$SIZELIMIT" ; then
+				echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+				test $KILLSERVERS != no && kill -HUP $KILLPIDS
+				exit 1
+			fi
+			echo "...didn't bump into the requested size limit ($SIZELIMIT; got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" = "$SIZELIMIT" ; then
+				echo "...bumped into requested size limit ($SIZELIMIT)"
+			else
+				echo "...error: got $COUNT entries with a requested sizelimit of $SIZELIMIT"
+				test $KILLSERVERS != no && kill -HUP $KILLPIDS
+				exit $RC
+			fi
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=2
+echo "Testing size limit request ($SIZELIMIT) for unlimited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Unlimited User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" -gt "$SIZELIMIT" ; then
+				echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+				test $KILLSERVERS != no && kill -HUP $KILLPIDS
+				exit 1
+			fi
+			echo "...didn't bump into the requested size limit ($SIZELIMIT; got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" = "$SIZELIMIT" ; then
+				echo "...bumped into requested size limit ($SIZELIMIT)"
+			else
+				echo "...error: got $COUNT entries with a requested sizelimit of $SIZELIMIT"
+				test $KILLSERVERS != no && kill -HUP $KILLPIDS
+				exit $RC
+			fi
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+TIMELIMIT=10
+echo "Testing time limit request ($TIMELIMIT s) for unlimited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -l $TIMELIMIT \
+	-D 'cn=Unlimited User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into the requested time limit ($TIMELIMIT s; got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	3)
+		if test x"$COUNT" != x ; then
+			COUNT=0
+		fi
+		echo "...bumped into requested time limit ($TIMELIMIT s; got $COUNT entries)"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limits requested for soft limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Soft Limited User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into server-side size limit (got $COUNT entries)"
+		else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			echo "...bumped into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+                fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=2
+echo "Testing lower than soft limit request ($SIZELIMIT) for soft limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Soft Limited User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" -gt "$SIZELIMIT" ; then
+				echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+				test $KILLSERVERS != no && kill -HUP $KILLPIDS
+				exit 1
+			fi
+			echo "...didn't bump into either requested ($SIZELIMIT) or server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			if test "x$SIZELIMIT" = "x$COUNT" ; then
+				echo "...bumped into requested ($SIZELIMIT) size limit"
+			else
+				echo "...bumped into server-side size limit ($COUNT)"
+			fi
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=100
+echo "Testing higher than soft limit request ($SIZELIMIT) for soft limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Soft Limited User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" -gt "$SIZELIMIT" ; then
+				echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+				test $KILLSERVERS != no && kill -HUP $KILLPIDS
+				exit 1
+			fi
+			echo "...didn't bump into either requested ($SIZELIMIT) or server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			if test "x$SIZELIMIT" = "x$COUNT" ; then
+				echo "...bumped into requested ($SIZELIMIT) size limit"
+			else
+				echo "...bumped into server-side size limit ($COUNT)"
+			fi
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=2
+echo "Testing lower than hard limit request ($SIZELIMIT) for hard limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Hard Limited User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" -gt "$SIZELIMIT" ; then
+				echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+				test $KILLSERVERS != no && kill -HUP $KILLPIDS
+				exit 1
+			fi
+			echo "...didn't bump into either requested ($SIZELIMIT) or server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		echo "...bumped into requested ($SIZELIMIT) size limit"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=100
+echo "Testing higher than hard limit request ($SIZELIMIT) for hard limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Hard Limited User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" -gt "$SIZELIMIT" ; then
+				echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+				test $KILLSERVERS != no && kill -HUP $KILLPIDS
+				exit 1
+			fi
+			echo "...didn't bump into either requested ($SIZELIMIT) or server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" = "$SIZELIMIT" ; then
+				echo "...error: bumped into requested ($SIZELIMIT) size limit"
+                		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                		exit $RC
+			else
+				echo "...got size limit $COUNT instead of requested $SIZELIMIT entries"
+			fi
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                	exit $RC
+		fi
+	;;
+#	11)
+#		echo "...bumped into server-side hard size administrative limit"
+#	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=max
+echo "Testing max limit request ($SIZELIMIT) for hard limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Hard Limited User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into either requested ($SIZELIMIT) or server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			echo "...bumped into requested ($SIZELIMIT=$COUNT) size limit"
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+		fi
+	;;
+#	11)
+#		echo "...bumped into server-side hard size administrative limit"
+#	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing lower than unchecked limit request for unchecked limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Unchecked Limited User,ou=People,dc=example,dc=com' \
+	'(uid=uncheckedlimited)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...success; didn't bump into server-side unchecked limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	11)
+		echo "...error: bumped into unchecked administrative limit"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+if test $INDEXDB = indexdb ; then
+
+echo "Testing higher than unchecked limit requested for unchecked limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Unchecked Limited User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...error: didn't bump into server-side unchecked limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+		fi
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	;;
+	11)
+		echo "...bumped into unchecked administrative limit"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limits requested for unchecked limited group..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Unchecked Limited User 2,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...error: didn't bump into server-side unchecked limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+		fi
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	;;
+	11)
+		echo "...bumped into unchecked administrative limit"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+else
+	echo "Skipping test for unchecked limit with $BACKEND backend."
+fi
+
+echo "Testing no limits requested for limited regex..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Foo User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			echo "...bumped into server-side size limit ($COUNT)"
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limits requested for limited onelevel..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Bar User,ou=People,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			echo "...bumped into server-side size limit ($COUNT)"
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limit requested for limited children..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Unchecked Limited Users,ou=Groups,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			echo "...bumped into server-side size limit ($COUNT)"
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limit requested for limited subtree..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Unchecked Limited User 3,ou=Admin,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			echo "...bumped into server-side size limit ($COUNT)"
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limit requested for limited users..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Special User,dc=example,dc=com' \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			echo "...bumped into server-side size limit ($COUNT)"
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limit requested for limited anonymous..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			echo "...bumped into server-side size limit ($COUNT)"
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+if test $MAINDB != maindb ; then
+		# only bdb|hdb|mdb currently supports pagedResults control
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+		echo ">>>>> Test succeeded"
+		exit 0
+fi
+
+if test x"$SLAPD_PAGE_SIZE" != x ; then
+	PAGESIZE="$SLAPD_PAGE_SIZE"
+	if test "$PAGESIZE" -le 0 ; then
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+		echo ""
+		echo "Testing with pagedResults control disabled"
+		echo ""
+		echo ">>>>> Test succeeded"
+		exit 0
+	fi
+else
+	PAGESIZE=5
+fi
+
+echo ""
+echo "Testing regular search limits with pagedResults control (page size $PAGESIZE)"
+echo ""
+
+echo "Testing no limits requested for unlimited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Unlimited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' >$SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...success (got $COUNT entries)"
+		else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=2
+echo "Testing size limit request ($SIZELIMIT) for unlimited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Unlimited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+                        if test "$COUNT" -gt "$SIZELIMIT" ; then
+                                echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+                                test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                                exit 1
+                        fi
+                        echo "...didn't bump into the requested size limit ($SIZELIMIT; got $COUNT entries)"
+                else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			if test $COUNT = $SIZELIMIT ; then
+				echo "...bumped into requested size limit ($SIZELIMIT)"
+			else
+				echo "...error: got $COUNT entries while requesting $SIZELIMIT..."
+                                test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                                exit $RC
+                        fi
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+TIMELIMIT=10
+echo "Testing time limit request ($TIMELIMIT s) for unlimited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -l $TIMELIMIT \
+	-D 'cn=Unlimited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into the requested time limit ($TIMELIMIT s; got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	3)
+		if test x"$COUNT" = x ; then
+			COUNT=0
+		fi
+		echo "...bumped into requested time limit ($TIMELIMIT s; got $COUNT entries)"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limits requested for soft limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Soft Limited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...didn't bump into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+		fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			echo "...bumped into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=2
+echo "Testing lower than soft limit request ($SIZELIMIT) for soft limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Soft Limited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+                        if test "$COUNT" -gt "$SIZELIMIT" ; then
+                                echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+                                test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                                exit 1
+                        fi
+                        echo "...didn't bump into either requested ($SIZELIMIT) or server-side size limit (got $COUNT entries)"
+                else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			if test "x$SIZELIMIT" = "x$COUNT" ; then
+				echo "...bumped into requested ($SIZELIMIT) size limit"
+			else
+				echo "...bumped into server-side size limit ($COUNT)"
+			fi
+		else
+			echo "...bumped into either requested ($SIZELIMIT) or server-side size limit"
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=100
+echo "Testing higher than soft limit request ($SIZELIMIT) for soft limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Soft Limited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+                        if test "$COUNT" -gt "$SIZELIMIT" ; then
+                                echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+                                test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                                exit 1
+                        fi
+                        echo "...didn't bump into either requested ($SIZELIMIT) or server-side size limit (got $COUNT entries)"
+                else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			if test "x$SIZELIMIT" = "x$COUNT" ; then
+				echo "...bumped into requested ($SIZELIMIT) size limit"
+			else
+				echo "...bumped into server-side size limit ($COUNT)"
+			fi
+		else
+			echo "...bumped into either requested ($SIZELIMIT) or server-side size limit"
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=2
+echo "Testing lower than hard limit request ($SIZELIMIT) for hard limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Hard Limited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+                        if test "$COUNT" -gt "$SIZELIMIT" ; then
+                                echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+                                test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                                exit 1
+                        fi
+                        echo "...didn't bump into either requested ($SIZELIMIT) or server-side size limit (got $COUNT entries)"
+                else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" = "$SIZELIMIT" ; then
+				echo "...bumped into requested ($SIZELIMIT) size limit"
+			else
+				echo "...error: got size limit $SIZELIMIT but $COUNT entries"
+                        	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        	exit $RC
+                	fi
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+                fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=100
+echo "Testing higher than hard limit request ($SIZELIMIT) for hard limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Hard Limited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+                        if test "$COUNT" -gt "$SIZELIMIT" ; then
+                                echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+                                test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                                exit 1
+                        fi
+                        echo "...didn't bump into either requested ($SIZELIMIT) or server-side size limit (got $COUNT entries)"
+                else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			if test "$COUNT" = "$SIZELIMIT" ; then
+				echo "...error: bumped into requested ($SIZELIMIT) size limit"
+                		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                		exit $RC
+			else
+				echo "...got size limit $COUNT instead of requested $SIZELIMIT entries"
+			fi
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                	exit $RC
+		fi
+	;;
+#	11)
+#		echo "...bumped into hard size administrative limit"
+#	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=max
+echo "Testing max limit request ($SIZELIMIT) for hard limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Hard Limited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+                        echo "...didn't bump into either requested ($SIZELIMIT) or server-side size limit (got $COUNT entries)"
+                else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			echo "...bumped into requested ($SIZELIMIT=$COUNT) size limit"
+		else
+			echo "...error: bumped into size limit but got no entries!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+	;;
+#	11)
+#		echo "...bumped into hard size administrative limit"
+#	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing lower than unchecked limit request for unchecked limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Unchecked Limited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(uid=uncheckedlimited)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+                        echo "...success; didn't bump into server-side unchecked limit (got $COUNT entries)"
+                else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+#	11)
+#		echo "...bumped into unchecked administrative limit"
+#	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing higher than unchecked limit requested for unchecked limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Unchecked Limited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+                        echo "...error: didn't bump into server-side unchecked limit (got $COUNT entries)"
+                else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                fi
+                test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                exit 1
+	;;
+	11)
+		echo "...bumped into unchecked administrative limit"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo ""
+echo "Testing specific search limits with pagedResults control"
+echo ""
+
+echo "Testing no limit requested for unlimited page size ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Unlimited User,ou=Paged Results Users,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+			echo "...success; didn't bump into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			echo "...bumped into server-side size limit (got $COUNT entries)"
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limit requested for limited page size ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Page Size Limited User,ou=Paged Results Users,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		echo "...success; didn't bump into server-side page size limit (got $COUNT entries)"
+	;;
+	4)
+		echo "...bumped into page size limit ($COUNT)"
+	;;
+	11)
+		echo "...bumped into page size administrative limit"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limit requested for pagedResults disabled ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Paged Results Disabled User,ou=Paged Results Users,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		echo "...success; didn't bump into server-side unchecked limit (got $COUNT entries)"
+	;;
+	4)
+		echo "...bumped into server-side size limit ($COUNT)"
+	;;
+	11)
+		echo "...bumped into pagedResults disabled administrative limit"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+echo "Testing no limit requested for pagedResults total count limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Paged Results Limited User,ou=Paged Results Users,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		echo "...success; didn't bump into server-side unchecked limit (got $COUNT entries)"
+	;;
+	4)
+		echo "...bumped into server-side size limit ($COUNT)"
+	;;
+	11)
+		echo "...bumped into pagedResults total count administrative limit"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=8
+echo "Testing higher than hard but lower then total count limit requested for pagedResults total count limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Paged Results Limited User,ou=Paged Results Users,dc=example,dc=com' \
+	-z $SIZELIMIT -E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		echo "...success; didn't bump into either requested ($SIZELIMIT) or server-side unchecked limit (got $COUNT entries)"
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			if test "x$SIZELIMIT" = "x$COUNT" ; then
+				echo "...bumped into requested ($SIZELIMIT) size limit"
+			else
+				echo "...bumped into server-side size limit ($COUNT)"
+			fi
+		else
+			echo "...bumped into either requested ($SIZELIMIT) or server-side size limit"
+		fi
+	;;
+	11)
+		echo "...bumped into either hard size or pagedResults total count administrative limit"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=15
+echo "Testing higher than total count limit requested for pagedResults total count limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Paged Results Limited User,ou=Paged Results Users,dc=example,dc=com' \
+	-z $SIZELIMIT -E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		echo "...success; didn't bump into either requested ($SIZELIMIT) or server-side unchecked limit (got $COUNT entries)"
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			if test "x$SIZELIMIT" = "x$COUNT" ; then
+				echo "...bumped into requested ($SIZELIMIT) size limit"
+			else
+				echo "...bumped into server-side size limit ($COUNT)"
+			fi
+		else
+			echo "...bumped into either requested ($SIZELIMIT) or server-side size limit"
+		fi
+	;;
+	11)
+		echo "...bumped into pagedResults total count administrative limit"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+SIZELIMIT=max
+echo "Testing max limit requested for pagedResults total count limited ID..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret \
+	-D 'cn=Paged Results Limited User,ou=Paged Results Users,dc=example,dc=com' \
+	-z $SIZELIMIT -E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		echo "...success; didn't bump into either requested ($SIZELIMIT) or server-side unchecked limit (got $COUNT entries)"
+	;;
+	4)
+		if test "x$COUNT" != "x" ; then
+			if test "x$SIZELIMIT" = "x$COUNT" ; then
+				echo "...bumped into requested ($SIZELIMIT) size limit"
+			else
+				echo "...bumped into server-side size limit ($COUNT)"
+			fi
+		else
+			echo "...bumped into either requested ($SIZELIMIT) or server-side size limit"
+		fi
+	;;
+	11)
+		echo "...bumped into pagedResults total count administrative limit"
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+# ITS#4479
+PAGESIZE=1
+SIZELIMIT=2
+echo "Testing size limit request ($SIZELIMIT) for unlimited ID and pagesize=$PAGESIZE..."
+$LDAPRSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 -w secret -z $SIZELIMIT \
+	-D 'cn=Unlimited User,ou=People,dc=example,dc=com' \
+	-E '!pr='$PAGESIZE'/noprompt' '(objectClass=*)' > $SEARCHOUT 2>&1
+RC=$?
+COUNT=`awk '/^# numEntries:/ {print $3}' $SEARCHOUT`
+case $RC in
+	0)
+		if test x"$COUNT" != x ; then
+                        if test "$COUNT" -gt "$SIZELIMIT" ; then
+                                echo "...error: got $COUNT entries instead of the requested $SIZELIMIT"
+                                test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                                exit 1
+                        fi
+                        echo "...didn't bump into the requested size limit ($SIZELIMIT; got $COUNT entries)"
+                else
+                        echo "...error: did not expect ldapsearch success ($RC)!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit 1
+                fi
+	;;
+	4)
+		if test x"$COUNT" != x ; then
+			if test $COUNT = $SIZELIMIT ; then
+				echo "...bumped into requested size limit ($SIZELIMIT)"
+			else
+				echo "...error: got $COUNT entries while requesting $SIZELIMIT..."
+                                test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                                exit $RC
+                        fi
+		else
+			echo "...error: bumped into server-side size limit, but got no entries!"
+                        test $KILLSERVERS != no && kill -HUP $KILLPIDS
+                        exit $RC
+		fi
+	;;
+	*)
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	;;
+esac
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

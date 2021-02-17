@@ -1,0 +1,51 @@
+src/backend/storage/smgr/README
+
+Storage Manager
+===============
+
+In the original Berkeley Postgres system, there were several storage managers,
+of which only the "magnetic disk" manager remains.  (At Berkeley there were
+also managers for the Sony WORM optical disk jukebox and persistent main
+memory, but these were never supported in any externally released Postgres,
+nor in any version of PostgreSQL.)  However, we retain the notion of a storage
+manager switch in case anyone wants to reintroduce other kinds of storage
+managers.
+
+In Berkeley Postgres each relation was tagged with the ID of the storage
+manager to use for it.  This is gone.  It would be more reasonable to
+associate storage managers with tablespaces (a feature not present as this
+text is being written, but one likely to emerge soon).
+
+The files in this directory, and their contents, are
+
+    smgrtype.c	Storage manager type -- maps string names to storage manager
+		IDs and provides simple comparison operators.  This is the
+		regproc support for type 'smgr' in the system catalogs.
+		(This is vestigial since no columns of type smgr exist
+		in the catalogs anymore.)
+
+    smgr.c	The storage manager switch dispatch code.  The routines in
+		this file call the appropriate storage manager to do hardware
+		accesses requested by the backend.  smgr.c also manages the
+		file handle cache (SMgrRelation table).
+
+    md.c	The magnetic disk storage manager.
+
+Note that md.c in turn relies on src/backend/storage/file/fd.c.
+
+Relation Forks
+==============
+
+Since 8.4, a single smgr relation can be comprised of multiple physical
+files, called relation forks. This allows storing additional metadata like
+Free Space information in additional forks, which can be grown and truncated
+independently of the main data file, while still treating it all as a single
+physical relation in system catalogs.
+
+It is assumed that the main fork, fork number 0 or MAIN_FORKNUM, always
+exists. Fork numbers are assigned in src/include/storage/relfilenode.h.
+Functions in smgr.c and md.c take an extra fork number argument, in addition
+to relfilenode and block number, to identify which relation fork you want to
+access. Since most code wants to access the main fork, a shortcut version of
+ReadBuffer that accesses MAIN_FORKNUM is provided in the buffer manager for
+convenience.

@@ -1,0 +1,82 @@
+.TH LDAP_FIRST_MESSAGE 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_first_message, ldap_next_message, ldap_count_messages \- Stepping through messages in a result chain
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_count_messages( LDAP *ld, LDAPMessage *result )
+.LP
+.ft B
+LDAPMessage *ldap_first_message( LDAP *ld, LDAPMessage *result )
+.LP
+.ft B
+LDAPMessage *ldap_next_message( LDAP *ld, LDAPMessage *message )
+.SH DESCRIPTION
+.LP
+These routines are used to step through the messages in a result chain
+received from
+.BR ldap_result (3) .
+For search operations, the result chain can contain referral, entry
+and result messages. The
+.BR ldap_msgtype (3)
+function can be used to distinguish between the different message types.
+.LP
+The
+.B ldap_first_message()
+routine is used to retrieve the first message in a result chain.
+It takes the \fIresult\fP as returned by a call to
+.BR ldap_result (3) ,
+.BR ldap_search_s (3)
+or
+.BR ldap_search_st (3)
+and returns a pointer to the first message in the result chain.
+.LP
+This pointer should be supplied on a subsequent call to
+.B ldap_next_message()
+to get the next message, the result of which should be
+supplied to the next call to
+.BR ldap_next_message() ,
+etc.
+.B ldap_next_message()
+will return NULL when there are no more messages.
+.LP
+These functions are useful when using routines like
+.BR ldap_parse_result (3)
+that only operate on the first result in the chain.
+.LP
+A count of the number of messages in the result chain can be obtained
+by calling
+.BR ldap_count_messages() .
+It can also be used to count the number of remaining messages in a chain
+if called with a message, entry or reference returned by
+.B ldap_first_message() ,
+.B ldap_next_message() ,
+.BR ldap_first_entry (3) ,
+.BR ldap_next_entry (3) ,
+.BR ldap_first_reference (3) ,
+.BR ldap_next_reference (3) .
+.SH ERRORS
+If an error occurs in
+.B ldap_first_message()
+or
+.BR ldap_next_message() ,
+NULL is returned.  If an error occurs in
+.BR ldap_count_messages() ,
+-1 is returned.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_search (3),
+.BR ldap_result (3),
+.BR ldap_parse_result (3),
+.BR ldap_first_entry (3),
+.BR ldap_first_reference (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

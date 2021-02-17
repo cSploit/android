@@ -1,0 +1,68 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/ms.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/ms.xml
+ */
+ms{
+    Languages{
+        af{"Afrikaans"}
+        am{"Amharic"}
+        ar{"Arab"}
+        as{"Assam"}
+        be{"Belarus"}
+        bn{"Benggala"}
+        bs{"Bosnia"}
+        ca{"Catalonia"}
+        cy{"Wales"}
+        eo{"Esperanto"}
+        eu{"Basque"}
+        fa{"Parsi"}
+        fy{"Frisian"}
+        gd{"Scots Gaelic"}
+        gl{"Galicia"}
+        gu{"Gujerat"}
+        hr{"Croat"}
+        hu{"Hungary"}
+        hy{"Armenia"}
+        id{"Indonesia"}
+        ka{"Georgia"}
+        km{"Khmer"}
+        kn{"Kannada"}
+        la{"Latin"}
+        ln{"Lingala"}
+        lo{"Laos"}
+        ml{"Malayalam"}
+        mn{"Mongolia"}
+        mr{"Marathi"}
+        ms{"Bahasa Melayu"}
+        mt{"Malta"}
+        ne{"Nepal"}
+        nn{"Nynorsk Norway"}
+        pa{"Punjabi"}
+        pt_PT{"Portugis Iberia"}
+        sa{"Sanskrit"}
+        sd{"Sindhi"}
+        sh{"SerboCroatia"}
+        si{"Sinhala"}
+        sk{"Slovak"}
+        sl{"Slovenia"}
+        so{"Somali"}
+        sq{"Albania"}
+        sr{"Serbia"}
+        su{"Sunda"}
+        sw{"Swahili"}
+        ta{"Tamil"}
+        te{"Telugu"}
+        th{"Thai"}
+        ti{"Tigrinya"}
+        ug{"Uighur"}
+        vi{"Vietnam"}
+    }
+    Version{"2.0.48.56"}
+}

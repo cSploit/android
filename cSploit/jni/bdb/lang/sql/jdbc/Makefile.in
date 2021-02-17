@@ -1,0 +1,245 @@
+# Makefile template for SQLite Java wrapper
+
+prefix =	@prefix@
+CC =		@CC@
+HOSTCC =	@HOSTCC@
+LIBTOOL =	./libtool
+SQLITE_INC =	@SQLITE_INC@
+SQLITE_LIB =	@SQLITE_LIB@
+SQLITE3_INC =	@SQLITE3_INC@
+SQLITE3_LIB =	@SQLITE3_LIB@
+SQLITE3_A10N_C =	@SQLITE3_A10N_C@
+SQLITE3_A10N_O =	@SQLITE3_A10N_O@
+JAVAH =		@JAVAH@
+JAVA_RUN =	@JAVA_RUN@
+JAVA_FLAGS =	@JAVA_FLAGS@
+JAVAC =		@JAVAC@
+JAVAC_FLAGS =	@JAVAC_FLAGS@
+JAVADOC =	@JAVADOC@
+JAVADOCLINK =	http://java.sun.com/javase/6/docs/api
+JAR =		@JAR@
+JNIINCLUDE =	@JNIINCLUDE@
+INSTALL =	@INSTALL@
+JAR_DIR =	@JAR_DIR@
+NATIVE_LIB_DIR =	@NATIVE_LIB_DIR@
+
+CFLAGS=	$(JNIINCLUDE) $(SQLITE_INC) $(SQLITE3_INC) \
+	-DHAVE_SQLITE2=@HAVE_SQLITE2@ -DHAVE_SQLITE3=@HAVE_SQLITE3@ \
+	-DHAVE_SQLITE_FUNCTION_TYPE=@HAVE_SQLITE_FUNCTION_TYPE@ \
+	-DHAVE_SQLITE_OPEN_AUX_FILE=@HAVE_SQLITE_OPEN_AUX_FILE@ \
+	-DHAVE_SQLITE_SET_AUTHORIZER=@HAVE_SQLITE_SET_AUTHORIZER@ \
+	-DHAVE_SQLITE_TRACE=@HAVE_SQLITE_TRACE@ \
+	-DHAVE_SQLITE_COMPILE=@HAVE_SQLITE_COMPILE@ \
+	-DHAVE_SQLITE_PROGRESS_HANDLER=@HAVE_SQLITE_PROGRESS_HANDLER@ \
+	-DHAVE_SQLITE3_MALLOC=@HAVE_SQLITE3_MALLOC@ \
+	-DHAVE_SQLITE3_PREPARE_V2=@HAVE_SQLITE3_PREPARE_V2@ \
+	-DHAVE_SQLITE3_PREPARE16_V2=@HAVE_SQLITE3_PREPARE16_V2@ \
+	-DHAVE_SQLITE3_BIND_ZEROBLOB=@HAVE_SQLITE3_BIND_ZEROBLOB@ \
+	-DHAVE_SQLITE3_CLEAR_BINDINGS=@HAVE_SQLITE3_CLEAR_BINDINGS@ \
+	-DHAVE_SQLITE3_COLUMN_TABLE_NAME16=@HAVE_SQLITE3_COLUMN_TABLE_NAME16@ \
+	-DHAVE_SQLITE3_COLUMN_DATABASE_NAME16=@HAVE_SQLITE3_COLUMN_DATABASE_NAME16@ \
+	-DHAVE_SQLITE3_COLUMN_ORIGIN_NAME16=@HAVE_SQLITE3_COLUMN_ORIGIN_NAME16@ \
+	-DHAVE_SQLITE3_BIND_PARAMETER_COUNT=@HAVE_SQLITE3_BIND_PARAMETER_COUNT@ \
+	-DHAVE_SQLITE3_BIND_PARAMETER_NAME=@HAVE_SQLITE3_BIND_PARAMETER_NAME@ \
+	-DHAVE_SQLITE3_BIND_PARAMETER_INDEX=@HAVE_SQLITE3_BIND_PARAMETER_INDEX@ \
+	-DHAVE_SQLITE3_RESULT_ZEROBLOB=@HAVE_SQLITE3_RESULT_ZEROBLOB@ \
+	-DHAVE_SQLITE3_INCRBLOBIO=@HAVE_SQLITE3_INCRBLOBIO@ \
+	-DHAVE_SQLITE3_KEY=@HAVE_SQLITE3_KEY@ \
+	-DHAVE_SQLITE3_SHARED_CACHE=@HAVE_SQLITE3_SHARED_CACHE@ \
+	-DHAVE_SQLITE3_OPEN_V2=@HAVE_SQLITE3_OPEN_V2@ \
+	-DHAVE_SQLITE3_LOAD_EXTENSION=@HAVE_SQLITE3_LOAD_EXTENSION@ \
+	-DHAVE_SQLITE3_BACKUPAPI=@HAVE_SQLITE3_BACKUPAPI@ \
+	-DHAVE_SQLITE3_PROFILE=@HAVE_SQLITE3_PROFILE@ \
+	-DHAVE_SQLITE3_STATUS=@HAVE_SQLITE3_STATUS@ \
+	-DHAVE_SQLITE3_DB_STATUS=@HAVE_SQLITE3_DB_STATUS@ \
+	-DHAVE_SQLITE3_STMT_STATUS=@HAVE_SQLITE3_STMT_STATUS@ \
+	@VALIST_FLAGS@ @CFLAGS@ @SQLITE3_A10N_FLAGS@
+
+LIBS=	@SQLITE_LIB@ @SQLITE3_LIB@ @LDFLAGS@ @BDB_LIB@
+
+# Add new suffixes
+.SUFFIXES: .java .class .lo .la .jar
+
+#
+# Rule to compile `java' files
+#
+.java.class:
+	$(JAVAC) -classpath $(CURDIR) $(JAVAC_FLAGS) $<
+
+CLASSES = \
+	SQLite/Authorizer.class \
+	SQLite/Backup.class \
+	SQLite/BusyHandler.class \
+	SQLite/Callback.class \
+	SQLite/Database.class \
+	SQLite/Exception.class \
+	SQLite/Shell.class \
+	SQLite/TableResult.class \
+	SQLite/Function.class \
+	SQLite/FunctionContext.class \
+	SQLite/Constants.class \
+	SQLite/Trace.class \
+	SQLite/Vm.class \
+	SQLite/Stmt.class \
+	SQLite/Blob.class \
+	SQLite/BlobR.class \
+	SQLite/BlobW.class \
+	SQLite/ProgressHandler.class \
+	SQLite/StringEncoder.class \
+	SQLite/SQLDump.class \
+	SQLite/SQLRestore.class \
+	SQLite/Profile.class
+
+COMMON_CLASSES = \
+	SQLite/Benchmark.class \
+	SQLite/BenchmarkThread.class \
+	SQLite/DBDump.class \
+	SQLite/JDBC.class \
+	SQLite/@JDBCVER@/JDBCConnection.class \
+	SQLite/@JDBCVER@/JDBCStatement.class \
+	SQLite/@JDBCVER@/JDBCResultSet.class \
+	SQLite/@JDBCVER@/JDBCResultSetMetaData.class \
+	SQLite/@JDBCVER@/JDBCDatabaseMetaData.class \
+	SQLite/@JDBCVER@/JDBCPreparedStatement.class \
+	SQLite/@JDBCVER@/BatchArg.class \
+	SQLite/@JDBCVER@/TableResultX.class \
+	SQLite/@JDBCVER@/DatabaseX.class
+
+JDBC_DATA_SOURCE_CLASSES = \
+	SQLite/JDBCDataSource.class \
+	SQLite/BenchmarkDataSource.class
+
+JDBC_DRIVER_CLASSES = \
+	SQLite/JDBCDriver.class \
+	SQLite/BenchmarkDriver.class
+
+JDBC0_CLASSES = $(JDBC_DATA_SOURCE_CLASSES)
+JDBC1_CLASSES = $(JDBC_DRIVER_CLASSES)
+JDBC2_CLASSES = $(JDBC_DRIVER_CLASSES)
+JDBC2x_CLASSES = $(JDBC_DRIVER_CLASSES) $(JDBC_DATA_SOURCE_CLASSES)
+JDBC2y_CLASSES = $(JDBC_DRIVER_CLASSES) $(JDBC_DATA_SOURCE_CLASSES)
+JDBC2z_CLASSES = $(JDBC_DRIVER_CLASSES) $(JDBC_DATA_SOURCE_CLASSES)
+JDBC2z1_CLASSES = $(JDBC_DRIVER_CLASSES) $(JDBC_DATA_SOURCE_CLASSES)
+
+PRIVATE_CLASSES = $(COMMON_CLASSES) $(@JDBCVER@_CLASSES)
+
+DOCSRCS = \
+	SQLite/Authorizer.java \
+	SQLite/Backup.java \
+	SQLite/BusyHandler.java \
+	SQLite/Callback.java \
+	SQLite/Database.java \
+	SQLite/Exception.java \
+	SQLite/TableResult.java \
+	SQLite/Function.java \
+	SQLite/FunctionContext.java \
+	SQLite/Constants.java \
+	SQLite/Trace.java \
+	SQLite/Vm.java \
+	SQLite/Stmt.java \
+	SQLite/Blob.java \
+	SQLite/ProgressHandler.java \
+	SQLite/StringEncoder.java \
+	SQLite/Profile.java
+
+all:	sqlite.jar libsqlite_jni.la
+
+SQLite/Constants.java:	native/mkconst VERSION
+	LD_LIBRARY_PATH="$$LD_LIBRARY_PATH:$(PWD)/../.libs" \
+	native/mkconst > SQLite/Constants.java
+
+$(CLASSES) $(PRIVATE_CLASSES):	SQLite/Constants.java
+
+META-INF/services/java.sql.Driver:
+	mkdir -p META-INF/services
+	echo SQLite.JDBCDriver > META-INF/services/java.sql.Driver
+
+sqlite.jar:	$(CLASSES) $(PRIVATE_CLASSES) META-INF/services/java.sql.Driver
+	$(JAR) cmf manifest sqlite.jar $(CLASSES) $(PRIVATE_CLASSES)
+	case "@JDBCVER@" in \
+	    JDBC2z*) \
+		$(JAR) uf sqlite.jar META-INF/services/java.sql.Driver ; \
+		;; \
+	esac
+
+native/sqlite_jni.h:	SQLite/Database.class SQLite/Vm.class \
+	SQLite/FunctionContext.class SQLite/Stmt.class SQLite/Blob.class \
+	SQLite/Backup.class SQLite/Profile.class
+	$(JAVAH) -classpath $(CURDIR) -o native/sqlite_jni.h \
+	    SQLite.Database SQLite.Vm \
+	    SQLite.FunctionContext SQLite.Stmt SQLite.Blob SQLite.Backup \
+	    SQLite.Profile
+
+sqlite_jni.lo:	native/sqlite_jni.h native/sqlite_jni.c
+	$(LIBTOOL) --mode=compile $(CC) -c $(CFLAGS) native/sqlite_jni.c
+
+$(SQLITE3_A10N_O):	$(SQLITE3_A10N_C)
+	$(LIBTOOL) --mode=compile $(CC) -c $(CFLAGS) $(SQLITE3_A10N_C)
+
+libsqlite_jni.la:	sqlite_jni.lo $(SQLITE3_A10N_O)
+	$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o libsqlite_jni.la \
+	    sqlite_jni.lo $(SQLITE3_A10N_O) -rpath $(NATIVE_LIB_DIR) \
+	    -module -avoid-version $(LIBS)
+
+native/mkconst:	native/mkconst.c
+	$(LIBTOOL) --mode=link $(HOSTCC) @HOST_CFLAGS@ $(SQLITE_INC) \
+	    $(SQLITE3_INC) -DHAVE_SQLITE2=@HAVE_SQLITE2@ \
+	    -DHAVE_SQLITE3=@HAVE_SQLITE3@ -o native/mkconst native/mkconst.c
+
+Makefile:	Makefile.in configure config.status
+	./config.status
+
+configure:	configure.in
+	autoconf
+
+test:	all
+	$(JAVAC) -classpath sqlite.jar:$(CURDIR) $(JAVAC_FLAGS) test.java
+	LD_LIBRARY_PATH="$$LD_LIBRARY_PATH:$(CURDIR)/.libs" \
+	    $(JAVA_RUN) $(JAVA_FLAGS) -classpath sqlite.jar:$(CURDIR) \
+	    -DSQLite.library.path=$(CURDIR)/.libs test
+
+test2:	test
+	LD_LIBRARY_PATH="$$LD_LIBRARY_PATH:$(CURDIR)/.libs" \
+	    $(JAVA_RUN) $(JAVA_FLAGS) -classpath sqlite.jar:$(CURDIR) \
+	    -DSQLite.library.path=$(CURDIR)/.libs test db2
+
+test3:	all
+	$(JAVAC) -classpath sqlite.jar:$(CURDIR) $(JAVAC_FLAGS) test3.java
+	LD_LIBRARY_PATH="$$LD_LIBRARY_PATH:$(CURDIR)/.libs" \
+	    $(JAVA_RUN) $(JAVA_FLAGS) -classpath sqlite.jar:$(CURDIR) \
+	    -DSQLite.library.path=$(CURDIR)/.libs test3
+
+clean:
+	$(RM) SQLite/*.class SQLite/@JDBCVER@/*.class *.lo *.la *.o *~ \
+	    native/sqlite_jni.h native/mkconst \
+	    SQLite/Constants.java \
+	    test.class test3.class sqlite.jar conftest*
+	$(RM) -r .libs native/.libs META-INF
+
+distclean:	clean
+	$(RM) config.status config.log config.cache Makefile
+
+javadoc:
+	$(JAVADOC) -private -nodeprecated -nodeprecatedlist \
+	    -link "$(JAVADOCLINK)" \
+	    -noindex -nohelp -overview doc/overview.html \
+	    -windowtitle "SQLite Java Wrapper" \
+	    -doctitle "`cat doc/title.html`" \
+	    -bottom '<small>Contact: <a HREF="mailto:chw@ch-werner.de">Christian Werner</a></small>' \
+	    -d doc -sourcepath . $(DOCSRCS)
+	$(INSTALL) -m 644 test.java doc/test.java
+	$(INSTALL) -m 644 test3.java doc/test3.java
+	$(INSTALL) -m 644 ChangeLog doc/ChangeLog
+
+install:
+	$(INSTALL) -d -m 755 $(DESTDIR)$(JAR_DIR)
+	$(INSTALL) -m 644 sqlite.jar $(DESTDIR)$(JAR_DIR)
+	$(INSTALL) -d -m 755 $(DESTDIR)$(NATIVE_LIB_DIR)
+	$(LIBTOOL) --mode=install $(INSTALL) libsqlite_jni.la \
+	    $(DESTDIR)$(NATIVE_LIB_DIR)
+
+uninstall:
+	$(RM) $(DESTDIR)$(JAR_DIR)/sqlite.jar
+	$(LIBTOOL) --mode=uninstall $(RM) \
+	    $(DESTDIR)$(NATIVE_LIB_DIR)/libsqlite_jni.la
+

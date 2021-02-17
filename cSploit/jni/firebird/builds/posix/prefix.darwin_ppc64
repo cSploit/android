@@ -1,0 +1,45 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+#
+# Copyright (C) 2000 Inprise Corporation
+# All Rights Reserved.
+# Contributor(s): ______________________________________.
+# Start of file prefix.darwin:	$(VERSION)	@PLATFORM@
+# 2 Oct 2002, Nickolay Samofatov - Major Cleanup
+
+# To use this file to build 64bit version of Firebird for MacOS 10.5 (Leopard)
+# Can only be built on MacOSX 10.5 (Leopard) due to lack of 64bit support in 
+# Carbon in previous versions of MacOSX
+# 1. edit configure.in so that MAKEFILE_PREFIX=darwin_ppc64
+# 2. uncomment the CPU_TYPE
+# 3. edit extern/icu/source/config/mh-darwin and set the right 64bit flags (-arch ppc64)
+# for CFLAGS, CXXFLAGS & LD_FLAGS
+# 4. export CFLAGS='-arch _ppc64'
+# 5. export CXXFLAGS='-arch ppc_64'
+# 6. export LDFLAGS='-arch ppc_64'
+# 7. export MACOSX_DEPLOYMENT_TARGET=10.5
+
+DYLD_LIBRARY_PATH=$(FIREBIRD)/lib
+export DYLD_LIBRARY_PATH
+
+MACOSX_DEPLOYMENT_TARGET=10.5
+export MACOSX_DEPLOYMENT_TARGET
+
+PROD_FLAGS=-O3 -DDARWIN -pipe -p -MMD -fPIC -fno-common -mmacosx-version-min=10.5
+DEV_FLAGS=-ggdb -DDARWIN -pipe -p -MMD -fPIC -fno-common -Wall -mmacosx-version-min=10.5 -Wno-non-virtual-dtor
+CXXFLAGS:=$(CXXFLAGS) -fvisibility-inlines-hidden -fvisibility=hidden
+
+EXE_LINK_OPTIONS:=-arch ppc64 
+LD_FLAGS+=-arch ppc64
+
+include $(ROOT)/gen/darwin.defaults

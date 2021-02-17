@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Using Sequences</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="dbsqlbasics.html" title="Chapter 1. Berkeley DB SQL: The Absolute Basics" />
+    <link rel="prev" href="sql_encryption.html" title="Encryption" />
+    <link rel="next" href="normal-sql.html" title="Differences for Users of other SQL Engines" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Using Sequences</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="sql_encryption.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 1. Berkeley DB SQL: The Absolute Basics</th>
+          <td width="20%" align="right"> <a accesskey="n" href="normal-sql.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="sequencesupport"></a>Using Sequences</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="sequencesupport.html#create_sequence">create_sequence</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="sequencesupport.html#seq_nextval">nextval</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="sequencesupport.html#seq_currval">currval</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="sequencesupport.html#seq_drop_sequence">drop_sequence</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+                You can use sequences with the SQL API.
+                Sequences provide for an arbitrary number of increasing or
+                decreasing integers that persist across database accesses.
+                Use sequences if you need to create unique values in a
+                highly efficient and persistent way.
+            </p>
+      <p>
+                To create and access a sequence, you must use SQL
+                functionality that is unique to the BDB SQL interface; no
+                corresponding functionality exists in SQLite.  The
+                sequence functionality is implemented using SQLite
+                function plugins, as such it is necessary to use the
+                'select' keyword as a prefix to all sequence APIs.
+            </p>
+      <p>
+                The SQL API sequence support is a partial implementation of
+                the sequence API defined in the SQL 2003 specification.
+            </p>
+      <p>
+                The following sections describe the BDB SQL interface sequence API.
+            </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="create_sequence"></a>create_sequence</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    Creates a new sequence. A name is required, all other
+                    parameters are optional. For example:
+                </p>
+        <pre class="programlisting">SELECT create_sequence("my_sequence", "start", 100, "incr", 10, 
+                       "maxvalue", 300);</pre>
+        <p>
+                    This creates a sequence called <code class="literal">my_sequence</code>
+                    starting at 100 and incrementing by 10 until it reaches
+                    300.
+                </p>
+        <pre class="programlisting">SELECT create_sequence("my_decr_sequence", "incr", -100, 
+                       "minvalue", -10000);</pre>
+        <p>
+                    This creates a sequence call <code class="literal">my_decr_sequence</code>
+                    starting at 0 and decreasing by 100 until it reaches
+                    -10000.
+                </p>
+        <p>
+                    Parameters are:
+                </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                            <code class="literal">name</code>
+                        </p>
+              <p>
+                            Required parameter that provides the name of
+                            the sequence. It is an error to create a
+                            sequence with another name that is currently in
+                            use within the database.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <code class="literal">start</code>
+                        </p>
+              <p>
+                            The starting value for the sequence. If this
+                            parameter is not provided then
+                            <code class="literal">0</code> is used.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <code class="literal">minvalue</code>
+                        </p>
+              <p>
+                            The lowest value generated by the sequence. If
+                            this parameter is not provided and a
+                            decrementing sequence is created, then
+                            INT64_MIN is used.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <code class="literal">maxvalue</code>
+                        </p>
+              <p>
+                            The largest value generated by the sequence.
+                            If this parameter is not provided and an
+                            incrementing sequence is created, then
+                            INT64_MAX is used.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <code class="literal">incr</code>
+                        </p>
+              <p>
+                            The amount the sequence is incremented for each
+                            get operation. This value can be positive or
+                            negative. If this parameter is not provided,
+                            then <code class="literal">1</code> is used.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <code class="literal">cache</code>
+                        </p>
+              <p>
+                            Causes each handle to keep a cache of sequence
+                            values. So long as there are values available
+                            in the cache, retrieving the next value is
+                            cheap and does not lead to contention between
+                            handles.
+                        </p>
+              <p>
+                            Sequences with caches cannot be created or dropped
+                            within an explicit transaction.
+                        </p>
+              <p>
+                            Operations on caching sequences are not
+                            transactionally protected. That is, a rollback
+                            will not result in a value being returned to
+                            the sequence.
+                        </p>
+              <p>
+                            Sequences with caches do not support the 
+                            <code class="literal">currval</code> function.
+                        </p>
+              <p>
+                            The parameter following the cache parameter must be
+                            an integer value specifying the size of the cache.
+                        </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="seq_nextval"></a>nextval</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    Retrieves the next value from the named sequence. For
+                    example:
+                </p>
+        <pre class="programlisting">SELECT nextval("my_sequence");</pre>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="seq_currval"></a>currval</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    Retrieves the last value that was returned from the
+                    named sequence. For example:
+                </p>
+        <pre class="programlisting">SELECT currval("my_sequence");</pre>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="seq_drop_sequence"></a>drop_sequence</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    Removes the sequence. For example:
+                </p>
+        <pre class="programlisting">SELECT drop_sequence("my_sequence");</pre>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="sql_encryption.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="dbsqlbasics.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="normal-sql.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Encryption </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Differences for Users of other SQL Engines</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

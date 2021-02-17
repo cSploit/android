@@ -1,0 +1,8 @@
+PKG="Firebird-libgcc"
+NAME="GNU C/C+ runtime for Firebird 2 @CPU_TYPE@"
+ARCH="@CPU_TYPE@"
+VERSION="6.0.9"
+CATEGORY="library"
+VENDOR="www.firebirdsql.org"
+BASEDIR=/opt/firebird
+EMAIL=pbeach at ibphoenix.com

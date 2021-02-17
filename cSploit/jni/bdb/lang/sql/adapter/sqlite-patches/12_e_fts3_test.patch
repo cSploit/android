@@ -1,0 +1,10 @@
+--- test/e_fts3.test
++++ test/e_fts3.test
+@@ -509,6 +509,7 @@
+ # of the document examples above.
+ #
+ do_malloc_test e_fts3-3 -tclbody { 
++  catch {db close}
+   if {[catch {sqlite3 db test.db}]} { error "out of memory" }
+ }
+ #-------------------------------------------------------------------------

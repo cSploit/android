@@ -1,0 +1,32 @@
+--- libnet-1.1.2.1.orig/src/libnet_cq.c
++++ libnet-1.1.2.1/src/libnet_cq.c
+@@ -393,3 +393,14 @@
+ {
+     return (l_cqd.node);
+ }
++
++u_int32_t
++libnet_cq_end_loop()
++{
++    if (! clear_cq_lock(CQ_LOCK_WRITE))
++    {
++        return (0);
++    }
++    l_cqd.current = l_cq;
++    return (1);
++}
+--- libnet-1.1.2.1.orig/include/libnet/libnet-functions.h
++++ libnet-1.1.2.1/include/libnet/libnet-functions.h
+@@ -1886,6 +1886,12 @@
+ libnet_cq_size();
+ 
+ /**
++ * [Context Queue]
++ */
++u_int32_t
++libnet_cq_end_loop();
++
++/**
+  * [Diagnostic] 
+  * Prints the contents of the given context.
+  * @param l pointer to a libnet context

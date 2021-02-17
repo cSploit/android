@@ -1,0 +1,65 @@
+.TH NWPURGE 1 4/2/1998 nwpurge nwpurge
+.SH NAME
+nwpurge \- Permanently delete previously erased files
+.SH SYNOPSIS
+.B nwpurge
+[
+.B -h
+] [
+.B -a
+] [
+.B -l
+] [
+.B -s
+] [
+.B directory
+]
+
+.SH DESCRIPTION
+.B nwpurge
+purges files from specified NetWare directory.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B -a
+.RS 3
+.B -a
+is used to specify that not only specified directory, but also its
+subdirectories have to be purged.
+.RE
+
+.B -l
+.RS 3
+.B -l
+is used to disable purge. Files are only printed out.
+.RE
+
+.B -s
+.RS 3
+.B -s
+specifies silent mode (no print output, only total is printed).
+.RE
+
+.B directory
+.RS 3
+You can specify the directory in which you want to purge files. Current
+working directory is used by default. You have to specify path in
+Linux format, not in NetWare format.
+
+.SH EXAMPLES
+
+nwpurge -a /NetWare/server/sys
+
+With this example, all files from directory /NetWare/server/sys and from
+all its subdirectories are purged.
+
+.SH AUTHORS
+nwpurge was written by Petr Vandrovec with the corresponding NetWare
+utility in mind. See the Changes file of ncpfs for other contributors.
+

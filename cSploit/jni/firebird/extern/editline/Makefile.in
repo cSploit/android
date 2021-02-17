@@ -1,0 +1,6 @@
+@SET_MAKE@
+
+all:	editlinelibrary
+
+.DEFAULT:
+	$(MAKE) -C src $@

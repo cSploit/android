@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbStream::close()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="blob.html" title="Chapter 14.  Binary Large Objects" />
+    <link rel="prev" href="dbstream.html" title="Dbc::db_stream()" />
+    <link rel="next" href="dbstream_read.html" title="DbStream::read()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbStream::close()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbstream.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 14. 
+                Binary Large Objects
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbstream_read.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbstream_close"></a>DbStream::close()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+ 
+int
+DbStream::close(u_int32_t flags);  </pre>
+      <p>
+         The <code class="methodname">DbStream::close()</code> method flushes any
+         unwritten data to disk, frees allocated resources, and closes the
+         underlying file which contains the BLOB. You open a BLOB stream
+         using <a class="xref" href="dbstream.html" title="Dbc::db_stream()">Dbc::db_stream()</a>.
+     </p>
+      <p>
+         Once this method is called, the stream can not be used again even
+         if this method returns an error.
+     </p>
+      <p>
+         Unless otherwise specified, the
+         <code class="methodname">DbStream::close()</code> <span>
+            
+            <span>
+                method either returns a non-zero error value or throws an
+                exception that encapsulates a non-zero error value on
+                failure, and returns 0 on success.
+            </span>
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5221904"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5236552"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>flags</strong></span> parameter must be set to 0.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5231208"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DbStream::close()</code> <span>
+            
+            <span>
+                method may fail and throw a <a class="link" href="dbexception.html" title="Chapter 6. The DbException Class">DbException</a> 
+                exception, encapsulating one of the following non-zero errors, or return one
+                of the following non-zero errors:
+            </span>
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5241576"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                An invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5240280"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="blob.html" title="Chapter 14.  Binary Large Objects">DbStream</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5242904"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="blob.html#bloblist" title="BLOBs and Related Methods">BLOBs and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbstream.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="blob.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbstream_read.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Dbc::db_stream() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbStream::read()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

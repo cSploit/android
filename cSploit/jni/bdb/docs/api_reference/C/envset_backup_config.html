@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_ENV-&gt;set_backup_config()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="env.html" title="Chapter 5.  The DB_ENV Handle" />
+    <link rel="prev" href="envset_backup_callbacks.html" title="DB_ENV-&gt;set_backup_callbacks()" />
+    <link rel="next" href="envset_data_dir.html" title="DB_ENV-&gt;set_data_dir()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_ENV-&gt;set_backup_config()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envset_backup_callbacks.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. 
+                The DB_ENV Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envset_data_dir.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envset_backup_config"></a>DB_ENV-&gt;set_backup_config()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+ 
+DB_ENV-&gt;set_backup_config(DB_ENV, DB_BACKUP_CONFIG option, 
+                          u_int32_t value);  </pre>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;set_backup_config()</code> method
+         configures tuning parameters for the hot backup APIs. See the
+         <a class="xref" href="envbackup.html" title="DB_ENV-&gt;backup()">DB_ENV-&gt;backup()</a>
+         and
+         <a class="xref" href="envdbbackup.html" title="DB_ENV-&gt;dbbackup()">DB_ENV-&gt;dbbackup()</a>
+         methods for a description of the hot backup APIs.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;set_backup_config()</code> method
+         configures operations performed using the specified 
+         <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a>  handle, not all operations
+         performed on the underlying database environment.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;set_backup_config()</code> method may
+         be called at any time during the life of the application.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;set_backup_config()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51871760"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51879304"></a>option</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The <span class="bold"><strong>option</strong></span> parameter 
+                identifies the backup parameter to be modified. It
+                must be one of the following:
+            </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                        <code class="literal">DB_BACKUP_WRITE_DIRECT</code>
+                    </p>
+                <p>
+                        Turning this on causes direct I/O to be used when
+                        writing pages to the disk.  For some environments,
+                        direct I/O can provide faster write throughput, but
+                        usually it is slower because the OS buffer pool
+                        offers asynchronous activity.
+                    </p>
+                <p>
+                        By default, this option is turned off.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">DB_BACKUP_READ_COUNT</code>
+                    </p>
+                <p>
+                        Configures the number of pages to read before
+                        pausing. Increasing this value increases the amount
+                        of I/O the backup process performs for any given
+                        time interval. If your application is already
+                        heavily I/O bound, setting this value to a lower
+                        number may help to improve your overall data
+                        throughput by reducing the I/O demands placed on
+                        your system.
+                    </p>
+                <p>
+                        By default, all pages are read without a pause.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">DB_BACKUP_READ_SLEEP</code>
+                    </p>
+                <p>
+                        Configures the number of microseconds to sleep
+                        between batches of reads.  Increasing this value
+                        decreases the amount of I/O the backup process
+                        performs for any given time interval. If your
+                        application is already heavily I/O bound, setting
+                        this value to a higher number may help to improve
+                        your overall data throughput by reducing the I/O
+                        demands placed on your system.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">DB_BACKUP_SIZE</code>
+                    </p>
+                <p>
+                        Configures the size of the buffer, in bytes, to
+                        read from the database. Default is 1 megabyte.
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51888040"></a>value</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The <span class="bold"><strong>value</strong></span> parameter sets
+                the configuration value for the option identified by the
+                <span class="bold"><strong>option</strong></span> parameter. For
+                those options which can only be turned on or off, this
+                parameter should be set to <code class="literal">0</code>
+                for off and <code class="literal">1</code> for on. Otherwise, set
+                this parameter to an integer value that represents the
+                number of units for which you are configuring the backup
+                APIs.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51870024"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a>,
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51890200"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="xref" href="env.html#envlist" title="Database Environments and Related Methods">Database Environments and Related Methods</a>,
+            <a class="xref" href="envget_backup_config.html" title="DB_ENV-&gt;get_backup_config()">DB_ENV-&gt;get_backup_config()</a>,
+            <a class="xref" href="envbackup.html" title="DB_ENV-&gt;backup()">DB_ENV-&gt;backup()</a>, 
+            <a class="xref" href="envdbbackup.html" title="DB_ENV-&gt;dbbackup()">DB_ENV-&gt;dbbackup()</a>
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envset_backup_callbacks.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="env.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envset_data_dir.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_ENV-&gt;set_backup_callbacks() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_ENV-&gt;set_data_dir()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

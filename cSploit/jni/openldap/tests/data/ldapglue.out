@@ -1,0 +1,51 @@
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=All,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: All
+member: uid=bjorn,ou=People,dc=example,dc=com
+member: uid=bjensen,ou=People,dc=example,dc=com
+
+dn: cn=ITD,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: ITD
+member: uid=bjorn,ou=People,dc=example,dc=com
+
+dn: uid=proxy,ou=Groups,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Proxy
+sn: Proxy
+uid: proxy
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: uid=bjorn,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Bjorn Jensen
+sn: Jensen
+uid: bjorn
+mail: bjorn@example.com
+
+dn: uid=bjensen,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Barbara Jensen
+sn: Jensen
+uid: bjensen
+mail: bjensen@example.com
+
+dn: uid=proxy,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Proxy
+sn: Proxy
+uid: proxy
+

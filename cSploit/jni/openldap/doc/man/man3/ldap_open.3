@@ -1,0 +1,225 @@
+.TH LDAP_OPEN 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_init, ldap_initialize, ldap_open \- Initialize the LDAP library and open a connection to an LDAP server
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+LDAP *ldap_open(host, port)
+.ft
+char *host;
+int port;
+.LP
+.ft B
+LDAP *ldap_init(host, port)
+.ft
+char *host;
+int port;
+.LP
+.ft B
+int ldap_initialize(ldp, uri)
+.ft
+LDAP **ldp;
+char *uri;
+.LP
+.ft B
+int ldap_set_urllist_proc(ld, proc, params)
+.ft
+LDAP *ld;
+LDAP_URLLIST_PROC *proc;
+void *params;
+.LP
+.ft B
+int (LDAP_URLLIST_PROC)(ld, urllist, url, params);
+.ft
+LDAP *ld;
+LDAPURLDesc **urllist;
+LDAPURLDesc **url;
+void *params;
+.LP
+.ft B
+#include <ldap_pvt.h>
+.LP
+.ft B
+int ldap_init_fd(fd, proto, uri, ldp)
+.ft
+ber_socket_t fd;
+int proto;
+char *uri;
+LDAP **ldp;
+.SH DESCRIPTION
+.LP
+.B ldap_open()
+opens a connection to an LDAP server and allocates an LDAP
+structure which is used to identify
+the connection and to maintain per-connection information.
+.B ldap_init()
+allocates an LDAP structure but does not open an initial connection.
+.B ldap_initialize()
+allocates an LDAP structure but does not open an initial connection.
+.B ldap_init_fd()
+allocates an LDAP structure using an existing connection on the
+provided socket.
+One
+of these routines must be called before any operations are attempted.
+.LP
+.B ldap_open()
+takes \fIhost\fP, the hostname on which the LDAP server is
+running, and \fIport\fP, the port number to which to connect.  If the default
+IANA-assigned port of 389 is desired, LDAP_PORT should be specified for
+\fIport\fP.  The \fIhost\fP parameter may contain a blank-separated list
+of hosts to try to connect to, and each host may optionally by of the form
+\fIhost:port\fP.  If present, the \fI:port\fP overrides the \fIport\fP
+parameter to
+.BR ldap_open() .
+Upon successfully making a connection to an
+LDAP server,
+.B ldap_open()
+returns a pointer to an opaque LDAP structure, which should be passed
+to subsequent calls to
+.BR ldap_bind() ,
+.BR ldap_search() ,
+etc. Certain fields in the LDAP structure can be set to indicate size limit,
+time limit, and how aliases are handled during operations; read and write access 
+to those fields must occur by calling
+.BR ldap_get_option (3) 
+and
+.BR ldap_set_option (3)
+respectively, whenever possible.
+.LP
+.B
+ldap_init()
+acts just like
+.BR ldap_open() ,
+but does not open a connection
+to the LDAP server.  The actual connection open will occur when the
+first operation is attempted.
+.LP
+.B ldap_initialize()
+acts like
+.BR ldap_init() ,
+but it returns an integer indicating either success or the failure reason,
+and it allows to specify details for the connection in the schema portion
+of the URI.
+The
+.I uri
+parameter may be a comma- or whitespace-separated list of URIs
+containing only the
+.IR schema ,
+the
+.IR host ,
+and the
+.I port
+fields.
+Apart from
+.BR ldap ,
+other (non-standard) recognized values of the
+.I schema
+field are
+.B ldaps
+(LDAP over TLS),
+.B ldapi
+(LDAP over IPC),
+and
+.B cldap
+(connectionless LDAP).
+If other fields are present, the behavior is undefined.
+.LP
+At this time,
+.B ldap_open()
+and 
+.B ldap_init()
+are deprecated in favor of
+.BR ldap_initialize() ,
+essentially because the latter allows to specify a schema in the URI
+and it explicitly returns an error code.
+.LP
+.B ldap_init_fd()
+allows an LDAP structure to be initialized using an already-opened
+connection. The
+.I proto
+parameter should be one of LDAP_PROTO_TCP, LDAP_PROTO_UDP,
+or LDAP_PROTO_IPC
+for a connection using TCP, UDP, or IPC, respectively. The value
+LDAP_PROTO_EXT
+may also be specified if user-supplied sockbuf handlers are going to
+be used. Note that support for UDP is not implemented unless libldap
+was built with LDAP_CONNECTIONLESS defined.
+The
+.I uri
+parameter may optionally be provided for informational purposes.
+.LP
+.B ldap_set_urllist_proc()
+allows to set a function
+.I proc
+of type
+.I LDAP_URLLIST_PROC
+that is called when a successful connection can be established.
+This function receives the list of URIs parsed from the
+.I uri
+string originally passed to
+.BR ldap_initialize() ,
+and the one that successfully connected.
+The function may manipulate the URI list; the typical use consists
+in moving the successful URI to the head of the list,
+so that subsequent attempts to connect to one of the URIs using the same LDAP handle
+will try it first.
+If
+.I ld
+is null,
+.I proc
+is set as a global parameter that is inherited by all handlers
+within the process that are created after the call to
+.BR ldap_set_urllist_proc() .
+By default, no 
+.I LDAP_URLLIST_PROC
+is set.
+In a multithreaded environment,
+.B ldap_set_urllist_proc()
+must be called before any concurrent operation using the LDAP handle is started.
+
+Note: the first call into the LDAP library also initializes the global
+options for the library. As such the first call should be single-threaded
+or otherwise protected to insure that only one call is active. It is
+recommended that
+.BR ldap_get_option ()
+or
+.BR ldap_set_option ()
+be used in the program's main thread before any additional threads are created.
+See
+.BR ldap_get_option (3).
+
+.SH ERRORS
+If an error occurs,
+.B ldap_open()
+and
+.B ldap_init()
+will return NULL and 
+.I errno
+should be set appropriately.
+.B ldap_initialize()
+and
+.B ldap_init_fd()
+will directly return the LDAP code associated to the error (or
+.I LDAP_SUCCESS
+in case of success);
+.I errno
+should be set as well whenever appropriate.
+.B ldap_set_urllist_proc()
+returns LDAP_OPT_ERROR on error, and LDAP_OPT_SUCCESS on success.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_bind (3),
+.BR ldap_get_option (3),
+.BR ldap_set_option (3),
+.BR lber-sockbuf (3),
+.BR errno (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

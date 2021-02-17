@@ -1,0 +1,33 @@
+#ifndef __EXT_STDINT_H__
+#define __EXT_STDINT_H__
+
+#if @stdint_types@
+/* we have stdint.h header */
+#include <stdint.h>
+#else
+/* we have not stdint.h */
+
+#include <ncp/kernel/types.h>
+/* Signed.  */
+#define int_least8_t	int8_t
+#define int_least16_t	int16_t
+#define int_least32_t	int32_t
+/* Unsigned.  */
+#define uint_least8_t	u_int8_t
+#define uint_least16_t	u_int16_t
+#define uint_least32_t	u_int32_t
+
+/* Fast types.  */
+/* Signed.  */
+#define int_fast8_t	u_int8_t
+/* fix for WORDSIZE==16 ! */
+#define int_fast16_t	int
+#define int_fast32_t	int
+/* Unsigned.  */
+#define uint_fast8_t	u_int8_t
+/* fix for WORDSIZE==16 ! */
+#define uint_fast16_t	unsigned int
+#define uint_fast32_t	unsigned int
+#endif
+
+#endif /* __EXT_STDINT_H__ */

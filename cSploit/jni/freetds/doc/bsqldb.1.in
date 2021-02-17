@@ -1,0 +1,116 @@
+.\" cf. groff_mdoc
+.Dd April 26, 2012
+.Os FreeTDS @VERSION@
+.Dt BSQLDB 1
+.Sh NAME
+.Nm bsqldb
+.Nd batch SQL script processor using DB-Library
+.Sh SYNOPSIS
+.Nm
+.Op Fl hqv
+.Op Fl S Ar servername
+.Op Fl D Ar database
+.Op Fl U Ar username
+.Op Fl P Ar password
+.Op Fl i Ar input_file
+.Op Fl o Ar output_file
+.Op Fl e Ar error_file
+.Op Fl H Ar hostname
+.Op Fl t Ar field_term
+.\"
+.Sh DESCRIPTION
+.Nm
+is a utility program distributed with FreeTDS.
+.Nm
+is a non-interactive equivalent of the "isql" utility programs
+distributed by Sybase and Microsoft. Like them, 
+.Nm
+uses the command "go" on a line by itself as a separator between
+batches. The last batch need not be followed by "go".
+.Nm
+makes use of the DB-Library API provided by FreeTDS. This API is of
+course also available to application developers.
+
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl D Ar database
+Database to use.
+.It Fl H Ar hostname
+hostname Override name of client sent to server.
+.It Fl P Ar password
+Database server password.
+.It Fl S Ar servername
+Database server to which to connect.
+.It Fl U Ar username
+Database server login name. If username is not provided, a domain
+login is attempted for TDS 7+ connections.
+.It Fl e Ar error_file
+Name of file for errors.
+.It Fl h
+Print column headers with the data to the same file.
+.It Fl i Ar input_file
+Name of script file, containing SQL.
+.It Fl o Ar output_file
+Name of output file, holding result data.
+.It Fl q
+Do not print column metadata, return status, or rowcount. Overrides 
+.Fl h Ns .
+.It Fl t Ar field_term
+Specifies the field terminator. Default is two spaces (' ').
+Recognized escape sequences are tab ('\\t'), carriage return ('\\r'),
+newline ('\\n'), and backslash ('\\\\').
+.It Fl v
+Verbose mode, for more information about the DB-Library interaction.
+This also reports the result set metadata, including and return code. All
+verbose data are written to standard error (or 
+.Fl e Ns ), so as not to interfere with the data stream.
+.El
+.\"
+.Sh ENVIRONMENT
+.Ev DSQUERY
+default 
+.Ar servername
+.\"
+.Sh NOTES
+.Nm
+is a filter; it reads from standard input, writes to standard output,
+and writes errors to standard error. The 
+.Fl i Ns , Fl o Ns , and Fl e
+options override these defaults.
+.Pp
+The source code for 
+.Nm
+is intended as a model for DB-Library users. DB-Library has a rich set
+of functions, and it can be hard sometimes to understand how to use
+them, particularly the first time. If you find something about the
+source code unclear, you are encouraged to email the author your
+comments.
+.\"
+.Sh EXIT STATUS
+.Nm
+exits 0 on success, and >0 if the server cannot process the query.
+.Pp
+For messages with severity > 10, 
+.Nm
+calls exit(3) with the severity level.  For example, if the severity
+level is 16,
+.Nm
+will return an exit status of 16 to the shell. 
+.\"
+.Sh HISTORY
+.Nm
+first appeared in FreeTDS 0.63.
+.\"
+.Sh AUTHORS
+The 
+.Nm
+utility was written by
+.An "James K. Lowden" Aq jklowden@freetds.org .
+.\"
+.Sh BUGS
+Microsoft servers as of SQL Server 7.0 SP 3 do not return output
+parameters unless the RPC functions are used. This means
+.Nm
+cannot return output parameters for stored procedures with these
+servers.
+

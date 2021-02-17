@@ -1,0 +1,62 @@
+Maybe you want to look at LIMITATIONS in README. Some might consider
+them to be bugs.
+
+But there are really problems that might be fixed in the future.
+
+If you find some problem unlisted in this file, contact me at
+"Petr Vandrovec" <vandrove@vc.cvut.cz>.
+
+-------------------------------------------------------------------------------
+
+You might experience lockups of ncpfs volumes. It happens especially
+under high network traffic, not necessarily only IPX traffic. I am not
+able to reproduce this problem on my machine, so I'm sorry I can not
+do anything about that. When such a lockup happens, you have to shut
+down the complete ipx subsystem by deleting all ipx interfaces,
+unmounting all ncpfs volumes (in this order!) and restarting all
+again.
+
+This problem has been solved by Martin Stover (THANKS!!)
+See patches/lockup-2.0.30.diff for the fix.
+
+-------------------------------------------------------------------------------
+
+'df' returns 0: Free disk space is distributed among the volumes in
+NetWare. df is only able to report one number per mounted
+filesystem. As connections are quite expensive for NetWare (with
+mars_nwe and lwared that might change ...), I rejected the alternative
+to mount only a single volume for a unix mount point. So I simply
+return 0.
+
+-------------------------------------------------------------------------------
+
+If you use Linux 1.2.x, In your kernel log there will appear messages
+like
+
+Nov 25 16:09:08 lx01 kernel: alloc_skb called nonatomically from interrupt 0000002e
+
+These are a bit annoying, but completely harmless.
+
+-------------------------------------------------------------------------------
+
+Known bugs:
+
+- If GetNearsetServer returns invalid (nonexistant, downed) server, all
+  utilities gives up. VLM/Client32 in this situation tries randomly choosen
+  server after 30 secs timeout. You have to fix your routers at this time. 
+  Sorry.
+- nwdplist does nothing good. This tool will be finished after nwnet.c...
+- manpages names for 3ncp section are too long... Is there a way to 
+  define page header or ...
+
+-------------------------------------------------------------------------------
+
+Known incompatibilities:
+
+PROBLEM:   ncpfs is not compatible with NSS volumes of beta releases of NW5
+SOLUTION:  Upgrade your NW5 to production NW5 version.
+
+PROBLEM:   ncpfs cannot access LinWare server
+SOLUTION:  LinWare does not support namespace calls used by ncpfs. Because of
+           LinWare is currently not maintained, you should fix it yourself or
+	   move your server to MarsNWE or Caldera's NetWare for Linux.

@@ -1,0 +1,6 @@
+; $Id$
+
+EXPORTS
+	Db_tcl_Init
+	_NameToPtr
+

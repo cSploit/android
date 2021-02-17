@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbStream::write()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="blob.html" title="Chapter 14.  Binary Large Objects" />
+    <link rel="prev" href="dbstream_size.html" title="DbStream::size()" />
+    <link rel="next" href="envget_blob_dir.html" title="DbEnv::get_blob_dir()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbStream::write()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbstream_size.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 14. 
+                Binary Large Objects
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envget_blob_dir.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbstream_write"></a>DbStream::write()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+ 
+int
+DbStream::write(Dbt *data, db_off_t offset, u_int32_t flags); </pre>
+      <p>
+         The <code class="methodname">DbStream::write()</code> method writes data
+         to an existing BLOB object in the database. This method writes
+         data contained in the <a class="link" href="dbt.html" title="Chapter 4.  The Dbt Handle">Dbt</a>
+         <span class="bold"><strong>data</strong></span> to the BLOB stream. Data is
+         written into the stream starting at the position indicated by
+         <span class="bold"><strong>offset</strong></span>. The amount of data
+         written is determined by the <code class="literal">size</code> field in the
+         Dbt.
+     </p>
+      <p>
+         If this method writes data in the middle of the BLOB, it will
+         overwrite existing data, instead of shifting it. If this method
+         writes data to the end of the BLOB, the data is appended to the
+         existing BLOB. You can determine how large a BLOB is using
+         <a class="xref" href="dbstream_size.html" title="DbStream::size()">DbStream::size()</a>.
+     </p>
+      <p>
+         To open a stream, use <a class="xref" href="dbstream.html" title="Dbc::db_stream()">Dbc::db_stream()</a>.
+     </p>
+      <p>
+         Unless otherwise specified, the
+         <code class="methodname">DbStream::write()</code> <span>
+            
+            <span>
+                method either returns a non-zero error value or throws an
+                exception that encapsulates a non-zero error value on
+                failure, and returns 0 on success.
+            </span>
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5269872"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5269224"></a>data</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>data</strong></span> parameter is
+                  the <a class="link" href="dbt.html" title="Chapter 4.  The Dbt Handle">Dbt</a> containing the
+                  data to be written to the BLOB. The amount of data to be
+                  written is determined by the Dbt's
+                  <code class="literal">size</code> field.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5225712"></a>offset</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>offset</strong></span> parameter
+                  identifies the position in the BLOB where the write
+                  operation will begin.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5241704"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>flags</strong></span> parameter must be set to 0
+                  or the following value:
+             </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p><a id="blobstream_DB_STREAM_SYNC_WRITE"></a>
+                          <code class="literal">DB_STREAM_SYNC_WRITE</code>
+                     </p>
+                <p>
+                         A sync to disk operation is performed on the
+                         stream at the end of the write operation. By
+                         default, the sync is performed only when the
+                         stream is closed using <a class="xref" href="dbstream_close.html" title="DbStream::close()">DbStream::close()</a>. Note that
+                         this flag can also be specified when the stream is
+                         created using <a class="xref" href="dbstream.html" title="Dbc::db_stream()">Dbc::db_stream()</a>, in which case the sync
+                         behavior becomes the default behavior for this
+                         stream instance.
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5278504"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DbStream::write()</code> <span>
+            
+            <span>
+                method may fail and throw a <a class="link" href="dbexception.html" title="Chapter 6. The DbException Class">DbException</a> 
+                exception, encapsulating one of the following non-zero errors, or return one
+                of the following non-zero errors:
+            </span>
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5286824"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                An invalid flag value or parameter was specified; or if the
+                stream is read-only; or if the input Dbt was
+                configured with 
+                <a class="link" href="dbt.html#dbt_DB_DBT_PARTIAL">DB_DBT_PARTIAL</a>.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5284416"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="blob.html" title="Chapter 14.  Binary Large Objects">DbStream</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5282472"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="blob.html#bloblist" title="BLOBs and Related Methods">BLOBs and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbstream_size.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="blob.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envget_blob_dir.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbStream::size() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbEnv::get_blob_dir()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbEnv::dbbackup()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="env.html" title="Chapter 5.  The DbEnv Handle" />
+    <link rel="prev" href="envcreate.html" title="DbEnv" />
+    <link rel="next" href="envdbremove.html" title="DbEnv::dbremove()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbEnv::dbbackup()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envcreate.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. 
+                The DbEnv Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envdbremove.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envdbbackup"></a>DbEnv::dbbackup()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+ 
+int
+DbEnv::dbbackup(const char *dbfile, const char *target, 
+                u_int32_t flags);</pre>
+      <p>
+        The <code class="methodname">DbEnv::dbbackup()</code> method performs a hot
+        backup of a single database file contained within the environment.
+    </p>
+      <p>
+        To back up an entire environment, use the
+        <a class="xref" href="envbackup.html" title="DbEnv::backup()">DbEnv::backup()</a>
+        method.
+    </p>
+      <p>
+        This method's default behavior can be changed by setting backup
+        callbacks. See
+        <a class="xref" href="envset_backup_callbacks.html" title="DbEnv::set_backup_callbacks()">DbEnv::set_backup_callbacks()</a>
+        for more information. Additional tuning parameters can also be set
+        using the 
+        <a class="xref" href="envset_backup_config.html" title="DbEnv::set_backup_config()">DbEnv::set_backup_config()</a> method.
+    </p>
+      <p>
+         The <code class="methodname">DbEnv::dbbackup()</code> method may only be
+         called after the environment handle has been opened.
+    </p>
+      <p>
+         The <code class="methodname">DbEnv::dbbackup()</code> <span>
+            
+            <span>
+                method either returns a non-zero error value or throws an
+                exception that encapsulates a non-zero error value on
+                failure, and returns 0 on success.
+            </span>
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp1221712"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1222312"></a>dbfile</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 Identifies the database file that you want to back up.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1236720"></a>target</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 Identifies the directory in which the back up will be
+                 placed.  This target must exist; otherwise this method
+                 exits with an <code class="literal">ENOENT</code> error return.
+             </p>
+          <p>
+                 Note that if the backup callbacks are set, then the value
+                 specified to this parameter is passed on to the
+                 <code class="literal">open_func()</code> callback.  If this
+                 parameter is NULL, then the target must be specified
+                 directly to the <code class="literal">open_func()</code> callback.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1229384"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The <span class="bold"><strong>flags</strong></span> parameter must
+                be set to 0 or the following value:
+            </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                        <code class="literal">DB_EXCL</code>
+                    </p>
+                <p>
+                        Return an <code class="literal">EEXIST</code> error if a
+                        target backup file already exists.
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp1239168"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DbEnv::dbbackup()</code> <span>
+            
+            <span>
+                method may fail and throw a <a class="link" href="dbexception.html" title="Chapter 6. The DbException Class">DbException</a> 
+                exception, encapsulating one of the following non-zero errors, or return one
+                of the following non-zero errors:
+            </span>
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1247832"></a>EEXIST</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                <code class="literal">DB_EXCL</code> was specified for the
+                <code class="literal">flags</code> parameter, and an existing target
+                file was discovered when attempting to back up a source
+                file.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1243816"></a>ENOENT</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The target directory does not exist.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1234944"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                An invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp1243600"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp1237224"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="env.html#envlist" title="Database Environments and Related Methods">Database Environments and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envcreate.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="env.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envdbremove.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbEnv </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbEnv::dbremove()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,82 @@
+# Makefile.in for tests
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+RUN=./run
+SUBDIRS= progs
+
+BUILD_BDB=@BUILD_BDB@
+BUILD_HDB=@BUILD_HDB@
+BUILD_MDB=@BUILD_MDB@
+BUILD_SQL=@BUILD_SQL@
+
+# test primary backends (default)
+test tests:
+	@$(MAKE) bdb
+	@$(MAKE) hdb
+	@$(MAKE) mdb
+
+# test all backends
+alltests: tests
+	@$(MAKE) sql
+	@$(MAKE) ldif
+
+bdb test-bdb:	bdb-$(BUILD_BDB)
+bdb-no:
+	@echo "run configure with --enable-bdb to run BDB tests"
+
+bdb-yes bdb-mod: FORCE
+	@echo "Initiating LDAP tests for BDB..."
+	@$(RUN) -b bdb all
+
+hdb test-hdb:	hdb-$(BUILD_HDB)
+hdb-no:
+	@echo "run configure with --enable-hdb to run HDB tests"
+
+hdb-yes hdb-mod: FORCE
+	@echo "Initiating LDAP tests for HDB..."
+	@$(RUN) -b hdb all
+
+mdb test-mdb:	mdb-$(BUILD_MDB)
+mdb-no:
+	@echo "run configure with --enable-mdb to run MDB tests"
+
+mdb-yes mdb-mod: FORCE
+	@echo "Initiating LDAP tests for MDB..."
+	@$(RUN) -b mdb all
+
+sql test-sql:	sql-$(BUILD_SQL)
+sql-no:
+	@echo "run configure with --enable-sql to run SQL tests"
+
+sql-yes sql-mod:	FORCE
+	@echo "Initiating LDAP tests for SQL..."
+	@$(RUN) -b sql sql-all
+
+ldif test-ldif: FORCE
+	@echo "Initiating LDAP tests for LDIF..."
+	@$(RUN) -b ldif all
+
+regressions:	FORCE
+	@echo "Testing (available) ITS regressions"
+	@$(RUN) its-all
+
+its: regressions
+
+clean-local:	FORCE
+	-$(RM) -r testrun configpw configpw.conf *leak *gmon *core
+
+veryclean-local: FORCE
+	@-$(RM) run testdata schema ucdata
+

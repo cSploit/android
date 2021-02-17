@@ -1,0 +1,67 @@
+<VisualStudioProject ProjectType="Visual C++" Version="8.00" Name="db_sql_odbc" ProjectGUID="{0D7E0170-2D8B-11DF-8A39-0800200C9A66}">
+  <Platforms>
+    <Platform Name="Win32"/>
+    <Platform Name="x64"/>
+  </Platforms>
+  <Configurations>
+    <Configuration Name="Debug|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_sql_odbc" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../lang/sql/generated,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_USRDLL;SQLITE_EXPORTS;_CRT_SECURE_NO_WARNINGS;SQLITE_CORE;_WIN32;WITHOUT_SHELL;HAVE_SQLITE3PREPAREV2=1;NO_TCL;THREADSAFE=1;SQLITE_DLL=1;SQLITE_THREADSAFE=1;SQLITE_OS_WIN=1;SQLITE_ASCII=1;SQLITE_SOUNDEX=1;SQLITE_OMIT_SHARED_CACHE=1;SQLITE_OMIT_EXPLAIN=1;_USRDLL" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_odbc.pch" AssemblerListingLocation="$(OutDir)/db_sql_odbc/" ObjectFile="$(OutDir)/db_sql_odbc/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="libdb_sql60d.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/sqlite3odbc.dll" ProgramDatabaseFile="$(OutDir)/sqlite3odbc.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/sqlite3odbc.lib" ModuleDefinitionFile="..\..\lang\sql\odbc\sqlite3odbc.def" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_sql_odbc" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../lang/sql/generated,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_USRDLL;SQLITE_EXPORTS;_CRT_SECURE_NO_WARNINGS;SQLITE_CORE;_WIN32;WITHOUT_SHELL;HAVE_SQLITE3PREPAREV2=1;NO_TCL;THREADSAFE=1;SQLITE_DLL=1;SQLITE_THREADSAFE=1;SQLITE_OS_WIN=1;SQLITE_ASCII=1;SQLITE_SOUNDEX=1;SQLITE_OMIT_SHARED_CACHE=1;SQLITE_OMIT_EXPLAIN=1;_USRDLL" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_odbc.pch" AssemblerListingLocation="$(OutDir)/db_sql_odbc/" ObjectFile="$(OutDir)/db_sql_odbc/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="libdb_sql60.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/sqlite3odbc.dll" ProgramDatabaseFile="$(OutDir)/sqlite3odbc.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/sqlite3odbc.lib" ModuleDefinitionFile="..\..\lang\sql\odbc\sqlite3odbc.def" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Debug|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_sql_odbc" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../lang/sql/generated,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_USRDLL;SQLITE_EXPORTS;_CRT_SECURE_NO_WARNINGS;SQLITE_CORE;_WIN32;WITHOUT_SHELL;HAVE_SQLITE3PREPAREV2=1;NO_TCL;THREADSAFE=1;SQLITE_DLL=1;SQLITE_THREADSAFE=1;SQLITE_OS_WIN=1;SQLITE_ASCII=1;SQLITE_SOUNDEX=1;SQLITE_OMIT_SHARED_CACHE=1;SQLITE_OMIT_EXPLAIN=1;_USRDLL" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_odbc.pch" AssemblerListingLocation="$(OutDir)/db_sql_odbc/" ObjectFile="$(OutDir)/db_sql_odbc/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="libdb_sql60d.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/sqlite3odbc.dll" ProgramDatabaseFile="$(OutDir)/sqlite3odbc.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/sqlite3odbc.lib" ModuleDefinitionFile="..\..\lang\sql\odbc\sqlite3odbc.def" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_sql_odbc" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../lang/sql/generated,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;WIN32;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_USRDLL;SQLITE_EXPORTS;_CRT_SECURE_NO_WARNINGS;SQLITE_CORE;_WIN32;WITHOUT_SHELL;HAVE_SQLITE3PREPAREV2=1;NO_TCL;THREADSAFE=1;SQLITE_DLL=1;SQLITE_THREADSAFE=1;SQLITE_OS_WIN=1;SQLITE_ASCII=1;SQLITE_SOUNDEX=1;SQLITE_OMIT_SHARED_CACHE=1;SQLITE_OMIT_EXPLAIN=1;_USRDLL" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_odbc.pch" AssemblerListingLocation="$(OutDir)/db_sql_odbc/" ObjectFile="$(OutDir)/db_sql_odbc/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="libdb_sql60.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/sqlite3odbc.dll" ProgramDatabaseFile="$(OutDir)/sqlite3odbc.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/sqlite3odbc.lib" ModuleDefinitionFile="..\..\lang\sql\odbc\sqlite3odbc.def" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+  </Configurations>
+  <References/>
+  <Files>
+    <File RelativePath="..\..\lang\sql\odbc\sqlite3odbc.c"/>
+    <File RelativePath="..\..\lang\sql\odbc\sqlite3odbc.rc">
+      <FileConfiguration Name="Debug|Win32"><Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG;$(NoInherit))"/>
+      </FileConfiguration>
+      <FileConfiguration Name="Release|Win32"><Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="NDEBUG;$(NoInherit))"/>
+      </FileConfiguration>
+      <FileConfiguration Name="Debug|x64"><Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG;$(NoInherit))"/>
+      </FileConfiguration>
+      <FileConfiguration Name="Release|x64"><Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="NDEBUG;$(NoInherit))"/>
+      </FileConfiguration>
+    </File>
+  </Files>
+  <Globals/>
+</VisualStudioProject>

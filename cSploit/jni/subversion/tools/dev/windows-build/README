@@ -1,0 +1,13 @@
+Makefiles for automating the Windows build.
+
+* TODO:
+  - document: how to use
+  - known bugs/shortcomings
+  - separate the configurable parts to a Makefile.local.tmpl file
+  - allow serf,httpd,neon,etc to be optional
+  - auto-generate the list of individual targets from build.conf
+    (that list is not used by the default make targets)
+  - add 'make tools' to the default windows build
+
+See: http://svn.haxx.se/users/archive-2009-07/0764.shtml
+(Message-Id: <alpine.561.2.00.0907241718550.6824@daniel2.local>)

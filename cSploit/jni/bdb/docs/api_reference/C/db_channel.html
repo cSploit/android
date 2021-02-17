@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>The DB_CHANNEL Handle</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 10.  Replication Methods" />
+    <link rel="prev" href="db_site.html" title="The DB_SITE Handle" />
+    <link rel="next" href="dbchannel_close.html" title="DB_CHANNEL-&gt;close()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">The DB_CHANNEL Handle</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="db_site.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 10. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbchannel_close.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="db_channel"></a>The DB_CHANNEL Handle</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                The DB_CHANNEL handle is used by Replication Manager
+                applications to manage and configure message channels that
+                carry custom message traffic between the sites in the
+                replication group. You create a DB_CHANNEL handle using the
+                <a class="xref" href="repmgr_channel.html" title="DB_ENV-&gt;repmgr_channel()">DB_ENV-&gt;repmgr_channel()</a> method. All DB_CHANNEL handles
+                must be closed before closing DB_ENV handles. Use the
+                <a class="xref" href="dbchannel_close.html" title="DB_CHANNEL-&gt;close()">DB_CHANNEL-&gt;close()</a> method to close a DB_CHANNEL handle.
+            </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="db_site.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbchannel_close.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">The DB_SITE Handle </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_CHANNEL-&gt;close()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

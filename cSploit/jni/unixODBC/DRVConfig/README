@@ -1,0 +1,28 @@
+***************************************************************
+* This code is LGPL. You CAN make commercial solutions using  *
+* LGPL software.                                              *
+***************************************************************
+
++-------------------------------------------------------------+
+| unixODBC                                                    |
+| DRVConfig                                                   |
++-------------------------------------------------------------+
+
+These are the setup libs for the various drivers. There are two
+generic ones;
+
+drvcfg1 - SQL servers (host, port etc)
+drvcfg2 - file based (database dir)
+
+These are typically installed into the same directory as the 
+drivers (often /usr/local/lib) and are denoted by a simple
+naming convention (*S.so).
+
+The driver lib and setup lib are key to registering an ODBC
+driver - a task which is done by a root user.
+
++-------------------------------------------------------------+
+| Peter Harvey pharvey@codebydesign.com                       |
+| http://www.unixodbc.org                                     |
++-------------------------------------------------------------+
+

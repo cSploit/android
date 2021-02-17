@@ -1,0 +1,87 @@
+.\" cf. groff_mdoc
+.Dd April 26, 2012
+.Os FreeTDS @VERSION@
+.Dt DATACOPY FreeTDS "FreeTDS Reference Manual"
+.\"
+.Sh NAME
+.Nm datacopy
+.Nd move table data between two servers
+.\"
+.Sh SYNOPSIS
+.Nm
+.Op Fl vd
+.Bro
+.Fl t Ba Fl a Ba Fl c Ar owner
+.Brc
+.Op Fl b Ar batchsize
+.Op Fl p Ar packetsize
+.Op Fl S Ar server/username/password/database/table_or_view
+.Op Fl D Ar server/username/password/database/table
+.\"
+.Sh DESCRIPTION
+.Nm
+is a utility distributed with FreeTDS.
+.Nm
+will move table data from one server to another without the need for
+intermediate files.
+.Nm
+is much faster and more efficient than is freebcp out/in.
+.Pp
+.Nm
+makes use of the db-lib bcp API built into FreeTDS. This API is also
+available to application developers.
+.Pp
+.Nm
+can be used to migrate data between Sybase ASE and SQL Server or vice
+versa.
+.\"
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl t
+Truncate target table before loading data.
+.It Fl a
+Append data to target table.
+.It Fl c Ar owner
+Create the target table with the same schema as the source table.
+.Nm
+will submit a
+.Ql CREATE TABLE
+command on the target server using the specified owner in
+the command, e.g.
+.Ql CREATE TABLE owner.table (.\|.\|.\&).
+.It Fl b Ar batchsize
+The number of rows per batch of data copied.  Each batch of data is
+effectively 'committed' to the database. The default is 1000.
+.It Fl p Ar packetsize
+The number of bytes, per network packet, sent to and from the
+servers. Increased packet size can enhance performance.
+.It Fl v
+Produce verbose output, including diagnostic timings.
+.It Fl d
+Produce freetds TDSDUMP output. (Serious debug only!)
+.It Fl S Ar server/username/password/database/table_or_view
+The connection information for the source server
+and the location/name of the table (or view) to be copied.
+If not specified, 
+.Nm
+prompts the user for the information.
+.It Fl D Ar server/username/password/database/table
+The connection information for the destination server and the
+location/name of the target table.
+If not specified, 
+.Nm
+prompts the user for the information.
+.Sh SEE ALSO
+.Xr freebcp 1 , Xr defncopy 1 , Xr bsqldb 1 , Xr tsql 1 , 
+.%B FreeTDS User Guide.
+.\"
+.Sh HISTORY
+.Pp
+.Nm
+first appeared in FreeTDS 0.64.
+.\"
+.Sh AUTHORS
+ The 
+.Nm
+utility was written by
+.An Bill Thompson Aq thompbil@exchange.uk.ml.com .

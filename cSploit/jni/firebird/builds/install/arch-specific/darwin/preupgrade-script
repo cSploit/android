@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+# Script args:
+# $0: full path to script
+# $1: full path to top level package dir, no trailing slash
+# $2: full path to installed location
+# $3:  ????? Path to install Volume????
+# $4:  ?????
+
+FB_FW="/Library/Frameworks/Firebird.framework"
+
+if test -f "$FB_FW/Versions/A/Resources/English.lproj/var/isc4.gdb"; then
+	mv -f "$FB_FW/Versions/A/Resources/English.lproj/var/isc4.gdb" /tmp/fb-security-database-update.fdb
+fi
+if test -f "$FB_FW/Versions/A/Resources/English.lproj/var/security.fdb"; then
+	mv -f "$FB_FW/Versions/A/Resources/English.lproj/var/security.fdb" /tmp/fb-security-database-update.fdb
+fi
+if test -f "$FB_FW/Versions/A/Resources/English.lproj/var/security2.fdb"; then
+	mv -f "$FB_FW/Versions/A/Resources/English.lproj/var/security2.fdb" /tmp/fb-security-database-update2.fdb
+fi
+if test -f "$FB_FW/Versions/A/Resources/English.lproj/var/databases.conf"; then
+	mv -f "$FB_FW/Versions/A/Resources/English.lproj/var/databases.conf" /tmp/fb-databases.conf
+fi
+
+for i in /Library/Frameworks/Firebird.framework/Resources/English.lproj/var/UDF/*;do
+x=`basename $i`
+if test $x = "fbudf.dylib"; then
+	echo -n
+elif test $x = "fbudf.sql"; then
+	echo -n
+elif test $x = "ib_udf.dylib"; then
+	echo -n
+elif test $x = "ib_udf.sql"; then
+	echo -n
+else
+	cp $i /tmp/UDF_save_$x
+fi
+done
+if [ -f /Library/StartupItems/Firebird/Firebird ]; then
+	/Library/StartupItems/Firebird/Firebird stop
+	rm -fr /Library/StartupItems/Firebird
+fi
+
+if [ -f /Library/LaunchDaemons/org.firebird.gds.plist ]; then
+	launchctl unload /Library/LaunchDaemons/org.firebird/gds.plist
+	rm /Library/LaunchDaemons/org.firebird.gds.plist
+fi
+
+rm -fr "$FB_FW"
+rm -fr /tmp/firebird
+
+exit 0

@@ -1,0 +1,82 @@
+# Makefile for the linux ncp-filesystem routines.
+#
+
+top_srcdir = @top_srcdir@
+top_builddir = ../..
+this_srcdir = ${top_srcdir}/contrib/tcl-utils
+
+include ${top_builddir}/Make.rules
+
+vpath %.c ${this_srcdir}
+
+USE_KERNEL = @USE_KERNEL@
+NDS_SUPPORT = @NDS_SUPPORT@
+MOUNT2 = @MOUNT2@
+
+LIBS = @INTLLIBS@ @LIBS@
+
+O_OTHER =
+O_USERUTILS =	ncpreadprop.o ncpwhoami.o ncplist.o ncplisttrees.o ncpvrest.o \
+		chgpwd.o slist2.o vlist.o ncpreadprops.o \
+		#
+O_SBINUTILS =
+
+USERUTILS = $(O_USERUTILS:%.o=%)
+SBINUTILS = $(O_SBINUTILS:%.o=%)
+
+UTILS = $(USERUTILS) $(SBINUTILS)
+
+ifeq ($(HAVE_ELF),yes)
+NCP_LIB := libncp.so
+else
+NCP_LIB := libncp.a
+endif
+NCPLIB_DIR := ${top_builddir}/lib
+LIBDEP := $(NCPLIB_DIR)/$(NCP_LIB)
+
+.PHONY : all install install-dev dep clean mrproper distclean
+.PHONY : default
+
+default: all
+
+all: $(UTILS)
+
+install: all
+	${INSTALL} -d $(DESTDIR)$(bindir)
+	${INSTALL} $(USERUTILS) $(DESTDIR)$(bindir)
+	[ -z "$(SBINUTILS)" ] || ${INSTALL} -d $(DESTDIR)$(sbindir)
+	[ -z "$(SBINUTILS)" ] || ${INSTALL} $(SBINUTILS) $(DESTDIR)$(sbindir)
+
+install-dev:
+
+${NCPLIB_DIR}/libncp.a:
+	make -C ${NCPLIB_DIR} libncp.a
+
+${NCPLIB_DIR}/libncp.so:
+	make -C ${NCPLIB_DIR} libncp.so
+
+$(O_USERUTILS) $(O_SBINUTILS) $(O_OTHER): %.o: %.c
+	$(CC) $(CFLAGS) $(CCFLAGS) $(CFLAGS_$@) -o $@ -c $<
+
+$(UTILS): %: %.o $(LIBDEP)
+	$(CC) $(CFLAGS) -o $@ $(addsuffix .o,$@) $(ADDOBJS_$@) -L$(NCPLIB_DIR) -lncp ${LIBS}
+
+dep:
+
+clean:
+	rm -f *.o *~ core $(UTILS)
+
+mrproper: clean
+	rm -f *.d
+
+distclean: mrproper
+
+%.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+ifeq ($(NEED_DEP),yes)
+include $(UTILS:%=%.d)
+endif
+

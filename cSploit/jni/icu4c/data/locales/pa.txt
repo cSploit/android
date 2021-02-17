@@ -1,0 +1,192 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/pa.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/pa.xml
+ */
+pa{
+    AuxExemplarCharacters{"[\u200C \u200D ਃ \u0A02 \u0A01 {ਲ\u0A3C}]"}
+    ExemplarCharacters{
+        "[\u0A71 \u0A70 \u0A3C ੦ ੧ ੨ ੩ ੪ ੫ ੬ ੭ ੮ ੯ ੴ ੳ ਉ ਊ ਓ ਅ ਆ ਐ ਔ ੲ ਇ ਈ ਏ ਸ {ਸ"
+        "\u0A3C} ਹ ਕ ਖ {ਖ\u0A3C} ਗ {ਗ\u0A3C} ਘ ਙ ਚ ਛ ਜ {ਜ\u0A3C} ਝ ਞ ਟ ਠ ਡ ਢ ਣ ਤ ਥ ਦ "
+        "ਧ ਨ ਪ ਫ {ਫ\u0A3C} ਬ ਭ ਮ ਯ ਰ ਲ ਵ ੜ \u0A4D ਾ ਿ ੀ \u0A41 \u0A42 \u0A47 \u0A48 "
+        "\u0A4B \u0A4C]"
+    }
+    LocaleScript{
+        "Guru",
+    }
+    NumberElements{
+        ".",
+        ",",
+        ";",
+        "%",
+        "੦",
+        "#",
+        "-",
+        "E",
+        "‰",
+        "∞",
+        "NaN",
+        "+",
+    }
+    NumberPatterns{
+        "#,##,##0.###",
+        "¤ #,##,##0.00",
+        "#,##,##0%",
+        "#E0",
+    }
+    Version{"2.0.47.63"}
+    calendar{
+        gregorian{
+            AmPmMarkers{
+                "ਸਵੇਰੇ",
+                "ਸ਼ਾਮ",
+            }
+            DateTimePatterns{
+                "h:mm:ss a zzzz",
+                "h:mm:ss a z",
+                "h:mm:ss a",
+                "h:mm a",
+                "EEEE, dd MMMM y",
+                "d MMMM y",
+                "d MMM y",
+                "dd/MM/yyyy",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            availableFormats{
+                HHmmss{"HH:mm:ss"}
+                Md{"d/M"}
+                mmss{"mm:ss"}
+                yyMMM{"MMM yy"}
+                yyQ{"Q yy"}
+            }
+            dayNames{
+                format{
+                    abbreviated{
+                        "ਐਤ.",
+                        "ਸੋਮ.",
+                        "ਮੰਗਲ.",
+                        "ਬੁਧ.",
+                        "ਵੀਰ.",
+                        "ਸ਼ੁਕਰ.",
+                        "ਸ਼ਨੀ.",
+                    }
+                    wide{
+                        "ਐਤਵਾਰ",
+                        "ਸੋਮਵਾਰ",
+                        "ਮੰਗਲਵਾਰ",
+                        "ਬੁਧਵਾਰ",
+                        "ਵੀਰਵਾਰ",
+                        "ਸ਼ੁੱਕਰਵਾਰ",
+                        "ਸ਼ਨੀਚਰਵਾਰ",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "ਐ",
+                        "ਸੋ",
+                        "ਮੰ",
+                        "ਬੁੱ",
+                        "ਵੀ",
+                        "ਸ਼ੁੱ",
+                        "ਸ਼",
+                    }
+                }
+            }
+            eras{
+                abbreviated{
+                    "ਈਸਾਪੂਰਵ",
+                    "ਸੰਨ",
+                }
+            }
+            fields{
+                day{
+                    dn{"ਦਿਨ"}
+                    relative{
+                        "-2"{"ਪਰਸੋਂ"}
+                        "-3"{"ਤਿੰਨ ਦਿਨ ਪਹਿਲਾਂ"}
+                        "0"{"ਅੱਜ"}
+                        "1"{"ਭਲਕ"}
+                        "2"{"ਭਲਕ"}
+                        "3"{"ਤਿੰਨ ਦਿਨ ਬਾਅਦ"}
+                    }
+                }
+                hour{
+                    dn{"ਘੰਟਾ"}
+                }
+                minute{
+                    dn{"ਮਿੰਟ"}
+                }
+                month{
+                    dn{"ਮਹੀਨਾ"}
+                }
+                week{
+                    dn{"ਹਫ਼ਤਾ"}
+                }
+                weekday{
+                    dn{"ਹਫ਼ਤੇ ਦਾ ਦਿਨ"}
+                }
+                year{
+                    dn{"ਸਾਲ"}
+                }
+                zone{
+                    dn{"ਖੇਤਰ"}
+                }
+            }
+            monthNames{
+                format{
+                    wide{
+                        "ਜਨਵਰੀ",
+                        "ਫ਼ਰਵਰੀ",
+                        "ਮਾਰਚ",
+                        "ਅਪ੍ਰੈਲ",
+                        "ਮਈ",
+                        "ਜੂਨ",
+                        "ਜੁਲਾਈ",
+                        "ਅਗਸਤ",
+                        "ਸਤੰਬਰ",
+                        "ਅਕਤੂਬਰ",
+                        "ਨਵੰਬਰ",
+                        "ਦਸੰਬਰ",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "ਜ",
+                        "ਫ",
+                        "ਮਾ",
+                        "ਅ",
+                        "ਮ",
+                        "ਜੂ",
+                        "ਜੁ",
+                        "ਅ",
+                        "ਸ",
+                        "ਅ",
+                        "ਨ",
+                        "ਦ",
+                    }
+                }
+            }
+            quarters{
+                format{
+                    wide{
+                        "ਪਹਿਲਾਂ ਚੌਥਾਈ",
+                        "ਦੂਜਾ ਚੌਥਾਈ",
+                        "ਤੀਜਾ ਚੌਥਾਈ",
+                        "ਚੌਥਾ ਚੌਥਾਈ",
+                    }
+                }
+            }
+        }
+    }
+    defaultNumberingSystem{"guru"}
+}

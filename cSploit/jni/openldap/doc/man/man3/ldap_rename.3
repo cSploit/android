@@ -1,0 +1,66 @@
+.TH LDAP_RENAME 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_rename, ldap_rename_s \- Renames the specified entry.
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_rename( ld, dn, newrdn, newparent, deleteoldrdn, sctrls[], cctrls[], msgidp );
+.ft
+LDAP *ld;
+const char *dn, *newrdn, *newparent;
+int deleteoldrdn;
+LDAPControl *sctrls[], *cctrls[];
+int *msgidp);
+.LP
+.ft B
+int ldap_rename_s( ld, dn, newrdn, newparent, deleteoldrdn, sctrls[], cctrls[] );
+.ft
+LDAP *ld;
+const char *dn, *newrdn, *newparent;
+int deleteoldrdn;
+LDAPControl *sctrls[], *cctrls[];
+.SH DESCRIPTION
+These routines are used to perform a LDAP rename operation.
+The function changes the leaf component of an entry's distinguished
+name and  optionally moves the entry to a new parent container. The 
+.B ldap_rename_s
+performs a rename operation synchronously.
+The method takes \fIdn\fP, which points to the distinguished name of
+the entry whose attribute is being compared, \fInewparent\fP,the distinguished
+name of the entry's new parent. If this parameter is NULL, only the RDN is changed.
+The root DN is specified by passing a zero length string, "". 
+\fIdeleteoldrdn\fP specifies whether the old RDN should be retained or deleted.
+Zero indicates that the old RDN should be retained. If you choose this option,
+the attribute will contain both names (the old and the new).
+Non-zero indicates that the old RDN should be deleted.
+\fIserverctrls\fP points to an array of LDAPControl structures that list the
+client controls to use with this extended operation. Use NULL to specify
+no client controls. \fIclientctrls\fP points to an array of LDAPControl 
+structures that list the client controls to use with the search.
+.LP
+.B ldap_rename
+works just like
+.B ldap_rename_s,
+but the operation is asynchronous. It returns the message id of the request
+it initiated. The result of this operation can be obtained by calling
+.BR ldap_result(3).
+.SH ERRORS
+.B ldap_rename()
+returns \-1 in case of error initiating the request, and
+will set the \fIld_errno\fP field in the \fIld\fP parameter to
+indicate the error.
+.BR ldap_rename_s()
+returns the LDAP error code resulting from the rename operation.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_modify (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

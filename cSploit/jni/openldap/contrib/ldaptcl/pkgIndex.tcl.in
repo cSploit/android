@@ -1,0 +1,1 @@
+package ifneeded Ldaptcl @NEO_VERSION@ "package require Tclx 8.0; load [file join $dir .. @NEO_SHARED_LIB_FILE@] Ldaptcl"

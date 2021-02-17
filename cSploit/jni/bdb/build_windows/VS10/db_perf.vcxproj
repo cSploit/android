@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="4.0">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+  <ProjectGuid>{5835B4B0-2F99-11DE-8C30-0800200C9A66}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+    </ImportGroup>
+  <ImportGroup>
+    <Import Project="application.props"/>
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\test\perf\db_perf.c"/>
+    <ClCompile Include="..\..\test\perf\perf_checkpoint.c"/>
+    <ClCompile Include="..\..\test\perf\perf_config.c"/>
+    <ClCompile Include="..\..\test\perf\perf_dbs.c"/>
+    <ClCompile Include="..\..\test\perf\perf_dead.c"/>
+    <ClCompile Include="..\..\test\perf\perf_debug.c"/>
+    <ClCompile Include="..\..\test\perf\perf_file.c"/>
+    <ClCompile Include="..\..\test\perf\perf_key.c"/>
+    <ClCompile Include="..\..\test\perf\perf_log.c"/>
+    <ClCompile Include="..\..\test\perf\perf_misc.c"/>
+    <ClCompile Include="..\..\test\perf\perf_op.c"/>
+    <ClCompile Include="..\..\test\perf\perf_parse.c"/>
+    <ClCompile Include="..\..\test\perf\perf_rand.c"/>
+    <ClCompile Include="..\..\test\perf\perf_spawn.c"/>
+    <ClCompile Include="..\..\test\perf\perf_stat.c"/>
+    <ClCompile Include="..\..\test\perf\perf_sync.c"/>
+    <ClCompile Include="..\..\test\perf\perf_thread.c"/>
+    <ClCompile Include="..\..\test\perf\perf_trickle.c"/>
+    <ClCompile Include="..\..\test\perf\perf_txn.c"/>
+    <ClCompile Include="..\..\test\perf\perf_util.c"/>
+    <ClCompile Include="..\..\src\clib\getopt.c"/>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>

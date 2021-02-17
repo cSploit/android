@@ -1,0 +1,246 @@
+--- libnet-1.1.2.1.orig/Makefile.am
++++ libnet-1.1.2.1/Makefile.am
+@@ -12,4 +12,4 @@
+ 
+ EXTRA_DIST = Makefile.am.common
+ 
+-bin_scripts = libnet-config
++bin_SCRIPTS = libnet-config
+--- libnet-1.1.2.1.orig/configure.in
++++ libnet-1.1.2.1/configure.in
+@@ -21,10 +21,24 @@
+ dnl
+ AC_PROG_CC
+ AC_PROG_INSTALL
+-AC_PROG_RANLIB
++AC_PROG_LIBTOOL
+ 
++# Added by Debian maintainer after `autoscan`
++AC_PROG_CXX
++AC_PROG_CPP
++AC_PROG_LN_S
++AC_PROG_MAKE_SET
++#
++
++# Check for headers
+ AC_CHECK_HEADERS(sys/sockio.h)
+ 
++# Added by Debian maintainer after `autoscan`
++AC_CHECK_HEADERS([arpa/inet.h fcntl.h memory.h netdb.h netinet/in.h nlist.h])
++AC_CHECK_HEADERS([stdlib.h string.h sys/file.h sys/ioctl.h sys/param.h])
++AC_CHECK_HEADERS([sys/socket.h sys/systeminfo.h sys/time.h sys/timeb.h unistd.h])
++#
++
+ dnl
+ dnl And some custom things
+ dnl
+@@ -49,6 +63,22 @@
+     CFLAGS="$CFLAGS -Wall"
+ fi
+ 
++# Added by Debian maintainer after `autoscan`
++AC_C_INLINE
++AC_TYPE_INT16_T
++AC_TYPE_INT32_T
++AC_TYPE_INT64_T
++AC_TYPE_INT8_T
++AC_TYPE_OFF_T
++AC_TYPE_SIZE_T
++AC_CHECK_MEMBERS([struct stat.st_rdev])
++AC_TYPE_UINT16_T
++AC_TYPE_UINT32_T
++AC_TYPE_UINT64_T
++AC_TYPE_UINT8_T
++#
++
++
+ dnl
+ dnl Set the root install directory
+ dnl
+@@ -61,6 +91,11 @@
+ dnl Check for library functions.
+ dnl
+ AC_CHECK_FUNCS(strerror)
++# Added by Debian maintainer after `autoscan`
++AC_HEADER_MAJOR
++AC_CHECK_FUNCS([bzero gethostbyaddr gethostbyname gettimeofday memmove])
++AC_CHECK_FUNCS([memset socket strchr strdup strpbrk strrchr strtol strtoul])
++#
+ 
+ dnl
+ dnl Get link-layer interface type
+--- libnet-1.1.2.1.orig/src/Makefile.am
++++ libnet-1.1.2.1/src/Makefile.am
+@@ -8,9 +8,9 @@
+ 
+ include $(top_srcdir)/Makefile.am.common
+ 
+-lib_LIBRARIES = libnet.a
++lib_LTLIBRARIES = libnet.la
+ 
+-libnet_a_SOURCES = libnet_asn1.c \
++libnet_la_SOURCES = libnet_asn1.c \
+ 			libnet_build_802.1q.c \
+ 			libnet_build_802.1x.c \
+ 			libnet_build_802.2.c \
+@@ -57,15 +57,20 @@
+ 			libnet_version.c \
+ 			libnet_write.c
+ 
+-EXTRA_libnet_a_SOURCES = libnet_link_bpf.c \
+-			libnet_link_dlpi.c \
+-			libnet_link_linux.c \
+-			libnet_link_nit.c \
+- 			libnet_link_none.c \
+-			libnet_link_pf.c \
+-			libnet_link_snit.c \
+-			libnet_link_snoop.c \
+-			libnet_link_win32.c
+-
+-libnet_a_LIBADD = @LIBOBJS@
++libnet_la_LIBADD = @LTLIBOBJS@
+ 
++#   Here are a set of rules to help you update your library version
++# information:
++#
++#   1. If the library source code has changed at all since the last
++#      update, then increment REVISION (`C:R:A' becomes `C:r+1:A').
++#
++#   2. If any interfaces have been added, removed, or changed since the
++#      last update, increment CURRENT, and set REVISION to 0.
++#
++#   3. If any interfaces have been added since the last public release,
++#      then increment AGE.
++#
++#   4. If any interfaces have been removed since the last public release,
++#      then set AGE to 0.
++libnet_la_LDFLAGS = -version-info 4:0:3 # CURRENT[:REVISION[:AGE]]
+--- libnet-1.1.2.1.orig/acinclude.m4
++++ libnet-1.1.2.1/acinclude.m4
+@@ -11,7 +11,7 @@
+ dnl usage:      AC_LIBNET_LINUX_PROCFS
+ dnl results:    HAVE_LINUX_PROCFS
+ dnl
+-AC_DEFUN(AC_LIBNET_LINUX_PROCFS,
++AC_DEFUN([AC_LIBNET_LINUX_PROCFS],
+     [AC_MSG_CHECKING(for Linux proc filesystem)
+     AC_CACHE_VAL(ac_cv_libnet_linux_procfs,
+         if test "x`cat /proc/sys/kernel/ostype 2>&-`" = "xLinux" ; then
+@@ -37,15 +37,15 @@
+ dnl     HAVE_PACKET_SOCKET (DEFINED)
+ dnl
+ 
+-AC_DEFUN(AC_LIBNET_CHECK_PF_PACKET,
++AC_DEFUN([AC_LIBNET_CHECK_PF_PACKET],
+ [
+     AC_MSG_CHECKING(for packet socket (PF_SOCKET))
+-    AC_CACHE_VAL(ac_libnet_have_packet_socket,
++    AC_CACHE_VAL(ac_cv_libnet_have_packet_socket,
+ 
+         [case "$target_os" in
+ 
+         linux)
+-                ac_libnet_have_packet_socket = no
++                ac_cv_libnet_have_packet_socket = no
+                 ;;
+         *)
+ 
+@@ -94,17 +94,17 @@
+ 
+     # Oopz 4.3 BSD doesn't have this.  Sorry.
+     if test ! -x ./pf_packet-test ; then
+-        ac_libnet_have_packet_socket=choked
++        ac_cv_libnet_have_packet_socket=choked
+     else
+-        ac_libnet_have_packet_socket=`./pf_packet-test`;
++        ac_cv_libnet_have_packet_socket=`./pf_packet-test`;
+     fi
+-    if test $ac_libnet_have_packet_socket = choked; then
++    if test $ac_cv_libnet_have_packet_socket = choked; then
+         AC_MSG_RESULT(test program compile choked... assuming no)
+-    elif test $ac_libnet_have_packet_socket = yes; then
++    elif test $ac_cv_libnet_have_packet_socket = yes; then
+         AC_MSG_RESULT(yes)
+-    elif test $ac_libnet_have_packet_socket = probably; then
++    elif test $ac_cv_libnet_have_packet_socket = probably; then
+         AC_MSG_RESULT(test program got EPERM... assuming yes)
+-    elif test $ac_libnet_have_packet_socket = no; then
++    elif test $ac_cv_libnet_have_packet_socket = no; then
+         AC_MSG_RESULT(no)
+     fi
+ 
+@@ -112,7 +112,7 @@
+     ;;
+     esac])
+ 
+-    if test $ac_libnet_have_packet_socket = yes -o $ac_libnet_have_packet_socket = probably; then
++    if test $ac_cv_libnet_have_packet_socket = yes -o $ac_cv_libnet_have_packet_socket = probably; then
+         AC_DEFINE(HAVE_PACKET_SOCKET)
+     fi
+ ])
+@@ -131,17 +131,17 @@
+ dnl
+ dnl
+ 
+-AC_DEFUN(AC_LIBNET_CHECK_LIBNET_VER,
++AC_DEFUN([AC_LIBNET_CHECK_LIBNET_VER],
+ [
+     AC_CHECK_LIB(net, libnet_build_ip, AC_MSG_CHECKING(version) \
+ 
+ changequote(<<, >>)dnl
+-    if [[ ! -f $LIB_PREFIX/libnet.a ]] ; then
++    if [[ ! -f $LIB_PREFIX/libnet.la ]] ; then
+ changequote([, ])dnl
+-        AC_MSG_RESULT($LIB_PREFIX/libnet.a doesn't exist)
++        AC_MSG_RESULT($LIB_PREFIX/libnet.la doesn't exist)
+         AC_MSG_RESULT(previous libnet install lives elsewhere, you should probably find it)
+     else
+-        __LIBNET_VERSION=`strings $LIB_PREFIX/libnet.a | grep "libnet version"\
++        __LIBNET_VERSION=`strings $LIB_PREFIX/libnet.la | grep "libnet version"\
+                 | cut -f3 -d" "`;\
+         if test -z "$__LIBNET_VERSION"; then
+             AC_MSG_RESULT(<0.8)
+@@ -166,7 +166,7 @@
+ dnl     HAVE_STRUCT_IP_CSUM (DEFINED)
+ dnl
+ 
+-AC_DEFUN(AC_LIBNET_CHECK_IP_CSUM,
++AC_DEFUN([AC_LIBNET_CHECK_IP_CSUM],
+ [
+     AC_MSG_CHECKING([struct ip contains ip_csum])
+     AC_TRY_COMPILE([
+@@ -199,7 +199,7 @@
+ dnl     LBL_ALIGN (DEFINED)
+ dnl
+ 
+-AC_DEFUN(AC_LBL_UNALIGNED_ACCESS,
++AC_DEFUN([AC_LBL_UNALIGNED_ACCESS],
+     [AC_MSG_CHECKING(if unaligned accesses fail)
+     AC_CACHE_VAL(ac_cv_lbl_unaligned_fail,
+         [case "$target_cpu" in
+@@ -278,7 +278,7 @@
+ dnl     LIBNET_LIL_ENDIAN = 1
+ dnl
+ 
+-AC_DEFUN(AC_LIBNET_ENDIAN_CHECK,
++AC_DEFUN([AC_LIBNET_ENDIAN_CHECK],
+     [AC_MSG_CHECKING(machine endianess)
+ 
+     cat > conftest.c << EOF
+@@ -439,7 +439,7 @@
+ dnl statically and happen to have a libresolv.a lying around (and no
+ dnl libnsl.a).
+ dnl
+-AC_DEFUN(AC_LBL_LIBRARY_NET, [
++AC_DEFUN([AC_LBL_LIBRARY_NET], [
+     # Most operating systems have gethostbyname() in the default searched
+     # libraries (i.e. libc):
+     AC_CHECK_FUNC(gethostbyname, ,
+--- libnet-1.1.2.1.orig/sample/Makefile.am
++++ libnet-1.1.2.1/sample/Makefile.am
+@@ -60,4 +60,4 @@
+ ip_link_SOURCES		= ip_link.c
+ sebek_SOURCES           = sebek.c
+ 
+-LDADD = $(top_srcdir)/src/libnet.a
++LDADD = $(top_srcdir)/src/libnet.la

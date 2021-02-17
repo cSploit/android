@@ -1,0 +1,217 @@
+# Helper functions
+doObjects= $(patsubst %.y,%.o,$(patsubst %.epp,%.o,$(patsubst %.c,%.o,$(1:.cpp=.o))))
+makeObjects= $(addprefix $(OBJ)/$(1)/,$(call doObjects,$2))
+dirFiles= $(notdir $(wildcard ../src/$(1)/*.cpp)) $(notdir $(wildcard ../src/$(1)/*.c)) \
+		  $(notdir $(wildcard ../src/$(1)/*.epp)) $(notdir $(wildcard ../src/$(1)/*.y))
+dirInPath= $(call makeObjects,$(1),$(call dirFiles,$(1)))
+
+dirMaster= $(call dirInPath,$(1))
+dirOs= $(call dirInPath,$(1)/$(PLATFORM_PATH))
+ifneq ($(strip $(PLATFORM_FALLBACK)),)
+dirBackList= $(filter-out $(call dirFiles,$(1)/$(PLATFORM_PATH)),$(call dirFiles,$(1)/$(PLATFORM_FALLBACK)))
+dirFallBack= $(call makeObjects,$(1)/$(PLATFORM_FALLBACK),$(call dirBackList,$(1)))
+else
+dirFallBack=
+endif
+
+dirObjects= $(call dirMaster,$(1)) $(call dirOs,$(1)) $(call dirFallBack,$(1))
+
+makePluginName= $(PLUGINS)/$(LIB_PREFIX)$(1).$(SHRLIB_EXT)
+
+
+# Collect all object files here
+AllObjects=
+
+
+# Common files
+CO1:= $(call dirObjects,common)
+CO2:= $(call dirObjects,common/classes)
+CO3:= $(call dirObjects,common/config)
+#CO4:= $(call dirObjects,common/exceptions)
+#CO5:= $(call dirObjects,common/sync)
+Common_Objects:= $(CO1) $(CO2) $(CO3) 
+# $(CO4) $(CO5)
+
+AllObjects += $(Common_Objects)
+
+
+# gpre
+GPRE_Common_Objects:= $(call dirObjects,gpre) $(call makeObjects,gpre/languages,@GPRE_LANGUAGE_MODULES@)
+GPRE_std:= $(call dirObjects,gpre/std)
+GPRE_Objects:= $(GPRE_Common_Objects) $(GPRE_std)
+GPRE_boot:= $(call dirObjects,gpre/boot) $(call makeObjects,yvalve,gds.cpp)
+GPRE_Boot_Objects:= $(GPRE_Common_Objects) $(GPRE_boot)
+
+AllObjects += $(GPRE_Common_Objects) $(GPRE_std) $(GPRE_boot)
+
+
+# Y-Valve
+YValve_Objects:= $(call dirObjects,yvalve)
+
+AllObjects += $(YValve_Objects)
+
+
+# Remote
+Remote_Common:= $(call dirObjects,remote) $(call dirObjects,auth/SecureRemotePassword)
+Remote_Server:= $(call dirObjects,remote/server) $(call dirObjects,auth/SecureRemotePassword/server)
+Remote_Client:= $(call dirObjects,remote/client) $(call dirObjects,auth/SecureRemotePassword/client) \
+				$(call makeObjects,auth/SecurityDatabase,LegacyClient.cpp) \
+				$(call dirObjects,plugins/crypt/arc4)
+Remote_Server_Objects:= $(Remote_Common) $(Remote_Server)
+Remote_Client_Objects:= $(Remote_Common) $(Remote_Client)
+
+AllObjects += $(Remote_Common) $(Remote_Server) $(Remote_Client)
+
+
+# Engine
+Engine_Objects:= $(call dirObjects,jrd) $(call dirObjects,dsql) $(call dirObjects,jrd/extds) \
+				 $(call dirObjects,jrd/recsrc) $(call dirObjects,jrd/trace) \
+				 $(call makeObjects,lock,lock.cpp)
+
+AllObjects += $(Engine_Objects)
+
+
+# services
+
+# gfix
+Svc_GFIX_Objects:= $(call dirObjects,alice)
+GFIX_Objects:= $(Svc_GFIX_Objects) $(call dirObjects,alice/main)
+
+AllObjects += $(GFIX_Objects)
+
+# gbak
+Svc_GBAK_Objects:= $(call dirObjects,burp)
+GBAK_Objects:= $(Svc_GBAK_Objects) $(call dirObjects,burp/main)
+
+AllObjects += $(GBAK_Objects)
+
+# gsec
+Svc_GSEC_Objects:= $(call dirObjects,utilities/gsec)
+GSEC_Objects:= $(Svc_GSEC_Objects) $(call dirObjects,utilities/gsec/main)
+
+AllObjects += $(GSEC_Objects)
+
+# gstat
+Svc_GSTAT_Objects:= $(call dirObjects,utilities/gstat)
+GSTAT_Own_Objects:= $(Svc_GSTAT_Objects) $(call dirObjects,utilities/gstat/main)
+GSTAT_Objects:= $(GSTAT_Own_Objects) $(call makeObjects,jrd,btn.cpp ods.cpp)
+
+AllObjects += $(GSTAT_Own_Objects)
+
+# nbackup
+Svc_NBACKUP_Objects:= $(call dirObjects,utilities/nbackup)
+NBACKUP_Own_Objects:= $(Svc_NBACKUP_Objects) $(call dirObjects,utilities/nbackup/main)
+NBACKUP_Objects:= $(NBACKUP_Own_Objects) $(call makeObjects,jrd,ods.cpp)
+
+AllObjects += $(NBACKUP_Own_Objects)
+
+SVC_Objects:= $(Svc_GFIX_Objects) $(Svc_GBAK_Objects) $(Svc_GSEC_Objects) $(Svc_GSTAT_Objects) \
+			  $(Svc_NBACKUP_Objects)
+
+
+# International support
+INTL_Objects:= $(call dirObjects,intl)
+
+AllObjects += $(INTL_Objects)
+
+
+# Lockprint
+LOCKPRINT_Objects:= $(call makeObjects,lock,print.cpp)
+
+AllObjects += $(LOCKPRINT_Objects)
+
+
+# Guardian
+FBGUARD_Objects:= $(call dirObjects,utilities/guard)
+
+AllObjects += $(FBGUARD_Objects)
+
+
+# Services manager
+FBSVCMGR_Objects:= $(call dirObjects,utilities/fbsvcmgr)
+
+AllObjects += $(FBSVCMGR_Objects)
+
+
+# Trace manager
+FBTRACEMGR_Objects:= $(call dirObjects,utilities/fbtracemgr) $(call makeObjects,jrd/trace,TraceCmdLine.cpp)
+
+AllObjects += $(FBTRACEMGR_Objects)
+
+
+# Trace plugin
+FBTRACE_UTIL_Objects:= $(call dirObjects,utilities/ntrace)
+
+AllObjects += $(FBTRACE_UTIL_Objects)
+
+
+# Split/merge backup files
+GSPLIT_Objects:= $(call dirObjects,burp/split)
+
+AllObjects += $(GSPLIT_Objects)
+
+
+# Interactive sql
+ISQL_Objects:= $(call dirObjects,isql)
+
+AllObjects += $(ISQL_Objects)
+
+
+# QLI
+QLI_Objects:= $(call dirObjects,qli)
+
+AllObjects += $(QLI_Objects)
+
+
+# Legacy users management in security database
+LEGACY_USERS_MANAGE_Objects:= $(call makeObjects,auth/SecurityDatabase,LegacyManagement.epp)
+
+AllObjects += $(LEGACY_USERS_MANAGE_Objects)
+
+
+# Legacy authentication on server
+LEGACY_AUTH_SERVER_Objects:= $(call makeObjects,auth/SecurityDatabase,LegacyServer.cpp)
+
+AllObjects += $(LEGACY_AUTH_SERVER_Objects)
+
+
+# SRP-based users management in security database
+SRP_USERS_MANAGE_Objects:= $(call dirObjects,auth/SecureRemotePassword/manage) \
+						   $(call dirObjects,auth/SecureRemotePassword)
+
+AllObjects += $(SRP_USERS_MANAGE_Objects)
+
+
+# Multihop authentication debugger
+AUTH_DEBUGGER_Objects:= $(call makeObjects,auth,AuthDbg.cpp)
+
+AllObjects += $(AUTH_DEBUGGER_Objects)
+
+
+# UDR engine
+UDRENG_Objects:= $(call dirObjects,plugins/udr_engine)
+
+AllObjects += $(UDRENG_Objects)
+
+
+# UDF support
+IBUDF_Objects:= $(call makeObjects,extlib,ib_udf.cpp)
+FBUDF_Objects:= $(call makeObjects,extlib/fbudf,fbudf.cpp)
+UTIL_Objects:= $(call makeObjects,extlib,ib_util.cpp)
+
+AllObjects += $(IBUDF_Objects) $(FBUDF_Objects) $(UTIL_Objects)
+
+
+# Regenerate error codes
+CODES_Objects:= $(call makeObjects,misc,codes.epp)
+MSG_SCRIPTS = msg.sql facilities2.sql locales.sql sqlstates.sql history2.sql messages2.sql \
+              symbols2.sql system_errors2.sql transmsgs.fr_FR2.sql transmsgs.de_DE2.sql
+MSG_FILES = $(addprefix $(SRC_ROOT)/msgs/, $(MSG_SCRIPTS))
+
+AllObjects += $(CODES_Objects)
+
+
+# Create messages file
+BUILD_Objects:= $(call makeObjects,msgs,build_file.epp)
+
+AllObjects += $(BUILD_Objects)

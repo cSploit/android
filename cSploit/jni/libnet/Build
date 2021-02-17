@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+make -C doc doc
+make
+make dist && mv libnet-1*.tar.gz ..
+

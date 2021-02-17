@@ -1,0 +1,233 @@
+#!/bin/sh
+#
+#  The contents of this file are subject to the Initial
+#  Developer's Public License Version 1.0 (the "License");
+#  you may not use this file except in compliance with the
+#  License. You may obtain a copy of the License at
+#  http://www.ibphoenix.com/main.nfs?a=ibphoenix&page=ibp_idpl.
+#
+#  Software distributed under the License is distributed AS IS,
+#  WITHOUT WARRANTY OF ANY KIND, either express or implied.
+#  See the License for the specific language governing rights
+#  and limitations under the License.
+#
+#  The Original Code was created by Mark O'Donohue
+#  for the Firebird Open Source RDBMS project.
+#
+#  Copyright (c) Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#  and all contributors signed below.
+#
+#  All Rights Reserved.
+#  Contributor(s): ______________________________________.
+#		Alex Peshkoff
+#
+
+RunUser=firebird
+export RunUser
+RunGroup=firebird
+export RunGroup
+PidDir=/var/run/firebird
+export PidDir
+
+#------------------------------------------------------------------------
+# Get correct options & misc.
+
+psOptions=-ajx
+export psOptions
+mktOptions=-q
+export mktOptions
+tarOptions=z
+export tarOptions
+tarExt=tar.gz
+export tarExt
+
+#------------------------------------------------------------------------
+#  Add new user and group
+
+addFirebirdUser() {
+
+nofbuid=0
+fbUID=`id -u firebird 2>/dev/null`
+if [ $? -ne 0 ]; then
+	fbUID=90
+	while [ ! -z `id -un $fbUID 2>/dev/null` ]
+	do
+		fbUID=$(($fbUID+1))
+	done
+	nofbuid=1
+fi
+
+fbGID=`pw groupshow firebird 2>/dev/null`
+if [ $? -ne 0 ]; then
+	fbGID=90
+	while [ ! -z `id -gn $fbGID 2>/dev/null` ]
+	do
+		fbGID=$(($fbGID+1))
+	done
+	echo "firebird:*:$fbGID:" >> /etc/group
+else
+	fbGID=`echo $fbGID | awk -F: '{print $3}'`
+fi
+
+echo "firebird user using uid $fbUID"
+echo "firebird user using gid $fbGID"
+
+if which -s pw; then
+	if [ $nofbuid -ne 0 ]; then
+		pw useradd firebird -u $fbUID -g $fbGID -h - -s /bin/sh \
+		-d @FB_CONFDIR@ -c "Firebird Database Administrator"
+	fi
+else
+	echo -n "unable to create user firebird - please create it manually,"
+	echo " before reinstalling this package."
+	exit 1
+fi
+
+}
+
+
+#------------------------------------------------------------------------
+#  print location of init script
+
+getInitScriptLocation() {
+    if [ -f /etc/rc.d/init.d/*firebird* ]
+	then
+		echo -n /etc/rc.d/init.d/*firebird*
+    elif [ -f /etc/rc.d/*firebird* ]
+	then
+		echo -n /etc/rc.d/*firebird*
+    elif [ -f /etc/init.d/*firebird* ]
+	then
+		echo -n /etc/init.d/*firebird*
+    fi
+}
+
+
+#------------------------------------------------------------------------
+#  stop super server if it is running
+
+stopSuperServerIfRunning() {
+    checkString=`ps -af | egrep "\b(fbserver|fbguard|fb_smp_server)\b" |grep -v grep`
+
+    if [ ! -z "$checkString" ]
+    then
+	init_d=`getInitScriptLocation`
+
+        if [ -x "$init_d" ]
+		then
+			i=1
+			while [ $i -le 20 ]
+			do
+       	    	$init_d stop
+				sleep 1
+				checkString=`ps -eaf | egrep "\b(fbserver|fbguard|fb_smp_server)\b" |grep -v grep`
+				if [ -z "$checkString" ]
+				then
+					return
+				fi
+				i=$((i+1))
+			done
+		fi
+    fi
+}
+
+#------------------------------------------------------------------------
+#  Generate new sysdba password - this routine is used only in the 
+#  rpm file not in the install script.
+
+generateNewDBAPassword() {
+    # openssl generates random data.
+	openssl </dev/null >/dev/null 2&>/dev/null
+    if [ $? -eq 0 ]
+    then
+        # We generate 20 random chars, strip any '/''s and get the first 8
+        NewPasswd=`openssl rand -base64 20 | tr -d '/' | cut -c1-8`
+    fi
+
+    # mkpasswd is a bit of a hassle, but check to see if it's there
+    if [ -z "$NewPasswd" ]
+    then
+        if [ -f /usr/bin/mkpasswd ]
+        then
+            NewPasswd=`/usr/bin/mkpasswd -l 8`
+        fi
+    fi
+
+	# On some systems the mkpasswd program doesn't appear and on others
+	# there is another mkpasswd which does a different operation.  So if
+	# the specific one isn't available then keep the original password.
+    if [ -z "$NewPasswd" ]
+    then
+        NewPasswd="masterkey"
+    fi
+
+    writeNewPassword $NewPasswd
+}
+
+#------------------------------------------------------------------------
+#  change init.d RunUser
+
+changeInitRunUser() {
+    NewUser=$1
+
+    InitFile=`getInitScriptLocation`
+    if [ -f "$InitFile" ]
+    then
+        editFile "$InitFile" FBRunUser "FBRunUser=$NewUser"
+	    chmod u=rwx,g=rx,o= "$InitFile"
+    fi
+}
+
+
+#------------------------------------------------------------------------
+# installInitdScript
+# Everbody stores this one in a seperate location, so there is a bit of
+# running around to actually get it for each packager.
+# Update rcX.d with Firebird initd entries
+# initd script for SuSE >= 7.2 is a part of RPM package
+
+installInitdScript() {
+	Arch=$1
+	if [ "$Arch" != super ]; then
+		return 0
+	fi
+
+# dummy for a while
+	return 1
+}
+
+
+#------------------------------------------------------------------------
+#  start init.d service
+
+startService() {
+	Arch=$1
+	if [ "$Arch" != super ]; then
+		return 0
+	fi
+
+    InitFile=`getInitScriptLocation`
+    if [ -f "$InitFile" ]
+    then
+		"$InitFile" start
+
+		checkString=`ps -af | egrep "\b(fbserver|fb_smp_server)\b" |grep -v grep`
+		if [ -z "$checkString" ]
+		then
+			# server didn't start - possible reason bad shell /bin/false for user "firebird"
+			echo
+			echo Fixing firebird\'s shell to /bin/sh
+			echo
+			pw usermod firebird -s /bin/sh
+			"$InitFile" start
+		fi
+	fi
+}
+
+#------------------------------------------------------------------------
+# If we have right systems remove the service autostart stuff.
+
+removeServiceAutostart() {
+    # dummy for a while
+    return 1
+}

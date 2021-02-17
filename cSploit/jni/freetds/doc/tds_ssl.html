@@ -1,0 +1,281 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>SSL and TDS</title>
+</head>
+<body>
+
+<h2>How to enable encryption on MSSQL</h2>
+
+<h3>Under Linux (or any system that have openssl)</h3>
+
+<pre>
+# create a file containing key and self-signed certificate
+openssl req \
+  -x509 -nodes -days 365 \
+  -newkey rsa:1024 -keyout mycert.pem -out mycert.pem
+
+# export mycert.pem as PKCS#12 file, mycert.pfx
+openssl pkcs12 -export \
+  -out mycert.pfx -in mycert.pem \
+  -name "My Certificate"
+</pre>
+
+<p>So we created a mycert.pfx certificate ready to be imported
+
+<h3>Under Windows</h3>
+
+<p>Open MMC and add certificates snap-in, add our certificate under <b>personal</b> and under <b>ca root</b> (to validate it)
+
+<p>Add to the registry the thumbprint of our certificato so to be used by mssql. For examples
+
+<pre>
+REGEDIT4
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\MSSQLServer\MSSQLServer\SuperSocketNetLib]
+"Certificate"=hex:DD,5F,6C,EE,47,8E,0C,C0,74,8B,C4,71,8D,87,1C,E6,07,20,F2,28
+</pre>
+
+<p>Restart MSSQL
+
+<p>Check event viewer for results
+
+<h2>Encryption protocol</h2>
+
+<p>Prelogin packet (tds 7.1 only)
+
+<p>&gt;From client to server 
+
+<pre>
+00000000  12 01 00 34 00 00 00 00  00 00 15 00 06 01 00 1b ...4.... ........
+00000010  00 01 02 00 1c 00 0c 03  00 28 00 04 ff 08 00 01 ........ .(......
+00000020  55 00 00 01 4d 53 53 51  4c 53 65 72 76 65 72 00 U...MSSQ LServer.
+00000030  38 09 00 00                                      8...
+</pre>
+
+<table border=1>
+ <tr><th>Header</th><th>Description</th><th>Value</th></tr>
+ <tr><td>
+  00 00 15 00 06
+ </td><td>
+  netlib version (0) start from 0x15 length 0x06
+ </td><td>
+  8.341.0
+ </td></tr>
+ <tr><td>
+  01 00 1b 00 01
+ </td><td>
+  encrypt flag (1) start from 0x1b length 0x01
+ </td><td>
+  1, see below
+ </td></tr>
+ <tr><td>
+  02 00 1c 00 0c
+ </td><td>
+  instance name (2) start from 0x1c length 0x0c
+ </td><td>
+  "MSSQLServer\0"
+  (as you note string is null terminated)
+ </td></tr>
+ <tr><td>
+  03 00 28 00 04
+ </td><td>
+  process id (3) start from 0x28 length 0x04
+ </td><td>
+  0x938 (why in little endian ??)
+ </td></tr>
+ <tr><td>
+  ff
+ </td><td>
+  end
+ </td><td>
+  &nbsp;
+ </td></tr>
+</table>
+
+<p>Meaning of encryption flag (client):
+<ul>
+<li>0x00 normal
+<li>0x01 high encryption (128 bit ??)
+</ul>
+
+<p>MSSQL 2005 have 9.0.0 as a version and have a single byte option 4 (always seen as zero, I don't know the meaning).
+
+<p>&gt;From server to client
+
+<pre>
+00000000  04 01 00 25 00 00 01 00  00 00 15 00 06 01 00 1b ...%.... ........
+00000010  00 01 02 00 1c 00 01 03  00 1d 00 00 ff 08 00 02 ........ ........
+00000020  f8 00 00 01 00     
+</pre>
+
+<p>Similar
+
+<table border=1>
+ <tr><th>Header</th><th>Description</th><th>Value</th></tr>
+ <tr><td>
+   00 00 15 00 06
+ </td><td>
+   version (0) start from 0x15 length 0x06
+ </td><td>
+   8.0.760.0
+ </td></tr>
+ <tr><td>
+  01 00 1b 00 01 
+ </td><td>
+   encrypt flag (1) start from 0x1b length 0x01
+ </td><td>
+   1, see below
+ </td></tr>
+ <tr><td>
+   02 00 1c 00 01 
+ </td><td>
+   instance name (2) start from 0x1c length 0x01
+ </td><td>
+   "\0" (still null terminatted)
+ </td></tr>
+ <tr><td>
+   03 00 1d 00 00 
+ </td><td>
+   process id (3) start from 0x1d length 0x0
+ </td><td>
+    no info
+ </td></tr>
+ <tr><td>
+   ff
+ </td><td>
+   end
+ </td><td>
+   &nbsp;
+ </td></tr>
+</table>
+
+<p>Meaning of encryption flag (server):
+<ul>
+<li>0x02, no certificate, no encryption required
+  just do normal jobs (like FreeTDS)
+<li>0x00, certificate, no force flag on server,
+  prelogin to see certificate (TLS 1.0, not SSL 2 or 3 !!)
+  login encrypted, after login do normal TDS (not
+  encrypted)
+<li>0x01, certificate, high encryption required by client
+  prelogin to see certificate
+  login encrypted, after login changed crypt (my client close connection
+perhaps a configuration problem...)
+<li>0x03, certificate enabled, force encryption configured on server
+  prelogin like 0x00, remains in SSL after login
+</ul>
+
+<p>Note that mssql2k unpatched do not set last packet flag (byte 2) for this packet.
+
+<p>Following a valid encrypted connection (0x00 from server, no force)
+
+<p>&gt;From client to server
+<pre>
+00000034  12 01 00 46 00 00 00 00  16 03 01 00 39 01 00 00 ...F.... ....9...
+00000044  35 03 01 41 b9 5e 02 f8  7d 45 81 31 d9 73 9e 93 5..A.^.. }E.1.s..
+00000054  91 b2 dd f4 4a 80 a3 92  a8 0f aa 67 32 8a 72 6d ....J... ...g2.rm
+00000064  4b 22 07 00 00 0e 00 09  00 64 00 62 00 03 00 06 K"...... .d.b....
+00000074  00 12 00 63 01 00                                ...c..
+</pre>
+
+<p>prelogin packet (0x12), content TLS 1.0 (you can see a ClientHell0, see RFC 2246)
+
+<p>&gt;From server to client
+<pre>
+00000025  04 01 03 da 00 00 01 00  16 03 01 03 cd 02 00 00 ........ ........
+00000035  46 03 01 41 b9 5e 03 4b  c1 bf 9b a5 7d 83 74 57 F..A.^.K ....}.tW
+00000045  00 03 de b5 fb fc 4d f8  84 15 ce 07 d9 ab fe 2b ......M. .......+
+00000055  57 3c ad 20 96 10 00 00  6f 31 af e4 17 ae 2a 2b W&lt;. .... o1....*+
+00000065  37 29 0e 57 8a 4d 1d 32  aa d9 ed 62 6b 3d 3c d1 7).W.M.2 ...bk=&lt;.
+00000075  d1 c6 a9 cb 00 09 00 0b  00 03 7b 00 03 78 00 03 ........ ..{..x..
+00000085  75 30 82 03 71 30 82 02  da a0 03 02 01 02 02 01 u0..q0.. ........
+00000095  00 30 0d 06 09 2a 86 48  86 f7 0d 01 01 04 05 00 .0...*.H ........
+000000A5  30 81 88 31 0b 30 09 06  03 55 04 06 13 02 49 54 0..1.0.. .U....IT
+000000B5  31 10 30 0e 06 03 55 04  08 13 07 42 6f 6c 6f 67 1.0...U. ...Bolog
+000000C5  6e 61 31 10 30 0e 06 03  55 04 07 13 07 42 6f 6c na1.0... U....Bol
+... omissis...
+</pre>
+
+<p>normal reply packet (0x4), ServerHello(2), content TLS (certificate).
+
+<p>NOTE: if server send certificate request client (MS ODBC) crash so I think this is not supported.
+
+<p>&gt;From client to server
+<pre>
+0000007A  12 01 00 c6 00 00 00 00  16 03 01 00 86 10 00 00 ........ ........
+0000008A  82 00 80 3a c6 96 ba 55  ce 8e 4b a4 e2 d7 b7 bd ...:...U ..K.....
+0000009A  5d 5e f4 28 30 c6 c7 b9  4e 66 60 80 45 ce cb 4e ]^.(0... Nf`.E..N
+000000AA  f6 f7 91 d7 9b 05 79 f8  ad f7 c7 13 77 36 cb 8c ......y. ....w6..
+000000BA  04 58 33 3f 51 c8 0a bb  6a 95 8f 65 a1 e9 74 c5 .X3?Q... j..e..t.
+000000CA  c9 c6 4a 11 b1 36 87 84  f2 96 82 d0 19 8a dd dc ..J..6.. ........
+000000DA  d1 32 6a 32 ab 73 47 76  58 69 16 fd 9f 0b bd d7 .2j2.sGv Xi......
+000000EA  72 79 a7 86 9a 71 2b 70  9a d1 8f e2 54 63 46 81 ry...q+p ....TcF.
+000000FA  3e 6d 8a f7 8d 2e 26 02  3f 2d 0c a1 bc 63 ac 0a &gt;m....&amp;. ?-...c..
+0000010A  8a 38 0e 14 03 01 00 01  01 16 03 01 00 28 12 09 .8...... .....(..
+0000011A  d5 2d 93 8c 60 aa ae ec  e3 9b 2b 3c 27 63 46 ad .-..`... ..+&lt;'cF.
+0000012A  b1 b9 3d 1e 06 60 18 49  6d bb 76 80 8b 7b 51 70 ..=..`.I m.v..{Qp
+0000013A  b7 79 14 b8 ba 62                                .y...b
+</pre>
+
+<p>prelogin (0x12), still TLS handshake, client_key_exchange (??) (0x16,
+0x10), change crypt (0x14), handshake (crypted)
+
+<p>&gt;From server to client
+<pre>
+000003FF  04 01 00 3b 00 00 01 00  14 03 01 00 01 01 16 03 ...;.... ........
+0000040F  01 00 28 96 3c 2e 41 42  09 d3 a8 77 82 19 7f 4b ..(.&lt;.AB ...w...K
+0000041F  ac 04 b8 96 4b f1 65 c2  35 9e ef 6a 1d c2 41 2d ....K.e. 5..j..A-
+0000042F  a3 98 b8 2b 5c 0f 40 d1  98 b0 1e                ...+\.@. ...
+</pre>
+
+<p>normal reply (0x4), still TLS
+
+<p>0x14 means change crypt, followed by 0x16 (handshake crypted).
+
+<p>&gt;From client to server
+<pre>
+00000140  17 03 01 01 08 d7 3a b5  c3 fd a7 4d 14 b7 ce c7 ......:. ...M....
+00000150  c6 6f f3 c5 03 1c 5c 86  7b 15 98 45 2a 93 73 c7 .o....\. {..E*.s.
+00000160  72 75 72 23 c2 11 20 7d  5c b1 be e7 ac 72 ac b3 rur#.. } \....r..
+00000170  47 41 4f 45 d8 fa 22 2b  94 b1 67 a5 7f de af 96 GAOE.."+ ..g.....
+00000180  05 ad bb fc e4 33 66 3a  a2 f1 8d c5 5f 84 8b 38 .....3f: ...._..8
+00000190  86 b0 df e8 87 e7 2c 26  e6 c0 66 2e b1 53 86 40 ......,&amp; ..f..S.@
+000001A0  98 0d 9e 2f 49 0b 17 b2  9d 55 d3 e3 7e 08 ca b9 .../I... .U..~...
+000001B0  de 62 87 23 14 98 6e 10  d0 dd c2 94 70 4c 33 4b .b.#..n. ....pL3K
+000001C0  09 8d b8 46 e5 a2 31 52  4d 89 06 b2 10 a8 ed b0 ...F..1R M.......
+000001D0  a8 21 02 79 ab 99 de 67  28 a3 6c ea 18 88 b5 63 .!.y...g (.l....c
+000001E0  02 ab f4 a1 78 0d 83 ec  b6 7b 61 7d 42 d2 38 bb ....x... .{a}B.8.
+000001F0  50 fc e1 9e 1e e0 51 69  93 ea 05 9f d5 a4 a8 2b P.....Qi .......+
+00000200  18 7f 79 4f 29 1a c0 35  3c 55 83 b0 9f af b7 de ..yO)..5 &lt;U......
+00000210  6d 2d 12 fa 27 ef 28 6b  a9 83 12 e6 a1 09 58 00 m-..'.(k ......X.
+00000220  30 b3 3d f0 60 00 97 84  ee 28 b0 ae 31 78 50 d7 0.=.`... .(..1xP.
+00000230  85 82 19 9f 57 ca a6 1c  d2 81 0f 6b 2d fb 47 41 ....W... ...k-.GA
+00000240  37 58 8a ba 4f 38 f6 00  23 24 56 c2 35          7X..O8.. #$V.5
+</pre>
+
+<p>Well... you can note that this it's not a TDS packet !!! This is
+a fully crypted packet (login packet).
+
+<p>&gt;From server to client
+<pre>
+0000043A  04 01 01 79 00 33 01 00  e3 1b 00 01 06 6d 00 61 ...y.3.. .....m.a
+0000044A  00 73 00 74 00 65 00 72  00 06 6d 00 61 00 73 00 .s.t.e.r ..m.a.s.
+0000045A  74 00 65 00 72 00 ab 66  00 45 16 00 00 02 00 25 t.e.r..f .E.....%
+0000046A  00 43 00 68 00 61 00 6e  00 67 00 65 00 64 00 20 .C.h.a.n .g.e.d. 
+0000047A  00 64 00 61 00 74 00 61  00 62 00 61 00 73 00 65 .d.a.t.a .b.a.s.e
+0000048A  00 20 00 63 00 6f 00 6e  00 74 00 65 00 78 00 74 . .c.o.n .t.e.x.t
+0000049A  00 20 00 74 00 6f 00 20  00 27 00 6d 00 61 00 73 . .t.o.  .'.m.a.s
+... omissis ...
+</pre>
+
+<p>Now normal data follow. In this case server used flag 0 (see above).
+
+<p>With force login (0x03 from server) after crypted login packet server
+and client continue to keep encrypting full packets
+
+<p>Note that uncrypted packets are still splitted using packet size selected during
+login (that is usually 4096 bytes).
+
+</body>
+</html>

@@ -1,0 +1,44 @@
+<?
+session_start();
+global $ss_authenticated;
+ if (!session_is_registered("ss_authenticated") || (!$ss_authenticated)) {
+    header ("Location: index.phtml?message=".urlencode("Vous n êtes pas authentifié"));
+    exit(); /* capital sinon execute quand même le code php plus bas !!!! */
+ }
+?>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<!-- *************************************************
+        EDITEUR WEBEXPERT
+        DATE DE CREATION: 01/01/00
+        DERNIERE MODIFICATION: 01/01/00
+************************************************** -->
+<HTML>
+<HEAD>
+<TITLE>Menu général</TITLE>
+<META NAME="Patrick Pollet" CONTENT="INSA de Lyon">
+<META NAME="Description" CONTENT="">
+
+
+</HEAD>
+<BODY >
+
+<?php
+
+$strEntete="Bienvenue au Centre Informatique du Premier Cycle<p>  Menu général de l'Intranet enseignants";
+include("header.inc.php3");
+?>
+<?php
+#echo "hello ".session_name()."=".session_id()."<BR>";
+#echo "vous êtes ".$ss_username."<BR>";
+#echo "attaché à ".$ss_tree."<BR>";
+?>
+
+
+<?
+require ("footer.inc.php3");
+?>
+
+</BODY>
+</HTML>
+

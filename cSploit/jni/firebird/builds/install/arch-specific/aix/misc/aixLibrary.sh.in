@@ -1,0 +1,123 @@
+#!/bin/sh
+
+RunUser=firebird
+export RunUser
+RunGroup=firebird
+export RunGroup
+PidDir=/var/run/firebird
+export PidDir
+
+#------------------------------------------------------------------------
+# Get correct options & misc.
+
+tarExt=tar
+export tarExt
+
+#------------------------------------------------------------------------
+#  Add new user and group
+
+#
+# On AIX the "mkgroup" command creates a new group.
+# Options include:
+# "-a", create an administrative group
+# "-A", set group administrator to the person who invoked the mkgroup command
+#
+TryAddGroup() {
+
+	AdditionalParameter=$1
+	testStr=`grep firebird /etc/group`
+	
+    if [ -z "$testStr" ]
+      then
+        mkgroup -a firebird
+    fi
+	
+}
+
+#
+# On AIX the "useradd" command adds a new user.
+# Options include:
+# "-c "comment""
+# "-d dir" identifies the user's home directory
+# "-g group", identifies the user's primary group
+# "-r role1,role2,...", lists the administrative roles for this user
+# "-s shell" defines the program run for the user at session initiation
+TryAddUser() {
+
+	AdditionalParameter=$1
+	testStr=`grep firebird /etc/passwd`
+	
+    if [ -z "$testStr" ]
+      then
+        useradd -d @FB_CONFDIR@ -s /bin/false \
+            -c "Firebird Database Owner" -g firebird firebird 
+    fi
+
+}
+
+
+addFirebirdUser() {
+
+	TryAddGroup
+	TryAddUser
+
+}
+
+
+#------------------------------------------------------------------------
+#  print location of init script
+
+getInitScriptLocation() {
+    if [ -f /etc/rc.d/init.d/firebird ]
+	then
+		echo -n /etc/rc.d/init.d/firebird
+    elif [ -f /etc/rc.d/rc.firebird ]
+	then
+		echo -n /etc/rc.d/rc.firebird
+    elif [ -f /etc/init.d/firebird ]
+	then
+		echo -n /etc/init.d/firebird
+    fi
+}
+
+
+#------------------------------------------------------------------------
+#  stop super server if it is running
+
+stopSuperServerIfRunning() {
+    checkString=`ps -eaf | egrep "\b(fbserver|fbguard)\b" |grep -v grep`
+
+    if [ ! -z "$checkString" ]
+    then
+		init_d=`getInitScriptLocation`
+
+        if [ -x "$init_d" ]
+		then
+       	    $init_d stop
+		fi
+    fi
+}
+
+#------------------------------------------------------------------------
+#  Generate new sysdba password - this routine is used only in the 
+#  rpm file not in the install script.
+
+generateNewDBAPassword() {
+    # openssl generates random data.
+	openssl </dev/null >/dev/null 2&>/dev/null
+    if [ $? -eq 0 ]
+    then
+        # We generate 20 random chars, strip any '/''s and get the first 8
+        NewPasswd=`openssl rand -base64 20 | tr -d '/' | cut -c1-8`
+    fi
+
+    # there is no mkpasswd on AIX
+
+    if [ -z "$NewPasswd" ]
+    then
+        NewPasswd="masterkey"
+    fi
+
+    writeNewPassword $NewPasswd
+}
+

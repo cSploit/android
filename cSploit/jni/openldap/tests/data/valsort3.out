@@ -1,0 +1,61 @@
+dn: o=valsort
+objectClass: top
+objectClass: organization
+o: valsort
+description: valsort test database
+
+dn: ou=users,o=valsort
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+description: container for test valsort users
+
+dn: uid=george,ou=users,o=valsort
+objectClass: OpenLDAPperson
+uid: george
+sn: zib
+sn: tree
+sn: jungle
+sn: alpha
+cn: george
+businessCategory: test
+carLicense: SAMPLE
+departmentNumber: 72
+departmentNumber: 5
+departmentNumber: 46
+departmentNumber: 37
+departmentNumber: 3
+departmentNumber: 10
+departmentNumber: 1
+displayName: George
+employeeNumber: 5150
+employeeType: staff
+employeeType: contractor
+employeeType: anarchist
+givenName: Big G
+ou: Chemistry
+ou: Computer Science
+ou: Hum Bio
+ou: Academia
+mailPreferenceOption: 87
+mailPreferenceOption: 66
+mailPreferenceOption: 22
+mailPreferenceOption: 3
+mailPreferenceOption: 1
+
+dn: uid=dave,ou=users,o=valsort
+objectClass: OpenLDAPperson
+uid: dave
+sn: nothere
+cn: dave
+businessCategory: otest
+carLicense: TEST
+departmentNumber: 42
+displayName: Dave
+employeeNumber: 69
+employeeType: contractor
+givenName: Dave
+ou: Test
+ou: Is
+ou: Okay
+

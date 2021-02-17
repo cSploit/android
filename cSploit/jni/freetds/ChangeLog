@@ -1,0 +1,1109 @@
+Fri May 18 11:47:47 EDT 2012	JK Lowden <jklowden@freetds.org>
+	* configure.ac doc/Makefile.am doc/bsqldb.1.in
+	* doc/bsqlodbc.1.in doc/datacopy.1.in doc/defncopy.1.in
+	* doc/fisql.1.in doc/freebcp.1.in
+	* doc/freetds.conf.5.in doc/osql.1.in doc/tsql.1.in
+	- replace txt with mdoc manpages
+	* doc/freetds.conf.5 doc/txt2man remove
+	* include/replacements/readpassphrase.h
+	* include/sybdb.h include/tds.h
+	* src/odbc/sqlwparams.h src/tds/login.c
+	* src/tds/md4.c src/tds/md5.c src/tds/mem.c
+	* src/tds/net.c src/tds/query.c
+	- small corrections related to warnings produced by clang
+
+Sun Mar 11 15:52:14 GMT 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/apps/tsql.c src/ctlib/ct.c src/dblib/dblib.c:
+	* src/odbc/odbc.c src/pool/member.c src/pool/user.c:
+	* src/server/login.c src/tds/config.c src/tds/mem.c:
+	* src/tds/unittests/common.c win32/winsetup.c:
+	- get rid of old tds_alloc_connection
+
+Sun Mar 11 13:10:50 GMT 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/common.c: allow to enable mars for odbc tests
+
+Sun Mar 11 09:24:27 GMT 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/mem.c: fix leak using REALM option in freetds.conf
+
+Fri Mar  9 21:51:14 GMT 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tdsodbc.h src/odbc/error.c src/odbc/odbc.c:
+	* src/odbc/odbc_export.pl src/odbc/sqlwchar.c:
+	- deal with string printing properly for wide odbc (initial patch
+	  fro Christos Zoulas)
+
+Fri Mar  9 19:20:24 GMT 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/bcp.c src/dblib/dbpivot.c:
+	- removed old function in bcp.c
+
+commented out unused function in dbpivot.c
+Tue Mar  6 21:49:23 GMT 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* misc/freetds_autobuild misc/prepare_win32.sh:
+	- improve various scripts
+
+Tue Mar  6 20:45:46 GMT 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/freeclose.c: removed already done TODO
+
+Tue Mar  6 20:39:59 GMT 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/Makefile.am src/replacements/Makefile.am:
+	* src/tds/Makefile.am:
+	- move win_mutex to replacements
+
+Tue Mar  6 20:33:07 GMT 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/apps/bsqldb.c src/dblib/dbpivot.c src/tds/query.c:
+	- remove some warnings and compatibility issues
+
+Sun Mar  4 12:34:17 CET 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/replacements/socketpair.c:
+	- fix socket pair emulation for Windows
+
+Sun Mar  4 12:32:49 CET 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/common.c src/odbc/unittests/common.h:
+	* src/odbc/unittests/connect2.c:
+	- better error report on SQLConnect failure
+
+Sat Mar  3 23:13:52 CET 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c src/odbc/unittests/funccall.c:
+	- does not return parameters as rows in odbc
+
+Sat Mar  3 22:36:49 CET 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc_export.pl: simplify export script
+
+Sat Mar  3 10:19:58 CET 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/ctlib/unittests/common.c:
+	- clean connection on connection failure
+
+Tue Feb 28 23:50:28 CET 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/unittests/.gitignore: update ignore file
+
+Sun Feb 26 23:22:25 CET 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/net.c: free context if ssl handshake fails
+
+Sun Feb 26 23:18:45 CET 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c: removed unused declaration
+
+Sun Feb 26 23:09:04 CET 2012    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/Makefile.am src/odbc/error.c src/odbc/odbc.c:
+	* src/odbc/odbc_export.pl src/odbc/sqlwparams.h:
+	- start different way to produce export functions
+
+Mon Jan 23 13:23:51 EST 2012	JK Lowden <jklowden@freetds.org>
+	* src/apps/tsql.c
+
+Mon Jan 23 11:04:52 EST 2012	JK Lowden <jklowden@freetds.org>
+	* doc/bsqldb.txt typo
+	* src/apps/tsql.c 
+	- clarified default-database message.
+	- print 5701 and 5703 in verbose mode
+
+Mon Jan 16 22:45:41 EST 2012	JK Lowden <jklowden@freetds.org>
+	* configure.ac doc/Makefile.am
+	- use MKDIR_P and INSTALL from autoconf
+
+Sun Jan 15 19:27:20 EST 2012	JK Lowden <jklowden@freetds.org>
+	* src/odbc/odbc.c 
+	- removed bogus test from _SQLRowCount, cf. ML.
+
+Sun Jan 15 19:24:02 EST 2012	JK Lowden <jklowden@freetds.org>
+	* Makefile.am doc/Makefile.am src/pool/Makefile.am
+	- use MKDIR_P and INSTALL from autoconf
+
+Sat Jan 14 14:44:10 EST 2012	JK Lowden <jklowden@freetds.org>
+	* .cvsignore doc/.cvsignore include/.cvsignore
+	* m4/.cvsignore samples/.cvsignore
+	* src/apps/.cvsignore src/apps/fisql/.cvsignore
+	* src/ctlib/unittests/.cvsignore src/dblib/unittests/.cvsignore
+	* src/dblib/unittests/rpc.c src/dblib/unittests/rpc.sql
+	* src/odbc/unittests/.cvsignore src/pool/.cvsignore
+	* src/server/.cvsignore src/tds/.cvsignore
+	* src/tds/unittests/.cvsignore win32/.cvsignore
+	- add .gitignore
+
+Wed Jan  4 17:09:08 EST 2012	JK Lowden <jklowden@freetds.org>
+	* doc/userguide.sgml add 'use ntlmv2' to freetds.conf
+
+Fri Dec 16 10:53:26 CET 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/net.c:
+	- improve thread-safe on ssl code, fix small leaks
+
+Thu Dec 15 20:59:53 EST 2011	JK Lowden <jklowden@freetds.org>
+	* include/tds.h src/apps/bsqldb.1 src/apps/fisql/fisql.c
+	* src/ctlib/ct.c src/odbc/odbc.c src/tds/net.c
+	- mostly a patch from today's ML by Christos Zoulas to 
+	- correct a thread-safe error in ct_connect().   
+
+Sun Dec  4 22:12:13 EST 2011	JK Lowden <jklowden@freetds.org>
+	* src/dblib/dbpivot.c  Add dbpivot() module
+
+Sun Dec  4 21:27:08 EST 2011	JK Lowden <jklowden@freetds.org>
+	* src/apps/bsqldb.1 added mdoc manpage
+
+Sun Dec  4 21:23:40 EST 2011	JK Lowden <jklowden@freetds.org>
+	* include/dblib.h include/sybdb.h
+	* src/dblib/Makefile.am src/apps/bsqldb.c
+	* src/dblib/buffering.h src/dblib/dblib.c
+	- Add dbpivot() function
+
+Tue Nov 29 18:38:33 EST 2011	JK Lowden <jklowden@freetds.org>
+	* src/apps/bsqldb.c	convert binary/image to hex characters
+
+Wed Nov  9 19:55:07 EST 2011	JK Lowden <jklowden@freetds.org>
+	* src/apps/bsqldb.c added OS error to error handler
+
+Mon Nov  7 14:01:24 CET 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/challenge.c: improve target info code
+
+Mon Nov  7 11:18:29 CET 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c:
+	- silence warnings about integer casts of different size to pointer
+	  (Christos Zoulas)
+
+Mon Nov  7 10:55:52 CET 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* configure.ac src/tds/gssapi.c:
+	- check if error_message() exists, if not supply one (Christos
+	  Zoulas)
+
+Mon Nov  7 10:53:27 CET 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c:
+	- remove a warning compiling with wide char (Christos Zoulas)
+
+Mon Oct 31 14:58:29 CET 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/unittests/Makefile.am:
+	- fix compile for machine with SSPI (currently Windows)
+
+Mon Oct 31 12:02:28 CET 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c: fix precision for date
+
+Sun Oct 30 19:02:02 CET 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/tds_checks.c: fix internal check
+
+Sun Oct 30 18:50:08 CET 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* misc/freetds_autobuild: add test for mssql 2008
+
+Sun Oct 30 18:48:48 CET 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c src/tds/data.c: small fix for precision/scale
+
+Fri Oct 21 12:05:20 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* misc/online.pl: fix title
+
+Fri Oct 21 12:03:41 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h:
+	- add missing prototype for tds_gettime_ms (Christos Zoulas)
+
+Fri Oct 21 12:01:56 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* configure.ac src/tds/gssapi.c src/tds/threadsafe.c:
+	- include additional header for Heimdal (Christos Zoulas)
+
+Fri Oct 14 17:4700 CDT 2011	Craig A. Berry <craigberry@mac.com>
+	* src/apps/freebcp.c
+	- Make exit codes in freebcp portable and self-documenting.
+
+Mon Oct 10 22:20:00 CDT 2011	Craig A. Berry <craigberry@mac.com>
+	* src/apps/fisql/handlers.c
+	- Make fisql's message handler mimic vendor behavior, which
+	  means always printing a message regardless of severity,
+	  but only printing context with severity greater than 10.
+
+Fri Oct  7 21:12:05 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/tds/token.c compute bugfix from Fredy Paquet
+
+Mon Oct  3 21:56:56 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/ctlib/ct.c fix but with ct_command & CS_MORE
+	* src/dblib/dblib.c indentation of one line
+
+Thu Sep 29 15:04:24 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/dblib/bcp.c src/tds/bulk.c
+	- allow sending NULL (no pun intended) even if column is not NULL.
+
+Sun Sep 25 13:41:32 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/login.c: return TDSRET from tds_connect
+
+Sun Sep 25 13:37:06 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/apps/tsql.c src/ctlib/blk.c src/ctlib/cs.c src/ctlib/ct.c:
+	* src/dblib/bcp.c src/dblib/dblib.c src/odbc/connectparams.c:
+	* src/odbc/odbc.c src/pool/member.c src/tds/bulk.c:
+	* src/tds/challenge.c src/tds/config.c src/tds/login.c:
+	- use TDS_SUCCEED/TDS_FAILED instead of comparing with TDS_SUCCESS
+
+Sun Sep 25 13:34:02 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/ctlib/blk.c src/ctlib/ct.c src/dblib/bcp.c src/dblib/dblib.c:
+	* src/odbc/odbc.c src/tds/bulk.c src/tds/gssapi.c src/tds/login.c:
+	* src/tds/query.c src/tds/token.c:
+	- use TDS_FAILED instead of TDS_FAIL
+
+Sun Sep 25 13:32:27 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/rpc.c: fix rpc for nvarchar
+
+Sun Sep 18 19:24:05 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/rpc.c: fix typo
+
+Sun Sep 18 19:23:11 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/convert_tds2sql.c:
+	- support conversion from ms date/time to text in odbc
+
+Sun Sep 18 19:13:16 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/rpc.c:
+	- post always using unicode to not loose characters
+
+Sun Sep 18 18:28:04 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/bcp.c: style updates
+
+Fri Sep  9 10:52:20 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/config.c: make compiler happy
+
+Fri Sep  9 10:51:15 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tdsthread.h: be consistent with thread macros
+
+Thu Sep  8 22:03:02 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* include/tds.h src/tds/config.c tds_config_verstr accepts "auto"
+	* include/tdsthread.h define mutex macros as 0 for non-thread
+
+Wed Sep  7 11:40:59 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/ctlib/ct.c src/odbc/convert_tds2sql.c:
+	* src/odbc/odbc.c src/odbc/odbc_util.c src/odbc/sql2tds.c:
+	* src/tds/bulk.c src/tds/data.c src/tds/gssapi.c src/tds/query.c:
+	* src/tds/token.c:
+	- start using new TDS_FAILED/TDS_SUCCEED macros
+
+Wed Sep  7 11:38:18 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/ctlib/ct.c src/tds/login.c: test correctly tds results
+
+Wed Sep  7 11:36:07 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h: change errors constants
+
+Mon Sep  5 21:24:54 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/cancel.c: improve cancel test
+
+Mon Sep  5 20:53:15 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/data.c src/tds/bulk.c: just some comments
+
+Sat Sep  3 19:17:40 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/descriptor.c src/odbc/odbc.c: fix _SQLFreeDesc
+
+Fri Sep  2 20:22:50 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tdsodbc.h src/odbc/odbc.c:
+	- use ODBC_ENTER and ODBC_EXIT macros
+
+Fri Sep  2 20:21:52 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/descriptor.c src/odbc/odbc.c: fix SQLCopyDesc
+
+Fri Sep  2 20:20:05 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tdsodbc.h src/odbc/odbc.c: improve odbc thread support
+
+Fri Sep  2 18:38:50 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/net.c src/tds/query.c: avoid useless assign
+
+Fri Sep  2 18:34:17 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/cancel.c src/odbc/unittests/freeclose.c:
+	* src/odbc/unittests/timeout3.c:
+	- use mutex to prevent memory problems
+
+Fri Sep  2 13:46:39 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c: do not access error on alternate threads
+
+Thu Sep  1 15:58:24 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tdsodbc.h src/odbc/odbc.c src/tds/net.c:
+	- improve odbc SQLCancel
+
+Thu Sep  1 15:34:28 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/mem.c src/tds/net.c src/tds/query.c:
+	- partial signal cancel
+
+Thu Sep  1 14:26:41 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h include/tdsthread.h src/tds/mem.c src/tds/util.c:
+	- add wire_mtx to TDSSOCKET
+
+Thu Sep  1 12:05:29 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/net.c: add tds_put_cancel
+
+Thu Sep  1 09:57:34 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/token.c: read data before handling it
+
+Thu Sep  1 09:56:18 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tdsthread.h src/tds/win_mutex.c: add TDS_MUTEX_TRYLOCK
+
+Thu Sep  1 09:53:09 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* configure.ac include/replacements.h src/replacements/Makefile.am:
+	* src/replacements/socketpair.c:
+	- implement socketpair where no available
+
+Thu Aug 18 13:42:04 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/net.c: silly optimization
+
+Wed Aug 17 15:23:28 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tdsodbc.h src/odbc/odbc_util.c src/tds/query.c:
+	- support new data types for tds 7.3
+
+Wed Aug 17 15:21:15 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/genparams.c: improve test for binary
+
+Wed Aug 17 11:11:38 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/convert_tds2sql.c src/odbc/odbc_util.c:
+	* src/odbc/sql2tds.c:
+	- use DATETIMEALL to avoid precision lose converting to/from ODBC
+	  date/time
+
+Tue Aug 16 09:04:38 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/error.c src/odbc/odbc.c:
+	- mark last error on odbc_errs_add
+
+Fri Aug 12 18:40:15 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* configure.ac: enable SSPI by default on Windows
+
+Fri Aug 12 18:38:45 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/config.c src/tds/gssapi.c src/tds/mem.c:
+	- add Kerberos realm parameter to connection
+
+Fri Aug 12 15:49:18 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/describecol.c:
+	* src/odbc/unittests/describecol.in:
+	- improve describecol test for ms date/time
+
+Fri Aug 12 15:33:59 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/data.c:
+	- check correct protocol for ms date/time -> binary tests
+
+Fri Aug 12 14:30:56 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/sql2tds.c: support ms date/time putting data in odbc
+
+Fri Aug 12 14:25:38 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/convert_tds2sql.c:
+	- support conversions from new ms date/time to binary
+
+Fri Aug 12 13:51:49 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* configure.ac src/tds/net.c:
+	- check for gnutls_record_disable_padding function
+
+Fri Aug 12 11:17:16 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* configure.ac: test for pthread_cond_timedwait
+
+Thu Aug 11 12:07:56 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* doc/tsql.txt updated for clarity and -D
+
+Thu Aug 11 14:50:33 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/dblib.c src/tds/convert.c:
+	- clear output buffer in tds_datecrack
+
+Thu Aug 11 11:38:02 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/getdata.c: check len returned by SQLGetData
+
+Thu Aug 11 09:51:15 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/getdata.c: test splitting fields for "n" types
+
+Thu Aug 11 09:07:19 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/data.c: improve test for ms date/time
+
+Thu Aug 11 09:05:49 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/convert.c: consider time offset in tds_datecrack
+
+Thu Aug 11 09:02:43 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/query.c: avoid c++ comments
+
+Thu Aug 11 09:01:33 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/convert.c: small tds_datecrack fix
+
+Wed Aug 10 10:03:11 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/query.c: make tds_put_data inline
+
+Wed Aug 10 09:49:10 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/funccall.c: initialize variable
+
+Wed Aug 10 09:47:22 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/data.c: support putting ms time/date
+
+Wed Aug 10 09:45:01 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/data.c src/tds/query.c:
+	- implement put_info as callback
+
+Wed Aug 10 09:43:36 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/convert.c: fix date conversion precision
+
+Wed Aug 10 09:42:16 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/data.c src/tds/query.c:
+	- use callback for put_data
+
+Wed Aug 10 09:41:23 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/data.c: avoid using union just to read some integer value
+
+Wed Aug 10 09:40:16 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/data.c: check DATETIMEOFFSET values from server
+
+Tue Aug  9 08:26:42 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* misc/freetds_autobuild:
+	- update autobuild using different position for working directory
+
+Mon Aug  8 18:57:47 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/unittests/dynamic1.c: make dynamic1 test work again
+
+Mon Aug  8 18:56:25 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/unittests/challenge.c: fix typo error
+
+Mon Aug  8 16:11:46 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/unittests/.cvsignore src/tds/unittests/Makefile.am:
+	* src/tds/unittests/challenge.c:
+	- add test for challenge functions
+
+Mon Aug  8 14:33:22 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tdsconvert.h src/tds/convert.c:
+	- improve ms time/date conversions
+
+Mon Aug  8 14:32:12 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tdsconvert.h src/dblib/bcp.c src/dblib/dblib.c:
+	* src/odbc/convert_tds2sql.c src/tds/convert.c:
+	- allow to pass a precision to tds_strftime
+
+Mon Aug  8 14:30:40 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/convert.c:
+	- rewrote tds_convert_datetime4 using tds_convert_datetime
+
+Mon Aug  8 14:27:15 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/convert.c src/tds/data.c src/tds/token.c:
+	- conversion and data work on ms date/time
+
+Mon Aug  8 14:21:23 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/ctlib/cs.c src/dblib/dblib.c:
+	* src/odbc/convert_tds2sql.c src/tds/convert.c:
+	- retain full precision in TDSDATEREC
+
+Mon Aug  8 14:17:56 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/convert.c: use nanosecond precision parsing for time
+
+Mon Aug  8 14:16:53 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tdsconvert.h src/tds/convert.c:
+	- move tds_time structure declaration directly into
+	  src/tds/convert.c
+
+Mon Aug  8 13:52:21 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/data.c src/tds/mem.c:
+	- add row_len function to TDSCOLUMNFUNCS
+
+Mon Aug  8 13:51:14 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/data.c: separate variant type
+
+Mon Aug  8 13:48:29 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/data.c: separate numeric type
+
+Mon Aug  8 11:58:41 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/data.c src/tds/tds_checks.c:
+	* src/tds/token.c:
+	- start moving some code to src/tds/data.c and use some callbacks
+	  for data
+
+Mon Aug  8 11:41:57 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/convert.c: return NOAVAIL converting money to datetime
+
+Mon Aug  8 11:39:23 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/convert.c: collapse code
+
+Mon Aug  8 11:16:39 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/convert.c: cleanup
+
+Mon Aug  8 10:24:20 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/convert.c:
+	- use auto variable directly in string_to_datetime
+
+Mon Aug  8 09:27:50 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds_sysdep_public.h.in win32/tds_sysdep_public.h:
+	- sync tds_sysdep_public
+
+Mon Aug  8 09:09:16 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/getdata.c: use malloc to catch memory errors
+
+Mon Aug  8 09:06:30 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/util.c: compile commented code is development enabled
+
+Mon Aug  8 09:03:58 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/bulk.c: fix typo
+
+Sat Aug  6 20:46:47 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/login.c: fix tds 7.3 connection
+
+Thu Aug  4 06:32:16 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* win32/tds_sysdep_public.h:
+	- change header inclusion order to avoid wrong redeclarations
+
+Wed Jul 27 18:34:18 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/query.c src/tds/token.c:
+	- do not use tds9_ prefix, use tds72_ instead
+
+Wed Jul 27 18:32:54 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/server/query.c src/tds/net.c:
+	- move tds_lastpacket to server code
+
+Wed Jul 27 18:30:35 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/apps/tsql.c src/ctlib/ct.c src/tds/util.c:
+	- move tds_version to tsql
+
+Wed Jul 27 18:29:00 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/config.c: removed tds_default_port, unused
+
+Wed Jul 27 18:27:08 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/util.c:
+	- commented out tds_gettime_ms, not used
+
+Wed Jul 13 13:03:09 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/sqlfront.h: more fix for php
+
+Tue Jul 12 12:16:51 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/array.c src/odbc/unittests/array_out.c:
+	* src/odbc/unittests/binary_test.c src/odbc/unittests/blob1.c:
+	* src/odbc/unittests/cancel.c src/odbc/unittests/common.c:
+	* src/odbc/unittests/common.h src/odbc/unittests/compute.c:
+	* src/odbc/unittests/connect.c src/odbc/unittests/connect2.c:
+	* src/odbc/unittests/const_params.c:
+	* src/odbc/unittests/convert_error.c src/odbc/unittests/cursor1.c:
+	* src/odbc/unittests/cursor2.c src/odbc/unittests/cursor3.c:
+	* src/odbc/unittests/cursor4.c src/odbc/unittests/cursor5.c:
+	* src/odbc/unittests/cursor6.c src/odbc/unittests/cursor7.c:
+	* src/odbc/unittests/date.c src/odbc/unittests/descrec.c:
+	* src/odbc/unittests/describecol.c src/odbc/unittests/freeclose.c:
+	* src/odbc/unittests/funccall.c src/odbc/unittests/genparams.c:
+	* src/odbc/unittests/hidden.c src/odbc/unittests/insert_speed.c:
+	* src/odbc/unittests/moreandcount.c src/odbc/unittests/paramcore.c:
+	* src/odbc/unittests/params.c src/odbc/unittests/peter.c:
+	* src/odbc/unittests/prepare_results.c:
+	* src/odbc/unittests/prepare_warn.c src/odbc/unittests/prepclose.c:
+	* src/odbc/unittests/preperror.c src/odbc/unittests/putdata.c:
+	* src/odbc/unittests/raiserror.c src/odbc/unittests/rebindpar.c:
+	* src/odbc/unittests/rowset.c src/odbc/unittests/rpc.c:
+	* src/odbc/unittests/scroll.c src/odbc/unittests/stats.c:
+	* src/odbc/unittests/t0003.c src/odbc/unittests/t0004.c:
+	* src/odbc/unittests/tables.c src/odbc/unittests/testodbc.c:
+	* src/odbc/unittests/timeout.c src/odbc/unittests/timeout2.c:
+	* src/odbc/unittests/timeout3.c src/odbc/unittests/timeout4.c:
+	* src/odbc/unittests/transaction.c:
+	* src/odbc/unittests/transaction2.c src/odbc/unittests/typeinfo.c:
+	* src/odbc/unittests/utf8.c src/odbc/unittests/utf8_2.c:
+	* src/odbc/unittests/warning.c:
+	- new macros and wide tests
+
+Tue Jul 12 11:49:22 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c: add SQLGetTypeInfoW
+
+Tue Jul 12 09:17:07 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c: remove warning
+
+Mon Jul 11 11:07:07 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/sqlfront.h: make php compile again
+
+Mon Jul 11 11:04:34 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/sqlfront.h: do not typedef LPCBYTE twice
+
+Sat Jul  9 22:41:03 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/array.c src/odbc/unittests/array_out.c:
+	* src/odbc/unittests/common.c src/odbc/unittests/common.h:
+	* src/odbc/unittests/rpc.c:
+	- allow to free all allocated buffers
+
+===================================================================
+Sat Jul  9 22:02:19 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* TODO.freddy: notes..
+
+Sat Jul  9 21:50:13 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/dblib.h src/dblib/bcp.c src/dblib/dblib.c:
+	* src/tds/gssapi.c:
+	- minor types improves
+
+Sat Jul  9 13:26:00 CDT 2011     Craig A. Berry <craigberry@mac.com>
+	* vms/descrip_mms.template compile getpassarg.c on VMS.
+
+Thu Jul  7 09:24:05 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* Nmakefile include/replacements.h:
+	- fix Nmakefile (from Ramiro Morales)
+
+Sat Jul  2 09:53:21 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/gssapi.c: minor changes
+
+Sat Jul  2 09:39:12 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/login.c: log authentication method always
+
+Sat Jul  2 09:37:57 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/gssapi.c: fix memory error on error
+
+Fri Jul  1 16:47:38 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/tds/gssapi.c src/tds/login.c 
+	- log kerberos error messages
+
+Wed Jun 29 15:22:37 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/unittests/t0004.c: make query longer
+
+Wed Jun 29 15:07:56 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* Nmakefile: updated to reflect file rename
+
+Wed Jun 29 09:06:46 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/net.c: disable ssl padding for compatibility
+
+Sat Jun 18 19:52:39 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/ctlib.h include/tds.h src/apps/tsql.c src/ctlib/blk.c:
+	* src/ctlib/cs.c src/ctlib/ct.c src/ctlib/ctutil.c src/dblib/bcp.c:
+	* src/dblib/dblib.c src/dblib/rpc.c src/odbc/convert_tds2sql.c:
+	* src/odbc/odbc.c src/odbc/sql2tds.c src/pool/member.c:
+	* src/tds/bulk.c src/tds/challenge.c src/tds/config.c:
+	* src/tds/convert.c src/tds/data.c src/tds/gssapi.c:
+	* src/tds/login.c src/tds/mem.c src/tds/net.c src/tds/query.c:
+	* src/tds/read.c src/tds/token.c src/tds/vstrbuild.c:
+	* src/tds/write.c:
+	- new TDSRET type
+
+Fri Jun 17 12:03:38 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/dblib.c:
+	- use proper default null representation for all bind types
+
+Thu Jun 16 15:16:23 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/dblib/dblib.c dbgetnull permits NULL dbproc
+
+Thu Jun 16 08:56:55 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/net.c: fix compile error (patch from Jason Yanowitz)
+
+Sat Jun 11 09:42:35 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/convert.c src/tds/numeric.c:
+	- do not mix conversion results with normal ones
+
+Sat Jun 11 08:35:17 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/bulk.c src/tds/query.c: fix some returns
+
+Fri Jun 10 19:51:47 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h include/tdsodbc.h src/apps/tsql.c src/ctlib/ct.c:
+	* src/dblib/dblib.c src/odbc/connectparams.c src/odbc/odbc.c:
+	* src/pool/member.c src/tds/challenge.c src/tds/config.c:
+	* src/tds/gssapi.c src/tds/login.c src/tds/mem.c src/tds/net.c:
+	* src/tds/sspi.c src/tds/token.c src/tds/unittests/common.c:
+	* win32/winlogin.c win32/winsetup.c:
+	- unify TDSCONNECTION and TDSLOGIN
+
+Thu Jun  9 15:04:09 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/bcp.c: bcp style update
+
+Wed Jun  8 11:35:17 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/net.c: net cleanup
+
+Wed Jun  8 11:25:50 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/apps/Makefile.am src/apps/fisql/Makefile.am:
+	* src/ctlib/Makefile.am src/ctlib/unittests/Makefile.am:
+	* src/dblib/Makefile.am src/dblib/unittests/Makefile.am:
+	* src/odbc/Makefile.am src/pool/Makefile.am src/server/Makefile.am:
+	* src/tds/unittests/Makefile.am:
+	- use LTLIBICONV instead of LIBICONV
+
+Wed Jun  8 11:01:59 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/dblib.c: small dblib improve
+
+Wed Jun  8 10:48:34 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/token.c: use TDS_OFFSET
+
+Tue Jun  7 16:14:23 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/unittests/t0016_1.in src/dblib/unittests/t0016_1.sql:
+	- add test for utf-8 encoding
+
+Tue Jun  7 16:09:05 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/unittests/common.c src/dblib/unittests/common.h:
+	* src/dblib/unittests/t0016.c src/dblib/unittests/t0016.sql:
+	- support more bcp tests
+
+Tue Jun  7 16:07:04 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/unittests/t0016.c: compatibility update
+
+Tue Jun  7 11:58:54 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/ctlib/ctutil.c src/dblib/dbutil.c:
+	- add TDS_OFFSET macro
+
+Tue Jun  7 10:46:35 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/bcp.c src/dblib/dblib.c src/dblib/dbutil.c:
+	- fix some dblib result
+
+Tue Jun  7 10:34:51 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/bcp.c: remove unused code
+
+Tue Jun  7 10:16:07 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/dblib.h src/dblib/bcp.c src/dblib/dblib.c:
+	* src/dblib/rpc.c:
+	- add CHECK_CONN macro and use it
+
+Tue Jun  7 10:10:55 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/bcp.c src/dblib/rpc.c: more type conversions
+
+Mon Jun  6 14:33:18 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/unittests/t0016.in src/dblib/unittests/t0016.sql:
+	* src/tds/query.c:
+	- fix quoting identifier if reserved words used
+
+Mon Jun  6 09:50:12 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/apps/defncopy.c: christos patch for defncopy
+
+Mon Jun  6 09:27:10 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/ctlib/cs.c src/dblib/dblib.c src/odbc/odbc.c:
+	* src/odbc/odbc_util.c src/tds/bulk.c src/tds/mem.c:
+	* src/tds/token.c src/tds/util.c src/tds/vstrbuild.c:
+	- more work on type safety
+
+Sun Jun  5 12:07:15 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* TODO.freddy: some notes on todo
+
+Sun Jun  5 11:21:50 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/sybdb.h src/ctlib/ct.c src/dblib/buffering.h:
+	* src/dblib/dblib.c src/odbc/odbc.c src/odbc/prepare_query.c:
+	* src/tds/bulk.c src/tds/challenge.c src/tds/convert.c:
+	* src/tds/log.c src/tds/mem.c src/tds/net.c src/tds/query.c:
+	* src/tds/token.c:
+	- add some casts
+
+Sun Jun  5 11:20:33 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/bulk.c: style updates
+
+Sat Jun  4 10:15:12 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c: change the way autocommit is sent to server
+
+Sat Jun  4 10:14:25 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/query.c:
+	- add functions to submit transaction changes
+
+Sat Jun  4 10:13:39 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/net.c: cleanup
+
+Sat Jun  4 09:17:38 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/net.c: cache socket in tds_goodwrite
+
+Fri Jun  3 23:51:28 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c: fix setting autocommit off during login
+
+Fri Jun  3 23:43:40 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/write.c: small write optimization
+
+Fri Jun  3 23:40:56 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/ctlib/ctutil.c: minor style changes
+
+Fri Jun  3 23:14:48 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/odbc/native.c src/odbc/odbc.c:
+	* src/odbc/odbc_util.c src/pool/user.c src/tds/login.c:
+	* src/tds/mem.c src/tds/net.c src/tds/query.c src/tds/read.c:
+	* src/tds/token.c src/tds/write.c:
+	- move connection related fields from TDSSOCKET to TDSSOCKETCONN
+
+Fri Jun  3 23:13:22 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/dblib/dblib.c src/pool/main.c:
+	* src/pool/member.c src/pool/user.c src/server/login.c:
+	* src/tds/login.c src/tds/mem.c src/tds/net.c src/tds/tds_checks.c:
+	* src/tds/util.c:
+	- use macros to access s field of TDSSOCKET
+
+Fri Jun  3 23:05:32 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/ctlib/ctutil.c src/dblib/dblib.c:
+	* src/dblib/dbutil.c src/odbc/odbc.c src/tds/mem.c src/tds/net.c:
+	* src/tds/util.c:
+	- use macros to access parent field of TDSSOCKET
+
+Fri Jun  3 23:04:13 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/apps/tsql.c src/ctlib/ct.c src/tds/bulk.c:
+	* src/tds/config.c src/tds/iconv.c src/tds/login.c src/tds/mem.c:
+	* src/tds/net.c src/tds/query.c src/tds/tds_checks.c:
+	* src/tds/token.c src/tds/unittests/utf8_2.c src/tds/util.c:
+	- use macros to access tds_ctx field in TDSSOCKET
+
+Fri Jun  3 08:55:18 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/ctlib/ct.c: constification
+
+Thu Jun  2 22:42:38 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/unittests/rpc.c: fix init_proc declaration
+
+Thu Jun  2 22:33:47 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/bcp.c: fix previous bcp patch
+
+Thu Jun  2 21:14:53 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/bcp.c: fix bcp conversion
+
+Thu Jun  2 16:39:49 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/apps/freebcp.c src/apps/tsql.c:
+	- improve usage messages (Christos)
+
+Wed Jun  1 09:39:47 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/dblib/bcp.c src/tds/bulk.c:
+	- fix bcp for queryout
+
+Wed Jun  1 09:03:09 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h: fix enumeration name
+
+Fri May 27 11:18:52 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/replacements.h src/apps/bsqldb.c src/apps/freebcp.c:
+	* src/apps/tsql.c src/replacements/Makefile.am:
+	* src/replacements/getpassarg.c:
+	- add and use getpassarg
+
+Fri May 27 10:59:53 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/apps/tsql.c: add -a option to tsql
+
+Fri May 27 10:58:57 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/ctlib/ct.c: remove spaces at end of line
+
+Mon May 23 22:31:56 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/ctlib/ct.c src/tds/login.c: do not mix error codes
+
+Mon May 23 21:27:01 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/sybdb.h src/dblib/dblib.c: fix some return codes
+
+Mon May 23 21:20:11 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/Makefile.am: add tdsproto.h to distribution
+
+Sun May 22 08:34:41 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/dblib/bcp.c reverted part of hasty fix
+
+Sat May 21 14:10:30 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* doc/userguide.sgml corrected typos
+	* src/dblib/bcp.c relaxed per ML from Bill Thompson today. 
+
+Sat May 21 15:04:50 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/bcp.c: fix _bcp_get_term_var check
+
+Fri May 20 22:56:24 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h include/tdsodbc.h include/tdsproto.h:
+	* src/odbc/connectparams.c src/odbc/odbc.c src/tds/login.c:
+	- prepare for mars support
+
+Fri May 20 22:53:24 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/vstrbuild.c: fix minor tds_vstrbuild issues
+
+Thu May 19 16:56:41 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/sybdb.h src/dblib/dblib.c: support bigint on dblib
+
+Thu May 19 11:07:35 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* misc/freetds_autobuild: use git
+
+Mon May 16 15:28:08 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h misc/commit src/apps/tsql.c src/ctlib/blk.c:
+	* src/ctlib/cs.c src/ctlib/ct.c src/ctlib/ctutil.c src/dblib/bcp.c:
+	* src/dblib/dblib.c src/odbc/connectparams.c src/odbc/odbc.c:
+	* src/pool/member.c src/tds/bulk.c src/tds/challenge.c:
+	* src/tds/config.c src/tds/convert.c src/tds/data.c:
+	* src/tds/example/token1.c src/tds/example/token2.c:
+	* src/tds/gssapi.c src/tds/login.c src/tds/mem.c src/tds/net.c:
+	* src/tds/numeric.c src/tds/query.c src/tds/read.c src/tds/sspi.c:
+	* src/tds/token.c src/tds/unittests/common.c:
+	* src/tds/unittests/dataread.c src/tds/unittests/dynamic1.c:
+	* src/tds/unittests/flags.c src/tds/unittests/t0001.c:
+	* src/tds/unittests/t0002.c src/tds/unittests/t0003.c:
+	* src/tds/unittests/t0004.c src/tds/unittests/t0005.c:
+	* src/tds/unittests/t0006.c src/tds/unittests/toodynamic.c:
+	* src/tds/unittests/utf8_1.c src/tds/unittests/utf8_2.c:
+	* src/tds/unittests/utf8_3.c src/tds/vstrbuild.c src/tds/write.c:
+	- renames TDS_SUCCEED with TDS_SUCCESS
+
+Mon May 16 14:27:22 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* .gitignore: ignore autogenerated file
+
+Mon May 16 11:57:08 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h include/tdsproto.h src/tds/login.c:
+	- add a new tdsproto.h file and put protocol related defines here
+
+Mon May 16 11:52:31 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* TODO.freddy:
+	- add a new tdsproto.h file and put protocol related defines here
+
+Mon May 16 10:51:06 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* Nmakefile README.Windows include/fakepoll.h src/apps/bsqldb.c:
+	* src/apps/bsqlodbc.c src/apps/datacopy.c src/apps/defncopy.c:
+	* src/apps/fisql/fisql.c src/apps/freebcp.c src/apps/tsql.c:
+	* src/ctlib/blk.c src/ctlib/cs.c src/ctlib/ct.c src/ctlib/ctutil.c:
+	* src/ctlib/unittests/array_bind.c src/ctlib/unittests/blk_in.c:
+	* src/ctlib/unittests/blk_in2.c src/ctlib/unittests/blk_out.c:
+	* src/ctlib/unittests/cancel.c src/ctlib/unittests/common.c:
+	* src/ctlib/unittests/connect_fail.c:
+	* src/ctlib/unittests/cs_config.c src/ctlib/unittests/cs_diag.c:
+	* src/ctlib/unittests/ct_cursor.c src/ctlib/unittests/ct_cursors.c:
+	* src/ctlib/unittests/ct_diagall.c:
+	* src/ctlib/unittests/ct_diagclient.c:
+	* src/ctlib/unittests/ct_diagserver.c:
+	* src/ctlib/unittests/ct_dynamic.c:
+	* src/ctlib/unittests/ct_options.c src/ctlib/unittests/datafmt.c:
+	* src/ctlib/unittests/get_send_data.c:
+	* src/ctlib/unittests/lang_ct_param.c:
+	* src/ctlib/unittests/rpc_ct_param.c:
+	* src/ctlib/unittests/rpc_ct_setparam.c:
+	* src/ctlib/unittests/t0001.c src/ctlib/unittests/t0002.c:
+	* src/ctlib/unittests/t0003.c src/ctlib/unittests/t0004.c:
+	* src/ctlib/unittests/t0005.c src/ctlib/unittests/t0006.c:
+	* src/ctlib/unittests/t0007.c src/ctlib/unittests/t0008.c:
+	* src/ctlib/unittests/t0009.c src/dblib/bcp.c:
+	* src/dblib/db-lib.vcproj src/dblib/dblib.c src/dblib/dbopen.c:
+	* src/dblib/dbutil.c src/dblib/rpc.c src/dblib/unittests/common.h:
+	* src/dblib/xact.c src/odbc/connectparams.c:
+	* src/odbc/convert_tds2sql.c src/odbc/descriptor.c:
+	* src/odbc/error.c src/odbc/native.c src/odbc/odbc.c:
+	* src/odbc/odbc_checks.c src/odbc/odbc_util.c:
+	* src/odbc/prepare_query.c src/odbc/sql2tds.c src/odbc/sqlwchar.c:
+	* src/odbc/unittests/common.h src/pool/config.c src/pool/main.c:
+	* src/pool/member.c src/pool/stream.c src/pool/user.c:
+	* src/pool/util.c src/replacements/asprintf.c:
+	* src/replacements/atoll.c src/replacements/basename.c:
+	* src/replacements/fakepoll.c src/replacements/gettimeofday.c:
+	* src/replacements/iconv.c src/replacements/readpassphrase.c:
+	* src/replacements/replacements.vcproj src/replacements/strlcat.c:
+	* src/replacements/strlcpy.c src/replacements/strtok_r.c:
+	* src/replacements/vasprintf.c src/server/login.c:
+	* src/server/query.c src/server/server.c src/server/unittest.c:
+	* src/tds/TDS.vcproj src/tds/bulk.c src/tds/challenge.c:
+	* src/tds/config.c src/tds/convert.c src/tds/data.c src/tds/des.c:
+	* src/tds/getmac.c src/tds/gssapi.c src/tds/hmac_md5.c:
+	* src/tds/iconv.c src/tds/locale.c src/tds/log.c src/tds/login.c:
+	* src/tds/md4.c src/tds/md5.c src/tds/mem.c src/tds/net.c:
+	* src/tds/numeric.c src/tds/query.c src/tds/read.c src/tds/sspi.c:
+	* src/tds/tds_checks.c src/tds/tdsstring.c src/tds/threadsafe.c:
+	* src/tds/token.c src/tds/unittests/common.h src/tds/util.c:
+	* src/tds/vstrbuild.c src/tds/win_mutex.c src/tds/write.c:
+	* vms/descrip_mms.template vms/getpass.c win32/dev-cpp/FreeTDS.dev:
+	* win32/dev-cpp/Makefile.win win32/msvc6/FreeTDS.dsp:
+	* win32/msvc6/dblib.dsp win32/msvc6/dblib_dll.dsp:
+	* win32/msvc6/libTDS.dsp win32/msvc6/libct.dsp win32/winlogin.c:
+	* win32/winsetup.c:
+	- remove check for HAVE_CONFIG_H, always defined
+
+Mon May 16 10:15:29 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* Nmakefile README.Windows configure.ac include/sybdb.h:
+	* include/tds.h src/dblib/db-lib.vcproj src/replacements/getopt.c:
+	* src/replacements/replacements.vcproj src/tds/TDS.vcproj:
+	* vms/descrip_mms.template win32/dev-cpp/FreeTDS.dev:
+	* win32/dev-cpp/Makefile.win win32/msvc6/FreeTDS.dsp:
+	* win32/msvc6/dblib.dsp win32/msvc6/dblib_dll.dsp:
+	* win32/msvc6/libTDS.dsp win32/msvc6/libct.dsp:
+	- remove _FREETDS_LIBRARY_SOURCE macro making it useless
+
+Mon May 16 10:08:17 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/bulk.c: fix strange space encoding
+
+Sat May 14 09:02:31 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/dblib/dbutil.c pass DBNOERR to error handler
+
+Sat May 14 08:06:27 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/dblib.c: remove useless declare
+
+Thu May 12 22:32:19 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/typeinfo.c: fix typo
+
+Thu May 12 21:40:42 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/sybdb.h include/tds.h misc/types.txt src/dblib/dblib.c:
+	* src/odbc/connectparams.c src/odbc/unittests/data.c:
+	* src/tds/config.c src/tds/convert.c src/tds/data.c:
+	* src/tds/tds_checks.c src/tds/token.c win32/winsetup.c:
+	- add more about tds 7.3
+
+Tue May 10 23:06:37 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/apps/osql correct servername feedback
+
+Tue May 10 17:42:06 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* include/tds.h src/tds/login.c
+	- first attempt and TDS 7.3 login
+
+Tue May 10 17:19:27 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/tds/login.c more tds7_send_login() cleanup
+
+Tue May 10 16:38:13 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/tds/login.c 
+	- Replace magic numbers with enums and prevent BCP if
+	- not explicitly enabled.  
+
+Tue May 10 15:19:27 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/gssapi.c src/tds/token.c: fix Kerberos login
+
+Tue May 10 14:52:32 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/.cvsignore src/odbc/unittests/Makefile.am:
+	* src/odbc/unittests/prepare_warn.c:
+	- add test from Sebastien Flaesch for cursor state
+
+Sun May  8 18:37:44 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* configure.ac added AC_CONFIG_MACRO_DIR per autoconf warning
+	* src/tds/query.c use varchar(4000) per ML patch from Ed Avis
+
+Sat May  7 21:18:18 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/sqlfront.h: compile fix for MingW
+
+Sat May  7 21:00:35 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* configure.ac: detect correctly odbcss.h
+
+Fri May  6 18:47:17 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h include/tdssrv.h src/odbc/odbc.c:
+	* src/odbc/unittests/data.c src/server/login.c src/server/server.c:
+	* src/tds/login.c src/tds/query.c src/tds/read.c src/tds/token.c:
+	- fix version names from 8.0 to 7.1
+
+Fri May  6 18:27:15 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/ctlib/ct.c src/ctlib/ctutil.c:
+	* src/dblib/dblib.c src/tds/mem.c:
+	- clean tds.h header
+
+Thu Apr 28 17:02:05 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h src/tds/token.c:
+	- correct fix to detect tds 7.1 revision 1
+
+Thu Apr 28 16:52:07 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c: rollback patch for SQLTables
+
+Thu Apr 28 14:20:24 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/token.c: fix for tds 7.1 revision 1 (mssql2k without SPs)
+
+Thu Apr 28 09:54:55 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/unittests/tables.c: be more verbose
+
+Mon Apr 25 13:59:52 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* include/tds.h: use tinyint for column_type
+
+Sun Apr 24 20:24:26 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/odbc/odbc.c src/odbc/unittests/prepare_results.c:
+	- fix problem preparing before binding parameters
+
+Sat Apr 23 16:55:00 CDT 2011     Craig A. Berry <craigberry@mac.com>
+	* vms/descrip_mms.template
+	- Build more of the newer tests we weren't building.
+ 
+Fri Apr 22 16:13:04 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/.cvsignore src/tds/Makefile.am src/tds/data.c:
+	- avoid header name clash
+
+Fri Apr 15 08:56:07 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/config.c: fix overriding port or instance
+
+Wed Apr 13 22:45:23 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* doc/.cvsignore doc/userguide.sgml src/tds/config.c
+	- minor changes to log messages 
+
+Tue Apr 12 11:26:29 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/dblib/bcp.c 
+	- bcp_send row returns FAIL if dbconvert fails to 
+	- convert the bound buffer to the column datatype
+
+Mon Apr 11 17:33:38 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* include/tds.h include netinet/in.h
+
+Mon Apr 11 15:43:45 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/tds/challenge.c: fix OpenSSL compile problem
+
+Mon Apr 11 11:56:44 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/apps/defncopy.c:
+	- include sybfront.h instead of sqlfront.h (from patches #3172166)
+
+Sat Apr  9 10:02:49 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* ChangeLog ChangeLog-0.91 start a new change log
+
+Sat Apr  9 08:48:22 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* doc/Makefile.am make dist works
+
+Thu Apr  7 10:06:28 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/apps/freebcp.c src/dblib/bcp.c:
+	- bcp path from Bill Thompson: support FIRE_TRIGGERS hint, fix -h
+	  in freebcp app
+
+Sat Apr  2 07:18:16 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* src/dblib/dblib.c src/tds/config.c src/tds/login.c
+	- Support DBSETLDBNAME (really, this time)
+
+Sat Apr  2 07:12:57 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* doc/userguide.sgml fixed indentation of sample code. 
+
+Fri Apr  1 13:44:39 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* src/dblib/dblib.c: avoid string format problem
+
+Wed Mar 30 14:53:04 CEST 2011    Frediano Ziglio <freddy77_A_gmail_D_com>
+	* configure.ac: future developing version!
+	
+Sat Apr  9 16:15:00 EDT 2011	JK Lowden <jklowden@freetds.org>
+	* ChangeLog  truncated because of release
+	* ChangeLog-0.91 added because of release
+
+$FreeTDS$
+$Id: ChangeLog,v 1.3463 2012-03-11 15:52:21 freddy77 Exp $

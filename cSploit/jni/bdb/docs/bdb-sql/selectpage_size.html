@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Selecting the Page Size</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="dbfeatures.html" title="Chapter 3. Berkeley DB Features" />
+    <link rel="prev" href="mvcc.html" title="Using Multiversion Concurrency Control" />
+    <link rel="next" href="sqlrep.html" title="Chapter 4. Using Replication with the SQL API" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Selecting the Page Size</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="mvcc.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 3. Berkeley DB Features</th>
+          <td width="20%" align="right"> <a accesskey="n" href="sqlrep.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="selectpage_size"></a>Selecting the Page Size</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+               When using the BDB SQL interface, you configure your database page size in
+               exactly the same way as you do when using 
+               SQLite. That is, use <code class="literal">PRAGMA page_size</code>
+               to report and set the page size. This PRAGMA must be called
+               before you create your first SQLite table. See the
+    <a class="ulink" href="http://www.sqlite.org/pragma.html#pragma_page_size" target="_top">PRAGMA page_size</a>
+               documentation for more information. 
+             </p>
+      <p>
+               When you use
+               <code class="literal">PRAGMA cache_size</code> to size your in-memory
+               cache, you provide the cache size in terms of a number of
+               pages. Therefore, your database page size influences how large your
+               cache is, and so determines how much of your
+               database will fit into memory.
+             </p>
+      <p>
+               The size of your pages can also affect how efficient your
+               application is at performing disk I/O. It will also
+               determine just how fine-grained the fine-grained locking
+               actually is. This is because Berkeley DB locks database pages
+               when it acquires a lock. 
+             </p>
+      <p>
+               Note that the default value for your page size is
+               probably correct for the physical hardware that you are using. In
+               almost all situations, the default page size value will
+               give your application the best possible I/O performance. For
+               this reason, tuning the page size should rarely, if
+               ever, be attempted.
+           </p>
+      <p>
+               That said, when using the BDB SQL interface, the page size affects
+               how much of your tables are locked when read and/or
+               write locks are acquired. (See 
+               <a class="xref" href="lockingnotes.html#dbusage" title="Internal Database Usage">Internal Database Usage</a> 
+               for more information.) 
+               Increasing your page size will typically improve the
+               bandwidth you get accessing the disk, but it also may
+               increase contention if too many key data pairs are on
+               the same page.  Decreasing your page size frequently
+               improves concurrency, but may increase the number of
+               locks you need to acquire and may decrease your disk
+               bandwidth.
+           </p>
+      <p>
+               When changing your page size, make sure the value you
+               select is a power of 2 that is greater than 512 and
+               less than or equal to 64KB. (Note that the standard
+               SQLite <code class="literal">MAX_PAGE_SIZE</code> limit is not
+               examined for this upper bound.)
+           </p>
+      <p>
+               Beyond that, there are some additional things 
+               that you need to consider when selecting your page
+               size. For a thorough treatment of selecting your page size, 
+               see the section on <span><a href="../programmer_reference/general_am_conf.html#am_conf_pagesize" class="olink">Selecting a page size</a></span>
+               in the 
+               <em class="citetitle">Berkeley DB Programmer's Reference Guide</em>.
+           </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="mvcc.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="dbfeatures.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="sqlrep.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Using Multiversion Concurrency Control </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 4. Using Replication with the SQL API</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 2. Locking Notes</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="prev" href="normal-sql.html" title="Differences for Users of other SQL Engines" />
+    <link rel="next" href="lockhandling.html" title="Lock Handling" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 2. Locking Notes</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="normal-sql.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="lockhandling.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="lockingnotes"></a>Chapter 2. Locking Notes</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="lockingnotes.html#dbusage">Internal Database Usage</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="lockhandling.html">Lock Handling</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="lockhandling.html#sqllockmodel">SQLite Lock Usage</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="lockhandling.html#bdblockusage">Lock Usage with the BDB SQL Interface</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+        </dl>
+      </div>
+      <p>
+            There are some important performance differences between the
+            BDB SQL interface and SQLite, especially in a concurrent environment.
+            This chapter gives you enough information about how the BDB SQL interface
+            uses its database, as opposed to how SQLite uses its
+            database, in order for you to understand the difference between
+            the two interfaces. It then gives you some advice on how to
+            best approach working with the BDB SQL interface in a multi-threaded
+            environment.
+        </p>
+      <p>
+            If you are an existing user of SQLite, and you care about
+            improving your application performance when using the BDB SQL interface in
+            a concurrent situation, you should read this chapter. Existing
+            users of Berkeley DB may also find some interesting information in
+            this chapter, although it is mostly geared towards SQLite
+            users.
+        </p>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="dbusage"></a>Internal Database Usage</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+          The BDB SQL interface and SQLite do different things
+          when it comes to locking data in their databases.  In order
+          to provide ACID transactions, both products must prevent
+          concurrent access during write operations. Further, both
+          products prevent concurrent access by obtaining software
+          level locks that allow only the current holder of the lock to
+          perform write access to the locked data.
+        </p>
+        <p>
+          The difference between the two is that when SQLite
+          requires a lock (such as when a transaction is underway), it
+          locks the entire database and all tables. (This is known as
+          <span class="emphasis"><em>database level locking</em></span>.) The BDB SQL interface, on the
+          other hand, only locks the portion of the table being
+          operated on within the current transactional context (this is
+          known as <span class="emphasis"><em>page level locking</em></span>).  In most
+          situations, this allows applications using the BDB SQL interface to 
+          operate concurrently and so have better read/write 
+          throughput than applications using SQLite.
+          This is because there is less lock contention.
+        </p>
+        <p>
+          By default, one Berkeley DB logical database is created within the
+          single database file for every SQL table that you create. Within
+          each such logical database, each table row is represented as a
+          Berkeley DB key/data pair. 
+        </p>
+        <p>
+          This is important because the BDB SQL interface uses Berkeley DB's Transaction
+          Data Store product. This means that Berkeley DB does not have to
+          lock an entire database (all the tables within a database
+          file) when it acquires a lock.  Instead, it locks a single
+          Berkeley DB database page (which usually contains a small sub-set
+          of rows within a single table).
+        </p>
+        <p>
+          The size of database pages will differ from platform to
+          platform (you can also manually configure this), but usually
+          a database page can hold multiple key/data pairs; that is,
+          multiple rows from a SQL table.  Exactly how many table
+          rows fit on a database page depends on the size of your page
+          and the size of your table rows. 
+        </p>
+        <p>
+          If you have an exceptionally small table, it is possible for
+          the entire table to fit on a single database page. In this
+          case, Berkeley DB is in essence forced to serialize access to the
+          entire table when it requires a lock for it.
+        </p>
+        <p>
+          Note, however, that the case of a single table fitting on a
+          single database page is very rare, and it in fact represents the
+          abnormal case.  Normally tables span multiple pages and so Berkeley DB
+          will lock only portions of your tables. This locking behavior is
+          automatic and transparent to your application.
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="normal-sql.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="lockhandling.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Differences for Users of other SQL Engines </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Lock Handling</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

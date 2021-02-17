@@ -1,0 +1,262 @@
+2012-02-09
+
+	* added DataSource for JDK 1.4/1.5/1.6
+	* proper detect Java 1.7 in SQLite.JDBC
+
+2012-02-02
+
+	* reviewed configure for Java 1.7
+	* added DataSource for Java 1.7
+
+2011-12-22
+	* fixes in open mode of SQLite.Shell
+	* minor tweaks in Makefile.in
+
+2011-11-22
+
+	* support for OpenJDK 1.7 added
+
+2011-10-30
+
+	* minor doc update
+	* updated config.sub/config.guess
+
+2011-10-27
+
+	* updated libtool/aclocal/configure
+	* added SQLite.Stmt.column_name method as suggested by Eoin Shanaghy
+
+2011-08-27
+
+	* update to SQLite 3.7.7.1
+	* fallback to pkg-config for Ubuntu 11 SQLite3
+	* RPM packaging
+	* added support for Oracle Java Embedded Client (OJEC)
+
+2011-04-30
+
+	* update to SQLite 3.7.6.2
+	* fix to allow "CREATE TRIGGER" in JDBCPreparedStatement
+	* added Ville Skytta"'s performance patches for JDK >= 1.6
+
+2011-01-06
+
+	* update to SQLite 3.7.4
+	* fixed divide by zero in batches as per Gregory Goldberg's patch
+	* added Elliot Hughes' patches for Android
+
+2010-07-27
+
+	* update to SQLite 3.7.0
+	* fixes in using JNI method GetStringUTFRegion
+
+2010-07-09
+
+	* update to SQLite 3.6.23.1
+	* added backup API support (SQLite.Backup class)
+	* added SQLite.Stmt.status method
+	* added SQLite.Database.status, SQLite.Database.db_status methods
+	* added SQLite.Profile interface
+
+2010-04-13
+
+	* added Elliot Hughes' patches for Android
+
+2010-01-31
+
+	* update to SQLite 3.6.22
+	* fix in SQLite.StringEncoder regarding string length
+	* fix in configure logic for JAVA_HOME detection
+
+2009-08-21
+
+	* added new utility classes SQLite.SQLDump and SQLite.SQLRestore
+	* fixed swapped PKCOLUMN_NAME vs. FKCOLUMN_NAME in
+	  JDBCDatabaseMetaData, thanks Ryan McKay for patch
+
+2009-04-30
+
+	* for SQLite 3 engines the Vm.step() method now reports
+	  column meta data for empty result sets similar to
+	  PRAGMA empty_result_callbacks = on
+
+2009-04-20
+
+	* update to SQLite 3.6.13
+	* autoconf and JDBC2z fixes as suggested by Ville Skyttä
+
+2009-04-09
+
+	* update to SQLite 3.6.11
+	* renamed native method SQLite.Database._open() to .._open4()
+	  and re-added old .._open() method to be backward compatible
+	  to sqlite.jar files older than 2009-01-22
+	* added JDBC driver property "vfs" to enable distinct
+	  per connection SQLite 3 VFS choice
+	* added configure option --enable-load-extension
+
+2009-02-13
+
+	* prefer amalgamation sqlite3.c if --with-sqlite3=<DIR> is used in
+	  configure, this allows to built a self contained libsqlite_jni.so
+	  when --without-sqlite is specified, too.
+
+2009-02-10
+
+	* added SQLite.Benchmark to sqlite.jar
+
+2009-01-22
+
+	* added support for sqlite3_open_v2()
+	* added variant SQLite.Database.open to allow to explicitely
+	  select creation of an SQLite 2 or 3 database, thanks
+	  David Fuchs for patch
+	* added test for failed malloc in internal trans2iso() function
+	* fixed wrong "DECIMAL_POINTS" column for
+	  JDBCDatabaseMetaData.getColumns() method to "DECIMAL_DIGITS"
+
+2008-10-12
+
+	* updated MSVC makefiles for newer SEE versions
+
+2008-10-06
+
+	* update to SQLite 3.6.3
+	* Debian packaging fixes as suggested by Pedro Aranda
+	* UN*X fixes as suggested by Ville Skyttä
+
+2008-08-04
+
+	* added JNI method _enable_shared_cache() and
+	  handling of system property SQLite.sharedcache
+	* implemented Connection.setTransactionIsolation() for
+	  SQLite 3.x with shared cache enabled
+	* update to SQLite 3.6.0
+
+2008-07-16
+
+	* added support for java.sql.Statement.(get|set)MaxRows()
+	* fixed warnings when compiling for x86_64 with SQLite 2 support
+
+2008-04-20
+
+	* update to SQLite 3.5.8
+
+2008-04-10
+
+	* libtool/automake update to 1.4.3/1.6.3 for proper
+	  x86_64 DSO building
+	* integrated Ville Skyttä's JDBC 4.0 SPI patch
+	* integrated Ville Skyttä's update boolean methods
+
+2008-04-05
+
+	* integrated Ville Skyttä's configure/make patches
+
+2008-04-01
+
+	* further fixes in setCharacterStream methods
+	* update to SQLite 3.5.7
+
+2008-03-31
+
+	* provide (not space/time efficient!) implementations for
+	  java.sql.ResultSet.getBinaryStream(),
+	  java.sql.ResultSet.getCharacterStream(),
+	  java.sql.PreparedStatement.setBinaryStream(),
+	  java.sql.PreparedStatement.setCharacterStream()
+	* again fix in StringEncoder, this time in the SQLite3
+	  blob (X'..' format) decoder, thanks Terry Zanzuchi
+	  for reporting
+
+2008-03-15
+
+	* again fix right-shift operator in StringEncoder
+	  this time with proper mask, thanks Ziqi Zhang for
+	  reporting
+	* fixed typo in JDBCResultSet which failed compilation
+	  on Java 1.6
+
+2008-01-30
+
+	* improved SQLite.(Database|Vm).compile error reporting for
+	  SQLite3 databases in native functions in sqlite_jni.c
+	* again conversion fixes in milliseconds vs.
+	  julian date double values, thanks Dr Harry Karadimas
+	  for initial fixes and testing
+
+2008-01-12
+
+	* fixes in double/julian date value conversions
+	  in SQLite.Database
+
+2008-01-10
+
+	* again tweaks regarding static native initializers
+	* allow to omit JNI_OnLoad function in sqlite_jni.c
+	  by C define DONT_USE_JNI_ONLOAD
+
+2008-01-08
+
+	* initial implementation of JDBC date/time/timestamp
+	  representation as double/julian date values as
+	  suggested by Dr Harry Karadimas, this is an option
+	  to be set in JDBC connect property "daterepr" = "[Jj]ulian"
+	* eliminated some jikes warnings
+	* integrated Ville Skyt"a's getBoolean() patch
+	* integrated Ville Skytt"a's lib64 and -classpath
+	  into configure.in and Makefile.in
+	* fix wrong right-shift operator in StringEncoder
+	  thanks Dr Harry Karadimas for patch
+
+2007-11-08
+
+	* update MSVC6 build, now using SQLite 3.5.2
+	* added java.sql.Types.REAL support
+
+2007-10-27
+
+	* update MSVC6 build stuff for SQLite 3.5.1
+	* added detect/support of encryption extension
+	* use "SELECT 1 FROM sqlite_master LIMIT 1" in various
+	  JDBCDatabaseMetaData methods to forcibly reload schema
+	  before "PRAGMA" statements are executed
+
+2007-09-15
+
+	* fixes in JDBCResultSet.deleteRow method, indexing
+	  of result set was wrong
+
+2007-09-14
+
+	* fixes regarding statement concurrency/type in
+	  JDBCDatabaseMetaData and JDBCConnection
+
+2007-09-11
+
+	* further fixes regarding updatable result sets in
+	  JDBCDatabaseMetaData and JDBCResultSet classes
+
+2007-09-09
+
+	* first working version with updatable result sets in
+	  JDBCResultSet class
+
+2007-08-23
+
+	* JDBC driver's getMinorVersion() returns date code as version
+	  identification
+
+2007-08-21
+
+	* explicitely clear batch in JDBCPreparedStatement.close()
+	* fixed in transaction flag in JDBCConnection.setAutocommit()
+	  when auto commit is turned back on
+
+2007-08-14
+
+	* made JDBCDatabaseMetaData.supportsBatchUpdates() report
+	  true for drivers for JDK >= 1.2
+	* fixed bug in indexing batch arguments in
+	  JDBCPreparedStatement.executeBatch()
+

@@ -1,0 +1,201 @@
+#
+#   The contents of this file are subject to the Mozilla Public
+#   License Version 1.1 (the "License"); you may not use this file
+#   except in compliance with the License. You may obtain a copy of
+#   the License at http://www.mozilla.org/MPL/
+#   Alternatively, the contents of this file may be used under the
+#   terms of the GNU General Public License Version 2 or later (the
+#   "GPL"), in which case the provisions of the GPL are applicable
+#   instead of those above. You may obtain a copy of the Licence at
+#   http://www.gnu.org/copyleft/gpl.html
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   Relevant for more details.
+# 
+#   This file was created by members of the firebird development team.
+#   All individual contributions remain the Copyright (C) of those
+#   individuals.  Contributors to this file are either listed here or
+#   can be obtained from a CVS history command.
+# 
+#   All rights reserved.
+#
+#   Created by: Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+# 
+#   Contributor(s):
+# 
+# 
+#   $Id: Makefile.in.example5,v 1.1 2003-07-11 13:30:32 brodsom Exp $
+# 
+
+ROOT=../..
+
+include     $(ROOT)/src/make.defaults
+include     $(ROOT)/src/make.platform
+include     $(ROOT)/src/make.rules
+include     $(ROOT)/src/make.shared.variables
+
+@SET_MAKE@
+
+PATH := $(BIN):$(PATH)
+export PATH
+
+
+GPRE_FLAGS=	-r -m -z -n
+
+EXAMPLES_DEST=	$(FIREBIRD)/examples/v5/
+EXAMPLES_SRC=	./
+
+EMPBLD_OBJ=	empbuild.o
+
+INTLBLD_OBJ=	intlbld.o
+
+INPUT_FILES=	empddl.sql empdml.sql indexoff.sql indexon.sql \
+		job.inp lang.inp proj.inp qtr.inp
+
+INTL_FILES=	intlddl.sql intldml.sql indexoff.sql indexon.sql \
+		job.inp lang.inp proj.inp qtr.inp
+
+
+# Add the install include directory to the search path since the
+# examples need to build using those headers values.
+
+CFLAGS := $(CFLAGS) -I$(FIREBIRD)/include
+
+.PHONY: all
+
+all: v5_examples
+
+# PR 2002-06-23 - Temporarily removed intlemp from the build as it caused a segfault
+# The lines to change back are prefixed with ##
+##v5_examples: employee.fdb intlemp.fdb $(NT_EXAMPLES) makefile.example
+v5_examples: employee.fdb $(NT_EXAMPLES) makefile.example
+	$(CP) $(EXAMPLES_SRC)readme $(EXAMPLES_DEST)README
+	$(CP) $(EXAMPLES_SRC)align.h $(EXAMPLES_DEST)align.h
+	$(CP) $(EXAMPLES_SRC)api1.c $(EXAMPLES_DEST)api1.c
+	$(CP) $(EXAMPLES_SRC)api10.c $(EXAMPLES_DEST)api10.c
+	$(CP) $(EXAMPLES_SRC)api11.c $(EXAMPLES_DEST)api11.c
+	$(CP) $(EXAMPLES_SRC)api12.c $(EXAMPLES_DEST)api12.c
+	$(CP) $(EXAMPLES_SRC)api13.c $(EXAMPLES_DEST)api13.c
+	$(CP) $(EXAMPLES_SRC)api14.e $(EXAMPLES_DEST)api14.e
+	$(CP) $(EXAMPLES_SRC)api15.c $(EXAMPLES_DEST)api15.c
+	$(CP) $(EXAMPLES_SRC)api16.c $(EXAMPLES_DEST)api16.c
+	$(CP) $(EXAMPLES_SRC)api16t.c $(EXAMPLES_DEST)api16t.c
+	$(CP) $(EXAMPLES_SRC)api2.c $(EXAMPLES_DEST)api2.c
+	$(CP) $(EXAMPLES_SRC)api3.c $(EXAMPLES_DEST)api3.c
+	$(CP) $(EXAMPLES_SRC)api4.c $(EXAMPLES_DEST)api4.c
+	$(CP) $(EXAMPLES_SRC)api5.c $(EXAMPLES_DEST)api5.c
+	$(CP) $(EXAMPLES_SRC)api6.c $(EXAMPLES_DEST)api6.c
+	$(CP) $(EXAMPLES_SRC)api7.c $(EXAMPLES_DEST)api7.c
+	$(CP) $(EXAMPLES_SRC)api8.c $(EXAMPLES_DEST)api8.c
+	$(CP) $(EXAMPLES_SRC)api9.c $(EXAMPLES_DEST)api9.c
+	$(CP) $(EXAMPLES_SRC)api9f.c $(EXAMPLES_DEST)api9f.c
+	$(CP) $(EXAMPLES_SRC)apifull.c $(EXAMPLES_DEST)apifull.c
+	$(CP) $(EXAMPLES_SRC)employe2.sql $(EXAMPLES_DEST)employe2.sql
+	$(CP) $(EXAMPLES_SRC)dyn1.e $(EXAMPLES_DEST)dyn1.e
+	$(CP) $(EXAMPLES_SRC)dyn2.e $(EXAMPLES_DEST)dyn2.e
+	$(CP) $(EXAMPLES_SRC)dyn3.e $(EXAMPLES_DEST)dyn3.e
+	$(CP) $(EXAMPLES_SRC)dyn4.e $(EXAMPLES_DEST)dyn4.e
+	$(CP) $(EXAMPLES_SRC)dyn5.e $(EXAMPLES_DEST)dyn5.e
+	$(CP) $(EXAMPLES_SRC)dynfull.e $(EXAMPLES_DEST)dynfull.e
+	$(ECHO) $(LD_LIBRARY_PATH)
+	$(GBAK) employee.fdb $(EXAMPLES_DEST)employee.gbk
+#	-$(RM) $(EXAMPLES_DEST)employee.fdb
+	$(GBAK) -r $(EXAMPLES_DEST)employee.gbk $(EXAMPLES_DEST)employee.fdb
+	$(CP) $(EXAMPLES_SRC)example.h $(EXAMPLES_DEST)example.h
+	$(CP) $(EXAMPLES_SRC)api9f.sql $(EXAMPLES_DEST)api9f.sql
+##	$(GBAK) intlemp.fdb $(EXAMPLES_DEST)intlemp.gbk
+#	-$(RM) $(EXAMPLES_DEST)intlemp.fdb
+##	$(GBAK) -r $(EXAMPLES_DEST)intlemp.gbk $(EXAMPLES_DEST)intlemp.fdb
+	$(CP) $(EXAMPLES_SRC)stat1.e $(EXAMPLES_DEST)stat1.e
+	$(CP) $(EXAMPLES_SRC)stat10.e $(EXAMPLES_DEST)stat10.e
+	$(CP) $(EXAMPLES_SRC)stat11.e $(EXAMPLES_DEST)stat11.e
+	$(CP) $(EXAMPLES_SRC)stat12.e $(EXAMPLES_DEST)stat12.e
+	$(CP) $(EXAMPLES_SRC)stat12t.e $(EXAMPLES_DEST)stat12t.e
+	$(CP) $(EXAMPLES_SRC)stat2.e $(EXAMPLES_DEST)stat2.e
+	$(CP) $(EXAMPLES_SRC)stat3.e $(EXAMPLES_DEST)stat3.e
+	$(CP) $(EXAMPLES_SRC)stat4.e $(EXAMPLES_DEST)stat4.e
+	$(CP) $(EXAMPLES_SRC)stat5.e $(EXAMPLES_DEST)stat5.e
+	$(CP) $(EXAMPLES_SRC)stat6.e $(EXAMPLES_DEST)stat6.e
+	$(CP) $(EXAMPLES_SRC)stat7.e $(EXAMPLES_DEST)stat7.e
+	$(CP) $(EXAMPLES_SRC)stat8.e $(EXAMPLES_DEST)stat8.e
+	$(CP) $(EXAMPLES_SRC)stat9.e $(EXAMPLES_DEST)stat9.e
+	$(CP) $(EXAMPLES_SRC)udf.sql $(EXAMPLES_DEST)udf.sql
+	$(CP) $(EXAMPLES_SRC)udflib.c $(EXAMPLES_DEST)udflib.c
+	$(CP) makefile.example $(EXAMPLES_DEST)makefile
+
+nt_examples:
+	$(CP) $(EXAMPLES_SRC)api9f.def $(EXAMPLES_DEST)api9f.def
+	$(CP) $(EXAMPLES_SRC)udflib.def $(EXAMPLES_DEST)udflib.def
+	$(CP) $(EXAMPLES_SRC)makefile.bc $(EXAMPLES_DEST)Makefile.bc
+	$(CP) $(EXAMPLES_SRC)makefile.msc $(EXAMPLES_DEST)Makefile.msc
+
+# Ok the following little story is, first build empbuild.fdb an empty db
+# using a script file.  Then we can compile the empbuild.e file, then we 
+# can run it to create employee.fdb database populated with data by the
+# program.  Thats how I found it.
+
+employee.fdb:	empbuild$(EXEC_EXT) $(INPUT_FILES)
+	-$(RM) employee.fdb
+#	$(CP) $(SRC_ROOT)/examples/empddl.sql .
+#	$(CP) $(SRC_ROOT)/examples/indexoff.sql .
+#	$(CP) $(SRC_ROOT)/examples/indexon.sql .
+#	$(CP) $(SRC_ROOT)/examples/empdml.sql .
+#	$(CP) $(SRC_ROOT)/examples/lang.inp .
+#	$(CP) $(SRC_ROOT)/examples/proj.inp .
+#	$(CP) $(SRC_ROOT)/examples/job.inp .
+#	$(CP) $(SRC_ROOT)/examples/qtr.inp .
+	./empbuild employee.fdb
+	-$(CHMOD_6) employee.fdb
+
+empbuild: $(EMPBLD_OBJ) $(LIBGDS_DEP)
+	-$(RM) $@
+	$(EXE_LINK) $(LINK_OPTS) $(LIBGDS_LINK) $^ -o $@ $(LINK_LIBS)
+	$(CHMOD_7) $@
+
+empbuild.exe:	$(EMPBLD_OBJ)
+	-$(RM) empbuild.exe
+	$(LD) $(O_EXE_SWITCH)empbuild $(LINK_OPTS) empbuild.o $(GDS_LINK)
+
+empbuild.c:	empbuild.fdb empbuild.e
+
+empbuild.fdb : empddl.sql empbld.sql
+	-$(RM) $@
+	$(ISQL) -i empbld.sql
+
+
+# The chain for intlemp.fdb is the same a script file to create an empty database
+# to allow a .e program to be compiled, to then create and populate with data
+# the intlemp.fdb database.
+
+intlemp.fdb:	intlbld$(EXEC_EXT) $(INTL_FILES)
+	-$(RM) intlemp.fdb
+#	$(CP) $(SRC_ROOT)/examples/intlddl.sql .
+#	$(CP) $(SRC_ROOT)/examples/indexoff.sql .
+#	$(CP) $(SRC_ROOT)/examples/indexon.sql .
+#	$(CP) $(SRC_ROOT)/examples/intldml.sql .
+#	$(CP) $(SRC_ROOT)/examples/lang.inp .
+	./intlbld intlemp.fdb
+	-$(CHMOD_6) intlemp.fdb
+
+intlbuild.fdb : intlddl.sql intlbld.sql 
+	-$(RM) intlbuild.fdb
+	$(ISQL) -i intlbld.sql
+
+intlbld: $(INTLBLD_OBJ) $(LIBGDS_DEP)
+	-$(RM) $@
+	$(EXE_LINK) $(LINK_OPTS) $(LIBGDS_LINK) $^ -o $@ $(LINK_LIBS)
+	$(CHMOD_7) $@
+
+intlbld.exe:	$(INTLBLD_OBJ)
+	-$(RM) intlbld.exe
+	$(LD) $(O_EXE_SWITCH)intlbld $(LINK_OPTS) intlbld.o $(GDS_LINK)
+
+
+intlbld.c:	intlbuild.fdb intlbld.e
+
+
+
+makefile.example: Makefile
+	$(CP) Makefile makefile.example

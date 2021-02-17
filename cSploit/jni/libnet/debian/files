@@ -1,0 +1,4 @@
+libnet1_1.1.2.1-4._amd64.deb libs optional
+libnet1-dbg_1.1.2.1-4._amd64.deb libs extra
+libnet1-dev_1.1.2.1-4._amd64.deb libdevel optional
+libnet1-doc_1.1.2.1-4._all.deb doc optional

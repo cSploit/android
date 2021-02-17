@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Hot Backup Changes</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_52_toc.html" title="Chapter 11.  Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2" />
+    <link rel="prev" href="upgrade_11gr2_52_xa.html" title="Berkeley DB X/Open Compliant XA Resource Manager" />
+    <link rel="next" href="changelog_5_2.html" title="Berkeley DB Library Version 11.2.5.2 Change Log" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Hot Backup Changes </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="upgrade_11gr2_52_xa.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 11. 
+        Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="changelog_5_2.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="upgrade_11gr2_52_hot_backup"></a>Hot Backup Changes </h2>
+          </div>
+        </div>
+      </div>
+      <p>
+        Because non-UNIX systems do not support atomic file system reads,
+        the <a href="../api_reference/C/db_hotbackup.html" class="olink">db_hotbackup</a> utility has been modified to read data through the environment.
+        If your application is running on a UNIX based system such as Solaris, HPUX,
+        BSD or Mac OS, you can specify the <span class="bold"><strong>-F</strong></span>
+        flag to read directly from the filesystem.  Please refer to 
+        <a href="../programmer_reference/transapp_recovery.html" class="olink">Recovery procedures</a> in the <em class="citetitle">Berkeley DB Programmer's Reference Guide</em> for
+        more information on safely backing up your databases.
+    </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="upgrade_11gr2_52_xa.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_52_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="changelog_5_2.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Berkeley DB X/Open Compliant XA Resource Manager  </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Berkeley DB Library Version 11.2.5.2 Change Log</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

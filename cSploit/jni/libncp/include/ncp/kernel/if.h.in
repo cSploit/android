@@ -1,0 +1,6 @@
+#ifndef _KERNEL_IF_H
+#define _KERNEL_IF_H
+
+@ncp_net_if_h@
+
+#endif

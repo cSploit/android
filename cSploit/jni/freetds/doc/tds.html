@@ -1,0 +1,1541 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" 
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  	<title>TDS Protocol Documentation</title>
+</head>
+
+<body>
+<H1>TDS Protocol Documentation</h1>
+<P>
+This document attempts to cover the TDS protocol for:
+</P>
+
+<table border=1 summary="protocol.versions">
+	<tr><td align=center><b>TDS Version</b></td><td><b>Supported Products</b></td></tr>
+	<tr><td align=center>4.2</td><td>Sybase SQL Server &lt; 10 and  Microsoft SQL Server 6.5</td></tr>
+	<tr><td align=center>5.0</td><td>Sybase SQL Server &gt;= 10</td></tr>
+	<tr><td align=center>7.0</td><td>Microsoft SQL Server 7.0</td></tr>
+	<tr><td align=center>7.1</td><td>Microsoft SQL Server 2000</td></tr>
+	<tr><td align=center>7.2</td><td>Microsoft SQL Server 2005</td></tr>
+</table>
+
+<h2>Contents</h2>
+
+<ul>
+<li><a href="#terms">Common Terms</a>
+<li><a href="#examples">Typical Usage Sequences</a>
+<li><a href="#packet">The Packet Format</a>
+<li><a href="#login">Login Packet</a>
+<li><a href="#login7">TDS 7.0 Login Packet</a>
+<li><a href="#collate">Collation structure</a>
+<li><a href="#requests">Client requests</a>
+<li><a href="#responses">Server Responses</a>
+<li><a href="http://jtds.sourceforge.net/apiCursors.html">OCBC stored procedures (by jtds)</a>
+</ul>
+
+<h2 class="section">Common Terms</h2>
+<p>
+<a name="terms"></a>
+<pre>
+TDS protocol versions
+  TDS 5.0    tds version 5.0
+  TDS 7.0    tds version 7.0
+  TDS 7.0+   tds version 7.0, 7.1 and 7.2
+  TDS 5.0-   tds version 5.0 and previous
+
+Variable types used in this document:
+  CHAR      8-bit char
+    CHAR[6]	string of 6 chars
+    CHAR[n]     variable length string
+  XCHAR    single byte (TDS 5.0-) or ucs2le (TDS 7.0+) characters
+  INT8      8-bit int
+  INT16    16-bit int
+  INT32    32-bit int
+  UCS2LE   Unicode in UCS2LE format
+</pre>
+<p>Note:  FreeTDS uses TDS_TINYINT for INT8 and TDS_SMALLINT for INT16.</p>
+
+<h2 class="section">Typical Usage sequences</h2>
+
+<p><a name="examples"></a>
+These are TDS 4.2 and not meant to be 100% correct, but
+I thought they might be helpful to get an overall view 
+of what goes on.
+<pre>
+--&gt; Login
+&lt;-- Login acknowledgement
+
+--&gt; INSERT SQL statement
+&lt;-- Result Set Done
+
+--&gt; SELECT SQL statement
+&lt;-- Column Names
+&lt;-- Column Info
+&lt;-- Row Result
+&lt;-- Row Result
+&lt;-- Result Set Done
+
+--&gt; call stored procedure
+&lt;-- Column Names
+&lt;-- Column Info
+&lt;-- Row Result
+&lt;-- Row Result
+&lt;-- Done Inside Process
+&lt;-- Column Names
+&lt;-- Column Info
+&lt;-- Row Result
+&lt;-- Row Result
+&lt;-- Done Inside Process
+&lt;-- Return Status
+&lt;-- Process Done
+</pre>
+
+<h2 class="section">The packet format</h2>
+<p>
+<a name="packet"></a>
+Every informations in TDS protocol (query, RPCs, responses and so on) is splitted in packets.</p>
+<p>All packets start with the following 8 byte header.  
+
+<pre>
+ INT8       INT8          INT16      4 bytes
++----------+-------------+----------+--------------------+
+|  packet  | last packet |  packet  |    unknown         |
+|   type   |  indicator  |   size   |                    |
++----------+-------------+----------+--------------------+
+
+Fields:
+packet type 
+     0x01 <a href="#p1">TDS 4.2 or 7.0 query</a>
+     0x02 <a href="#login">TDS 4.2 or 5.0 login packet</a>
+     0x03 <a href="#p3">RPC</a>
+     0x04 <a href="#responses">responses from server</a>
+     0x06 cancels
+     0x07 Used in <a href="#p7">Bulk Copy</a>
+     0x0F TDS 5.0 query
+     0x10 <a href="#login7">TDS 7.0 login packet</a>
+     0x11 <a href="#auth7">TDS 7.0 authentication packet</a>
+     0x12 TDS 8 prelogin packet
+last packet indicator 
+     0x00 if more packets
+     0x01 if last packet
+packet size
+     (in network byte order)
+unknown?
+     always 0x00
+     this has something to do with server to server communication/rpc stuff
+</pre>
+
+<p>The remainder of the packet depends on the type of information it is
+providing.  As noted above, packets break down into the types query, login,
+response, and cancels.  Response packets are further split into multiple
+sub-types denoted by the first byte (a.k.a. the token) following the
+above header.</p>
+
+<p><i>Note:</i>
+  A TDS packet that is longer than 512 bytes is split on the 512 byte
+  boundary and the "more packets" bit is set.  The full TDS packet is reassembled
+  from its component 512 byte packets with the 8-byte headers stripped out.
+  512 is the block_size in the login packet, so it could be set to a
+  different values.
+  In Sybase you can configure a range of valid block sizes.
+  TDS 7.0+ use a default of 4096 as block size.</p>
+<hr>
+<p>
+<a name="login"></a>
+<h2 class="section">TDS 4.2 &amp; 5.0 Login Packet</h2>
+
+<p>
+Packet type (first byte) is 2. The numbers
+on the left are decimal offsets <i>including</i> the 
+8 byte packet header.
+<pre>
+byte   var type    description
+------------------------------
+   8   CHAR[30]    host_name
+  38   INT8        host_name_length
+  39   CHAR[30]    user_name
+  69   INT8        user_name_length
+  70   CHAR[30]    password
+ 100   INT8        password_length
+ 101   CHAR[30]    host_process
+ 131   INT8        host_process_length
+ 132   ?           magic1[6]          /* mystery stuff */
+ 138   INT8        bulk_copy 
+ 139   ?           magic2[9]          /* mystery stuff */
+ 148   CHAR[30]    app_name
+ 178   INT8        app_name_length
+ 179   CHAR[30]    server_name
+ 209   INT8        server_name_length
+ 210   ?           magic3[1]          /* 0, don't know this one either */
+ 211   INT8        password2_length
+ 212   CHAR[30]    password2
+ 242   CHAR[223]   magic4
+ 465   INT8        password2_length_plus2
+ 466   INT16       major_version      /* TDS version */
+ 468   INT16       minor_version      /* TDS version */
+ 470   CHAR        library_name[10]   /* "Ct-Library" or "DB-Library" */
+ 480   INT8        library_length
+ 481   INT16       major_version2     /* program version */
+ 483   INT16       minor_version2     /* program version */
+ 485   ?           magic6[3]          /* ? last two octets are 13 and 17 */
+                                      /* bdw reports last two as 12 and 16 here  */
+                                      /* possibly a bitset flag  */
+ 488   CHAR[30]    language           /* e.g. "us-english" */
+ 518   INT8        language_length
+ 519   ?           magic7[1]          /*  mystery stuff */
+ 520   INT16       old_secure         /* explanation? */
+ 522   INT8        encrypted          /*  1 means encrypted all password fields blank */
+ 523   ?           magic8[1]          /*  no clue... zeros */
+ 524   CHAR        sec_spare[9]       /* explanation? */
+ 533   CHAR[30]    char_set           /* e.g. "iso_1" */
+ 563   INT8        char_set_length
+ 564   INT8        magic9[1]          /* 1 */ 
+ 565   CHAR[6]     block_size         /*  in text */
+ 571   INT8        block_size_length 
+ 572   ?           magic10[25]        /* lots of stuff here...no clue */
+</pre>
+<p>Any help with the magic numbers would be most appreciated.</p>
+
+<hr>
+<p>
+<a name="login7"></a>
+<h2 class="section">TDS 7.0+ Login Packet</h2>
+<pre>
+byte  var type  description
+---------------------------
+  0   INT32	total packet size
+  4   INT8[4]	TDS Version	
+                	0x00000070 7.0
+			0x01000071 7.1
+                	0x02000972 7.2 (7.2.9?)
+  8   INT32	packet size (default 4096)
+ 12   INT8[4]	client program version
+ 16   INT32	PID of client
+ 20   INT32	connection id (usually 0)
+ 24   INT8	option flags 1
+                0x80 enable warning messages if SET LANGUAGE issued
+                0x40 change to initial database must succeed
+                0x20 enable warning messages if USE &lt;database&gt; issued
+                0x10 enable BCP
+		0x08 use ND5000 floating point format (untested)
+		0x04 use VAX floating point format (untested)
+		0x02 use EBCDIC encoding (untested)
+		0x01 use big-endian byte order (untested)
+ 25   INT8	option flags 2
+                0x80 enable domain login security
+		0x40 "USER_SERVER - reserved" 
+		0x20 user type is "DQ login"
+		0x10 user type is "replication login"
+		0x08 "fCacheConnect"
+		0x04 "fTranBoundary"
+                0x02 client is an ODBC driver
+                0x01 change to initial language must succeed
+ 26   INT8	0x04 spawn user instance (TDS 7.2)
+                0x02 XML data type instances are returned as binary XML (TDS 7.2)
+                0x01 password change requested (TDS 7.2)
+ 27   INT8	0x01 SQL Type: 0 = use default, 1 = use T-SQL (TDS 7.2)
+ 28   INT8[4]	time zone (0x88ffffff ???)
+ 32   INT8[4]	collation information
+ 36   INT16	position of client hostname (86)
+ 38   INT16	hostname length
+ 40   INT16	position of username
+ 42   INT16	username length
+ 44   INT16	position of password
+ 46   INT16	password length
+ 48   INT16	position of app name
+ 50   INT16	app name length
+ 52   INT16	position of server name
+ 54   INT16	server name length
+ 56   INT16	position of remote server/password pairs
+ 58   INT16	remote server/password pairs length
+ 60   INT16	position of library name
+ 62   INT16	library name length
+ 64   INT16	position of language
+ 66   INT16	language name (for italian "Italiano", coded UCS2)
+ 68   INT16	position of database name
+ 70   INT16	database name length
+ 72   INT8[6]	MAC address of client
+ 78   INT16	position of auth portion
+ 80   INT16	NT authentication length
+ 82   INT16	next position (same as total packet size)
+ 84   INT16	0
+ 86   UCS2LE[n] hostname
+      UCS2LE[n]	username
+      UCS2LE[n]	encrypted password
+      UCS2LE[n]	app name
+      UCS2LE[n]	server name
+      UCS2LE[n]	library name
+      UCS2LE[n]	language name
+      UCS2LE[n]	database name
+      NT Authentication packet
+
+NT Authentication packet
+  0   CHAR[8]	authentication id "NTLMSSP\0"
+  8   INT32     1  message type
+ 12   INT32	0xb201 flags
+ 16   INT16	domain length
+ 18   INT16     domain length
+ 20   INT32     domain offset
+ 24   INT16     hostname length
+ 26   INT16     hostname length
+ 28   INT32     hostname offset
+ 32   CHAR[n]   hostname
+      CHAR[n]   domain
+See documentation on Samba for detail (or search ntlm authentication for IIS)
+
+For mssql 2005 before hostname (byte 86) you have
+ 86   INT16     next position,  or 
+                position of file name for a database to be 
+                attached during the connection process
+ 88   INT16     database filename length
+ 90   INT16     new password position
+ 92   INT16     new password length
+ 94   UCS2LE[n] hostname
+      ... (as above)
+</pre>
+<p>"current pos" is the starting byte address for a Unicode string within
+the packet.  The length of that Unicode string immediately follows.  
+That implies there are at least 2 more strings that could be defined.
+(character set??)
+</p>
+
+<p>Username and password are empty if domain authentication is used.</p>
+
+<p>If the client uses an authentication packet, the server replies with an
+<a href="#t237">Authentication</a> token followed by an <a href="#auth7">Authentication packet</a>.</p>
+
+<hr>
+<h2 class="section">TDS 7.0 Authentication Packet</h2>
+<p>
+<a name="auth7"></a>
+</p>
+
+<pre>
+ varies
++------+
+| auth |
++------+
+
+auth   authentication data
+       for NTLM this message 3
+</pre>
+
+<p>This packet usually follows <a href="#t237">Authentication</a> token.</p>
+
+<hr>
+<h2 class="section">Types</h2>
+<p>
+<a name="types"></a>
+</p>
+<table border="0" summary="packets">
+<tr>
+  <th>HEX</th><th>DEC</th><th>type</th><th>protocol</th><th>nullable</th><th>size</th><th>collate</th>
+</tr>
+<tr>
+  <td>0x1F</td><td>31</td><td>SYBVOID</td><td>7+</td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x22</td><td>34</td><td>SYBIMAGE</td><td></td><td>yes</td><td>4</td><td></td>
+</tr>
+<tr>
+  <td>0x23</td><td>35</td><td>SYBTEXT</td><td></td><td>yes</td><td>4</td><td>yes</td>
+</tr>
+<tr>
+  <td>0x24</td><td>36</td><td>SYBUNIQUE</td><td>7+</td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x25</td><td>37</td><td>SYBVARBINARY</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x26</td><td>38</td><td>SYBINTN</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x27</td><td>39</td><td>SYBVARCHAR</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x2D</td><td>45</td><td>SYBBINARY</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x2F</td><td>47</td><td>SYBCHAR</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x30</td><td>48</td><td>SYBINT1</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x32</td><td>50</td><td>SYBBIT</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x34</td><td>52</td><td>SYBINT2</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x38</td><td>56</td><td>SYBINT4</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x3A</td><td>58</td><td>SYBDATETIME4</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x3B</td><td>59</td><td>SYBREAL</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x3C</td><td>60</td><td>SYBMONEY</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x3D</td><td>61</td><td>SYBDATETIME</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x3E</td><td>62</td><td>SYBFLT8</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x40</td><td>64</td><td>SYBSINT1</td><td>5</td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x41</td><td>65</td><td>SYBUINT2</td><td>5</td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x42</td><td>66</td><td>SYBUINT4</td><td>5</td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x43</td><td>67</td><td>SYBUINT8</td><td>5</td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x62</td><td>98</td><td>SYBVARIANT</td><td>7+</td><td>yes</td><td>4</td><td></td>
+</tr>
+<tr>
+  <td>0x63</td><td>99</td><td>SYBNTEXT</td><td>7+</td><td>yes</td><td>4</td><td>yes</td>
+</tr>
+<tr>
+  <td>0x67</td><td>103</td><td>SYBNVARCHAR</td><td>7+</td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x68</td><td>104</td><td>SYBBITN</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x6A</td><td>106</td><td>SYBDECIMAL</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x6C</td><td>108</td><td>SYBNUMERIC</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x6D</td><td>109</td><td>SYBFLTN</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x6E</td><td>110</td><td>SYBMONEYN</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x6F</td><td>111</td><td>SYBDATETIMN</td><td></td><td>yes</td><td>1</td><td></td>
+</tr>
+<tr>
+  <td>0x7A</td><td>122</td><td>SYBMONEY4</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0x7F</td><td>127</td><td>SYBINT8</td><td></td><td>no</td><td>0</td><td></td>
+</tr>
+<tr>
+  <td>0xA5</td><td>165</td><td>XSYBVARBINARY</td><td>7+</td><td>yes</td><td>2 *</td><td></td>
+</tr>
+<tr>
+  <td>0xA7</td><td>167</td><td>XSYBVARCHAR</td><td>7+</td><td>yes</td><td>2 *</td><td>yes</td>
+</tr>
+<tr>
+  <td>0xAD</td><td>173</td><td>XSYBBINARY</td><td>7+</td><td>yes</td><td>2</td><td></td>
+</tr>
+<tr>
+  <td>0xAF</td><td>175</td><td>XSYBCHAR</td><td>7+</td><td>yes</td><td>2</td><td>yes</td>
+</tr>
+<tr>
+  <td>0xE1</td><td>225</td><td>SYBLONGBINARY</td><td>5</td><td>yes</td><td>4</td><td></td>
+</tr>
+<tr>
+  <td>0xE7</td><td>231</td><td>XSYBNVARCHAR</td><td>7+</td><td>yes</td><td>2 *</td><td>yes</td>
+</tr>
+<tr>
+  <td>0xEF</td><td>239</td><td>XSYBNCHAR</td><td>7+</td><td>yes</td><td>2</td><td>yes</td>
+</tr>
+</table>
+<hr>
+<p>* Under TDS 7.2+ these types allow size to be -1, representing varchar(max), varbinary(max) and nvarchar(max).
+Data representation for them changes: </p>
+<ul>
+ <li>size is 64 (not 16) bits</li>
+ <li>size of -1 means NULL</li>
+ <li>size of -2 means the size is unknown</li>
+ <li>the data are split in chunks,  where each chunk starts with a 32-bit size</li>
+ <li>a chunk with size &lt;= 0 is the terminal chunk</li>
+</ul>
+<p>
+<a name="collate"></a>
+<h2 class="section">Collation type - TDS 7.1</h2>
+<p>The collation structure contains information about the character set encoding and comparison method.</p>
+<pre>
+ INT16      INT16    INT8
++----------+--------+------------+
+| codepage | flags  | charset_id |
++----------+--------+------------+
+
+codepage    windows codepage (see <a href="http://www.microsoft.com/globaldev/nlsweb/">http://www.microsoft.com/globaldev/nlsweb/</a>)
+            also specified in lcid column of master..syslanguages
+flags       sort flags
+            0x100 binary compare
+            0x080 width insensitive
+            0x040 Katatype insensitive
+            0x020 accent insensitive
+            0x010 case insensitive
+            If binary flag is specified other flags are not present
+            Low nibble of flags is a charset specifier (like chinese dialect)
+charset_id  charset id in master..syscharsets table or zero for no SQL collations
+</pre>
+
+<p>Collations names can be obtained from <code>select name from ::fn_helpcollations()</code>
+query</p>
+
+<hr>
+<h2 id="colInfo"><b class="subsection">Column Metadata</b></h2>
+
+<pre>
+ INT8          XCHAR[n]       INT8    INT32   INT8
++-------------+--------------+-------+-------+---------+
+| column name | column name  | flags |  user | column  |
+|   length    |              |       |  type |  type   |
++-------------+--------------+-------+-------+---------+
+
+ varies        INT8       INT8       INT16      XCHAR[n]     INT8     varies
++-------------+----------+----------+----------+------------+--------+--------+
+| column size |precision |  scale   | t length | table name | locale | locale |
+|             |          |          |          |            | length |  info  |
+| (optional)  |(optional)|(optional)|(optional)| (optional) | (opt)  | (opt)  |
++-------------+----------+----------+----------+------------+--------+--------+
+
+column name length 
+column name        column name in result set, not necessarily db column name
+flags              bit flags
+                   0x1  hidden (TDS 5.0)
+                   0x2  key
+                   0x10 writable
+                   0x20 can be NULL
+                   0x40 identity
+user type          usertype column from syscolumns
+<a href="#types">column type</a>        column type
+column size        not present for fixed size columns
+precision          present only for SYBDECIMAL and SYBNUMERIC
+scale              present only for SYBDECIMAL and SYBNUMERIC
+t length           present only for SYBTEXT and SYBIMAGE, length of table name
+table name         present only for SYBTEXT and SYBIMAGE
+locale length      length of locale info (in bytes)
+                   only for TDS 5.0 results (not for parameters)
+locale info        unknown
+                   only for TDS 5.0 results (not for parameters)
+</pre>
+
+<hr>
+
+<h2 id="requests" class="section">Client request</h2>
+
+<p>Normal tokens (contained in packets 0xF)
+
+<pre>
+TODO
+</pre>
+
+<p>Special packets</p>
+<ul>
+<li>0x1  1  <a href="#p1">Language</a></li>
+<li>0x3  3  <a href="#p3">RPC</a>      TDS 4.6+</li>
+<li>0x7  7  <a href="#p7">BCP</a>      TDS 5.0+</li>
+</ul>
+
+<hr>
+<h2><a name="p1"><b class="section">Language packet (0x1 1)</b></a></h2>
+<p>
+This sample packet contain just SQL commands. It's supported by all TDS version
+(although TDS 5.0 have others token with similar use)
+<pre>
+  XCHAR[n]
++---------+
+| string  |
++---------+
+
+string   SQL text
+</pre>
+
+<hr>
+<h2 id="p3"><b class="section">RPC packet (0x3 3)</b></h2>
+
+<p> Do not confuse an RPC packet with an RPC token. The RPC packet is supported
+by all version of TDS; the RPC token is supported only by TDS 5.0 (and has
+different format). This is the oldest (and the only one in mssql) way to call
+directly an RPC.  Sybase also documents it, but as 0xE.  
+
+<pre>
+  INT16         XCHAR[n]   INT16  
++-------------+----------+-------+----------+
+| name length | rpc name | flags | params   |
++-------------+----------+-------+----------+
+
+name length   length of RPC name in characters. 
+              mssql2k+ support some core RPC using numbers
+              If a number is used instead of name name length is marked as -1
+              (null) and a INT16 is used for the name.
+                0x1  1  sp_cursor
+                0x2  2  sp_cursoropen
+                0x3  3  sp_cursorprepare
+                0x4  4  sp_cursorexecute
+                0x5  5  sp_cursorprepexec
+                0x6  6  sp_cursorunprepare
+                0x7  7  sp_cursorfetch
+                0x8  8  sp_cursoroption
+                0x9  9  sp_cursorclose
+                0xA  10 sp_executesql
+                0xB  11 sp_prepare
+                0xC  12 sp_execute ???
+                0xD  13 sp_prepexec
+                0xE  14 sp_prepexecrpc
+                0xF  15 sp_unprepare
+              sp_execute seems to have some problems, even MS ODBC use name
+              version instead of number.
+rpc name      name of RPC.
+flags         bit flags. 
+               0x1 1 recompile procedure (TDS 7.0+/TDS 5.0)
+               0x2 2 no metadata (TDS 7.0+)
+                     (I don't know meaning of "no metadata" -- freddy77)
+params        parameters. See below
+</pre>
+
+<p>Every parameter has the following structure</p>
+
+<pre>
++-----------+------+
+| data info | data |
++-----------+------+
+data info    data information. See below
+data         data. See results for detail
+</pre>
+
+<h4>Data info structure</h4>
+<pre>
+  INT8          XCHAR[n]     INT8    INT32
++-------------+------------+-------+--------------------+
+| name length | param name | flags | usertype (TDS 5.0) |
++-------------+------------+-------+--------------------+
+  INT8   varies  varies     INT8[5]         INT8
++------+-------+----------+---------------+------------------+
+| type | size  | optional | collate       | locale           |
+|      | (opt) | (opt)    | info(TDS 7.1) | length (TDS 5.0) |
++------+-------+----------+---------------+------------------+
+
+name length   parameter name length (0 if unused)
+param name    parameter name
+flags         bit Name           Meaning
+              0x1 TDS_RPC_OUTPUT output parameter
+              0x2 TDS_RPC_NODEF  output parameter has no default value. 
+                                 Valid only with TDS_RPC_OUTPUT.
+
+usertype      usertype
+type          param type
+size          see <a href="#t129">Results</a>
+optional      see <a href="#t129">Results</a>. Blobs DO NOT have 
+              optional on input parameters (output blob parameters
+              are not supported by any version of TDS).
+collate info  only for type that want collate info and using TDS 7.1
+locale length locale information length. Usually 0 (if not locale
+              information follow, the structure is unknown)
+</pre>
+
+<h2>Chained RPCs</h2>
+<p>Under TDS 7.0+ is possible to chain multiple RPCs together. This is useful to limit packets and round-trips with server. RPCs can be chained using byte 0x80 (TDS 7.0/TDS 7.1) or 0xFF (TDS 7.2).</p>
+
+<pre>
+       INT8                     INT8
++-----+------------------------+----------------+-----+
+| RPC | 0x80 (TDS 7.0/TDS 7.1) | 0xFF (TDS 7.2) | RPC | ...
++-----+------------------------+----------------+-----+
+</pre>
+
+<hr>
+
+<h2 id="p7" class="section">Bulk Copy packet (0x7 7)</h2>
+
+<p>This documents a TDS 5.0 packet.  It might be true for others....
+
+<h3>BCP Packet Structure</h3>
+<pre>
+ INT8       INT16          INT32                
++----------+-------------+--------------------+
+|  packet  | last packet |  packet            |
+| type = 7 |  indicator  |   size             |
++----------+-------------+--------------------+
+
+		followed by N row buffers, 
+		where N is computed by exhausting the packet size
+</pre>
+<h3>BCP Packet Row Buffer</h3>
+<pre>
+ INT16          INT8       INT8	      INT16	    
++--------------+----------+----------+--------------+
+| size         |  ncols   |  zero    | size (again) |
++--------------+----------+----------+--------------+
+
+	followed by column buffers (data), where 
+		
+		first, the fixed-size datatype columns
+
+		 fixed size and count (determined by column definition)
+		+--------------+
+		|    data .... | [repeats once for each mandatory column]
+		+--------------+
+
+		then, the variable-size (including nullable) datatype columns
+
+		 variable size and count
+		+--------------+
+		|    data .... | [repeats ncol times]
+		+--------------+
+
+		followed by two tables (!) to describe the column buffers
+
+ <b>Adjustment Table</b> (optional)
+ 
+ INT8       INT8        
++----------+----------+
+| 1 + ncols| offset   | [repeats ncol + 1 times]
++----------+----------+
+
+ <b>Offset Table</b> (mandatory)
+ 
+ INT8       INT8        
++----------+----------+
+| 1 + ncols| offset   | [repeats ncol + 1 times]
++----------+----------+
+</pre>	   
+
+<P>The BCP packet has a slightly different Packet header!?  </P>
+
+<h3>Computation of Offset and Adjustment tables</h3>
+
+<p>The offset and adjustment tables describe the postion of the first byte of each variable-size column.  The first element holds the count of elements in the offset/adjustment table.  Thereafer, the offsets are arranged in reverse order: the last element &mdash; which is also the last byte of the row buffer &mdash; holds the offset from the start of the row of the first variable-size column.  The next-to-last offset table element holds the starting position of the second variable-size column, and so on.</p>
+
+<h4>Offset Table Example</h4>
+
+<ol>
+	<li>5</li>
+	<li>31</li>
+	<li>22</li>
+	<li>21</li>
+	<li>8</li>
+	<li>4</li>
+</ol>
+
+<p>The first element is 5 because there are five elements in the list.  There are 4 column data buffers with 5 endpoints.  The first column's data begins at offset 4.  Computations:
+
+<dl>
+	<dt>column 1</dt>
+		<dd>offset 4</dd>
+		<dd>length: 4 = 8 - 4</dd>
+	<dt>column 2</dt>
+		<dd>offset 8</dd>
+		<dd>length: 13 = 21 - 8</dd>
+	<dt>column 3</dt>
+		<dd>offset 21</dd>
+		<dd>length: 1 = 22 - 21</dd>
+	<dt>column 4</dt>
+		<dd>offset 22</dd>
+		<dd>length: 9 = 31 - 22</dd>
+</dl>
+
+
+<p>Any column not accounted for is implicitly NULL.  To represent a NULL column between two dataful columns, the offset table will have adjacent entries of the same value.  </p>
+
+<h4>Adjustment table</h4>
+
+<p>The so-called adjustment table provides for longer rows.  The reader will note the Offset table has 8-bit elements, which would limit the width of the table: the last variable column would have to end less than 256 bytes from the start fo the row.  Rather than changing the definition of the Offset table, a second table, the Adjustment table, was introduced.  It holds high-order bytes for the column offsets.  </p>
+
+<p>In other words, to compute a variable column's offset from the start of the row buffer, the server looks up its offset table value, then consults the same position in the adjustment table, and splices them together. </p>
+
+<h3>Offset table commentary</h3>
+
+<p>The BCP packet is very dense.  The data formats are governed by the table definition.  Non-NULL columns of course must be present; there is no need to count them or compute their size.  The NULL columns are undelimited; their boundaries are defined by the minimalist offset table.  </p>
+
+<p>The Adjustment table seems silly at first glance.   Why not just make the offset table's elements 16 or or even 32 bits?  The reason is overhead.  Most rows will have less than 256 bytes of variable column data.  By using the adjustment table, the BCP packet avoids adding one or even three empty bytes per column per row.  </p>
+
+<p>Why is the table in reverse order?  Because that places the first offset at a known location: the end of each <i>row</i> gives the start of the first column.  The server can work its way down the offset table and compute the column sizes.  If they don't add up &mdash; if there are data between the (presumed) end of the last column and the start of the offset table &mdash; the server knows it should look for an adjustment table.  Because the scheme is infinitely repeatable, rows could one day grow to terabyte widths without redefining the packet structure. </p>
+
+<hr>
+
+<h2 class="section">Server Responses</h2>
+<p>
+<a name="responses"></a>
+Responses from the server start with a single octet (token) identifying
+its type. If variable length, they generally have the length as the second
+and third bytes
+<p>
+Tokens encountered thus far:
+<table border="0" summary="tokens">
+<tr>
+ <th>HEX</th><th>DEC</th><th>name</th><th>note</th>
+</tr>
+<tr>
+ <td>0x20</td><td>32</td><td><a href="#t32">Param Format 2</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0x21</td><td>33</td><td><a href="#t33">Language</a></td><td>5.0 only, client-side</td>
+</tr>
+<tr>
+ <td>0x22</td><td>34</td><td><a href="#t34">OrderBy 2</a></td><td>5.0 only??</td>
+</tr>
+<tr>
+ <td>0x61</td><td>97</td><td><a href="#t97">Row Format 2</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0x71</td><td>113</td><td><a href="#t113">"Logout"</a></td><td>5.0? ct_close(), client-side?</td>
+</tr>
+<tr>
+ <td>0x79</td><td>121</td><td><a href="#t121">Return Status</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0x7C</td><td>124</td><td><a href="#t124">Process ID</a></td><td>4.2 only</td>
+</tr>
+<tr>
+ <td>0x80</td><td>128</td><td><a href="#t128">Cursor Close</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0x81</td><td>129</td><td><a href="#t129c">Cursor Delete</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0x81</td><td>129</td><td><a href="#t129">7.0 Result</a></td><td>7.0 only</td>
+</tr>
+<tr>
+ <td>0x82</td><td>130</td><td><a href="#t130">Cursor Fetch</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0x83</td><td>131</td><td><a href="#t131">Cursor Info</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0x84</td><td>132</td><td><a href="#t132">Cursor Open</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0x86</td><td>134</td><td><a href="#t134">Cursor Declare</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0x88</td><td>136</td><td><a href="#t136">7.0 Compute Result</a></td><td>7.0 only</td>
+</tr>
+<tr>
+ <td>0xA0</td><td>160</td><td><a href="#t160">Column Name</a></td><td>4.2 only</td>
+</tr>
+<tr>
+ <td>0xA1</td><td>161</td><td><a href="#t161">Column Format</a></td><td>4.2 only</td>
+</tr>
+<tr>
+ <td>0xA3</td><td>163</td><td><a href="#t163">Dynamic 2</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0xA4</td><td>164</td><td><a href="#t164">Table names</a></td><td>name of tables in a FOR BROWSE select</td>
+</tr>
+<tr>
+ <td>0xA5</td><td>165</td><td><a href="#t165">Column Info</a></td><td>column information in a FOR BROWSE select</td>
+</tr>
+<tr>
+ <td>0xA6</td><td>166</td><td><a href="#t166">Option Cmd</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0xA7</td><td>167</td><td><a href="#t167">Compute Names</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xA8</td><td>168</td><td><a href="#t168">Compute Result</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xA9</td><td>169</td><td><a href="#t169">Order By</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xAA</td><td>170</td><td><a href="#t170">Error Message</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xAB</td><td>171</td><td><a href="#t171">Info Message</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xAC</td><td>172</td><td><a href="#t172">Output Parameters</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xAD</td><td>173</td><td><a href="#t173">Login Acknowledgement</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xAE</td><td>174</td><td><a href="#t174">Control</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xD1</td><td>209</td><td><a href="#t209">Data --- Row Result</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xD3</td><td>211</td><td><a href="#t211">Data --- Compute Result</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xD7</td><td>215</td><td><a href="#t215">Params</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0xE2</td><td>226</td><td><a href="#t226">Capability</a></td><td>5.0 only. Information on server</td>
+</tr>
+<tr>
+ <td>0xE3</td><td>227</td><td><a href="#t227">Environment Change</a></td><td>(database change, packet size, etc...)</td>
+</tr>
+<tr>
+ <td>0xE5</td><td>229</td><td><a href="#t229">Extended Error Message</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xE6</td><td>230</td><td><a href="#t230">DBRPC</a></td><td>5.0 only RPC calls</td>
+</tr>
+<tr>
+ <td>0xE7</td><td>231</td><td><a href="#t231">Dynamic</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0xEC</td><td>236</td><td><a href="#t236">Param Format</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0xED</td><td>237</td><td><a href="#t237">Authentication</a></td><td>7.0 only</td>
+</tr>
+<tr>
+ <td>0xEE</td><td>238</td><td><a href="#t238">Result Set</a></td><td>5.0 only</td>
+</tr>
+<tr>
+ <td>0xFD</td><td>253</td><td><a href="#t253">Result Set Done</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xFE</td><td>254</td><td><a href="#t254">Process Done</a></td><td>&nbsp;</td>
+</tr>
+<tr>
+ <td>0xFF</td><td>255</td><td><a href="#t255">Done inside Process</a></td><td>&nbsp;</td>
+</tr>
+</table>
+
+<h2 class="section">Param Format 2 - TDS 5.0 (0x20 32)</h2>
+
+<p>TODO.
+<a name="t32">&nbsp;</a> <hr>
+
+<h2 id="t33" class="section">Language - TDS 5.0 (0x21 33)</h2>
+
+<pre>
+ INT32    INT8     CHAR[n]
++--------+--------+-------+
+| length | status | query |
++--------+--------+-------+
+
+length  total token length
+status  0 no args
+        1 has args (followed by PARAMFMT/PARAMS)
+query   query (total length - 1)
+</pre>
+
+<h2 class="section">Order By 2 (0x22 34)</h2>
+
+<p>TODO.
+<a name="t34">&nbsp;</a> <hr>
+
+<h2 id="t97" class="section">Row Format 2 - TDS 5.0 (0x61 97)</h2>
+
+<p>TODO.
+
+<a name="t113">&nbsp;</a> <hr>
+<h2 class="section">"Logout" (0x71 113)</h2>
+<p>
+No information. (1 byte, value=0 ?)
+
+<a name="t121">&nbsp;</a> <hr>
+<h2 class="subsection">Return Status (0x79 121)</h2>
+
+<pre>
+ INT32
++---------------+
+| Return status |
++---------------+
+</pre>
+
+<p>The return value of a stored procedure.
+<a name="t124">&nbsp;</a> 
+</p>
+
+<h2 class="subsection">Process ID (0x7C 124)</h2>
+<hr>
+
+<pre>
+ 8 bytes
++----------------+
+| process number |
++----------------+
+</pre>
+<p>Presumably the process ID number for an executing stored procedure.
+(I'm not sure how this would ever be used by a client.  *mjs*)
+
+<a name="t128">&nbsp;</a> </p>
+
+<hr>
+<h2 class="subsection">Cursor Close - TDS 5.0 (0x80 128)</h2>
+
+<p>TODO.
+
+<a name="t129c">&nbsp;</a> <hr>
+<h2 class="subsection">Cursor Delete - TDS 5.0 (0x81 129)</h2>
+
+<p>TODO.
+
+<a name="t129">&nbsp;</a> <hr>
+<h2 class="subsection">Result - TDS 7.0+ (0x81 129)</h2>
+
+<pre>
+ INT16  
++----------+-------------+
+| #columns | column_info | 
++----------+-------------+
+</pre>
+
+<p>The TDS 7.0 column_info is formatted as follows for each column:</p>
+
+<pre>
+ INT16      INT16   INT8   varies  varies     INT8[5]         INT8          UCS2LE[n]
++----------+-------+------+-------+----------+---------------+-------------+---------+
+| usertype | flags | type | size  | optional | collate       | name length | name    | 
+|          |       |      | (opt) | (opt)    | info(TDS 7.1) |             |         |
++----------+-------+------+-------+----------+---------------+-------------+---------+
+
+usertype	type modifier
+flags		bit flags
+		0x1  can be NULL
+		0x8  can be written (it's not an expression)
+		0x10 identity 
+<a href="#types">type</a>		data type, values &gt;128 indicate a large type
+size		none for fixed size types
+		4 bytes for blob and text
+		2 bytes for large types
+		1 byte for all others
+optional
+                               INT8        INT8
+                              +-----------+-------+
+  numeric/decimal types:      | precision | scale |
+                              +-----------+-------+
+
+                               INT16               UCS2LE[n]
+                              +-------------------+------------+
+  blob/text types:            | table name length | table name |
+                              +-------------------+------------+
+
+  collate info are available only using TDS 7.1 and for characters types (but not
+  for old type like short VARCHAR, only 2byte length versions)
+</pre>
+
+
+<h2 id="t130" class="subsection">Cursor Fetch - TDS 5.0 (0x82 130)</h2>
+
+<p>TODO.
+
+<h2 id="t131" class="subsection">Cursor Info - TDS 5.0 (0x83 131)</h2>
+
+<p>TODO.
+
+<h2 id="t132" class="subsection">Cursor Open - TDS 5.0 (0x84 132)</h2>
+
+<p>TODO.
+
+<h2 id="t134" class="subsection">Cursor Declare - TDS 5.0 (0x86 134)</h2>
+
+<p>TODO.
+
+<h2 id="t136" class="subsection">Compute Result - TDS 7.0+ (0x88 136)</h2>
+
+<p>TODO.
+
+<h2 id="t160" class="subsection">Column Name (0xA0 160)</h2>
+
+<pre>
+ INT16          INT8      CHAR[n]               INT8      CHAR[n] 
++--------------+---------+--------------+------+---------+--------------+
+| total length | length1 | column1 name | .... | lengthN | columnN name |
++--------------+---------+--------------+------+---------+--------------+
+</pre>
+
+<p>This token is the first token that contain result informations. Is usually followed by <a href="#t161">Column Format</a> token (0xA1 161)</p>
+
+<hr>
+<h2 id="t161" class="subsection">Column Format (0xA1 161)</h2>
+
+<pre>
+ INT16  
++--------------+-------------+
+| total length | column_info | 
++--------------+-------------+
+</pre>
+
+<p>The number of columns is the same of previous <a href="#t160">Column Name</a> token.
+<p>The TDS 4.2 column_info is formatted as follows for each column:
+
+<pre>
+ INT8[4]     INT8   varies  varies
++-----------+------+-------+----------+
+| usertype/ | type | size  | optional |
+|   flags   |      | (opt) | (opt)    |
++-----------+------+-------+----------+
+
+usertype/flags for Sybase
+
+   INT32
+  +----------+
+  | usertype |
+  +----------+
+
+usertype/flags for MSSQL
+
+   INT16
+  +----------+-------+
+  | usertype | flags |
+  +----------+-------+
+
+usertype	type modifier
+flags		bit flags (only MSSQL)
+		0x1  can be NULL
+		0x8  can be written (it's not an expression)
+		0x10 identity 
+<a href="#types">type</a>		data type
+size		none for fixed size types
+		4 bytes for blob and text
+		1 byte for all others
+                (TDS 4.2 do not support large types)
+optional
+                               INT8        INT8
+                              +-----------+-------+
+  numeric/decimal types:      | precision | scale |
+  (supported??)               +-----------+-------+
+
+                               INT16               CHAR[n]
+                              +-------------------+------------+
+  blob/text types:            | table name length | table name |
+                              +-------------------+------------+
+</pre>
+
+<h2 id="t163" class="subsection">Dynamic 2 - TDS 5.0 (0xA3 163)</h2>
+
+<p>TODO.
+
+<h2 id="t166" class="subsection">Option Cmd - TDS 5.0 (0xA6 166)</h2>
+
+<p>TODO.
+
+<h2 id="t168" class="subsection">Compute Result (0xA8 168)</h2>
+
+<pre>
+ INT16          INT16        INT8       varies        INT8      INT8[n]
++--------------+------------+----------+-------------+---------+-------+
+| total length | compute id | #columns | column info | #bycols | bycol |
++--------------+------------+----------+-------------+---------+-------+
+</pre>
+
+<p>column info:</p>
+
+<pre>
+ INT8       INT8      INT32      INT8     varies  INT8               varies
++----------+---------+----------+--------+-------+------------------+----------------+
+| operator | operand | usertype | column | size  | locale length    | locale info    |
+|          |         |          |  type  | (opt) |  info (TDS 5.0)  | (TDS 5.0)      |
++----------+---------+----------+--------+-------+------------------+----------------+
+
+operator      operator
+              0x4b COUNT
+              0x4c UNSIGNED? COUNT
+              0x4d SUM
+              0x4e UNSIGNED? SUM
+              0x4f AVG
+              0x50 UNSIGNED? AVG
+              0x51 MIN
+              0x52 MAX
+              0x09 COUNT_BIG (mssql2k)
+              0x30 STDEV (mssql2k)
+              0x31 STDEVP (mssql2k)
+              0x32 VAR (mssql2k)
+              0x33 VARP (mssql2k)
+              0x72 CHECKSUM_AGG (mssql2k)
+operand       ???
+usertype      usertype
+<a href="#types">column type</a>   data type
+size          data size
+locale length length of locale informations
+locale info   locale informations (unknown)
+</pre>
+
+<p>Each bycol information contains column info for a specific column.</p>
+<p>TODO: optional possible?? collate infos ??</p>
+
+<h2 id="t164" class="section">TabName (0xA4 164)</h2>
+
+<p>TDS4/5/7:</p>
+
+<pre>
+ INT16          INT16         XCHAR[n]
++--------------+-------------+------------+
+| total length | name length | table name | ...
++--------------+-------------+------------+
+
+name length   table name length
+table name    table name
+</pre>
+
+<p>TDS 7.1:</p>
+
+<pre>
+ INT16          varies
++--------------+-------------+
+| total length | table names |
++--------------+-------------+
+
+table name:
+ INT8              INT16              XCHAR[n]
++-----------------+------------------+----------------+
+| # of components | component length | component name |
++-----------------+------------------+----------------+
+
+ie:
+  name        -&gt; 01  04 00  ucs2le "name"
+  db..name    -&gt; 03  02 00  ucs2le "db"  00 00  04 00  ucs2le "name"
+  db.dbo.name -&gt; 03  02 00  ucs2le "db"  03 00  ucs2le "dbo"  04 00  ucs2le "name"
+</pre>
+
+<h2 id="t165" class="section">Column Info (0xA5 165)</h2>
+
+<pre>
+ INT16          varies
++--------------+--------------+
+| total length | column infos |
++--------------+--------------+
+</pre>
+
+<p>column info:</p>
+
+<pre>
+ INT8    INT8          INT8    INT8          XCHAR[n]
++-------+-------------+-------+-------------+-------------+
+| index | table index | flags | name length | column name |
+|       |             |       |  (opt)      |  (opt)      |
++-------+-------------+-------+-------------+-------------+
+
+index        index in result format (1-based)
+table index  index in previous TabName (1-based)
+             0 means no table (ie computed)
+flags        set of flags
+             0x04 expression
+             0x08 key
+             0x10 hidden
+             0x20 column name present
+name length  length of following column
+column name  real column name (result contain the label)
+</pre>
+
+<p>This token follow TabName token
+<a name="t167">&nbsp;</a>
+<a name="t174">&nbsp;</a> </p>
+<hr>
+<h2 class="section">compute "control" ? (0xA7 167)</h2>
+<h2 class="section">"control" (0xAE 174)</h2>
+<p>
+
+Miscellaneous note (from *bdw* ?) found with 0xAE: <br>
+<pre>
+  has one byte for each column, 
+  comes between result(238) and first row(209),
+  I believe computed column info is stored here, need to investigate
+</pre>
+
+<h2 id="t169" class="section">Order By (0xA9 169)</h2>
+
+<pre>
+ INT16    variable (1 byte per col)
++--------+---------+
+| length | orders  |
++--------+---------+
+
+length		Length of packet(and number of cols)
+orders          one byte per order by indicating the
+                column # in the output matching the
+                order from Column Info and Column Names
+                and data in following Row Data items.
+                A 0 indicates the column is not in the
+                resulting rows.
+
+an example:
+select first_name, last_name, number from employee
+order by salary, number
+assuming the columns are returned in the order
+queried:
+first_name then last_name, then number. we would have:
+----------------
+|  2   | 0 | 3 |
+----------------
+where length = 2 then the orders evaluate:
+0 for salary, meaning there is no salary data returned
+3 for number, meaning the 3rd data item corresponding
+to a column is the number
+</pre>
+
+<p><a name="t170">&nbsp;</a>
+<a name="t171"></a>
+<a name="t229"></a>  </P>
+<hr>
+<h2 class="section">Error Message (0xAA 170)</h2>
+<h2 class="section">Non-error Message (0xAB 171)</h2>
+<h2 class="section">Extended Error Message (0xE5 229)</h2>
+
+<pre>
+ INT16    INT32        INT8    INT8    
++--------+------------+-------+-------+
+| length | msg number | state | level |
++--------+------------+-------+-------+
+
+ INT16      XCHAR[n]  INT8       XCHAR[n]  INT8       XCHAR[n]  INT16             INT32
++----------+---------+----------+---------+----------+---------+-----------------+-----------------+
+| m length | message | s length | server  | p length | process | line#(TDS 7.1-) | line# (TDS 7.2) |
++----------+---------+----------+---------+----------+---------+-----------------+-----------------+
+
+length		Length of packet
+msg number	SQL message number
+state		?
+level		An error if level &gt; 10, a message if level &lt;= 10
+m length	Length of message
+message		Text of error/message
+s length	Length of server name
+server		Name of "server" ?
+p length	Length of process name
+process name	Stored procedure name, if any
+line#		Line number of input which generated the message
+</pre>
+
+<hr>
+
+<h2 class="section">Output Parameters (0xAC 172)</h2>
+<p>
+<a name="t172">&nbsp;</a> 
+Output parameters of a stored procedure.
+<pre>
+ INT16    INT8       XCHAR[n]  INT8    INT32      INT8
++--------+----------+---------+-------+----------+----------+------+
+| length | c length | colname | flags | usertype | datatype | .... | 
++--------+----------+---------+-------+----------+----------+------+
+
+length		Length of packet
+c length	Length of colname
+colname		Name of column
+flags		0x1 Nullable
+usertype	cf. systypes table in database
+<a href="#types">datatype</a>	Type of data returned
+
+The trailing information depends on whether the datatype is
+a fixed size datatype.
+				 N bytes
+				+---------+
+  Datatype of fixed size N	| data    |
+				+---------+
+
+				 INT8          INT8            N bytes
+				+-------------+---------------+--------+
+  Otherwise			| column size | actual size N | data   |
+				+-------------+---------------+--------+
+</pre>
+
+<h2 id="t173" class="section">Login Acknowledgement (0xAD 173)</h2>
+
+<pre>
+ INT16    INT8    4 bytes   INT8       XCHAR[n] 4 bytes
++--------+-------+---------+----------+--------+----------+
+| length |  ack  | version | t length |  text  | ser_ver  |
++--------+-------+---------+----------+--------+----------+
+
+length		length of packet
+ack		0x01 success	4.2
+		0x05 success	5.0
+		0x06 failure	5.0
+version		TDS version 4 bytes:  major.minor.?.?
+t length	length of text
+text		server name (ie 'Microsoft SQL Server')
+ser_ver		Server version
+		(with strange encoding, differring from TDS version)
+</pre>
+
+<P><a name="t209">&nbsp;</a>
+<a name="t211">&nbsp;</a> 
+<hr>
+<h2 class="section">Data - Row Result (0xD1 209)</h2>
+<h2 class="section">Data - Compute Result (0xD3 211)</h2>
+
+<pre>
+ INT8       variable size
++----------+--------------------+
+|  token   |   row data         |
++----------+--------------------+
+</pre>
+<p>
+Row data starts with one byte (decimal 209), for variable length types,
+a one byte length field precedes the data, for fixed length records just
+the data appears.
+<br><i>Note:</i> nullable integers and floats are variable length.
+<p>
+For example: sp_who
+<p>
+The first field is spid, a smallint
+<br>
+The second field is status a char(12), in our example "recv sleep  "
+<p>
+The row would look like this:
+<pre>
+  byte  0 is the token
+  bytes 1-2 are a smallint in low-endian
+  byte  3 is the length of the char field
+  bytes 4-15 is the char field
+
+byte  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
+hex  D1  01  00  0C  72  65  63  76  20  73  6C  65  65  70  20  20
+    209   1   0  12   r   e   c   v ' '   s   l   e   e   p ' ' ' '
+</pre>
+
+<h2 id="t215" class="section">Params - TDS 5.0 (0xD7 215)</h2>
+<p>
+TODO.
+
+<h2 id="t226" class="section">Capability - TDS 5.0 (0xE2 226)</h2>
+
+<pre>
+ INT16    variable
++--------+--------------+
+| length | capabilities |
++--------+--------------+
+
+length		Length of capability string
+capabilities	Server capabilities?  Related to login magic?
+</pre>
+
+<h2 id="t227" class="section">Environment change (0xE3 227)</h2>
+
+<pre>
+ INT16    INT8       INT8        CHAR[n]   INT8        CHAR[n] 
++--------+----------+-----------+---------+-----------+---------+
+| length | env code | t1 length |  text1  | t2 length |  text2  |
++--------+----------+-----------+---------+-----------+---------+
+
+env code	Code for what part of environment changed
+	0x01  database context
+	0x02  language
+	0x03  character set
+	0x04  packet size
+	0x05  TDS 7.0+ LCID
+	0x06  TDS 7.0+ ??? (sort method? sql server encoding?)
+	0x07  Collation info
+text1		Old value
+text2		New value
+
+text1 and text2 are text information (coded in ucs2 in TDS 7.0+) except 
+collation info that's a structure (see collation structure)
+</pre>
+
+<h2 id="t230" class="section">DBRPC - TDS 5.0 (0xE6 230)</h2>
+<p>
+TODO.
+
+<h2 id="t231" class="section">Dynamic - TDS 5.0 (0xE7 231)</h2>
+<p>
+TODO.
+
+<h2 id="t236" class="section">Param Format - TDS 5.0 (0xEC 236)</h2>
+<pre>
+ INT16     INT16        variable size
++---------+------------+-------------------+
+| length  | number of  | parameter info    |
+|         | parameters |                   |
++---------+------------+-------------------+
+
+length            	length of message following this field
+number of parameters	number of parameter formats following
+list of formats		I (*bdw*) imagine it uses the column format structure.
+</pre>
+
+<h2 id="t237" class="section">Authentication - TDS 7.0 (0xED 237)</h2>
+<pre>
+ INT16     varies
++---------+------+
+| length  | auth |
++---------+------+
+
+length   length of authentication data following this field
+auth     authentication data
+         for NTLM this is message 2
+</pre>
+
+<p>Client reply with <a href="#auth7">Authentication packet</a>.</p>
+
+<h2 id="t238" class="section">Result Set - TDS 5.0 (0xEE 238)</h2>
+
+<pre>
+ INT16     INT16        variable size
++---------+------------+-----------------+
+| length  | number of  | column info     |
+|         | columns    |                 |
++---------+------------+-----------------+
+
+
+Fields:
+length             length of message following this field
+number of columns  number of columns in the result set, this many column
+                   information fields will follow.
+column info        <a href="#colInfo">column info</a>
+</pre>
+
+<hr>
+<h2>Done Packets</h2>
+<P>
+<a name="t253"></a>
+<a name="t254"></a>
+<a name="t255"></a> 
+<b class="section">Result Set Done (0xFD 253)</b><br>
+<b class="section">Process Done (0xFE 254)</b><br>
+<b class="section">Done Inside Process (0xFF 255)</b><br>
+
+<pre>
+ INT16       INT16     INT32                  INT64
++-----------+---------+----------------------+---------------------+
+| bit flags | unknown | row count (TDS 7.1-) | row count (TDS 7.2) |
++-----------+---------+----------------------+---------------------+
+
+Fields:
+bit flags          0x01 more results
+		   0x02 error (like invalid sql syntax)
+		   0x10 row count is valid
+		   0x20 cancelled
+unknown            2,0  /* something to do with block size perhaps */
+row count          number of rows affected / returned in the result set. 
+                   row count is 64-bit using TDS 7.2.
+		(FIXME check if "affected / returned" is correct)
+</pre>
+<P>
+"Result Set Complete" is the end of a query that doesn't create a process
+on the server.  I.e., it doesn't call a stored procedure.
+<br>
+"Process Done" is the end of a stored procedure
+<br>
+"Done In Process" means that a query internal to a stored procedure
+has finished, but the stored procedure isn't done overall.
+<br>
+
+<hr>
+
+<h2 class="section">Acknowledgements</h2>
+<p>
+The following people have contributed to this document:
+<ul style="list-style-type: none">
+	<li>Brian Bruns (first draft, protocol discovery)
+	<li>Brian Wheeler (protocol discovery)
+	<li>Mark Schaal (second draft)
+	<li>Frediano Ziglio
+</ul>
+<p>
+(short list)
+
+<h2>Document Status </h2>
+<P>$Id: tds.html,v 1.41 2008-11-25 23:38:33 jklowden Exp $</p>
+<p>
+    <a href="http://validator.w3.org/check?uri=referer"><img
+        src="http://www.w3.org/Icons/valid-html401"
+        alt="Valid HTML 4.01 Strict" height="31" width="88"></a>
+  </p>
+</body>
+</html>

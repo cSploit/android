@@ -1,0 +1,52 @@
+#!/bin/sh
+
+#------------------------------------------------------------------------------
+# $Copyright:
+# Copyright (C) Siemens Nixdorf Informationssysteme AG 1994 - 1998
+# Copyright (C) Siemens AG 1998 1999
+# Copyright (C) Fujitsu Siemens Computers GmbH 1999 2000
+# All rights reserved
+# $
+#------------------------------------------------------------------------------
+
+# save files which will be replaced
+# don't save shell, will not be removed
+
+FILELIST="
+/etc/inet/services
+/etc/inet/inetd.conf
+/etc/profile
+"
+
+echo "saving the original modules $FILELIST ..."
+
+if [ -f /tmp/ERROR.${PKGINST} ]
+then
+	rm /tmp/ERROR.${PKGINST}
+fi
+
+for file in ${FILELIST};do
+	if [ ! -f ${PKGSAV}${file}.Z -a -f ${file} ];then
+		echo ${file} | tr '\040' '\012' | cpio -pvdum ${PKGSAV}
+		/usr/bin/compress ${PKGSAV}${file}
+	fi
+done >/tmp/ERROR.${PKGINST} 2>&1
+
+# check for successful saved modules
+ERR=0
+for file in ${FILELIST}; do
+	[ ! -s ${file} ] && continue
+	if [ ! -f ${PKGSAV}${file}.Z ]; then
+		if [ "$ERR" = '0' ];then
+			echo "\nAn error occurred when saving original modules. \ntmp/ERROR.${PKGINST} contains the reported errors.\n\n"
+			echo "/tmp/ERROR.${PKGINST}:"
+			cat /tmp/ERROR.${PKGINST}
+			ERR=1
+		fi
+		ls -l $file ${PKGSAV}${file}.Z
+	fi
+done
+
+[ "$ERR" = '0' ] && rm -f /tmp/ERROR.${PKGINST}
+
+exit 0

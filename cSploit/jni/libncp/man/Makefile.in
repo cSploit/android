@@ -1,0 +1,61 @@
+
+top_srcdir = @top_srcdir@
+top_builddir = ..
+this_srcdir = ${top_srcdir}/man
+
+include ${top_builddir}/Make.rules
+
+vpath %.1 ${this_srcdir}
+vpath %.5 ${this_srcdir}
+vpath %.8 ${this_srcdir}
+vpath %.3ncp ${this_srcdir}
+
+USE_KERNEL = @USE_KERNEL@
+MOUNT2 = @MOUNT2@
+
+MAN1 := nprint.1 nsend.1 nwauth.1 nwbols.1 nwboprops.1 nwbpset.1 \
+	nwbpvalues.1 nwdir.1 nwfsinfo.1 nwfstime.1 nwpasswd.1 nwpurge.1 \
+	nwrights.1 nwsfind.1 nwtrustee.1 nwuserlist.1 nwvolinfo.1 pqlist.1 \
+	nwpqjob.1 pqstat.1 pserver.1 slist.1 nwpjmv.1
+MAN3 := $(notdir $(wildcard ${this_srcdir}/*.3ncp))
+MAN5 := nwclient.5
+MAN8 := nwbocreate.8 nwborm.8 nwbpadd.8 nwbpcreate.8 nwbprm.8 nwfsctrl.8 \
+	nwgrant.8 nwrevoke.8
+ifeq ($(USE_KERNEL),1)
+MAN1 += ncopy.1
+MAN8 += ncpmount.8 ncpumount.8
+endif
+MAN8 += nwmsg.8
+
+MAN = $(MAN1) $(MAN3) $(MAN5) $(MAN8)
+GZMAN := $(MAN:%=%.gz)
+
+.PHONY : all dep install install-dev clean mrproper distclean
+
+all:	$(GZMAN)
+
+$(GZMAN): %.gz: %
+	gzip -9 -c $< >$@    
+
+dep:
+
+install: all
+	$(INSTALL) -d $(DESTDIR)$(mandir)/man1 $(DESTDIR)$(mandir)/man5 $(DESTDIR)$(mandir)/man8
+	$(INSTALL_DATA) $(MAN1:%=%.gz) $(DESTDIR)$(mandir)/man1
+	$(INSTALL_DATA) $(MAN5:%=%.gz) $(DESTDIR)$(mandir)/man5
+	$(INSTALL_DATA) $(MAN8:%=%.gz) $(DESTDIR)$(mandir)/man8
+	ln -sf nwpqjob.1.gz $(DESTDIR)$(mandir)/man1/pqrm.1.gz
+ifeq ($(USE_KERNEL),1)
+	ln -sf ncpmount.8.gz $(DESTDIR)$(mandir)/man8/mount.ncp.8.gz
+endif
+
+install-dev: all
+	$(INSTALL) -d $(DESTDIR)$(mandir)/man3
+	$(INSTALL_DATA) $(MAN3:%=%.gz) $(DESTDIR)$(mandir)/man3
+
+clean:
+	rm -f *~ *.gz
+
+mrproper: clean
+
+distclean: mrproper

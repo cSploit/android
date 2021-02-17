@@ -1,0 +1,284 @@
+#!/bin/sh
+#
+# Script args:
+# $0: full path to script
+# $1: full path to top level package dir, no trailing slash
+# $2: full path to installed location
+# $3:  ????? Path to install Volume????
+# $4:  ?????
+
+# MacOS Notes
+# 10.0 Cheetah
+# 10.01 Puma
+# 10.2 Jaguar
+# 10.3 Panther (xinetd)
+# 10.4 Tiger - Uses Launchd (xinetd for backward compatibility)
+# 10.5 Leopard - Uses Launchd (No xinetd) (no ni* commands)
+
+OSVERSION=`sw_vers -productVersion | awk -F '.' '{print $2}'`
+echo $OSVERSION
+
+FB_FW="/Library/Frameworks/Firebird.framework"
+FB_RES="$FB_FW/Versions/A/Resources"
+
+if test $OSVERSION -lt 5; then
+# Setup our services entry 
+echo "Setup the service entry 10.4-"
+if niutil -list . /services/gds_db 2&>1 /dev/null ; then
+	echo -n
+else
+	niutil -create . /services/gds_db
+	niutil -createprop . /services/gds_db port 3050
+	niutil -createprop . /services/gds_db protocol tcp tcp
+fi
+fi
+
+
+if test $OSVERSION -lt 5; then 
+# niutil works pre 10.5
+# Now for the group.  If the firebird group already exists, remember the
+# id if we need it to create the firebird user
+echo "Create the Firebird group 10.4-"
+if niutil -list . /groups/firebird 2&>1 /dev/null; then
+	NEW_GID=`niutil -readprop . /groups/firebird gid`
+else
+	NEW_GID=`nigrep gid . /groups | grep ":  gid " | awk '{ print $4 + 1 } ' | sort -n | tail -1`
+	niutil -create . /groups/firebird
+	niutil -createprop . /groups/firebird passwd "*"
+	niutil -createprop . /groups/firebird gid $NEW_GID
+	niutil -createprop . /groups/firebird users firebird
+fi
+else
+
+# No niutil on 10.5
+# Now create the firebird group
+echo "Create the Firebird group 10.5+"
+if dscl localhost -read /Local/Default/Groups/firebird 2&>1 /dev/null; then
+	echo "Group Found" 
+else
+gid=501
+dscl localhost -search /Local/Default/Groups PrimaryGroupID $gid | grep $gid 
+while [ "$?" = "0" ]; do 
+	let "gid =$gid+1"
+	dscl localhost -search /Local/Default/Groups PrimaryGroupID $gid | grep $gid
+done
+	dscl localhost -create /Local/Default/Groups/firebird
+	dscl localhost -create /Local/Default/Groups/firebird Password "*"
+	dscl localhost -create /Local/Default/Groups/firebird PrimaryGroupID $gid
+	dscl localhost -create /Local/Default/Groups/firebird RecordName firebird
+fi
+fi
+
+if test $OSVERSION -lt 5; then
+# niutil works pre 10.5
+# Now create the firebird user
+echo "Create the Firebird user 10.4-"
+if niutil -list . /users/firebird 2&>1 /dev/null; then
+	echo -n
+else
+	NEW_UID=`nigrep uid . /users | grep ":  uid " | awk '{ print $4 + 1 } ' | sort -n | tail -1`
+	niutil -create . /users/firebird
+	niutil -createprop . /users/firebird uid $NEW_UID
+	niutil -createprop . /users/firebird home /Library/Frameworks/Firebird.framework
+	niutil -createprop . /users/firebird passwd "*"
+	niutil -createprop . /users/firebird expire 0
+	niutil -createprop . /users/firebird shell /bin/tcsh
+	niutil -createprop . /users/firebird change 0
+	niutil -createprop . /users/firebird gid $NEW_GID
+	niutil -createprop . /users/firebird realname "Firebird Database"
+fi
+else
+
+# no niutil on 10.5 use dscl
+# Now create the firebird user
+echo "Create the Firebird user 10.5+"
+if dscl localhost -read /Local/Default/Users/firebird 2&>1 /dev/null; then
+	echo "User Found"
+else
+ugid=501
+dscl localhost -search /Local/Default/Users UniqueID $ugid | grep $ugid 
+while [ "$?" = "0" ]; do 
+	let "ugid=$ugid+1"
+	dscl localhost -search /Local/Default/Users UniqueID $ugid | grep $ugid 
+done
+echo "create the firebird user 10.5+"
+	dscl localhost -create /Local/Default/Users/firebird
+	dscl localhost -create /Local/Default/Users/firebird NFSHomeDirectory /Library/Frameworks/firebird.framework
+	dscl localhost -create /Local/Default/Users/firebird Password "*"
+	dscl localhost -create /Local/Default/Users/firebird UserShell /bin/tcsh
+	dscl localhost -create /Local/Default/Users/firebird RecordName firebird
+	dscl localhost -create /Local/Default/Users/firebird PrimaryGroupID $gid 
+	dscl localhost -create /Local/Default/Users/firebird UniqueID $ugid
+	dscl localhost -create /Local/Default/Users/firebird RealName "Firebird Database"
+fi
+fi
+
+# Shutdown any existing servers
+echo "Shutdown any existing servers"
+if [ -x /sbin/service ]; then
+	service firebird stop
+fi
+
+# Install the framework
+echo "Install the framework"
+chown -R firebird:firebird "$FB_FW"
+
+# set the permissions correctly
+echo "Set the permissions correctly"
+if [ -f "$FB_FW/Versions/A/Resources/.SuperServer" ]; then
+    chmod 777 "$FB_FW/Resources/English.lproj/var"
+    chmod 600 "$FB_FW/Resources/English.lproj/var/security2.fdb"
+    chmod 444 "$FB_FW/Resources/English.lproj/var/help/help.fdb"
+else
+    chmod 777 "$FB_FW/Resources/English.lproj/var"
+    chmod 660 "$FB_FW/Resources/English.lproj/var/security2.fdb"
+    chmod 444 "$FB_FW/Resources/English.lproj/var/help/help.fdb"
+
+    chmod a+s "$FB_FW/Resources/bin/gds_drop"
+    chmod a+s "$FB_FW/Resources/bin/fb_inet_server"
+fi
+
+
+# Remove all traces of Classic first
+echo "Remove all traces of Classic first"
+if [ -f /etc/inetd.conf ]; then
+	grep -s gds_db /etc/inetd.conf  > /dev/null 2>&1
+	if test $? != 0 ; then
+		cat /etc/inetd.conf | grep -v gds_db > /etc/.firebird.temp.install.inetd.conf
+		mv /etc/.firebird.temp.install.inetd.conf /etc/inetd.conf
+		HUPNEEDED='y'
+	fi
+fi
+
+if [ -f /etc/xinetd.d/firebird ]; then
+	rm /etc/xinetd.d/firebird
+	HUPNEEDED='y'
+fi
+
+if [ -f /Library/LaunchDaemons/org.firebird.gds.plist ]; then
+	launchctl unload /Library/LaunchDaemons/org.firebird.gds.plist
+	rm /Library/LaunchDaemons/org.firebird.gds.plist
+	HUPNEEDED='y'
+fi
+
+# Install ourselves in the correct place - SuperServer
+echo "Install StartupItem in the correct place SuperServer"
+if [ -f "$FB_FW/Versions/A/Resources/.SuperServer" ]; then
+	rm -fr /Library/StartupItems/Firebird
+	cp -r "$1/Contents/Resources/StartupItem" /Library/StartupItems/Firebird
+else
+	cp -r "$1/Contents/Resources/StartupItem" $FB_FW/Resources/FirebirdSS
+	rm -fr /Library/StartupItems/Firebird
+fi
+
+# Install ourselves in the correct place - Classic 
+echo "Install ourselves in the correct place Classic"
+
+# inetd.d - older versions of MacOS
+echo "Test inetd"
+if [ -f /var/run/inetd.pid -a -d /etc/inetd.d ]; then
+	if [ -f /etc/inetd.conf ]; then
+	echo "gds_db stream  tcp     nowait  root $FB_FW/Resources/bin/fb_inet_server fb_inet_server" > /etc/.fb.inetd.conf.entry
+	cat /etc/inetd.conf /etc/.fb.inetd.conf.entry > /etc/.firebird.temp.install.inetd.conf
+	mv /etc/.firebird.temp.install.inetd.conf /etc/inetd.conf
+        rm -f /etc/.fb.inetd.conf.entry
+	HUPNEEDED='y'
+	fi
+fi
+
+# xinetd.d - Pre MacOS 10.5 (Leopard)
+echo "Test xinetd.d"
+if [ -f "$FB_FW/Versions/A/Resources/.SuperServer" ]; then
+echo -n
+else
+if [ -f /etc/xinet.d ]; then
+cat > /etc/xinetd.d/firebird <<EOF
+service gds_db
+{
+        disable		= no
+        socket_type     = stream
+        wait            = no
+        user            = firebird
+EOF
+		echo "server          = $FB_FW/Resources/bin/fb_inet_server" >> /etc/xinetd.d/firebird
+		cat >> /etc/xinetd.d/firebird << EOF
+        groups          = yes
+}
+EOF
+
+	    HUPNEEDED='y'
+fi
+fi
+
+# launchd
+echo "Test launchd"
+if [ -f "$FB_FW/Versions/A/Resources/.SuperServer" ]; then
+echo -n
+else
+cp $FB_FW/Resources/org.firebird.gds.plist /Library/LaunchDaemons/org.firebird.gds.plist
+launchctl load /Library/LaunchDaemons/org.firebird.gds.plist
+fi
+
+# Make sure the hosts.equiv files are set correctly
+echo "Make sure hosts.equiv files are set correctly"
+cp /etc/hosts.equiv /etc/hosts.equiv.fbsave
+if grep -x "localhost" /etc/hosts.equiv > /dev/null; then                
+	echo -n
+else     
+    echo "localhost" >> /etc/hosts.equiv                
+fi    
+if grep -x "localhost.localdomain" /etc/hosts.equiv > /dev/null; then    
+	echo -n
+else     
+    echo "localhost.localdomain" >> /etc/hosts.equiv    
+fi    
+
+# Install the saved security database, if any
+echo "Install the saved security database"
+if test -f /tmp/fb-security-database-update2.fdb; then
+	mv -f /tmp/fb-security-database-update2.fdb "$FB_RES/English.lproj/var/security2.fdb"
+	rm -f /tmp/fb-security-database-update2.fdb
+fi
+
+#Install the saved databases.conf, if any
+echo "Install the saved databases.conf file"
+if test -f /tmp/fb-databases.conf; then
+	mv -f /tmp/fb-databases.conf "$FB_RES/English.lproj/var/databases.conf"
+fi
+
+#Install the saved UDF libraries, if any
+echo "Install the saved UDF libraries"
+for file in /tmp/*UDF_save_*; do
+new=`echo $file | sed -e 's/UDF_save_//g'`
+return=`basename $new`
+cp $file "$FB_RES/English.lproj/var/UDF/$return"
+rm $file
+done
+
+#If classic, add libfbclient to dynamic loader search path
+echo "Add libfbclient to dynamic loader search path"
+if [ ! -f "$FB_FW/Versions/A/Resources/.SuperServer" ]; then
+ln -s "$FB_FW/Libraries/libfbclient.dylib" /usr/local/lib/libfbclient.dylib
+fi
+
+# Tell inetd/xinetd to reload their configuration files.
+echo "Tell inetd/xinetd to reload configuration files"
+if [ "$HUPNEEDED" = 'y' ]
+then
+    #INETPID=`ps -axe | grep inetd | awk '{print $1}'`
+	if [ -f /var/run/inetd.pid ]
+	then
+    	kill -HUP `cat /var/run/inetd.pid`
+	fi
+	if [ -f /var/run/xinetd.pid ]
+	then
+    	kill -HUP `cat /var/run/xinetd.pid`
+	fi
+fi
+
+# And last but not least, start the server
+echo "Start SuperServer"
+if [ -f "$FB_FW/Versions/A/Resources/.SuperServer" ]; then
+	chmod u+xg+xo+x /Library/StartupItems/Firebird/Firebird
+	/Library/StartupItems/Firebird/Firebird start
+fi

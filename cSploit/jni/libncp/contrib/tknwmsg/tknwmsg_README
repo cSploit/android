@@ -1,0 +1,40 @@
+Tknwmsg 1.0 for NCPFS. 
+
+Kevin Burton (kburto1@umbc.edu), Copyright 1996
+Distributed under GPL (GNU Public License)
+
+-- INTRO --
+
+Tknwmesg is a extension for ncpfs for linux that allows users to recived messages
+while under an X console.  
+
+Essentially it is an extension for nwmsg that comes with ncpfs.  The only 
+changes are a system() call to a tk script that will run a dialog with an "ok"
+button under X.
+
+--  INSTALLATION --
+TCL/TK must be installed on your system.  If they are not then you will have to
+get the source for their installation if you want to run tkmesg.  
+
+	-  Download ncpfs from sunsite.unc.edu
+	-  Run "su" to become root if you are not already root.
+	-  Unpack ncpfs in a temporary directory.
+	-  copy the Tknwmsg nwmsg.c to util/nwmsg.c in your ncpfs directory.
+	-  copy tknwmsg to /usr/bin
+	-  change to your nwmsg directory.
+	-  run "make all;make install" and the new version of tknwmsg will be 
+	   installed.
+	  
+--  USE --
+
+	- At least 1 terminal on the local system must be have "mesg y".  Else
+	  no GUI dialog will be displayed.
+          
+          Using mesg y in a .bashrc will not work.  The only way that I have 
+	  found to do this is to have chmod a+w /dev/ttyp? in Xsession or 
+   	  $HOME/.xsession.  Also it may be necessary to have .bashrc do the
+	  same thing if users are starting and stopping xterms.
+
+
+
+

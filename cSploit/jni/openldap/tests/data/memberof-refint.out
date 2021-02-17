@@ -1,0 +1,125 @@
+# Search the entire database...
+dn: cn=Baby Herman,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Baby Herman
+sn: Herman
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+dn: cn=Cartoonia,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Cartoonia
+member: cn=Roger Rabbit,ou=People,dc=example,dc=com
+member: cn=Baby Herman,ou=People,dc=example,dc=com
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=Roger Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+# Re-search the entire database...
+dn: cn=Baby Herman,ou=Toons,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Baby Herman
+sn: Herman
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+dn: cn=Cartoonia,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Cartoonia
+member: cn=Roger Rabbit,ou=Toons,dc=example,dc=com
+member: cn=Baby Herman,ou=Toons,dc=example,dc=com
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=Roger Rabbit,ou=Toons,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+dn: ou=Toons,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Toons
+
+# Re-search the entire database...
+dn: cn=Baby Herman,ou=Toons,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Baby Herman
+sn: Herman
+memberOf: cn=Cartoonia,ou=Studios,dc=example,dc=com
+
+dn: cn=Cartoonia,ou=Studios,dc=example,dc=com
+objectClass: groupOfNames
+cn: Cartoonia
+member: cn=Roger Rabbit,ou=Toons,dc=example,dc=com
+member: cn=Baby Herman,ou=Toons,dc=example,dc=com
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: cn=Roger Rabbit,ou=Toons,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+memberOf: cn=Cartoonia,ou=Studios,dc=example,dc=com
+
+dn: ou=Studios,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Studios
+
+dn: ou=Toons,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Toons
+
+# Re-search the entire database...
+dn: cn=Cartoonia,ou=Studios,dc=example,dc=com
+objectClass: groupOfNames
+cn: Cartoonia
+member: cn=Roger Rabbit,ou=Toons,dc=example,dc=com
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: cn=Roger Rabbit,ou=Toons,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+memberOf: cn=Cartoonia,ou=Studios,dc=example,dc=com
+
+dn: ou=Studios,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Studios
+
+dn: ou=Toons,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Toons
+

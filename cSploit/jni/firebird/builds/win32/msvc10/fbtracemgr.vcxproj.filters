@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="UTILITIES files">
+      <UniqueIdentifier>{b6b8c307-b3d5-4d7f-a5c4-4e450cbe1658}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{c8f684e3-ddb4-45aa-8ea4-32c393dd0052}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{4bad3699-e854-4f4e-b122-6760d3b20813}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JRD files">
+      <UniqueIdentifier>{b3969856-669d-4782-abb7-0097a5a60e97}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\utilities\fbtracemgr\traceMgrMain.cpp">
+      <Filter>UTILITIES files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\trace\TraceCmdLine.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

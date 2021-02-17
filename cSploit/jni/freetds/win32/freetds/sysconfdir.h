@@ -1,0 +1,1 @@
+#define FREETDS_SYSCONFDIR "c:"

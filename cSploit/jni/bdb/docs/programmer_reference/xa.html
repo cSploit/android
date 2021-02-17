@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 13.  Distributed Transactions</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="prev" href="rep_ex_chan.html" title="Ex_rep_chan: a Replication Manager channel example" />
+    <link rel="next" href="ch13s02.html" title="Berkeley DB XA Implementation" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 13. 
+		Distributed Transactions
+        </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="rep_ex_chan.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="ch13s02.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="xa"></a>Chapter 13. 
+		Distributed Transactions
+        </h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="xa.html#xa_intro">Introduction</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="ch13s02.html">Berkeley DB XA Implementation</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="xa_build.html">Building a Global Transaction Manager</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="xa_build.html#idp2338192">Communicating with multiple Berkeley DB environments</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="xa_build.html#idp2339136">Recovering from GTM failure</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="xa_build.html#idp2272528">Managing the Global Transaction ID (GID) name space</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="xa_build.html#idp2291232">Maintaining state for each distributed transaction.</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="xa_build.html#idp2336712">Recovering from the failure of a single environment</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="xa_build.html#idp2339600">Recovering from GTM failure</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="xa_xa_intro.html">XA Introduction</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="xa_xa_config.html">Configuring Berkeley DB with the Tuxedo System</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="xa_xa_config.html#idp2346992">Update the Resource Manager File in Tuxedo</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="xa_xa_config.html#idp2372504">Build the Transaction Manager Server</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="xa_xa_config.html#idp2318584">Update the UBBCONFIG File</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="xa_xa_restrict.html">Restrictions on XA Transactions</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="xa_faq.html">XA: Frequently Asked Questions</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="xa_intro"></a>Introduction</h2>
+            </div>
+          </div>
+        </div>
+        <p>An application must use distributed transactions whenever it wants transactional semantics either
+across operations in multiple Berkeley DB environments (even if they are on the same machine) 
+or across operations in Berkeley DB and some other database systems (for example, Oracle server).
+Berkeley DB provides support for distributed transactions using a two-phase
+commit protocol. In order to use the two-phase commit feature of Berkeley DB, an application
+must either implement its own global transaction manager or use an
+XA-compliant transaction manager such as Oracle Tuxedo (as Berkeley DB can act as an XA-compliant
+resource manager). 
+</p>
+        <p>This chapter explains Berkeley DB's XA-compliant resource manager, which can be used in any X/Open
+distributed transaction processing system, and explains how to configure 
+Oracle Tuxedo to use the Berkeley DB resource manager.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="rep_ex_chan.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="ch13s02.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Ex_rep_chan: a Replication Manager
+channel example </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Berkeley DB XA Implementation</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

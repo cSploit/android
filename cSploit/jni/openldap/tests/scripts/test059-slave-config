@@ -1,0 +1,430 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+if test $SYNCPROV = syncprovno; then 
+	echo "Syncrepl provider overlay not available, test skipped"
+	exit 0
+fi 
+
+CFPRO=$TESTDIR/cfpro.d
+CFCON=$TESTDIR/cfcon.d
+
+mkdir -p $TESTDIR $DBDIR1A $DBDIR1B $DBDIR2A $CFPRO $CFCON
+
+$SLAPPASSWD -g -n >$CONFIGPWF
+
+if test x"$SYNCMODE" = x ; then
+	SYNCMODE=rp
+fi
+case "$SYNCMODE" in
+	ro)
+		SYNCTYPE="type=refreshOnly interval=00:00:00:03"
+		;;
+	rp)
+		SYNCTYPE="type=refreshAndPersist"
+		;;
+	*)
+		echo "unknown sync mode $SYNCMODE"
+		exit 1;
+		;;
+esac
+
+#
+# Test replication of dynamic config with alternate slave config:
+# - start provider
+# - start consumer
+# - configure over ldap
+# - populate over ldap
+# - configure syncrepl over ldap
+# - retrieve database over ldap and compare against expected results
+#
+
+echo "Starting provider slapd on TCP/IP port $PORT1..."
+. $CONFFILTER $BACKEND $MONITORDB < $DYNAMICCONF > $CONFLDIF
+$SLAPADD -F $CFPRO -n 0 -l $CONFLDIF
+$SLAPD -F $CFPRO -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID"
+
+sleep 1
+
+echo "Using ldapsearch to check that provider slapd is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI1 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Inserting syncprov overlay on provider..."
+if [ "$SYNCPROV" = syncprovmod ]; then
+	$LDAPADD -D cn=config -H $URI1 -y $CONFIGPWF <<EOF > $TESTOUT 2>&1
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: ../servers/slapd/overlays
+olcModuleLoad: syncprov.la
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed for moduleLoad ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+fi
+read CONFIGPW < $CONFIGPWF
+$LDAPMODIFY -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcOverlay=syncprov,olcDatabase={0}config,cn=config
+changetype: add
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: syncprov
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for syncprov config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Slaves will not replicate the master's actual cn=config.
+# Instead, they will use an alternate DB so that they may be
+# configured differently from the master. This alternate DB
+# will also be a consumer for the real cn=schema,cn=config tree.
+# It has MirrorMode enabled so that it can be written directly
+# while being a slave of the main schema.
+echo "Configuring slave config DB on provider..."
+$LDAPMODIFY -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: cn=config
+changetype: modify
+add: olcServerID
+olcServerID: 1
+
+dn: olcDatabase={1}ldif,cn=config
+changetype: add
+objectClass: olcDatabaseConfig
+objectClass: olcLdifConfig
+olcDatabase: {1}ldif
+olcDbDirectory: $DBDIR1A
+olcSuffix: cn=config,cn=slave
+olcRootDN: cn=config,cn=slave
+olcRootPW: repsecret
+olcAccess: to * by dn.base="cn=config" write
+
+dn: olcOverlay=syncprov,olcDatabase={1}ldif,cn=config
+changetype: add
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: syncprov
+
+dn: cn=config,cn=slave
+changetype: add
+objectClass: olcGlobal
+cn: slaveconfig
+
+dn: cn=schema,cn=config,cn=slave
+changetype: add
+objectClass: olcSchemaConfig
+cn: schema
+
+dn: olcDatabase={0}config,cn=config,cn=slave
+changetype: add
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcRootPW: topsecret
+olcSyncrepl: {0}rid=001 provider=$URI1 binddn="cn=config,cn=slave"
+  bindmethod=simple credentials=repsecret searchbase="cn=config,cn=slave"
+  $SYNCTYPE retry="3 5 300 5" timeout=3 suffixmassage="cn=config"
+olcUpdateRef: $URI1
+
+dn: olcDatabase={1}ldif,cn=config
+changetype: modify
+add: olcSyncrepl
+olcSyncrepl: {0}rid=001 provider=$URI1 binddn="cn=config"
+  bindmethod=simple credentials=$CONFIGPW searchbase="cn=schema,cn=config"
+  $SYNCTYPE retry="3 5 300 5" timeout=3
+  suffixmassage="cn=schema,cn=config,cn=slave"
+-
+add: olcMirrorMode
+olcMirrorMode: TRUE
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for slave DB config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting consumer slapd on TCP/IP port $PORT2..."
+$SLAPADD -F $CFCON -n 0 -l $CONFLDIF
+$SLAPD -F $CFCON -h $URI2 -d $LVL $TIMING > $LOG2 2>&1 &
+SLAVEPID=$!
+if test $WAIT != 0 ; then
+    echo SLAVEPID $SLAVEPID
+    read foo
+fi
+KILLPIDS="$KILLPIDS $SLAVEPID"
+
+sleep 1
+
+echo "Using ldapsearch to check that consumer slapd is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI2 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Configuring syncrepl on consumer..."
+$LDAPMODIFY -D cn=config -H $URI2 -y $CONFIGPWF <<EOF >>$TESTOUT 2>&1
+dn: olcDatabase={0}config,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=001 provider=$URI1 binddn="cn=config,cn=slave"
+  bindmethod=simple credentials=repsecret searchbase="cn=config,cn=slave"
+  $SYNCTYPE retry="3 5 300 5" timeout=3
+  suffixmassage="cn=config"
+-
+add: olcUpdateRef
+olcUpdateRef: $URI1
+EOF
+
+echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+sleep $SLEEP1
+
+echo "Using ldapsearch to check that syncrepl received config changes..."
+RC=32
+for i in 0 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI2 -D cn=config -y $CONFIGPWF \
+		-s base -b "olcDatabase={0}config,cn=config" \
+		'(olcUpdateRef=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+	sleep $SLEEP1
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding schema and databases on provider..."
+$LDAPADD -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >>$TESTOUT 2>&1
+include: file://$ABS_SCHEMADIR/core.ldif
+
+include: file://$ABS_SCHEMADIR/cosine.ldif
+
+include: file://$ABS_SCHEMADIR/inetorgperson.ldif
+
+include: file://$ABS_SCHEMADIR/openldap.ldif
+
+include: file://$ABS_SCHEMADIR/nis.ldif
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for schema config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+nullExclude="" nullOK=""
+test $BACKEND = null && nullExclude="# " nullOK="OK"
+
+if [ "$BACKENDTYPE" = mod ]; then
+	$LDAPADD -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >>$TESTOUT 2>&1
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: ../servers/slapd/back-$BACKEND
+olcModuleLoad: back_$BACKEND.la
+
+dn: cn=module,cn=config,cn=slave
+objectClass: olcModuleList
+cn: module
+olcModulePath: ../servers/slapd/back-$BACKEND
+olcModuleLoad: back_$BACKEND.la
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed for backend config ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+fi
+
+$LDAPADD -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >>$TESTOUT 2>&1
+dn: olcDatabase={2}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {2}$BACKEND
+olcSuffix: $BASEDN
+${nullExclude}olcDbDirectory: $DBDIR1B
+olcRootDN: $MANAGERDN
+olcRootPW: $PASSWD
+olcSyncRepl: rid=002 provider=$URI1 binddn="$MANAGERDN" bindmethod=simple
+  credentials=$PASSWD searchbase="$BASEDN" $SYNCTYPE
+  retry="3 5 300 5" timeout=3
+olcUpdateRef: $URI1
+
+dn: olcOverlay=syncprov,olcDatabase={2}${BACKEND},cn=config
+changetype: add
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: syncprov
+
+dn: olcDatabase={1}$BACKEND,cn=config,cn=slave
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+olcSuffix: $BASEDN
+${nullExclude}olcDbDirectory: $DBDIR2A
+olcRootDN: $MANAGERDN
+olcRootPW: $PASSWD
+olcSyncRepl: rid=002 provider=$URI1 binddn="$MANAGERDN" bindmethod=simple
+  credentials=$PASSWD searchbase="$BASEDN" $SYNCTYPE
+  retry="3 5 300 5" timeout=3
+olcUpdateRef: $URI1
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for database config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+if test $INDEXDB = indexdb ; then
+	$LDAPMODIFY -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >>$TESTOUT 2>&1
+dn: olcDatabase={2}$BACKEND,cn=config
+changetype: modify
+add: olcDbIndex
+olcDbIndex: objectClass,entryUUID,entryCSN eq
+olcDbIndex: cn,uid pres,eq,sub
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd modify for database config ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+fi
+
+echo "Using ldapadd to populate provider..."
+$LDAPADD -D "$MANAGERDN" -H $URI1 -w $PASSWD -f $LDIFORDERED \
+	>> $TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for database config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+sleep $SLEEP1
+
+echo "Using ldapsearch to check that syncrepl received database changes..."
+RC=32
+for i in 0 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI2 \
+		-s base -b "cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+	sleep $SLEEP1
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to read all the entries from the provider..."
+$LDAPSEARCH -S "" -b "$BASEDN" -D "$MANAGERDN" -H $URI1 -w $PASSWD  \
+	'objectclass=*' > $MASTEROUT 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at provider ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to read all the entries from the consumer..."
+$LDAPSEARCH -S "" -b "$BASEDN" -D "$MANAGERDN" -H $URI2 -w $PASSWD  \
+	'objectclass=*' > $SLAVEOUT 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at consumer ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+echo "Filtering provider results..."
+$LDIFFILTER < $MASTEROUT > $MASTERFLT
+echo "Filtering consumer results..."
+$LDIFFILTER < $SLAVEOUT > $SLAVEFLT
+
+echo "Comparing retrieved entries from provider and consumer..."
+$CMP $MASTERFLT $SLAVEFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "test failed - provider and consumer databases differ"
+	exit 1
+fi
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

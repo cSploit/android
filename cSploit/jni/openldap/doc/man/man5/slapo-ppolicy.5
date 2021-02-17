@@ -1,0 +1,805 @@
+.TH SLAPO_PPOLICY 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2004-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-ppolicy \- Password Policy overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+.LP
+The 
+.B ppolicy
+overlay
+is an implementation of the most recent IETF Password
+Policy proposal for LDAP.   When instantiated, it intercepts,
+decodes and applies specific password policy controls to overall
+use of a backend database, changes to user password fields, etc.
+.P
+The overlay provides a variety of password control mechanisms.  They
+include password aging -- both minimum and maximum ages, password
+reuse and duplication control, account time-outs, mandatory password
+resets, acceptable password content, and even grace logins.
+Different groups of users may be associated with different password
+policies, and there is no limit to the number of password policies
+that may be created.
+.P
+Note that some of the policies do not take effect when the operation
+is performed with the
+.B rootdn
+identity; all the operations, when performed with any other identity,
+may be subjected to constraints, like access control.
+.P
+Note that the IETF Password Policy proposal for LDAP makes sense
+when considering a single-valued password attribute, while 
+the userPassword attribute allows multiple values.  This implementation
+enforces a single value for the userPassword attribute, despite
+its specification.
+
+.SH CONFIGURATION
+These 
+.B slapd.conf
+configuration options apply to the ppolicy overlay. They should appear
+after the
+.B overlay
+directive.
+.TP
+.B ppolicy_default <policyDN>
+Specify the DN of the pwdPolicy object to use when no specific policy is
+set on a given user's entry. If there is no specific policy for an entry
+and no default is given, then no policies will be enforced.
+.TP
+.B ppolicy_forward_updates
+Specify that policy state changes that result from Bind operations (such
+as recording failures, lockout, etc.) on a consumer should be forwarded
+to a master instead of being written directly into the consumer's local
+database. This setting is only useful on a replication consumer, and
+also requires the
+.B updateref
+setting and
+.B chain
+overlay to be appropriately configured.
+.TP
+.B ppolicy_hash_cleartext
+Specify that cleartext passwords present in Add and Modify requests should
+be hashed before being stored in the database. This violates the X.500/LDAP
+information model, but may be needed to compensate for LDAP clients that
+don't use the Password Modify extended operation to manage passwords.  It
+is recommended that when this option is used that compare, search, and
+read access be denied to all directory users. 
+.TP
+.B ppolicy_use_lockout
+A client will always receive an LDAP
+.B InvalidCredentials
+response when
+Binding to a locked account. By default, when a Password Policy control
+was provided on the Bind request, a Password Policy response will be
+included with no special error code set. This option changes the
+Password Policy response to include the
+.B AccountLocked
+error code. Note
+that sending the
+.B AccountLocked
+error code provides useful information
+to an attacker; sites that are sensitive to security issues should not
+enable this option.
+
+.SH OBJECT CLASS
+The 
+.B ppolicy
+overlay depends on the
+.B pwdPolicy
+object class.  The definition of that class is as follows:
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.2.1
+    NAME 'pwdPolicy'
+    AUXILIARY
+    SUP top
+    MUST ( pwdAttribute )
+    MAY (
+        pwdMinAge $ pwdMaxAge $ pwdInHistory $
+        pwdCheckQuality $ pwdMinLength $
+        pwdExpireWarning $ pwdGraceAuthnLimit $
+        pwdLockout $ pwdLockoutDuration $
+        pwdMaxFailure $ pwdFailureCountInterval $
+        pwdMustChange $ pwdAllowUserChange $
+        pwdSafeModify ) )
+.RE
+
+This implementation also provides an additional
+.B pwdPolicyChecker
+objectclass, used for password quality checking (see below).
+.LP
+.RS 4
+(  1.3.6.1.4.1.4754.2.99.1
+    NAME 'pwdPolicyChecker'
+    AUXILIARY
+    SUP top
+    MAY ( pwdCheckModule ) )
+.RE
+.P
+Every account that should be subject to password policy control should
+have a
+.B
+pwdPolicySubentry
+attribute containing the DN of a valid
+.B pwdPolicy
+entry, or they can simply use the configured default.
+In this way different users may be managed according to
+different policies.
+
+.SH OBJECT CLASS ATTRIBUTES
+.P
+Each one of the sections below details the meaning and use of a particular
+attribute of this
+.B pwdPolicy
+object class.
+.P
+
+.B pwdAttribute
+.P
+This attribute contains the name of the attribute to which the password
+policy is applied. For example, the password policy may be applied
+to the
+.B userPassword
+attribute.
+.P
+Note: in this implementation, the only
+value accepted for
+.B pwdAttribute
+is
+.IR " userPassword ".
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.1
+   NAME 'pwdAttribute'
+   EQUALITY objectIdentifierMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.38 )
+.RE
+
+.B pwdMinAge
+.P
+This attribute contains the number of seconds that must elapse
+between modifications allowed to the password. If this attribute
+is not present, zero seconds is assumed (i.e. the password may be
+modified whenever and however often is desired).
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.2
+   NAME 'pwdMinAge'
+   EQUALITY integerMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE\-VALUE )
+.RE
+
+.B pwdMaxAge
+.P
+This attribute contains the number of seconds after which a modified
+password will expire.  If this attribute is not present, or if its
+value is zero (0), then passwords will not expire.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.3
+   NAME 'pwdMaxAge'
+   EQUALITY integerMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE\-VALUE )
+.RE
+
+.B pwdInHistory
+.P
+This attribute is used to specify the maximum number of used
+passwords that will be stored in the
+.B pwdHistory
+attribute.  If the
+.B pwdInHistory
+attribute is not present, or if its value is
+zero (0), used passwords will not be stored in
+.B pwdHistory
+and thus any previously-used password may be reused.
+No history checking occurs if the password is being modified by the
+.BR rootdn ,
+although the password is saved in the history.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.4
+   NAME 'pwdInHistory'
+   EQUALITY integerMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE\-VALUE )
+.RE
+
+.B pwdCheckQuality
+.P
+This attribute indicates if and how password syntax will be checked
+while a password is being modified or added. If this attribute is
+not present, or its value is zero (0), no syntax checking will be
+done. If its value is one (1), the server will check the syntax,
+and if the server is unable to check the syntax,
+whether due to a client-side hashed password or some other reason,
+it will be
+accepted. If its value is two (2), the server will check the syntax,
+and if the server is unable to check the syntax it will return an
+error refusing the password.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.5
+   NAME 'pwdCheckQuality'
+   EQUALITY integerMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE\-VALUE )
+.RE
+
+.B pwdMinLength
+.P
+When syntax checking is enabled
+(see also the
+.B pwdCheckQuality
+attribute), this attribute contains the minimum
+number of characters that will be accepted in a password. If this
+attribute is not present, minimum password length is not
+enforced. If the server is unable to check the length of the password,
+whether due to a client-side hashed password or some other reason,
+the server will, depending on the
+value of
+.BR pwdCheckQuality ,
+either accept the password
+without checking it (if
+.B pwdCheckQuality
+is zero (0) or one (1)) or refuse it (if
+.B pwdCheckQuality
+is two (2)).
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.6
+   NAME 'pwdMinLength'
+   EQUALITY integerMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE\-VALUE )
+.RE
+
+.B pwdExpireWarning
+.P
+This attribute contains the maximum number of seconds before a
+password is due to expire that expiration warning messages will be
+returned to a user who is authenticating to the directory.
+If this attribute is not
+present, or if the value is zero (0), no warnings will be sent.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.7
+   NAME 'pwdExpireWarning'
+   EQUALITY integerMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE\-VALUE )
+.RE
+
+.B pwdGraceAuthnLimit
+.P
+This attribute contains the number of times that an expired password
+may be used to authenticate a user to the directory. If this
+attribute is not present or if its value is zero (0), users with
+expired passwords will not be allowed to authenticate to the
+directory.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.8
+   NAME 'pwdGraceAuthnLimit'
+   EQUALITY integerMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE\-VALUE )
+.RE
+
+.B pwdLockout
+.P
+This attribute specifies the action that should be taken
+by the directory when a user has made a number of failed attempts
+to authenticate to the directory.  If
+.B pwdLockout
+is set (its value is "TRUE"), the user will not be allowed to
+attempt to authenticate to the directory after there have been a
+specified number of consecutive failed bind attempts.  The maximum
+number of consecutive failed bind attempts allowed is specified by
+the
+.B pwdMaxFailure
+attribute.  If
+.B pwdLockout
+is not present, or if its value is "FALSE", the password may be
+used to authenticate no matter how many consecutive failed bind
+attempts have been made.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.9
+   NAME 'pwdLockout'
+   EQUALITY booleanMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+   SINGLE\-VALUE )
+.RE
+
+.B pwdLockoutDuration
+.P
+This attribute contains the number of seconds during
+which the password cannot be used to authenticate the
+user to the directory due to too many consecutive failed
+bind attempts.
+(See also
+.B pwdLockout
+and
+.BR pwdMaxFailure .)
+If
+.B pwdLockoutDuration
+is not present, or if its value is zero (0), the password
+cannot be used to authenticate the user to the directory
+again until it is reset by an administrator.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.10
+   NAME 'pwdLockoutDuration'
+   EQUALITY integerMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE\-VALUE )
+.RE
+
+.B pwdMaxFailure
+.P
+This attribute contains the number of consecutive failed bind
+attempts after which the password may not be used to authenticate
+a user to the directory.
+If
+.B pwdMaxFailure
+is not present, or its value is zero (0), then a user will
+be allowed to continue to attempt to authenticate to
+the directory, no matter how many consecutive failed 
+bind attempts have occurred with that user's DN.
+(See also
+.B pwdLockout
+and
+.BR pwdLockoutDuration .)
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.11
+   NAME 'pwdMaxFailure'
+   EQUALITY integerMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE\-VALUE )
+.RE
+
+.B pwdFailureCountInterval
+.P
+This attribute contains the number of seconds after which old
+consecutive failed bind attempts are purged from the failure counter,
+even though no successful authentication has occurred.
+If
+.B pwdFailureCountInterval
+is not present, or its value is zero (0), the failure
+counter will only be reset by a successful authentication.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.12
+   NAME 'pwdFailureCountInterval'
+   EQUALITY integerMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+   SINGLE\-VALUE )
+.RE
+
+.B pwdMustChange
+.P
+This attribute specifies whether users must change their passwords
+when they first bind to the directory after a password is set or
+reset by the administrator, or not.  If
+.B pwdMustChange
+has a value of "TRUE", users must change their passwords when they
+first bind to the directory after a password is set or reset by
+the administrator.  If
+.B pwdMustChange
+is not present, or its value is "FALSE",
+users are not required to change their password upon binding after
+the administrator sets or resets the password.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.13
+  NAME 'pwdMustChange'
+  EQUALITY booleanMatch
+  SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+  SINGLE\-VALUE )
+.RE
+
+.B pwdAllowUserChange
+.P
+This attribute specifies whether users are allowed to change their own
+passwords or not.  If
+.B pwdAllowUserChange
+is set to "TRUE", or if the attribute is not present, users will be
+allowed to change their own passwords.  If its value is "FALSE",
+users will not be allowed to change their own passwords.
+.LP
+Note: this implies that when
+.B pwdAllowUserChange
+is set to "TRUE",
+users will still be able to change the password of another user,
+subjected to access control.
+This restriction only applies to modifications of ones's own password.
+It should also be noted that
+.B pwdAllowUserChange
+was defined in the specification to provide rough access control
+to the password attribute in implementations that do not allow fine-grain
+access control.
+Since OpenLDAP provides fine-grain access control, the use of this attribute
+is discouraged; ACLs should be used instead
+(see
+.BR slapd.access (5)
+for details).
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.14
+   NAME 'pwdAllowUserChange'
+   EQUALITY booleanMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+   SINGLE\-VALUE )
+.RE
+
+.B pwdSafeModify
+.P
+This attribute denotes whether the user's existing password must be sent
+along with their new password when changing a password.  If
+.B pwdSafeModify
+is set to "TRUE", the existing password must be sent
+along with the new password.  If the attribute is not present, or
+its value is "FALSE", the existing password need not be sent
+along with the new password.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.15
+   NAME 'pwdSafeModify'
+   EQUALITY booleanMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+   SINGLE\-VALUE )
+.RE
+
+.B pwdCheckModule
+.P
+This attribute names a user-defined loadable module that must
+instantiate the check_password() function.  This function
+will be called to further check a new password if
+.B pwdCheckQuality
+is set to one (1) or two (2),
+after all of the built-in password compliance checks have
+been passed.  This function will be called according to this
+function prototype:
+.RS 4
+int
+.I check_password
+(char *pPasswd, char **ppErrStr, Entry *pEntry);
+.RE
+The
+.B pPasswd
+parameter contains the clear-text user password, the
+.B ppErrStr
+parameter contains a double pointer that allows the function
+to return human-readable details about any error it encounters.
+The optional
+.B pEntry
+parameter, if non-NULL, carries a pointer to the
+entry whose password is being checked.
+If
+.B ppErrStr
+is NULL, then 
+.I funcName
+must NOT attempt to use it/them.
+A return value of LDAP_SUCCESS from the called
+function indicates that the password is ok, any other value
+indicates that the password is unacceptable.  If the password is
+unacceptable, the server will return an error to the client, and
+.B ppErrStr
+may be used to return a human-readable textual explanation of the
+error. The error string must be dynamically allocated as it will
+be free()'d by slapd.
+.LP
+.RS 4
+(  1.3.6.1.4.1.4754.1.99.1
+   NAME 'pwdCheckModule'
+   EQUALITY caseExactIA5Match
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+   SINGLE\-VALUE )
+.RE
+.P
+Note: 
+The user-defined loadable module named by
+.B pwdCheckModule     
+must be in
+.B slapd's
+standard executable search PATH.
+.P
+Note:
+.B pwdCheckModule
+is a non-standard extension to the LDAP password
+policy proposal.
+
+.SH OPERATIONAL ATTRIBUTES
+.P
+The operational attributes used by the
+.B ppolicy
+module are stored in the user's entry.  Most of these attributes
+are not intended to be changed directly by users; they are there
+to track user activity.  They have been detailed here so that
+administrators and users can both understand the workings of
+the
+.B ppolicy
+module.
+
+.P
+Note that the current IETF Password Policy proposal does not define
+how these operational attributes are expected to behave in a
+replication environment. In general, authentication attempts on
+a slave server only affect the copy of the operational attributes
+on that slave and will not affect any attributes for
+a user's entry on the master server. Operational attribute changes
+resulting from authentication attempts on a master server
+will usually replicate to the slaves (and also overwrite
+any changes that originated on the slave). 
+These behaviors are not guaranteed and are subject to change
+when a formal specification emerges.
+
+.B userPassword
+.P
+The
+.B userPassword
+attribute is not strictly part of the
+.B ppolicy
+module.  It is, however, the attribute that is tracked and controlled
+by the module.  Please refer to the standard OpenLDAP schema for
+its definition.
+
+.B pwdPolicySubentry
+.P
+This attribute refers directly to the
+.B pwdPolicy
+subentry that is to be used for this particular directory user.
+If
+.B pwdPolicySubentry
+exists, it must contain the DN of a valid
+.B pwdPolicy
+object.  If it does not exist, the
+.B ppolicy
+module will enforce the default password policy rules on the
+user associated with this authenticating DN. If there is no
+default, or the referenced subentry does not exist, then no
+policy rules will be enforced.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.23
+   NAME 'pwdPolicySubentry'
+   DESC 'The pwdPolicy subentry in effect for
+       this object'
+   EQUALITY distinguishedNameMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+   SINGLE\-VALUE
+   NO\-USER\-MODIFICATION
+   USAGE directoryOperation)
+.RE
+
+.B pwdChangedTime
+.P
+This attribute denotes the last time that the entry's password was
+changed.  This value is used by the password expiration policy to
+determine whether the password is too old to be allowed to be used
+for user authentication.  If
+.B pwdChangedTime
+does not exist, the user's password will not expire.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.16
+   NAME 'pwdChangedTime'
+   DESC 'The time the password was last changed'
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+   EQUALITY generalizedTimeMatch
+   ORDERING generalizedTimeOrderingMatch
+   SINGLE\-VALUE
+   NO\-USER\-MODIFICATION
+   USAGE directoryOperation)
+.RE
+
+.B pwdAccountLockedTime
+.P
+This attribute contains the time that the user's account was locked.
+If the account has been locked, the password may no longer be used to
+authenticate the user to the directory.  If
+.B pwdAccountLockedTime   
+is set to 000001010000Z, the user's account has been permanently locked
+and may only be unlocked by an administrator. Note that account locking
+only takes effect when the
+.B pwdLockout
+password policy attribute is set to "TRUE".
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.17
+   NAME 'pwdAccountLockedTime'
+   DESC 'The time an user account was locked'
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+   EQUALITY generalizedTimeMatch
+   ORDERING generalizedTimeOrderingMatch
+   SINGLE\-VALUE
+   NO\-USER\-MODIFICATION
+   USAGE directoryOperation)
+.RE
+
+.B pwdFailureTime
+.P
+This attribute contains the timestamps of each of the consecutive
+authentication failures made upon attempted authentication to this
+DN (i.e. account).  If too many timestamps accumulate here (refer to
+the
+.B pwdMaxFailure
+password policy attribute for details),
+and the
+.B pwdLockout
+password policy attribute is set to "TRUE", the
+account may be locked.
+(Please also refer to the
+.B pwdLockout
+password policy attribute.)
+Excess timestamps beyond those allowed by
+.B pwdMaxFailure
+may also be purged.  If a successful authentication is made to this
+DN (i.e. to this user account), then
+.B pwdFailureTime   
+will be cleansed of entries.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.19
+   NAME 'pwdFailureTime'
+   DESC 'The timestamps of the last consecutive
+       authentication failures'
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+   EQUALITY generalizedTimeMatch
+   ORDERING generalizedTimeOrderingMatch
+   NO\-USER\-MODIFICATION
+   USAGE directoryOperation )
+.RE
+
+.B pwdHistory
+.P
+This attribute contains the history of previously used passwords
+for this DN (i.e. for this user account).
+The values of this attribute are stored in string format as follows:
+
+.RS 4
+
+pwdHistory=
+.RS 4
+time "#" syntaxOID "#" length "#" data
+.RE
+
+time=
+.RS 4
+GeneralizedTime as specified in section 3.3.13 of [RFC4517]
+.RE
+
+.P
+syntaxOID = numericoid
+.RS 4
+This is the string representation of the dotted-decimal OID that
+defines the syntax used to store the password.  numericoid is
+described in section 1.4 of [RFC4512].
+.RE
+
+length = NumericString
+.RS 4
+The number of octets in the data.  NumericString is described in
+section 3.3.23 of [RFC4517].
+.RE
+
+data =
+.RS 4
+Octets representing the password in the format specified by syntaxOID.
+.RE
+
+.RE
+
+This format allows the server to store and transmit a history of
+passwords that have been used.  In order for equality matching
+on the values in this attribute to function properly, the time
+field is in GMT format.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.20
+   NAME 'pwdHistory'
+   DESC 'The history of user passwords'
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+   EQUALITY octetStringMatch
+   NO\-USER\-MODIFICATION
+   USAGE directoryOperation)
+.RE
+
+.B pwdGraceUseTime
+This attribute contains the list of timestamps of logins made after
+the user password in the DN has expired.  These post-expiration
+logins are known as "\fIgrace logins\fP".
+If too many
+.I grace logins
+have been used (please refer to the
+.B pwdGraceLoginLimit
+password policy attribute), then the DN will no longer be allowed
+to be used to authenticate the user to the directory until the
+administrator changes the DN's
+.B userPassword
+attribute.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.21
+   NAME 'pwdGraceUseTime'
+   DESC 'The timestamps of the grace login once the password has expired'
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+   EQUALITY generalizedTimeMatch
+   NO\-USER\-MODIFICATION
+   USAGE directoryOperation)
+.RE
+
+.B pwdReset
+.P
+This attribute indicates whether the user's password has been reset
+by the administrator and thus must be changed upon first use of this
+DN for authentication to the directory.  If
+.B pwdReset   
+is set to "TRUE", then the password was reset and the user must change
+it upon first authentication.  If the attribute does not exist, or
+is set to "FALSE", the user need not change their password due to
+administrative reset.
+.LP
+.RS 4
+(  1.3.6.1.4.1.42.2.27.8.1.22
+   NAME 'pwdReset'
+   DESC 'The indication that the password has
+       been reset'
+   EQUALITY booleanMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+   SINGLE\-VALUE
+   USAGE directoryOperation)
+.RE
+
+.SH EXAMPLES
+.LP
+.RS
+.nf
+database mdb
+suffix dc=example,dc=com
+\|...
+overlay ppolicy
+ppolicy_default "cn=Standard,ou=Policies,dc=example,dc=com"
+.fi
+.RE
+
+.SH SEE ALSO
+.BR ldap (3),
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapo\-chain (5).
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.LP
+IETF LDAP password policy proposal by P. Behera, L.  Poitou and J.
+Sermersheim:  documented in IETF document
+"draft-behera-ldap-password-policy-09.txt".
+
+.SH BUGS
+The LDAP Password Policy specification is not yet an approved standard,
+and it is still evolving. This code will continue to be in flux until the
+specification is finalized.
+
+.SH ACKNOWLEDGEMENTS
+.P
+This module was written in 2004 by Howard Chu of Symas Corporation
+with significant input from Neil Dunbar and Kartik Subbarao of Hewlett-Packard.
+.P
+This manual page borrows heavily and shamelessly from the specification
+upon which the password policy module it describes is based.  This
+source is the
+IETF LDAP password policy proposal by P. Behera, L.
+Poitou and J. Sermersheim.
+The proposal is fully documented in
+the
+IETF document named draft-behera-ldap-password-policy-09.txt,
+written in July of 2005.
+.P
+.so ../Project

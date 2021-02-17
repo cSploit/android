@@ -1,0 +1,491 @@
+.TH SLAPO-ACCESSLOG 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2005-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-accesslog \- Access Logging overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The Access Logging overlay can be used to record all accesses to a given
+backend database on another database. This allows all of the activity on
+a given database to be reviewed using arbitrary LDAP queries, instead of
+just logging to local flat text files. Configuration options are available
+for selecting a subset of operation types to log, and to automatically
+prune older log records from the logging database.  Log records are stored
+with audit schema (see below) to assure their readability whether viewed
+as LDIF or in raw form.
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the Access Logging overlay.
+They should appear after the
+.B overlay
+directive.
+.TP
+.B logdb <suffix>
+Specify the suffix of a database to be used for storing the log records.
+The specified database must be defined elsewhere in the configuration.
+The access controls
+on the log database should prevent general access. The suffix entry
+of the log database will be created automatically by this overlay. The log
+entries will be generated as the immediate children of the suffix entry.
+.TP
+.B logops <operations>
+Specify which types of operations to log. The valid operation types are
+abandon, add, bind, compare, delete, extended, modify, modrdn, search,
+and unbind. Aliases for common sets of operations are also available:
+.RS
+.TP
+.B writes
+add, delete, modify, modrdn
+.TP
+.B reads
+compare, search
+.TP
+.B session
+abandon, bind, unbind
+.TP
+.B all
+all operations
+.RE
+.TP
+.B logbase <operations> <baseDN>
+Specify a set of operations that will only be logged if they occur under
+a specific subtree of the database. The operation types are as above for
+the
+.B logops
+setting, and delimited by a '|' character.
+.TP
+.B logold <filter>
+Specify a filter for matching against Deleted and Modified entries. If
+the entry matches the filter, the old contents of the entry will be
+logged along with the current request.
+.TP
+.B logoldattr <attr> ...
+Specify a list of attributes whose old contents are always logged in
+Modify and ModRDN requests. Usually only the contents of attributes that were
+actually modified will be logged; by default no old attributes are logged
+for ModRDN requests.
+.TP
+.B logpurge <age> <interval>
+Specify the maximum age for log entries to be retained in the database,
+and how often to scan the database for old entries. Both the
+.B age
+and
+.B interval
+are specified as a time span in days, hours, minutes, and seconds. The
+time format is [ddd+]hh:mm[:ss] i.e., the days and seconds components are
+optional but hours and minutes are required. Except for days, which can
+be up to 5 digits, each numeric field must be exactly two digits. For example
+.RS
+.RS
+.PD 0
+.TP
+logpurge 2+00:00 1+00:00
+.RE
+.PD
+would specify that the log database should be scanned every day for old
+entries, and entries older than two days should be deleted. When using a
+log database that supports ordered indexing on generalizedTime attributes,
+specifying an eq index on the
+.B reqStart
+attribute will greatly benefit the performance of the purge operation.
+.RE
+.TP
+.B logsuccess TRUE | FALSE
+If set to TRUE then log records will only be generated for successful
+requests, i.e., requests that produce a result code of 0 (LDAP_SUCCESS).
+If FALSE, log records are generated for all requests whether they
+succeed or not. The default is FALSE.
+
+.SH EXAMPLES
+.LP
+.nf
+	database mdb
+	suffix dc=example,dc=com
+	\...
+	overlay accesslog
+	logdb cn=log
+	logops writes reads
+	logbase search|compare ou=testing,dc=example,dc=com
+	logold (objectclass=person)
+
+	database mdb
+	suffix cn=log
+	\...
+	index reqStart eq
+	access to *
+	  by dn.base="cn=admin,dc=example,dc=com" read
+.fi
+
+.SH SCHEMA
+The
+.B accesslog
+overlay utilizes the "audit" schema described herein.
+This schema is specifically designed for
+.B accesslog
+auditing and is not intended to be used otherwise.  It is also
+noted that the schema described here is
+.I a work in
+.IR progress ,
+and hence subject to change without notice.
+The schema is loaded automatically by the overlay.
+
+The schema includes a number of object classes and associated
+attribute types as described below.
+
+There is
+a basic
+.B auditObject
+class from which two additional classes,
+.B auditReadObject
+and
+.B auditWriteObject
+are derived. Object classes for each type of LDAP operation are further
+derived from these classes. This object class hierarchy is designed to
+allow flexible yet efficient searches of the log based on either a specific
+operation type's class, or on more general classifications. The definition
+of the
+.B auditObject
+class is as follows:
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.11.5.2.1
+    NAME 'auditObject'
+    DESC 'OpenLDAP request auditing'
+    SUP top STRUCTURAL
+    MUST ( reqStart $ reqType $ reqSession )
+    MAY ( reqDN $ reqAuthzID $ reqControls $ reqRespControls $
+        reqEnd $ reqResult $ reqMessage $ reqReferral ) )
+.RE
+.P
+Note that all of the OIDs used in the logging schema currently reside
+under the OpenLDAP Experimental branch. It is anticipated that they
+will migrate to a Standard branch in the future.
+
+An overview of the attributes follows:
+.B reqStart
+and
+.B reqEnd
+provide the start and end time of the operation, respectively. They use
+generalizedTime syntax. The
+.B reqStart
+attribute is also used as the RDN for each log entry.
+
+The
+.B reqType
+attribute is a simple string containing the type of operation
+being logged, e.g.
+.BR add ,
+.BR delete ,
+.BR search ,
+etc. For extended operations, the type also includes the OID of the
+extended operation, e.g.
+.B extended(1.1.1.1)
+
+The
+.B reqSession
+attribute is an implementation-specific identifier that is common to
+all the operations associated with the same LDAP session. Currently this
+is slapd's internal connection ID, stored in decimal.
+
+The
+.B reqDN
+attribute is the distinguishedName of the target of the operation. E.g., for
+a Bind request, this is the Bind DN. For an Add request, this is the DN
+of the entry being added. For a Search request, this is the base DN of
+the search.
+
+The
+.B reqAuthzID
+attribute is the distinguishedName of the user that performed the operation.
+This will usually be the same name as was established at the start of a
+session by a Bind request (if any) but may be altered in various
+circumstances.
+
+The
+.B reqControls
+and
+.B reqRespControls
+attributes carry any controls sent by the client on the request and returned
+by the server in the response, respectively. The attribute values are just
+uninterpreted octet strings.
+
+The
+.B reqResult
+attribute is the numeric LDAP result code of the operation, indicating
+either success or a particular LDAP error code. An error code may be
+accompanied by a text error message which will be recorded in the
+.B reqMessage
+attribute.
+
+The
+.B reqReferral
+attribute carries any referrals that were returned with the result of the
+request.
+
+Operation-specific classes are defined with additional attributes to carry
+all of the relevant parameters associated with the operation:
+
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.11.5.2.4
+    NAME 'auditAbandon'
+    DESC 'Abandon operation'
+    SUP auditObject STRUCTURAL
+    MUST reqId )
+.RE
+.P
+For the
+.B Abandon
+operation the
+.B reqId
+attribute contains the message ID of the request that was abandoned.
+
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.11.5.2.5
+    NAME 'auditAdd'
+    DESC 'Add operation'
+    SUP auditWriteObject STRUCTURAL
+    MUST reqMod )
+.RE
+.P
+The
+.B Add
+class inherits from the
+.B auditWriteObject
+class. The Add and Modify classes are very similar. The
+.B reqMod
+attribute carries all of the attributes of the original entry being added.
+(Or in the case of a Modify operation, all of the modifications being
+performed.) The values are formatted as
+.RS
+.PD 0
+.TP
+attribute:<+|\-|=|#> [ value]
+.RE
+.RE
+.PD
+Where '+' indicates an Add of a value, '\-' for Delete, '=' for Replace,
+and '#' for Increment. In an Add operation, all of the reqMod values will
+have the '+' designator.
+.P
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.11.5.2.6
+    NAME 'auditBind'
+    DESC 'Bind operation'
+    SUP auditObject STRUCTURAL
+    MUST ( reqVersion $ reqMethod ) )
+.RE
+.P
+The
+.B Bind
+class includes the
+.B reqVersion
+attribute which contains the LDAP protocol version specified in the Bind
+as well as the
+.B reqMethod
+attribute which contains the Bind Method used in the Bind. This will be
+the string
+.B SIMPLE
+for LDAP Simple Binds or
+.B SASL(<mech>)
+for SASL Binds.
+Note that unless configured as a global overlay, only Simple Binds using
+DNs that reside in the current database will be logged.
+
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.11.5.2.7
+    NAME 'auditCompare'
+    DESC 'Compare operation'
+    SUP auditObject STRUCTURAL
+    MUST reqAssertion )
+.RE
+.P
+For the
+.B Compare
+operation the
+.B reqAssertion
+attribute carries the Attribute Value Assertion used in the compare request.
+
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.11.5.2.8
+    NAME 'auditDelete'
+    DESC 'Delete operation'
+    SUP auditWriteObject STRUCTURAL
+    MAY reqOld )
+.RE
+.P
+The
+.B Delete
+operation needs no further parameters. However, the
+.B reqOld
+attribute may optionally be used to record the contents of the entry prior
+to its deletion. The values are formatted as
+.RS
+.PD 0
+.TP
+attribute: value
+.RE
+.PD
+The
+.B reqOld
+attribute is only populated if the entry being deleted matches the
+configured
+.B logold
+filter.
+
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.11.5.2.9
+    NAME 'auditModify'
+    DESC 'Modify operation'
+    SUP auditWriteObject STRUCTURAL
+    MAY reqOld MUST reqMod )
+.RE
+.P
+The
+.B Modify
+operation contains a description of modifications in the
+.B reqMod
+attribute, which was already described above in the Add operation. It may
+optionally contain the previous contents of any modified attributes in the
+.B reqOld
+attribute, using the same format as described above for the Delete operation.
+The
+.B reqOld
+attribute is only populated if the entry being modified matches the
+configured
+.B logold
+filter.
+
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.11.5.2.10
+    NAME 'auditModRDN'
+    DESC 'ModRDN operation'
+    SUP auditWriteObject STRUCTURAL
+    MUST ( reqNewRDN $ reqDeleteOldRDN )
+    MAY ( reqNewSuperior $ reqOld ) )
+.RE
+.P
+The
+.B ModRDN
+class uses the
+.B reqNewRDN
+attribute to carry the new RDN of the request.
+The
+.B reqDeleteOldRDN
+attribute is a Boolean value showing
+.B TRUE
+if the old RDN was deleted from the entry, or
+.B FALSE
+if the old RDN was preserved.
+The
+.B reqNewSuperior
+attribute carries the DN of the new parent entry if the request specified
+the new parent.
+The
+.B reqOld
+attribute is only populated if the entry being modified matches the
+configured
+.B logold
+filter and contains attributes in the
+.B logoldattr
+list.
+
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.11.5.2.11
+    NAME 'auditSearch'
+    DESC 'Search operation'
+    SUP auditReadObject STRUCTURAL
+    MUST ( reqScope $ reqDerefAliases $ reqAttrsOnly )
+    MAY ( reqFilter $ reqAttr $ reqEntries $ reqSizeLimit $
+          reqTimeLimit ) )
+.RE
+.P
+For the
+.B Search
+class the
+.B reqScope
+attribute contains the scope of the original search request, using the
+values specified for the LDAP URL format. I.e.
+.BR base ,
+.BR one ,
+.BR sub ,
+or
+.BR subord .
+The
+.B reqDerefAliases
+attribute is one of
+.BR never ,
+.BR finding ,
+.BR searching ,
+or
+.BR always ,
+denoting how aliases will be processed during the search.
+The
+.B reqAttrsOnly
+attribute is a Boolean value showing
+.B TRUE 
+if only attribute names were requested, or
+.B FALSE
+if attributes and their values were requested.
+The
+.B reqFilter
+attribute carries the filter used in the search request.
+The
+.B reqAttr
+attribute lists the requested attributes if specific attributes were
+requested.
+The
+.B reqEntries
+attribute is the integer count of how many entries were returned by
+this search request.
+The
+.B reqSizeLimit
+and
+.B reqTimeLimit
+attributes indicate what limits were requested on the search operation.
+
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.11.5.2.12
+    NAME 'auditExtended'
+    DESC 'Extended operation'
+    SUP auditObject STRUCTURAL
+    MAY reqData )
+.RE
+.P
+The
+.B Extended
+class represents an LDAP Extended Operation. As noted above, the actual OID of
+the operation is included in the
+.B reqType
+attribute of the parent class. If any optional data was provided with the
+request, it will be contained in the
+.B reqData
+attribute as an uninterpreted octet string.
+
+.SH NOTES
+The Access Log implemented by this overlay may be used for a variety of
+other tasks, e.g. as a ChangeLog for a replication mechanism, as well
+as for security/audit logging purposes.
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5).
+
+.SH ACKNOWLEDGEMENTS
+.P
+This module was written in 2005 by Howard Chu of Symas Corporation.

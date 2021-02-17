@@ -1,0 +1,44 @@
+
+ifeq ($(NDK),)
+$(error Must export NDK location before building for Android)
+endif
+NDK_ROOT:=$(NDK)
+NDK_LOG:=1
+include $(NDK)/build/core/init.mk
+NDK_TOOLCHAIN_VERSION:= 4.6
+
+CROSS_PLATFORM:=$(NDK)/platforms/android-9/arch-arm
+CROSS_PREFIX:=$(NDK)/toolchains/arm-linux-androideabi-$(NDK_TOOLCHAIN_VERSION)/prebuilt/$(HOST_TAG64)/bin/arm-linux-androideabi-
+
+CXX:=$(CROSS_PREFIX)g++
+CC:=$(CROSS_PREFIX)gcc
+AR:=$(CROSS_PREFIX)ar
+AS:=$(CROSS_PREFIX)as
+LD:=$(CROSS_PREFIX)ld
+NM:=$(CROSS_PREFIX)nm
+OBJCOPY:=$(CROSS_PREFIX)objcopy
+OBJDUMP:=$(CROSS_PREFIX)objdump
+RANLIB:=$(CROSS_PREFIX)ranlib
+STRIP:=$(CROSS_PREFIX)strip
+
+COMMON_FLAGS=-ggdb -DFB_SEND_FLAGS=MSG_NOSIGNAL -DLINUX -DANDROID -DARM -pipe -MMD -fPIC -fmessage-length=0 \
+			 -I$(ROOT)/extern/libtommath --sysroot=$(CROSS_PLATFORM) \
+			 -I$(ROOT)/extern/icu/source/common -I$(ROOT)/extern/icu/source/i18n
+OPTIMIZE_FLAGS=-O3 -fno-omit-frame-pointer
+WARN_FLAGS=-Wall -Wno-switch -Wno-parentheses -Wno-unknown-pragmas -Wno-unused-variable
+
+PROD_FLAGS=$(COMMON_FLAGS) $(OPTIMIZE_FLAGS)
+#DEV_FLAGS=-DUSE_VALGRIND $(COMMON_FLAGS) $(WARN_FLAGS)
+DEV_FLAGS=$(COMMON_FLAGS) $(WARN_FLAGS)
+
+CROSS_CONFIG=android.arme
+
+LDFLAGS += --sysroot=$(CROSS_PLATFORM) -L$(NDK)/sources/cxx-stl/gnu-libstdc++/$(NDK_TOOLCHAIN_VERSION)/libs/armeabi
+DroidLibs := -lm -ldl -lsupc++
+
+LINK_LIBS = $(DroidLibs)
+STATICLINK_LIBS = $(DroidLibs)
+SO_LINK_LIBS = $(DroidLibs)
+
+EXE_LINK_OPTIONS= $(LDFLAGS) $(UNDEF_FLAGS) $(LIB_PATH_OPTS) $(LINK_EMPTY_SYMBOLS)
+LIB_LINK_OPTIONS= $(LDFLAGS) -shared

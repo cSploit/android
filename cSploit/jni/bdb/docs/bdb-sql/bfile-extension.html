@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Appendix A. Using the BFILE Extension</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="prev" href="verifysql.html" title="Verify Database Structure" />
+    <link rel="next" href="bfile-sql.html" title="BFILE SQL Objects and Functions" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Appendix A. Using the BFILE Extension</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="verifysql.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="bfile-sql.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="appendix" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="bfile-extension"></a>Appendix A. Using the BFILE Extension</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+        The BFILE data type allows the BDB SQL interface to access binary files that
+        are stored in the file system outside of the database. The binary
+        file can be queried in exactly the same way as any other data type
+        stored in the database, but Berkeley DB is able to save space in the
+        database file by not embedding a large amount of binary data in it.
+        This also helps overall database performance.
+    </p>
+      <p>
+        Internally, a BFILE column or attribute stores a BFILE locater,
+        which serves as a pointer to the binary file. The locater maintains
+        the directory alias and the filename. You can change the path of
+        BFILE without affecting the base table by using the BFILENAME function.
+        BFILE is somewhat like the BLOB data type, but it does not participate in
+        transactions and it is not recoverable.  Instead, the underlying
+        operating system is expected to provide file integrity and durability.
+    </p>
+      <p>
+        The remainder of this section describes the various objects and
+        functions that the BFILE extension makes available to you.
+        In addition, complete examples of using these extensions are
+        available with your Berkeley DB distribution. They are placed in the
+        following location:
+    </p>
+      <pre class="programlisting">&lt;db-dist&gt;/lang/sql/sqlite/ext/bfile/examples</pre>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="bfile-support"></a>Supported Platforms and Languages</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+            The BFILE extension is currently only supported for *nix platforms.
+        </p>
+        <p>
+            The BFILE extension it is not available in your library by
+            default. Instead, you must enable the extension when you
+            compile Berkeley DB. See the <em class="citetitle">Berkeley DB Installation and Build Guide</em>
+            for information on how to enable this extension when you build
+            Berkeley DB. Once you have enabled the extension, applications will
+            also need to load the BFILE library file:
+            <code class="literal">libbfile_ext.so</code>.
+        </p>
+        <p>
+            By default, the BFILE extension provides support for additional SQL
+            statements. With some extra configuration at Berkeley DB compile
+            time, you can also obtain support for extensions to the SQLite
+            C/C++ interface. Both the SQL extensions and the extensions
+            to the SQLite C/C++ interface are described in the
+            following sections.
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="verifysql.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="bfile-sql.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Verify Database Structure </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> BFILE SQL Objects and Functions</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

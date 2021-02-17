@@ -1,0 +1,286 @@
+.TH SLAPD-BDB 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd\-bdb, slapd\-hdb \- Berkeley DB backends to slapd
+.SH SYNOPSIS
+.B ETCDIR/slapd.conf
+.SH DESCRIPTION
+The \fBbdb\fP backend to
+.BR slapd (8)
+uses the Oracle Berkeley DB (BDB) package to store data.
+It makes extensive use of indexing and caching to speed data access.
+.LP
+Note that BDB is deprecated and support will be dropped in future
+OpenLDAP releases. Installations should use the \fBmdb\fP
+backend instead.
+.LP
+\fBhdb\fP is a variant of
+the \fBbdb\fP backend that uses a hierarchical database layout which
+supports subtree renames. It is both more space-efficient and more
+execution-efficient than the \fBbdb\fP backend.  It is otherwise identical
+to the \fBbdb\fP behavior, and all the same configuration options apply.
+.LP
+It is noted that these options are intended to complement
+Berkeley DB configuration options set in the environment's
+.B DB_CONFIG
+file.  See Berkeley DB documentation for details on
+.B DB_CONFIG
+configuration options.
+Where there is overlap, settings in
+.B DB_CONFIG
+take precedence.
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the \fBbdb\fP and \fBhdb\fP backend database.
+That is, they must follow a "database bdb" or "database hdb" line and
+come before any subsequent "backend" or "database" lines.
+Other database options are described in the
+.BR slapd.conf (5)
+manual page.
+.TP
+.BI cachesize \ <integer>
+Specify the size in entries of the in-memory entry cache maintained 
+by the \fBbdb\fP or \fBhdb\fP backend database instance.
+The default is 1000 entries.
+.TP
+.BI cachefree \ <integer>
+Specify the number of entries to free from the entry cache when the
+cache reaches the \fBcachesize\fP limit.
+The default is 1 entry.
+.TP
+.BI checkpoint \ <kbyte>\ <min>
+Specify the frequency for checkpointing the database transaction log.
+A checkpoint operation flushes the database buffers to disk and writes
+a checkpoint record in the log.
+The checkpoint will occur if either \fI<kbyte>\fP data has been written or
+\fI<min>\fP minutes have passed since the last checkpoint.
+Both arguments default to zero, in which case they are ignored. When
+the \fI<min>\fP argument is non-zero, an internal task will run every 
+\fI<min>\fP minutes to perform the checkpoint.
+See the Berkeley DB reference guide for more details.
+.TP
+.B checksum
+Enable checksum validation of DB pages whenever they are read from disk.
+This setting can only be configured before any database files are created.
+.TP
+.BI cryptfile \ <file>
+Specify the pathname of a file containing an encryption key to use for
+encrypting the database. Encryption is performed using Berkeley DB's
+implementation of AES. Note that encryption can only be configured before
+any database files are created, and changing the key can only be done
+after destroying the current database and recreating it. Encryption is
+not enabled by default, and some distributions of Berkeley DB do not
+support encryption.
+.TP
+.BI cryptkey \ <key>
+Specify an encryption key to use for encrypting the database. This option
+may be used when a separate
+.I cryptfile
+is not desired. Only one of
+.B cryptkey
+or
+.B cryptfile
+may be configured.
+.TP
+.BI dbconfig \ <Berkeley-DB-setting>
+Specify a configuration directive to be placed in the
+.B DB_CONFIG
+file of the database directory. The
+.B dbconfig
+directive is just a convenience
+to allow all necessary configuration to be set in the
+.B slapd.conf
+file.
+The options set using this directive will only be written to the 
+.B DB_CONFIG
+file if no such file existed at server startup time, otherwise
+they are completely ignored. This allows one
+to set initial values without overwriting/destroying a 
+.B DB_CONFIG 
+file that was already customized through other means. 
+This directive may be specified multiple times, as needed. 
+For example:
+.RS
+.nf
+	dbconfig set_cachesize 0 1048576 0
+	dbconfig set_lg_bsize 2097152
+.fi
+.RE
+.TP
+.B dbnosync
+Specify that on-disk database contents should not be immediately
+synchronized with in memory changes.
+Enabling this option may improve performance at the expense of data
+security.
+See the Berkeley DB reference guide for more details.
+.TP
+\fBdbpagesize \fR \fI<dbfile> <size>\fR
+Specify the page size to use for a particular database file, in units
+of 1024 bytes. The default for the
+.B id2entry
+file is 16, the default for all other files depends on the size of the
+underlying filesystem's block size (typically 4 or 8).
+The maximum that BerkeleyDB supports is 64. This
+setting usually should not need to be changed, but if BerkeleyDB's
+"db_stat \-d" shows a large amount of overflow pages in use in a file,
+setting a larger size may increase performance at the expense of
+data integrity. This setting only takes effect when a database is
+being newly created. See the Berkeley DB reference guide for more details.
+.TP
+.BI directory \ <directory>
+Specify the directory where the BDB files containing this database and
+associated indexes live.
+A separate directory must be specified for each database.
+The default is
+.BR LOCALSTATEDIR/openldap\-data .
+.TP
+.B dirtyread
+Allow reads of modified but not yet committed data.
+Usually transactions are isolated to prevent other operations from
+accessing uncommitted data.
+This option may improve performance, but may also return inconsistent
+results if the data comes from a transaction that is later aborted.
+In this case, the modified data is discarded and a subsequent search
+will return a different result.
+.TP
+.BI dncachesize \ <integer>
+Specify the maximum number of DNs in the in-memory DN cache.
+Ideally this cache should be
+large enough to contain the DNs of every entry in the database. If
+set to a smaller value than the \fBcachesize\fP it will be silently
+increased to equal the \fBcachesize\fP. The default value is 0 which
+means unlimited, i.e. the DN cache will grow without bound.
+
+It should be noted that the \fBDN cache\fP is allowed to temporarily
+grow beyond the configured size. It does this if many entries are 
+locked when it tries to do a purge, because that means they're
+legitimately in use. Also, the \fBDN cache\fP never purges entries
+that have cached children, so depending on the shape of the DIT, it 
+could have lots of cached DNs over the defined limit.
+.TP
+.BI idlcachesize \ <integer>
+Specify the size of the in-memory index cache, in index slots. The
+default is zero. A larger value will speed up frequent searches of
+indexed entries. An \fBhdb\fP database needs a large \fBidlcachesize\fP
+for good search performance, typically three times the 
+.B cachesize
+(entry cache size)
+or larger.
+.TP
+\fBindex \fR{\fI<attrlist>\fR|\fBdefault\fR} [\fBpres\fR,\fBeq\fR,\fBapprox\fR,\fBsub\fR,\fI<special>\fR]
+Specify the indexes to maintain for the given attribute (or
+list of attributes).
+Some attributes only support a subset of indexes.
+If only an \fI<attr>\fP is given, the indices specified for \fBdefault\fR
+are maintained.
+Note that setting a default does not imply that all attributes will be
+indexed. Also, for best performance, an
+.B eq
+index should always be configured for the
+.B objectClass
+attribute.
+
+A number of special index parameters may be specified.
+The index type
+.B sub
+can be decomposed into
+.BR subinitial ,
+.BR subany ,\ and
+.B subfinal
+indices.
+The special type
+.B nolang
+may be specified to disallow use of this index by language subtypes.
+The special type
+.B nosubtypes
+may be specified to disallow use of this index by named subtypes.
+Note: changing \fBindex\fP settings in 
+.BR slapd.conf (5)
+requires rebuilding indices, see
+.BR slapindex (8);
+changing \fBindex\fP settings
+dynamically by LDAPModifying "cn=config" automatically causes rebuilding
+of the indices online in a background task.
+.TP
+.B linearindex
+Tell 
+.B slapindex 
+to index one attribute at a time. By default, all indexed
+attributes in an entry are processed at the same time. With this option,
+each indexed attribute is processed individually, using multiple passes
+through the entire database. This option improves 
+.B slapindex 
+performance
+when the database size exceeds the \fBdbcache\fP size. When the \fBdbcache\fP is
+large enough, this option is not needed and will decrease performance.
+Also by default, 
+.B slapadd 
+performs full indexing and so a separate 
+.B slapindex
+run is not needed. With this option, 
+.B slapadd 
+does no indexing and 
+.B slapindex
+must be used.
+.TP
+.BR lockdetect \ { oldest | youngest | fewest | random | default }
+Specify which transaction to abort when a deadlock is detected.
+The default is
+.BR random .
+.TP
+.BI mode \ <integer>
+Specify the file protection mode that newly created database 
+index files should have.
+The default is 0600.
+.TP
+.BI searchstack \ <depth>
+Specify the depth of the stack used for search filter evaluation.
+Search filters are evaluated on a stack to accommodate nested AND / OR
+clauses. An individual stack is assigned to each server thread.
+The depth of the stack determines how complex a filter can be
+evaluated without requiring any additional memory allocation. Filters that
+are nested deeper than the search stack depth will cause a separate
+stack to be allocated for that particular search operation. These
+allocations can have a major negative impact on server performance,
+but specifying too much stack will also consume a great deal of memory.
+Each search stack uses 512K bytes per level. The default stack depth
+is 16, thus 8MB per thread is used.
+.TP
+.BI shm_key \ <integer>
+Specify a key for a shared memory BDB environment. By default the
+BDB environment uses memory mapped files. If a non-zero value is
+specified, it will be used as the key to identify a shared memory
+region that will house the environment.
+.SH ACCESS CONTROL
+The 
+.B bdb
+and
+.B hdb
+backends honor access control semantics as indicated in
+.BR slapd.access (5).
+.SH FILES
+.TP
+.B ETCDIR/slapd.conf
+default 
+.B slapd 
+configuration file
+.TP
+.B DB_CONFIG
+Berkeley DB configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd\-mdb (5),
+.BR slapd (8),
+.BR slapadd (8),
+.BR slapcat (8),
+.BR slapindex (8),
+Berkeley DB documentation.
+.SH ACKNOWLEDGEMENTS
+.so ../Project
+Originally begun by Kurt Zeilenga. Caching mechanisms originally designed
+by Jong-Hyuk Choi. Completion and subsequent work, as well as
+back-hdb, by Howard Chu.

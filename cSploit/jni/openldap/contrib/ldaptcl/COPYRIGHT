@@ -1,0 +1,31 @@
+Copyright 1998-2014 The OpenLDAP Foundation.  All rights reserved.
+
+COPYING RESTRICTIONS APPLY.
+
+See COPYRIGHT and LICENSE files in the top-level directory of this
+distribution (i.e., ../../COPYRIGHT and ../../LICENSE, respectively).
+
+---
+NeoSoft Tcl client extensions to Lightweight Directory Access Protocol.
+
+Copyright (c) 1998-1999 NeoSoft, Inc.  
+All Rights Reserved.
+
+This software may be used, modified, copied, distributed, and sold,
+in both source and binary form provided that these copyrights are
+retained and their terms are followed.
+
+Under no circumstances are the authors or NeoSoft Inc. responsible
+for the proper functioning of this software, nor do the authors
+assume any liability for damages incurred with its use.
+
+Redistribution and use in source and binary forms are permitted
+provided that this notice is preserved and that due credit is given
+to NeoSoft, Inc.
+
+NeoSoft, Inc. may not be used to endorse or promote products derived
+from this software without specific prior written permission. This
+software is provided ``as is'' without express or implied warranty.
+
+Requests for permission may be sent to NeoSoft Inc, 1770 St. James Place,
+Suite 500, Houston, TX, 77056.

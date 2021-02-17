@@ -1,0 +1,77 @@
+--- /dev/null	Thu Jan 01 00:00:00 1970 +0000
++++ build_config.h.in
+@@ -0,0 +1,47 @@
++
++/*
++** Build options detected by SQLite's configure script but not normally part
++** of config.h.  Accept what configure detected unless it was overridden on the
++** command line.
++*/
++#ifndef HAVE_EDITLINE
++#define HAVE_EDITLINE @TARGET_HAVE_EDITLINE@
++#endif
++#if !HAVE_EDITLINE
++#undef HAVE_EDITLINE
++#endif
++
++#ifndef HAVE_READLINE
++#define HAVE_READLINE @TARGET_HAVE_READLINE@
++#endif
++#if !HAVE_READLINE
++#undef HAVE_READLINE
++#endif
++
++#ifndef SQLITE_OS_UNIX
++#define SQLITE_OS_UNIX @SQLITE_OS_UNIX@
++#endif
++#if !SQLITE_OS_UNIX
++#undef SQLITE_OS_UNIX
++#endif
++
++#ifndef SQLITE_OS_WIN
++#define SQLITE_OS_WIN @SQLITE_OS_WIN@
++#endif
++#if !SQLITE_OS_WIN
++#undef SQLITE_OS_WIN
++#endif
++
++#ifndef SQLITE_THREADSAFE
++#define SQLITE_THREADSAFE @SQLITE_THREADSAFE@
++#endif
++#if !SQLITE_THREADSAVE
++#undef SQLITE_THREADSAVE
++#endif
++
++#ifndef SQLITE_TEMP_STORE
++#define SQLITE_TEMP_STORE @TEMP_STORE@
++#endif
++#if !SQLITE_TEMP_STORE
++#undef SQLITE_TEMP_STORE
++#endif
+--- configure
++++ configure
+@@ -13638,7 +13638,7 @@
+ # Generate the output files.
+ #
+ 
+-ac_config_files="$ac_config_files Makefile sqlite3.pc"
++ac_config_files="$ac_config_files Makefile sqlite3.pc build_config.h"
+ 
+ cat >confcache <<\_ACEOF
+ # This file is a shell script that caches the results of configure
+@@ -14492,6 +14492,7 @@
+     "config.h") CONFIG_HEADERS="$CONFIG_HEADERS config.h" ;;
+     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+     "sqlite3.pc") CONFIG_FILES="$CONFIG_FILES sqlite3.pc" ;;
++    "build_config.h") CONFIG_FILES="$CONFIG_FILES build_config.h" ;;
+ 
+   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
+ $as_echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
+--- configure.ac
++++ configure.ac
+@@ -716,4 +716,5 @@
+ AC_OUTPUT([
+ Makefile
+ sqlite3.pc
++build_config.h
+ ])

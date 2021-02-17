@@ -1,0 +1,25 @@
+This is beta code. You need special swig-1.3.10
+version, available on request from vandrove@vc.cvut.cz,
+as I have to do couple of changes in swig to get it
+to work as I expected.
+
+If you are installing this code, on Debian system
+just run 'make'. On other systems run 'perl Makefile.PL',
+then 'touch ncpfs.int ncpfs.pm ncpfs_wrap.c' (as you
+have no swig to regenerate them), and then 'make',
+'make install', and so on...
+
+I put generated files also to 'generated' subdirectory,
+as 'make clean' removes them...
+
+And DO NOT RUN test.pl UNLESS YOU REALLY KNOW WHAT YOU DO!
+It requires server VMWARE-NW6 mounted somewhere, and
+then it creates/deletes files, directories, bindery
+objects, NDS objects, NDS partitions and containers and
+so on on that server to verify that all API functions
+work correctly. It is VERY dangerous example...
+			Best regards,
+				Petr Vandrovec
+				vandrove@vc.cvut.cz
+
+

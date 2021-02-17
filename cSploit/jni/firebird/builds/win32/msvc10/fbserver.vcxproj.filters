@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="AUTH files">
+      <UniqueIdentifier>{2343e620-c8ee-4202-b2b5-8d3462f02f74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{4af5b667-81f4-470d-9fa2-ef0ab6cfdff3}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="Remote server">
+      <UniqueIdentifier>{6e27505b-0eda-4a76-8bfd-6f4e74348cb8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\remote\server\os\win32\window.cpp">
+      <Filter>Remote server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\server\os\win32\chop.cpp">
+      <Filter>Remote server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\server\os\win32\cntl.cpp">
+      <Filter>Remote server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\server\os\win32\property.cpp">
+      <Filter>Remote server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\server\server.cpp">
+      <Filter>Remote server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\server\os\win32\srvr_w32.cpp">
+      <Filter>Remote server</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\auth\SecureRemotePassword\server\SrpServer.cpp">
+      <Filter>AUTH files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\remote\server\os\win32\server.ico">
+      <Filter>Resource files</Filter>
+    </None>
+    <None Include="..\..\..\src\remote\server\os\win32\caution.ico">
+      <Filter>Resource files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\remote\server\os\win32\window.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\auth\SecureRemotePassword\server\SrpServer.h">
+      <Filter>AUTH files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

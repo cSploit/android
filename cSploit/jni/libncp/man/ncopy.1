@@ -1,0 +1,121 @@
+.\" 
+.\"  Man page for the ncopy program
+.\"
+.TH NCOPY 1 17/03/1996 ncopy ncopy
+.SH NAME
+ncopy \- NetWare file copy
+
+.SH SYNOPSIS
+\fBncopy -V\fP
+
+\fBncopy\fP [ \fB-vmMnpptu\fP ] [ \fB-s\fP \fIamount\fP ] \fBfile\fP
+.BR destinationfile | directory
+
+\fBncopy\fP [ \fB-vmMnpptu\fP ] [ \fB-s\fP \fIamount\fP ] \fBfile1\fP
+.RB "[ " "file2 ..." " ] " directory
+
+\fBncopy\fP \fB-r\fP [ \fB-vmMnpptu\fP ] [ \fB-s\fP \fIamount\fP ] \fBsrcdir\fP
+.B dstdir
+
+.SH DESCRIPTION
+With \fBncopy\fP you can copy files to different locations on a single 
+NetWare file server without generating excess network traffic.  The 
+program uses a NetWare function to do the copy rather than transferring 
+the file across the network for both the read and write.
+
+If the last argument is a directory, \fBncopy\fP will copy the source 
+file(s) into the directory.  If only two files are given and the last 
+argument is not a directory, it will copy the source file to the destination 
+file.
+
+If the source and destination files are not on the same NetWare server 
+(or are not on NetWare servers at all), \fBncopy\fP will do a normal file 
+copy.
+.SH OPTIONS
+.B -V
+.RS 3
+Show version number and exit
+.RE
+
+.B -v
+.RS 3
+Verbose copy.  Will show current file and percentage completion.
+.RE
+
+.B -m
+.RS 3
+Copy MAC resource fork. Copies MAC resource fork together with
+data fork.
+.RE
+
+.B -M
+.RS 3
+Copy MAC resource fork to/from non-MAC filesystem. It expects/creates 
+resource forks in subdirectory \fI.rsrc\fP of each directory copied.
+
+If you want to copy files from MAC volume to \fI.rsrc\fP scheme, you
+must specify both options, \fB-mM\fP. It is not possible to 
+create \fI.rsrc\fP directory on MAC-aware volume in one step, you must 
+first copy data to non-MAC media using \fBncopy -mM\fP and then copy them
+back using \fBncopy -M\fP.
+
+If you want to copy files from \fI.rsrc\fP scheme on MAC volume to
+real MAC multiple-forks file, you must first copy data to non-MAC
+filesystem using \fBncopy -M\fP and then copy them back using 
+\fBncopy -mM\fP.
+.RE
+
+.B -n
+.RS 3
+Nice NetWare copy.  Will sleep for a second between copying blocks on
+the NetWare server.  Gives other people a chance to do some work on 
+the NetWare server when you are copying large files.  This has no
+effect if you are not copying on a NetWare server.
+.RE
+
+\fB-s\fP \fIamount\fP
+.RS 3
+Nice time slice factor.  Used in conjunction with the 
+.B -n
+option, this specifies the number of 100K blocks to copy before sleeping.
+Default is 10. (1 Megabyte)
+.RE
+
+.B -p
+.RS 3
+Preserve file attributes and date/time during copy.
+.RE
+
+.B -pp
+.RS 3
+Preserve file attributes, date/time and owner during copy. Name of owner
+is preserved, not owner ID.
+.RE
+
+.B -t
+.RS 3
+Preserve trustees during copy. Trustee name is preserved, not ID.
+.RE
+
+.B -r
+.RS 3
+Perform recursive copy.
+.RE
+
+.B -u
+.RS 3
+Perform copy only if mtime or size differs.
+.RE
+
+.SH BUGS
+\fBncopy\fP does not preserve long (MAC, NFS, FTAM, OS2) names during copy.
+
+.SH "SEE ALSO"
+.B ncpmount(8), ncpumount(8)
+
+.SH CREDITS
+ncopy was written by Brian G. Reid (breid@tim.com) and Tom
+C. Henderson (thenderson@tim.com).  Many thanks to Volker Lendecke
+(lendecke@math.uni-goettingen.de) for the ncpfs and ncplib which made
+ncopy possible. Some further work was done by Petr Vandrovec
+(vandrove@vc.cvut.cz).

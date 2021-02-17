@@ -1,0 +1,31 @@
+OpenLDAP C++ LDAP API ToDo items:
+=================================
+
+This is a list of projects that need getting done for the C++ API.  
+They are not listed in any specific order.  Contribute to projects 
+based upon your personal priorities.
+
+If you would like to work on any of these projects, please coordinate
+by posting to OpenLDAP-devel mailing list:
+  http://www.OpenLDAP.org/lists
+
+If you have a project you'd like added to the list, talk it up on
+Developer's list or just do it.
+
+Please read:
+        http://www.OpenLDAP.org/devel/programming.html
+        http://www.OpenLDAP.org/devel/contributing.html
+
+
+- Add SASL Authentication 
+- Add methods to the Data Classes (LDAPAttribute, LDAPEntry) for higher
+  usability. (e.g. LDAPAttributeList::getAttribute(name), ... )
+- implement some Controls/Extented Operations
+- LDIF im/export library
+- Rework the logging and debugging facilities
+- write some more documentation about the design and structure of the 
+  library.
+- example applications
+
+$ID$
+

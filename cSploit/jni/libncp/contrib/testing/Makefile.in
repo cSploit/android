@@ -1,0 +1,58 @@
+top_srcdir = @top_srcdir@
+top_builddir = ../..
+this_srcdir = ${top_srcdir}/contrib/testing
+
+include ${top_builddir}/Make.rules
+
+O_UTILS1 = canon.o abbrev.o resolve.o readaddr.o fileinfo.o resint.o \
+	   nsfileinfo.o nfssetinfo.o dirlist2.o vollist.o \
+	   readattr.o cmpattr.o nwdslist.o mkobj.o rmobj.o modobj.o \
+	   renobj.o mvobj.o copyauth.o nwdsgethost.o nwdsgetstat.o mkfile.o \
+	   setkeys.o verpwd.o chgpwd.o nwdsgetvi.o nwdspartlist.o \
+	   nwdspartsplit.o nwdspartjoin.o nwdspartrm.o replops.o \
+	   effright.o partroot.o reloadds.o nwdsresetstat.o nwgettime.o \
+	   readcls.o mkclass.o rmclass.o readcc.o modclass.o readadef.o \
+	   mkattr.o rmattr.o readsynt.o timegv.o schsync.o timeinfo.o \
+	   eaops.o lic.o verunix.o nwbcast.o dirlimit.o large.o \
+	   dsstream.o physlock.o semaphore.o dssearch.o \
+	   #
+O_TMP1 = rsynt.o
+UTILS1 = $(O_UTILS1:%.o=%)
+
+.PHONY : all clean distclean mrproper
+
+all: wcsmbs-tst1 time $(UTILS1)
+
+# we must link dirlist static. ncp_unlock_conn & ncp_init_request are not exported from versioned shared library
+# we cannot use --gc-sections always... there are linkers which do not understand it :-(
+LDFLAGS_dirlist = -static #-Wl,--gc-sections
+OBJS_modobj = rsynt.o
+
+%.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+iconvx: iconv_prog.c error.c add.c
+	gcc -D_GNU_SOURCE -D_libc_intl_domainname=\"libc\" -D_= -DN_= -Dgettext= -Dinternal_function= -DHAVE_VPRINTF -DSTDC_HEADERS -DHAVE_STRERROR_R -I. -o iconvx iconv_prog.c error.c add.c
+
+wcsmbs-tst1 time: %: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) -o $@ $(addsuffix .c,$@)
+
+$(O_UTILS1) $(O_TMP1): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) $(CFLAGS_$@) -o $@ -c $<
+
+$(UTILS1):: %: %.o $(O_TMP1)
+	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $(addsuffix .o,$@) $(OBJS_$@) -L$(top_builddir)/lib -lncp $(LDFLAGS_$@) @INTLLIBS@ @LIBS@ 
+
+clean:
+	-rm -f iconvx wcsmbs-tst1 time $(UTILS1) $(O_UTILS1) $(O_TMP1)
+
+distclean: clean
+	-rm -f *.d
+
+mrproper: clean
+
+ifeq ($(NEED_DEP),yes)
+include $(O_UTILS1:%.o=%.d) $(O_TMP1:%.o=%.d)
+endif

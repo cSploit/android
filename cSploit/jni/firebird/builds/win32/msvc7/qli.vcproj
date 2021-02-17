@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="qli" ProjectGUID="{EBB8361B-49D5-43A5-8771-940DF3E308EF}">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Debug|Win32" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" PreprocessorDefinitions="WIN32,_DEBUG,_CONSOLE,DEV_BUILD,SUPERCLIENT" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" AdditionalDependencies="comctl32.lib ws2_32.lib mpr.lib version.lib" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\bin\$(ProjectName).exe" LinkIncremental="1" SubSystem="1" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+    <Configuration Name="Release|Win32" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="2" InlineFunctionExpansion="1" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" PreprocessorDefinitions="WIN32,NDEBUG,_CONSOLE,SUPERCLIENT" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" AdditionalOptions="/MACHINE:I386" AdditionalDependencies="comctl32.lib ws2_32.lib mpr.lib version.lib" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\bin\$(ProjectName).exe" LinkIncremental="1" SubSystem="1" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="QLI files">
+      <File RelativePath="..\..\..\src\qli\all.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\command.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\compile.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\dtr.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\err.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\eval.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\exe.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\expand.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\format.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\gener.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\hsh.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\lex.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\mov.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\parse.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\picstr.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\qli\report.cpp">
+      </File>
+      <Filter Name="epp files">
+        <File RelativePath="..\..\..\src\qli\help.epp">
+        </File>
+        <File RelativePath="..\..\..\src\qli\meta.epp">
+        </File>
+        <File RelativePath="..\..\..\src\qli\proc.epp">
+        </File>
+        <File RelativePath="..\..\..\src\qli\show.epp">
+        </File>
+      </Filter>
+      <Filter Name="Generated files">
+        <File RelativePath="..\..\..\gen\$(PlatformName)\qli\help.cpp">
+        </File>
+        <File RelativePath="..\..\..\gen\$(PlatformName)\qli\meta.cpp">
+        </File>
+        <File RelativePath="..\..\..\gen\$(PlatformName)\qli\proc.cpp">
+        </File>
+        <File RelativePath="..\..\..\gen\$(PlatformName)\qli\show.cpp">
+        </File>
+      </Filter>
+    </Filter>
+    <Filter Name="JRD files">
+      <File RelativePath="..\..\..\src\jrd\dsc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_file.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\status.cpp">
+      </File>
+    </Filter>
+    <Filter Name="GPRE files">
+      <File RelativePath="..\..\..\src\gpre\pretty.cpp">
+      </File>
+    </Filter>
+    <Filter Name="COMMON files">
+      <File RelativePath="..\..\..\src\common\fb_exception.cpp">
+      </File>
+    </Filter>
+    <Filter Name="Header files" Filter="h;hpp;hxx;hm;inl">
+      <File RelativePath="..\..\..\src\qli\all_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\comma_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\compi_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\compile.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\dtr.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\err_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\eval_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\exe.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\exe_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\expan_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\forma_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\format.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\gener_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\help_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\hsh_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\lex_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\meta_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\mov_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\parse.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\parse_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\picst_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\proc_ddl.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\proc_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\procddl1.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\procddl2.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\procddl3.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\procddl4.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\repor_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\report.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\reqs.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\show_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\symbols.h">
+      </File>
+      <File RelativePath="..\..\..\src\qli\words.h">
+      </File>
+    </Filter>
+    <Filter Name="Resource files">
+      <File RelativePath="..\..\..\src\jrd\version.rc">
+        <FileConfiguration Name="Debug|Win32">
+          <Tool Name="VCResourceCompilerTool" AdditionalIncludeDirectories="..\..\..\src\jrd;$(NoInherit)" />
+        </FileConfiguration>
+        <FileConfiguration Name="Release|Win32">
+          <Tool Name="VCResourceCompilerTool" AdditionalIncludeDirectories="..\..\..\src\jrd;$(NoInherit)" />
+        </FileConfiguration>
+      </File>
+    </Filter>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

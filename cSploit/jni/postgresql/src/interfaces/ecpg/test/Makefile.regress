@@ -1,0 +1,18 @@
+override CPPFLAGS := -I../../include -I$(top_srcdir)/src/interfaces/ecpg/include \
+	-I$(libpq_srcdir) $(CPPFLAGS)
+override CFLAGS += $(PTHREAD_CFLAGS)
+
+override LDFLAGS := -L../../ecpglib -L../../pgtypeslib $(filter-out -l%, $(libpq)) $(LDFLAGS)
+override LIBS := -lecpg -lpgtypes $(filter -l%, $(libpq)) $(LIBS) $(PTHREAD_LIBS)
+
+ECPG = ../../preproc/ecpg --regression -I$(srcdir)/../../include
+
+%: %.c
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $*.o
+	$(CC) $(CPPFLAGS) $(CFLAGS) $*.o $(LDFLAGS) $(LDFLAGS_EX) $(LIBS) -o $@
+
+%.c: %.pgc ../regression.h
+	$(ECPG) -o $@ -I$(srcdir) $<
+
+clean:
+	rm -f $(TESTS) $(TESTS:%=%.o) $(TESTS:%=%.c)

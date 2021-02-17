@@ -1,0 +1,175 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/pt_PT.xml
+// *
+// ***************************************************************************
+pt_PT{
+    AuxExemplarCharacters{"[ª ă å ä ā æ è ĕ ë ē ì ĭ î ï ī ñ º ŏ ö ø ō œ ù ŭ û ü ū ÿ]"}
+    NumberElements{
+        ",",
+        " ",
+        ";",
+        "%",
+        "0",
+        "#",
+        "-",
+        "E",
+        "‰",
+        "∞",
+        "NaN",
+        "+",
+    }
+    NumberPatterns{
+        "#,##0.###",
+        "#,##0.00 ¤",
+        "#,##0%",
+        "#E0",
+    }
+    Version{"2.0.47.71"}
+    calendar{
+        buddhist{
+            DateTimePatterns{
+                "HH'h'mm'min'ss's' zzzz",
+                "HH'h'mm'min'ss's' z",
+                "HH:mm:ss",
+                "HH:mm",
+                "EEEE, MMMM d, y G",
+                "MMMM d, y G",
+                "MMM d, y G",
+                "M/d/yyyy",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+        }
+        gregorian{
+            AmPmMarkers{
+                "Antes do meio-dia",
+                "Depois do meio-dia",
+            }
+            DateTimePatterns{
+                "HH'h'mm'min'ss's' zzzz",
+                "HH'h'mm'min'ss's' z",
+                "HH:mm:ss",
+                "HH:mm",
+                "EEEE, d 'de' MMMM 'de' y",
+                "d 'de' MMMM 'de' y",
+                "d 'de' MMM 'de' yyyy",
+                "dd/MM/yy",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            availableFormats{
+                hm{"h:mm"}
+                hms{"h:mm:ss"}
+                yQ{"QQQ 'de' yyyy"}
+                yQQQ{"QQQ 'de' y"}
+                yyQ{"QQQ 'de' yy"}
+            }
+            dayNames{
+                format{
+                    wide{
+                        "Domingo",
+                        "Segunda-feira",
+                        "Terça-feira",
+                        "Quarta-feira",
+                        "Quinta-feira",
+                        "Sexta-feira",
+                        "Sábado",
+                    }
+                }
+            }
+            intervalFormats{
+                Hm{
+                    H{"HH'h' - HH'h'"}
+                }
+                MMM{
+                    M{"MMM-MMM"}
+                }
+                h{
+                    a{"h a - h a"}
+                    h{"h-h a"}
+                }
+                hm{
+                    h{"h'h' - h'h' a"}
+                }
+                y{
+                    y{"y-y"}
+                }
+                yMMMM{
+                    M{"MM-MM 'de' yyyy"}
+                }
+            }
+            monthNames{
+                format{
+                    abbreviated{
+                        "Jan",
+                        "Fev",
+                        "Mar",
+                        "Abr",
+                        "Mai",
+                        "Jun",
+                        "Jul",
+                        "Ago",
+                        "Set",
+                        "Out",
+                        "Nov",
+                        "Dez",
+                    }
+                    wide{
+                        "Janeiro",
+                        "Fevereiro",
+                        "Março",
+                        "Abril",
+                        "Maio",
+                        "Junho",
+                        "Julho",
+                        "Agosto",
+                        "Setembro",
+                        "Outubro",
+                        "Novembro",
+                        "Dezembro",
+                    }
+                }
+            }
+            quarters{
+                format{
+                    wide{
+                        "1.º trimestre",
+                        "2.º trimestre",
+                        "3.º trimestre",
+                        "4.º trimestre",
+                    }
+                }
+            }
+        }
+        japanese{
+            DateTimePatterns{
+                "HH'h'mm'min'ss's' zzzz",
+                "HH'h'mm'min'ss's' z",
+                "HH:mm:ss",
+                "HH:mm",
+                "EEEE, MMMM d, y G",
+                "MMMM d, y G",
+                "MMM d, y G",
+                "M/d/yy",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+        }
+    }
+    measurementSystemNames{
+        metric{"Métrico"}
+    }
+}

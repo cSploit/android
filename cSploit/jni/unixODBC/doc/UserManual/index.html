@@ -1,0 +1,512 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=utf-8">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 2.0  (Linux)">
+	<META NAME="AUTHOR" CONTENT="Peter Harvey">
+	<META NAME="CREATED" CONTENT="20070322;14575800">
+	<META NAME="CHANGED" CONTENT="16010101;0">
+	<STYLE>
+	<!--
+		TD P { color: #000000 }
+		P { color: #000000 }
+		A:link { color: #0000ef }
+		A:visited { color: #51188e }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" TEXT="#000000" LINK="#0000ef" VLINK="#51188e" BGCOLOR="#ffffff" DIR="LTR">
+<P STYLE="margin-bottom: 0in"><IMG SRC="unixODBC.gif" NAME="graphics1" ALIGN=BOTTOM WIDTH=32 HEIGHT=32 BORDER=0><FONT SIZE=7><FONT FACE="Arial, Helvetica">unixODBC</FONT></FONT>
+</P>
+<HR>
+<P ALIGN=CENTER><FONT FACE="Arial, Helvetica"><FONT SIZE=5><B>USER
+MANUAL</B></FONT></FONT></P>
+<P><BR><BR>
+</P>
+<P><FONT FACE="Arial, Helvetica">Welcome to the unixODBC User
+Manual.&nbsp; This manual is targeted toward people who will be using
+unixODBC to access data sources from tools and applications which
+have been developed by others. This manual compliments the
+<A HREF="../AdministratorManual">Administrator Manual</A> and the
+<A HREF="../ProgrammerManual">Programmer Manual</A>, each of which is
+geared for a more technical audience.</FONT> 
+</P>
+<P><B><FONT SIZE=4><FONT FACE="Arial, Helvetica">Getting Started</FONT></FONT></B>
+</P>
+<P><FONT FACE="Arial, Helvetica">At this point unixODBC has been
+installed by your System Administrator. Your System Administrator
+should have installed and registered at least one ODBC Driver (we
+will assume that the ODBC Text File Driver has been installed). Your
+System Administrator accomplished this by following the directions
+laid out in the Administrator Manual.</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">You will need an account on the
+UNIX/Linux machine; this is also provided by your System
+Administrator. In fact, if you run into problems at any point in this
+manual then you should refer to your System Administrator to ensure
+that all required software is installed, accounts given and
+privileges granted. You may also want to talk to your Database
+Administrator (DBA) to ensure that you have access to your database
+and to resolve any questions about which driver to use and what
+options to set.</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">UNIX users can be given a wide
+variety of methods to access their account resources and these access
+methods usually fall into one of two categories.</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">1. shell account (telnet and
+terminal sessions)</FONT> <BR><FONT FACE="Arial, Helvetica">2.
+graphical desktop</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">If you are limited to a shell
+account then you will not be able to use the ODBCConfig and the
+DataManager tools.</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">We are now ready to start using the
+unixODBC tools. The first thing you should do is verify that you have
+a working System DSN. If you do not; then you should create a User
+DSN. These tasks can be accomplished using the ODBCConfig tool.</FONT>
+</P>
+<P><B><FONT SIZE=4><FONT FACE="Arial, Helvetica">Using ODBCConfig</FONT></FONT></B>
+</P>
+<P><FONT FACE="Arial, Helvetica">The ODBCConfig tool is designed to
+allow you to easily setup a Data Source (DSN). DSN's act as an access
+point for getting to your data. In many cases; creating a DSN is as
+simple as picking a Driver to use, selecting a Server, and entering a
+Name for the DSN. In fact; DSN stands for Data Source Name.</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">You should find using the ODBCConfig
+tool to be quite intuitive because of the simple Graphical User
+Interface (see Figure 1) but you must understand a few terms before
+getting started.</FONT> <BR>&nbsp; 
+</P>
+<CENTER>
+	<TABLE BORDER=1 CELLPADDING=2 CELLSPACING=2>
+		<TR>
+			<TD>
+				<P><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P ALIGN=CENTER>Figure 1</P>
+			</TD>
+		</TR>
+	</TABLE>
+</CENTER>
+<P><B><I><FONT FACE="Arial, Helvetica">User DSN</FONT></I></B> 
+</P>
+<P><FONT FACE="Arial, Helvetica">These are your personal Data
+Sources. You are able to; Add new ones, Remove existing ones, and
+Configure existing ones. User DSN information is stored in a secret
+location where only you can access them. Keeping your User DSN's
+separate from other User DSN's allows you a great deal of flexibility
+and control over creating and working with Data Sources which are
+only important to you.</FONT> 
+</P>
+<P><B><I><FONT FACE="Arial, Helvetica">System DSN</FONT></I></B> 
+</P>
+<P><FONT FACE="Arial, Helvetica">These are created by the System
+Administrator. They act very much like the User DSN's but with three
+important differences.</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">1. ONLY the System Administrator
+can; Add, Remove and Configure System DSN's.</FONT> <BR><FONT FACE="Arial, Helvetica">2.
+System DSN's will be used only if the DSN does not exist as a User
+DSN. In other words; your User DSN has precedence over the System
+DSN.</FONT> <BR><FONT FACE="Arial, Helvetica">3. Everyone, logged
+into the ODBC enabled computer, shares the same list of System DSN's.</FONT>
+</P>
+<P><B><I><FONT FACE="Arial, Helvetica">Drivers</FONT></I></B> 
+</P>
+<P><FONT FACE="Arial, Helvetica">Drivers contain the special code
+required to talk to the specific type of database you will work with.
+The Drivers often come from the vendor of the database but may also
+be found in the unixODBC package. Your System Administrator is the
+only user who can install and register a Driver. You will select a
+Driver to use when adding a new DSN.</FONT> 
+</P>
+<P><B><I><FONT FACE="Arial, Helvetica">Add a DSN</FONT></I></B> 
+</P>
+<P><FONT FACE="Arial, Helvetica">You will want to ensure that you
+have at least one working DSN. Here is a quick step-by-step guide to
+creating your first User DSN. We will not actually use it yet because
+that will involve using other tools and we have not talked about them
+yet.</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">1. Execute ODBCConfig</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">This can be done in a variety of
+ways. If you know that you have an icon or menu item for ODBCConfig
+on your desktop then execute it using one of these methods. If you do
+not; then start a shell and enter the command <FONT COLOR="#cc33cc">ODBCConfig</FONT><FONT COLOR="#000000">.
+You should see a window popup (see Figure 1).</FONT></FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica"><FONT COLOR="#000000">2. Add</FONT></FONT>
+</P>
+<P><FONT FACE="Arial, Helvetica"><FONT COLOR="#000000">Click on the
+User DSN tab to ensure that you are working with User DSNs. Click on
+the Add button. Select a Driver from the list. If the list is empty
+then contact your System Administrator; only the System Administrator
+can add Drivers. For this example we will try to use the Text File
+Driver. Select the Text File Driver if you have it available.</FONT></FONT>
+</P>
+<P><FONT FACE="Arial, Helvetica"><FONT COLOR="#000000">3. Edit
+Options</FONT></FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica"><FONT COLOR="#000000">You should be
+presented with a list of DSN options which you can edit.&nbsp; Figure
+2 shows the options for the Text File Driver but you may have a
+different set of options if you selected a different driver. Common
+options are; Name (a unique name must be entered). Description, Trace
+and TraceFile.</FONT></FONT> <BR>&nbsp; <BR>&nbsp; 
+</P>
+<CENTER>
+	<TABLE BORDER=1 CELLPADDING=2 CELLSPACING=2>
+		<TR>
+			<TD>
+				<P><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P ALIGN=CENTER>Figure 2</P>
+			</TD>
+		</TR>
+	</TABLE>
+</CENTER>
+<P><FONT FACE="Arial, Helvetica"><FONT COLOR="#000000">Enter a unique
+name, enter a comment, turn Trace off and click Ok to save it. You
+may click on Configure, at the main window, to come back to these
+options at any time in the future. Notice that the Database in
+Figure-2 is /home/pharvey/test.db. You should ensure that this points
+to something like; /home/YourLoginID/test.db where you replace
+YourLoginID with your ID. The test.db file should not already exist
+(for the purposes of this excercise); it will be created for you.
+This is how to create a new database using the ODBC Text File Driver.</FONT></FONT>
+</P>
+<P><FONT FACE="Arial, Helvetica"><FONT COLOR="#000000">4. Your Done</FONT></FONT>
+</P>
+<P><FONT FACE="Arial, Helvetica"><FONT COLOR="#000000">Notice that
+you now have your new DSN listed in the main form. This means that
+you can try to use it in any tool or application which uses ODBC DSNs
+for data access. This includes many applications such as Word
+Processors and Spread Sheets. You may want to test your DSN using the
+DataManager.</FONT></FONT> 
+</P>
+<P><B><I><FONT FACE="Arial, Helvetica"><FONT COLOR="#000000">Summary</FONT></FONT></I></B>
+</P>
+<P><FONT FACE="Arial, Helvetica"><FONT COLOR="#000000">ODBCConfig is
+a useful tool for PowerUsers but it is simple enough for almost any
+user to use. ODBCConfig exposes the most important reason for using
+ODBC to access your data; the ability for you or your System
+Administrator to change the Data Source for your tools and
+applications. Please take some time to get familiar with ODBCConfig
+and your Driver options, perhaps sit with someone who is a bit more
+technical and talk about it for one or two minutes. You will be
+rewarded.</FONT></FONT> 
+</P>
+<P><B><FONT SIZE=4><FONT FACE="Arial, Helvetica">Using DataManager</FONT></FONT></B>
+</P>
+<P><FONT FACE="Arial, Helvetica">The DataManager is a great,
+graphical, tool for exploring your Data Sources. It allows you to
+explore you Data Sources in a similar manner to exploring your file
+system. The DataManager ( see Figure 6 ) is split into two views. On
+the left hand side you have a Tree View'. The Tree View is where you
+can drill down to the information that interests you. On the right
+hand side you have a Detail View. The Detail View shows any details
+that may be available for the selected item in the Tree View.</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">Just like ODBCConfig, you can
+execute the DataManager in a variety of ways. One way is to go to a
+shell and enter the command <FONT COLOR="#cc66cc">DataManager</FONT>.
+This should bring up a window that looks similar to Figure 6.</FONT>
+<BR>&nbsp; 
+</P>
+<CENTER>
+	<TABLE BORDER=1 CELLPADDING=2 CELLSPACING=2>
+		<TR>
+			<TD>
+				<P><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P ALIGN=CENTER>Figure 6</P>
+			</TD>
+		</TR>
+	</TABLE>
+</CENTER>
+<P><FONT FACE="Arial, Helvetica">Next; expand the nodes to drill down
+to the information that interests you. You will be asked to login if
+you try to drill past a Data Source. If this happens, enter the login
+ID and Password provided by your Database Administrator or System
+Administrator. You will know that you are logged in when the little
+computer screen changes from Red to Green.</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">One of the interesting Detail Views
+occurs when you select a Data Source item in the Tree View when you
+are logged into it (the little computer screen is Green). The Detail
+View is an SQL editor. This is only useful if you know the SQL
+command language but for those that do... it can be very handy.</FONT>
+</P>
+<P><B><I><FONT FACE="Arial, Helvetica">Summary</FONT></I></B> 
+</P>
+<P><FONT FACE="Arial, Helvetica">The DataManager tool is a good way
+to test a DSN and then to see what resources are available inside the
+Data Source. It is also very easy to use.</FONT> <BR>&nbsp; 
+</P>
+<P><B><FONT SIZE=4><FONT FACE="Arial, Helvetica">Using isql</FONT></FONT></B>
+</P>
+<P><FONT FACE="Arial, Helvetica">This is a command line tool. This
+means that you can use it even if you are not working on a Graphical
+Desktop (for example; in a telnet session). This tool is designed for
+more advanced uses of unixODBC. You can use isql to test a connection
+but it is designed to be used by those experienced with the
+Structured Query Language (SQL). You probably will not want to use
+this tool if you are unfamiliar with SQL.</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">isql allows you to;</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">1. connect to your Data Source
+(using a DSN)</FONT> <BR><FONT FACE="Arial, Helvetica">2. send SQL
+commands to the Data Source</FONT> <BR><FONT FACE="Arial, Helvetica">3.
+receive results from the Data Source</FONT> 
+</P>
+<P><FONT FACE="Arial, Helvetica">This tool can act in batch mode or
+interactive mode. Figure 3 shows a simple, interactive, session.</FONT>
+<BR>&nbsp; <BR>&nbsp; 
+</P>
+<CENTER>
+	<TABLE BORDER=1 CELLPADDING=2 CELLSPACING=2>
+		<TR>
+			<TD>
+				<P><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P ALIGN=CENTER>Figure 3</P>
+			</TD>
+		</TR>
+	</TABLE>
+</CENTER>
+<P><FONT FACE="Arial, Helvetica">Figure 4 shows an example of isql
+being used in batch mode. Notice that it is being told to run a
+similar query as above but this time it is coming from a file (
+My.sql ).</FONT> <BR>&nbsp; <BR>&nbsp; 
+</P>
+<CENTER>
+	<TABLE BORDER=1 CELLPADDING=2 CELLSPACING=2>
+		<TR>
+			<TD>
+				<P><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P ALIGN=CENTER>Figure 4</P>
+			</TD>
+		</TR>
+	</TABLE>
+</CENTER>
+<P><FONT FACE="Arial, Helvetica">The example, in Figure 4, is also
+formatting the results into an HTML table and is sending them to a
+new file ( My.html ). Figure 5 shows the resulting html table.</FONT>
+<BR>&nbsp; 
+</P>
+<CENTER>
+	<TABLE WIDTH=679 BORDER=1 CELLPADDING=2 CELLSPACING=3 FRAME=VOID RULES=COLS>
+		<COL WIDTH=0>
+		<COL WIDTH=118>
+		<COL WIDTH=118>
+		<COL WIDTH=104>
+		<COL WIDTH=136>
+		<COL WIDTH=158>
+		<COL WIDTH=0>
+		<TBODY>
+			<TR>
+				<TD COLSPAN=7 WIDTH=669></TD>
+			</TR>
+			<TR>
+				<TD ROWSPAN=4 WIDTH=0 VALIGN=TOP></TD>
+				<TD WIDTH=118 BGCOLOR="#000099">
+					<P><FONT COLOR="#ffffff"><FONT FACE="Arial, Helvetica">vcCompanyName</FONT></FONT></P>
+				</TD>
+				<TD WIDTH=118 BGCOLOR="#000099">
+					<P><FONT COLOR="#ffffff"><FONT FACE="Arial, Helvetica">vcCompanyStreet</FONT></FONT></P>
+				</TD>
+				<TD WIDTH=104 BGCOLOR="#000099">
+					<P><FONT COLOR="#ffffff"><FONT FACE="Arial, Helvetica">vcCompanyCity</FONT></FONT></P>
+				</TD>
+				<TD WIDTH=136 BGCOLOR="#000099">
+					<P><FONT COLOR="#ffffff"><FONT FACE="Arial, Helvetica">vcCompanyProvince</FONT></FONT></P>
+				</TD>
+				<TD WIDTH=158 BGCOLOR="#000099">
+					<P><FONT COLOR="#ffffff"><FONT FACE="Arial, Helvetica">vcCompanyPostalCode</FONT></FONT></P>
+				</TD>
+				<TD ROWSPAN=4 WIDTH=0 VALIGN=TOP></TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD WIDTH=118>
+					<P><FONT FACE="Arial, Helvetica">XYZ Company</FONT></P>
+				</TD>
+				<TD WIDTH=118>
+					<P><FONT FACE="Arial, Helvetica">XYZ Street</FONT></P>
+				</TD>
+				<TD WIDTH=104>
+					<P><BR>
+					</P>
+				</TD>
+				<TD WIDTH=136>
+					<P><BR>
+					</P>
+				</TD>
+				<TD WIDTH=158>
+					<P><BR>
+					</P>
+				</TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD WIDTH=118>
+					<P><FONT FACE="Arial, Helvetica">Another Company</FONT></P>
+				</TD>
+				<TD WIDTH=118>
+					<P><BR>
+					</P>
+				</TD>
+				<TD WIDTH=104>
+					<P><BR>
+					</P>
+				</TD>
+				<TD WIDTH=136>
+					<P><BR>
+					</P>
+				</TD>
+				<TD WIDTH=158>
+					<P><BR>
+					</P>
+				</TD>
+			</TR>
+		</TBODY>
+		<TBODY>
+			<TR>
+				<TD WIDTH=118>
+					<P><FONT FACE="Arial, Helvetica">CodeByDesign</FONT></P>
+				</TD>
+				<TD WIDTH=118>
+					<P><BR>
+					</P>
+				</TD>
+				<TD WIDTH=104>
+					<P><BR>
+					</P>
+				</TD>
+				<TD WIDTH=136>
+					<P><BR>
+					</P>
+				</TD>
+				<TD WIDTH=158>
+					<P><BR>
+					</P>
+				</TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=7 WIDTH=669></TD>
+			</TR>
+			<TR>
+				<TD COLSPAN=7 WIDTH=669>
+					<P ALIGN=CENTER>Figure 5</P>
+				</TD>
+			</TR>
+		</TBODY>
+	</TABLE>
+</CENTER>
+<P><B><I><FONT FACE="Arial, Helvetica">Summary</FONT></I></B> 
+</P>
+<P><FONT FACE="Arial, Helvetica">isql is a powerful tool for working
+SQL to access your Data Source but it is more for the advanced user.</FONT>
+</P>
+<P><B><FONT SIZE=4><FONT FACE="Arial, Helvetica">StarOffice 5</FONT></FONT></B>
+</P>
+<P><FONT FACE="Arial, Helvetica">StarOffice is an application similar
+in goals to MS Office. A free version, for non-commercial use, can be
+downloaded from <A HREF="http://www.stardivision.com/">StarDivisions
+web site</A>. Figure 7 shows a PostgreSQL table being browsed in
+StarOffice. StarOffice can use ODBC data but it can be tricky to get
+going. Here are some things to note about using StarOffice with
+unixODBC. Make sure that unixODBC is installed on your machine before
+trying to use StarOffice ODBC on UNIX.</FONT> <BR>&nbsp; 
+</P>
+<CENTER>
+	<TABLE BORDER=1 CELLPADDING=2 CELLSPACING=2>
+		<TR>
+			<TD>
+				<P><BR>
+				</P>
+			</TD>
+		</TR>
+		<TR>
+			<TD>
+				<P ALIGN=CENTER>Figure 7</P>
+			</TD>
+		</TR>
+	</TABLE>
+</CENTER>
+<P><FONT FACE="Arial, Helvetica">Q. StarOffice disappears when I try
+to load a list of ODBC DSNs and I get an error in my terminal window
+about some library file missing?</FONT> 
+</P>
+<P>A. If you have StarOffice 5.0 you may want to try adding this to
+your soffice start script <I><B>export
+LD_PRELOAD=/usr/lib/libodbc.so</B>&nbsp; </I>Your soffice start
+script can be found in <B><I>Office50/bin/soffice</I></B>and can be
+edited with any text editor. If you are not sure of where libodbc.so
+is or where soffice is then you may want to use the UNIX <B><I>find
+</I></B>command. 
+</P>
+<P>However with the release of StarOffice 5.1 and beyond all you need
+to do is to add the path to the libodbc.so to either /etc/ld.so.conf
+or to your LD_LIBRARY_PATH environment variable. 
+</P>
+<P>Q. Do all ODBC drivers work with StarOffice? 
+</P>
+<P>A. No. StarOffice is very demanding upon an ODBC driver.
+StarOffice needs many ODBC features in order to accept a driver. Two
+drivers which are known to work are; 1. PostgreSQL and 2. MySQL.
+People are actively working on other drivers. 
+</P>
+<P><B><I><FONT FACE="Arial, Helvetica">Summary</FONT></I></B> 
+</P>
+<P><FONT FACE="Arial, Helvetica">StarOffice is a rising 'star' in the
+UNIX world. You can combine StarOffice with unixODBC to get at your
+data. With StarOffice and unixODBC you can pull your data into a
+Spreadsheet, Word Processor or even create Web forms based upon your
+data.</FONT> 
+</P>
+<P><B><FONT SIZE=4><FONT FACE="Arial, Helvetica">Conclusion</FONT></FONT></B>
+</P>
+<P><FONT FACE="Arial, Helvetica">unixODBC comes with a variety of
+useful and powerful tools to allow you to configure you ODBC access
+and to work with your ODBC data. Familiarity with these tools is a
+great start to using your ODBC in applications such as word
+processors, spreadsheets and even applications developed at your
+company of employ. I hope you enjoy them! Please email comments
+and/or suggestions to me, <A HREF="mailto:pharvey@codebydesign.com">Peter
+Harvey</A>.</FONT> 
+</P>
+<HR>
+<P><BR>&nbsp; <BR>&nbsp; 
+</P>
+</BODY>
+</HTML>

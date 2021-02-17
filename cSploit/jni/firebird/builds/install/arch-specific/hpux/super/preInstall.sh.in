@@ -1,0 +1,215 @@
+#!/bin/sh
+
+#------------------------------------------------------------------------
+# Prompt for response, store result in Answer
+
+	Answer=""
+
+	AskQuestion() {
+	    Test=$1
+	    DefaultAns=$2
+	    echo -n "${1}"
+	    Answer="$DefaultAns"
+	    read Answer
+	}
+
+
+#------------------------------------------------------------------------
+#  stop super server if it is running
+#  Also will only stop firebird, since that has the init script
+
+
+	stopServerIfRunning() {
+
+	    checkString=`ps -ef | egrep "(fbserver|fbguard)" |grep -v grep`
+
+	    if [ ! -z "$checkString" ] 
+	      then
+		if [ -f /sbin/init.d/firebird ]
+		  then
+		    /sbin/init.d/firebird stop
+		fi
+	    fi
+	}
+
+#------------------------------------------------------------------------
+#  stop server if it is running
+
+
+	checkIfServerRunning() {
+
+
+	    stopServerIfRunning
+
+
+	    checkString=`ps -ef | egrep "(fbserver|fbguard)" |grep -v grep`
+
+	    if [ ! -z "$checkString" ] 
+	      then
+		echo "An instance of the Firebird SuperServer seems to be running." 
+		echo "(the fbserver/fbguard process was detected running on your system)"
+		echo "Please quit all Firebird applications and then proceed"
+		exit -1 
+	    fi
+
+
+
+	    checkString=`ps -ef | egrep "(fb_inet_server|fb_smp_server)" |grep -v grep`
+
+	    if [ ! -z "$checkString" ] 
+	      then
+		echo "An instance of the Firebird Classic server seems to be running." 
+		echo "Please quit all interbase applications and then proceed." 
+		exit 1 
+	    fi
+
+
+
+# Stop lock manager if it is the only thing running.
+
+	    for i in `ps -ef | egrep "fb_lock_mgr" | awk '{print $2}' `
+	     do
+		kill $i
+	     done
+
+
+	}
+
+
+#------------------------------------------------------------------------
+# Run process and check status
+
+
+	runAndCheckExit() {
+	    Cmd=$*
+
+	#    echo $Cmd
+	    $Cmd
+
+	    ExitCode=$?
+
+	    if [ $ExitCode -ne 0 ]
+	      then
+		echo "Install aborted: The command $Cmd "
+		echo "                 failed with error code $ExitCode"
+		exit $ExitCode
+	    fi
+	}
+
+
+#------------------------------------------------------------------------
+#  Display message if this is being run interactively.
+
+
+	displayMessage() {
+
+	    msgText=$1
+	    if [ ! -z "$InteractiveInstall" ]
+	      then
+		echo $msgText
+	    fi
+	}
+
+
+#------------------------------------------------------------------------
+#  Archive any existing prior installed files.
+#  The 'cd' stuff is to avoid the "leading '/' removed message from tar.
+#  for the same reason the DestFile is specified without the leading "/"
+
+
+	archivePriorInstallSystemFiles() {
+
+	    oldPWD=`pwd`
+	    archiveFileList=""
+
+	    cd /
+
+	    DestFile=${FBRootDir#/}   # strip off leading /
+	    if [ -e "$DestFile"  ]
+	      then
+		echo ""
+		echo ""
+		echo ""
+		echo "--- Warning ----------------------------------------------"
+		echo "    The installation target directory: $FBRootDir"
+		echo "    Already contains a prior installation of Firebird."
+		echo "    This and files found in /usr/include and @libdir@ will be"
+		echo "    archived in the file : ${ArchiveMainFile}"
+		echo "" 
+
+		if [ ! -z "$InteractiveInstall" ]
+		  then
+		    AskQuestion "Press return to continue or ^C to abort"
+		fi
+
+		if [ -e $DestFile ]
+		  then
+		    archiveFileList="$archiveFileList $DestFile"
+		fi
+	    fi
+
+
+	    for i in ibase.h ib_util.h
+	      do
+		DestFile=usr/include/$i
+		if [ -e $DestFile ]
+		  then
+		    archiveFileList="$archiveFileList $DestFile"
+		fi
+	      done
+
+	    for i in libib_util.so libfbclient.so.1.5.0 libfbclient.so.1 libfbclient.so
+	      do
+		DestFile=usr/lib/$i
+		if [ -e $DestFile ]
+		  then
+		    archiveFileList="$archiveFileList $DestFile"
+		fi
+	      done
+
+	      if [ ! -z "$archiveFileList" ]
+		then
+
+		  displayMessage "Archiving..."
+
+		  runAndCheckExit "tar -cvf $ArchiveMainFile $archiveFileList"
+
+
+		  displayMessage "Done."
+		  displayMessage "Deleting..."
+
+		  for i in $archiveFileList
+		    do
+		      rm -rf $i
+		    done
+
+		  displayMessage "Done."
+
+	      fi
+	    cd $oldPWD
+
+	}
+
+
+
+#== Main Pre =================================================================
+
+	    ArchiveDateTag=`date +"%Y%m%d_%H%M"`
+	    ArchiveMainFile="${FBRootDir}_${ArchiveDateTag}.tar"
+
+# Ok so any of the following packages are a problem
+# these don't work at least in the latest rpm manager, since it 
+# has the rpm database locked and it fails.
+
+#    checkForRPMInstall InterBase
+#    checkForRPMInstall FirebirdCS
+#    checkForRPMInstall FirebirdSS
+
+
+    checkIfServerRunning
+
+
+# Failing that we archive any files we find
+
+    archivePriorInstallSystemFiles
+

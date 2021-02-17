@@ -1,0 +1,359 @@
+.\"  etterfilter -- filter compiler for ettercap filter files
+.\"
+.\"  This program is free software; you can redistribute it and/or modify
+.\"  it under the terms of the GNU General Public License as published by
+.\"  the Free Software Foundation; either version 2 of the License, or
+.\"  (at your option) any later version.
+.\"
+.\"  This program is distributed in the hope that it will be useful,
+.\"  but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"  GNU General Public License for more details.
+.\"
+.\"  You should have received a copy of the GNU General Public License
+.\"  along with this program; if not, write to the Free Software
+.\"  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.\"
+.\"  $Id: etterfilter.8.in,v 1.22 2005/01/04 14:35:43 alor Exp $
+.\"
+.de Sp
+.if n .sp
+.if t .sp 0.4
+..
+.TH ETTERFILTER "8" "" "ettercap NG-0.7.3"
+.SH NAME
+.B etterfilter NG-0.7.3 \- Filter compiler for ettercap content filtering engine
+
+.SH SYNOPSIS
+.B etterfilter
+[\fIOPTIONS\fR] \fIFILE\fR
+
+
+.SH DESCRIPTION
+The etterfilter utility is used to compile source filter files into binary
+filter files that can be interpreted by the JIT interpreter in the ettercap(8)
+filter engine. You have to compile your filter scripts in order to use them in
+ettercap. All syntax/parse errors will be checked at compile time, so you
+will be sure to produce a correct binary filter for ettercap.
+
+.TP
+.B GENERAL OPTIONS
+.TP
+\fB\-o\fR, \fB\-\-output <FILE>\fR
+you can specify the output file for a source filter file. By default the output
+is filter.ef.
+
+.TP
+\fB\-t\fR, \fB\-\-test <FILE>\fR
+you can analyze a compiled filter file with this option. etterfilter will print
+in a human readable form all the instructions contained in it. It is a sort of
+"disassembler" for binary filter files.
+
+.TP
+\fB\-d\fR, \fB\-\-debug\fR
+prints some debug messages during the compilation. Use it more than once to
+increase the debug level ( etterfilter -ddd ... ).
+                           
+.TP
+\fB\-w\fR, \fB\-\-suppress-warnings\fR
+Don't exit on warnings. With this option the compiler will compile the script
+even if it contains warnings.
+                           
+.TP
+.B STANDARD OPTIONS
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Print the version and exit.
+
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+prints the help screen with a short summary of the available options.
+
+
+
+.TP
+.B SCRIPTS SYNTAX
+A script is a compound of instructions. It is executed sequentially and you can
+make branches with the 'if' statements. 'if' and 'if/else' statements are the only
+supported. No loops are implemented. The syntax is almost like C code
+except that you have to put 'if' blocks into graph parentheses '{' '}', even if they 
+contain only one instruction.
+.Sp
+NOTE: you have to put a space between the 'if' and the '('. You must not put the 
+space between the function name and the '('.
+.Sp
+Example:
+.br
+if (conditions) { }
+.br
+func(args...);
+
+.Sp
+The conditions for an 'if' statement can be either functions or comparisons.
+Two or more conditions can be linked together with logical operators like 
+OR '||' and AND '&&'.
+.Sp
+Example:
+.br
+if (tcp.src == 21 && search(DATA.data, "ettercap")) {
+.br
+}
+.Sp
+Pay attention to the operator precedence. 
+You cannot use parentheses to group conditions, so be careful with the order. An
+AND at the beginning of a conditions block will exclude all the other tests if
+it is evaluated as false. The parsing is left-to-right, when an operator is
+found: if it is an AND and the previous condition is false, all the statement
+is evaluated as false; if it is an OR the parsing goes on even if the condition 
+is false.
+.Sp
+Example:
+.br
+if (ip.proto == UDP || ip.proto == TCP && tcp.src == 80) {
+.br
+}
+.Sp
+if (ip.proto == TCP && tcp.src == 80 || ip.proto == UDP) {
+.br
+}
+.Sp
+the former condition will match all udp or http traffic. The latter is wrong,
+because if the packet is not tcp, the whole condition block will be evaluated as false.
+If you want to make complex conditions, the best way is to split them into nested 'if'
+blocks.
+
+.Sp
+Every instruction in a block must end with a semicolon ';'. 
+.Sp
+Comparisons are implemented with the '==' operator and can be used to compare 
+numbers, strings or ip addresses. An ip address MUST be enclosed within two single 
+quotes (eg. '192.168.0.7'). You can also use the 'less than' ('<'), 'greater than'
+('>'), 'less or equal' ('<=') and 'greater or equal' ('>=') operators.
+The lvalue of a comparison must be an offset (see later)
+.Sp
+Example:
+.br
+if (DATA.data + 20 == "ettercap" && ip.ttl > 16) {
+.br
+}
+.Sp
+Assignments are implemented with the '=' operator and the lvalue can be an 
+offset (see later). The rvalue can be a string, an integer or a hexadecimal
+value.
+.Sp
+Example:
+.br
+ip.ttl = 0xff;
+.br
+DATA.data + 7 = "ettercap NG"; 
+.Sp
+You can also use the 'inc' and 'dec' operations on the packet fields. The operators
+used are '+=' and '-='. The rvalue can be an integer or a hexadecimal value.
+.Sp
+Example:
+.br
+ip.ttl += 5;
+
+
+.TP
+.B OFFSET DEFINITION
+An offset is identified by a virtual pointer. In short words, an offset is a
+pointer to the packet buffer. The virtual pointer is a tuple <L, O, S>, where 
+L is the iso/osi level, O is the offset in that level and S is the size of the virtual pointer.
+You can make algebraic operations on a virtual pointer and the result is still an
+offset. Specifying 'vp + n' will result in a new virtual pointer <L, O+n, S>.
+And this is perfectly legal, we have changed the internal offset of that
+level. 
+.Sp
+Virtual pointers are in the form 'name.field.subfield'. For example 'ip.ttl' is
+the virtual pointer for the Time To Live field in the IP header of a packet. It
+will be translated as <L=3, O=9, S=1>. Indeed it is the 9th byte of level 3 and
+its size is 1 byte. 'ip.ttl + 1' is the same as 'ip.proto' since the 10th byte
+of the IP header is the protocol encapsulated in the IP packet.
+.Sp
+The list of all supported virtual pointers is in the file etterfilter.tbl. You
+can add your own virtual pointers by adding a new table or modifying the
+existing ones. Refer to the comments at the beginning of the file for the
+syntax of etterfilter.tbl file.
+
+
+.TP
+.B SCRIPTS FUNCTIONS
+.TP
+.B search(\fIwhere\fR, \fIwhat\fR)
+this function searches the string 'what' in the buffer 'where'. The buffer
+can be either DATA.data or DECODED.data. The former is the payload at layer
+DATA (ontop TCP or UDP) as it is transmitted on the wire, the latter is the
+payload decoded/decrypted by dissectors.
+.br
+So, if you want to search in an SSH connection, it is better to use 'DECODED.data'
+since 'data' will be encrypted.
+.br
+The string 'what' can be binary. You have to escape it.
+.Sp
+example:
+.br
+search(DATA.data, "\\x41\\x42\\x43")
+
+
+.TP
+.B regex(\fIwhere\fR, \fIregex\fR)
+this function will return true if the 'regex' has matched the buffer 'where'.
+The considerations about 'DECODED.data' and 'DATA.data' mentioned for the function 'search'
+are the same for the regex function.
+.Sp
+NOTE: regex can be used only against a string buffer.
+.Sp
+example:
+.br
+regex(DECODED.data, ".*login.*")
+
+
+.TP
+.B pcre_regex(\fIwhere\fR, \fIpcre_regex\fR ... )
+this function will evaluate a perl compatible regular expression. You can match
+against both DATA and DECODED, but if your expression modifies the buffer, it
+makes sense to operate only on DATA. The function accepts 2 or 3 parameters
+depending on the operation you want. The two parameter form is used only to
+match a pattern. The three parameter form means that you want to make a
+substitution. In both cases, the second parameter is the search string.
+.br
+You can use $n in the replacement string. These
+placeholders are referred to the groups created in the search string. (e.g.
+pcre_regex(DATA.data, "^var1=([:digit:]*)&var2=([:digit:]*)", "var1=$2&var2=$1")
+will swap the value of var1 and var2).
+.br
+NOTE: The pcre support is optional in ettercap and will be enabled only if you
+have the libpcre installed.
+The compiler will warn you if you try to compile a filter that contains
+pcre expressions but you don't have libpcre. Use the -w option to suppress the
+warning.
+.Sp
+example:
+.br
+pcre_regex(DATA.data, ".*foo$")
+.br
+pcre_regex(DATA.data, "([^ ]*) bar ([^ ]*)", "foo $1 $2")
+
+
+.TP
+.B replace(\fIwhat\fR, \fIwith\fR)
+this function replaces the string 'what' with the string 'with'. They can be
+binary string and must be escaped. The replacement is always performed in
+DATA.data since is the only payload which gets forwarded. The 'DECODED.data' buffer
+is used only internally and never reaches the wire.
+.Sp
+example:
+.br
+replace("ethercap", "ettercap")
+
+
+.TP
+.B inject(\fIwhat\fR)
+this function injects the content of the file 'what' after the packet being
+processed. It always injects in DATA.data. You can use it to replace the entire
+packet with a fake one using the drop() function right before the inject() command. 
+In that case the filtering engine will drop the current packet and inject the
+fake one.
+.Sp
+example:
+.br
+inject("./fake_packet")
+
+
+.TP
+.B log(\fIwhat\fR, \fIwhere\fR)
+this function dumps in the file 'where' the buffer 'what'. No information is
+stored about the packet, only the payload is dumped. So you will see the stream
+in the file. If you want to log packets in a more enhanced mode, you need to
+use the ettercap -L option and analyze it with etterlog(8).
+.br
+The file 'where' must be writable to the user EC_UID (see etter.conf(5)).
+.Sp
+example:
+.br
+log(DECODED.data, "/tmp/interesting.log")
+
+
+.TP
+.B msg(\fImessage\fR)
+this function displays a message to the user in the User Messages window. It is
+useful to let the user know whether a particular filter has been successful or not.
+.Sp
+example:
+.br
+msg("Packet filtered successfully")
+
+
+.TP
+.B drop()
+this function marks the packet "to be dropped". The packet will not be
+forwarded to the real destination. 
+.Sp
+example:
+.br
+drop()
+
+
+.TP
+.B kill()
+this function kills the connection that owns the matched packet. If it is a TCP
+connection, a RST is sent to both sides of the connection. If it is an UDP
+connection, an ICMP PORT UNREACHABLE is sent to the source of the packet.
+.Sp
+example:
+.br
+kill()
+
+
+.TP
+.B exec(\fIcommand\fR)
+this function executes a shell command. You have to provide the full path to
+the command since it is executed without any environment. There is no way to
+determine if the command was successful or not. Furthermore, it is executed
+asynchronously since it is forked by the main process.
+.Sp
+example:
+.br
+exec("/bin/cat /tmp/foo >> /tmp/bar")
+
+
+.TP
+.B exit()
+this function causes the filter engine to stop executing the code. It is useful
+to stop the execution of the script on some circumstance checked by an 'if' statement.
+.Sp
+example:
+.br
+exit()
+
+
+
+.SH EXAMPLES
+Here are some examples of using etterfilter.
+.TP
+.B etterfilter filter.ecf -o filter.ef
+.Sp
+Compiles the source filter.ecf into a binary filter.ef
+
+
+
+.SH AUTHORS
+Alberto Ornaghi (ALoR) <alor@users.sf.net>
+.br
+Marco Valleri (NaGA) <naga@antifork.org>
+
+
+
+.SH "SEE ALSO"
+.I "etter.filter.examples"
+.br
+.I "ettercap(8)"
+.I "etterlog(8)"
+.I "etter.conf(5)"
+.I "ettercap_curses(8)"
+.I "ettercap_plugins(8)"
+.LP
+
+
+

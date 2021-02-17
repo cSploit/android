@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="UTILITIES files">
+      <UniqueIdentifier>{3326a9b6-4ba6-4e54-a8cc-b6435d9825de}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{6156a2ac-63b7-40e8-be35-fa14af10a050}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{c2239767-b491-4f6b-9650-affdc5b7504f}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\utilities\gsec\gsec.cpp">
+      <Filter>UTILITIES files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\utilities\gsec\main\gsecMain.cpp">
+      <Filter>UTILITIES files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\utilities\gsec\gsec.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

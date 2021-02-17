@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_SITE-&gt;set_config()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 10.  Replication Methods" />
+    <link rel="prev" href="dbsite_remove.html" title="DB_SITE-&gt;remove()" />
+    <link rel="next" href="repelect.html" title="DB_ENV-&gt;rep_elect()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_SITE-&gt;set_config()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbsite_remove.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 10. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="repelect.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbsite_set_config"></a>DB_SITE-&gt;set_config()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB_SITE-&gt;set_config(DB_SITE *site, u_int32_t which, u_int32_t value); </pre>
+      <p>
+         The <code class="methodname">DB_SITE-&gt;set_config()</code> method configures 
+         a Replication Manager site.
+    </p>
+      <p>
+         The <code class="methodname">DB_SITE-&gt;set_config()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <p>
+        The Replication Manager site may also be configured using the
+        environment's DB_CONFIG file. The syntax of the entry in that file
+        is described in
+        <a class="xref" href="repmgr_site_parameter.html" title="repmgr_site">repmgr_site</a>.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53983080"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp53983272"></a>which</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  This parameter must be set to one of the following
+                  values:
+             </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p><a id="DB_BOOTSTRAP_HELPER"></a>
+                        <code class="literal">DB_BOOTSTRAP_HELPER</code>
+                    </p>
+                <p>
+                        Specifies that a remote site may be used as a
+                        "helper" when the local site is first joining the
+                        replication group. Once the local site has been
+                        established as a member of the group, this 
+                        setting is ignored.
+                    </p>
+              </li>
+              <li>
+                <p><a id="DB_GROUP_CREATOR"></a>
+                        <code class="literal">DB_GROUP_CREATOR</code>
+                    </p>
+                <p>
+                        Specifies that this site should create the initial
+                        group membership database contents, defining a
+                        "group" of just the one site, rather than trying to
+                        join an existing group when it starts for the first
+                        time.
+                    </p>
+                <p>
+                        This setting can only be used on the local site.
+                        It is ignored after the local site's initial startup
+                        and when configured for a remote site.
+                    </p>
+              </li>
+              <li>
+                <p><a id="DB_LEGACY"></a>
+                        <code class="literal">DB_LEGACY</code>
+                    </p>
+                <p>
+                        Specifies that the site is already part of an
+                        existing group. This setting causes the site to be
+                        upgraded from a previous version of Berkeley DB.
+                        All sites
+                        in the legacy group must specify this setting for
+                        themselves (the local site) and for all other sites
+                        currently existing in the group. Once the upgrade
+                        has been completed, this setting is no longer
+                        required. 
+                    </p>
+              </li>
+              <li>
+                <p><a id="DB_LOCAL_SITE"></a>
+                        <code class="literal">DB_LOCAL_SITE</code>
+                    </p>
+                <p>
+                        Specifies that this site is the local site within
+                        the replication group. The application must
+                        identify exactly one site as the local site in this
+                        way, before calling the
+                        <a class="xref" href="repmgrstart.html" title="DB_ENV-&gt;repmgr_start()">DB_ENV-&gt;repmgr_start()</a>
+                        method.
+                    </p>
+              </li>
+              <li>
+                <p><a id="DB_REPMGR_PEER"></a>
+                        <code class="literal">DB_REPMGR_PEER</code>
+                    </p>
+                <p>
+                        Specifies that the site may be used as a target for
+                        "client-to-client" synchronization messages.
+                        A peer can be either a client or a view.  This
+                        setting is ignored if it is specified for the local
+                        site.
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp53989656"></a>value</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 If <code class="literal">0</code>, the parameter identified by the <span class="bold"><strong>which</strong></span> is turned off. Otherwise,
+                 it is turned on.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53990736"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DB_SITE-&gt;set_config()</code> <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp53984408"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If an invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53970544"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="db_site.html" title="The DB_SITE Handle">DB_SITE</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53991200"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="xref" href="rep.html#replist" title="Replication and Related Methods">Replication and Related Methods</a>
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbsite_remove.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="repelect.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_SITE-&gt;remove() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_ENV-&gt;rep_elect()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

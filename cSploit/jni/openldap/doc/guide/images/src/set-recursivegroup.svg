@@ -1,0 +1,505 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="833.63007"
+   height="212.5425"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.47pre4 r22446"
+   version="1.0"
+   sodipodi:docname="set-recursivegroup.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+   inkscape:export-xdpi="70.18"
+   inkscape:export-ydpi="70.18">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 106.27125 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="833.63007 : 106.27125 : 1"
+       inkscape:persp3d-origin="416.81503 : 70.847499 : 1"
+       id="perspective3053" />
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend"
+       style="overflow:visible">
+      <path
+         id="path3186"
+         d="M 0,0 L 5,-5 L -12.5,0 L 5,5 L 0,0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lstart"
+       style="overflow:visible">
+      <path
+         id="path3183"
+         d="M 0,0 L 5,-5 L -12.5,0 L 5,5 L 0,0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(0.8,0,0,0.8,10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send"
+       style="overflow:visible">
+      <path
+         id="path3198"
+         d="M 0,0 L 5,-5 L -12.5,0 L 5,5 L 0,0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lstart"
+       style="overflow:visible">
+      <path
+         id="path3201"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.97309,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="matrix(1.1,0,0,1.1,1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend"
+       style="overflow:visible">
+      <path
+         id="path8347"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.97309,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.9689479"
+     inkscape:cx="232.40369"
+     inkscape:cy="118.87263"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     showguides="false"
+     inkscape:window-width="1655"
+     inkscape:window-height="1001"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     width="1052.3622px"
+     height="744.09449px"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Camada 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-39.91817,-73.881854)">
+    <g
+       id="g3462"
+       transform="translate(30.553822,-0.6080081)"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001">
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="523.97247"
+         y="89.280624"
+         id="text3318"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-ydpi="136.2"><tspan
+           sodipodi:role="line"
+           id="tspan3320"
+           x="523.97247"
+           y="89.280624">DN: <tspan
+   style="font-weight:bold"
+   id="tspan7581">uid=john,ou=people,dc=example,dc=com</tspan></tspan><tspan
+           sodipodi:role="line"
+           x="523.97247"
+           y="104.28062"
+           id="tspan3322">uid: john</tspan><tspan
+           sodipodi:role="line"
+           x="523.97247"
+           y="119.28062"
+           id="tspan3324">objectClass: person</tspan><tspan
+           sodipodi:role="line"
+           x="523.97247"
+           y="134.28062"
+           id="tspan3326">cn: john</tspan><tspan
+           id="tspan3334"
+           sodipodi:role="line"
+           x="523.97247"
+           y="149.28062">givenName: John</tspan><tspan
+           sodipodi:role="line"
+           x="523.97247"
+           y="164.28062"
+           id="tspan3330">sn: Smith</tspan></text>
+      <rect
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.97567958px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         id="rect3336"
+         width="318.06735"
+         height="96.658691"
+         x="520.29657"
+         y="75.253609"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-ydpi="136.2" />
+    </g>
+    <g
+       id="g3474"
+       transform="translate(30.276908,4.0242246)"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001">
+      <g
+         id="g7676">
+        <text
+           xml:space="preserve"
+           style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+           x="523.97247"
+           y="199.28062"
+           id="text3416"
+           inkscape:export-filename="/home/andreas/palestra/allmail.png"
+           inkscape:export-xdpi="136.2"
+           inkscape:export-ydpi="136.2"><tspan
+             sodipodi:role="line"
+             id="tspan3418"
+             x="523.97247"
+             y="199.28062">DN: <tspan
+   id="tspan7674"
+   style="font-weight:bold">uid=mary,ou=people,dc=example,dc=com</tspan></tspan><tspan
+             sodipodi:role="line"
+             x="523.97247"
+             y="214.28062"
+             id="tspan3420">uid: mary</tspan><tspan
+             sodipodi:role="line"
+             x="523.97247"
+             y="229.28062"
+             id="tspan3422">objectClass: person</tspan><tspan
+             sodipodi:role="line"
+             x="523.97247"
+             y="244.28062"
+             id="tspan3424">cn: mary</tspan><tspan
+             id="tspan3426"
+             sodipodi:role="line"
+             x="523.97247"
+             y="259.28062">givenName: Mary</tspan><tspan
+             sodipodi:role="line"
+             x="523.97247"
+             y="274.28062"
+             id="tspan3432">sn: Smith</tspan></text>
+        <rect
+           style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.98239046px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           id="rect3460"
+           width="322.48019"
+           height="96.651978"
+           x="520.29993"
+           y="185.25696"
+           inkscape:export-filename="/home/andreas/palestra/allmail.png"
+           inkscape:export-xdpi="136.2"
+           inkscape:export-ydpi="136.2" />
+      </g>
+    </g>
+    <g
+       id="g7550"
+       transform="translate(-109.4887,-12.321663)"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001">
+      <g
+         id="g7614"
+         transform="translate(-103.41823,-0.8839165)">
+        <text
+           inkscape:export-ydpi="136.2"
+           inkscape:export-xdpi="136.2"
+           inkscape:export-filename="/home/andreas/palestra/allmail.png"
+           id="text3350"
+           y="216.91795"
+           x="258.37482"
+           style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+           xml:space="preserve"><tspan
+             y="216.91795"
+             x="258.37482"
+             id="tspan3352"
+             sodipodi:role="line">DN: cn=accountadm,ou=group,dc=example,dc=com</tspan><tspan
+             id="tspan3354"
+             y="231.91795"
+             x="258.37482"
+             sodipodi:role="line">cn: accountadm</tspan><tspan
+             id="tspan3356"
+             y="246.91795"
+             x="258.37482"
+             sodipodi:role="line">objectClass: groupOfNames</tspan><tspan
+             id="tspan3360"
+             y="261.91795"
+             x="258.37482"
+             sodipodi:role="line">member: <tspan
+   id="tspan7612"
+   style="font-weight:bold">uid=mary,ou=people,dc=example,dc=com</tspan></tspan><tspan
+             id="tspan3362"
+             y="276.91795"
+             x="258.37482"
+             sodipodi:role="line" /></text>
+        <rect
+           inkscape:export-ydpi="136.2"
+           inkscape:export-xdpi="136.2"
+           inkscape:export-filename="/home/andreas/palestra/allmail.png"
+           y="203.48654"
+           x="254.13257"
+           height="83.046989"
+           width="371.37915"
+           id="rect3402"
+           style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.97723264px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        <rect
+           inkscape:export-ydpi="136.2"
+           inkscape:export-xdpi="136.2"
+           inkscape:export-filename="/home/andreas/palestra/allmail.png"
+           y="249.90959"
+           x="256.3075"
+           height="16.297295"
+           width="351.43427"
+           id="rect5542"
+           style="opacity:0.28915663;fill:#aa9ab2;fill-opacity:1;stroke:none;stroke-width:0.69669151;stroke-opacity:1" />
+      </g>
+    </g>
+    <g
+       id="g7662"
+       transform="translate(-217.44346,0.8839165)"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001">
+      <text
+         inkscape:export-ydpi="136.2"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         id="text2170"
+         y="86.335617"
+         x="262.09247"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="86.335617"
+           x="262.09247"
+           id="tspan2172"
+           sodipodi:role="line">DN: <tspan
+   style="font-weight:bold"
+   id="tspan7595">cn=sudoadm,ou=group,dc=example,dc=com</tspan></tspan><tspan
+           id="tspan2174"
+           y="101.33562"
+           x="262.09247"
+           sodipodi:role="line">cn: sudoadm</tspan><tspan
+           id="tspan5373"
+           y="116.33562"
+           x="262.09247"
+           sodipodi:role="line">objectClass: groupOfNames</tspan><tspan
+           id="tspan3295"
+           y="131.33562"
+           x="262.09247"
+           sodipodi:role="line">member: uid=john,ou=people,dc=example,dc=com</tspan><tspan
+           id="tspan3297"
+           y="146.33562"
+           x="262.09247"
+           sodipodi:role="line">member: cn=accountadm,ou=group,dc=example,dc=com</tspan><tspan
+           id="tspan3411"
+           y="161.33562"
+           x="262.09247"
+           sodipodi:role="line" /></text>
+      <rect
+         inkscape:export-ydpi="136.2"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         y="73.485397"
+         x="257.84909"
+         height="83.049301"
+         width="369.61365"
+         id="rect7321"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.97492063px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <rect
+         style="opacity:0.28915663;fill:#aa9ab2;fill-opacity:1;stroke:none"
+         id="rect5582"
+         width="360.11356"
+         height="31.950695"
+         x="260.02518"
+         y="120.25619"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-ydpi="136.2" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:italic;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="364.2525"
+       y="224.56728"
+       id="text7528"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001"><tspan
+         sodipodi:role="line"
+         id="tspan7530"
+         x="364.2525"
+         y="224.56728">yes!</tspan></text>
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow2Lend);stroke-opacity:1"
+       d="M 365.29385,128.78999 C 466.06034,130.87918 457.22118,89.335108 547.38066,84.915525"
+       id="path7687"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow2Lend);stroke-opacity:1"
+       d="m 404.35364,144.89531 c 26.30535,21.71639 24.5822,55.81327 -30.22062,56.69719"
+       id="path7689"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001" />
+    <path
+       sodipodi:nodetypes="cc"
+       id="path7691"
+       d="M 396.23093,243.6739 C 484.62258,241.34352 479.3191,199.79944 547.38066,198.91553"
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow2Lend);stroke-opacity:1"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001" />
+    <text
+       id="text9637"
+       y="232.54912"
+       x="473.47699"
+       style="font-size:12px;font-style:italic;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001"><tspan
+         y="232.54912"
+         x="473.47699"
+         id="tspan9639"
+         sodipodi:role="line">more<tspan
+   id="tspan9641"
+   style="font-weight:bold" /></tspan><tspan
+         y="247.54912"
+         x="473.47699"
+         sodipodi:role="line"
+         id="tspan9643"><tspan
+   style="font-weight:bold"
+   id="tspan9645">member</tspan>?</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:italic;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="473.47699"
+       y="112.54912"
+       id="text9647"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001"><tspan
+         sodipodi:role="line"
+         id="tspan9649"
+         x="473.47699"
+         y="112.54912">more<tspan
+   style="font-weight:bold"
+   id="tspan9651" /></tspan><tspan
+         id="tspan9653"
+         sodipodi:role="line"
+         x="473.47699"
+         y="127.54912"><tspan
+   id="tspan9655"
+   style="font-weight:bold">member</tspan>?</tspan></text>
+    <text
+       id="text10626"
+       y="173.85262"
+       x="431.01266"
+       style="font-size:12px;font-style:italic;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001"><tspan
+         y="173.85262"
+         x="431.01266"
+         id="tspan10628"
+         sodipodi:role="line">more<tspan
+   id="tspan10630"
+   style="font-weight:bold" /></tspan><tspan
+         y="188.85262"
+         x="431.01266"
+         sodipodi:role="line"
+         id="tspan10632"><tspan
+   style="font-weight:bold"
+   id="tspan10634">member</tspan>?</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:italic;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="742.7262"
+       y="130.87918"
+       id="text10640"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001"><tspan
+         sodipodi:role="line"
+         id="tspan10642"
+         x="742.7262"
+         y="130.87918">no <tspan
+   style="font-weight:bold"
+   id="tspan10648">member</tspan></tspan><tspan
+         sodipodi:role="line"
+         x="742.7262"
+         y="145.87918"
+         id="tspan10644">here!</tspan></text>
+    <text
+       id="text10650"
+       y="244.87918"
+       x="742.7262"
+       style="font-size:12px;font-style:italic;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       xml:space="preserve"
+       inkscape:export-filename="/home/andreas/set-recursivegroup.png"
+       inkscape:export-xdpi="80.970001"
+       inkscape:export-ydpi="80.970001"><tspan
+         y="244.87918"
+         x="742.7262"
+         id="tspan10652"
+         sodipodi:role="line">no <tspan
+   id="tspan10654"
+   style="font-weight:bold">member</tspan></tspan><tspan
+         id="tspan10656"
+         y="259.87918"
+         x="742.7262"
+         sodipodi:role="line">here!</tspan></text>
+  </g>
+</svg>

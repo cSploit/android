@@ -1,0 +1,565 @@
+#!/bin/sh
+
+#------------------------------------------------------------------------
+# Prompt for response, store result in Answer
+
+Answer=""
+
+AskQuestion() {
+    Test=$1
+    DefaultAns=$2
+    echo -n "${1}"
+    Answer="$DefaultAns"
+    read Answer
+}
+
+
+#------------------------------------------------------------------------
+# add a service line in the (usually) /etc/services or /etc/inetd.conf file
+# Here there are three cases, not found         => add service line,
+#                             found & different => ask user to check
+#                             found & same      => do nothing
+#                             
+
+replaceLineInFile() {
+
+    FileName=$1
+    newLine=$2
+    oldLine=$3
+    Silent=$4
+
+    if [ -z "$oldLine" ] 
+      then
+        echo "$newLine" >> $FileName
+
+    elif [ "$oldLine" != "$newLine"  ]
+      then
+        if [ "$Silent" != "Silent" ]
+	  then
+            echo ""
+	    echo "--- Warning ----------------------------------------------"
+    	    echo ""
+            echo "    In file $FileName found line: "
+	    echo "    $oldLine"
+    	    echo "    Which differs from the expected line:"
+            echo "    $newLine"
+	    echo ""
+	fi
+
+#        AskQuestion "Press return to update file or ^C to abort install"
+
+        cat $FileName | grep -v "$oldLine" > ${FileName}.tmp
+        mv ${FileName}.tmp $FileName
+        echo "$newLine" >> $FileName
+        echo "Updated $FileName."
+
+    fi
+}
+
+#------------------------------------------------------------------------
+#  Add new user and group
+TryAddGroup() {
+	testStr=`grep firebird /etc/group`
+	
+    if [ -z "$testStr" ]; then
+        groupadd firebird
+    fi
+	
+}
+
+
+TryAddUser() {
+    testStr=`grep firebird /etc/passwd`
+	
+    if [ -z "$testStr" ]; then
+        useradd -d $FBRootDir -s /bin/false \
+            -c "Firebird Database Administrator" -g firebird firebird 
+    fi
+
+}
+
+
+addFirebirdUser() {
+	TryAddGroup "-g 84 -r" >/dev/null 2>&1
+	TryAddGroup "-g 84" >/dev/null 2>&1
+	TryAddGroup "-r" >/dev/null 2>&1
+	TryAddGroup " "
+	
+	TryAddUser "-u 84 -r" >/dev/null 2>&1
+	TryAddUser "-u 84" >/dev/null 2>&1
+	TryAddUser "-r" >/dev/null 2>&1
+	TryAddUser " "
+
+}
+
+
+#------------------------------------------------------------------------
+#  changeInitPassword
+
+changeInitPassword() {
+
+    NewPasswd=$1
+
+    InitFile=/sbin/init.d/firebird
+
+    if [ -f $InitFile ]
+      then
+        echo ""
+        echo Running ex to modify /sbin/init.d/firebird
+
+        # to be sure that `ex' can write to file
+	chmod u=rwx,g=rx,o= $InitFile
+
+        ex -s $InitFile <<EOF
+/ISC_PASSWORD/s/ISC_PASSWORD=.*/ISC_PASSWORD=$NewPasswd/g
+w
+q
+EOF
+	chmod u=rwx,g=rx,o= $InitFile
+
+    fi
+}
+
+
+#------------------------------------------------------------------------
+# Write new password to the @prefix@/SYSDBA.password file
+
+writeNewPassword() {
+    NewPasswd=$1
+
+    echo "# Firebird generated password for user SYSDBA is: " > $DBAPasswordFile
+    echo "" >> $DBAPasswordFile
+
+    echo "ISC_USER=sysdba" >> $DBAPasswordFile
+    echo "ISC_PASSWD=$NewPasswd" >> $DBAPasswordFile
+    echo "" >> $DBAPasswordFile
+
+    if [ $NewPasswd = "masterkey" ]
+      then
+        echo "# for install on `hostname` at time `date`" >> $DBAPasswordFile
+        echo "# You should change this password at the earliest oportunity" >> $DBAPasswordFile
+      else 
+        echo "# generated on `hostname` at time `date`" >> $DBAPasswordFile
+    fi
+    echo "" >> $DBAPasswordFile
+    echo "# Your password can be changed to a more suitable one using the" >> $DBAPasswordFile
+    echo "# @prefix@/bin/changeDBAPassword.sh script" >> $DBAPasswordFile
+
+    # Additional instructions for super server
+    echo "" >> $DBAPasswordFile
+    echo "# For superserver you will also want to check the password in the" >> $DBAPasswordFile
+    echo "# daemon init routine in the file /sbin/init.d/firebird" >> $DBAPasswordFile
+
+    echo "" >> $DBAPasswordFile
+    chmod u=r $DBAPasswordFile
+
+
+    # Only if we have changed the password from the default do we need
+    # to update the entry in the database
+
+    if [ $NewPasswd != "masterkey" ]
+      then
+        @FB_BINDIR@/gsec -user sysdba -password masterkey <<EOF
+modify sysdba -pw $NewPasswd
+EOF
+    fi
+}
+
+
+#------------------------------------------------------------------------
+#  Generate new sysdba password - this routine is used only in the 
+#  rpm file not in the install acript.
+
+
+generateNewDBAPassword() {
+    DBAPasswordFile=$FBRootDir/SYSDBA.password
+
+    # openssl generates random data.
+    if [ -f /usr/bin/openssl ]
+      then
+        # We generate 20 random chars, strip any '/''s and get the first 8
+        NewPasswd=`openssl rand -base64 20 | tr -d '/' | cut -c1-8`
+    fi
+
+    # mkpasswd is a bit of a hassle, but check to see if it's there
+    if [ -z "$NewPasswd" ]
+      then
+        if [ -f /usr/bin/mkpasswd ]
+          then
+            NewPasswd=`/usr/bin/mkpasswd -l 8`
+        fi
+    fi
+
+
+    # So we failed to generate a new password, so keep the original 
+    # installed one.
+
+    if [ -z "$NewPasswd" ]
+      then
+        NewPasswd="masterkey"
+    fi
+
+    writeNewPassword $NewPasswd
+    changeInitPassword "$NewPasswd"
+
+}
+
+
+
+
+#------------------------------------------------------------------------
+#  Change sysdba password - this routine is interactive and is only 
+#  used in the install shell script not the rpm one.
+
+
+askUserForNewDBAPassword() {
+    NewPasswd=""
+
+    echo ""
+    while [ -z "$NewPasswd" ]
+      do
+          AskQuestion "Please enter new password for SYSDBA user: "
+          NewPasswd=$Answer
+          if [ ! -z "$NewPasswd" ]
+            then
+              echo ""
+              writeNewPassword $NewPasswd
+              changeInitPassword "$NewPasswd"
+          fi
+          
+      done
+}
+
+
+#------------------------------------------------------------------------
+#  Change sysdba password - this routine is interactive and is only 
+#  used in the install shell script not the rpm one.
+
+#  On some systems the mkpasswd program doesn't appear and on others
+#  there is another mkpasswd which does a different operation.  So if
+#  the specific one isn't available then keep the original password.
+
+
+changeDBAPassword() {
+    if [ -z "$InteractiveInstall" ]
+      then
+        generateNewDBAPassword
+      else
+        askUserForNewDBAPassword
+    fi
+}
+
+
+#------------------------------------------------------------------------
+# installInitdScript
+# Everbody stores this one in a seperate location, so there is a bit of
+# running around to actually get it for each packager.
+# Update rcX.d with Firebird initd entries
+# initd script for SuSE >= 7.2 is a part of RPM package
+
+installInitdScript() {
+
+# HPUX...
+
+    if [ -d /sbin/init.d ]
+      then
+        srcScript=firebird.init.d.hpux
+        initScript=/sbin/init.d/firebird
+    fi
+
+    # Install the firebird init.d script
+    cp  $FBRootDir/misc/$srcScript $initScript
+    chown root:root $initScript
+    chmod u=rx,g=rx,o= $initScript  # contains password hence no world read.
+
+}
+
+#------------------------------------------------------------------------
+# startInetService
+# Now that we've installed it start up the service.
+
+startInetService() {
+    initScript=/sbin/init.d/firebird
+    if [ ! -f $initScript ]
+      then
+        initScript=/sbin/init.d/firebird
+    fi
+
+	if [ -f $initScript ]
+      then
+        $initScript start
+		checkString=`ps -ef | grep fbserver |grep -v grep`
+
+		if [ -z "$checkString" ]
+		  then
+			# server didn't start - possible reason bad shell /bin/false
+			echo
+			echo Fixing firebird\'s shell to /bin/sh
+			echo
+			usermod -s /bin/sh firebird
+			$initScript start
+		fi
+	fi
+}
+
+
+#------------------------------------------------------------------------
+# UpdateHostsDotEquivFile
+# The /etc/hosts.equiv file is needed to allow local access for super server
+# from processes on the machine to port @FB_SERVICE_PORT@ on the local machine.
+# The two host names that are needed there are 
+# localhost.localdomain and whatever hostname returns.
+
+updateHostsDotFile() {
+    hostEquivFile=$1 
+
+    if [ ! -f $hostEquivFile ]
+      then
+        touch $hostEquivFile
+        chown root:root $hostEquivFile
+	chmod u=rw,g=r,o=r $hostEquivFile
+    fi
+
+    newLine="localhost"
+    oldLine=`grep "^$newLine\$" $hostEquivFile`
+    replaceLineInFile "$hostEquivFile" "$newLine" "$oldLine"
+
+    newLine="localhost.localdomain"
+    oldLine=`grep "^$newLine\$" $hostEquivFile`
+    replaceLineInFile "$hostEquivFile" "$newLine" "$oldLine"
+
+    newLine="`hostname`"
+    oldLine=`grep "^$newLine\$" $hostEquivFile`
+    replaceLineInFile "$hostEquivFile" "$newLine" "$oldLine"
+    
+}
+
+
+#------------------------------------------------------------------------
+#  buildUninstallFile
+#  This will work only for the .tar install and it builds an
+#  uninstall shell script. 
+
+
+buildUninstallFile() {
+    cd "$origDir"
+
+    if [ ! -f manifest.txt ]  # Only do this if we are a .tar install
+      then
+        return
+    fi
+
+    cp manifest.txt $FBRootDir/misc
+
+    cp -r scripts $FBRootDir/misc/
+    cp scripts/tarmainUninstall.sh $FBRootDir/bin/uninstall.sh
+
+}
+
+#------------------------------------------------------------------------
+#  createLinksForBackCompatibility
+#  Create links for back compatibility to InterBase and Firebird1.0 
+#  linked systems.
+
+createLinksForBackCompatibility() {
+# These two links are required for compatibility with existing ib programs
+# If the program had been linked with libgds.so then this link is required
+# to ensure it loads the fb equivalent.  Eventually these should be 
+# optional and in a seperate rpm install.  MOD 7-Nov-2002.
+
+
+# Althhough classic has two options for  libgds.so super server has only 
+# one:
+#  1) The multithreaded client only libfbclient.so 
+#  MOD 23-Dec-2003
+
+    newLibrary=$FBRootDir/lib/libfbclient.so
+    #newLibrary=$FBRootDir/lib/libfbembed.so
+
+    # Remove if only a link
+    if [ -L @libdir@/libgds.so ]
+      then
+        rm -f @libdir@/libgds.so
+    fi
+
+    if [ ! -e @libdir@/libgds.so ]
+      then
+        ln -s $newLibrary @libdir@/libgds.so
+    fi
+
+    # Remove if only a link
+    if [ -L @libdir@/libgds.so.0 ]
+      then
+        rm -f @libdir@/libgds.so.0
+    fi
+
+    if [ ! -e @libdir@/libgds.so.0 ]
+      then
+        ln -s $newLibrary @libdir@/libgds.so.0
+    fi
+
+}
+
+
+#------------------------------------------------------------------------
+#  For security reasons most files in firebird installation are
+#  root-owned and world-readable(executable) only (including firebird).
+
+#  For some files RunUser (firebird) must have write access - 
+#  lock and log are such.
+
+
+MakeFileFirebirdWritable() {
+    FileName=$1
+    chown firebird:firebird $FileName
+    chmod 0644 $FileName
+}
+
+
+#------------------------------------------------------------------------
+# remove line from config file if it exists in it.
+
+removeLineFromFile() {
+    FileName=$1
+    oldLine=$2
+
+    if [ -f $FileName ]
+      then
+        if [ ! -z "$oldLine" ] 
+	  then
+            cat $FileName | grep -v "$oldLine" > ${FileName}.tmp
+	    mv ${FileName}.tmp $FileName
+    	    echo "Updated."
+	fi
+    fi
+}
+
+
+
+#= Main Post ===============================================================
+   # Make sure the links are in place 
+    if [ ! -L @prefix@ -a ! -d @prefix@ ] 
+      then 
+    # Main link and... 
+        ln -s $RPM_INSTALL_PREFIX/interbase @prefix@
+    fi 
+
+    origDir=`pwd`
+
+#    RunUser=root
+    RunUser=firebird
+    DBAPasswordFile=@FB_CONFDIR@/SYSDBA.password
+    export RunUser
+    export DBAPasswordFile
+
+
+    # Update /etc/services
+    # The \n is needed, some /etc/services files are missing a trailing
+    # line feed - MOD 12-Dec-2003
+
+    FileName=/etc/services
+    newLine="@FB_SERVICE_NAME@          @FB_SERVICE_PORT@/tcp  # Firebird SQL Database Remote Protocol"
+    oldLine=`grep "^@FB_SERVICE_NAME@" $FileName`
+
+    if [ -z "$oldLine" ]
+      then
+        echo "" >> $FileName
+        echo $newLine >> $FileName
+        echo "" >> $FileName
+    # replaceLineInFile "$FileName" "$newLine" "$oldLine"
+    fi
+
+
+    # Add entries to host.equiv & hosts.allow files
+    updateHostsDotFile /etc/hosts.equiv
+#   updateHostsDotFile /etc/hosts.allow
+	
+	
+    # remove any @FB_SERVICE_NAME@ line in the /etc/inetd.conf
+    FileName=/etc/inetd.conf
+    if [ -f $FileName ]
+      then
+        oldLine=`grep "^@FB_SERVICE_NAME@" $FileName`
+
+	removeLineFromFile "$FileName" "$oldLine"
+    fi
+
+
+    # Get inetd to reread new init files.
+
+    if [ -f /var/run/inetd.pid ]
+      then
+        kill -HUP `cat /var/run/inetd.pid`
+    fi
+
+
+    # Update ownership of files
+    if [ $RunUser = firebird ]
+      then
+        # Prepare firebird user
+	addFirebirdUser
+    fi
+
+    # For security reasons initially force all root:root non-writable
+   chown -R root:root $FBRootDir
+   chmod -R u-w,g-w,a-w $FBRootDir
+
+    # Create the fbmgr shell script.
+    cat > @FB_SBINDIR@/fbmgr <<EOF
+#!/bin/sh
+FIREBIRD=@FB_CONFDIR@
+export FIREBIRD
+exec @FB_SBINDIR@/fbmgr.bin \$@
+EOF
+
+
+    # Everyone may execute clients
+    chmod 0555 *
+
+    # Shell scripts changing security attributes are for root only
+    chmod 0500 *.sh
+    
+    # These two should only be executed by firebird user.
+    #fbservices=fbguard fbserver
+    #chown firebird:firebird $fbserveces
+    #chmod 0544 $fbservices
+
+
+    # Lock files
+    cd $FBRootDir
+
+    for i in isc_init1 isc_lock1 isc_event1 isc_guard1
+      do
+        FileName=$i.`hostname`
+        touch $FileName
+        MakeFileFirebirdWritable $FileName
+      done
+
+    touch firebird.log
+    MakeFileFirebirdWritable firebird.log
+    
+    # Security database
+    # Nobody besides firebird permitted to even read this file
+    chown firebird:firebird security.fdb
+    chmod 0600 security.fdb
+
+    # make examples writable by firebird
+    for i in examples/*.fdb
+      do
+        MakeFileFirebirdWritable $i
+      done
+
+    # Set up Firebird for run with init.d
+    installInitdScript
+
+
+    createLinksForBackCompatibility
+
+    buildUninstallFile
+
+    # start the db server so we can change the password
+    startInetService
+
+    # Change sysdba password
+    cd $FBRootDir
+    changeDBAPassword

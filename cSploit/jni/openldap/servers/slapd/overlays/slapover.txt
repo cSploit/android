@@ -1,0 +1,152 @@
+slapd internal APIs
+
+Introduction
+
+Frontend, backend, database, callback, overlay - what does it all mean?
+
+The "frontend" refers to all the code that deals with the actual interaction
+with an LDAP client. This includes the code to read requests from the network
+and parse them into C data structures, all of the session management, and the
+formatting of responses for transmission onto the network. It also includes the
+access control engine and other features that are generic to LDAP processing,
+features which are not dependent on a particular database implementation.
+Because the frontend serves as the framework that ties everything together,
+it should not change much over time.
+
+The terms "backend" and "database" have historically been used interchangeably
+and/or in combination as if they are the same thing, but the code has a clear
+distinction between the two. A "backend" is a type of module, and a "database"
+is an instance of a backend type. Together they work with the frontend to
+manage the actual data that are operated on by LDAP requests. Originally the
+backend interface was relatively compact, with individual functions
+corresponding to each LDAP operation type, plus functions for init, config, and
+shutdown. The number of entry points has grown to allow greater flexibility,
+but the concept is much the same as before.
+
+The language here can get a bit confusing. A backend in slapd is embodied in a
+BackendInfo data structure, and a database is held in a BackendDB structure.
+Originally it was all just a single Backend data structure, but things have
+grown and the concept was split into these two parts. The idea behind the
+distinct BackendInfo is to allow for any initialization and configuration that
+may be needed by every instance of a type of database, as opposed to items that
+are specific to just one instance. For example, you might have a database
+library that requires an initialization routine to be called exactly once at
+program startup. Then there may be a "open" function that must be called once
+for each database instance. The BackendInfo.bi_open function provides the
+one-time startup, while the BackendInfo.bi_db_open function provides the
+per-database startup. The main feature of the BackendInfo structure is its
+table of entry points for all of the database functions that it implements.
+There's also a bi_private pointer that can be used to carry any configuration
+state needed by the backend. (Note that this is state that applies to the
+backend type, and thus to all database instances of the backend as well.) The
+BackendDB structure carries all of the per-instance state for a backend
+database. This includes the database suffix, ACLs, flags, various DNs, etc. It
+also has a pointer to its BackendInfo, and a be_private pointer for use by the
+particular backend instance. In practice, the per-type features are seldom
+used, and all of the work is done in the per-instance data structures.
+
+Ordinarily an LDAP request is received by the slapd frontend, parsed into a
+request structure, and then passed to the backend for processing. The backend
+may call various utility functions in the frontend to assist in processing, and
+then it eventually calls some send_ldap_result function in the frontend to send
+results back to the client. The processing flow is pretty rigidly defined; even
+though slapd is capable of dynamically loading new code modules, it was
+difficult to add extensions that changed the basic protocol operations. If you
+wanted to extend the server with special behaviors you would need to modify the
+frontend or the backend or both, and generally you would need to write an
+entire new backend to get some set of special features working. With OpenLDAP
+2.1 we added the notion of a callback, which can intercept the results sent
+from a backend before they are sent to a client. Using callbacks makes it
+possible to modify the results if desired, or to simply discard the results
+instead of sending them to any client. This callback feature is used
+extensively in the SASL support to perform internal searches of slapd databases
+when mapping authentication IDs into regular DNs. The callback mechanism is
+also the basis of backglue, which allows separate databases to be searched as
+if they were a single naming context.
+
+Very often, one needs to add just a tiny feature onto an otherwise "normal"
+database. The usual way to achieve this was to use a programmable backend (like
+back-perl) to preprocess various requests and then forward them back into slapd
+to be handled by the real database. While this technique works, it is fairly
+inefficient because it involves many transitions from network to slapd and back
+again. The overlay concept introduced in OpenLDAP 2.2 allows code to be
+inserted between the slapd frontend and any backend, so that incoming requests
+can be intercepted before reaching the backend database. (There is also a SLAPI
+plugin framework in OpenLDAP 2.2; it offers a lot of flexibility as well but is
+not discussed here.) The overlay framework also uses the callback mechanism, so
+outgoing results can also be intercepted by external code. All of this could
+get unwieldy if a lot of overlays were being used, but there was also another
+significant API change in OpenLDAP 2.2 to streamline internal processing. (See
+the document "Refactoring the slapd ABI"...)
+
+OK, enough generalities... You should probably have a copy of slap.h in front
+of you to continue here.
+
+What is an overlay? The structure defining it includes a BackendInfo structure
+plus a few additional fields. It gets inserted into the usual frontend->backend
+call chain by replacing the BackendDB's BackendInfo pointer with its own. The
+framework to accomplish this is in backover.c. For a given backend, the
+BackendInfo will point to a slap_overinfo structure. The slap_overinfo has a
+BackendInfo that points to all of the overlay framework's entry points. It also
+holds a copy of the original BackendInfo pointer, and  a linked list of
+slap_overinst structures. There is one slap_overinst per configured overlay,
+and the set of overlays configured on a backend are treated like a stack; i.e.,
+the last one configured is at the top of the stack, and it executes first.
+
+Continuing with the stack notion - a request enters the frontend, is directed
+to a backend by select_backend, and then intercepted by the top of the overlay
+stack. This first overlay may do something with the request, and then return
+SLAP_CB_CONTINUE, which will then cause processing to fall into the next
+overlay, and so on down the stack until finally the request is handed to the
+actual backend database. Likewise, when the database finishes processing and
+sends a result, the overlay callback intercepts this and the topmost overlay
+gets to process the result. If it returns SLAP_CB_CONTINUE then processing will
+continue in the next overlay, and then any other callbacks, then finally the
+result reaches the frontend for sending back to the client. At any step along
+the way, a module may choose to fully process the request or result and not
+allow it to propagate any further down the stack. Whenever a module returns
+anything other than SLAP_CB_CONTINUE the processing stops.
+
+An overlay can call most frontend functions without any special consideration.
+However, if a call is going to result in any backend code being invoked, then
+the backend environment must be correct. During a normal backend invocation,
+op->o_bd points to the BackendDB structure for the backend, and
+op->o_bd->bd_info points to the BackendInfo for the backend. All of the
+information a specific backend instance needs is in op->o_bd->be_private and
+all of its entry points are in the BackendInfo structure. When overlays are in
+use on a backend, op->o_bd->bd_info points to the BackendInfo (actually a
+slap_overinfo) that contains the overlay framework. When a particular overlay
+instance is executing, op->o_bd points to a copy of the original op->o_bd, and
+op->o_bd->bd_info points to a slap_overinst which carries the information about
+the current overlay. The slap_overinst contains an on_private pointer which can
+be used to carry any configuration or state information the overlay needs. The
+normal way to invoke a backend function is through the op->o_bd->bd_info table
+of entry points, but obviously this must be set to the backend's original
+BackendInfo in order to get to the right function.
+
+There are two approaches here. The slap_overinst also contains a on_info field
+that points to the top slap_overinfo that wraps the current backend. The
+simplest thing is for the overlay to set op->o_bd->bd_info to this on_info
+value before invoking a backend function. This will cause processing of that
+particular operation to begin at the top of the overlay stack, so all the other
+overlays on the backend will also get a chance to handle this internal request.
+The other possibility is to invoke the underlying backend directly, bypassing
+the rest of the overlays, by calling through on_info->oi_orig. You should be
+careful in choosing this approach, since it precludes other overlays from doing
+their jobs.
+
+One of the more interesting uses for an overlay is to attach two (or more)
+different database backends into a single execution stack. Assuming that the
+basic frontend-managed information (suffix, rootdn, ACLs, etc.) will be the
+same for all of the backends, the only thing the overlay needs to maintain is a
+be_private and bd_info pointer for the added backends. The chain and proxycache
+overlays are two complementary examples of this usage. The chain overlay
+attaches a back-ldap backend to a local database backend, and allows referrals
+to remote servers generated by the database to be processed by slapd instead of
+being returned to the client. The proxycache overlay attaches a local database
+to a back-ldap (or back-meta) backend and allows search results from remote
+servers to be cached locally. In both cases the overlays must provide a bit of
+glue to swap in the appropriate be_private and bd_info pointers before invoking
+the attached backend, which can then be invoked as usual.
+
+---

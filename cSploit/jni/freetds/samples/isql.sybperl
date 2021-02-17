@@ -1,0 +1,60 @@
+#!/usr/local/bin/sybperl
+# $Id: isql.sybperl,v 1.1 2003-03-27 07:42:49 jklowden Exp $
+# Contributed by Michael Peppler on 26 March 2003
+
+require 'sybperl.pl';
+require 'getopts.pl';
+
+&Getopts('P:U:');
+
+&dblogin($opt_U, $opt_P);
+
+select(STDOUT); $| = 1;		# set unbuffered
+
+$count = 1;
+print "$count> ";
+
+while(<>)
+{
+    /^exit|^quit/ && exit(0);
+    /^go/ && do {
+	&exec;
+	$count = 1;
+	print "$count> ";
+	next;
+    };
+    
+    &dbcmd($_);
+    ++$count;
+    print "$count> ";
+}
+
+sub exec
+{
+    local($ret, $numcol, $i);
+    local(@dat, %width);
+    
+    &dbsqlexec;
+    while(($ret = &dbresults) != $NO_MORE_RESULTS)
+    {
+	$numcol = &dbnumcols;
+	for($i = 1; $i <= $numcol; ++$i)
+	{
+	    $width{$i} = &dbcollen(0, $i);
+	    printf("%-$width{$i}.$width{$i}s ",  &dbcolname(0, $i));
+	}
+	print "\n\n";
+	while(@dat = &dbnextrow)
+	{
+	    for($i = 1; $i <= $numcol; ++$i)
+	    {
+		printf("%$width{$i}.$width{$i}s ",  $dat[$i-1]);
+	    }
+	    print "\n";
+	}
+	while(@dat = &dbretdata)
+	{
+	    print "@dat\n";
+	}
+    }
+}

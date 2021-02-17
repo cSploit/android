@@ -1,0 +1,2913 @@
+/*
+ *	PROGRAM:	JRD Command Oriented Query Language
+ *	MODULE:		show.epp
+ *	DESCRIPTION:	Show environment commands
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+#include "firebird.h"
+#include <stdio.h>
+#include <string.h>
+#include "../jrd/ibase.h"
+#include "../qli/dtr.h"
+#include "../qli/parse.h"
+#include "../qli/compile.h"
+#include "../jrd/license.h"
+#include "../qli/reqs.h"
+#include "../jrd/flags.h"
+#include "../qli/all_proto.h"
+#include "../qli/comma_proto.h"
+#include "../qli/err_proto.h"
+#include "../qli/meta_proto.h"
+#include "../qli/proc_proto.h"
+#include "../qli/show_proto.h"
+#include "../yvalve/gds_proto.h"
+#include "../common/utils_proto.h"
+#include "../common/classes/UserBlob.h"
+
+using MsgFormat::SafeArg;
+
+
+static void array_dimensions(qli_dbb*, const TEXT*);
+static void display_acl(qli_dbb*, ISC_QUAD&);
+static void display_blob(qli_dbb*, ISC_QUAD&, const TEXT*, USHORT, const UCHAR*, bool);
+static void display_blr(qli_dbb*, ISC_QUAD&);
+static void display_text(qli_dbb*, ISC_QUAD&, const TEXT*, bool);
+static void display_procedure(qli_dbb*, const UCHAR*, FB_API_HANDLE);
+static USHORT get_window_size(int);
+static void show_blob_info(ISC_QUAD&, ISC_QUAD&, USHORT, USHORT, qli_dbb*, const TEXT*);
+static void show_blr(qli_dbb*, USHORT, ISC_QUAD&, USHORT, ISC_QUAD&);
+static void show_datatype(qli_dbb*, USHORT, USHORT, SSHORT, SSHORT, USHORT, USHORT);
+static void show_dbb(qli_dbb*);
+static void show_dbb_parameters(qli_dbb*);
+static int show_field_detail(qli_dbb*, const TEXT*, const TEXT*, qli_syntax*);
+static int show_field_instances(qli_dbb*, const TEXT*);
+static void show_fields(qli_rel*, qli_fld*);
+static void show_filt(qli_filter*);
+static int show_filter_detail(qli_dbb*, const TEXT*);
+static void show_filts(qli_dbb*);
+static int show_filters_detail(qli_dbb*);
+static void show_fld(qli_syntax*);
+static void show_func(qli_func*);
+static int show_func_detail(qli_dbb*, const TEXT*);
+static void show_funcs(qli_dbb*);
+static int show_funcs_detail(qli_dbb*);
+static int show_insecure_fields(qli_dbb*, const TEXT*, const TEXT*);
+static void show_gbl_field(qli_syntax*);
+static int show_gbl_field_detail(qli_dbb*, const TEXT*);
+static void show_gbl_fields(qli_dbb*);
+static int show_gbl_fields_detail(qli_dbb*);
+static int show_indices_detail(qli_rel*);
+static void show_matching();
+static void show_names(const TEXT*, USHORT, TEXT*);
+static void show_proc(qli_proc*);
+static void show_procs(qli_dbb*);
+static void show_rel(qli_rel*);
+static void show_rel_detail(qli_rel*);
+static void show_rels(qli_dbb*, enum show_t, SSHORT);
+static USHORT show_security_class_detail(qli_dbb*, const TEXT*);
+static USHORT show_security_classes_detail(qli_dbb*);
+static void show_string(USHORT, TEXT*, USHORT, TEXT*);
+static void show_sys_trigs(qli_dbb*);
+static void show_text_blob(qli_dbb*, const TEXT*, USHORT, ISC_QUAD*, USHORT, ISC_QUAD*, bool);
+static void show_trig(qli_rel*);
+static int show_trigger_detail(qli_dbb*, const TEXT*);
+static void show_trigger_header(TEXT*, USHORT, USHORT, USHORT, ISC_QUAD&, qli_dbb*); // const TEXT*);
+static void show_trigger_messages(qli_dbb*, const TEXT*);
+static void show_trigger_status(TEXT*, USHORT, USHORT, USHORT);
+static void show_trigs(qli_dbb*);
+static int show_triggers_detail(qli_dbb*);
+static void show_var(const qli_name*);
+static void show_vars();
+static void show_versions();
+static void show_view(qli_rel*);
+static int show_views_detail(qli_dbb*);
+static void view_info(qli_dbb*, const TEXT*, const TEXT*, SSHORT, SSHORT);
+
+static const SCHAR db_items[] =
+{
+	isc_info_page_size, isc_info_db_size_in_pages, isc_info_end
+};
+static const UCHAR acl_bpb[] =
+{
+	isc_bpb_version1, isc_bpb_source_type, 1, 3,
+	isc_bpb_target_type, 1, 1
+};
+static const UCHAR blr_bpb[] =
+{
+	isc_bpb_version1, isc_bpb_source_type, 1, 2,
+	isc_bpb_target_type, 1, 1
+};
+
+DATABASE DB = EXTERN FILENAME "yachts.lnk";
+
+// values for rdb$trigger_type, based from types.h
+// ** Some better way should be found to pick this up dynamically (?) **
+// until then, this must be kept in sync with jrd/types.h manually.
+
+const USHORT PRE_STORE		= 1;
+const USHORT POST_STORE		= 2;
+const USHORT PRE_MODIFY		= 3;
+const USHORT POST_MODIFY	= 4;
+const USHORT PRE_ERASE		= 5;
+const USHORT POST_ERASE		= 6;
+
+const int buf_len = 256;
+typedef TEXT buf_type[buf_len];
+
+
+void SHOW_stuff( qli_syntax* node)
+{
+/**************************************
+ *
+ *	S H O W _ s t u f f
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show various stuffs.
+ *
+ **************************************/
+	qli_rel* relation;
+	qli_dbb* dbb;
+	USHORT count;
+	qli_name* name;
+	SSHORT width;
+
+	QLI_skip_line = true;
+	qli_syntax** ptr = node->syn_arg;
+
+	for (USHORT i = 0; i < node->syn_count; i++)
+	{
+		const show_t sw = (enum show_t)(IPTR)*ptr++;
+		qli_syntax* value = *ptr++;
+		if (sw != show_matching_language && sw != show_version &&
+			sw != show_variable && sw != show_variables && CMD_check_ready())
+		{
+			return;
+		}
+
+		switch (sw)
+		{
+		case show_all:
+			for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+			{
+				show_dbb(dbb);
+				for (relation = dbb->dbb_relations; relation; relation = relation->rel_next)
+				{
+					if (!(relation->rel_flags & REL_system))
+					{
+						show_rel(relation);
+						show_fields(relation, NULL);
+					}
+					if (QLI_abort)
+						return;
+				}
+				printf("\n");
+			}
+			if (QLI_variables)
+				show_vars();
+			break;
+
+		case show_databases:
+			for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+			{
+				show_dbb(dbb);
+				show_dbb_parameters(dbb);
+			}
+			break;
+
+		case show_database:
+			if (!(dbb = (qli_dbb*) value))
+				dbb = QLI_databases;
+			show_dbb(dbb);
+			show_dbb_parameters(dbb);
+			for (relation = dbb->dbb_relations; relation; relation = relation->rel_next)
+			{
+				if (!(relation->rel_flags & REL_system))
+				{
+					show_rel(relation);
+					show_fields(relation, NULL);
+				}
+			}
+			printf("\n");
+			break;
+
+		case show_relations:
+		case show_system_relations:
+			// No need to define a buffer here; we are interested in its length.
+			width = get_window_size(buf_len - 1);
+			if (dbb = (qli_dbb*) value)
+				show_rels(dbb, sw, width);
+			else
+			{
+				for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+					show_rels(dbb, sw, width);
+			}
+			break;
+
+		case show_db_fields:
+			dbb = (qli_dbb*) value;
+			for (relation = dbb->dbb_relations; relation; relation = relation->rel_next)
+			{
+				if (!(relation->rel_flags & REL_system))
+				{
+					show_rel(relation);
+					show_fields(relation, NULL);
+				}
+				if (QLI_abort)
+					return;
+			}
+			break;
+
+		case show_security_classes:
+			count = 0;
+			if (value)
+				count += show_security_classes_detail((qli_dbb*) value);
+			else
+			{
+				for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+					count += show_security_classes_detail(dbb);
+			}
+			if (!count) {
+				ERRQ_msg_put(90); // Msg90 No security classes defined
+			}
+			break;
+
+		case show_security_class:
+			count = 0;
+			name = (qli_name*) value;
+			for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+				count += show_security_class_detail(dbb, name->nam_string);
+			if (!count) {
+				ERRQ_msg_put(91, name->nam_string); // Msg91 Security class %s is not defined
+			}
+			break;
+
+		case show_views:
+			count = 0;
+			if (value)
+				count += show_views_detail((qli_dbb*) value);
+			else
+			{
+				for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+					count += show_views_detail(dbb);
+			}
+			if (!count) {
+				ERRQ_msg_put(92); // Msg92 No views defined
+			}
+			break;
+
+		case show_relation:
+			show_rel((qli_rel*) value);
+			show_fields((qli_rel*) value, NULL);
+			show_view((qli_rel*) value);
+			show_rel_detail((qli_rel*) value);
+			break;
+
+		case show_indices:
+			if (value)
+			{
+				show_rel((qli_rel*) value);
+				if (!show_indices_detail((qli_rel*) value)) {
+					ERRQ_msg_put(93); // Msg93 No indices defined
+				}
+				break;
+			}
+			for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+			{
+				show_dbb(dbb);
+				for (relation = dbb->dbb_relations; relation; relation = relation->rel_next)
+				{
+					if (!(relation->rel_flags & (REL_system | REL_view)))
+					{
+						show_rel(relation);
+						if (!show_indices_detail(relation)) {
+							ERRQ_msg_put(94); // Msg94 No indices defined
+						}
+					}
+				}
+			}
+			break;
+
+		case show_db_indices:
+			dbb = (qli_dbb*) value;
+			show_dbb(dbb);
+			for (relation = dbb->dbb_relations; relation; relation = relation->rel_next)
+			{
+				if (!(relation->rel_flags & (REL_system | REL_view)))
+				{
+					show_rel(relation);
+					if (!show_indices_detail(relation)) {
+						ERRQ_msg_put(94); // Msg94 No indices defined
+					}
+				}
+			}
+			break;
+
+		case show_field:
+			show_fld(value);
+			break;
+
+		case show_filter:
+			show_filt((qli_filter*) value);
+			break;
+
+		case show_filters:
+			if (value)
+				show_filts((qli_dbb*) value);
+			else
+			{
+				for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+					show_filts(dbb);
+			}
+			break;
+
+		case show_function:
+			show_func((qli_func*) value);
+			break;
+
+		case show_functions:
+			if (value)
+				show_funcs((qli_dbb*) value);
+			else
+			{
+				for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+					show_funcs(dbb);
+			}
+			break;
+
+		case show_matching_language:
+			show_matching();
+			break;
+
+		case show_procedures:
+			if (value)
+				show_procs((qli_dbb*) value);
+			else
+			{
+				for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+					show_procs(dbb);
+			}
+			break;
+
+		case show_procedure:
+			show_proc((qli_proc*) value);
+			break;
+
+		case show_version:
+			show_versions();
+			break;
+
+		case show_variable:
+			show_var((qli_name*) value);
+			break;
+
+		case show_variables:
+			show_vars();
+			break;
+
+		case show_global_field:
+			show_gbl_field(value);
+			break;
+
+		case show_global_fields:
+			show_gbl_fields((qli_dbb*) value);
+			break;
+
+		case show_trigger:
+			show_trig((qli_rel*) value);
+			break;
+
+		case show_triggers:
+			show_trigs((qli_dbb*) value);
+			break;
+
+		case show_system_triggers:
+			if (value)
+				show_sys_trigs((qli_dbb*) value);
+			else
+			{
+				for (dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+					show_sys_trigs(dbb);
+			}
+			break;
+
+		default:
+			ERRQ_bugcheck(7);		// Msg7 show option not implemented
+		}
+	}
+}
+
+
+static void array_dimensions( qli_dbb* database, const TEXT* field_name)
+{
+/**************************************
+ *
+ *	a r r a y _ d i m e n s i o n s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display the dimensions of an array
+ *
+ **************************************/
+	MET_meta_transaction(database, false);
+
+	TEXT s[128], *p = s;
+	s[0] = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_dimensions])
+		D IN RDB$FIELD_DIMENSIONS WITH D.RDB$FIELD_NAME = field_name
+			SORTED BY D.RDB$DIMENSION
+
+		if (D.RDB$LOWER_BOUND != 1)
+		{
+			sprintf(p, "%"SLONGFORMAT":", D.RDB$LOWER_BOUND);
+			while (*++p);
+		}
+
+		sprintf(p, "%"SLONGFORMAT", ", D.RDB$UPPER_BOUND);
+		while (*++p);
+	END_FOR;
+
+	--p;
+	*--p = 0;
+
+	ERRQ_msg_partial(479, SafeArg() << s);	// Msg479 (%s)
+}
+
+
+static void display_acl( qli_dbb* dbb, ISC_QUAD& blob_id)
+{
+/**************************************
+ *
+ *	d i s p l a y _ a c l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display the contents of a security class
+ *
+ **************************************/
+
+	display_blob(dbb, blob_id, "\t    ", sizeof(acl_bpb), acl_bpb, true);
+}
+
+
+static void display_blob(qli_dbb* dbb,
+						 ISC_QUAD& blob_id,
+						 const TEXT* prefix,
+						 USHORT bpb_length,
+						 const UCHAR* bpb,
+						 bool strip_line)
+{
+/**************************************
+ *
+ *	d i s p l a y _ b l o b
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display the contents of a security class
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+	UserBlob blob(status_vector);
+
+	if (!blob.open(dbb->dbb_handle, dbb->dbb_meta_trans, blob_id, bpb_length, bpb))
+	{
+			ERRQ_database_error(dbb, status_vector);
+	}
+
+	buf_type buffer;
+	const USHORT buffer_length = sizeof(buffer) - 1;
+	for (;;)
+	{
+		size_t length;
+		if (!blob.getSegment(buffer_length, buffer, length))
+			break;
+		buffer[length--] = 0;
+		if (strip_line)
+		{
+			for (TEXT* b = buffer + length; b >= buffer;)
+			{
+				if (*b == '\n' || *b == '\t' || *b == ' ')
+					*b-- = 0;
+				else
+					break;
+			}
+		}
+		else
+		{
+			if (buffer[length] == '\n')
+				buffer[length] = 0;
+		}
+		if (buffer[0])
+			printf("%s%s\n", prefix, buffer);
+	}
+
+	blob.close();
+}
+
+
+static void display_blr( qli_dbb* dbb, ISC_QUAD& blob_id)
+{
+/**************************************
+ *
+ *	d i s p l a y _ b l r
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display the contents of a security class
+ *
+ **************************************/
+
+	display_blob(dbb, blob_id, "\t    ", sizeof(blr_bpb), blr_bpb, true);
+}
+
+
+static void display_text( qli_dbb* dbb, ISC_QUAD& blob_id, const TEXT* prefix, bool strip)
+{
+/**************************************
+ *
+ *	d i s p l a y _ t e x t
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display a text blob.
+ *
+ **************************************/
+
+	display_blob(dbb, blob_id, prefix, 0, NULL, strip);
+}
+
+
+static void display_procedure( qli_dbb* database, const UCHAR* name, FB_API_HANDLE blob)
+{
+/**************************************
+ *
+ *	d i s p l a y _ p r o c e d u r e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show definition of procedure.  Somebody
+ *	else has already figured out what database
+ *	it's in, and so forth.
+ *
+ **************************************/
+	ERRQ_msg_put(96, SafeArg() << name <<
+				 database->dbb_filename << database->dbb_symbol->sym_string);
+	// Msg96 Procedure %s in database %s (%s)
+
+	TEXT buffer[256];
+	while (PRO_get_line(blob, buffer, sizeof(buffer))) {
+		printf("    %s", buffer);
+	}
+
+	PRO_close(database, blob);
+	printf("\n");
+}
+
+
+static USHORT get_window_size( int max_width)
+{
+/**************************************
+ *
+ *	g e t _ w i n d o w _ s i z e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Get the display window size.
+ *
+ **************************************/
+	SSHORT result = QLI_columns;
+
+	if (max_width < result)
+		result = max_width;
+	return result;
+}
+
+
+static void show_blob_info(ISC_QUAD& blob_blr,
+						   ISC_QUAD& blob_src,
+						   USHORT msg_blr,
+						   USHORT msg_src, qli_dbb* database,
+						   const TEXT* relation_name)
+{
+/*****************************************************
+ *
+ *	s h o w _ b l o b _ i n f o
+ *
+ *****************************************************
+ *
+ * Functional description
+ *	 Display source if possible or blr.
+ *
+ *****************************************************/
+
+	if (UserBlob::blobIsNull(blob_src))
+	{
+		ERRQ_msg_put(msg_blr);
+		display_blr(database, blob_blr);
+	}
+	else
+	{
+		ERRQ_msg_put(msg_src, relation_name);
+		show_text_blob(database, "\t", 0, &blob_src, 0, NULL, true);
+	}
+}
+
+
+
+static void show_blr(qli_dbb* database,
+					 USHORT source_msg,
+					 ISC_QUAD& source, USHORT blr_msg, ISC_QUAD& blr)
+{
+/**************************************
+ *
+ *	s h o w _ b l r
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show either source or blr for a blr item along with
+ *	appopriate messages.
+ *
+ **************************************/
+
+	if (!UserBlob::blobIsNull(source))
+		show_text_blob(database, "\t", source_msg, &source, 0, NULL, false);
+	else if (!UserBlob::blobIsNull(blr))
+	{
+		if (blr_msg)
+			ERRQ_msg_put(blr_msg);
+		display_blr(database, blr);
+	}
+}
+
+
+static void show_datatype(qli_dbb* database,
+						  USHORT dtype,
+						  USHORT length,
+						  SSHORT scale,
+						  SSHORT sub_type,
+						  USHORT segment_length,
+						  USHORT dimensions)
+{
+/**************************************
+ *
+ *	s h o w _ d a t a t y p e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display datatype information.
+ *
+ **************************************/
+	TEXT subtype[32];
+	SSHORT msg = 0;
+
+	switch (dtype)
+	{
+	case dtype_text:
+		msg = 97;
+		break;
+
+	case dtype_varying:
+		msg = 98;
+		break;
+
+	case dtype_cstring:
+		length -= 1;
+		msg = 99;
+		break;
+
+	case dtype_short:
+		msg = 100;
+		break;
+
+	case dtype_long:
+		msg = 101;
+		break;
+
+	case dtype_quad:
+		msg = 102;
+		break;
+
+	case dtype_real:
+		msg = 103;
+		break;
+
+	case dtype_double:
+		msg = 104;
+		break;
+
+	case dtype_int64:
+		msg = 329;
+		break;
+
+	case dtype_blob:
+		ERRQ_msg_partial(105);	// Msg105 blob
+		if (segment_length) {
+			ERRQ_msg_partial(106, SafeArg() << segment_length);	// Msg106 , segment length %d
+		}
+		if (sub_type)
+		{
+			// Only the number in case there's no text name for the type.
+			sprintf(subtype, "%d", sub_type);
+			if (database && (database->dbb_capabilities & DBB_cap_types))
+			{
+				FOR(REQUEST_HANDLE database->dbb_requests[REQ_fld_subtype])
+					TYPE IN RDB$TYPES WITH TYPE.RDB$FIELD_NAME EQ "RDB$FIELD_SUB_TYPE"
+					AND TYPE.RDB$TYPE EQ sub_type
+
+					TEXT* p = subtype;
+					for (const TEXT* q = TYPE.RDB$TYPE_NAME; *q && *q != ' ';) {
+						*p++ = *q++;
+					}
+					*p = 0;
+				END_FOR;
+			}
+			ERRQ_msg_partial(107, SafeArg() << subtype);
+		}
+		return;
+
+	case dtype_sql_date:
+		ERRQ_msg_partial(110, SafeArg() << length);
+		ERRQ_msg_partial(107, SafeArg() << "SQL DATE");
+		return;
+
+	case dtype_sql_time:
+		ERRQ_msg_partial(110, SafeArg() << length);
+		ERRQ_msg_partial(107, SafeArg() << "SQL TIME");
+		return;
+
+	case dtype_timestamp:
+		msg = 110;
+		break;
+
+	default:
+		ERRQ_bugcheck(8);			// Msg8 show_fields: dtype not done
+	}
+
+	ERRQ_msg_partial(msg, SafeArg() << length);
+
+	if (dimensions) {
+		ERRQ_msg_partial(433);	// Msg433  array
+	}
+
+	switch (dtype)
+	{
+	case dtype_short:
+	case dtype_long:
+	case dtype_quad:
+	case dtype_int64:
+		if (scale) {
+			ERRQ_msg_partial(111, SafeArg() << scale); // Msg111 , scale %d
+		}
+		break;
+	case dtype_text:
+	case dtype_varying:
+	case dtype_cstring:
+		if (sub_type == 1)
+			ERRQ_msg_partial(112);	// Msg112 , subtype fixed
+		else if (sub_type != 0)
+		{
+			sprintf(subtype, "%d", sub_type);
+			ERRQ_msg_partial(107, SafeArg() << subtype);
+		}
+		break;
+	}
+}
+
+
+static void show_dbb( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ d b b
+ *
+ **************************************
+ *
+ * Functional description
+ *	Print a database name and some
+ *	functional stuff about it.
+ *
+ **************************************/
+	if (database)
+	{
+		const qli_symbol* symbol = database->dbb_symbol;
+		if (symbol)
+		{
+			ERRQ_msg_put(113, SafeArg() << database->dbb_filename << symbol->sym_string);
+			// Msg113 Database %s readied as %s
+		}
+		else
+			ERRQ_msg_put(114, database->dbb_filename);	// Msg114 Database %s
+	}
+	else
+		ERRQ_msg_put(115);	// Msg115 No databases are currently ready
+}
+
+
+static void show_dbb_parameters( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ d b b _ p a r a m e t e r s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Print stuff about a database.
+ *
+ **************************************/
+	UCHAR buffer[127];
+	ISC_STATUS_ARRAY status_vector;
+
+	if (!database)
+		return;
+
+	if (isc_database_info(status_vector, &database->dbb_handle,
+						   sizeof(db_items), db_items, sizeof(buffer), (char*) buffer))
+	{
+		ERRQ_database_error(database, status_vector);
+	}
+
+	SLONG page_size = 0, allocation = 0;
+
+	for (const UCHAR* d = buffer; *d != isc_info_end;)
+	{
+		const UCHAR item = *d++;
+		const SLONG length = gds__vax_integer(d, 2);
+		d += 2;
+
+		switch (item)
+		{
+		case isc_info_db_size_in_pages:
+			allocation = gds__vax_integer(d, length);
+			break;
+
+		case isc_info_page_size:
+			page_size = gds__vax_integer(d, length);
+			break;
+
+		case isc_info_error:
+			break;
+		}
+		d += length;
+	}
+
+	ERRQ_msg_put(116, SafeArg() << page_size << allocation);
+	// Msg116 Page size is %d bytes.  Current allocation is %d pages.
+
+	MET_meta_transaction(database, false);
+
+	if (database->dbb_capabilities & DBB_cap_security)
+	{
+		FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_dbb])
+			D IN RDB$DATABASE
+			show_string(260, D.RDB$SECURITY_CLASS, 0, NULL);
+			show_text_blob(database, "\t", 261, &D.RDB$DESCRIPTION, 0, NULL, false);
+		END_FOR;
+	}
+	else
+	{
+		FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_dbb])
+			D IN RDB$DATABASE
+			show_text_blob(database, "\t", 262, &D.RDB$DESCRIPTION, 0, NULL, false);
+		END_FOR;
+	}
+
+	if (database->dbb_capabilities & DBB_cap_files)
+	{
+		if (database->dbb_capabilities & DBB_cap_shadowing)
+		{
+			FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_files])
+				F IN DB.RDB$FILES SORTED BY F.RDB$SHADOW_NUMBER, F.RDB$FILE_START
+
+				if (F.RDB$SHADOW_NUMBER)
+				{
+					if (!(F.RDB$FILE_FLAGS & FILE_conditional))
+					{
+						ERRQ_msg_put(385, SafeArg() << F.RDB$SHADOW_NUMBER <<
+										F.RDB$FILE_NAME << F.RDB$FILE_START);
+						// Msg385 Shadow %d, File:%s starting at page %d
+					}
+				}
+				else
+				{
+					ERRQ_msg_put(263, SafeArg() << F.RDB$FILE_NAME << F.RDB$FILE_START);
+						// Msg263 File:%s starting at page %d
+			 	}
+			END_FOR;
+		}
+		else
+		{
+			FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_files])
+				F IN DB.RDB$FILES SORTED BY F.RDB$FILE_START
+
+				ERRQ_msg_put(263, SafeArg() << F.RDB$FILE_NAME << F.RDB$FILE_START);
+				// Msg263 File:%s starting at page %d
+			END_FOR;
+		}
+	}
+}
+
+
+static int show_field_detail(qli_dbb* database,
+							 const TEXT* relation_name,
+							 const TEXT* field_name,
+							 qli_syntax* idx_node)
+{
+/**************************************
+ *
+ *	s h o w _ f i e l d _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show everything we know about local
+ *	fields with the specified name in a particular
+ *	database.
+ *
+ **************************************/
+	MET_meta_transaction(database, false);
+	USHORT count = 0;
+
+	if (!(database->dbb_capabilities & DBB_cap_security))
+		count += show_insecure_fields(database, relation_name, field_name);
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_field])
+		RFR IN RDB$RELATION_FIELDS CROSS
+			F IN RDB$FIELDS CROSS
+			R IN RDB$RELATIONS WITH
+			RFR.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME AND
+			R.RDB$RELATION_NAME = RFR.RDB$RELATION_NAME AND
+			(RFR.RDB$FIELD_NAME = field_name OR
+			 RFR.RDB$QUERY_NAME = field_name OR
+			 (RFR.RDB$QUERY_NAME MISSING AND F.RDB$QUERY_NAME = field_name))
+
+		fb_utils::exact_name(RFR.RDB$RELATION_NAME);
+
+		if (relation_name && (strcmp(RFR.RDB$RELATION_NAME, relation_name)))
+			continue;
+
+		const USHORT dimensions = MET_dimensions(database, F.RDB$FIELD_NAME);
+		if (dimensions && idx_node && dimensions != idx_node->syn_arg[s_idx_count]->syn_count)
+		{
+			continue;
+		}
+
+		if (count++)
+			printf("\n");
+
+		fb_utils::exact_name(RFR.RDB$FIELD_NAME);
+		fb_utils::exact_name(F.RDB$FIELD_NAME);
+
+		if (!R.RDB$VIEW_BLR.NULL)
+		{
+			ERRQ_msg_put(495, SafeArg() << RFR.RDB$FIELD_NAME << RFR.RDB$RELATION_NAME <<
+						 database->dbb_symbol->sym_string);
+			// Msg495 Field %s in view %s of database %s
+		}
+		else
+		{
+			ERRQ_msg_put(496, SafeArg() << RFR.RDB$FIELD_NAME << RFR.RDB$RELATION_NAME <<
+						 database->dbb_symbol->sym_string);
+			// Msg495 Field %s in relation %s of database %s
+		}
+		ERRQ_msg_put(265, F.RDB$FIELD_NAME);
+		// Msg265 Global field %s
+
+		if (!RFR.RDB$BASE_FIELD.NULL)
+		{
+			fb_utils::exact_name(RFR.RDB$BASE_FIELD);
+			view_info(database, RFR.RDB$RELATION_NAME, RFR.RDB$BASE_FIELD, RFR.RDB$VIEW_CONTEXT, 0);
+		}
+
+		show_text_blob(database, "\t", 266, &RFR.RDB$DESCRIPTION, 339, &F.RDB$DESCRIPTION, false);
+		ERRQ_msg_put(267);
+		// Msg267 Datatype information:
+		printf("\t");
+
+		show_datatype(database, MET_get_datatype(F.RDB$FIELD_TYPE), F.RDB$FIELD_LENGTH,
+						F.RDB$FIELD_SCALE, F.RDB$FIELD_SUB_TYPE, F.RDB$SEGMENT_LENGTH, dimensions);
+		if (dimensions && !idx_node)
+			array_dimensions(database, F.RDB$FIELD_NAME);
+		printf("\n");
+		show_blr(database, 341, F.RDB$COMPUTED_SOURCE, 341, F.RDB$COMPUTED_BLR);
+		show_blr(database, 342, F.RDB$VALIDATION_SOURCE, 342, F.RDB$VALIDATION_BLR);
+		show_string(270, RFR.RDB$SECURITY_CLASS, 0, NULL);
+		show_string(271, RFR.RDB$QUERY_NAME, 271, F.RDB$QUERY_NAME);
+		show_string(273, RFR.RDB$EDIT_STRING, 273, F.RDB$EDIT_STRING);
+		show_text_blob(database, "\t", 275, &RFR.RDB$QUERY_HEADER, 275, &F.RDB$QUERY_HEADER, false);
+	END_FOR;
+
+	return count;
+}
+
+
+static int show_field_instances( qli_dbb* database, const TEXT* field_name)
+{
+/**************************************
+ *
+ *	s h o w _ f i e l d _ i n s t a n c e s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Print a list of places where a global field
+ *	is used.
+ *
+ **************************************/
+	int count = 0;
+
+	MET_meta_transaction(database, false);
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_field_instance])
+		RFR IN RDB$RELATION_FIELDS WITH RFR.RDB$FIELD_SOURCE = field_name
+			SORTED BY RFR.RDB$RELATION_NAME
+
+		if (!count++)
+		{
+			ERRQ_msg_put(335, SafeArg() << field_name << database->dbb_symbol->sym_string);
+			// Msg335 Global field %s is used database %s as:
+		}
+		fb_utils::exact_name(RFR.RDB$FIELD_NAME);
+		fb_utils::exact_name(RFR.RDB$RELATION_NAME);
+		ERRQ_msg_put(336, SafeArg() << RFR.RDB$FIELD_NAME << RFR.RDB$RELATION_NAME);
+		// Msg336 %s in relation %s
+	END_FOR;
+
+	return count;
+}
+
+
+static void show_fields( qli_rel* relation, qli_fld* fields)
+{
+/**************************************
+ *
+ *	s h o w _ f i e l d s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show the fields for a relation.
+ *
+ **************************************/
+	qli_dbb* database;
+
+	// Find the long field name (including query name)
+
+	if (relation)
+	{
+		if (!(relation->rel_flags & REL_fields))
+			MET_fields(relation);
+		fields = relation->rel_fields;
+		database = relation->rel_database;
+		MET_meta_transaction(database, false);
+	}
+	else
+		database = NULL;
+
+	USHORT max_name = 0;
+	const qli_fld* field;
+
+	for (field = fields; field; field = field->fld_next)
+	{
+		USHORT l = field->fld_name->sym_length;
+		const qli_symbol* symbol = field->fld_query_name;
+		if (symbol)
+			l += symbol->sym_length + 3;
+		max_name = MAX(max_name, l);
+	}
+
+	// Now print the fields
+
+	for (field = fields; field; field = field->fld_next)
+	{
+		if (QLI_abort)
+			return;
+
+		const qli_symbol* symbol = field->fld_name;
+		USHORT l = symbol->sym_length;
+		printf("        %s", symbol->sym_string);
+
+		if (symbol = field->fld_query_name)
+		{
+			l += symbol->sym_length + 3;
+			printf(" (%s)", symbol->sym_string);
+		}
+
+		for (l = max_name + 12 - l; l; --l)
+			putchar(' ');
+		show_datatype(database, field->fld_dtype,
+					  (field->fld_dtype == dtype_varying) ? field->fld_length - 2 : field->fld_length,
+					  field->fld_scale, field->fld_sub_type, field->fld_segment_length,
+					  (field->fld_flags & FLD_array) ? 1 : 0);
+		if (database && field->fld_flags & FLD_array)
+			array_dimensions(database, field->fld_name->sym_string);
+		if (field->fld_flags & FLD_computed)
+			ERRQ_msg_put(119);	// Msg119 (computed expression)
+		else
+			printf("\n");
+	}
+}
+
+
+static void show_filt( qli_filter* filter)
+{
+/**************************************
+ *
+ *	s h o w _ f i l t
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show definition of filter.  If a particular database
+ *	was specified, look there, otherwise, print all filters
+ *	with that name.
+ *
+ **************************************/
+	int count = 0;
+	const qli_name* name = filter->qfl_name;
+
+	qli_dbb* database = filter->qfl_database;
+	if (database)
+	{
+		if (!(database->dbb_capabilities & DBB_cap_filters))
+		{
+			// Msg439 Filters are not supported in database %s.
+			ERRQ_msg_put(439, database->dbb_symbol->sym_string);
+			return;
+		}
+		count = show_filter_detail(database, name->nam_string);
+		if (!count)
+		{
+			// Msg440 Filter %s is not defined in database %s.
+			ERRQ_msg_put(440, SafeArg() << name->nam_string << database->dbb_symbol->sym_string);
+		}
+	}
+	else
+	{
+		bool any_supported = false;
+		for (database = QLI_databases; database; database = database->dbb_next)
+		{
+			if (database->dbb_capabilities & DBB_cap_filters)
+			{
+				any_supported = true;
+				count += show_filter_detail(database, name->nam_string);
+			}
+		}
+		if (!count)
+		{
+			if (any_supported)
+			{
+				// Msg441 Filter %s is not defined in any open database
+				ERRQ_msg_put(441, name->nam_string);
+			}
+			else
+			{
+				// Msg442 Filters are not supported in any open database.
+				ERRQ_msg_put(442);
+			}
+		}
+	}
+}
+
+
+static int show_filter_detail( qli_dbb* database, const TEXT* filter_name)
+{
+/**************************************
+ *
+ *	s h o w _ f i l t e r _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display the following information about a
+ *	filter with the specified name in a particular
+ *	database:  Filter name, filter library, input and
+ *	output sub-types, and description.
+ *
+ **************************************/
+	MET_meta_transaction(database, false);
+
+	int count = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_filter_detail])
+		F IN RDB$FILTERS WITH F.RDB$FUNCTION_NAME = filter_name
+
+		count++;
+		fb_utils::exact_name(F.RDB$FUNCTION_NAME);
+
+		ERRQ_msg_put(444,		// Msg444 Filter %s in database \"%s\" (%s):
+					 SafeArg() << F.RDB$FUNCTION_NAME << database->dbb_filename <<
+					 database->dbb_symbol->sym_string);
+		ERRQ_msg_put(445, F.RDB$MODULE_NAME); // Msg445 Filter library is %s
+		ERRQ_msg_put(446, SafeArg() << F.RDB$INPUT_SUB_TYPE);	// Msg446 Input sub-type is %d
+		ERRQ_msg_put(447, SafeArg() << F.RDB$OUTPUT_SUB_TYPE);	// Msg447 Output sub-type is %d
+		show_text_blob(database, "\t", 448, &F.RDB$DESCRIPTION, 0, NULL, false);
+	END_FOR;
+	return count;
+}
+
+
+static void show_filts( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ f i l t s
+ *
+ * Functional description
+ *	Show filter names in a database.
+ *
+ **************************************/
+
+	if (!(database->dbb_capabilities & DBB_cap_filters))
+	{
+		// Msg463 Filters are not supported for database %s.
+		ERRQ_msg_put(463, database->dbb_symbol->sym_string);
+	}
+	else if (!(show_filters_detail(database)))
+	{
+		// Msg464 no filters defined for database %s.
+		ERRQ_msg_put(464, database->dbb_symbol->sym_string);
+	}
+}
+
+
+static int show_filters_detail( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ f i l t e r s _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show filter names in a database.
+ *
+ **************************************/
+	buf_type buffer;
+	SSHORT width = get_window_size(sizeof(buffer) - 1);
+	buffer[0] = 0;
+
+	MET_meta_transaction(database, false);
+
+	int count = 0;
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_filters])
+		F IN RDB$FILTERS
+		SORTED BY F.RDB$FUNCTION_NAME
+
+		if (!count++)
+		{
+			ERRQ_msg_put(449, SafeArg() << database->dbb_filename <<
+						   database->dbb_symbol->sym_string);
+			// Msg449 Filters in database %s (%s):
+		}
+		show_names(F.RDB$FUNCTION_NAME, width, buffer);
+	END_FOR;
+
+	if (buffer[0])
+		printf("%s\n", buffer);
+
+	return count;
+}
+
+
+static void show_fld( qli_syntax* field_node)
+{
+/**************************************
+ *
+ *	s h o w _ f l d
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show all details about a particular
+ *	field.  What we've got coming in
+ *	is a list of 1, 2, or 3 name blocks,
+ *	contain the [[database.]relation.]field
+ *	specification.  Figure out what we've
+ *	got and let somebody else do all the work.
+ *
+ **************************************/
+	qli_syntax* idx_node = NULL;
+
+	if (field_node->syn_type == nod_index)
+	{
+		idx_node = field_node;
+		field_node = idx_node->syn_arg[s_idx_field];
+	}
+
+	qli_dbb* database = NULL;
+	qli_name* field_name = NULL;
+	qli_name* relation_name = NULL;
+	for (qli_syntax** ptr = field_node->syn_arg + field_node->syn_count;
+		--ptr >= field_node->syn_arg;)
+	{
+		if (!field_name)
+			field_name = (qli_name*) * ptr;
+		else if (!relation_name)
+			relation_name = (qli_name*) * ptr;
+		else
+			for (qli_symbol* symbol = ((qli_name*) *ptr)->nam_symbol; symbol; symbol = symbol->sym_homonym)
+			{
+				if (symbol->sym_type == SYM_database)
+				{
+					database = (qli_dbb*) symbol->sym_object;
+					break;
+				}
+			}
+	}
+
+	const TEXT* string = relation_name ? relation_name->nam_string : NULL;
+	TEXT s[65];
+
+	if (string)
+		sprintf(s, "%s.%s", string, field_name->nam_string);
+	else
+		sprintf(s, "%s", field_name->nam_string);
+
+	int count = 0;
+	if (database)
+	{
+		count += show_field_detail(database, string, field_name->nam_string, NULL);
+		if (!count)
+		{
+			ERRQ_msg_put(117, SafeArg() << s << database->dbb_symbol->sym_string);
+			// Msg117 Field %s does not exist in database %s
+		}
+	}
+	else
+	{
+		for (database = QLI_databases; database; database = database->dbb_next)
+		{
+			count += show_field_detail(database, string, field_name->nam_string, idx_node);
+		}
+		if (!count) {
+			ERRQ_msg_put(118, s); // Msg118 Field %s does not exist in any open database
+		}
+	}
+}
+
+
+static void show_func( qli_func* func)
+{
+/**************************************
+ *
+ *	s h o w _ f u n c
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show definition of function.  If a particular database
+ *	was specified, look there, otherwise, print all functions
+ *	with that name.
+ *
+ **************************************/
+	int count = 0;
+	const qli_name* name = func->qfn_name;
+
+	qli_dbb* database = func->qfn_database;
+	if (database)
+	{
+		if (!(database->dbb_capabilities & DBB_cap_functions))
+		{
+			// Msg417 Functions are not supported in database %s.
+			ERRQ_msg_put(417, database->dbb_symbol->sym_string);
+			return;
+		}
+		count = show_func_detail(database, name->nam_string);
+		if (!count)
+		{
+			// Msg422 Function %s is not defined in database %s.
+			ERRQ_msg_put(422, SafeArg() << name->nam_string << database->dbb_symbol->sym_string);
+		}
+	}
+	else
+	{
+		bool any_supported = false;
+		for (database = QLI_databases; database; database = database->dbb_next)
+		{
+			if (database->dbb_capabilities & DBB_cap_functions)
+			{
+				any_supported = true;
+				count += show_func_detail(database, name->nam_string);
+			}
+		}
+		if (!count)
+		{
+			if (any_supported)
+			{
+				// Msg423 Function is %s not defined in any open database
+				ERRQ_msg_put(423, name->nam_string);
+			}
+			else {
+				ERRQ_msg_put(420); // Msg420 Functions are not supported in any open database.
+			}
+		}
+	}
+}
+
+
+static int show_func_detail( qli_dbb* database, const TEXT* func_name)
+{
+/**************************************
+ *
+ *	s h o w _ f u n c _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display the following information about a
+ *	function with the specified name in a particular
+ *	database:  Function name, query name, function
+ *	library, input and output argument datatypes, and
+ *	description.
+ *
+ **************************************/
+
+	MET_meta_transaction(database, false);
+	int count = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_func_detail])
+		F IN RDB$FUNCTIONS WITH
+			(F.RDB$FUNCTION_NAME = func_name OR F.RDB$QUERY_NAME = func_name)
+		count++;
+		fb_utils::exact_name(F.RDB$QUERY_NAME);
+		fb_utils::exact_name(F.RDB$FUNCTION_NAME);
+
+		BASED ON RDB$FUNCTIONS.RDB$QUERY_NAME fq_name;
+		strcpy(fq_name, F.RDB$FUNCTION_NAME);
+
+		if (F.RDB$QUERY_NAME[0])
+		{
+			ERRQ_msg_put(424,	// Msg424 Function %s (%s) in database \"%s\" (%s):
+						 SafeArg() << F.RDB$FUNCTION_NAME << F.RDB$QUERY_NAME <<
+						 database->dbb_filename << database->dbb_symbol->sym_string);
+		}
+		else
+		{
+			ERRQ_msg_put(425,	// Msg425 Function %s in database \"%s\" (%s):
+						 SafeArg() << F.RDB$FUNCTION_NAME << database->dbb_filename <<
+						 database->dbb_symbol->sym_string);
+		}
+
+		ERRQ_msg_put(426, F.RDB$MODULE_NAME);
+		// Msg426 Function library is %s
+
+		FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_func_args])
+			FA IN RDB$FUNCTION_ARGUMENTS WITH
+				FA.RDB$FUNCTION_NAME = fq_name SORTED BY FA.RDB$ARGUMENT_POSITION
+			if (FA.RDB$ARGUMENT_POSITION == 0) {
+				ERRQ_msg_partial(427); // Msg427 Return argument is
+			}
+			else
+			{
+				ERRQ_msg_partial(428, SafeArg() << FA.RDB$ARGUMENT_POSITION);
+				// Msg428 Argument %d is
+			}
+
+			const USHORT array = (FA.RDB$MECHANISM == 2); // funct below wants USHORT
+			show_datatype(database, MET_get_datatype(FA.RDB$FIELD_TYPE),
+						  FA.RDB$FIELD_LENGTH, FA.RDB$FIELD_SCALE,
+						  FA.RDB$FIELD_SUB_TYPE, 0, array);
+			printf("\n");
+		END_FOR;
+
+		show_text_blob(database, "\t", 421, &F.RDB$DESCRIPTION, 0, NULL, false);
+
+	END_FOR;
+	return count;
+}
+
+
+static void show_funcs( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ f u n c s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show function names in all ready databases,
+ *	or a specific database.
+ *
+ **************************************/
+
+	if (!(database->dbb_capabilities & DBB_cap_functions))
+	{
+		ERRQ_msg_put(461, database->dbb_symbol->sym_string);
+		// 461 - functions aren't supported in this database
+	}
+
+	if (!(show_funcs_detail(database)))
+	{
+		ERRQ_msg_put(462, database->dbb_symbol->sym_string);
+		// 462 - no functions are defined in this database
+	}
+}
+
+
+static int show_funcs_detail( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ f u n c s _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show function names in a database.
+ *
+ **************************************/
+	buf_type buffer;
+	SSHORT width = get_window_size(sizeof(buffer) - 1);
+	buffer[0] = 0;
+
+	MET_meta_transaction(database, false);
+
+	int count = 0;
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_functions])
+		F IN RDB$FUNCTIONS
+		SORTED BY F.RDB$FUNCTION_NAME
+		if (!count++)
+		{
+			// Msg416 Functions in database %s (%s):
+			ERRQ_msg_put(416, SafeArg() << database->dbb_filename <<
+						   database->dbb_symbol->sym_string);
+		}
+		show_names(F.RDB$FUNCTION_NAME, width, buffer);
+	END_FOR;
+
+	if (buffer[0])
+		printf("%s\n", buffer);
+
+	return count;
+}
+
+
+static int show_insecure_fields(qli_dbb* database,
+								const TEXT* relation_name,
+								const TEXT* field_name)
+{
+/**************************************
+ *
+ *	s h o w _ i n s e c u r e _ f i e l d s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show everything we know about local
+ *	fields with the specified name in a particular
+ *	database, that doesn't have security classes
+ *	defined.
+ *
+ **************************************/
+	int count = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_field])
+		RFR IN RDB$RELATION_FIELDS CROSS
+			F IN RDB$FIELDS CROSS
+			R IN RDB$RELATIONS WITH
+			RFR.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME AND
+			R.RDB$RELATION_NAME = RFR.RDB$RELATION_NAME AND
+			(RFR.RDB$FIELD_NAME = field_name OR
+			 RFR.RDB$QUERY_NAME = field_name OR
+			 (RFR.RDB$QUERY_NAME MISSING AND F.RDB$QUERY_NAME = field_name))
+
+		fb_utils::exact_name(RFR.RDB$RELATION_NAME);
+		if (relation_name && (strcmp(RFR.RDB$RELATION_NAME, relation_name)))
+			continue;
+		if (count++)
+			printf("\n");
+		fb_utils::exact_name(RFR.RDB$FIELD_NAME);
+		fb_utils::exact_name(F.RDB$FIELD_NAME);
+
+		if (R.RDB$VIEW_BLR.NULL)
+		{
+			ERRQ_msg_put(496, SafeArg() << RFR.RDB$FIELD_NAME << RFR.RDB$RELATION_NAME <<
+						 database->dbb_symbol->sym_string);
+			// Msg495 Field %s in relation %s of database %s
+		}
+		else
+		{
+			ERRQ_msg_put(495, SafeArg() << RFR.RDB$FIELD_NAME << RFR.RDB$RELATION_NAME <<
+						 database->dbb_symbol->sym_string);
+			// Msg495 Field %s in view %s of database %s
+		}
+		ERRQ_msg_put(338, F.RDB$FIELD_NAME);
+		// Msg338 Global field %s
+
+		if (!RFR.RDB$BASE_FIELD.NULL)
+		{
+			fb_utils::exact_name(RFR.RDB$BASE_FIELD);
+			view_info(database, RFR.RDB$RELATION_NAME, RFR.RDB$BASE_FIELD, RFR.RDB$VIEW_CONTEXT, 0);
+		}
+
+		show_text_blob(database, "\t", 339, &RFR.RDB$DESCRIPTION, 339, &F.RDB$DESCRIPTION, false);
+		ERRQ_msg_partial(340);	// Msg340 Datatype information:
+		printf("\t");
+		show_datatype(database, MET_get_datatype(F.RDB$FIELD_TYPE),
+					  F.RDB$FIELD_LENGTH, F.RDB$FIELD_SCALE,
+					  F.RDB$FIELD_SUB_TYPE, F.RDB$SEGMENT_LENGTH,
+					  MET_dimensions(database, F.RDB$FIELD_NAME));
+		printf("\n");
+		show_blr(database, 341, F.RDB$COMPUTED_SOURCE, 341, F.RDB$COMPUTED_BLR);
+		show_blr(database, 342, F.RDB$VALIDATION_SOURCE, 342, F.RDB$VALIDATION_BLR);
+		show_string(343, RFR.RDB$QUERY_NAME, 343, F.RDB$QUERY_NAME);
+		show_string(346, RFR.RDB$EDIT_STRING, 346, F.RDB$EDIT_STRING);
+		show_text_blob(database, "\t", 345, &RFR.RDB$QUERY_HEADER, 345, &F.RDB$QUERY_HEADER, false);
+	END_FOR;
+
+	return count;
+}
+
+
+static void show_gbl_field( qli_syntax* field_node)
+{
+/**************************************
+ *
+ *	s h o w _ g b l _ f i e l d
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show what we know about a global
+ *	field.  It may be qualified with a
+ *	database handle, in which case, show only
+ *	the one global field in that database,
+ *	otherwise show them all.
+ *
+ **************************************/
+	qli_name* field_name = NULL;
+	qli_dbb* database = NULL;
+
+	for (qli_syntax** ptr = field_node->syn_arg + field_node->syn_count - 1;
+		ptr >= field_node->syn_arg; ptr--)
+	{
+		if (!field_name) {
+			field_name = (qli_name*) * ptr;
+		}
+		else
+		{
+			qli_name* name = (qli_name*) *ptr;
+			for (qli_symbol* symbol = name->nam_symbol; symbol; symbol = symbol->sym_homonym)
+			{
+				if (symbol->sym_type == SYM_database)
+				{
+					database = (qli_dbb*) symbol->sym_object;
+					break;
+				}
+			}
+		}
+	}
+
+	int count = 0;
+	if (database)
+	{
+		count += show_gbl_field_detail(database, field_name->nam_string);
+		if (!count)
+		{
+			ERRQ_msg_put(122,	// Msg122 Global field %s does not exist in database %s
+						 SafeArg() << field_name->nam_string <<
+						 database->dbb_symbol->sym_string);
+		}
+	}
+	else
+	{
+		for (database = QLI_databases; database; database = database->dbb_next)
+			count += show_gbl_field_detail(database, field_name->nam_string);
+		if (!count)
+		{
+			ERRQ_msg_put(123, field_name->nam_string);
+			// Msg123 Global field %s does not exist in any open database
+		}
+	}
+}
+
+
+static int show_gbl_field_detail( qli_dbb* database, const TEXT* field_name)
+{
+/**************************************
+ *
+ *	s h o w _ g b l _ f i e l d _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show everything we know about a global
+ *	field with the specified name in a particular
+ *	database.
+ *
+ **************************************/
+	int count = 0;
+
+	MET_meta_transaction(database, false);
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_global_field])
+		F IN RDB$FIELDS WITH F.RDB$FIELD_NAME = field_name
+
+		if (count++)
+			printf("\n");
+		fb_utils::exact_name(F.RDB$FIELD_NAME);
+
+		ERRQ_msg_put(276, SafeArg() << F.RDB$FIELD_NAME << database->dbb_symbol->sym_string);
+		// Msg276 Global field %s in database %s
+
+		show_text_blob(database, "\t", 277, &F.RDB$DESCRIPTION, 0, NULL, false);
+		ERRQ_msg_put(278);	// Msg278 Datatype information:
+		printf("\t");
+		show_datatype(database, MET_get_datatype(F.RDB$FIELD_TYPE),
+					  F.RDB$FIELD_LENGTH, F.RDB$FIELD_SCALE,
+					  F.RDB$FIELD_SUB_TYPE, F.RDB$SEGMENT_LENGTH,
+					  MET_dimensions(database, F.RDB$FIELD_NAME));
+		printf("\n");
+		show_blr(database, 279, F.RDB$COMPUTED_SOURCE, 341, F.RDB$COMPUTED_BLR);
+		show_blr(database, 280, F.RDB$VALIDATION_SOURCE, 342, F.RDB$VALIDATION_BLR);
+		show_string(281, F.RDB$QUERY_NAME, 0, NULL);
+		show_string(282, F.RDB$EDIT_STRING, 0, NULL);
+		show_text_blob(database, "\t", 283, &F.RDB$QUERY_HEADER, 0, NULL, false);
+	END_FOR;
+
+	if (count && !(show_field_instances(database, field_name)))
+	{
+		ERRQ_msg_put(284, SafeArg() << field_name << database->dbb_symbol->sym_string);
+		// Msg284 %s is not used in any relations in database %s
+	}
+
+	return count;
+}
+
+
+static void show_gbl_fields( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ g b l _ f i e l d s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show what we know about a global
+ *	field.  It may be qualified with a
+ *	database handle, in which case, show only
+ *	the global fields in that database,
+ *	otherwise show them all.
+ *
+ **************************************/
+	int count = 0;
+	if (database)
+	{
+		count += show_gbl_fields_detail(database);
+		if (!count)
+		{
+			ERRQ_msg_put(124, database->dbb_symbol->sym_string);
+			// Msg124 There are no fields defined for database %s
+		}
+	}
+	else
+	{
+		for (database = QLI_databases; database; database = database->dbb_next)
+		{
+			count += show_gbl_fields_detail(database);
+		}
+		if (!count) {
+			ERRQ_msg_put(125); // Msg125 There are no fields defined in any open database
+		}
+	}
+}
+
+
+static int show_gbl_fields_detail( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ g b l _ f i e l d s _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show everything we know about
+ *	global fields in a particular
+ *	database.
+ *
+ **************************************/
+	int count = 0;
+
+	MET_meta_transaction(database, false);
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_global_fields])
+		F IN RDB$FIELDS WITH F.RDB$SYSTEM_FLAG MISSING OR
+			F.RDB$SYSTEM_FLAG = 0 SORTED BY F.RDB$FIELD_NAME
+
+		if (!count++)
+		{
+			ERRQ_msg_put(286, SafeArg() << database->dbb_symbol->sym_string);
+			// Msg286 Global fields for database %s:
+		}
+		if (!F.RDB$COMPUTED_BLR.NULL)
+			continue;
+		printf("    %s", F.RDB$FIELD_NAME);
+		show_datatype(database, MET_get_datatype(F.RDB$FIELD_TYPE),
+					  F.RDB$FIELD_LENGTH, F.RDB$FIELD_SCALE,
+					  F.RDB$FIELD_SUB_TYPE, F.RDB$SEGMENT_LENGTH,
+					  MET_dimensions(database, F.RDB$FIELD_NAME));
+		show_text_blob(database, "\t", 262, &F.RDB$DESCRIPTION, 0, NULL, false);
+		printf("\n");
+	END_FOR;
+
+	return count;
+}
+
+
+static int show_indices_detail( qli_rel* relation)
+{
+/**************************************
+ *
+ *	s h o w _ i n d i c e s _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show indices for a relation.  If none, return 0.
+ *
+ **************************************/
+	USHORT count = 0;
+
+	qli_dbb* database = relation->rel_database;
+	MET_meta_transaction(database, false);
+
+	if (database->dbb_capabilities & DBB_cap_idx_inactive)
+	{
+		FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_indices])
+			X IN RDB$INDICES CROSS Z IN RDB$RELATIONS
+				WITH X.RDB$RELATION_NAME EQ relation->rel_symbol->sym_string
+				AND Z.RDB$RELATION_NAME EQ X.RDB$RELATION_NAME
+				AND Z.RDB$VIEW_BLR MISSING SORTED BY X.RDB$INDEX_NAME
+			++count;
+			USHORT type = 0; // this wasn't reset for each index!
+			if (database->dbb_capabilities & DBB_cap_index_type)
+			{
+				FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_index_type])
+					Y IN RDB$INDICES WITH Y.RDB$INDEX_NAME = X.RDB$INDEX_NAME
+
+					type = Y.RDB$INDEX_TYPE;
+				END_FOR;
+			}
+
+			// Index name can have spaces, we need something like MET_exact_name()
+			// to replace the custom loops that get rid of trailing spaces.
+			// I found truncate_string(). But later replaced it by fb_utils::exact_name().
+			fb_utils::exact_name(X.RDB$INDEX_NAME);
+			ERRQ_msg_put(450, SafeArg() << X.RDB$INDEX_NAME <<
+						 ((X.RDB$UNIQUE_FLAG) ? " (unique)" : "") <<
+						 ((type == 1) ? " (descending)" : "") <<
+						 ((X.RDB$INDEX_INACTIVE) ? " (inactive)" : ""));
+			// Msg450 Index %s%s%s%s
+
+			FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_index])
+				Y IN RDB$INDEX_SEGMENTS WITH
+					Y.RDB$INDEX_NAME EQ X.RDB$INDEX_NAME
+					SORTED BY Y.RDB$FIELD_POSITION
+
+				fb_utils::exact_name(Y.RDB$FIELD_NAME);
+				printf("            %s\n", Y.RDB$FIELD_NAME);
+			END_FOR;
+
+
+			if (!X.RDB$EXPRESSION_SOURCE.NULL)
+				show_text_blob(database, "\t    ", 0, &X.RDB$EXPRESSION_SOURCE, 0, NULL, true);
+			else if (!X.RDB$EXPRESSION_BLR.NULL)
+			{
+				ERRQ_msg_put (485);
+				display_blr(database, X.RDB$EXPRESSION_BLR);
+			}
+
+		END_FOR;
+	}
+	else
+	{
+		FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_indices])
+			X IN RDB$INDICES CROSS Z IN RDB$RELATIONS
+				WITH X.RDB$RELATION_NAME EQ relation->rel_symbol->sym_string
+				AND Z.RDB$RELATION_NAME EQ X.RDB$RELATION_NAME
+				AND Z.RDB$VIEW_BLR MISSING SORTED BY X.RDB$INDEX_NAME
+
+			++count;
+			fb_utils::exact_name(X.RDB$INDEX_NAME);
+			ERRQ_msg_put(290, SafeArg() << X.RDB$INDEX_NAME <<
+						 ((X.RDB$UNIQUE_FLAG) ? " (unique)" : ""));	// Msg290 Index %s%s
+			FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_index])
+				Y IN RDB$INDEX_SEGMENTS WITH
+					Y.RDB$INDEX_NAME EQ X.RDB$INDEX_NAME
+					SORTED BY Y.RDB$FIELD_POSITION
+				fb_utils::exact_name(Y.RDB$FIELD_NAME);
+				printf("            %s\n", Y.RDB$FIELD_NAME);
+			END_FOR;
+		END_FOR;
+	}
+
+	return count;
+}
+
+
+static void show_matching()
+{
+/**************************************
+ *
+ *	s h o w _ m a t c h i n g
+ *
+ **************************************
+ *
+ * Functional description
+ *	Just print the QLI matching language string.
+ *
+ **************************************/
+	if (QLI_abort)
+		return;
+	if (QLI_matching_language)
+	{
+		printf("\n\t%.*s\n",
+			int(QLI_matching_language->con_desc.dsc_length), QLI_matching_language->con_data);
+	}
+}
+
+
+static void show_names( const TEXT* name, USHORT width, TEXT* buffer)
+{
+/**************************************
+ *
+ *	s h o w _ n a m e s
+ *
+ **************************************
+ *
+ * Functional description
+ *
+ **************************************/
+	BASED ON QLI$PROCEDURES.QLI$PROCEDURE_NAME padded_name;
+
+	TEXT* s = buffer + strlen(buffer);
+	SSHORT len = sizeof(padded_name) - 1;
+	const SSHORT l1 = s - buffer;
+	if ((s != buffer) && ((l1 + len + 4) > width))
+	{
+		printf("%s\n", buffer);
+		buffer[0] = 0;
+		s = buffer;
+	}
+	*s++ = ' ';
+	*s++ = ' ';
+	*s++ = ' ';
+	*s++ = ' ';
+	strcpy(s, name);
+	while (*s)
+	{
+		s++;
+		len--;
+	}
+	while (len--) {
+		*s++ = ' ';
+	}
+	*s = 0;
+}
+
+
+static void show_proc( qli_proc* proc)
+{
+/**************************************
+ *
+ *	s h o w _ p r o c
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show definition of procedure.  If a particular database
+ *	was specified, look there, otherwise, print all procedures
+ *	with that name.
+ *
+ **************************************/
+	const qli_name* name = proc->qpr_name;
+
+	qli_dbb* database = proc->qpr_database;
+	if (database)
+	{
+		FB_API_HANDLE blob = PRO_fetch_procedure(database, (TEXT*) name->nam_string);
+		if (blob)
+			display_procedure(database, (const UCHAR*) name->nam_string, blob);
+		else
+		{
+			// Msg126 Procedure %s not found in database %s
+			ERRQ_msg_put(126, SafeArg() << name->nam_string << database->dbb_symbol->sym_string);
+		}
+		return;
+	}
+
+	int count = 0;
+	for (database = QLI_databases; database; database = database->dbb_next)
+	{
+		FB_API_HANDLE blob = PRO_fetch_procedure(database, (TEXT*) name->nam_string);
+		if (blob)
+		{
+			display_procedure(database, (const UCHAR*) name->nam_string, blob);
+			count++;
+		}
+	}
+
+	if (!count)
+	{
+		ERRQ_msg_put(127, name->nam_string); // Msg127 Procedure %s not found
+		return;
+	}
+}
+
+
+static void show_procs( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ p r o c s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show procedures in a database
+ *
+ **************************************/
+	buf_type buffer;
+
+	const SSHORT width = get_window_size(sizeof(buffer) - 1);
+
+	PRO_setup(database);
+	ERRQ_msg_put(128, SafeArg() << database->dbb_filename <<	// Msg128 Procedures in database %s (%s):
+				 database->dbb_symbol->sym_string);
+	buffer[0] = 0;
+	FOR(REQUEST_HANDLE database->dbb_scan_blobs) X IN DB.QLI$PROCEDURES
+		SORTED BY X.QLI$PROCEDURE_NAME
+		show_names(X.QLI$PROCEDURE_NAME, width, buffer);
+	END_FOR;
+	if (buffer[0])
+		printf("%s\n", buffer);
+}
+
+
+static void show_rel( qli_rel* relation)
+{
+/**************************************
+ *
+ *	s h o w _ r e l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Just print a relation name.  Almost mindless.
+ *
+ **************************************/
+
+	if (QLI_abort)
+		return;
+
+	printf("    %s\n", relation->rel_symbol->sym_string);
+}
+
+
+static void show_rel_detail( qli_rel* relation)
+{
+/**************************************
+ *
+ *	s h o w _ r e l _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Ask META to print description,
+ *	security class, etc.
+ *
+ **************************************/
+	const TEXT* relation_name = relation->rel_symbol->sym_string;
+	qli_dbb* database = relation->rel_database;
+	MET_meta_transaction(database, false);
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_rel_detail])
+		R IN RDB$RELATIONS WITH R.RDB$RELATION_NAME = relation_name
+		show_text_blob(database, "\t", 291, &R.RDB$DESCRIPTION, 0, NULL, false);
+
+		if (database->dbb_capabilities & DBB_cap_security)
+		{
+			FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_rel_secur])
+				S IN RDB$RELATIONS WITH S.RDB$RELATION_NAME = R.RDB$RELATION_NAME
+					AND S.RDB$SECURITY_CLASS NOT MISSING
+				show_string(292, S.RDB$SECURITY_CLASS, 0, NULL);
+			END_FOR;
+		}
+
+		if (database->dbb_capabilities & DBB_cap_extern_file)
+		{
+			FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_rel_extern])
+				E IN RDB$RELATIONS WITH E.RDB$RELATION_NAME = R.RDB$RELATION_NAME
+					AND E.RDB$EXTERNAL_FILE NOT MISSING
+				ERRQ_msg_put(293, E.RDB$EXTERNAL_FILE);	// Msg293 Stored in external file %s
+			END_FOR;
+		}
+
+		// OBSOLETE - Handling of DBB_cap_triggers (old V2 style triggers)
+		// OBSOLETE - Msg294 An erase trigger is defined for %s
+		// OBSOLETE - Msg295 A modify trigger is defined for %s
+		// OBSOLETE - Msg296 A store trigger is defined for %s
+
+		if (database->dbb_capabilities & DBB_cap_new_triggers)
+		{
+			USHORT msg = 380;
+			FOR(REQUEST_HANDLE database->dbb_requests[REQ_new_trig_exists])
+				X IN RDB$TRIGGERS
+				WITH X.RDB$RELATION_NAME EQ relation->rel_symbol->sym_string
+				if (!X.RDB$TRIGGER_BLR.NULL)
+				{
+					if (msg)
+					{
+						ERRQ_msg_put(msg); // Msg380 Trigger defined for this relation
+						msg = 0;
+					}
+					printf("\t");
+					show_trigger_status(X.RDB$TRIGGER_NAME, X.RDB$TRIGGER_TYPE,
+										X.RDB$TRIGGER_INACTIVE, X.RDB$TRIGGER_SEQUENCE);
+				}
+			END_FOR;
+		}
+	END_FOR;
+}
+
+
+static void show_rels( qli_dbb* dbb, enum show_t sw, SSHORT width)
+{
+/**************************************
+ *
+ *	s h o w _ r e l s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display information about a relations
+ *      or system_relations for a specific database.
+ *
+ **************************************/
+	buf_type buffer;
+
+	switch (sw)
+	{
+	case show_relations:
+		show_dbb(dbb);
+		buffer[0] = 0;
+		for (const qli_rel* relation = dbb->dbb_relations; relation;
+			 relation = relation->rel_next)
+		{
+			if (!(relation->rel_flags & REL_system))
+				show_names(relation->rel_symbol->sym_string, width, buffer);
+		}
+		if (buffer[0])
+			printf("%s\n", buffer);
+		printf("\n");
+		break;
+	case show_system_relations:
+		show_dbb(dbb);
+		buffer[0] = 0;
+		for (const qli_rel* relation = dbb->dbb_relations; relation;
+			 relation = relation->rel_next)
+		{
+			if (relation->rel_flags & REL_system)
+				show_names(relation->rel_symbol->sym_string, width, buffer);
+		}
+		if (buffer[0])
+			printf("%s\n", buffer);
+		printf("\n");
+	}
+}
+
+
+static USHORT show_security_class_detail( qli_dbb* database, const TEXT* name)
+{
+/**************************************
+ *
+ *	s h o w _ s e c u r i t y _ c l a s s _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show security classes for a databases.
+ *
+ **************************************/
+	MET_meta_transaction(database, false);
+
+	if (!(database->dbb_capabilities & DBB_cap_security))
+		return 0;
+
+	USHORT count = 0;
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_secur_class])
+		S IN RDB$SECURITY_CLASSES WITH S.RDB$SECURITY_CLASS = name
+		if (fb_utils::exact_name(S.RDB$SECURITY_CLASS)[0])
+		{
+			printf("\t%s:\n", S.RDB$SECURITY_CLASS);
+			display_acl(database, S.RDB$ACL);
+		}
+		count++;
+	END_FOR;
+
+	return count;
+}
+
+
+static USHORT show_security_classes_detail( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ s e c u r i t y _ c l a s s e s _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show security classes for a databases.
+ *
+ **************************************/
+	MET_meta_transaction(database, false);
+
+	if (!(database->dbb_capabilities & DBB_cap_security))
+		return 0;
+
+	USHORT count = 0;
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_secur])
+		S IN RDB$SECURITY_CLASSES
+		if (!count)
+		{
+			ERRQ_msg_put(297, database->dbb_symbol->sym_string);
+			// Msg297 Security classes for database %s
+		}
+
+		if (fb_utils::exact_name(S.RDB$SECURITY_CLASS)[0])
+		{
+			printf("\t%s:\n", S.RDB$SECURITY_CLASS);
+			display_acl(database, S.RDB$ACL);
+		}
+		count++;
+	END_FOR;
+
+	return count;
+}
+
+
+static void show_string(USHORT msg1, TEXT* string1, USHORT msg2, TEXT* string2)
+{
+/**************************************
+ *
+ *	s h o w _ s t r i n g
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show one of two strings and maybe a message, too.
+ *
+ **************************************/
+
+	if (string2 && (!*string1 || *string1 == ' '))
+	{
+		msg1 = msg2;
+		string1 = string2;
+	}
+
+	if (!*string1 || *string1 == ' ')
+		return;
+
+	fb_utils::exact_name(string1);
+	ERRQ_msg_put(msg1, string1);
+}
+
+
+static void show_sys_trigs( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ s y s _ t r i g s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Ask META to print trigger information
+ *	for the system.  Since parse
+ *	has already swallowed a possible database
+ *	qualifier, just assume that the database
+ *	is the right one.
+ *
+ **************************************/
+	MET_meta_transaction(database, false);
+	USHORT count = 0;
+
+	if (database->dbb_capabilities & DBB_cap_new_triggers)
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_sys_triggers])
+		X IN RDB$TRIGGERS WITH X.RDB$SYSTEM_FLAG EQ 1
+			SORTED BY X.RDB$RELATION_NAME, X.RDB$TRIGGER_TYPE,
+			X.RDB$TRIGGER_SEQUENCE,
+			X.RDB$TRIGGER_NAME
+
+		if (!X.RDB$TRIGGER_BLR.NULL)
+		{
+			ERRQ_msg_put(379, X.RDB$RELATION_NAME);
+			// Msg379 System Triggers
+			show_trigger_header(X.RDB$TRIGGER_NAME, X.RDB$TRIGGER_TYPE,
+								X.RDB$TRIGGER_SEQUENCE,
+								X.RDB$TRIGGER_INACTIVE, X.RDB$DESCRIPTION,
+								database); //, X.RDB$RELATION_NAME);
+			show_blob_info(X.RDB$TRIGGER_BLR, X.RDB$TRIGGER_SOURCE,
+							377,	// Msg377 Source for the trigger is not available.  Trigger BLR:
+							376,	// Msg376 Source for the trigger
+							database, X.RDB$RELATION_NAME);
+			show_trigger_messages(database, X.RDB$TRIGGER_NAME);
+			count++;
+		}
+	END_FOR;
+
+	if (!count)
+		ERRQ_msg_put(378);	// Msg378 No system triggers
+}
+
+
+static void show_text_blob(qli_dbb* database,
+						   const TEXT* column,
+						   USHORT msg1,
+						   ISC_QUAD* blob1,
+						   USHORT msg2,
+						   ISC_QUAD* blob2,
+						   bool strip)
+{
+/**************************************
+ *
+ *	s h o w _ t e x t _ b l o b
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display a text blob.
+ *
+ **************************************/
+
+	if (blob2 && UserBlob::blobIsNull(*blob1))
+	{
+		blob1 = blob2;
+		msg1 = msg2;
+	}
+
+	if (UserBlob::blobIsNull(*blob1))
+		return;
+
+	if (msg1)
+		ERRQ_msg_put(msg1);
+
+	display_text(database, *blob1, column, strip);
+}
+
+
+static void show_trig( qli_rel* relation)
+{
+/**************************************
+ *
+ *	s h o w _ t r i g
+ *
+ **************************************
+ *
+ * Functional description
+ *	Ask META to print trigger information
+ *	for a particular relation.  Since parse
+ *	has already swallowed a possible database
+ *	qualifier, just assume that the database
+ *	is the right one.
+ *
+ **************************************/
+
+	if (!(show_trigger_detail(relation->rel_database, relation->rel_symbol->sym_string)))
+	{
+		ERRQ_msg_put(129, relation->rel_symbol->sym_string);
+		// Msg129 No triggers are defined for relation %s
+	}
+}
+
+
+static int show_trigger_detail( qli_dbb* database, const TEXT* relation_name)
+{
+/**************************************
+ *
+ *	s h o w _ t r i g g e r _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show trigger definitions for a particular
+ *	relation.
+ *
+ **************************************/
+	if (!(database->dbb_capabilities & DBB_cap_new_triggers))
+		return 0;
+
+	MET_meta_transaction(database, false);
+	int count = 0;
+
+	// New style triggers
+
+	if (database->dbb_capabilities & DBB_cap_new_triggers)
+	{
+		ERRQ_msg_put(365, relation_name);	// Msg365 Triggers for relation %s
+		FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_new_trigger])
+			X IN RDB$TRIGGERS WITH X.RDB$RELATION_NAME EQ relation_name
+				AND(X.RDB$SYSTEM_FLAG MISSING OR X.RDB$SYSTEM_FLAG EQ 0)
+			SORTED BY X.RDB$TRIGGER_TYPE, X.RDB$TRIGGER_SEQUENCE,
+				X.RDB$TRIGGER_NAME
+
+			if (!X.RDB$TRIGGER_BLR.NULL)
+			{
+				show_trigger_header(X.RDB$TRIGGER_NAME, X.RDB$TRIGGER_TYPE,
+									X.RDB$TRIGGER_SEQUENCE,
+									X.RDB$TRIGGER_INACTIVE,
+									X.RDB$DESCRIPTION, database);
+									//relation_name);
+				show_blob_info(X.RDB$TRIGGER_BLR, X.RDB$TRIGGER_SOURCE,
+								377,	// Msg377 Source for the trigger is not available.  Trigger BLR:
+								376,	// Msg376 Source for the trigger
+								database, relation_name);
+				show_trigger_messages(database, X.RDB$TRIGGER_NAME);
+				count++;
+			}
+		END_FOR;
+		return count;
+	}
+
+	// Old style triggers
+	// OBSOLETE - 1996-Aug-06 David Schnepper
+
+	// OBSOLETE - Msg298 Triggers for relation %s:
+	// OBSOLETE - Msg299 Source for the erase trigger is not available.  Trigger BLR:
+	// OBSOLETE - Msg300 Erase trigger for relation %s:
+	// OBSOLETE - Msg301 Source for the modify trigger is not available.  Trigger BLR:
+	// OBSOLETE - Msg302 Modify trigger for relation %s:
+	// OBSOLETE - Msg303 Source for the store trigger is not available.  Trigger BLR:
+	// OBSOLETE - Msg304 Store trigger for relation %s:
+
+	return count;
+}
+
+
+static void show_trigger_header(TEXT* name,
+								USHORT type,
+								USHORT sequence,
+								USHORT inactive,
+								ISC_QUAD& description,
+								qli_dbb* database)
+								//const TEXT* relation_name) // unused param
+{
+/*****************************************************
+ *
+ *	s h o w _ t r i g g e r _ h e a d e r
+ *
+ *****************************************************
+ *
+ * Functional description
+ * 	Display header information for a new style
+ *	trigger only.
+ *
+ *****************************************************/
+
+	show_trigger_status(name, type, inactive, sequence);
+	show_text_blob(database, "\t    ", 375, &description, 0, NULL, true);
+}
+
+
+static void show_trigger_messages( qli_dbb* database, const TEXT* name)
+{
+/*****************************************************
+ *
+ *	s h o w _ t r i g g e r _ m e s s a g e s
+ *
+ *****************************************************
+ *
+ *	 Display error messages associated with
+ *       a new style (V3) trigger
+ *
+ *****************************************************/
+	bool first = true;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_trig_message])
+		M IN RDB$TRIGGER_MESSAGES WITH M.RDB$TRIGGER_NAME = name
+			SORTED BY M.RDB$MESSAGE_NUMBER
+
+		if (first)
+		{
+			ERRQ_msg_put(456, name); // msg 456: Messages associated with %s:\n
+			first = false;
+		}
+		ERRQ_msg_put(457, SafeArg() << M.RDB$MESSAGE_NUMBER << M.RDB$MESSAGE);
+		// msg 457:     message %ld:  %s\n
+	END_FOR;
+
+	if (!first)
+		printf("\n");
+}
+
+
+static void show_trigger_status(TEXT* name, USHORT type, USHORT status, USHORT sequence)
+{
+/*****************************************************
+ *
+ *	s h o w _ t r i g g e r _ s t a t u s
+ *
+ *****************************************************
+ *
+ *	 Display type and active status of a new style (V3) trigger
+ *
+ *****************************************************/
+	SCHAR trigger_type[16], trigger_active[9];
+	int msg_num;
+
+	switch (type)
+	{
+	case PRE_STORE:
+		msg_num = 367;
+		break;					// Msg367 pre-store
+	case POST_STORE:
+		msg_num = 368;
+		break;					// Msg368 post-store
+	case PRE_MODIFY:
+		msg_num = 369;
+		break;					// Msg369 pre-modify
+	case POST_MODIFY:
+		msg_num = 370;
+		break;					// Msg370 post-modify
+	case PRE_ERASE:
+		msg_num = 371;
+		break;					// Msg371 pre-erase
+	case POST_ERASE:
+		msg_num = 372;
+		break;					// Msg372 post-erase
+	default:
+		msg_num = 372;
+		break;					// Should never happen, not worth an error
+	}
+
+	ERRQ_msg_format(msg_num, sizeof(trigger_type), trigger_type);
+	msg_num = status ? 374 : 373;
+	ERRQ_msg_format(msg_num, sizeof(trigger_active), trigger_active);
+
+	fb_utils::exact_name(name);
+	ERRQ_msg_put(366, SafeArg() << name << trigger_type << sequence << trigger_active);
+	// Msg366 Name: %s, Type: %s, Sequence: %d, Active: %s
+}
+
+
+static void show_trigs( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ t r i g s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Ask META to print all trigger information
+ *	for a particular database or all databases.
+ *
+ **************************************/
+
+	if (database)
+	{
+		if (!show_triggers_detail(database))
+		{
+			ERRQ_msg_put(130, database->dbb_symbol->sym_string);
+			// Msg130 No triggers are defined in database %s
+		}
+	}
+	else
+	{
+		for (database = QLI_databases; database; database = database->dbb_next)
+			if (!show_triggers_detail(database))
+			{
+				ERRQ_msg_put(131, database->dbb_symbol->sym_string);
+				// Msg131 No triggers are defined in database %s
+			}
+	}
+}
+
+
+static int show_triggers_detail( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ t r i g g e r s _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show trigger definitions for a particular
+ *	database
+ *
+ **************************************/
+	MET_meta_transaction(database, false);
+	int count = 0;
+
+	if (!(database->dbb_capabilities & DBB_cap_new_triggers))
+		return count;
+
+	if (database->dbb_capabilities & DBB_cap_new_triggers)
+	{
+		// New style triggers
+
+		FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_new_triggers])
+			X IN RDB$TRIGGERS WITH X.RDB$SYSTEM_FLAG MISSING
+				OR X.RDB$SYSTEM_FLAG EQ 0 SORTED BY X.RDB$RELATION_NAME,
+				X.RDB$TRIGGER_TYPE, X.RDB$TRIGGER_SEQUENCE, X.RDB$TRIGGER_NAME
+			if (!X.RDB$TRIGGER_BLR.NULL)
+			{
+				fb_utils::exact_name(X.RDB$RELATION_NAME);
+				ERRQ_msg_put(381, X.RDB$RELATION_NAME);
+				// Msg365 Triggers for relation %s
+				show_trigger_header(X.RDB$TRIGGER_NAME, X.RDB$TRIGGER_TYPE,
+									X.RDB$TRIGGER_SEQUENCE,
+									X.RDB$TRIGGER_INACTIVE,
+									X.RDB$DESCRIPTION, database);
+									//X.RDB$RELATION_NAME);
+				show_blob_info(X.RDB$TRIGGER_BLR, X.RDB$TRIGGER_SOURCE,
+							   377,	// Msg377 Source for the trigger is not available.  Trigger BLR:
+							   376,	// Msg376 Source for the trigger
+							   database, X.RDB$RELATION_NAME);
+				show_trigger_messages(database, X.RDB$TRIGGER_NAME);
+				count++;
+			}
+		END_FOR;
+	}
+	else
+	{
+		// Old style triggers
+		// OBSOLETE - 1996-Aug-06 David Schnepper
+		// OBSOLETE - Msg305 Triggers for relation %s:
+
+		// OBSOLETE - Msg306 Source for the erase trigger is not available.  Trigger BLR:
+		// OBSOLETE - Msg307 Erase trigger for relation %s:
+
+		// OBSOLETE - Msg308 Source for the modify trigger is not available.  Trigger BLR:
+		// OBSOLETE - Msg309 Modify trigger for relation %s:
+
+		// OBSOLETE - Msg310 Source for the store trigger is not available.  Trigger BLR:
+		// OBSOLETE - Msg311 Store trigger for relation %s:
+	}
+
+	return count;
+}
+
+
+static void show_var( const qli_name* var_name)
+{
+/**************************************
+ *
+ *	s h o w _ v a r
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display a global variables.
+ *
+ **************************************/
+	const qli_fld* variable;
+
+	for (variable = QLI_variables; variable; variable = variable->fld_next)
+	{
+		if (!strcmp(var_name->nam_string, variable->fld_name->sym_string))
+			break;
+	}
+
+	if (!variable)
+	{
+		ERRQ_msg_put(474, var_name->nam_string);	// Msg474 Variable %s has not been declared
+		return;
+	}
+
+	ERRQ_msg_put(471, variable->fld_name->sym_string);	// Msg471 Variable %s
+	ERRQ_msg_put(475);
+	printf("\t");
+	show_datatype(NULL, variable->fld_dtype,
+				  (variable->fld_dtype == dtype_varying) ?
+				  	variable->fld_length - 2 : variable->fld_length,
+				  variable->fld_scale,
+				  variable->fld_sub_type, variable->fld_segment_length,
+				  (variable->fld_flags & FLD_array) ? 1 : 0);
+	printf("\n");
+	if (variable->fld_query_name) {
+		ERRQ_msg_put(472, variable->fld_query_name->sym_string);
+	}
+	if (variable->fld_edit_string)
+		ERRQ_msg_put(473, variable->fld_edit_string);
+}
+
+
+static void show_vars()
+{
+/**************************************
+ *
+ *	s h o w _ v a r s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Display global variables.  If there aren't any, don't
+ *	display any.
+ *
+ **************************************/
+	ERRQ_msg_put(132);	// Msg132 Variables:
+	show_fields(NULL, QLI_variables);
+}
+
+
+static void show_versions()
+{
+/**************************************
+ *
+ *	s h o w _ v e r s i o n s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show the version for QLI and all databases.
+ *
+ **************************************/
+	ERRQ_msg_put(133, FB_VERSION);	// Msg133 QLI, version %s
+
+	for (qli_dbb* dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+	{
+		ERRQ_msg_put(134, dbb->dbb_filename);
+		// Msg134 Version(s) for database %s
+		isc_version(&dbb->dbb_handle, NULL, NULL);
+	}
+}
+
+
+static void show_view( qli_rel* relation)
+{
+/**************************************
+ *
+ *	s h o w _ v i e w
+ *
+ **************************************
+ *
+ * Functional description
+ *	Call MET to show the view definition
+ *	if there is one.
+ *
+ **************************************/
+	qli_dbb* database = relation->rel_database;
+	MET_meta_transaction(database, false);
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_view])
+		X IN RDB$RELATIONS
+			WITH X.RDB$RELATION_NAME EQ relation->rel_symbol->sym_string
+			AND X.RDB$VIEW_BLR NOT MISSING
+
+		if (X.RDB$VIEW_SOURCE.NULL)
+		{
+			ERRQ_msg_put(312, relation->rel_symbol->sym_string);
+			// Msg312 View source for relation %s is not available.  View BLR:
+			display_blr(database, X.RDB$VIEW_BLR);
+		}
+		else
+		{
+			ERRQ_msg_put(313, relation->rel_symbol->sym_string);
+			// Msg313 Relation %s is a view defined as:
+			show_text_blob(database, "\t", 0, &X.RDB$VIEW_SOURCE, 0, NULL, false);
+		}
+	END_FOR;
+}
+
+
+static int show_views_detail( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s h o w _ v i e w s _ d e t a i l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Show the view definitions.  If none, return 0.
+ *
+ **************************************/
+	MET_meta_transaction(database, false);
+	int count = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_views])
+		X IN RDB$RELATIONS WITH X.RDB$VIEW_BLR NOT MISSING
+			SORTED BY X.RDB$RELATION_NAME
+
+		if (!count++)
+		{
+			ERRQ_msg_put(316, database->dbb_symbol->sym_string);
+			// Msg316 Views in database %s:
+		}
+
+		fb_utils::exact_name(X.RDB$RELATION_NAME);
+		ERRQ_msg_put(317, X.RDB$RELATION_NAME);	// Msg317 %s comprised of:
+		FOR(REQUEST_HANDLE database->dbb_requests[REQ_show_view_rel])
+			V IN RDB$VIEW_RELATIONS
+				WITH V.RDB$VIEW_NAME = X.RDB$RELATION_NAME
+				SORTED BY V.RDB$RELATION_NAME
+			printf("	%s\n", V.RDB$RELATION_NAME);
+		END_FOR;
+
+	END_FOR;
+
+	return count;
+}
+
+
+static void view_info(qli_dbb* dbb,
+					  const TEXT* view,
+					  const TEXT* base_field,
+					  SSHORT context,
+					  SSHORT level)
+{
+/**************************************
+ *
+ *	v i e w _ i n f o
+ *
+ **************************************
+ *
+ * Functional description
+ *
+ *	field came from another relation.
+ *	expand on this phenomenon.
+ *
+ **************************************/
+	TEXT spaces[64];
+
+	FOR(REQUEST_HANDLE dbb->dbb_requests[REQ_show_view_field] LEVEL level)
+		RFR IN RDB$RELATION_FIELDS CROSS VR IN RDB$VIEW_RELATIONS
+			WITH RFR.RDB$FIELD_NAME = base_field AND
+			RFR.RDB$RELATION_NAME = VR.RDB$RELATION_NAME AND
+			VR.RDB$VIEW_NAME = view AND
+			VR.RDB$VIEW_CONTEXT = context
+		fb_utils::exact_name(RFR.RDB$RELATION_NAME);
+
+		// create some space according to how many levels deep we are;
+		// this is to avoid using %*s in the printf, which doesn't work for OS/2
+		TEXT* p = spaces;
+		for (const TEXT* const end = spaces + MIN((level + 2) * 4, static_cast<int>(sizeof(spaces) - 1));
+			p < end;)
+		{
+			*p++ = ' ';
+		}
+		*p = '\0';
+
+		if (RFR.RDB$BASE_FIELD.NULL)
+		{
+			ERRQ_msg_put(507, SafeArg() << spaces << base_field << RFR.RDB$RELATION_NAME);
+		// Msg507 %s Based on field %s of relation %s
+		}
+		else
+		{
+			ERRQ_msg_put(508, SafeArg() << spaces << base_field << RFR.RDB$RELATION_NAME);
+		// Msg508 %s Based on field %s of view %s
+		}
+		show_text_blob(dbb, "\t", 349, &RFR.RDB$DESCRIPTION, 0, NULL, false);
+
+		if (!RFR.RDB$DESCRIPTION.NULL)
+		{
+			ERRQ_msg_put(349, SafeArg() << spaces << base_field);
+			// Msg349 %sBase field description for %s:
+			show_text_blob(dbb, "\t\t", 0, &RFR.RDB$DESCRIPTION, 0, NULL, false);
+		}
+
+		if (!RFR.RDB$BASE_FIELD.NULL && (dbb->dbb_capabilities & DBB_cap_multi_trans))
+		{
+			fb_utils::exact_name(RFR.RDB$BASE_FIELD);
+			view_info(dbb, RFR.RDB$RELATION_NAME, RFR.RDB$BASE_FIELD,
+					  RFR.RDB$VIEW_CONTEXT, level + 1);
+		}
+	END_FOR;
+}

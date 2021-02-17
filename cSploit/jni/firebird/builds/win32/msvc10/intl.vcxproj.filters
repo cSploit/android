@@ -1,0 +1,130 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="INTL files">
+      <UniqueIdentifier>{023515a1-e852-4346-9992-31ef1b8cb002}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{7124f9ff-8c59-466e-916e-5f13ed7f2c53}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{8e2ee845-fff9-4741-891d-132cfbad590e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\intl\cs_big5.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cs_gb2312.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cs_icu.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cs_jis.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cs_ksc.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cs_narrow.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cs_unicode_fss.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cs_unicode_ucs2.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cv_big5.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cv_gb2312.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cv_icu.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cv_jis.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cv_ksc.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cv_narrow.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\cv_unicode_fss.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_ascii.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_big5.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_dos.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_gb2312.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_icu.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_iso8859_1.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_iso8859_13.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_iso8859_2.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_jis.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_ksc.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_narrow.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\lc_unicode_ucs2.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\ld.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\intl\kanji.cpp">
+      <Filter>INTL files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\intl\ldcommon.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\intl\charsets.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\intl\country_codes.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\intl\ld.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\intl\ld_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\defs\intl.def" />
+  </ItemGroup>
+</Project>

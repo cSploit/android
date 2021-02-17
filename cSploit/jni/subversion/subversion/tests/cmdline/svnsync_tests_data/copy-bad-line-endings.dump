@@ -1,0 +1,48 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 0e893bae-2d4c-452c-8616-b774d5b9104e
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2009-03-27T19:25:43.035921Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 151
+Content-length: 151
+
+K 10
+svn:author
+V 7
+smithma
+K 8
+svn:date
+V 27
+2009-03-27T19:33:51.178381Z
+K 7
+svn:log
+V 49
+added svn:ignore using CRLF to terminate lines
+
+PROPS-END
+
+Node-path: 
+Node-kind: dir
+Node-action: change
+Prop-content-length: 55
+Content-length: 55
+
+K 10
+svn:ignore
+V 23
+target
+target-eclipse
+
+PROPS-END
+
+

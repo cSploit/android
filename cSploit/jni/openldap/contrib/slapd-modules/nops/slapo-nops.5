@@ -1,0 +1,32 @@
+.TH SLAPO-NOPS 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2008 Emmanuel Dreyfus
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapo-nops \- Remove Null Operations Overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+Some broken client tend to implement modifications as replace operations
+where all attributes are replaced, most of the time by the same values
+they had before. This can cause undesirable load on logs, ACL evaluation, 
+or replication trafic.
+
+This overlay detects idempotent replace operations and filter them out.
+.SH CONFIGURATION
+This overlay had no specific configuration.
+.SH EXAMPLES
+.LP
+.RS
+.nf
+overlay nops
+.RE
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5).
+.SH ACKNOWLEDGEMENTS
+This module was written in 2008 by Emmanuel Dreyfus.
+.so ../Project

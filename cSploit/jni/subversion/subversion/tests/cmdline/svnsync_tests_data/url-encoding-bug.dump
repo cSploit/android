@@ -1,0 +1,107 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 182b6a41-8020-0410-bcb2-35c7cd5e7ab9
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2006-10-23T20:25:32.242666Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 101
+Content-length: 101
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2006-10-23T20:26:00.932678Z
+K 7
+svn:log
+V 1
+,
+PROPS-END
+
+Node-path: foo%20bar.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 15
+Text-content-md5: e58d666df0d6cc6e87a7e48440d637e9
+Text-content-sha1: ca53b1f604b633a6bc3cf75325932596efc4717f
+Content-length: 25
+
+PROPS-END
+blah blah blah
+
+
+Revision-number: 2
+Prop-content-length: 101
+Content-length: 101
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2006-10-23T20:26:12.565554Z
+K 7
+svn:log
+V 1
+,
+PROPS-END
+
+Node-path: foo bar.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 1
+Node-copyfrom-path: foo%20bar.txt
+Text-copy-source-md5: e58d666df0d6cc6e87a7e48440d637e9
+Text-copy-source-sha1: ca53b1f604b633a6bc3cf75325932596efc4717f
+
+
+Node-path: foo%20bar.txt
+Node-action: delete
+
+
+Revision-number: 3
+Prop-content-length: 102
+Content-length: 102
+
+K 10
+svn:author
+V 7
+jrandom
+K 8
+svn:date
+V 27
+2006-10-23T20:52:11.378819Z
+K 7
+svn:log
+V 1
+,
+PROPS-END
+
+Node-path: foo%20bar.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 2
+Node-copyfrom-path: foo bar.txt
+Text-copy-source-md5: e58d666df0d6cc6e87a7e48440d637e9
+Text-copy-source-sha1: ca53b1f604b633a6bc3cf75325932596efc4717f
+
+
+Node-path: foo bar.txt
+Node-action: delete
+
+

@@ -1,0 +1,338 @@
+<!--
+doc/src/sgml/ref/insert.sgml
+PostgreSQL documentation
+-->
+
+<refentry id="SQL-INSERT">
+ <refmeta>
+  <refentrytitle>INSERT</refentrytitle>
+  <manvolnum>7</manvolnum>
+  <refmiscinfo>SQL - Language Statements</refmiscinfo>
+ </refmeta>
+
+ <refnamediv>
+  <refname>INSERT</refname>
+  <refpurpose>create new rows in a table</refpurpose>
+ </refnamediv>
+
+ <indexterm zone="sql-insert">
+  <primary>INSERT</primary>
+ </indexterm>
+
+ <refsynopsisdiv>
+<synopsis>
+[ WITH [ RECURSIVE ] <replaceable class="parameter">with_query</replaceable> [, ...] ]
+INSERT INTO <replaceable class="PARAMETER">table</replaceable> [ ( <replaceable class="PARAMETER">column</replaceable> [, ...] ) ]
+    { DEFAULT VALUES | VALUES ( { <replaceable class="PARAMETER">expression</replaceable> | DEFAULT } [, ...] ) [, ...] | <replaceable class="PARAMETER">query</replaceable> }
+    [ RETURNING * | <replaceable class="parameter">output_expression</replaceable> [ [ AS ] <replaceable class="parameter">output_name</replaceable> ] [, ...] ]
+</synopsis>
+ </refsynopsisdiv>
+
+ <refsect1>
+  <title>Description</title>
+
+  <para>
+   <command>INSERT</command> inserts new rows into a table.
+   One can insert one or more rows specified by value expressions,
+   or zero or more rows resulting from a query.
+  </para>
+
+  <para>
+   The target column names can be listed in any order.  If no list of
+   column names is given at all, the default is all the columns of the
+   table in their declared order; or the first <replaceable>N</> column
+   names, if there are only <replaceable>N</> columns supplied by the
+   <literal>VALUES</> clause or <replaceable>query</>.  The values
+   supplied by the <literal>VALUES</> clause or <replaceable>query</> are
+   associated with the explicit or implicit column list left-to-right.
+  </para>
+
+  <para>
+   Each column not present in the explicit or implicit column list will be
+   filled with a default value, either its declared default value
+   or null if there is none.
+  </para>
+
+  <para>
+   If the expression for any column is not of the correct data type,
+   automatic type conversion will be attempted.
+  </para>
+
+  <para>
+   The optional <literal>RETURNING</> clause causes <command>INSERT</>
+   to compute and return value(s) based on each row actually inserted.
+   This is primarily useful for obtaining values that were supplied by
+   defaults, such as a serial sequence number.  However, any expression
+   using the table's columns is allowed.  The syntax of the
+   <literal>RETURNING</> list is identical to that of the output list
+   of <command>SELECT</>.
+  </para>
+
+  <para>
+   You must have <literal>INSERT</literal> privilege on a table in
+   order to insert into it.  If a column list is specified, you only
+   need <literal>INSERT</literal> privilege on the listed columns.
+   Use of the <literal>RETURNING</> clause requires <literal>SELECT</>
+   privilege on all columns mentioned in <literal>RETURNING</>.
+   If you use the <replaceable
+   class="PARAMETER">query</replaceable> clause to insert rows from a
+   query, you of course need to have <literal>SELECT</literal> privilege on
+   any table or column used in the query.
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>Parameters</title>
+
+  <variablelist>
+   <varlistentry>
+    <term><replaceable class="parameter">with_query</replaceable></term>
+    <listitem>
+     <para>
+      The <literal>WITH</literal> clause allows you to specify one or more
+      subqueries that can be referenced by name in the <command>INSERT</>
+      query. See <xref linkend="queries-with"> and <xref linkend="sql-select">
+      for details.
+     </para>
+     <para>
+      It is possible for the <replaceable class="parameter">query</replaceable>
+      (<command>SELECT</command> statement)
+      to also contain a <literal>WITH</literal> clause.  In such a case both
+      sets of <replaceable>with_query</replaceable> can be referenced within
+      the <replaceable class="parameter">query</replaceable>, but the
+      second one takes precedence since it is more closely nested.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="PARAMETER">table</replaceable></term>
+    <listitem>
+     <para>
+      The name (optionally schema-qualified) of an existing table.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="PARAMETER">column</replaceable></term>
+    <listitem>
+     <para>
+      The name of a column in <replaceable class="PARAMETER">table</replaceable>.
+      The column name can be qualified with a subfield name or array
+      subscript, if needed.  (Inserting into only some fields of a
+      composite column leaves the other fields null.)
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>DEFAULT VALUES</literal></term>
+    <listitem>
+     <para>
+      All columns will be filled with their default values.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="PARAMETER">expression</replaceable></term>
+    <listitem>
+     <para>
+      An expression or value to assign to the corresponding <replaceable
+      class="PARAMETER">column</replaceable>.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>DEFAULT</literal></term>
+    <listitem>
+     <para>
+      The corresponding <replaceable>column</replaceable> will be filled with
+      its default value.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="PARAMETER">query</replaceable></term>
+    <listitem>
+     <para>
+      A query (<command>SELECT</command> statement) that supplies the
+      rows to be inserted.  Refer to the
+      <xref linkend="sql-select">
+      statement for a description of the syntax.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="PARAMETER">output_expression</replaceable></term>
+    <listitem>
+     <para>
+      An expression to be computed and returned by the <command>INSERT</>
+      command after each row is inserted.  The expression can use any
+      column names of the <replaceable class="PARAMETER">table</replaceable>.
+      Write <literal>*</> to return all columns of the inserted row(s).
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="PARAMETER">output_name</replaceable></term>
+    <listitem>
+     <para>
+      A name to use for a returned column.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </refsect1>
+
+ <refsect1>
+  <title>Outputs</title>
+
+  <para>
+   On successful completion, an <command>INSERT</> command returns a command
+   tag of the form
+<screen>
+INSERT <replaceable>oid</replaceable> <replaceable class="parameter">count</replaceable>
+</screen>
+   The <replaceable class="parameter">count</replaceable> is the number
+   of rows inserted.  If <replaceable class="parameter">count</replaceable>
+   is exactly one, and the target table has OIDs, then
+   <replaceable class="parameter">oid</replaceable> is the
+   <acronym>OID</acronym> assigned to the inserted row.  Otherwise
+   <replaceable class="parameter">oid</replaceable> is zero.
+  </para>
+
+  <para>
+   If the <command>INSERT</> command contains a <literal>RETURNING</>
+   clause, the result will be similar to that of a <command>SELECT</>
+   statement containing the columns and values defined in the
+   <literal>RETURNING</> list, computed over the row(s) inserted by the
+   command.
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>Examples</title>
+
+  <para>
+   Insert a single row into table <literal>films</literal>:
+
+<programlisting>
+INSERT INTO films VALUES
+    ('UA502', 'Bananas', 105, '1971-07-13', 'Comedy', '82 minutes');
+</programlisting>
+  </para>
+
+  <para>
+   In this example, the <literal>len</literal> column is
+   omitted and therefore it will have the default value:
+
+<programlisting>
+INSERT INTO films (code, title, did, date_prod, kind)
+    VALUES ('T_601', 'Yojimbo', 106, '1961-06-16', 'Drama');
+</programlisting>
+  </para>
+
+  <para>
+   This example uses the <literal>DEFAULT</literal> clause for
+   the date columns rather than specifying a value:
+
+<programlisting>
+INSERT INTO films VALUES
+    ('UA502', 'Bananas', 105, DEFAULT, 'Comedy', '82 minutes');
+INSERT INTO films (code, title, did, date_prod, kind)
+    VALUES ('T_601', 'Yojimbo', 106, DEFAULT, 'Drama');
+</programlisting>
+  </para>
+
+  <para>
+   To insert a row consisting entirely of default values:
+
+<programlisting>
+INSERT INTO films DEFAULT VALUES;
+</programlisting>
+  </para>
+
+  <para>
+   To insert multiple rows using the multirow <command>VALUES</> syntax:
+
+<programlisting>
+INSERT INTO films (code, title, did, date_prod, kind) VALUES
+    ('B6717', 'Tampopo', 110, '1985-02-10', 'Comedy'),
+    ('HG120', 'The Dinner Game', 140, DEFAULT, 'Comedy');
+</programlisting>
+  </para>
+
+  <para>
+   This example inserts some rows into table
+   <literal>films</literal> from a table <literal>tmp_films</literal>
+   with the same column layout as <literal>films</literal>:
+
+<programlisting>
+INSERT INTO films SELECT * FROM tmp_films WHERE date_prod &lt; '2004-05-07';
+</programlisting>
+  </para>
+
+  <para>
+   This example inserts into array columns:
+
+<programlisting>
+-- Create an empty 3x3 gameboard for noughts-and-crosses
+INSERT INTO tictactoe (game, board[1:3][1:3])
+    VALUES (1, '{{" "," "," "},{" "," "," "},{" "," "," "}}');
+-- The subscripts in the above example aren't really needed
+INSERT INTO tictactoe (game, board)
+    VALUES (2, '{{X," "," "},{" ",O," "},{" ",X," "}}');
+</programlisting>
+  </para>
+
+  <para>
+   Insert a single row into table <literal>distributors</literal>, returning
+   the sequence number generated by the <literal>DEFAULT</literal> clause:
+
+<programlisting>
+INSERT INTO distributors (did, dname) VALUES (DEFAULT, 'XYZ Widgets')
+   RETURNING did;
+</programlisting>
+  </para>
+
+  <para>
+   Increment the sales count of the salesperson who manages the
+   account for Acme Corporation, and record the whole updated row
+   along with current time in a log table:
+<programlisting>
+WITH upd AS (
+  UPDATE employees SET sales_count = sales_count + 1 WHERE id =
+    (SELECT sales_person FROM accounts WHERE name = 'Acme Corporation')
+    RETURNING *
+)
+INSERT INTO employees_log SELECT *, current_timestamp FROM upd;
+</programlisting></para>
+ </refsect1>
+
+ <refsect1>
+  <title>Compatibility</title>
+
+  <para>
+   <command>INSERT</command> conforms to the SQL standard, except that
+   the <literal>RETURNING</> clause is a
+   <productname>PostgreSQL</productname> extension, as is the ability
+   to use <literal>WITH</> with <command>INSERT</>.
+   Also, the case in
+   which a column name list is omitted, but not all the columns are
+   filled from the <literal>VALUES</> clause or <replaceable>query</>,
+   is disallowed by the standard.
+  </para>
+
+  <para>
+   Possible limitations of the <replaceable
+   class="PARAMETER">query</replaceable> clause are documented under
+   <xref linkend="sql-select">.
+  </para>
+ </refsect1>
+</refentry>

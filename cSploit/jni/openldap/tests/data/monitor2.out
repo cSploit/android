@@ -1,0 +1,40 @@
+dn: cn=Database 0,cn=Databases,cn=Monitor
+structuralObjectClass: monitoredObject
+monitorIsShadow: FALSE
+namingContexts: cn=config
+readOnly: FALSE
+entryDN: cn=Database 0,cn=Databases,cn=Monitor
+
+dn: cn=Database 1,cn=Databases,cn=Monitor
+structuralObjectClass: monitoredObject
+monitorIsShadow: FALSE
+namingContexts: o=OpenLDAP Project,l=Internet
+readOnly: FALSE
+olmBDBEntryCache: 0
+olmBDBDNCache: 0
+olmBDBIDLCache: 0
+entryDN: cn=Database 1,cn=Databases,cn=Monitor
+
+dn: cn=Database 2,cn=Databases,cn=Monitor
+structuralObjectClass: monitoredObject
+monitorIsShadow: FALSE
+monitorContext: cn=Monitor
+readOnly: FALSE
+entryDN: cn=Database 2,cn=Databases,cn=Monitor
+
+dn: cn=Databases,cn=Monitor
+structuralObjectClass: monitorContainer
+readOnly: FALSE
+namingContexts:
+namingContexts: cn=config
+namingContexts: o=OpenLDAP Project,l=Internet
+monitorContext: cn=Monitor
+entryDN: cn=Databases,cn=Monitor
+
+dn: cn=Frontend,cn=Databases,cn=Monitor
+structuralObjectClass: monitoredObject
+monitorIsShadow: FALSE
+namingContexts:
+readOnly: FALSE
+entryDN: cn=Frontend,cn=Databases,cn=Monitor
+

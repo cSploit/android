@@ -1,0 +1,72 @@
+<?xml version='1.0'?>
+<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
+<!--
+    Service manifest for the firebird gds_db service.
+-->
+
+<service_bundle type='manifest' name='inetconv:gds_db'>
+
+<service
+	name='network/gds_db/tcp'
+	type='service'
+	version='1'>
+
+	<create_default_instance enabled='true'/>
+
+	<restarter>
+		<service_fmri value='svc:/network/inetd:default' />
+	</restarter>
+
+	<exec_method
+		type='method'
+		name='inetd_start'
+		exec='/opt/firebird/bin/fb_smp_server'
+		timeout_seconds='0'>
+		<method_context>
+			<method_credential user='firebird' group='firebird' />
+		</method_context>
+	</exec_method>
+
+	<!--
+	    Use inetd's built-in kill support to disable services.
+	-->
+	<exec_method
+		type='method'
+		name='inetd_disable'
+		exec=':kill'
+		timeout_seconds='0'>
+	</exec_method>
+
+	<!--
+	    This property group is used to record information about
+	    how this manifest was created.  It is an implementation
+	    detail which should not be modified or deleted.
+	-->
+	<property_group name='inetconv' type='framework'>
+		<propval name='converted' type='boolean' value='true' />
+		<propval name='version' type='integer' value='1' />
+		<propval name='source_line' type='astring' value=
+'gds_db stream tcp nowait firebird /opt/firebird/bin/fb_smp_server fb_smp_server'
+		/>
+	</property_group>
+
+	<property_group name='inetd' type='framework'>
+		<propval name='name' type='astring' value='gds_db' />
+		<propval name='endpoint_type' type='astring' value='stream' />
+		<propval name='proto' type='astring' value='tcp' />
+		<propval name='wait' type='boolean' value='false' />
+		<propval name='isrpc' type='boolean' value='false' />
+	</property_group>
+
+	<stability value='External' />
+
+	<template>
+		<common_name>
+			<loctext xml:lang='C'>
+gds_db
+			</loctext>
+		</common_name>
+	</template>
+</service>
+
+</service_bundle>

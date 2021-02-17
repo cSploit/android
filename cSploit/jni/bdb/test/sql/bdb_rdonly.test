@@ -1,0 +1,77 @@
+#
+#    May you do good and not evil.
+#    May you find forgiveness for yourself and forgive others.
+#    May you share freely, never taking more than you give.
+#
+#***********************************************************************
+# This file implements regression tests for handling read only and 
+# read write open of the same database in BDB SQL
+#
+
+set testdir [file dirname $argv0]/../../lang/sql/sqlite/test
+source $testdir/tester.tcl
+reset_db
+
+# Test bdb_rdonly-1
+# 1. Create a table for test.
+# 2. Open a read write connection.
+# 3. Open another connection readonly and ensure that it cannot update
+# 4. Ensure that the first connection still can update
+do_test bdb_rdonly-1.1 {
+  execsql {
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(1);
+    SELECT * FROM t1;
+  }
+} {1}
+ 
+# Ensure that the readonly connection can not update
+do_test bdb_rdonly-1.2 {
+  sqlite3 dbr test.db -readonly 1
+  catchsql {
+    INSERT INTO t1 VALUES(2);
+  } dbr
+} {1 {attempt to write a readonly database}}
+
+# Ensure that the read write connection still can update
+do_test bdb_rdonly-1.3 {
+  catchsql {
+    INSERT INTO t1 VALUES(2);
+    SELECT * FROM t1;
+  }
+} {0 {1 2}}
+catch {dbr close}
+reset_db
+
+# Test bdb_rdonly-2
+# 1. Create a table for test.
+# 2. Open a readonly connection.
+# 3. Ensure that the read write connection still can update
+# 4. Ensure that the first connection can not update
+do_test bdb_rdonly-2.1 {
+  execsql {
+    CREATE TABLE t1(x);
+    INSERT INTO t1 VALUES(1);
+    SELECT * FROM t1;
+  }
+} {1}
+ 
+# Ensure that the read write connection still can update
+do_test bdb_rdonly-2.2 {
+  sqlite3 dbr test.db -readonly 1
+  catchsql {
+    INSERT INTO t1 VALUES(2);
+    SELECT * FROM t1;
+  }
+} {0 {1 2}}
+
+# Ensure that the readonly connection can not update
+do_test bdb_rdonly-2.3 {
+  catchsql {
+    INSERT INTO t1 VALUES(2);
+  } dbr
+} {1 {attempt to write a readonly database}}
+catch {dbr close}
+reset_db
+ 
+finish_test

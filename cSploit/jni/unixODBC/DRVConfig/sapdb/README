@@ -1,0 +1,26 @@
+***************************************************************
+* This code is LGPL. You CAN make commercial solutions using  *
+* LGPL software.                                              *
+***************************************************************
+
++-------------------------------------------------------------+
+| unixODBC                                                    |
+| Driver Config for SAP DB SQL Server options                 |
++-------------------------------------------------------------+
+
+
+SAP DB awaits it's odbc.ini file in /usr/spool/sql/config/odbc.ini.
+That's weird enought, because it's not even FHS (that would be
+/var/spool/...)  There are two ways you can fix this:
+
+- Edit the libsqlod.so file
+- make a symlink from /usr/spool/sql/config/odbc.ini to /etc/odbc.ini
+
+Also note that currently (09-Mar-2001) unixODBC crashes when you
+use the libsqlod from the sapdb-srv or sapdb-if RPM packages. If you
+use the one from the the sapdb-web RPM, then it works.
+
++-------------------------------------------------------------+
+| Holger Schurig holgerschurig@gmx.de                         |
+| http://home.nikocity.de/hschurig                            |
++-------------------------------------------------------------+

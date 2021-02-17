@@ -1,0 +1,161 @@
+                               -*- text -*-
+
+                     TREE CONFLICT TESTING STRATEGY
+
+
+This document describes how we are testing the code that detects,
+reports and resolves tree conflicts.  We'd like to make the testing,
+and the tree conflicts feature itself, more transparent and open to
+contributions.
+
+For tree conflicts, there already exist cmdline tests for the update,
+switch, merge, commit, status, info and revert commands.  We've added
+tree_conflicts_tests.py, not to replace the other tests, but rather to
+complement them by offering a generic way to create lots of
+tree-conflict detection test scenarios.  The generic framework is not
+yet finished, but we think it will be useful as we extend the
+tree-conflict feature beyond its original use cases.
+
+================
+The Declarations
+================
+
+The new tree-conflict testing framework offers a compact, declarative
+format for test definitions.  Elementary actions are combined into
+scenarios, scenarios are bundled into sets, and the sets are fed into
+a generic tree-conflict-maker.  A scenario can be committed to the
+test repository and then applied to the working copy by an update,
+switch or merge operation.  In another test, the same scenario can
+modify the working copy prior to an update or switch operation.
+
+An advantage of this abstraction is that it allows us to create
+additional tests easily through code reuse.  It also helps us to see
+beyond our 6 original use cases.
+
+A disadvantage is that test failures are rather opaque, but that could
+probably be fixed with some Python wizardry.
+
+The changes that can cause tree conflicts are composed from a set of
+elementary actions, each named according to its function.  For
+instance, fD signifies running 'svn delete' on a file.
+
+The first character of an action name specifies the type of the item
+acted upon.  The names of the items are fixed.
+
+  f_  Item is the file 'F'
+  d_  Item is the directory 'D'
+
+The second character of an action name can specify an svn operation.
+
+  _P  - Change a Property.
+          (Note: Presently just sets a particular property value, even
+           if that property already had that value.)
+
+  _A  - Create the item by Adding an unversioned item
+          (and set a property on it as well).
+          (Suggestion: Don't set a property here; let the user do so
+           explicitly with '_P' when desired. We'd have to ensure that
+           a subsequent '_P' later in the same test would still cause
+           a change; presently it would not.)
+  _C  - Create the item by Copying from an existing one.
+
+  _M  - Move the item to a different name.
+  _D  - Delete the item.
+
+Alternately, the second character can specify a non-svn filesystem
+operation.
+
+  _t  Append text to the file.
+
+  _a  Create the item on disk.
+
+  _d  Delete the item from disk.
+
+To help detect bugs in the test scenarios, each action, except for _a,
+first asserts that the item (F or D) exists on disk.
+
+Some actions operate on 2 items.  _C copies F1 to F (or D1 to D) and
+_M moves F to F2 (or D to D2).  The items F, F1, D and D1 are created,
+added and committed by a generic test-setup function. F2 and D2 do not
+exist at the start of a test.
+
+The arguments for copy and move are not symmetrical because we are
+interested only in the destination of a copy and the source of a move.
+The source of a copy is uninteresting, and the destination of a move
+is the same as that of a copy.
+
+The elementary actions are combined to form "scenarios".  A scenario
+is a literal Python tuple containing two lists of actions: the first
+list creates the starting point for the change to be tested, and the
+second being the actual change to be tested.  For example, this
+scenario represents a simple deletion of a file:
+
+  ( ['fa','fA'], ['fD'] )
+
+=================
+Behind the Scenes
+=================
+
+How are the scenarios actually used?
+
+The generic tree-conflict-maker is ensure_tree_conflict().  This
+function applies two sets of scenarios.  The "incoming" set is
+applied to the repository, and the "localmod" set is applied to the
+working copy.  Each possible combination of incoming and localmod
+scenarios is tested as an independent subtest.
+
+The incoming scenarios are prepared as follows.
+
+1. Run the usual Subversion test setup, sbox.build(), which creates a
+test repository containing the "greek tree" (as revision 1) and checks
+out a working copy of it.
+
+2. For each incoming scenario, create the scenario path via 'svn
+mkdir'.
+
+3. For each incoming scenario, execute its initialisation actions which
+will typically create the file or directory that will be acted on later.
+
+4. Commit as revision 2.
+
+5. For each incoming scenario, execute its actions on the F or D in
+its scenario path.
+
+6. Commit as revision 3.
+
+Now the repository is loaded with all of the incoming scenarios.  To
+run the actual subtests, each incoming scenario must be applied to
+each localmod scenario.
+
+1. Check out a fresh working copy at revision 2.
+
+2. Execute the localmod scenario's actions on the F or D in its
+scenario path.
+
+3. For each incoming scenario, run the given svn command (e.g. update)
+on the incoming scenario's path, then run 'svn status' on the same
+path.  If the path is tree-conflicted, we're happy.
+
+The working copy is deleted and the steps are repeated for next
+localmod scenario.  If any failure occurs, the whole test is marked as
+a failure in the test output.
+
+Each test scenario is executed in a unique path created from the actions
+in the action list, concatenated with "_" between them.  For the above
+example, that path would be simply "fD".  The use of a unique path could
+allow running many of them in parallel.  Currently, we run the scenarios
+one-by-one, each in a fresh working copy.
+
+==============
+Current Status
+==============
+
+The following features are sketched out in the scenario data, but not
+tested:
+
+  Obstructions
+
+  Replacement (file->file, dir->dir)
+
+  'svn switch'
+

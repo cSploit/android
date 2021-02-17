@@ -1,0 +1,75 @@
+--- Makefile.in
++++ Makefile.in
+@@ -163,8 +163,8 @@
+ #
+ LIBOBJS0 = alter.lo analyze.lo attach.lo auth.lo \
+          backup.lo bitvec.lo btmutex.lo btree.lo build.lo \
+-         callback.lo complete.lo ctime.lo date.lo db_pragma.lo db_shell.lo \
+-         delete.lo expr.lo fault.lo fkey.lo \
++         callback.lo complete.lo ctime.lo date.lo db_encrypt.lo db_pragma.lo \
++         db_shell.lo delete.lo expr.lo fault.lo fkey.lo \
+          fts3.lo fts3_aux.lo fts3_expr.lo fts3_hash.lo fts3_icu.lo \
+          fts3_porter.lo fts3_snippet.lo fts3_tokenizer.lo fts3_tokenizer1.lo \
+          fts3_unicode.lo fts3_unicode2.lo fts3_write.lo \
+@@ -208,6 +208,7 @@
+   $(TOP)/src/complete.c \
+   $(TOP)/src/ctime.c \
+   $(TOP)/src/date.c \
++  $(TOP)/../adapter/db_encrypt.c \
+   $(TOP)/../adapter/db_pragma.c \
+   $(TOP)/../adapter/db_shell.c \
+   $(TOP)/src/delete.c \
+@@ -596,6 +597,10 @@
+ date.lo:	$(TOP)/src/date.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/date.c
+ 
++db_encrypt.lo:	$(TOP)/../adapter/db_encrypt.c $(HDR) \
++		$(TOP)/../adapter/btreeInt.h
++	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_encrypt.c
++
+ db_pragma.lo:	$(TOP)/../adapter/db_pragma.c $(HDR) \
+ 		$(TOP)/../adapter/btreeInt.h
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_pragma.c
+--- src/tclsqlite.c
++++ src/tclsqlite.c
+@@ -3023,7 +3023,13 @@
+   }
+ #ifdef SQLITE_HAS_CODEC
+   if( p->db ){
+-    sqlite3_key(p->db, pKey, nKey);
++    rc = sqlite3_key(p->db, pKey, nKey);
++    if( rc ){
++      zErrMsg = sqlite3_mprintf("%s", sqlite3ErrStr(rc));
++      sqlite3_close(p->db);
++      p->db = 0;
++    }
++
+   }
+ #endif
+   if( p->db==0 ){
+--- test/vtab1.test
++++ test/vtab1.test
+@@ -878,8 +878,12 @@
+ ifcapable attach {
+   do_test vtab1.8-1 {
+     set echo_module ""
++    set key ""
++    if {[sqlite -has-codec]} {
++      set key "xyzzy"
++    }
+     execsql {
+-      ATTACH 'test2.db' AS aux;
++      ATTACH 'test2.db' AS aux KEY $key;
+       CREATE VIRTUAL TABLE aux.e2 USING echo(real_abc);
+     }
+     set echo_module
+--- tool/mksqlite3c.tcl
++++ tool/mksqlite3c.tcl
+@@ -260,6 +260,7 @@
+    btmutex.c
+    btree.c
+    backup.c
++   db_encrypt.c
+    db_pragma.c
+    db_shell.c
+ 

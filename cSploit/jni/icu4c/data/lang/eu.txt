@@ -1,0 +1,257 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/eu.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/eu.xml
+ */
+eu{
+    Keys{
+        calendar{"egutegia"}
+        collation{"alfabetoa"}
+        currency{"moneta"}
+    }
+    Languages{
+        af{"afrikaans"}
+        am{"amharikera"}
+        ar{"arabiera"}
+        as{"assamera"}
+        az{"azerbaijanera"}
+        be{"bielorrusiera"}
+        bg{"bulgariera"}
+        bh{"bihariera"}
+        bn{"bengalera"}
+        br{"bretoiera"}
+        bs{"bosniera"}
+        ca{"katalana"}
+        cs{"txekiera"}
+        cy{"galesera"}
+        da{"daniera"}
+        de{"alemana"}
+        el{"greziera"}
+        en{"ingelera"}
+        en_AU{"ingelesa (Australia)"}
+        en_GB{"ingelesa (Erresuma Batua)"}
+        en_US{"ingelesa (AEB)"}
+        eo{"esperantoa"}
+        es{"espainiera"}
+        et{"estoniera"}
+        eu{"euskara"}
+        fa{"pertsiera"}
+        fi{"finlandiera"}
+        fil{"tagalo"}
+        fo{"faroera"}
+        fr{"frantsesa"}
+        fy{"frisiarra"}
+        ga{"gaelikoa"}
+        gd{"eskoziar gaelikoa"}
+        gl{"galegoa"}
+        gn{"guaraniera"}
+        gu{"gujaratera"}
+        he{"hebreera"}
+        hi{"hindia"}
+        hr{"kroaziera"}
+        hu{"hungariera"}
+        hy{"armeniera"}
+        ia{"interlingua"}
+        id{"indonesiera"}
+        ie{"interlingue"}
+        is{"islandiera"}
+        it{"italiera"}
+        ja{"japoniera"}
+        jv{"javera"}
+        ka{"georgiera"}
+        km{"khemerera"}
+        kn{"kannada"}
+        ko{"koreera"}
+        ku{"kurduera"}
+        ky{"kirgizera"}
+        la{"latina"}
+        ln{"lingala"}
+        lo{"laosera"}
+        lt{"lituaniera"}
+        lv{"letoniera"}
+        mk{"mazedoniera"}
+        ml{"malayalamera"}
+        mn{"mongoliera"}
+        mr{"marathera"}
+        ms{"malaysiera"}
+        mt{"maltera"}
+        ne{"nepalera"}
+        nl{"nederlandera"}
+        nn{"norvegiera berria"}
+        no{"norvegiera"}
+        oc{"okzitaniera"}
+        or{"oriya"}
+        pa{"punjabera"}
+        pl{"poloniera"}
+        ps{"paxtuera"}
+        pt{"portugalera"}
+        pt_BR{"portugesa (Brasil)"}
+        pt_PT{"portugesa (Potugal)"}
+        ro{"errumaniera"}
+        ru{"errusiera"}
+        sa{"sanskritoa"}
+        sd{"sindhia"}
+        sh{"serbokroaziera"}
+        si{"sinhala"}
+        sk{"eslovakiera"}
+        sl{"esloveniera"}
+        so{"somaliera"}
+        sq{"albaniera"}
+        sr{"serbiera"}
+        st{"sesothoera"}
+        su{"sundanera"}
+        sv{"suediera"}
+        sw{"swahili"}
+        swb{"swb"}
+        ta{"tamilera"}
+        te{"telugua"}
+        th{"thailandiera"}
+        ti{"tigrinya"}
+        tk{"turkmeniera"}
+        tl{"tagalog"}
+        tlh{"klingonera"}
+        tr{"turkiera"}
+        tw{"twia"}
+        ug{"uigurrera"}
+        uk{"ukrainera"}
+        ur{"urdu"}
+        uz{"uzbekera"}
+        vi{"vietnamera"}
+        xh{"xhosa"}
+        yi{"yiddishera"}
+        yue{"yue"}
+        zh{"txinera"}
+        zh_Hans{"txinera (soildua)"}
+        zh_Hant{"txinera (tradizionala)"}
+        zu{"zuluera"}
+    }
+    Scripts{
+        Arab{"Arab"}
+        Armi{"Armi"}
+        Armn{"Armn"}
+        Avst{"Avst"}
+        Bali{"Bali"}
+        Batk{"Batk"}
+        Beng{"Beng"}
+        Blis{"Blis"}
+        Bopo{"Bopo"}
+        Brah{"Brah"}
+        Brai{"Brai"}
+        Bugi{"Bugi"}
+        Buhd{"Buhd"}
+        Cakm{"Cakm"}
+        Cari{"Cari"}
+        Cham{"Cham"}
+        Cher{"Txer"}
+        Cirt{"Cirt"}
+        Copt{"Copt"}
+        Cprt{"Cprt"}
+        Cyrl{"Cyrl"}
+        Deva{"Deva"}
+        Dsrt{"Dsrt"}
+        Egyd{"Egyd"}
+        Egyh{"Egyh"}
+        Egyp{"Egyp"}
+        Ethi{"Etiop"}
+        Geok{"Geok"}
+        Geor{"Geor"}
+        Glag{"Glag"}
+        Goth{"Goth"}
+        Grek{"Grek"}
+        Gujr{"Gujr"}
+        Guru{"Guru"}
+        Hang{"Hang"}
+        Hani{"Hani"}
+        Hano{"Hano"}
+        Hans{"Hans"}
+        Hant{"Hant"}
+        Hebr{"Hebr"}
+        Hira{"Hira"}
+        Hrkt{"Hrkt"}
+        Inds{"Inds"}
+        Java{"Java"}
+        Jpan{"Jpon"}
+        Kali{"Kali"}
+        Kana{"Kana"}
+        Khar{"Khar"}
+        Khmr{"Khmr"}
+        Knda{"Knda"}
+        Kore{"Kore"}
+        Kthi{"Kthi"}
+        Lana{"Lana"}
+        Laoo{"Laoo"}
+        Latf{"Latf"}
+        Latg{"Latg"}
+        Latn{"Latn"}
+        Lepc{"Lepc"}
+        Limb{"Limb"}
+        Lina{"Lina"}
+        Linb{"Linb"}
+        Lyci{"Lyci"}
+        Lydi{"Lydi"}
+        Mand{"Mand"}
+        Mani{"Mani"}
+        Maya{"Maia"}
+        Mero{"Mero"}
+        Mlym{"Mlym"}
+        Mong{"Mong"}
+        Moon{"Moon"}
+        Mtei{"Mtei"}
+        Mymr{"Mymr"}
+        Nkoo{"Nkoo"}
+        Phli{"Phli"}
+        Phlv{"Phlv"}
+        Prti{"Prti"}
+        Qaai{"Qaai"}
+        Syre{"Syre"}
+        Syrn{"Syrn"}
+        Talu{"Talu"}
+        Zmth{"Zmth"}
+        Zxxx{"Zxxx"}
+        Zyyy{"Zyyy"}
+        Zzzz{"Zzzz"}
+    }
+    Types{
+        calendar{
+            buddhist{"egutegi budista"}
+            chinese{"txinatar egutegia"}
+            gregorian{"egutegi gregoriarra"}
+            hebrew{"hebrear egutegia"}
+            indian{"indiar egutegia"}
+            islamic{"islamiar egutegia"}
+            islamic-civil{"islamiar egutegi zibila"}
+            japanese{"japoniar egutegia"}
+            roc{"Txinako Errepublikako egutegia"}
+        }
+        collation{
+            big5han{"Txinera tradizionalaren alfabetoa-Big5"}
+            direct{"Zuzena"}
+            gb2312han{"Txinera sinplifikatuaren alfabetoa -GB2312"}
+            phonebook{"Telefonoen zerrenda"}
+            traditional{"Tradizionala"}
+        }
+    }
+    Variants{
+        POLYTON{"POLITON"}
+        REVISED{"BERRIKUSIA"}
+        SAAHO{"SAHO"}
+        SCOTLAND{"ESKOZIAR INGELESA"}
+        VALENCIA{"VALENTZIERA"}
+    }
+    Version{"2.0.48.64"}
+    codePatterns{
+        language{"{0}"}
+        script{"{0}"}
+        territory{"{0}"}
+    }
+    localeDisplayPattern{
+        pattern{"{0} ({1})"}
+        separator{", "}
+    }
+}

@@ -1,0 +1,4 @@
+dn: ou=Other,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Other
+

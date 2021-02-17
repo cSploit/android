@@ -1,0 +1,67 @@
+===============================================================================
+
+TOPIC:      capture
+
+ABSTRACT:   this file describes how the capture process works within ettercap
+
+NOTE:       when in bridget sniffing, two thread are spawned, one for each
+            network interface.
+            
+===============================================================================
+
+
+ Here is represented in Very-High-Level-Language the capture thread behavior:
+
+
+   loop {
+      
+      receives a single packet from the pcap callback
+
+      updates the packet statistics
+
+      dump the packet to a file (if the user has requested it)
+   
+      if (truncated) continue;
+         
+      creates the packet object
+
+      determine the interface where the packet was captured
+   
+      HOOK POINT: HOOK_RECEIVED  
+
+      starts the protocol decoding
+         -> the packet is decoded by decoder and the po is filled
+            -> the ip and tcp sessions are created
+
+         -> the middle layer is called (only if TCP or UDP)
+            -> if (PO_DONT_DISSECT) return;
+            -> set the PO_IGNORE according to the visualization filters
+            -> HOOK POINT: HOOK_HANDLED
+            -> if (PO_IGNORE) return;
+            -> execute the dissectors
+            -> HOOK POINT: HOOK_DECODED
+            -> execute the filtering engine
+            -> HOOK POINT: HOOK_FILTER
+            -> a copy of the packet is added to the top_half queue
+   
+      if (PO_FORWARDABLE) {
+         HOOK POINT: HOOK_PRE_FORWARD
+         forward the packet to the real host (the victim)
+      }
+     
+      destroy the packet object
+      
+   }
+
+ Top_half thread behavior:
+
+   loop {
+      
+      extract a packet from the top_half queue
+
+      HOOK POINT: HOOK_DISPATCHER
+
+      destroy the packet
+   }
+
+EOF

@@ -1,0 +1,73 @@
+Examples for SQL
+================
+a) Common files:
+1.ex_sql_utils.c/h:    common utils
+
+b) There are 8 INDEPENDENT examples. They are NOT interdependent and only 
+   based on above common utils:
+1.ex_sql_load:          create table, insert, load csv files
+2.ex_sql_query:         select, order by, group by, subquery, SQL function
+3.ex_sql_index:         index, query explain
+4.ex_sql_statment:      prepare, iterate results, callback function
+5.ex_sql_transaction:   transaction, commit, rollback
+6.ex_sql_savepoint:     savepoint
+7.ex_sql_multi_thread:  multi-thread, transaction
+8.ex_sql_binding:       prepare, variable binding, transaction, bulk insert
+9.ex_sql_fts3:		full-text search features
+10.ex_sql_rtree:        create, maintain, and query r-tree index
+
+c) Sample data source:
+1.university.csv:       Sample data of table university
+2.country.csv:          Sample data of table country
+3.sms.csv:		Sample data of table sms
+
+Run Instructions
+================
+UNIX/Linux platform:
+1. Build db sql
+  - cd <db>/build_unix
+  - ../dist/configure --enable-sql --enable-test --with-tcl=/usr/lib<or your 
+    tcl path which include tclConfig.sh>. To run ex_sql_fts3, SQLITE_ENABLE_FTS3
+    need to be added in CPPFLAGS so the fts3 extension could be included.To run 
+    ex_sql_rtree, SQLITE_ENABLE_RTREE need to be added in CPPFLAGS so the rtree
+    extension could be included.
+  - make dbsql
+2. Build c examples
+  - make ex_sql_load
+  - make ex_sql_index
+  - ...
+3. Executing
+  These examples must be executed on <db>/build_unx
+  - ./ex_sql_load
+  - ./ex_sql_index
+  - ...
+
+Windows:
+1. Use Visual Studio to build example project ex_sql_* in BerkeleyDB.sln. To 
+run ex_sql_fts3, all source code and head files under <db>/sql/sqlite/ext/fts3
+need to be added to db_sql project and "/D SQLITE_ENABLE_FTS3" needs to be 
+specified in the project's C/C++ command line. To run ex_sql_rtree,
+"/D SQLITE_ENABLE_RTREE" needs to be specified in db_sql project, and
+db/sql/sqlite/ext/rtree/rtree.c should be added in.
+2. Work on command line to run(say above build option is Win32|Release):
+- cd <db>/build_windows
+- Win32\Release\ex_sql_load (or other examples)
+
+
+Common Behaviors of Examples
+============================
+1. Data Source
+All examples data is stored in files *.csv. The location is db/sqlite/examples/data.
+
+2. Exception Handler
+To simplify the examples we use a common exception handling function
+error_handler(db_handle*) in ex_sql_utils.c. It reports an error message and 
+exits if any unexpected error occurs. Most of the examples which do not 
+require individualized error handler can use this common handler for 
+convenience. 
+
+3. Common SQL Executor
+The function exec_sql(db_handle* db, const char* sql) in ex_sql_utils.c can 
+execute a given sql expression and print results automatically. It also calls 
+upon the common exception handler.
+

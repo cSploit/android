@@ -1,0 +1,546 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+if test $SYNCPROV = syncprovno; then
+	echo "Syncrepl provider overlay not available, test skipped"
+	exit 0
+fi
+if test $ACCESSLOG = accesslogno; then
+	echo "Accesslog overlay not available, test skipped"
+	exit 0
+fi
+
+MMR=2
+
+XDIR=$TESTDIR/srv
+TMP=$TESTDIR/tmp
+
+mkdir -p $TESTDIR
+
+$SLAPPASSWD -g -n >$CONFIGPWF
+
+if test x"$SYNCMODE" = x ; then
+	SYNCMODE=rp
+fi
+case "$SYNCMODE" in
+	ro)
+		SYNCTYPE="type=refreshOnly interval=00:00:00:03"
+		;;
+	rp)
+		SYNCTYPE="type=refreshAndPersist interval=00:00:00:03"
+		;;
+	*)
+		echo "unknown sync mode $SYNCMODE"
+		exit 1;
+		;;
+esac
+
+#
+# Test delta-sync mmr
+# - start servers
+# - configure over ldap
+# - populate over ldap
+# - configure syncrepl over ldap
+# - break replication
+# - modify each server separately
+# - restore replication
+# - compare results
+#
+
+nullExclude=""
+test $BACKEND = null && nullExclude="# "
+
+KILLPIDS=
+
+echo "Initializing server configurations..."
+n=1
+while [ $n -le $MMR ]; do
+
+DBDIR=${XDIR}$n/db
+CFDIR=${XDIR}$n/slapd.d
+
+mkdir -p ${XDIR}$n $DBDIR.1 $DBDIR.2 $CFDIR
+
+o=`expr 3 - $n`
+cat > $TMP <<EOF
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+olcServerID: $n
+
+EOF
+
+if [ "$SYNCPROV" = syncprovmod -o "$ACCESSLOG" = accesslogmod ]; then
+  cat <<EOF >> $TMP
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/overlays
+EOF
+  if [ "$SYNCPROV" = syncprovmod ]; then
+  echo "olcModuleLoad: syncprov.la" >> $TMP
+  fi
+  if [ "$ACCESSLOG" = accesslogmod ]; then
+  echo "olcModuleLoad: accesslog.la" >> $TMP
+  fi
+  echo "" >> $TMP
+fi
+
+if [ "$BACKENDTYPE" = mod ]; then
+cat <<EOF >> $TMP
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/back-$BACKEND
+olcModuleLoad: back_$BACKEND.la
+
+EOF
+fi
+MYURI=`eval echo '$URI'$n`
+PROVIDERURI=`eval echo '$URI'$o`
+if test $INDEXDB = indexdb ; then
+INDEX1="olcDbIndex: objectClass,entryCSN,reqStart,reqDN eq"
+INDEX2="olcDbIndex: objectClass,entryCSN,entryUUID eq"
+else
+INDEX1=
+INDEX2=
+fi
+cat >> $TMP <<EOF
+dn: cn=schema,cn=config
+objectclass: olcSchemaconfig
+cn: schema
+
+include: file://$ABS_SCHEMADIR/core.ldif
+
+include: file://$ABS_SCHEMADIR/cosine.ldif
+
+include: file://$ABS_SCHEMADIR/inetorgperson.ldif
+
+include: file://$ABS_SCHEMADIR/openldap.ldif
+
+include: file://$ABS_SCHEMADIR/nis.ldif
+
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcRootPW:< file://$CONFIGPWF
+
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+olcSuffix: cn=log
+${nullExclude}olcDbDirectory: ${DBDIR}.1
+olcRootDN: $MANAGERDN
+$INDEX1
+
+dn: olcOverlay=syncprov,olcDatabase={1}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: syncprov
+olcSpNoPresent: TRUE
+olcSpReloadHint: TRUE
+
+dn: olcDatabase={2}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {2}$BACKEND
+olcSuffix: $BASEDN
+${nullExclude}olcDbDirectory: ${DBDIR}.2
+olcRootDN: $MANAGERDN
+olcRootPW: $PASSWD
+olcSyncRepl: rid=001 provider=$PROVIDERURI binddn="$MANAGERDN" bindmethod=simple
+  credentials=$PASSWD searchbase="$BASEDN" $SYNCTYPE
+  retry="3 +" timeout=3 logbase="cn=log"
+  logfilter="(&(objectclass=auditWriteObject)(reqresult=0))"
+  syncdata=accesslog
+olcMirrorMode: TRUE
+$INDEX2
+
+dn: olcOverlay=syncprov,olcDatabase={2}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: syncprov
+
+dn: olcOverlay=accesslog,olcDatabase={2}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcAccessLogConfig
+olcOverlay: accesslog
+olcAccessLogDB: cn=log
+olcAccessLogOps: writes
+olcAccessLogSuccess: TRUE
+
+EOF
+$SLAPADD -F $CFDIR -n 0  -d-1< $TMP > $TESTOUT 2>&1
+PORT=`eval echo '$PORT'$n`
+echo "Starting server $n on TCP/IP port $PORT..."
+cd ${XDIR}${n}
+LOG=`eval echo '$LOG'$n`
+$SLAPD -F slapd.d -h $MYURI -d $LVL $TIMING > $LOG 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID $KILLPIDS"
+cd $TESTWD
+
+echo "Using ldapsearch to check that server $n is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $MYURI \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+if [ $n = 1 ]; then
+echo "Using ldapadd for context on server 1..."
+$LDAPADD -D "$MANAGERDN" -H $URI1 -w $PASSWD -f $LDIFORDEREDCP \
+	>> $TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for server $n database ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+fi
+
+n=`expr $n + 1`
+done
+
+echo "Using ldapadd to populate server 1..."
+$LDAPADD -D "$MANAGERDN" -H $URI1 -w $PASSWD -f $LDIFORDEREDNOCP \
+	>> $TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for server $n database ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+sleep $SLEEP1
+
+n=1
+while [ $n -le $MMR ]; do
+PORT=`expr $BASEPORT + $n`
+URI="ldap://${LOCALHOST}:$PORT/"
+
+echo "Using ldapsearch to read all the entries from server $n..."
+$LDAPSEARCH -S "" -b "$BASEDN" -D "$MANAGERDN" -H $URI -w $PASSWD  \
+	'objectclass=*' > $TESTDIR/server$n.out 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at server $n ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+$LDIFFILTER < $TESTDIR/server$n.out > $TESTDIR/server$n.flt
+n=`expr $n + 1`
+done
+
+n=2
+while [ $n -le $MMR ]; do
+echo "Comparing retrieved entries from server 1 and server $n..."
+$CMP $MASTERFLT $TESTDIR/server$n.flt > $CMPOUT
+
+if test $? != 0 ; then
+	echo "test failed - server 1 and server $n databases differ"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+n=`expr $n + 1`
+done
+
+echo "Using ldapadd to populate server 2..."
+$LDAPADD -D "$MANAGERDN" -H $URI2 -w $PASSWD -f $LDIFADD1 \
+	>> $TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for server 2 database ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+THEDN="cn=James A Jones 2,ou=Alumni Association,ou=People,dc=example,dc=com"
+sleep 1
+for i in 1 2 3; do
+	$LDAPSEARCH -S "" -b "$THEDN" -H $URI1 \
+		-s base '(objectClass=*)' entryCSN > "${MASTEROUT}.$i" 2>&1
+	RC=$?
+
+	if test $RC = 0 ; then
+		break
+	fi
+
+	if test $RC != 32 ; then
+		echo "ldapsearch failed at slave ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+	sleep $SLEEP1
+done
+
+n=1
+while [ $n -le $MMR ]; do
+PORT=`expr $BASEPORT + $n`
+URI="ldap://${LOCALHOST}:$PORT/"
+
+echo "Using ldapsearch to read all the entries from server $n..."
+$LDAPSEARCH -S "" -b "$BASEDN" -D "$MANAGERDN" -H $URI -w $PASSWD  \
+	'objectclass=*' > $TESTDIR/server$n.out 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at server $n ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+$LDIFFILTER < $TESTDIR/server$n.out > $TESTDIR/server$n.flt
+n=`expr $n + 1`
+done
+
+n=2
+while [ $n -le $MMR ]; do
+echo "Comparing retrieved entries from server 1 and server $n..."
+$CMP $MASTERFLT $TESTDIR/server$n.flt > $CMPOUT
+
+if test $? != 0 ; then
+	echo "test failed - server 1 and server $n databases differ"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+n=`expr $n + 1`
+done
+
+echo "Breaking replication between server 1 and 2..."
+n=1
+while [ $n -le $MMR ]; do
+o=`expr 3 - $n`
+MYURI=`eval echo '$URI'$n`
+PROVIDERURI=`eval echo '$URI'$o`
+$LDAPMODIFY -D cn=config -H $MYURI -y $CONFIGPWF > $TESTOUT 2>&1 <<EOF
+dn: olcDatabase={2}$BACKEND,cn=config
+changetype: modify
+replace: olcSyncRepl
+olcSyncRepl: rid=001 provider=$PROVIDERURI binddn="$MANAGERDN" bindmethod=simple
+  credentials=InvalidPw searchbase="$BASEDN" $SYNCTYPE
+  retry="3 +" timeout=3 logbase="cn=log"
+  logfilter="(&(objectclass=auditWriteObject)(reqresult=0))"
+  syncdata=accesslog
+-
+replace: olcMirrorMode
+olcMirrorMode: TRUE
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for server $n config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+n=`expr $n + 1`
+done
+
+echo "Using ldapmodify to force conflicts between server 1 and 2..."
+$LDAPMODIFY -D "$MANAGERDN" -H $URI1 -w $PASSWD \
+	>> $TESTOUT 2>&1 << EOF
+dn: $THEDN
+changetype: modify
+add: description
+description: Amazing
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for server 1 database ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDAPMODIFY -D "$MANAGERDN" -H $URI2 -w $PASSWD \
+	>> $TESTOUT 2>&1 << EOF
+dn: $THEDN
+changetype: modify
+add: description
+description: Stupendous
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for server 2 database ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDAPMODIFY -D "$MANAGERDN" -H $URI1 -w $PASSWD \
+	>> $TESTOUT 2>&1 << EOF
+dn: $THEDN
+changetype: modify
+delete: description
+description: Outstanding
+-
+add: description
+description: Mindboggling
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for server 1 database ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDAPMODIFY -D "$MANAGERDN" -H $URI2 -w $PASSWD \
+	>> $TESTOUT 2>&1 << EOF
+dn: $THEDN
+changetype: modify
+delete: description
+description: OutStanding
+-
+add: description
+description: Bizarre
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for server 2 database ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDAPMODIFY -D "$MANAGERDN" -H $URI1 -w $PASSWD \
+	>> $TESTOUT 2>&1 << EOF
+dn: $THEDN
+changetype: modify
+add: carLicense
+carLicense: 123-XYZ
+-
+add: employeeNumber
+employeeNumber: 32
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for server 1 database ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDAPMODIFY -D "$MANAGERDN" -H $URI2 -w $PASSWD \
+	>> $TESTOUT 2>&1 << EOF
+dn: $THEDN
+changetype: modify
+add: employeeType
+employeeType: deadwood
+-
+add: employeeNumber
+employeeNumber: 64
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for server 2 database ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Restoring replication between server 1 and 2..."
+n=1
+while [ $n -le $MMR ]; do
+o=`expr 3 - $n`
+MYURI=`eval echo '$URI'$n`
+PROVIDERURI=`eval echo '$URI'$o`
+$LDAPMODIFY -D cn=config -H $MYURI -y $CONFIGPWF > $TESTOUT 2>&1 <<EOF
+dn: olcDatabase={2}$BACKEND,cn=config
+changetype: modify
+replace: olcSyncRepl
+olcSyncRepl: rid=001 provider=$PROVIDERURI binddn="$MANAGERDN" bindmethod=simple
+  credentials=$PASSWD searchbase="$BASEDN" $SYNCTYPE
+  retry="3 +" timeout=3 logbase="cn=log"
+  logfilter="(&(objectclass=auditWriteObject)(reqresult=0))"
+  syncdata=accesslog
+-
+replace: olcMirrorMode
+olcMirrorMode: TRUE
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for server $n config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+n=`expr $n + 1`
+done
+
+echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+sleep $SLEEP1
+
+n=1
+while [ $n -le $MMR ]; do
+PORT=`expr $BASEPORT + $n`
+URI="ldap://${LOCALHOST}:$PORT/"
+
+echo "Using ldapsearch to read all the entries from server $n..."
+$LDAPSEARCH -S "" -b "$BASEDN" -D "$MANAGERDN" -H $URI -w $PASSWD  \
+	'objectclass=*' > $TESTDIR/server$n.out 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at server $n ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+$LDIFFILTER -s $BACKEND=a < $TESTDIR/server$n.out > $TESTDIR/server$n.flt
+n=`expr $n + 1`
+done
+
+n=2
+while [ $n -le $MMR ]; do
+echo "Comparing retrieved entries from server 1 and server $n..."
+$CMP $MASTERFLT $TESTDIR/server$n.flt > $CMPOUT
+
+if test $? != 0 ; then
+	echo "test failed - server 1 and server $n databases differ"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+n=`expr $n + 1`
+done
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

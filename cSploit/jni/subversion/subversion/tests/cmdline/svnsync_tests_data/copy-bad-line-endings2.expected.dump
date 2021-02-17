@@ -1,0 +1,143 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 1676c7c8-1042-47ba-811d-d6f56ff7be54
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2010-09-14T00:20:38.518085Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 148
+Content-length: 148
+
+K 10
+svn:author
+V 9
+dtrebbien
+K 8
+svn:date
+V 27
+2010-09-14T00:22:19.558161Z
+K 7
+svn:log
+V 44
+This log message
+contains CRLF
+line endings.
+PROPS-END
+
+Node-path: TEST
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 0
+Text-content-md5: d41d8cd98f00b204e9800998ecf8427e
+Text-content-sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 146
+Content-length: 146
+
+K 10
+svn:author
+V 9
+dtrebbien
+K 8
+svn:date
+V 27
+2010-09-14T14:04:52.173534Z
+K 7
+svn:log
+V 42
+This log message
+contains
+CR line endings.
+PROPS-END
+
+Node-path: TEST
+Node-kind: file
+Node-action: change
+Text-content-length: 5
+Text-content-md5: d8e8fca2dc0f896fd7cb4cb0031ba249
+Text-content-sha1: 4e1243bd22c66e76c2ba9eddc1f91394e57f9f83
+Content-length: 5
+
+test
+
+
+Revision-number: 3
+Prop-content-length: 151
+Content-length: 151
+
+K 10
+svn:author
+V 9
+dtrebbien
+K 8
+svn:date
+V 27
+2010-09-14T14:16:41.718227Z
+K 7
+svn:log
+V 47
+Add `svn:ignore` using CRLF to terminate lines.
+PROPS-END
+
+Node-path: 
+Node-kind: dir
+Node-action: change
+Prop-content-length: 47
+Content-length: 47
+
+K 10
+svn:ignore
+V 15
+blah.o
+blah2.o
+
+PROPS-END
+
+
+Revision-number: 4
+Prop-content-length: 153
+Content-length: 153
+
+K 10
+svn:author
+V 9
+dtrebbien
+K 8
+svn:date
+V 27
+2010-09-14T14:17:35.488565Z
+K 7
+svn:log
+V 49
+Add `x:related-to` using CRLF to terminate lines.
+PROPS-END
+
+Node-path: TEST
+Node-kind: file
+Node-action: change
+Prop-content-length: 51
+Content-length: 51
+
+K 12
+x:related-to
+V 17
+blah.o
+blah2.o
+
+PROPS-END
+
+

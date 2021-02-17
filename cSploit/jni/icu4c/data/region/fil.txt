@@ -1,0 +1,122 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/fil.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/fil.xml
+ */
+fil{
+    Countries{
+        001{"Mundo"}
+        002{"Africa"}
+        003{"North America"}
+        005{"South America"}
+        009{"Oceania"}
+        011{"Kanlurang Africa"}
+        013{"Gitnang Amerika"}
+        014{"Silangang Africa"}
+        015{"Hilagang Africa"}
+        017{"Gitnang Africa"}
+        018{"Katimugang Africa"}
+        019{"Americas"}
+        021{"Hilagang Amerika"}
+        029{"Carribbean"}
+        030{"Silangang Asya"}
+        034{"Katimugang Asya"}
+        035{"Timog-Silangang Asya"}
+        039{"Katimugang Europa"}
+        053{"Australia at New Zealand"}
+        054{"Melanesia"}
+        057{"Rehiyong Micronesia"}
+        061{"Polynesia"}
+        062{"Timog-Gitnang Asya"}
+        142{"Asya"}
+        143{"Gitnang Asya"}
+        145{"Kanlurang Asya"}
+        150{"Europa"}
+        151{"Silangang Europa"}
+        154{"Hilagang Europa"}
+        155{"Kanlurang Europa"}
+        419{"Latin America at ang Caribbean"}
+        AC{"Acsencion island"}
+        AD{"Andorra"}
+        AF{"Afghanistan"}
+        AI{"Anguilla"}
+        AL{"Albania"}
+        AM{"Armenia"}
+        AO{"Angola"}
+        AQ{"Antartica"}
+        AR{"Argentina"}
+        AS{"American Samoa"}
+        AT{"Austria"}
+        AU{"Australia"}
+        AW{"Aruba"}
+        AX{"Aland Islands"}
+        AZ{"Azerbaijan"}
+        BA{"Bosnia and Herzegovina"}
+        BB{"Barbados"}
+        BD{"Bangladesh"}
+        BF{"Burkina Faso"}
+        BG{"Bulgaria"}
+        BH{"Bahrain"}
+        BI{"Burundi"}
+        BN{"Brunei"}
+        BO{"Bolivia"}
+        BR{"Brazil"}
+        BS{"Bahamas"}
+        BV{"Bouvet Island"}
+        BW{"Botswana"}
+        BY{"Belarus"}
+        CA{"Canada"}
+        CD{"Congo - Kinshasa"}
+        CG{"Congo - Brazzaville"}
+        CI{"Côte d'Ivoire"}
+        CM{"Cameroon"}
+        CP{"Clipperton Island"}
+        CV{"Cape Verde"}
+        DG{"Diego Garcia"}
+        DZ{"Algeria"}
+        EA{"Ceuta and Melilla"}
+        EU{"European Union"}
+        FK{"Falkland Islands"}
+        GE{"Georgia"}
+        GS{"South Georgia and The South Sandwich Islands"}
+        HK{"Hong Kong SAR China"}
+        IC{"Canary Island"}
+        ID{"Indonesia"}
+        IO{"British Indian Ocean Territory"}
+        KH{"Cambodia"}
+        KP{"North Korea"}
+        KY{"Cayman Islands"}
+        MH{"Marshall Islands"}
+        MK{"Macedonia"}
+        MM{"Myanmar"}
+        MO{"Macau SAR China"}
+        PH{"Pilipinas"}
+        PL{"Poland"}
+        PN{"Pitcairn"}
+        PS{"Palestinian Territory"}
+        QO{"Malayong bahagi ng Oceania"}
+        RU{"Russian Federation"}
+        SH{"St. Helena"}
+        SJ{"Svalbard and Jan Mayen Islands"}
+        ST{"Sao Tome and Principe"}
+        TA{"Tristan de Cunha"}
+        TL{"Timor-Leste"}
+        TT{"Trinidad and Tobago"}
+        UM{"Mga Minor Outlying Island ng Estados Unidos"}
+        US{"Estados Unidos"}
+        VC{"Saint Vincent and the Grenadines"}
+        VG{"British Virgin Islands"}
+        VI{"U.S. Virgin Islands"}
+        VN{"Vietnam"}
+        WF{"Wallis and the Futuna Islands"}
+        ZA{"South Africa"}
+        ZZ{"Hindi kilala o Hindi wastong Rehiyon"}
+    }
+    Version{"2.0.48.64"}
+}

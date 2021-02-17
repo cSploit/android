@@ -1,0 +1,155 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+mkdir -p $TESTDIR $DBDIR1
+
+echo "Running slapadd to build slapd database..."
+. $CONFFILTER $BACKEND $MONITORDB < $MCONF > $ADDCONF
+$SLAPADD -f $ADDCONF -l $LDIFORDERED
+RC=$?
+if test $RC != 0 ; then
+	echo "slapadd failed ($RC)!"
+	exit $RC
+fi
+
+echo "Running slapindex to index slapd database..."
+. $CONFFILTER $BACKEND $MONITORDB < $CONF > $CONF1
+$SLAPINDEX -f $CONF1
+RC=$?
+if test $RC != 0 ; then
+	echo "warning: slapindex failed ($RC)"
+	echo "  assuming no indexing support"
+fi
+
+echo "Starting slapd on TCP/IP port $PORT1..."
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID"
+
+sleep 1
+
+echo "Testing slapd searching..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT1 \
+		'(objectclass=*)' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing exact searching..."
+echo "# Testing exact searching..." > $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(sn=jENSEN)' >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing approximate searching..."
+echo "# Testing approximate searching..." >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(sn~=jENSEN)' name >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing OR searching..."
+echo "# Testing OR searching..." >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(|(givenname=Xx*yY*Z)(cn=)(undef=*)(objectclass=groupofnames)(sn=jones)(member=cn=Manager,dc=example,dc=com)(uniqueMember=cn=Manager,dc=example,dc=com))' >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing AND matching and ends-with searching..."
+echo "# Testing AND matching and ends-with searching..." >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "ou=groups,$BASEDN" -s one -h $LOCALHOST -p $PORT1 \
+	'(&(objectclass=groupofnames)(cn=A*)(member=cn=Mark Elliot,ou=Alumni Association,ou=People,dc=example,dc=com))' >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing NOT searching..."
+echo "# Testing NOT searching..." >> $SEARCHOUT
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(!(objectclass=pilotPerson))' >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing objectClass/attributeType inheritance ..."
+echo "# Testing objectClass/attributeType inheritance ..." >> $SEARCHOUT
+$LDAPSEARCH -M -a never -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(&(objectClass=inetorgperson)(userid=uham))' \
+	"2.5.4.0" "userid" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+LDIF=$SEARCHOUTMASTER
+
+echo "Filtering ldapsearch results..."
+$LDIFFILTER < $SEARCHOUT > $SEARCHFLT
+echo "Filtering original ldif used to create database..."
+$LDIFFILTER < $LDIF > $LDIFFLT
+echo "Comparing filter output..."
+$CMP $SEARCHFLT $LDIFFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "Comparison failed"
+	exit 1
+fi
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

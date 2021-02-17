@@ -1,0 +1,53 @@
+# LIBLBER
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+LIBRARY = liblber.la
+
+NT_SRCS = nt_err.c
+NT_OBJS = nt_err.lo
+
+UNIX_SRCS = stdio.c
+UNIX_OBJS = stdio.lo
+
+LIB_DEFS = -DLBER_LIBRARY
+
+SRCS= assert.c decode.c encode.c io.c bprint.c debug.c \
+	memory.c options.c sockbuf.c $(@PLAT@_SRCS)
+OBJS= assert.lo decode.lo encode.lo io.lo bprint.lo debug.lo \
+	memory.lo options.lo sockbuf.lo $(@PLAT@_OBJS)
+XSRCS= version.c
+
+PROGRAMS= dtest etest idtest
+
+LDAP_INCDIR= ../../include
+LDAP_LIBDIR= ../../libraries
+
+XLIBS = $(LIBRARY) $(LDAP_LIBLUTIL_A)
+XXLIBS = 
+NT_LINK_LIBS = $(AC_LIBS)
+UNIX_LINK_LIBS = $(AC_LIBS)
+
+dtest:    $(XLIBS) dtest.o
+	$(LTLINK) -o $@ dtest.o $(LIBS)
+etest:  $(XLIBS) etest.o
+	$(LTLINK) -o $@ etest.o $(LIBS)
+idtest:  $(XLIBS) idtest.o
+	$(LTLINK) -o $@ idtest.o $(LIBS)
+
+install-local: FORCE
+	-$(MKDIR) $(DESTDIR)$(libdir)
+	$(LTINSTALL) $(INSTALLFLAGS) -m 644 $(LIBRARY) $(DESTDIR)$(libdir)
+	$(LTFINISH) $(DESTDIR)$(libdir)
+

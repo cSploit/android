@@ -1,0 +1,118 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+if test $RWM = rwmno ; then 
+	echo "rwm (Rewrite/remap) overlay not available, test skipped"
+	exit 0
+fi 
+
+echo ""
+
+if test "x$RELAYS" = "x" ; then
+	RELAYS=
+	# back-relay
+	if test $BACKRELAY = relayno ; then 
+		echo "relay backend not available, test skipped"
+	else
+		if test "x$RELAYS" != "x" ; then
+			RELAYS="${RELAYS} "
+		fi
+		RELAYS="${RELAYS}relay"
+	fi
+
+	# back-ldap
+	if test $BACKLDAP = ldapno ; then 
+		echo "ldap backend not available, test skipped"
+	else
+		if test $THREADS = "threadsno" ; then
+			echo "Need threads support, test skipped"
+		else
+			if test "x$RELAYS" != "x" ; then
+				RELAYS="${RELAYS} "
+			fi
+			RELAYS="${RELAYS}ldap"
+		fi 
+	fi
+
+	# back-meta
+	if test $BACKMETA = metano ; then 
+		echo "meta backend not available, test skipped"
+	else
+		if test $THREADS = "threadsno" ; then
+			echo "Need threads support, test skipped"
+		else
+			if test "x$RELAYS" != "x" ; then
+				RELAYS="${RELAYS} "
+			fi
+			RELAYS="${RELAYS}meta"
+		fi
+	fi 
+fi
+
+if test "x$RELAYS" = "x" ; then
+	echo "no relaying capable backend is available"
+	echo ">>>>> Test succeeded"
+	exit 0
+fi
+
+echo "Testing virtual naming context mapping with $RELAYS backend(s)..."
+echo ""
+
+tmpfile=savelog.log
+if test -f $tmpfile ; then
+	rm -f $tmpfile
+fi
+first=1
+for RELAY in $RELAYS ; do
+	RUNIT=yes
+	if test $THREADS = "threadsno" ; then
+		case $RELAY in
+		ldap|meta)
+			echo "Need threads support, test skipped"
+			RUNIT=no
+			;;
+		esac
+	fi
+	
+	if test $RUNIT = yes ; then		
+		if test $first = 1 ; then
+			first=0
+		else
+			echo ">>>>> waiting for things to exit"
+			test $KILLSERVERS != no && wait
+			echo ""
+
+			mv -f $LOG1 $tmpfile
+			rm -rf $TESTDIR
+		fi
+
+		mkdir -p $TESTDIR $DBDIR1
+
+		if test -f $tmpfile ; then
+			mv $tmpfile $LOG1
+		fi
+	
+		. $SRCDIR/scripts/relay
+	fi
+done
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

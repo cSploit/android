@@ -1,0 +1,71 @@
+--- Makefile.in
++++ Makefile.in
+@@ -163,7 +163,7 @@
+ #
+ LIBOBJS0 = alter.lo analyze.lo attach.lo auth.lo \
+          backup.lo bitvec.lo btmutex.lo btree.lo build.lo \
+-         callback.lo complete.lo ctime.lo date.lo delete.lo \
++         callback.lo complete.lo ctime.lo date.lo db_pragma.lo delete.lo \
+          expr.lo fault.lo fkey.lo \
+          fts3.lo fts3_aux.lo fts3_expr.lo fts3_hash.lo fts3_icu.lo \
+          fts3_porter.lo fts3_snippet.lo fts3_tokenizer.lo fts3_tokenizer1.lo \
+@@ -208,6 +208,7 @@
+   $(TOP)/src/complete.c \
+   $(TOP)/src/ctime.c \
+   $(TOP)/src/date.c \
++  $(TOP)/../adapter/db_pragma.c \
+   $(TOP)/src/delete.c \
+   $(TOP)/src/expr.c \
+   $(TOP)/src/fault.c \
+@@ -594,6 +595,10 @@
+ date.lo:	$(TOP)/src/date.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/date.c
+ 
++db_pragma.lo:	$(TOP)/../adapter/db_pragma.c $(HDR) \
++		$(TOP)/../adapter/btreeInt.h
++	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_pragma.c
++
+ delete.lo:	$(TOP)/src/delete.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/delete.c
+ 
+--- src/pragma.c
++++ src/pragma.c
+@@ -145,7 +145,7 @@
+ /*
+ ** Generate code to return a single integer value.
+ */
+-static void returnSingleInt(Parse *pParse, const char *zLabel, i64 value){
++void returnSingleInt(Parse *pParse, const char *zLabel, i64 value){
+   Vdbe *v = sqlite3GetVdbe(pParse);
+   int mem = ++pParse->nMem;
+   i64 *pI64 = sqlite3DbMallocRaw(pParse->db, sizeof(value));
+@@ -288,6 +288,8 @@
+   return azModeName[eMode];
+ }
+ 
++extern int bdbsqlPragma(Parse *, char *, char *, int);
++
+ /*
+ ** Process a pragma statement.  
+ **
+@@ -380,7 +382,9 @@
+     pParse->rc = rc;
+   }else
+                             
+- 
++  if( bdbsqlPragma(pParse, zLeft, zRight, iDb)==0 ){
++    /* Do nothing if this was a Berkeley DB specific pragma. */
++  }else
+ #if !defined(SQLITE_OMIT_PAGER_PRAGMAS) && !defined(SQLITE_OMIT_DEPRECATED)
+   /*
+   **  PRAGMA [database.]default_cache_size
+--- tool/mksqlite3c.tcl
++++ tool/mksqlite3c.tcl
+@@ -260,6 +260,7 @@
+    btmutex.c
+    btree.c
+    backup.c
++   db_pragma.c
+ 
+    vdbemem.c
+    vdbeaux.c

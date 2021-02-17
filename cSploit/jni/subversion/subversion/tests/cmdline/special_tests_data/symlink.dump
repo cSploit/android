@@ -1,0 +1,58 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 82e4110f-07c2-41a8-ba25-4b48b5cb5f5b
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2007-01-10T21:16:13.268177Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 124
+Content-length: 124
+
+K 7
+svn:log
+V 22
+Commit a symbolic link
+K 10
+svn:author
+V 7
+malcolm
+K 8
+svn:date
+V 27
+2007-01-10T21:18:08.532835Z
+PROPS-END
+
+Node-path: from
+Node-kind: file
+Node-action: add
+Prop-content-length: 33
+Text-content-length: 7
+Text-content-md5: 2419f8600825e9410d1b9a62a34570ec
+Content-length: 40
+
+K 11
+svn:special
+V 1
+*
+PROPS-END
+link to
+
+Node-path: to
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 0
+Text-content-md5: d41d8cd98f00b204e9800998ecf8427e
+Content-length: 10
+
+PROPS-END
+
+

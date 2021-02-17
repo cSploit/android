@@ -1,0 +1,253 @@
+.\" $OpenLDAP$
+.\" This contribution is derived from OpenLDAP Software.
+.\" All of the modifications to OpenLDAP Software represented in this
+.\" contribution were developed by Peter Marschall <peter@adpm.de>.
+.\" I have not assigned rights and/or interest in this work to any party.
+.\"
+.\" Copyright 2009 Peter Marschall
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted only as authorized by the OpenLDAP Public License.
+.\"
+.\" A copy of this license is available in file LICENSE in the
+.\" top-level directory of the distribution or, alternatively, at
+.\" http://www.OpenLDAP.org/license.html.
+
+.TH LDAPEXOP 1
+
+.SH NAME
+ldapexop \- issue LDAP extended operations
+
+.SH SYNOPSIS
+ldapexop
+[\c
+.BR \-V [ V ]]
+[\c
+.BI \-d \ debuglevel\fR]
+[\c
+.BR \-n ]
+[\c
+.BR \-v ]
+[\c
+.BI \-f \ file\fR]
+[\c
+.BR \-x ]
+[\c
+.BI \-D \ binddn\fR]
+[\c
+.BR \-W ]
+[\c
+.BI \-w \ passwd\fR]
+[\c
+.BI \-y \ passwdfile\fR]
+[\c
+.BI \-H \ URI\fR]
+[\c
+.BI \-h \ ldaphost\fR]
+[\c
+.BI \-p \ ldapport\fR]
+[\c
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BI \-o \ opt \fR[= optparam \fR]]
+[\c
+.BI \-O \ security-properties\fR]
+[\c
+.BR \-I ]
+[\c
+.BR \-Q ]
+[\c
+.BR \-N ]
+[\c
+.BI \-U \ authcid\fR]
+[\c
+.BI \-R \ realm\fR]
+[\c
+.BI \-X \ authzid\fR]
+[\c
+.BI \-Y \ mech\fR]
+[\c
+.BR \-Z [ Z ]]
+{\c
+.I oid
+|
+.BI oid: data
+|
+.BI oid:: b64data
+|
+.B whoami
+|
+.BI cancel \ cancel-id
+|
+.BI refresh \ DN \ \fR[\fIttl\fR]}
+
+.SH DESCRIPTION
+ldapexop issues the LDAP extended operation specified by \fBoid\fP
+or one of the special keywords \fBwhoami\fP, \fBcancel\fP, or \fBrefresh\fP.
+
+Additional data for the extended operation can be passed to the server using
+\fIdata\fP or base-64 encoded as \fIb64data\fP in the case of \fBoid\fP,
+or using the additional parameters in the case of the specially named extended
+operations above.
+
+Please note that ldapexop behaves differently for the same extended operation
+when it was given as an OID or as a specialliy named operation:
+
+Calling ldapexop with the OID of the \fBwhoami\fP (RFC 4532) extended operation
+.nf
+
+  ldapexop [<options>] 1.3.6.1.4.1.4203.1.11.3
+
+.fi
+yields
+.nf
+
+  # extended operation response
+  data:: <base64 encoded response data>
+
+.fi
+while calling it with the keyword \fBwhoami\fP
+.nf
+
+  ldapexop [<options>] whoami
+
+.fi
+results in
+.nf
+
+  dn:<client's identity>
+
+.fi
+
+
+.SH OPTIONS
+.TP
+.BI \-V [ V ]
+Print version info.
+If\fB\-VV\fP is given, only the version information is printed.
+.TP
+.BI \-d \ debuglevel
+Set the LDAP debugging level to \fIdebuglevel\fP.
+.TP
+.BI \-n
+Show what would be done but don't actually do it.
+Useful for debugging in conjunction with \fB\-v\fP.
+.TP
+.BI \-v
+Run in verbose mode, with many diagnostics written to standard output.
+.TP
+.BI \-f \ file
+Read operations from \fIfile\fP.
+.TP
+.BI \-x
+Use simple authentication instead of SASL.
+.TP
+.BI \-D \ binddn
+Use the Distinguished Name \fIbinddn\fP to bind to the LDAP directory.
+.TP
+.BI \-W
+Prompt for simple authentication.
+This is used instead of specifying the password on the command line.
+.TP
+.BI \-w \ passwd
+Use \fIpasswd\fP as the password for simple authentication.
+.TP
+.BI \-y \ passwdfile
+Use complete contents of \fIpasswdfile\fP as the password for
+simple authentication.
+.TP
+.BI \-H \ URI
+Specify URI(s) referring to the ldap server(s); only the protocol/host/port
+fields are allowed; a list of URI, separated by whitespace or commas
+is expected.
+.TP
+.BI \-h \ ldaphost
+Specify the host on which the ldap server is running.
+Deprecated in favor of \fB\-H\fP.
+.TP
+.BI \-p \ ldapport
+Specify the TCP port where the ldap server is listening.
+Deprecated in favor of \fB\-H\fP.
+.TP
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+Specify general extensions.  \'!\' indicates criticality.
+.nf
+  [!]assert=<filter>    (an RFC 4515 Filter)
+  !authzid=<authzid>    ("dn:<dn>" or "u:<user>")
+  [!]bauthzid           (RFC 3829 authzid control)
+  [!]chaining[=<resolve>[/<cont>]]
+  [!]manageDSAit
+  [!]noop
+  ppolicy
+  [!]postread[=<attrs>] (a comma-separated attribute list)
+  [!]preread[=<attrs>]  (a comma-separated attribute list)
+  [!]relax
+  sessiontracking[=<username>]
+  abandon,cancel,ignore (SIGINT sends abandon/cancel,
+  or ignores response; if critical, doesn't wait for SIGINT.
+  not really controls)
+.fi
+.TP
+.BI \-o \ opt \fR[= optparam \fR]
+
+Specify general options.
+
+General options:
+.nf
+  nettimeout=<timeout>  (in seconds, or "none" or "max")
+  ldif-wrap=<width>     (in columns, or "no" for no wrapping)
+.fi
+.TP
+.BI \-O \ security-properties
+Specify SASL security properties.
+.TP
+.BI \-I
+Enable SASL Interactive mode.  Always prompt.  Default is to prompt
+only as needed.
+.TP
+.BI \-Q
+Enable SASL Quiet mode.  Never prompt.
+.TP
+.B \-N
+Do not use reverse DNS to canonicalize SASL host name.
+.TP
+.BI \-U \ authcid
+Specify the authentication ID for SASL bind. The form of the ID
+depends on the actual SASL mechanism used.
+.TP
+.BI \-R \ realm
+Specify the realm of authentication ID for SASL bind. The form of the realm
+depends on the actual SASL mechanism used.
+.TP
+.BI \-X \ authzid
+Specify the requested authorization ID for SASL bind.
+.I authzid
+must be one of the following formats:
+.BI dn: "<distinguished name>"
+or
+.BI u: <username>
+.TP
+.BI \-Y \ mech
+Specify the SASL mechanism to be used for authentication.
+Without this option, the program will choose the best mechanism the server knows.
+.TP
+.BR \-Z [ Z ]
+Issue StartTLS (Transport Layer Security) extended operation.
+Giving it twice (\fB\-ZZ\fP) will require the operation to be successful.
+
+.SH DIAGNOSTICS
+Exit status is zero if no errors occur.
+Errors result in a non-zero exit status and
+a diagnostic message being written to standard error.
+
+.SH "SEE ALSO"
+.BR ldap_extended_operation_s (3)
+
+.SH AUTHOR
+This manual page was written by Peter Marschall
+based on \fBldapexop\fP's usage message and a few tests
+with \fBldapexop\fP.
+Do not expect it to be complete or absolutely correct.
+
+.SH ACKNOWLEDGEMENTS
+.so ../Project
+

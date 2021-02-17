@@ -1,0 +1,106 @@
+.TH odbcinst.ini 5 "Thu 27 Jun 2013" "version 2.3.2" "unixODBC manual pages"
+
+.SH NAME
+/etc/odbcinst.ini - An unixODBC drivers configuration
+
+.SH DESCRIPTION
+.B /etc/odbcinst.ini
+is a text configuration file for unixODBC drivers. It can be edited by hand,
+but the recommended way to update this file is to use the
+.BR odbcinst (1)
+utility.
+
+.SH FILE FORMAT
+The general .ini file format is:
+
+.RS
+.nf
+.BI [ SectionName1 ]
+.IB key1 " = " value1
+.IB key2 " = " value2
+.B ...
+
+.BI [ SectionName2 ]
+.IB key1 " = " value1
+.IB key2 " = " value2
+.B ...
+.fi
+.RE
+
+Each ODBC driver has its own section and can be referred to by the name of its
+section. Recognized configuration keys are:
+
+.IP \fBDescription
+A text string briefly describing the driver.
+
+.IP \fBDriver
+A filesystem path to the actual driver library.
+
+.IP \fBSetup
+A filesystem path to the driver setup library.
+
+.IP \fBFileUsage
+.BR odbcinst (1)
+entry, if you edit the configuration file by hand, you have to supply it yourself.
+
+.SS TEMPLATE FILES
+The recommended way to manage the drivers is using the
+.BR odbcinst (1)
+utility. You can install the drivers by supplying it with template file, which
+has the same format as this file.
+
+.SH EXAMPLES
+An example of the actual PostgreSQL driver:
+
+.RS
+.nf
+[PostgreSQL]
+Description = PostgreSQL driver for GNU/Linux
+Driver      = /usr/lib/psqlodbcw.so
+Setup       = /usr/lib/libodbcpsqlS.so
+FileUsage   = 1
+.fi
+.RE
+
+By specifying the driver like that, you can then reference it in the
+.BR odbc.ini (5)
+as follows:
+
+.RS
+.nf
+...
+Driver = PostgreSQL
+...
+.fi
+.RE
+
+The recommended way to add that driver is by creating template file containg:
+
+.RS
+.nf
+[PostgreSQL]
+Description = PostgreSQL driver for GNU/Linux
+Driver      = /usr/lib/psqlodbcw.so
+Setup       = /usr/lib/libodbcpsqlS.so
+.fi
+.RE
+
+and call the 
+.BR odbcinst (1):
+
+.RS
+.BI "# odbcinst -i -d -f " template.ini
+.RE
+
+.SH "SEE ALSO"
+.BR odbcinst (1),
+.BR odbc.ini (5)
+
+.SH AUTHORS
+The authors of unixODBC are Peter Harvey <\fIpharvey@codebydesign.com\fR> and
+Nick Gorham <\fInick@lurcher.org\fR>. For the full list of contributors see the
+AUTHORS file.
+
+.SH COPYRIGHT
+unixODBC is licensed under the GNU Lesser General Public License. For details
+about the license, see the COPYING file.

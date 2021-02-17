@@ -1,0 +1,224 @@
+.TH LDAP_ERROR 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_perror, ld_errno, ldap_result2error, ldap_errlist, ldap_err2string \- LDAP protocol error handling routines
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+char *ldap_err2string( int \fIerr\fB );
+.SH DESCRIPTION
+The
+.B ldap_err2string()
+routine provides short description of the various codes returned by
+routines in this library.  The returned string is a pointer to a
+static area that should not be modified.
+
+These codes are either negative,
+indicating an API error code; positive, indicating an LDAP resultCode
+other than \'success' (0), or - zero, indicating both successful use
+of the API and the LDAP resultCode \'success' (0).
+
+The code associated with an LDAP session is accessible using
+.BR ldap_get_option (3)
+and
+.BR ldap_set_option (3)
+with the
+.B LDAP_OPT_RESULT_CODE
+option (previously called
+.BR LDAP_OPT_ERROR_NUMBER ).
+
+.SH PROTOCOL RESULT CODES
+
+This section provides a partial list of protocol codes recognized
+by the library.  As LDAP is extensible, additional values may be
+returned.  A complete listing of \fIregistered\fP LDAP result codes
+can be obtained from the \fIInternet Assigned Numbers Authority\fP
+<http://www.iana.org>.
+
+.LP
+.TP 20
+.SM LDAP_SUCCESS
+The request was successful.
+.TP
+.SM LDAP_OPERATIONS_ERROR
+An operations error occurred.
+.TP
+.SM LDAP_PROTOCOL_ERROR
+A protocol violation was detected.
+.TP
+.SM LDAP_TIMELIMIT_EXCEEDED
+An LDAP time limit was exceeded.
+.TP
+.SM LDAP_SIZELIMIT_EXCEEDED
+An LDAP size limit was exceeded.
+.TP
+.SM LDAP_COMPARE_FALSE
+A compare operation returned false.
+.TP
+.SM LDAP_COMPARE_TRUE
+A compare operation returned true.
+.TP
+.SM LDAP_STRONG_AUTH_NOT_SUPPORTED
+The LDAP server does not support strong authentication.
+.TP
+.SM LDAP_STRONG_AUTH_REQUIRED
+Strong authentication is required for the operation.
+.TP
+.SM LDAP_PARTIAL_RESULTS
+Partial results only returned.
+.TP
+.SM LDAP_NO_SUCH_ATTRIBUTE
+The attribute type specified does not exist in the entry.
+.TP
+.SM LDAP_UNDEFINED_TYPE
+The attribute type specified is invalid.
+.TP
+.SM LDAP_INAPPROPRIATE_MATCHING
+Filter type not supported for the specified attribute.
+.TP
+.SM LDAP_CONSTRAINT_VIOLATION
+An attribute value specified violates some constraint (e.g., a postalAddress
+has too many lines, or a line that is too long).
+.TP
+.SM LDAP_TYPE_OR_VALUE_EXISTS
+An attribute type or attribute value specified already exists in the entry.
+.TP
+.SM LDAP_INVALID_SYNTAX
+An invalid attribute value was specified.
+.TP
+.SM LDAP_NO_SUCH_OBJECT
+The specified object does not exist in The Directory.
+.TP
+.SM LDAP_ALIAS_PROBLEM
+An alias in The Directory points to a nonexistent entry.
+.TP
+.SM LDAP_INVALID_DN_SYNTAX
+A syntactically invalid DN was specified.
+.TP
+.SM LDAP_IS_LEAF
+The object specified is a leaf.
+.TP
+.SM LDAP_ALIAS_DEREF_PROBLEM
+A problem was encountered when dereferencing an alias.
+.TP
+.SM LDAP_INAPPROPRIATE_AUTH
+Inappropriate authentication was specified (e.g., LDAP_AUTH_SIMPLE was
+specified and the entry does not have a userPassword attribute).
+.TP
+.SM LDAP_INVALID_CREDENTIALS
+Invalid credentials were presented (e.g., the wrong password).
+.TP
+.SM LDAP_INSUFFICIENT_ACCESS
+The user has insufficient access to perform the operation.
+.TP
+.SM LDAP_BUSY
+The DSA is busy.
+.TP
+.SM LDAP_UNAVAILABLE
+The DSA is unavailable.
+.TP
+.SM LDAP_UNWILLING_TO_PERFORM
+The DSA is unwilling to perform the operation.
+.TP
+.SM LDAP_LOOP_DETECT
+A loop was detected.
+.TP
+.SM LDAP_NAMING_VIOLATION
+A naming violation occurred.
+.TP
+.SM LDAP_OBJECT_CLASS_VIOLATION
+An object class violation occurred (e.g., a "must" attribute was missing
+from the entry).
+.TP
+.SM LDAP_NOT_ALLOWED_ON_NONLEAF
+The operation is not allowed on a nonleaf object.
+.TP
+.SM LDAP_NOT_ALLOWED_ON_RDN
+The operation is not allowed on an RDN.
+.TP
+.SM LDAP_ALREADY_EXISTS
+The entry already exists.
+.TP
+.SM LDAP_NO_OBJECT_CLASS_MODS
+Object class modifications are not allowed.
+.TP
+.SM LDAP_OTHER
+An unknown error occurred.
+
+.SH API ERROR CODES
+
+This section provides a complete list of API error codes recognized
+by the library.   Note that LDAP_SUCCESS indicates success of an
+API call in addition to representing the return of the LDAP
+\'success' resultCode.
+
+
+.LP
+.TP 20
+.SM LDAP_SERVER_DOWN
+The LDAP library can't contact the LDAP server.
+.TP
+.SM LDAP_LOCAL_ERROR
+Some local error occurred.  This is usually a failed dynamic memory allocation.
+.TP
+.SM LDAP_ENCODING_ERROR
+An error was encountered encoding parameters to send to the LDAP server.
+.TP
+.SM LDAP_DECODING_ERROR
+An error was encountered decoding a result from the LDAP server.
+.TP
+.SM LDAP_TIMEOUT
+A timelimit was exceeded while waiting for a result.
+.TP
+.SM LDAP_AUTH_UNKNOWN
+The authentication method specified to ldap_bind() is not known.
+.TP
+.SM LDAP_FILTER_ERROR
+An invalid filter was supplied to ldap_search() (e.g., unbalanced
+parentheses).
+.TP
+.SM LDAP_PARAM_ERROR
+An ldap routine was called with a bad parameter.
+.TP
+.SM LDAP_NO_MEMORY
+An memory allocation (e.g., malloc(3) or other dynamic memory
+allocator) call failed in an ldap library routine.
+.TP
+.SM LDAP_USER_CANCELED
+Indicates the user cancelled the operation.
+.TP
+.SM LDAP_CONNECT_ERROR
+Indicates a connection problem.
+.TP
+.SM LDAP_NOT_SUPPORTED
+Indicates the routine was called in a manner not supported by the library.
+.TP
+.SM LDAP_CONTROL_NOT_FOUND
+Indicates the control provided is unknown to the client library.
+.TP
+.SM LDAP_NO_RESULTS_RETURNED
+Indicates no results returned.
+.TP
+.SM LDAP_MORE_RESULTS_TO_RETURN
+Indicates more results could be returned.
+.TP
+.SM LDAP_CLIENT_LOOP
+Indicates the library has detected a loop in its processing.
+.TP
+.SM LDAP_REFERRAL_LIMIT_EXCEEDED
+Indicates the referral limit has been exceeded.
+
+.SH DEPRECATED
+.so Deprecated
+
+.SH SEE ALSO
+.BR ldap (3),
+.SH ACKNOWLEDGEMENTS
+.so ../Project

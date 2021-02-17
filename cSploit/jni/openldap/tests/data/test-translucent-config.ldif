@@ -1,0 +1,26 @@
+# toplevel
+
+dn: o=translucent
+objectClass: top
+objectClass: organization
+o: translucent
+description: backend database root
+
+# backend OU
+
+dn: ou=users,o=translucent
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+description: backend user container root
+
+# bind user for frontend connection
+
+dn: uid=binder,o=translucent
+objectClass: inetOrgPerson
+uid: binder
+sn: test
+cn: binder
+businessCategory: binder-test-user
+displayName: Binder Test User
+userPassword: bindtest

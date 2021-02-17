@@ -1,0 +1,4 @@
+dn: cn=John Doe,ou=users,dc=example,dc=com
+changetype: modify
+replace: givenname
+givenname: Joe

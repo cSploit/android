@@ -1,0 +1,1183 @@
+.TH SLAPD.ACCESS 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd.access \- access configuration for slapd, the stand-alone LDAP daemon
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The 
+.BR slapd.conf (5)
+file contains configuration information for the
+.BR slapd (8)
+daemon. This configuration file is also used by the SLAPD tools
+.BR slapacl (8),
+.BR slapadd (8),
+.BR slapauth (8),
+.BR slapcat (8),
+.BR slapdn (8),
+.BR slapindex (8),
+and
+.BR slaptest (8).
+.LP
+The
+.B slapd.conf
+file consists of a series of global configuration options that apply to
+.B slapd
+as a whole (including all backends), followed by zero or more database
+backend definitions that contain information specific to a backend
+instance.
+.LP
+The general format of
+.B slapd.conf
+is as follows:
+.LP
+.nf
+    # comment - these options apply to every database
+    <global configuration options>
+    # first database definition & configuration options
+    database    <backend 1 type>
+    <configuration options specific to backend 1>
+    # subsequent database definitions & configuration options
+    ...
+.fi
+.LP
+Both the global configuration and each backend-specific section can
+contain access information.  Backend-specific access control
+directives are used for those entries that belong to the backend,
+according to their naming context.  In case no access control
+directives are defined for a backend or those which are defined are
+not applicable, the directives from the global configuration section
+are then used.
+.LP
+If no access controls are present, the default policy
+allows anyone and everyone to read anything but restricts
+updates to rootdn.  (e.g., "access to * by * read").
+.LP
+When dealing with an access list, because the global access list is 
+effectively appended to each per-database list, if the resulting 
+list is non-empty then the access list will end with an implicit 
+.B access to * by * none
+directive. If there are no access directives applicable to a backend, 
+then a default read is used.
+.LP
+.B Be warned: the rootdn can always read and write EVERYTHING!
+.LP
+For entries not held in any backend (such as a root DSE), the
+global directives are used.
+.LP
+Arguments that should be replaced by actual text are shown in
+brackets <>.
+.SH THE ACCESS DIRECTIVE
+The structure of the access control directives is
+.TP
+.B access to <what> "[ by <who> [ <access> ] [ <control> ] ]+"
+Grant access (specified by 
+.BR <access> ) 
+to a set of entries and/or attributes (specified by 
+.BR <what> ) 
+by one or more requestors (specified by 
+.BR <who> ).
+
+.LP
+Lists of access directives are evaluated in the order they appear
+in \fIslapd.conf\fP.
+When a
+.B <what>
+clause matches the datum whose access is being evaluated, its
+.B <who>
+clause list is checked.
+When a
+.B <who>
+clause matches the accessor's properties, its
+.B <access>
+and
+.B <control>
+clauses are evaluated.
+Access control checking stops at the first match of the
+.B <what>
+and
+.B <who>
+clause, unless otherwise dictated by the
+.B <control>
+clause.
+Each
+.B <who>
+clause list is implicitly terminated by a
+.LP
+.nf
+	by * none stop
+.fi
+.LP
+clause that results in stopping the access control with no access 
+privileges granted.
+Each
+.B <what>
+clause list is implicitly terminated by a
+.LP
+.nf
+	access to *
+		by * none
+.fi
+.LP
+clause that results in granting no access privileges to an otherwise
+unspecified datum.
+.SH THE <WHAT> FIELD
+The field
+.BR <what>
+specifies the entity the access control directive applies to.
+It can have the forms
+.LP
+.nf
+	dn[.<dnstyle>]=<dnpattern>
+	filter=<ldapfilter>
+	attrs=<attrlist>[ val[/matchingRule][.<attrstyle>]=<attrval>]
+.fi
+.LP
+with
+.LP
+.nf
+	<dnstyle>={{exact|base(object)}|regex
+		|one(level)|sub(tree)|children}
+	<attrlist>={<attr>|[{!|@}]<objectClass>}[,<attrlist>]
+	<attrstyle>={{exact|base(object)}|regex
+		|one(level)|sub(tree)|children}
+.fi
+.LP
+The statement
+.B dn=<dnpattern>
+selects the entries based on their naming context.
+The
+.B <dnpattern>
+is a string representation of the entry's DN.
+The wildcard
+.B *
+stands for all the entries, and it is implied if no
+.B dn
+form is given.
+.LP
+The 
+.B <dnstyle> 
+is optional; however, it is recommended to specify it to avoid ambiguities.
+.B Base 
+(synonym of
+.BR baseObject ),
+the default,
+or
+.B exact 
+(an alias of 
+.BR base )
+indicates the entry whose DN is equal to the
+.BR <dnpattern> ;
+.B one
+(synonym of
+.BR onelevel )
+indicates all the entries immediately below the
+.BR <dnpattern> ,
+.B sub
+(synonym of
+.BR subtree )
+indicates all entries in the subtree at the
+.BR <dnpattern> ,
+.B children
+indicates all the entries below (subordinate to) the 
+.BR <dnpattern> .
+.LP
+If the
+.B <dnstyle>
+qualifier is
+.BR regex ,
+then 
+.B <dnpattern>
+is a POSIX (''extended'') regular expression pattern,
+as detailed in
+.BR regex (7)
+and/or
+.BR re_format (7),
+matching a normalized string representation of the entry's DN.
+The regex form of the pattern does not (yet) support UTF-8.
+.LP
+The statement
+.B filter=<ldapfilter>
+selects the entries based on a valid LDAP filter as described in RFC 4515.
+A filter of
+.B (objectClass=*)
+is implied if no
+.B filter
+form is given.
+.LP
+The statement
+.B attrs=<attrlist>
+selects the attributes the access control rule applies to.
+It is a comma-separated list of attribute types, plus the special names
+.BR entry ,
+indicating access to the entry itself, and
+.BR children ,
+indicating access to the entry's children. ObjectClass names may also
+be specified in this list, which will affect all the attributes that
+are required and/or allowed by that objectClass.
+Actually, names in 
+.B <attrlist>
+that are prefixed by
+.B @
+are directly treated as objectClass names.  A name prefixed by
+.B !
+is also treated as an objectClass, but in this case the access rule
+affects the attributes that are not required nor allowed 
+by that objectClass.
+If no
+.B attrs
+form is given, 
+.B attrs=@extensibleObject
+is implied, i.e. all attributes are addressed.
+.LP
+Using the form
+.B attrs=<attr> val[/matchingRule][.<attrstyle>]=<attrval>
+specifies access to a particular value of a single attribute.
+In this case, only a single attribute type may be given. The
+.B <attrstyle>
+.B exact
+(the default) uses the attribute's equality matching rule to compare the
+value, unless a different (and compatible) matching rule is specified. If the
+.B <attrstyle>
+is
+.BR regex ,
+the provided value is used as a POSIX (''extended'') regular
+expression pattern.  If the attribute has DN syntax, the 
+.B <attrstyle>
+can be any of
+.BR base ,
+.BR onelevel ,
+.B subtree
+or
+.BR children ,
+resulting in base, onelevel, subtree or children match, respectively.
+.LP
+The dn, filter, and attrs statements are additive; they can be used in sequence 
+to select entities the access rule applies to based on naming context,
+value and attribute type simultaneously.
+Submatches resulting from
+.B regex
+matching can be dereferenced in the
+.B <who>
+field using the syntax
+.IR ${v<n>} ,
+where
+.I <n>
+is the submatch number.
+The default syntax,
+.IR $<n> ,
+is actually an alias for
+.IR ${d<n>} ,
+that corresponds to dereferencing submatches from the
+.B dnpattern
+portion of the
+.B <what>
+field.
+.SH THE <WHO> FIELD
+The field
+.B <who>
+indicates whom the access rules apply to.
+Multiple 
+.B <who>
+statements can appear in an access control statement, indicating the
+different access privileges to the same resource that apply to different
+accessee.
+It can have the forms
+.LP
+.nf
+	*
+	anonymous
+	users
+	self[.<selfstyle>]
+
+	dn[.<dnstyle>[,<modifier>]]=<DN>
+	dnattr=<attrname>
+
+	realanonymous
+	realusers
+	realself[.<selfstyle>]
+
+	realdn[.<dnstyle>[,<modifier>]]=<DN>
+	realdnattr=<attrname>
+
+	group[/<objectclass>[/<attrname>]]
+		[.<groupstyle>]=<group>
+	peername[.<peernamestyle>]=<peername>
+	sockname[.<style>]=<sockname>
+	domain[.<domainstyle>[,<modifier>]]=<domain>
+	sockurl[.<style>]=<sockurl>
+	set[.<setstyle>]=<pattern>
+
+	ssf=<n>
+	transport_ssf=<n>
+	tls_ssf=<n>
+	sasl_ssf=<n>
+
+	dynacl/<name>[/<options>][.<dynstyle>][=<pattern>]
+.fi
+.LP
+with
+.LP
+.nf
+	<style>={exact|regex|expand}
+	<selfstyle>={level{<n>}}
+	<dnstyle>={{exact|base(object)}|regex
+		|one(level)|sub(tree)|children|level{<n>}}
+	<groupstyle>={exact|expand}
+	<peernamestyle>={<style>|ip|ipv6|path}
+	<domainstyle>={exact|regex|sub(tree)}
+	<setstyle>={exact|expand}
+	<modifier>={expand}
+	<name>=aci		<pattern>=<attrname>]
+.fi
+.LP
+They may be specified in combination.
+.LP
+.nf
+.fi
+.LP
+The wildcard
+.B *
+refers to everybody.
+.LP
+The keywords prefixed by
+.B real
+act as their counterparts without prefix; the checking respectively occurs
+with the \fIauthentication\fP DN and the \fIauthorization\fP DN.
+.LP
+The keyword
+.B anonymous
+means access is granted to unauthenticated clients; it is mostly used 
+to limit access to authentication resources (e.g. the
+.B userPassword
+attribute) to unauthenticated clients for authentication purposes.
+.LP
+The keyword
+.B users
+means access is granted to authenticated clients.
+.LP
+The keyword
+.B self
+means access to an entry is allowed to the entry itself (e.g. the entry
+being accessed and the requesting entry must be the same).
+It allows the 
+.B level{<n>}
+style, where \fI<n>\fP indicates what ancestor of the DN 
+is to be used in matches.
+A positive value indicates that the <n>-th ancestor of the user's DN
+is to be considered; a negative value indicates that the <n>-th ancestor
+of the target is to be considered.
+For example, a "\fIby self.level{1} ...\fP" clause would match
+when the object "\fIdc=example,dc=com\fP" is accessed
+by "\fIcn=User,dc=example,dc=com\fP".
+A "\fIby self.level{-1} ...\fP" clause would match when the same user
+accesses the object "\fIou=Address Book,cn=User,dc=example,dc=com\fP".
+.LP
+The statement
+.B dn=<DN>
+means that access is granted to the matching DN.
+The optional style qualifier
+.B dnstyle
+allows the same choices of the dn form of the
+.B <what>
+field.  In addition, the
+.B regex
+style can exploit substring substitution of submatches in the
+.B <what>
+dn.regex clause by using the form
+.BR $<digit> ,
+with 
+.B digit
+ranging from 0 to 9 (where 0 matches the entire string),
+or the form
+.BR ${<digit>+} ,
+for submatches higher than 9.
+Substring substitution from attribute value can
+be done in 
+using the form
+.BR ${v<digit>+} .
+Since the dollar character is used to indicate a substring replacement,
+the dollar character that is used to indicate match up to the end of
+the string must be escaped by a second dollar character, e.g.
+.LP
+.nf
+    access to dn.regex="^(.+,)?uid=([^,]+),dc=[^,]+,dc=com$"
+        by dn.regex="^uid=$2,dc=[^,]+,dc=com$$" write
+.fi
+.LP
+The style qualifier
+allows an optional
+.BR modifier .
+At present, the only type allowed is 
+.BR expand ,
+which causes substring substitution of submatches to take place
+even if 
+.B dnstyle
+is not 
+.BR regex .
+Note that the 
+.B regex 
+dnstyle in the above example may be of use only if the 
+.B <by>
+clause needs to be a regex; otherwise, if the
+value of the second (from the right)
+.B dc=
+portion of the DN in the above example were fixed, the form
+.LP
+.nf
+    access to dn.regex="^(.+,)?uid=([^,]+),dc=example,dc=com$"
+        by dn.exact,expand="uid=$2,dc=example,dc=com" write
+.fi
+.LP
+could be used; if it had to match the value in the 
+.B <what>
+clause, the form
+.LP
+.nf
+    access to dn.regex="^(.+,)?uid=([^,]+),dc=([^,]+),dc=com$"
+        by dn.exact,expand="uid=$2,dc=$3,dc=com" write
+.fi
+.LP
+could be used.
+.LP
+Forms of the 
+.B <what>
+clause other than regex may provide submatches as well.
+The 
+.BR base(object) ,
+the
+.BR sub(tree) ,
+the
+.BR one(level) ,
+and the
+.BR children
+forms provide
+.B $0
+as the match of the entire string.
+The 
+.BR sub(tree) ,
+the
+.BR one(level) ,
+and the
+.BR children
+forms also provide
+.B $1
+as the match of the rightmost part of the DN as defined in the
+.B <what>
+clause.
+This may be useful, for instance, to provide access to all the 
+ancestors of a user by defining
+.LP
+.nf
+    access to dn.subtree="dc=com"
+        by dn.subtree,expand="$1" read
+.fi
+.LP
+which means that only access to entries that appear in the DN of the
+.B <by>
+clause is allowed.
+.LP
+The 
+.BR level{<n>}
+form is an extension and a generalization of the
+.BR onelevel
+form, which matches all DNs whose <n>-th ancestor is the pattern.
+So, \fIlevel{1}\fP is equivalent to \fIonelevel\fP, 
+and \fIlevel{0}\fP is equivalent to \fIbase\fP.
+.LP
+It is perfectly useless to give any access privileges to a DN 
+that exactly matches the
+.B rootdn
+of the database the ACLs apply to, because it implicitly
+possesses write privileges for the entire tree of that database.
+Actually, access control is bypassed for the
+.BR rootdn ,
+to solve the intrinsic chicken-and-egg problem.
+.LP
+The statement
+.B dnattr=<attrname>
+means that access is granted to requests whose DN is listed in the
+entry being accessed under the 
+.B <attrname>
+attribute.
+.LP
+The statement
+.B group=<group>
+means that access is granted to requests whose DN is listed
+in the group entry whose DN is given by
+.BR <group> .
+The optional parameters
+.B <objectclass>
+and
+.B <attrname>
+define the objectClass and the member attributeType of the group entry.
+The defaults are
+.B groupOfNames
+and
+.BR member ,
+respectively.
+The optional style qualifier
+.B <style>
+can be
+.BR expand ,
+which means that
+.B <group>
+will be expanded as a replacement string (but not as a regular expression)
+according to
+.BR regex (7)
+and/or
+.BR re_format (7),
+and
+.BR exact ,
+which means that exact match will be used.
+If the style of the DN portion of the
+.B <what>
+clause is regex, the submatches are made available according to
+.BR regex (7)
+and/or
+.BR re_format (7);
+other styles provide limited submatches as discussed above about 
+the DN form of the 
+.B <by>
+clause.
+.LP
+For static groups, the specified attributeType must have
+.B DistinguishedName
+or
+.B NameAndOptionalUID
+syntax. For dynamic groups the attributeType must
+be a subtype of the
+.B labeledURI
+attributeType. Only LDAP URIs of the form
+.B ldap:///<base>??<scope>?<filter>
+will be evaluated in a dynamic group, by searching the local server only.
+.LP
+The statements
+.BR peername=<peername> ,
+.BR sockname=<sockname> ,
+.BR domain=<domain> ,
+and
+.BR sockurl=<sockurl>
+mean that the contacting host IP (in the form 
+.BR "IP=<ip>:<port>"
+for IPv4, or
+.BR "IP=[<ipv6>]:<port>"
+for IPv6)
+or the contacting host named pipe file name (in the form
+.B "PATH=<path>"
+if connecting through a named pipe) for
+.BR peername ,
+the named pipe file name for
+.BR sockname ,
+the contacting host name for
+.BR domain ,
+and the contacting URL for
+.BR sockurl
+are compared against
+.B pattern
+to determine access.
+The same
+.B style
+rules for pattern match described for the
+.B group
+case apply, plus the
+.B regex
+style, which implies submatch
+.B expand
+and regex match of the corresponding connection parameters.
+The
+.B exact
+style of the
+.BR <peername>
+clause (the default) implies a case-exact match on the client's
+.BR IP , 
+including the
+.B "IP="
+prefix and the trailing
+.BR ":<port>" , 
+or the client's 
+.BR path ,
+including the
+.B "PATH="
+prefix if connecting through a named pipe.
+The special
+.B ip
+style interprets the pattern as 
+.BR <peername>=<ip>[%<mask>][{<n>}] ,
+where
+.B <ip>
+and 
+.B <mask>
+are dotted digit representations of the IP and the mask, while
+.BR <n> ,
+delimited by curly brackets, is an optional port.
+The same applies to IPv6 addresses when the special
+.B ipv6
+style is used.
+When checking access privileges, the IP portion of the
+.BR peername 
+is extracted, eliminating the
+.B "IP="
+prefix and the
+.B ":<port>"
+part, and it is compared against the
+.B <ip>
+portion of the pattern after masking with
+.BR <mask> :
+\fI((peername & <mask>) == <ip>)\fP.
+As an example, 
+.B peername.ip=127.0.0.1
+and
+.B peername.ipv6=::1
+allow connections only from localhost,
+.B peername.ip=192.168.1.0%255.255.255.0 
+allows connections from any IP in the 192.168.1 class C domain, and
+.B peername.ip=192.168.1.16%255.255.255.240{9009}
+allows connections from any IP in the 192.168.1.[16-31] range 
+of the same domain, only if port 9009 is used.
+The special 
+.B path
+style eliminates the 
+.B "PATH="
+prefix from the 
+.B peername
+when connecting through a named pipe, and performs an exact match 
+on the given pattern.
+The
+.BR <domain>
+clause also allows the
+.B subtree
+style, which succeeds when a fully qualified name exactly matches the
+.BR domain
+pattern, or its trailing part, after a 
+.BR dot ,
+exactly matches the 
+.BR domain
+pattern.
+The 
+.B expand
+style is allowed, implying an
+.B exact 
+match with submatch expansion; the use of 
+.B expand 
+as a style modifier is considered more appropriate.
+As an example,
+.B domain.subtree=example.com
+will match www.example.com, but will not match www.anotherexample.com.
+The
+.B domain
+of the contacting host is determined by performing a DNS reverse lookup.
+As this lookup can easily be spoofed, use of the
+.B domain
+statement is strongly discouraged.  By default, reverse lookups are disabled.
+The optional
+.B domainstyle
+qualifier of the
+.B <domain>
+clause allows a
+.B modifier
+option; the only value currently supported is
+.BR expand ,
+which causes substring substitution of submatches to take place even if
+the 
+.B domainstyle
+is not 
+.BR regex ,
+much like the analogous usage in 
+.B <dn>
+clause.
+.LP
+The statement
+.B set=<pattern>
+is undocumented yet.
+.LP
+The statement
+.B dynacl/<name>[/<options>][.<dynstyle>][=<pattern>]
+means that access checking is delegated to the admin-defined method
+indicated by
+.BR <name> ,
+which can be registered at run-time by means of the
+.B moduleload
+statement.
+The fields
+.BR <options> ,
+.B <dynstyle>
+and
+.B <pattern>
+are optional, and are directly passed to the registered parsing routine.
+Dynacl is experimental; it must be enabled at compile time.
+.LP
+The statement
+.B dynacl/aci[=<attrname>]
+means that the access control is determined by the values in the
+.B attrname
+of the entry itself.
+The optional
+.B <attrname>
+indicates what attributeType holds the ACI information in the entry.
+By default, the 
+.B OpenLDAPaci
+operational attribute is used.
+ACIs are experimental; they must be enabled at compile time.
+.LP
+The statements
+.BR ssf=<n> ,
+.BR transport_ssf=<n> ,
+.BR tls_ssf=<n> ,
+and
+.BR sasl_ssf=<n>
+set the minimum required Security Strength Factor (ssf) needed
+to grant access.  The value should be positive integer.
+.SH THE <ACCESS> FIELD
+The optional field
+.B <access> ::= [[real]self]{<level>|<priv>}
+determines the access level or the specific access privileges the
+.B who 
+field will have.
+Its component are defined as
+.LP
+.nf
+	<level> ::= none|disclose|auth|compare|search|read|{write|add|delete}|manage
+	<priv> ::= {=|+|\-}{0|d|x|c|s|r|{w|a|z}|m}+
+.fi
+.LP
+The modifier
+.B self
+allows special operations like having a certain access level or privilege
+only in case the operation involves the name of the user that's requesting
+the access.
+It implies the user that requests access is authorized.
+The modifier
+.B realself
+refers to the authenticated DN as opposed to the authorized DN of the
+.B self
+modifier.
+An example is the
+.B selfwrite
+access to the member attribute of a group, which allows one to add/delete
+its own DN from the member list of a group, while being not allowed
+to affect other members.
+.LP
+The 
+.B level 
+access model relies on an incremental interpretation of the access
+privileges.
+The possible levels are
+.BR none ,
+.BR disclose ,
+.BR auth ,
+.BR compare ,
+.BR search ,
+.BR read ,
+.BR write ,
+and
+.BR manage .
+Each access level implies all the preceding ones, thus 
+.B manage
+grants all access including administrative access.
+The 
+.BR write
+access is actually the combination of
+.BR add
+and
+.BR delete ,
+which respectively restrict the write privilege to add or delete
+the specified
+.BR <what> .
+
+.LP
+The
+.B none 
+access level disallows all access including disclosure on error.
+.LP
+The
+.B disclose
+access level allows disclosure of information on error.
+.LP
+The 
+.B auth
+access level means that one is allowed access to an attribute to perform
+authentication/authorization operations (e.g.
+.BR bind )
+with no other access.
+This is useful to grant unauthenticated clients the least possible 
+access level to critical resources, like passwords.
+.LP
+The
+.B priv
+access model relies on the explicit setting of access privileges
+for each clause.
+The
+.B =
+sign resets previously defined accesses; as a consequence, the final 
+access privileges will be only those defined by the clause.
+The 
+.B +
+and
+.B \-
+signs add/remove access privileges to the existing ones.
+The privileges are
+.B m
+for manage,
+.B w
+for write,
+.B a
+for add,
+.B z
+for delete,
+.B r
+for read,
+.B s 
+for search,
+.B c 
+for compare,
+.B x
+for authentication, and
+.B d
+for disclose.
+More than one of the above privileges can be added in one statement.
+.B 0
+indicates no privileges and is used only by itself (e.g., +0).
+Note that
+.B +az
+is equivalent to
+.BR +w .
+.LP
+If no access is given, it defaults to 
+.BR +0 .
+.SH THE <CONTROL> FIELD
+The optional field
+.B <control>
+controls the flow of access rule application.
+It can have the forms
+.LP
+.nf
+	stop
+	continue
+	break
+.fi
+.LP
+where
+.BR stop ,
+the default, means access checking stops in case of match.
+The other two forms are used to keep on processing access clauses.
+In detail, the
+.B continue
+form allows for other 
+.B <who>
+clauses in the same 
+.B <access>
+clause to be considered, so that they may result in incrementally altering
+the privileges, while the
+.B break
+form allows for other
+.B <access>
+clauses that match the same target to be processed.
+Consider the (silly) example
+.LP
+.nf
+	access to dn.subtree="dc=example,dc=com" attrs=cn
+		by * =cs break
+
+	access to dn.subtree="ou=People,dc=example,dc=com"
+		by * +r
+.fi
+.LP
+which allows search and compare privileges to everybody under
+the "dc=example,dc=com" tree, with the second rule allowing
+also read in the "ou=People" subtree,
+or the (even more silly) example
+.LP
+.nf
+	access to dn.subtree="dc=example,dc=com" attrs=cn
+		by * =cs continue
+		by users +r
+.fi
+.LP
+which grants everybody search and compare privileges, and adds read
+privileges to authenticated clients.
+.LP
+One useful application is to easily grant write privileges to an
+.B updatedn
+that is different from the
+.BR rootdn .
+In this case, since the
+.B updatedn
+needs write access to (almost) all data, one can use
+.LP
+.nf
+	access to *
+		by dn.exact="cn=The Update DN,dc=example,dc=com" write
+		by * break
+.fi
+.LP
+as the first access rule.
+As a consequence, unless the operation is performed with the 
+.B updatedn
+identity, control is passed straight to the subsequent rules.
+
+.SH OPERATION REQUIREMENTS
+Operations require different privileges on different portions of entries.
+The following summary applies to primary database backends such as
+the BDB and HDB backends.   Requirements for other backends may
+(and often do) differ.
+
+.LP
+The
+.B add
+operation requires
+.B add (=a)
+privileges on the pseudo-attribute 
+.B entry
+of the entry being added, and 
+.B add (=a)
+privileges on the pseudo-attribute
+.B children
+of the entry's parent.
+When adding the suffix entry of a database,
+.B add
+access to
+.B children
+of the empty DN ("") is required. Also if
+Add content ACL checking has been configured on
+the database (see the
+.BR slapd.conf (5)
+or
+.BR slapd\-config (5)
+manual page),
+.B add (=a)
+will be required on all of the attributes being added.
+
+.LP
+The 
+.B bind
+operation, when credentials are stored in the directory, requires 
+.B auth (=x)
+privileges on the attribute the credentials are stored in (usually
+.BR userPassword ).
+
+.LP
+The
+.B compare
+operation requires 
+.B compare (=c)
+privileges on the attribute that is being compared.
+
+.LP
+The
+.B delete
+operation requires
+.B delete (=z)
+privileges on the pseudo-attribute
+.B entry 
+of the entry being deleted, and
+.B delete (=d)
+privileges on the
+.B children
+pseudo-attribute of the entry's parent.
+
+.LP
+The
+.B modify
+operation requires 
+.B write (=w)
+privileges on the attributes being modified.
+In detail, 
+.B add (=a)
+is required to add new values,
+.B delete (=z)
+is required to delete existing values,
+and both
+.B delete
+and
+.BR "add (=az)" ,
+or
+.BR "write (=w)" ,
+are required to replace existing values.
+
+.LP
+The
+.B modrdn
+operation requires
+.B write (=w)
+privileges on the pseudo-attribute
+.B entry
+of the entry whose relative DN is being modified,
+.B delete (=z)
+privileges on the pseudo-attribute
+.B children
+of the old entry's parents,
+.B add (=a)
+privileges on the pseudo-attribute
+.B children
+of the new entry's parents, and
+.B add (=a)
+privileges on the attributes that are present in the new relative DN.
+.B Delete (=z)
+privileges are also required on the attributes that are present 
+in the old relative DN if 
+.B deleteoldrdn
+is set to 1.
+
+.LP
+The
+.B search
+operation, requires 
+.B search (=s)
+privileges on the 
+.B entry
+pseudo-attribute of the searchBase
+(NOTE: this was introduced with OpenLDAP 2.4).
+Then, for each entry, it requires
+.B search (=s)
+privileges on the attributes that are defined in the filter.
+The resulting entries are finally tested for 
+.B read (=r)
+privileges on the pseudo-attribute
+.B entry
+(for read access to the entry itself)
+and for
+.B read (=r)
+access on each value of each attribute that is requested.
+Also, for each
+.B referral
+object used in generating continuation references, the operation requires
+.B read (=r)
+access on the pseudo-attribute
+.B entry
+(for read access to the referral object itself),
+as well as
+.B read (=r)
+access to the attribute holding the referral information
+(generally the
+.B ref
+attribute).
+
+.LP
+Some internal operations and some
+.B controls
+require specific access privileges.
+The
+.B authzID
+mapping and the 
+.B proxyAuthz
+control require
+.B auth (=x)
+privileges on all the attributes that are present in the search filter
+of the URI regexp maps (the right-hand side of the
+.B authz-regexp
+directives).
+.B Auth (=x)
+privileges are also required on the
+.B authzTo
+attribute of the authorizing identity and/or on the 
+.B authzFrom
+attribute of the authorized identity.
+In general, when an internal lookup is performed for authentication
+or authorization purposes, search-specific privileges (see the access
+requirements for the search operation illustrated above) are relaxed to
+.BR auth .
+
+.LP
+Access control to search entries is checked by the frontend,
+so it is fully honored by all backends; for all other operations
+and for the discovery phase of the search operation,
+full ACL semantics is only supported by the primary backends, i.e.
+.BR back\-bdb (5),
+and
+.BR back\-hdb (5).
+
+Some other backend, like
+.BR back\-sql (5),
+may fully support them; others may only support a portion of the 
+described semantics, or even differ in some aspects.
+The relevant details are described in the backend-specific man pages.
+
+.SH CAVEATS
+It is strongly recommended to explicitly use the most appropriate
+.B <dnstyle>
+in
+.B <what>
+and
+.B <who>
+clauses, to avoid possible incorrect specifications of the access rules 
+as well as for performance (avoid unnecessary regex matching when an exact
+match suffices) reasons.
+.LP
+An administrator might create a rule of the form:
+.LP
+.nf
+	access to dn.regex="dc=example,dc=com"
+		by ...
+.fi
+.LP
+expecting it to match all entries in the subtree "dc=example,dc=com".
+However, this rule actually matches any DN which contains anywhere
+the substring "dc=example,dc=com".  That is, the rule matches both
+"uid=joe,dc=example,dc=com" and "dc=example,dc=com,uid=joe".
+.LP
+To match the desired subtree, the rule would be more precisely
+written:
+.LP
+.nf
+	access to dn.regex="^(.+,)?dc=example,dc=com$"
+		by ...
+.fi
+.LP
+For performance reasons, it would be better to use the subtree style.
+.LP
+.nf
+	access to dn.subtree="dc=example,dc=com"
+		by ...
+.fi
+.LP
+When writing submatch rules, it may be convenient to avoid unnecessary
+.B regex
+.B <dnstyle>
+use; for instance, to allow access to the subtree of the user 
+that matches the
+.B <what>
+clause, one could use
+.LP
+.nf
+	access to dn.regex="^(.+,)?uid=([^,]+),dc=example,dc=com$"
+		by dn.regex="^uid=$2,dc=example,dc=com$$" write
+		by ...
+.fi
+.LP
+However, since all that is required in the 
+.B <by>
+clause is substring expansion, a more efficient solution is
+.LP
+.nf
+	access to dn.regex="^(.+,)?uid=([^,]+),dc=example,dc=com$"
+		by dn.exact,expand="uid=$2,dc=example,dc=com" write
+		by ...
+.fi
+.LP
+In fact, while a
+.B <dnstyle>
+of
+.B regex
+implies substring expansion, 
+.BR exact ,
+as well as all the other DN specific
+.B <dnstyle>
+values, does not, so it must be explicitly requested.
+.LP
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd (8),
+.BR slapd\-* (5),
+.BR slapacl (8),
+.BR regex (7),
+.BR re_format (7)
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>New Berkeley DB SQL API Pragma</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_60_toc.html" title="Chapter 9.  Upgrading Berkeley DB 11.2.5.3 applications to Berkeley DB 12.1.6.0" />
+    <link rel="prev" href="rep_auto_takeover.html" title="Replication Manager Automatic Takeover" />
+    <link rel="next" href="bdb_sql_encryption.html" title="UNIX/POSIX SQL Encryption Default" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">New Berkeley DB SQL API Pragma</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="rep_auto_takeover.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 9. 
+        Upgrading Berkeley DB 11.2.5.3 applications to Berkeley DB 12.1.6.0
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="bdb_sql_encryption.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="sql_logbuf"></a>New Berkeley DB SQL API Pragma</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="sql_logbuf.html#idp50981688">New Pragma</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        The new Berkeley DB SQL API specific pragma
+        <code class="literal">bdbsql_log_buffer</code> has been added to set the
+        size of the Berkeley DB in-memory log buffer, in bytes. This is
+        useful for long-running transactions or applications producing
+        large amounts of data because a larger log buffer can increase
+        throughput.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50981688"></a>New Pragma</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <code class="literal">PRAGMA bdbsql_log_buffer[=n]</code>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="rep_auto_takeover.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_60_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="bdb_sql_encryption.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Replication Manager Automatic Takeover </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> UNIX/POSIX SQL Encryption Default</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

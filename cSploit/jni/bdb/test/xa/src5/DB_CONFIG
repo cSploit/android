@@ -1,0 +1,3 @@
+set_flags DB_MULTIVERSION
+set_flags DB_TXN_SNAPSHOT
+

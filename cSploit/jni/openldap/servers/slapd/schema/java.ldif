@@ -1,0 +1,59 @@
+# java.ldif -- Java Object Schema
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+# Java Object Schema (defined in RFC 2713)
+#	depends upon core.ldif
+#
+# This file was automatically generated from java.schema; see that file
+# for complete references.
+#
+dn: cn=java,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: java
+olcAttributeTypes: {0}( 1.3.6.1.4.1.42.2.27.4.1.6 NAME 'javaClassName' DESC 'F
+ ully qualified name of distinguished Java class or interface' EQUALITY caseEx
+ actMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: {1}( 1.3.6.1.4.1.42.2.27.4.1.7 NAME 'javaCodebase' DESC 'UR
+ L(s) specifying the location of class definition' EQUALITY caseExactIA5Match 
+ SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+olcAttributeTypes: {2}( 1.3.6.1.4.1.42.2.27.4.1.13 NAME 'javaClassNames' DESC 
+ 'Fully qualified Java class or interface name' EQUALITY caseExactMatch SYNTAX
+  1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: {3}( 1.3.6.1.4.1.42.2.27.4.1.8 NAME 'javaSerializedData' DE
+ SC 'Serialized form of a Java object' SYNTAX 1.3.6.1.4.1.1466.115.121.1.40 SI
+ NGLE-VALUE )
+olcAttributeTypes: {4}( 1.3.6.1.4.1.42.2.27.4.1.10 NAME 'javaFactory' DESC 'Fu
+ lly qualified Java class name of a JNDI object factory' EQUALITY caseExactMat
+ ch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: {5}( 1.3.6.1.4.1.42.2.27.4.1.11 NAME 'javaReferenceAddress'
+  DESC 'Addresses associated with a JNDI Reference' EQUALITY caseExactMatch SY
+ NTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: {6}( 1.3.6.1.4.1.42.2.27.4.1.12 NAME 'javaDoc' DESC 'The Ja
+ va documentation for the class' EQUALITY caseExactIA5Match SYNTAX 1.3.6.1.4.1
+ .1466.115.121.1.26 )
+olcObjectClasses: {0}( 1.3.6.1.4.1.42.2.27.4.2.1 NAME 'javaContainer' DESC 'Co
+ ntainer for a Java object' SUP top STRUCTURAL MUST cn )
+olcObjectClasses: {1}( 1.3.6.1.4.1.42.2.27.4.2.4 NAME 'javaObject' DESC 'Java 
+ object representation' SUP top ABSTRACT MUST javaClassName MAY ( javaClassNam
+ es $ javaCodebase $ javaDoc $ description ) )
+olcObjectClasses: {2}( 1.3.6.1.4.1.42.2.27.4.2.5 NAME 'javaSerializedObject' D
+ ESC 'Java serialized object' SUP javaObject AUXILIARY MUST javaSerializedData
+  )
+olcObjectClasses: {3}( 1.3.6.1.4.1.42.2.27.4.2.8 NAME 'javaMarshalledObject' D
+ ESC 'Java marshalled object' SUP javaObject AUXILIARY MUST javaSerializedData
+  )
+olcObjectClasses: {4}( 1.3.6.1.4.1.42.2.27.4.2.7 NAME 'javaNamingReference' DE
+ SC 'JNDI reference' SUP javaObject AUXILIARY MAY ( javaReferenceAddress $ jav
+ aFactory ) )

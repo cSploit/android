@@ -1,0 +1,394 @@
+/* $Id: config_h.vms,v 1.12 2010-09-02 18:01:42 berryc Exp $ */
+
+/* include/config.h.in.  Generated from configure.ac by autoheader.  */
+/* and edited by hand for VMS */
+
+#ifndef CONFIG_H_LOADED
+#define CONFIG_H_LOADED 1
+
+/* Define to 1 if you need BSD_COMP defined to get FIONBIO defined. */
+#undef BSD_COMP
+
+/* Define to enable work in progress code */
+#undef ENABLE_DEVELOPING
+
+/* Define to enable extra checks on code */
+#undef ENABLE_EXTRA_CHECKS
+
+/* Define to 1 if you have the <arpa/inet.h> header file. */
+#define HAVE_ARPA_INET_H 1
+
+/* Define to 1 if you have the `alarm' function. */
+#define HAVE_ALARM 1
+
+/* Define to 1 if you have the `asprintf' function. */
+#define HAVE_ASPRINTF @D_ASPRINTF@
+
+/* Define to 1 if you have the `atoll' function. */
+#ifdef __VAX
+#undef HAVE_ATOLL 
+#else
+#define HAVE_ATOLL 1
+#endif
+
+/* Define to 1 if you have the `basename' function. */
+#ifndef __CRTL_VER
+#define __CRTL_VER __VMS_VER
+#endif
+#if __CRTL_VER >= 70000000
+#define HAVE_BASENAME 1
+#else
+#define HAVE_BASENAME 0
+#endif
+
+/* Define if you have the clock_gettime function. */
+#if __CRTL_VER >= 70302000
+#define HAVE_CLOCK_GETTIME 1
+#endif
+
+/* Define to 1 if you have the <errno.h> header file. */
+#define HAVE_ERRNO_H 1
+
+/* Define to 1 if your system provides the 5-parameter version of
+   gethostbyaddr_r(). */
+#undef HAVE_FUNC_GETHOSTBYADDR_R_5
+
+/* Define to 1 if your system provides the 6-parameter version of
+   gethostbyaddr_r(). */
+#undef HAVE_FUNC_GETHOSTBYADDR_R_7
+
+/* Define to 1 if your system provides the 8-parameter version of
+   gethostbyaddr_r(). */
+#undef HAVE_FUNC_GETHOSTBYADDR_R_8
+
+/* Define to 1 if your system provides the 3-parameter version of
+   gethostbyname_r(). */
+#undef HAVE_FUNC_GETHOSTBYNAME_R_3
+
+/* Define to 1 if your system provides the 5-parameter version of
+   gethostbyname_r(). */
+#undef HAVE_FUNC_GETHOSTBYNAME_R_5
+
+/* Define to 1 if your system provides the 6-parameter version of
+   gethostbyname_r(). */
+#undef HAVE_FUNC_GETHOSTBYNAME_R_6
+
+/* Define to 1 if your system provides the 4-parameter version of
+   getpwuid_r(). */
+#undef HAVE_FUNC_GETPWUID_R_4
+
+/* Define to 1 if your system getpwuid_r() have 4 parameters and return struct
+   passwd*. */
+#undef HAVE_FUNC_GETPWUID_R_4_PW
+
+/* Define to 1 if your system provides the 5-parameter version of
+   getpwuid_r(). */
+#undef HAVE_FUNC_GETPWUID_R_5
+
+/* Define to 1 if your system provides the 4-parameter version of
+   getservbyname_r(). */
+#undef HAVE_FUNC_GETSERVBYNAME_R_4
+
+/* Define to 1 if your system provides the 5-parameter version of
+   getservbyname_r(). */
+#undef HAVE_FUNC_GETSERVBYNAME_R_5
+
+/* Define to 1 if your system provides the 6-parameter version of
+   getservbyname_r(). */
+#undef HAVE_FUNC_GETSERVBYNAME_R_6
+
+/* Define to 1 if you have the `gethostent_r' function. */
+#undef HAVE_GETHOSTENT_R
+
+/* Define if you have getaddrinfo function */
+#define HAVE_GETADDRINFO 1
+
+/* Define to 1 if you have the `gethostname' function. */
+#define HAVE_GETHOSTNAME 1
+
+/* Define to 1 if you have the `getpwuid' function. */
+#define HAVE_GETPWUID 1
+
+/* Define to 1 if you have the `getpwuid_r' function. */
+#undef HAVE_GETPWUID_R
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#define HAVE_GETTIMEOFDAY 1
+
+/* Define to 1 if you have the `getuid' function. */
+#define HAVE_GETUID 1
+
+/* Define if you have the iconv() function. */
+#define HAVE_ICONV @D_HAVE_ICONV@
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#define HAVE_INTTYPES_H 1
+
+/* Define to 1 if you have the <langinfo.h> header file. */
+#define HAVE_LANGINFO_H 1
+
+/* Define to 1 if you have the <libgen.h> header file. */
+#define HAVE_LIBGEN_H 1
+
+/* Define to 1 if you have the <locale.h> header file. */
+#define HAVE_LOCALE_H 1
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if your system provides the malloc_options variable. */
+#undef HAVE_MALLOC_OPTIONS
+
+/* Define to 1 if you have the <memory.h> header file. */
+#define HAVE_MEMORY_H 1
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#define HAVE_NETDB_H 1
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#define HAVE_NETINET_IN_H 1
+
+/* Define to 1 if you have the `nl_langinfo' function. */
+#define HAVE_NL_LANGINFO 1
+
+/* Define to 1 if you have the <paths.h> header file. */
+#undef HAVE_PATHS_H
+
+#if __CRTL_VER >= 70302000 && !defined(__VAX)
+
+/* Define to 1 if you have the `poll' function. */
+#define HAVE_POLL 1
+
+/* Define to 1 if you have the <poll.h> header file. */
+#define HAVE_POLL_H 1
+
+#endif
+
+/* Define if you have POSIX threads libraries and header files. */
+#define HAVE_PTHREAD 1
+
+/* Define to 1 if you have the `pthread_cond_timedwait' function. */
+#define HAVE_PTHREAD_COND_TIMEDWAIT 1
+
+/* Define to 1 if you have the GNU Readline library. */
+#define HAVE_READLINE 1
+
+/* Define to 1 if you have the `sethostent_r' function. */
+#undef HAVE_SETHOSTENT_R
+
+/* Define to 1 if you have the `socketpair' function. */
+#if __CRTL_VER >= 80200000
+#define HAVE_SOCKETPAIR 1
+#endif
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#define HAVE_STDLIB_H 1
+
+/* Define to 1 if you have the <strings.h> header file. */
+#define HAVE_STRINGS_H 1
+
+/* Define to 1 if you have the <string.h> header file. */
+#define HAVE_STRING_H 1
+
+/* Define to 1 if you have the `strtok_r' function. */
+#define HAVE_STRTOK_R @D_STRTOK_R@
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#define HAVE_SYS_IOCTL_H 1
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
+
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#define HAVE_SYS_SOCKET_H 1
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#define HAVE_SYS_STAT_H  1
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#define HAVE_SYS_TIME_H 1
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#define HAVE_SYS_TYPES_H 1
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#define HAVE_UNISTD_H 1
+
+/* Define to 1 if you have the `vasprintf' function. */
+#define HAVE_VASPRINTF @D_VASPRINTF@
+
+/* Define to 1 if you have the `snprintf' function. */
+#define HAVE_SNPRINTF @D_SNPRINTF@
+
+/* Define to 1 if you have the `vsnprintf' function. */
+#define HAVE_VSNPRINTF 0
+
+/* Define as const if the declaration of iconv() needs const. */
+#if HAVE_ICONV
+#  define ICONV_CONST
+#else
+#  define ICONV_CONST const
+#endif
+
+/* Define to value of INADDR_NONE if not provided by your system header files.
+   */
+/*#undef INADDR_NONE*/
+
+/* Define to 1 if the BSD-style netdb interface is reentrant. */
+#undef NETDB_REENTRANT
+
+/* Name of package */
+#define PACKAGE "freetds"
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* The size of a `char', as computed by sizeof. */
+#undef SIZEOF_CHAR
+
+/* The size of a `double', as computed by sizeof. */
+#undef SIZEOF_DOUBLE
+
+/* The size of a `float', as computed by sizeof. */
+#undef SIZEOF_FLOAT
+
+/* The size of a `int', as computed by sizeof. */
+#undef SIZEOF_INT
+
+/* The size of a `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of a `long long', as computed by sizeof. */
+#undef SIZEOF_LONG_LONG
+
+/* The size of a `short', as computed by sizeof. */
+#undef SIZEOF_SHORT
+
+/* The size of a `__int64', as computed by sizeof. */
+#undef SIZEOF___INT64
+
+/* Define to 1 if you have the ANSI C header files. */
+#define STDC_HEADERS 1
+
+/* define to constant to use for clock_gettime */
+#if __CRTL_VER >= 70302000
+#define TDS_GETTIMEMILLI_CONST CLOCK_REALTIME
+#endif
+
+/* Define if you have pthread with mutex support */
+#define TDS_HAVE_PTHREAD_MUTEX 1
+
+/* Define if stdio support locking */
+#if __CRTL_VER >= 80200000
+#define TDS_HAVE_STDIO_LOCKED 1
+#endif
+
+/* define to prefix format string used for 64bit integers */
+#define TDS_I64_PREFIX "ll"
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Version number of package */
+#define VERSION @VERSION@
+
+/* Define to 1 if your processor stores words with the most significant byte
+   first (like Motorola and SPARC, unlike Intel and VAX). */
+#undef WORDS_BIGENDIAN
+
+/* Enable GNU extensions on systems that have them.  */
+#ifndef _GNU_SOURCE
+# undef _GNU_SOURCE
+#endif
+
+/* Additions below not originally from config.h.in */
+
+/* This really just needs to be the current working directory for the tests */
+#define FREETDS_SRCDIR "."
+
+/* But some tests insist on redefining that in terms of this */
+#define FREETDS_TOPDIR "../../.."
+
+#include <limits.h>
+#define MAXPATHLEN PATH_MAX
+
+#define _PATH_DEVNULL "_NLA0:"
+
+/* FIXME: There are numerous signed/unsigned mismatches in the code
+ * that should really be corrected, but this hushes the compiler for now.
+ */
+#pragma message disable PTRMISMATCH1
+
+
+#include <stddef.h> /* we need size_t for replacements */
+
+#pragma extern_prefix save
+
+/* We cook up our own version of this, so prototype it here. */
+#pragma extern_prefix "freetds_" (getpass)
+char *getpass( const char* prompt );
+
+#if !HAVE_ASPRINTF
+#pragma extern_prefix "freetds_" (asprintf)
+#endif /* !HAVE_ASPRINTF */
+
+#if !HAVE_VASPRINTF
+#pragma extern_prefix "freetds_" (vasprintf)
+#endif /* !HAVE_VASPRINTF */
+
+#if !HAVE_SNPRINTF
+#pragma extern_prefix "portable_" (snprintf)
+extern int snprintf(char *, size_t, const char *, /*args*/ ...);
+#endif /* !HAVE_SNPRINTF */
+
+#if !HAVE_STRTOK_R
+#pragma extern_prefix "freetds_" (strtok_r)
+#endif /* !HAVE_STRTOK_R */
+
+#pragma extern_prefix restore
+
+#define tds_sysdep_intptr_type int	/* 32-bit int */
+
+#pragma extern_prefix "freetds_" (readpassphrase)
+char * readpassphrase(const char *, char *, size_t, int);
+#ifdef HAVE_READPASSPHRASE
+/* has to be undefined to pick up constants in readpassphrase.h */
+# undef HAVE_READPASSPHRASE
+#endif
+
+#include "replacements.h"
+
+/* If the CRTL ever complies with UNIX98 and defines socklen_t in
+ * sys/socket.h, this _may_ prevent a conflicting definition but
+ * still get us what we need in the meantime.
+ */
+#if !defined __SOCKLEN_T
+#   define __SOCKLEN_T 1
+    typedef __size_t socklen_t;
+#endif
+
+/* We only support unixODBC, so we do have these */
+#define HAVE_SQLGETPRIVATEPROFILESTRING 1
+#define HAVE_SQLLEN 1
+#define HAVE_SQLSETPOSIROW 1
+#define TDS_SQLCOLATTRIBUTE_SQLLEN 1
+
+/* Prototype for routine to convert VMS-style arguments to Unix-style. */
+int parse_vms_args(int *argc, char **argv[]);
+
+#endif /* CONFIG_H_LOADED */

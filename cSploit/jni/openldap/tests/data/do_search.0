@@ -1,0 +1,12 @@
+dc=example,dc=com
+(cn=Barbara Jensen)
+ou=people,dc=example,dc=com
+(cn=Bjorn Jensen)
+ou=people,dc=example,dc=com
+(cn=James A Jones 1)
+dc=example,dc=com
+(cn=Bjorn Jensen)
+dc=example,dc=com
+(cn=Alumni Assoc Staff)
+dc=example,dc=com
+(cn=James*)

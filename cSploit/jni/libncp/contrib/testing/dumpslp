@@ -1,0 +1,12 @@
+#! /bin/sh
+
+types=`slpinfo -t | sort | uniq`
+for a in $types; do
+  echo "------ Type: $a ------"
+  vals=`slpinfo -s "$a///" | sort | uniq`
+  for b in $vals; do
+    echo "------ Service: $b ------"
+    slpinfo -a "$b"
+  done
+done
+

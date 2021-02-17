@@ -1,0 +1,20 @@
+.TH SLAPD-LDBM 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd\-ldbm \- Discontinued LDBM backend to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+LDBM was the original database backend to
+.BR slapd (8),
+and was supported up to OpenLDAP 2.3.
+It has been superseded by the more robust BDB and HDB backends.
+
+.SH SEE ALSO
+.BR slapd (8),
+.BR slapd\-bdb (5),
+.BR slapd.backends (5).
+.SH ACKNOWLEDGEMENTS
+.so ../Project

@@ -1,0 +1,16 @@
+- de-IBM SLAPI
+- add a config statement, or redefine the dynamic backend one,
+  "modulepath", to set/modify the load path also for plugins
+  (both plugins and modules use ltdl, so "modulepath" suffices ...)
+- improve slapi logging (use some [v]s[n]printf function)
+- add a config statement to set the log file name, or better
+- use syslog where available?
+- add some plugin monitoring stuff in back-monitor (e.g. a subentry
+  for each plugin with data from struct Slapi_PluginDesc)
+- This is a very tough task: try to implement a sandbox to execute
+  plugins in, trap deadly signals and possibly disable unsafe plugins
+  without crashing slapd (fork from inside thread? trap signals
+  and longjump to next plugin execution? Brrr). 
+
+---
+$OpenLDAP$

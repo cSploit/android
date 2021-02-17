@@ -1,0 +1,145 @@
+.TH NWBPADD 8 7/9/1996 nwbpadd nwbpadd
+.SH NAME
+nwbpadd \- Set the value of a NetWare Bindery Property
+.SH SYNOPSIS
+.B nwbpadd
+[
+.B -h
+] [
+.B -S
+.I server
+] [
+.B -U
+.I user name
+] [
+.B -P
+.I password
+|
+.B -n
+] [
+.B -C
+] [
+.B -o
+.I object name
+] [
+.B -t
+.I type
+] [
+.B -p
+.I property
+]
+.B value
+
+.SH DESCRIPTION
+.B nwbpadd
+sets the value of a ITEM type property, and adds bindery objects to a
+SET type property.
+
+.B nwbpadd
+looks up the file
+.I $HOME/.nwclient
+to find a file server, a user name and possibly a password. See
+nwclient(5) for more information. Please note that the access
+permissions of $HOME/.nwclient MUST be 600 for security reasons.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user
+.RS 3
+.B user
+is the user name to use for login.
+.RE
+
+.B -P
+.I password
+.RS 3
+.B password
+is the password to use for login. If neither
+.B -n
+nor
+.B -P
+are given, and the user has no open connection to the server, nwbpadd
+prompts for a password.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given if no password is required for the login.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.B -o
+.I object name
+.RS 3
+The name of the object to be touched.
+.RE
+
+.B -t
+.I object type
+.RS 3
+The type of the object.
+.I Object type
+must be specified as a decimal value. Common values are 1 for user
+objects, 2 for group objects and 3 for print queues. Other values are
+allowed, but are usually used for specialized applications.
+.RE
+
+.B -p
+.I property
+.RS 3
+The name of the property to be set.
+.RE
+
+.B value
+.RS 3
+If property is of type SET, value is an object id in hexadecimal
+notation.  Otherwise, value is either a string value to be written, or
+a count of bytes to be written. The latter is assumed if more than one
+value argument is given. The count is decimal, and the following
+arguments are interpreted as bytes in hexadecimal notation.
+
+Examples:
+
+All these examples assume the existence of the file
+$HOME/.nwclient. Otherwise, the server and user would have to be
+specified.
+
+nwbpadd -o linus -t 1 -p groups_i\\'m_in 030a0002
+
+In this example, user linus is added to the group whose ID is 030a0002. Please
+note that the ' has to be quoted.
+
+nwbpadd -o linus -t 1 -p identification "Linus Torvalds"
+
+User linus is given his real name :-).
+
+nwbpadd -o linus -t 1 -p revision -v 04 00 00 01 0b
+
+A new 4-byte binary value 0x0000010b (hi-lo order, no byte-swapping) is added
+to the "REVISION" property of the user "linus".
+
+.SH AUTHORS
+nwbpadd was written by Volker Lendecke with the corresponding Caldera
+utility in mind. See the Changes file of ncpfs for other contributors.

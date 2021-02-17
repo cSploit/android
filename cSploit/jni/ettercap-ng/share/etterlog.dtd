@@ -1,0 +1,26 @@
+<!ELEMENT etterlog (host*)>
+<!ATTLIST etterlog version CDATA #REQUIRED>
+<!ATTLIST etterlog date CDATA #REQUIRED>
+<!ELEMENT host (hostname?, mac?, manuf?, distance, type, fingerprint?, os?, port*)>
+<!ATTLIST host ip CDATA #REQUIRED>
+<!ELEMENT hostname (#PCDATA)>
+<!ELEMENT mac (#PCDATA)>
+<!ELEMENT manuf (#PCDATA)>
+<!ELEMENT distance (#PCDATA)>
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT fingerprint (#PCDATA)>
+<!ATTLIST fingerprint type CDATA #REQUIRED>
+<!ELEMENT os (#PCDATA)>
+<!ATTLIST os type CDATA #REQUIRED>
+<!ELEMENT port (banner?, account*)>
+<!ATTLIST port proto CDATA #REQUIRED>
+<!ATTLIST port addr CDATA #REQUIRED>
+<!ATTLIST port service CDATA #REQUIRED>
+<!ELEMENT banner (#PCDATA)>
+<!ELEMENT account (user, pass, client, info?)>
+<!ATTLIST account user CDATA #REQUIRED>
+<!ATTLIST account failed CDATA>
+<!ELEMENT user (#PCDATA)>
+<!ELEMENT pass (#PCDATA)>
+<!ELEMENT client (#PCDATA)>
+<!ELEMENT info (#PCDATA)>

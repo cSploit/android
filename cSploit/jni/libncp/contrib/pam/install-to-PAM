@@ -1,0 +1,57 @@
+#!/bin/sh
+
+INCLDIR=../../include
+
+if [ "$1" = "-y" ]; then
+  REMOVE=/bin/true
+  shift
+else
+  REMOVE=/bin/false
+fi
+if [ $# -ne 1 ]; then
+  echo "usage: install-to-PAM pam-directory"
+  echo ""
+  echo "Run this program if you want to place this code into PAM tree"
+  echo "Usual value for pam-directory is /usr/src/pam-0.66/Linux-PAM/modules"
+  echo ""
+  echo "Due to strangeness of static PAM modules do not forget, that static"
+  echo "module links together with static libncp, resulting in very big"
+  echo "object file (60KB without debugging info, 500KB with)."
+  echo ""
+  echo "Also, do not forget to do 'make install-dev' in ncpfs tree before"
+  echo "compiling PAM modules."
+  exit 1
+fi
+DEST=$1
+if [ ! -d $DEST/. ]; then
+  echo "$DEST does not exist or is not directory"
+  exit 1
+fi
+if [ ! -f $DEST/register_static ]; then
+  echo "$DEST is not module directory of PAM suite"
+  exit 1
+fi
+if [ ! -f pam_ncp_auth.c ]; then
+  echo "You must run this program from ncp_pam_auth plugin directory"
+  exit 1
+fi
+DESTD=$DEST/pam_ncp_auth
+if [ -d $DESTD ]; then
+  if $REMOVE ; then
+    echo "Removing old code from $DESTD"
+    rm -rf $DESTD
+  else
+    echo "pam_ncp_auth is already present in $DEST"
+    echo ""
+    echo "Remove pam_ncp_auth or run this program with option -y"
+    exit 1
+  fi
+fi
+mkdir $DESTD
+cp Makefile.pam $DESTD/Makefile
+cp COPYING README *.c $DESTD
+echo "PAM module was copied into $DESTD directory."
+echo ""
+echo "Please, do not forget to do 'make install-dev' in ncpfs tree before"
+echo "attempting to compile this PAM module."
+

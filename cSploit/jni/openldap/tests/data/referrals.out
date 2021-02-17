@@ -1,0 +1,239 @@
+# extended LDIF
+#
+# LDAPv3
+# base <c=US> with scope sub
+# filter: (objectClass=referral)
+# requesting: * ref 
+# with manageDSAit critical control
+#
+
+# ABC, US
+dn: o=ABC,c=US
+o: ABC
+ref: ldap://hostA/o=abc,c=us HostA
+ref: ldap://hostB HostB
+objectClass: referral
+objectClass: extensibleObject
+
+# XYZ, US
+dn: o=XYZ,c=US
+o: XYZ
+ref: ldap://hostC/o=xyz,c=us HostC
+objectClass: referral
+objectClass: extensibleObject
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 3
+# numEntries: 2
+# extended LDIF
+#
+# LDAPv3
+# base <o=abc,c=US> with scope sub
+# filter: (objectClass=referral)
+# requesting: * ref 
+# with manageDSAit critical control
+#
+
+# ABC, US
+dn: o=ABC,c=US
+o: ABC
+ref: ldap://hostA/o=abc,c=us HostA
+ref: ldap://hostB HostB
+objectClass: referral
+objectClass: extensibleObject
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 2
+# numEntries: 1
+# extended LDIF
+#
+# LDAPv3
+# base <uid=xxx,o=abc,c=US> with scope sub
+# filter: (objectClass=referral)
+# requesting: * ref 
+# with manageDSAit critical control
+#
+
+# search result
+search: 2
+result: 10 Referral
+matchedDN: o=ABC,c=US
+ref: ldap://hostA/uid=xxx,o=abc,c=us??sub
+ref: ldap://hostB/uid=xxx,o=abc,c=US??sub
+
+# numResponses: 1
+# extended LDIF
+#
+# LDAPv3
+# base <c=US> with scope base
+# filter: (objectclass=*)
+# requesting: 1.1 
+#
+
+# US
+dn: c=US
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 2
+# numEntries: 1
+# extended LDIF
+#
+# LDAPv3
+# base <c=US> with scope one
+# filter: (objectclass=*)
+# requesting: 1.1 
+#
+
+# Example, Inc., US
+dn: o=Example,c=US
+
+# search reference
+ref: ldap://hostA/o=abc,c=us??base
+ref: ldap://hostB/o=ABC,c=US??base
+
+# search reference
+ref: ldap://hostC/o=xyz,c=us??base
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 4
+# numEntries: 1
+# numReferences: 2
+# extended LDIF
+#
+# LDAPv3
+# base <c=US> with scope sub
+# filter: (objectclass=*)
+# requesting: 1.1 
+#
+
+# Example, Inc., US
+dn: o=Example,c=US
+
+# Manager, Example, Inc., US
+dn: cn=Manager,o=Example,c=US
+
+# US
+dn: c=US
+
+# search reference
+ref: ldap://hostA/o=abc,c=us??sub
+ref: ldap://hostB/o=ABC,c=US??sub
+
+# search reference
+ref: ldap://hostC/o=xyz,c=us??sub
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 6
+# numEntries: 3
+# numReferences: 2
+# extended LDIF
+#
+# LDAPv3
+# base <o=abc,c=US> with scope base
+# filter: (objectclass=*)
+# requesting: 1.1 
+#
+
+# search result
+search: 2
+result: 10 Referral
+matchedDN: o=ABC,c=US
+ref: ldap://hostA/o=abc,c=us??base
+ref: ldap://hostB/o=abc,c=US??base
+
+# numResponses: 1
+# extended LDIF
+#
+# LDAPv3
+# base <o=abc,c=US> with scope one
+# filter: (objectclass=*)
+# requesting: 1.1 
+#
+
+# search result
+search: 2
+result: 10 Referral
+matchedDN: o=ABC,c=US
+ref: ldap://hostA/o=abc,c=us??one
+ref: ldap://hostB/o=abc,c=US??one
+
+# numResponses: 1
+# extended LDIF
+#
+# LDAPv3
+# base <o=abc,c=US> with scope sub
+# filter: (objectclass=*)
+# requesting: 1.1 
+#
+
+# search result
+search: 2
+result: 10 Referral
+matchedDN: o=ABC,c=US
+ref: ldap://hostA/o=abc,c=us??sub
+ref: ldap://hostB/o=abc,c=US??sub
+
+# numResponses: 1
+# extended LDIF
+#
+# LDAPv3
+# base <uid=xxx,o=abc,c=US> with scope base
+# filter: (objectclass=*)
+# requesting: 1.1 
+#
+
+# search result
+search: 2
+result: 10 Referral
+matchedDN: o=ABC,c=US
+ref: ldap://hostA/uid=xxx,o=abc,c=us??base
+ref: ldap://hostB/uid=xxx,o=abc,c=US??base
+
+# numResponses: 1
+# extended LDIF
+#
+# LDAPv3
+# base <uid=xxx,o=abc,c=US> with scope one
+# filter: (objectclass=*)
+# requesting: 1.1 
+#
+
+# search result
+search: 2
+result: 10 Referral
+matchedDN: o=ABC,c=US
+ref: ldap://hostA/uid=xxx,o=abc,c=us??one
+ref: ldap://hostB/uid=xxx,o=abc,c=US??one
+
+# numResponses: 1
+# extended LDIF
+#
+# LDAPv3
+# base <uid=xxx,o=abc,c=US> with scope sub
+# filter: (objectclass=*)
+# requesting: 1.1 
+#
+
+# search result
+search: 2
+result: 10 Referral
+matchedDN: o=ABC,c=US
+ref: ldap://hostA/uid=xxx,o=abc,c=us??sub
+ref: ldap://hostB/uid=xxx,o=abc,c=US??sub
+
+# numResponses: 1

@@ -1,0 +1,525 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+#include "firebird.h"
+#include "../jrd/ibase.h"
+
+DATABASE DB = "msg.fdb";
+
+struct stuff
+{
+	SLONG value;
+	const char* symbol;
+	const char* class_name;
+	const char* type;
+};
+
+#define ITEM(symbol, class, type)	{symbol, "symbol", "class", "type"},
+
+static const stuff a_stuff[] =
+{
+		ITEM(blr_text, BLR, DTYPE)
+		ITEM(blr_short, BLR, DTYPE)
+		ITEM(blr_long, BLR, DTYPE)
+		ITEM(blr_quad, BLR, DTYPE)
+		ITEM(blr_float, BLR, DTYPE)
+		ITEM(blr_double, BLR, DTYPE)
+		ITEM(blr_d_float, BLR, DTYPE)
+		ITEM(blr_date, BLR, DTYPE)
+		ITEM(blr_varying, BLR, DTYPE)
+		ITEM(blr_blob, BLR, DTYPE)
+		ITEM(blr_cstring, BLR, DTYPE)
+		ITEM(blr_blob_id, BLR, DTYPE)
+
+		ITEM(blr_inner, BLR, JOIN)
+		ITEM(blr_left, BLR, JOIN)
+		ITEM(blr_right, BLR, JOIN)
+		ITEM(blr_full, BLR, JOIN)
+
+		ITEM(blr_version4, BLR, MECH)
+		ITEM(blr_eoc, BLR, MECH)
+		ITEM(blr_end, BLR, MECH)
+
+		ITEM(blr_assignment, BLR, STATEMENTS)
+		ITEM(blr_begin, BLR, STATEMENTS)
+		ITEM(blr_dcl_variable, BLR, STATEMENTS)
+		ITEM(blr_message, BLR, STATEMENTS)
+		ITEM(blr_erase, BLR, STATEMENTS)
+		ITEM(blr_fetch, BLR, STATEMENTS)
+		ITEM(blr_for, BLR, STATEMENTS)
+		ITEM(blr_if, BLR, STATEMENTS)
+		ITEM(blr_loop, BLR, STATEMENTS)
+		ITEM(blr_modify, BLR, STATEMENTS)
+		ITEM(blr_handler, BLR, STATEMENTS)
+		ITEM(blr_receive, BLR, STATEMENTS)
+		ITEM(blr_select, BLR, STATEMENTS)
+		ITEM(blr_send, BLR, STATEMENTS)
+		ITEM(blr_store, BLR, STATEMENTS)
+		ITEM(blr_label, BLR, STATEMENTS)
+		ITEM(blr_leave, BLR, STATEMENTS)
+		ITEM(blr_store2, BLR, STATEMENTS)
+		ITEM(blr_post, BLR, STATEMENTS)
+		ITEM(blr_exec_sql, BLR, STATEMENTS)
+
+		ITEM(blr_literal, BLR, VALUES)
+		ITEM(blr_dbkey, BLR, VALUES)
+		ITEM(blr_field, BLR, VALUES)
+		ITEM(blr_fid, BLR, VALUES)
+		ITEM(blr_parameter, BLR, VALUES)
+		ITEM(blr_variable, BLR, VALUES)
+		ITEM(blr_average, BLR, VALUES)
+		ITEM(blr_count, BLR, VALUES)
+		ITEM(blr_maximum, BLR, VALUES)
+		ITEM(blr_minimum, BLR, VALUES)
+		ITEM(blr_total, BLR, VALUES)
+
+		ITEM(blr_add, BLR, VALUES)
+		ITEM(blr_subtract, BLR, VALUES)
+		ITEM(blr_multiply, BLR, VALUES)
+		ITEM(blr_divide, BLR, VALUES)
+		ITEM(blr_negate, BLR, VALUES)
+		ITEM(blr_concatenate, BLR, VALUES)
+		ITEM(blr_substring, BLR, VALUES)
+		ITEM(blr_parameter2, BLR, VALUES)
+		ITEM(blr_from, BLR, VALUES)
+		ITEM(blr_via, BLR, VALUES)
+		ITEM(blr_user_name, BLR, VALUES)	// User name
+		ITEM(blr_null, BLR, VALUES)
+		ITEM(blr_internal_info, BLR, VALUES)
+
+		ITEM(blr_eql, BLR, BOOLEANS)
+		ITEM(blr_neq, BLR, BOOLEANS)
+		ITEM(blr_gtr, BLR, BOOLEANS)
+		ITEM(blr_geq, BLR, BOOLEANS)
+		ITEM(blr_lss, BLR, BOOLEANS)
+		ITEM(blr_leq, BLR, BOOLEANS)
+		ITEM(blr_containing, BLR, BOOLEANS)
+		ITEM(blr_matching, BLR, BOOLEANS)
+		ITEM(blr_starting, BLR, BOOLEANS)
+		ITEM(blr_between, BLR, BOOLEANS)
+		ITEM(blr_or, BLR, BOOLEANS)
+		ITEM(blr_and, BLR, BOOLEANS)
+		ITEM(blr_not, BLR, BOOLEANS)
+		ITEM(blr_any, BLR, BOOLEANS)
+		ITEM(blr_missing, BLR, BOOLEANS)
+		ITEM(blr_unique, BLR, BOOLEANS)
+		ITEM(blr_like, BLR, BOOLEANS)
+
+		ITEM(blr_rse, BLR, RSE)
+		ITEM(blr_first, BLR, RSE)
+		ITEM(blr_project, BLR, RSE)
+		ITEM(blr_sort, BLR, RSE)
+		ITEM(blr_boolean, BLR, RSE)
+		ITEM(blr_nullsfirst, BLR, RSE)
+		ITEM(blr_ascending, BLR, RSE)
+		ITEM(blr_descending, BLR, RSE)
+		ITEM(blr_relation, BLR, RSE)
+		ITEM(blr_rid, BLR, RSE)
+		ITEM(blr_union, BLR, RSE)
+		ITEM(blr_map, BLR, RSE)
+		ITEM(blr_group_by, BLR, RSE)
+		ITEM(blr_aggregate, BLR, RSE)
+		ITEM(blr_join_type, BLR, RSE)
+
+		ITEM(blr_agg_count, BLR, AGGREGATE)
+		ITEM(blr_agg_max, BLR, AGGREGATE)
+		ITEM(blr_agg_min, BLR, AGGREGATE)
+		ITEM(blr_agg_total, BLR, AGGREGATE)
+		ITEM(blr_agg_average, BLR, AGGREGATE)
+		ITEM(blr_run_count, BLR, AGGREGATE)
+		ITEM(blr_run_max, BLR, AGGREGATE)
+		ITEM(blr_run_min, BLR, AGGREGATE)
+		ITEM(blr_run_total, BLR, AGGREGATE)
+		ITEM(blr_run_average, BLR, AGGREGATE)
+
+		ITEM(blr_function, BLR, NEW)
+		ITEM(blr_gen_id, BLR, NEW)
+		ITEM(blr_prot_mask, BLR, NEW)
+		ITEM(blr_upcase, BLR, NEW)
+		ITEM(blr_lowcase, BLR, NEW)
+		ITEM(blr_lock_state, BLR, NEW)
+		ITEM(blr_value_if, BLR, NEW)
+		ITEM(blr_matching2, BLR, NEW)
+		ITEM(blr_index, BLR, NEW)
+		ITEM(blr_ansi_like, BLR, NEW)
+
+		// Database parameter block stuff
+		ITEM(gds__dpb_version1, DPB, ITEMS)
+
+		ITEM(gds__dpb_cdd_pathname, DPB, ITEMS)	// not implemented
+		ITEM(gds__dpb_allocation, DPB, ITEMS)	// not implemented
+		ITEM(gds__dpb_journal, DPB, ITEMS)	// not implemented
+		ITEM(gds__dpb_page_size, DPB, ITEMS)
+		ITEM(gds__dpb_num_buffers, DPB, ITEMS)
+		ITEM(gds__dpb_buffer_length, DPB, ITEMS)	// not implemented
+		ITEM(gds__dpb_debug, DPB, ITEMS)
+		ITEM(gds__dpb_garbage_collect, DPB, ITEMS)	// not implemented
+		ITEM(gds__dpb_verify, DPB, ITEMS)
+		ITEM(gds__dpb_sweep, DPB, ITEMS)
+		ITEM(gds__dpb_enable_journal, DPB, ITEMS)
+		ITEM(gds__dpb_disable_journal, DPB, ITEMS)
+		ITEM(gds__dpb_dbkey_scope, DPB, ITEMS)
+		ITEM(gds__dpb_number_of_users, DPB, ITEMS)	// not implemented
+		ITEM(gds__dpb_trace, DPB, ITEMS)
+		ITEM(gds__dpb_no_garbage_collect, DPB, ITEMS)	// not implemented
+		ITEM(gds__dpb_damaged, DPB, ITEMS)
+		ITEM(gds__dpb_license, DPB, ITEMS)
+		ITEM(gds__dpb_user_name, DPB, ITEMS)	// User Name (advisory only, DPB, ITEMS)
+		ITEM(gds__dpb_encrypt_key, DPB, ITEMS)	// Encryption key
+		ITEM(gds__dpb_activate_shadow, DPB, ITEMS)	// make a database out of a shadow
+		ITEM(gds__dpb_sweep_interval, DPB, ITEMS)
+		// Transactions betweens sweeps
+		ITEM(gds__dpb_pages, DPB, BITS)
+		ITEM(gds__dpb_records, DPB, BITS)
+		ITEM(gds__dpb_indices, DPB, BITS)
+		ITEM(gds__dpb_transactions, DPB, BITS)
+		ITEM(gds__dpb_no_update, DPB, BITS)
+		ITEM(gds__dpb_repair, DPB, BITS)
+		ITEM(gds__dpb_ignore, DPB, BITS)
+
+		// Bit assignments in RDB$SYSTEM_FLAG
+		ITEM(RDB_system, RDB, FLAG)	// Object belongs to system
+		ITEM(RDB_id_assigned, RDB, FLAG)
+
+
+		// Internal id has been assigned
+		// Transaction parameter blob stuff
+		ITEM(gds__tpb_version1, TPB, ITEMS)
+		ITEM(gds__tpb_version3, TPB, ITEMS)
+		ITEM(gds__tpb_consistency, TPB, ITEMS)
+		ITEM(gds__tpb_concurrency, TPB, ITEMS)
+		ITEM(gds__tpb_shared, TPB, ITEMS)
+		ITEM(gds__tpb_protected, TPB, ITEMS)
+		ITEM(gds__tpb_exclusive, TPB, ITEMS)
+		ITEM(gds__tpb_wait, TPB, ITEMS)
+		ITEM(gds__tpb_nowait, TPB, ITEMS)
+		ITEM(gds__tpb_read, TPB, ITEMS)
+		ITEM(gds__tpb_write, TPB, ITEMS)
+		ITEM(gds__tpb_lock_read, TPB, ITEMS)
+		ITEM(gds__tpb_lock_write, TPB, ITEMS)
+		ITEM(gds__tpb_verb_time, TPB, ITEMS)
+		ITEM(gds__tpb_commit_time, TPB, ITEMS)
+		ITEM(gds__tpb_ignore_limbo, TPB, ITEMS)
+
+		// Blob Parameter Block
+		ITEM(gds__bpb_version1, BPB, ITEMS)
+		ITEM(gds__bpb_source_type, BPB, ITEMS)
+		ITEM(gds__bpb_target_type, BPB, ITEMS)
+		ITEM(gds__bpb_type, BPB, ITEMS)
+
+		ITEM(gds__bpb_type_segmented, BPB, ITEMS)
+		ITEM(gds__bpb_type_stream, BPB, ITEMS)
+
+
+		// Information call declarations
+		// Common, structural codes
+		ITEM(gds__info_end, INFO, MECH)
+		ITEM(gds__info_truncated, INFO, MECH)
+		ITEM(gds__info_error, INFO, MECH)
+
+		// Database information items
+		ITEM(gds__info_db_id, INFO, DB)
+		ITEM(gds__info_reads, INFO, DB)
+		ITEM(gds__info_writes, INFO, DB)
+		ITEM(gds__info_fetches, INFO, DB)
+		ITEM(gds__info_marks, INFO, DB)
+		ITEM(gds__info_implementation, INFO, DB)
+		ITEM(gds__info_version, INFO, DB)
+		ITEM(gds__info_base_level, INFO, DB)
+		ITEM(gds__info_page_size, INFO, DB)
+		ITEM(gds__info_num_buffers, INFO, DB)
+		ITEM(gds__info_limbo, INFO, DB)
+		ITEM(gds__info_current_memory, INFO, DB)
+		ITEM(gds__info_max_memory, INFO, DB)
+		ITEM(gds__info_window_turns, INFO, DB)
+		ITEM(gds__info_license, INFO, DB)
+		ITEM(gds__info_allocation, INFO, DB)
+		ITEM(gds__info_attachment_id, INFO, DB)
+		ITEM(gds__info_read_seq_count, INFO, DB)
+		ITEM(gds__info_read_idx_count, INFO, DB)
+		ITEM(gds__info_insert_count, INFO, DB)
+		ITEM(gds__info_update_count, INFO, DB)
+		ITEM(gds__info_delete_count, INFO, DB)
+		ITEM(gds__info_backout_count, INFO, DB)
+		ITEM(gds__info_purge_count, INFO, DB)
+		ITEM(gds__info_expunge_count, INFO, DB)
+
+		// Database Info Return Values
+		ITEM(gds__info_db_impl_rdb_vms, INFO, VALUES)
+		ITEM(gds__info_db_impl_rdb_eln, INFO, VALUES)
+		ITEM(gds__info_db_impl_rdb_eln_dev, INFO, VALUES)
+		ITEM(gds__info_db_impl_rdb_vms_y, INFO, VALUES)
+		ITEM(gds__info_db_impl_rdb_eln_y, INFO, VALUES)
+		ITEM(gds__info_db_impl_jri, INFO, VALUES)
+		ITEM(gds__info_db_impl_jsv, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_a, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_u, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_v, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_s, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_apl_68K, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_vax_ultr, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_vms, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_sun_68k, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_os2, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_sun4, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_hp_ux, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_sun_386i, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_vms_orcl, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_rt_aix, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_mips_ult, INFO, VALUES)
+		ITEM(gds__info_db_impl_isc_apl_dn10, INFO, VALUES)
+
+		ITEM(gds__info_db_class_access, INFO, VALUES)
+		ITEM(gds__info_db_class_y_valve, INFO, VALUES)
+		ITEM(gds__info_db_class_rem_int, INFO, VALUES)
+		ITEM(gds__info_db_class_rem_srvr, INFO, VALUES)
+		ITEM(gds__info_db_class_pipe_int, INFO, VALUES)
+		ITEM(gds__info_db_class_pipe_srvr, INFO, VALUES)
+		ITEM(gds__info_db_class_sam_int, INFO, VALUES)
+		ITEM(gds__info_db_class_sam_srvr, INFO, VALUES)
+		ITEM(gds__info_db_class_gateway, INFO, VALUES)
+
+
+		// Request information items
+		ITEM(gds__info_number_messages, INFO, REQUEST)
+		ITEM(gds__info_max_message, INFO, REQUEST)
+		ITEM(gds__info_max_send, INFO, REQUEST)
+		ITEM(gds__info_max_receive, INFO, REQUEST)
+		ITEM(gds__info_state, INFO, REQUEST)
+		ITEM(gds__info_message_number, INFO, REQUEST)
+		ITEM(gds__info_message_size, INFO, REQUEST)
+		ITEM(gds__info_request_cost, INFO, REQUEST)
+
+		ITEM(gds__info_req_active, INFO, REQUEST)
+		ITEM(gds__info_req_inactive, INFO, REQUEST)
+		ITEM(gds__info_req_send, INFO, REQUEST)
+		ITEM(gds__info_req_receive, INFO, REQUEST)
+		ITEM(gds__info_req_select, INFO, REQUEST)
+
+		// Blob information items
+		ITEM(gds__info_blob_num_segments, INFO, BLOB)
+		ITEM(gds__info_blob_max_segment, INFO, BLOB)
+		ITEM(gds__info_blob_total_length, INFO, BLOB)
+		ITEM(gds__info_blob_type, INFO, BLOB)
+
+		// Transaction information items
+		ITEM(gds__info_tra_id, INFO, TRANSACTION)
+
+
+		ITEM(gds_facility, ERROR, MECH)
+		ITEM(gds_err_base, ERROR, MECH)
+		ITEM(gds_err_factor, ERROR, MECH)
+		ITEM(gds_arg_end, ERROR, MECH)
+		ITEM(gds_arg_gds, ERROR, MECH)
+		ITEM(gds_arg_string, ERROR, MECH)
+		ITEM(gds_arg_cstring, ERROR, MECH)
+		ITEM(gds_arg_number, ERROR, MECH)
+		ITEM(gds_arg_interpreted, ERROR, MECH)
+		ITEM(gds_arg_vms, ERROR, MECH)
+		ITEM(gds_arg_unix, ERROR, MECH)
+		ITEM(gds_arg_domain, ERROR, MECH)
+		ITEM(gds_arg_dos, ERROR, MECH)
+		ITEM(gds_arg_mpexl, ERROR, MECH)
+
+		// Dynamic Data Definition Language operators
+		// Version number
+		ITEM(gds__dyn_version_1, DYN, MECH)
+		ITEM(gds__dyn_eoc, DYN, MECH)
+
+		// Operations (may be nested, DYN, yyy)
+		ITEM(gds__dyn_begin, DYN, OPERATIONS)
+		ITEM(gds__dyn_end, DYN, OPERATIONS)
+		ITEM(gds__dyn_if, DYN, OPERATIONS)
+
+		ITEM(gds__dyn_def_database, DYN, OPERATIONS)
+		ITEM(gds__dyn_def_global_fld, DYN, OPERATIONS)
+		ITEM(gds__dyn_def_local_fld, DYN, OPERATIONS)
+		ITEM(gds__dyn_def_idx, DYN, OPERATIONS)
+		ITEM(gds__dyn_def_rel, DYN, OPERATIONS)
+		ITEM(gds__dyn_def_sql_fld, DYN, OPERATIONS)
+		ITEM(gds__dyn_def_view, DYN, OPERATIONS)
+		ITEM(gds__dyn_def_trigger, DYN, OPERATIONS)
+		ITEM(gds__dyn_def_security_class, DYN, OPERATIONS)
+		ITEM(gds__dyn_def_dimension, DYN, OPERATIONS)
+
+		ITEM(gds__dyn_mod_rel, DYN, OPERATIONS)
+		ITEM(gds__dyn_mod_global_fld, DYN, OPERATIONS)
+		ITEM(gds__dyn_mod_idx, DYN, OPERATIONS)
+		ITEM(gds__dyn_mod_local_fld, DYN, OPERATIONS)
+		ITEM(gds__dyn_mod_view, DYN, OPERATIONS)
+		ITEM(gds__dyn_mod_security_class, DYN, OPERATIONS)
+		ITEM(gds__dyn_mod_trigger, DYN, OPERATIONS)
+
+		ITEM(gds__dyn_delete_database, DYN, OPERATIONS)
+		ITEM(gds__dyn_delete_rel, DYN, OPERATIONS)
+		ITEM(gds__dyn_delete_global_fld, DYN, OPERATIONS)
+		ITEM(gds__dyn_delete_local_fld, DYN, OPERATIONS)
+		ITEM(gds__dyn_delete_idx, DYN, OPERATIONS)
+		ITEM(gds__dyn_delete_security_class, DYN, OPERATIONS)
+		ITEM(gds__dyn_delete_dimensions, DYN, OPERATIONS)
+
+		ITEM(gds__dyn_grant, DYN, OPERATIONS)
+		ITEM(gds__dyn_revoke, DYN, OPERATIONS)
+
+		// View specific stuff
+		ITEM(gds__dyn_view_blr, DYN, VIEW)
+		ITEM(gds__dyn_view_source, DYN, VIEW)
+		ITEM(gds__dyn_view_relation, DYN, VIEW)
+		ITEM(gds__dyn_view_context, DYN, VIEW)
+		ITEM(gds__dyn_view_context_name, DYN, VIEW)
+
+		// Generic attributes
+		ITEM(gds__dyn_rel_name, DYN, GENERIC)
+		ITEM(gds__dyn_fld_name, DYN, GENERIC)
+		ITEM(gds__dyn_idx_name, DYN, GENERIC)
+		ITEM(gds__dyn_description, DYN, GENERIC)
+		ITEM(gds__dyn_security_class, DYN, GENERIC)
+		ITEM(gds__dyn_system_flag, DYN, GENERIC)
+		ITEM(gds__dyn_update_flag, DYN, GENERIC)
+
+		// Relation specific attributes
+		ITEM(gds__dyn_rel_dbkey_length, DYN, RELATION)
+		ITEM(gds__dyn_rel_store_trig, DYN, RELATION)
+		ITEM(gds__dyn_rel_modify_trig, DYN, RELATION)
+		ITEM(gds__dyn_rel_erase_trig, DYN, RELATION)
+		ITEM(gds__dyn_rel_store_trig_source, DYN, RELATION)
+		ITEM(gds__dyn_rel_modify_trig_source, DYN, RELATION)
+		ITEM(gds__dyn_rel_erase_trig_source, DYN, RELATION)
+		ITEM(gds__dyn_rel_ext_file, DYN, RELATION)
+		ITEM(gds__dyn_rel_sql_protection, DYN, RELATION)
+
+		// Global field specific attributes
+		ITEM(gds__dyn_fld_type, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_length, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_scale, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_sub_type, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_segment_length, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_query_header, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_edit_string, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_validation_blr, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_validation_source, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_computed_blr, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_computed_source, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_missing_value, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_default_value, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_query_name, DYN, GLOBAL)
+		ITEM(gds__dyn_fld_dimensions, DYN, GLOBAL)
+
+		// Local field specific attributes
+		ITEM(gds__dyn_fld_source, DYN, FIELD)
+		ITEM(gds__dyn_fld_base_fld, DYN, FIELD)
+		ITEM(gds__dyn_fld_position, DYN, FIELD)
+		ITEM(gds__dyn_fld_update_flag, DYN, FIELD)
+
+		// Index specific attributes
+		ITEM(gds__dyn_idx_unique, DYN, INDEX)
+		ITEM(gds__dyn_idx_inactive, DYN, INDEX)
+		ITEM(gds__dyn_idx_type, DYN, INDEX)
+
+		// Trigger specific attributes
+		ITEM(gds__dyn_trg_type, DYN, TRIGGER)
+		ITEM(gds__dyn_trg_blr, DYN, TRIGGER)
+		ITEM(gds__dyn_trg_source, DYN, TRIGGER)
+
+		// Security Class specific attributes *
+		ITEM(gds__dyn_scl_acl, DYN, SECURITY)
+
+		// Grant/Revoke specific attributes
+		ITEM(gds__dyn_grant_user, DYN, SECURITY)
+		ITEM(gds__dyn_grant_options, DYN, SECURITY)
+
+		ITEM(gds__dyn_dim_lower, DYN, ARRAY)
+		ITEM(gds__dyn_dim_upper, DYN, ARRAY)
+
+		// Array slice description language (SDL, xxx, yyy)
+		ITEM(gds__sdl_version1, SDL, SDL)
+		ITEM(gds__sdl_eoc, SDL, SDL)
+		ITEM(gds__sdl_relation, SDL, SDL)
+		ITEM(gds__sdl_rid, SDL, SDL)
+		ITEM(gds__sdl_field, SDL, SDL)
+		ITEM(gds__sdl_fid, SDL, SDL)
+		ITEM(gds__sdl_struct, SDL, SDL)
+		ITEM(gds__sdl_variable, SDL, SDL)
+		ITEM(gds__sdl_scalar, SDL, SDL)
+		ITEM(gds__sdl_tiny_integer, SDL, SDL)
+		ITEM(gds__sdl_short_integer, SDL, SDL)
+		ITEM(gds__sdl_long_integer, SDL, SDL)
+		ITEM(gds__sdl_literal, SDL, SDL)
+		ITEM(gds__sdl_add, SDL, SDL)
+		ITEM(gds__sdl_subtract, SDL, SDL)
+		ITEM(gds__sdl_multiply, SDL, SDL)
+		ITEM(gds__sdl_divide, SDL, SDL)
+		ITEM(gds__sdl_negate, SDL, SDL)
+		ITEM(gds__sdl_eql, SDL, SDL)
+		ITEM(gds__sdl_neq, SDL, SDL)
+		ITEM(gds__sdl_gtr, SDL, SDL)
+		ITEM(gds__sdl_geq, SDL, SDL)
+		ITEM(gds__sdl_lss, SDL, SDL)
+		ITEM(gds__sdl_leq, SDL, SDL)
+		ITEM(gds__sdl_and, SDL, SDL)
+		ITEM(gds__sdl_or, SDL, SDL)
+		ITEM(gds__sdl_not, SDL, SDL)
+		ITEM(gds__sdl_while, SDL, SDL)
+		ITEM(gds__sdl_assignment, SDL, SDL)
+		ITEM(gds__sdl_label, SDL, SDL)
+		ITEM(gds__sdl_leave, SDL, SDL)
+		ITEM(gds__sdl_begin, SDL, SDL)
+		ITEM(gds__sdl_end, SDL, SDL)
+		ITEM(gds__sdl_do3, SDL, SDL)
+		ITEM(gds__sdl_do2, SDL, SDL)
+		ITEM(gds__sdl_do1, SDL, SDL)
+		ITEM(gds__sdl_element, SDL, SDL)
+
+		ITEM(SQL_TEXT, SQL, DTYPE)
+		ITEM(SQL_VARYING, SQL, DTYPE)
+		ITEM(SQL_SHORT, SQL, DTYPE)
+		ITEM(SQL_LONG, SQL, DTYPE)
+		ITEM(SQL_FLOAT, SQL, DTYPE)
+		ITEM(SQL_DOUBLE, SQL, DTYPE)
+		ITEM(SQL_DATE, SQL, DTYPE)
+		ITEM(SQL_BLOB, SQL, DTYPE)
+
+	{0, 0, 0, 0}
+};
+
+int main( int argc, char **argv)
+{
+	READY;
+	START_TRANSACTION;
+
+	FOR X IN SYMBOLS
+		ERASE X;
+	END_FOR;
+
+	SSHORT sequence = 0;
+
+	for (const stuff* item = a_stuff; item->symbol; ++item)
+	{
+		STORE X IN SYMBOLS
+			X.SEQUENCE = ++sequence;
+			X.VALUE = item->value;
+			strcpy(X.SYMBOL, item->symbol);
+			strcpy(X.CLASS, item->class_name);
+			strcpy(X.TYPE, item->type);
+		END_STORE;
+	}
+
+	COMMIT;
+	FINISH;
+	return FINI_OK;
+}

@@ -1,0 +1,10 @@
+--- This file is part of LuaDist project
+
+name = "libexpat"
+version = "2.0.1"
+
+desc = "Expat is a C library for parsing XML."
+author = "James Clark"
+license = "MIT/X Consortium license"
+url = "http://www.libexpat.org/"
+maintainer = "Peter Kapec"

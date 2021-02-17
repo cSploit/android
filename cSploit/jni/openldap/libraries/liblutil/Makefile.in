@@ -1,0 +1,61 @@
+# Makefile for -llutil
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+## 
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+LIBRARY	= liblutil.a
+PROGRAM = testavl
+
+LDAP_INCDIR= ../../include       
+LDAP_LIBDIR= ../../libraries
+
+NT_SRCS = ntservice.c
+NT_OBJS = ntservice.o slapdmsg.res
+
+UNIX_SRCS = detach.c
+UNIX_OBJS = detach.o
+
+XLIBS = $(LIBRARY) $(LDAP_LIBLBER_LA)
+
+SRCS	= base64.c entropy.c sasl.c signal.c hash.c passfile.c \
+	md5.c passwd.c sha1.c getpass.c lockf.c utils.c uuid.c sockpair.c \
+	avl.c tavl.c \
+	testavl.c \
+	meter.c \
+	@LIBSRCS@ $(@PLAT@_SRCS)
+
+OBJS	= base64.o entropy.o sasl.o signal.o hash.o passfile.o \
+	md5.o passwd.o sha1.o getpass.o lockf.o utils.o uuid.o sockpair.o \
+	avl.o tavl.o \
+	meter.o \
+	@LIBOBJS@ $(@PLAT@_OBJS)
+
+testavl: $(XLIBS) testavl.o
+	(LTLINK) -o $@ testavl.o $(LIBS)
+
+testtavl: $(XLIBS) testtavl.o
+	(LTLINK) -o $@ testtavl.o $(LIBS)
+
+# These rules are for a Mingw32 build, specifically.
+# It's ok for them to be here because the clean rule is harmless, and
+# slapdmsg.res won't get built unless it's declared in OBJS.
+
+slapdmsg.bin: FORCE
+	@if [ ! -f $@ ]; then cp $(srcdir)/$@ .; fi
+
+slapdmsg.res: slapdmsg.rc slapdmsg.bin
+	windres $< -O coff -o $@
+
+clean-local:
+	$(RM) *.res
+

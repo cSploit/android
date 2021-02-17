@@ -1,0 +1,1125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Berkeley DB 11g Release 2 Change Log</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_11gr2_toc.html" title="Chapter 13.  Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0" />
+    <link rel="prev" href="build_unix_stacksize.html" title="Changing Stack Size" />
+    <link rel="next" href="upgrade_4_8_toc.html" title="Chapter 14. Upgrading Berkeley DB 4.7 applications to Berkeley DB 4.8" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Berkeley DB 11g Release 2 Change Log</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="build_unix_stacksize.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 13. 
+        Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="upgrade_4_8_toc.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="changelog_5_0"></a>Berkeley DB 11g Release 2 Change Log</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="changelog_5_0.html#idp51372752">Changes between 11.2.5.0.26  and 11.2.5.0.32</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="changelog_5_0.html#idp51373656">Changes between 11.2.5.0.21  and 11.2.5.0.26</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="changelog_5_0.html#idp51351832">Changes between 4.8 and 11.2.5.0.21</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="changelog_5_0.html#idp51378624">Known Bugs</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51372752"></a>Changes between 11.2.5.0.26  and 11.2.5.0.32</h3>
+            </div>
+          </div>
+        </div>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p>
+ Added Visual Studio 2010 support. Users can find Visual Studio 2010 solutions and projects on build_windows. [#18889]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a leak of log file ids when a database is closed before the end of a transaction that references it. [#15957]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a race condition that was causing an "unable to allocate space from the buffer cache" error.  The error can only be triggered when multiple mpool regions are used and there is a periodic gathering and clearing of statistics. This also fixes a second bug where if you compile without statistics and explicitly set the mpool default pagesize, other environment handles to that environment would not see the correct mpool default pagesize.  [#18386]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fix failure to flush pages to disk. [#18760]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fix a general I/O problem on Windows where system doesn't always return ENOENT when file is missing. [#18762]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed locking bugs: [#18789] 
+</p>
+              <div class="itemizedlist">
+                <ul type="disc">
+                  <li>
+ Db-&gt;compact of BTREE with MVCC could return an unpinned page. 
+</li>
+                  <li>
+ RECNO would fail to lock the next page when splitting a leaf page.
+</li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <p>
+ Don't await ack if message not sent due to queue limit exceeded. [#18682]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that could cause data to not be returned in a HASH database that was one of multiple databases in a file and it was opened prior to running DB-&gt;compact on that database in another thread of control [#18824]
+            </p>
+            </li>
+            <li>
+              <p>
+ Return HANDLE_DEAD on cursor creation that names a specific txn after client callback. [#18862]
+            </p>
+            </li>
+            <li>
+              <p>
+ Remove parting_shot rep_start(CLIENT) in election thread because it can occasionally conflict with rep_start(MASTER) in another thread. [#18946]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that would cause handle locks to be left referencing the wrong metadata page if DB-&gt;compact moved the metadata page of a sub-database. [#18944]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that might cause an update to a HASH database to fail with an "unpinned page returned" error if it first gets an I/O error while logging. [#18985]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that failed to dirty a page when DB-&gt;compact moved records within a hash bucket [#18994]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug in page allocation where if a non-transactional update was being done, then we release the metadata page lock too early possibly leading to the corruption of the in memory page list used by DB-&gt;compact. [#19036]
+            </p>
+            </li>
+            <li>
+              <p>
+ A log write failure on a replication master will now cause a panic since the transaction may be committed on some clients. [#19054]
+            </p>
+            </li>
+            <li>
+              <p>
+ Removed the possibility that checkpoints will overlap in the log, decreasing the time to recover [#19062]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that could leave a hash bucket overflow page not linked to the bucket if the unlink of that page aborted. [#19001]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that would leave the next page pointer of a hash bucket that was removed pointing to an invalid page. [#19004]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed several bugs that could cause an update running with MVCC to get the wrong version of a page or improperly update the metadata last page number. [#19063]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug where an error during an update to a hash database with DB_NOOVERWRITE set could return DB_KEYEXIST rather than the correct error. [#19077]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug where an updater supporting DB_READ_UNCOMMITED might downgrade its lock too soon if there was an error during the update [#19155]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that could cause the wrong page number to be on a root or metadata page if DB-&gt;compact moved the page and the operation was later rolled forward [#19167]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that could cause the close of a secondary index database to fail if the transaction doing the open aborted [#19169]
+            </p>
+            </li>
+            <li>
+              <p>
+ The database open code will no longer log the open and close of the master database in a file when opening a sub database in that file [#19071]
+            </p>
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51373656"></a>Changes between 11.2.5.0.21  and 11.2.5.0.26</h3>
+            </div>
+          </div>
+        </div>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p>
+ Fixed a bug that might cause recovery to fail if processed part of the log that had previously been recovered and a database which was not present was opened in the log and not closed. [#18459]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug which could occur when using bulk transfer with Replication Manager.  When closing a DB_ENV handle, any remaining bulk buffer contents are flushed, and Replication Manager could have tried to send the resulting messages even though its connections had already been closed, leading in rare circumstances to spurious EBADF error reports, or possibly even arbitrary memory corruption.  [#18469]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug in C# HasMultiple() that this function always throws exceptions when there are multiple databases in a single db file. [#18483]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed the '--enable-dbm' argument to configure. [#18497]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug in the Java API where populating a SecondaryDatabase on open could lead to an OutOfMemoryException. [#18529]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug where DB SQL reports "The database disk image is malformed" in "group by" operations. [#18531]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that prevented the same process from reconnecting to the database when DB_REGISTER is being used. [#18535]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fix a race between opening and closing SQL databases from multiple threads that could lead to the error "DB_REGISTER limits processes to one open DB_ENV handle per environment". [#18538]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed some bugs that could cause a panic or a DB_RUN_RECOVERY error if the sync of the transaction log failed. [#18588]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug which would occur when recovery checkpoint was not written because the cache ran out of space attempting to flush the mpool cache. The environment was recovered and all database where made available, but some databases were incorrectly closed. This would cause a subsequent recovery to fail on its backward pass with the error "PANIC: No such file or directory". [#18590]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that segementation fault would occur if DB-&gt;set_partition_dirs was called before DB-&gt;set_partition. [#18591]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that the error of "unknown path" would occur if putting duplicate records to duplicated sorted hash database with DB_OVERWRITE_DUP.[#18607]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug where DatabaseConfig.getUnsortedDuplicates() returned true when the datbase had been configured for sorted duplicates.  [#18612]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that could cause recovery to fail with the error "DB_LOGC-&gt;get: log record LSN %u/%u: checksum mismatch" if the last log file was nearly full and ended with a partially written log record which was smaller than a checkpoint record. It now erases the invalid partial record before switching to the new log file. [#18651]
+            </p>
+            </li>
+            <li>
+              <p>
+ Initialize DatabaseConfig.pageSize so that it can be queried from Java. [#18691]
+            </p>
+            </li>
+            <li>
+              <p>
+ Fixed a bug that might cause an aborting transaction to fail if it aborted while a DB-&gt;compact of the same HASH database was compacting the dynamic hash table [#18695]
+            </p>
+            </li>
+          </ol>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51351832"></a>Changes between 4.8 and 11.2.5.0.21</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51377976"></a>Database or Log File On-Disk Format Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ The log file format changed in 11.2.5.0.21
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51351920"></a>New Features</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Replication Manager sites can specify one or more possible client-to-client peers. [#14776]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added resource management feature in all Berkeley DB APIs to automatically manage cursor and database handles by closing them when they are not required, if they are not yet closed.[#16188]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added a SQL interface to the Berkeley DB library. The interface is based on - and a drop-in-replacement for - the SQLite API. It can be accessed via a command line utility, a C API, or existing APIs built for SQLite. [#16809]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added hash databases support to the DB-&gt;compact interface. [#16936]
+            </p>
+              </li>
+              <li>
+                <p>
+ Renamed the "db_sql" utility to "db_sql_codegen". This utility is not built by default. To build this utility, enter --enable-sql_codegen as an argument to configure. [#18265]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added transactional support in db_sql_codegen utility. Specify TRANSACTIONAL or NONTRANSACTIONAL in hint comments in SQL statement, db_sql_codegen enable/disable transaction in generated code accordingly. [#17237]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added the feature read-your-writes consistency that allows client application to check, or wait for a specific transaction to be replicated from the master before reading database. [#17323]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added DB log verification feature, accessible via the API and a new utility. This feature can help debugging and analysis.  [#17420]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added support for applications to assign master/client role explicitly at any time. Replication Manager can now be configured not to initiate elections. [#17484]
+            </p>
+              </li>
+              <li>
+                <p>
+ Enhanced the DB-&gt;compact method so that it can reassign metadata and root pages from subdatabases to lower numbered pages while compacting a database file that contains multiple databases. This feature helps to free the higher numbered pages and truncate the file. [#17554]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added system diagnostic messages that are ON by default. [#17561]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added the feature to assign a priority level to transactions. When resolving a deadlock: 
+</p>
+                <div class="itemizedlist">
+                  <ul type="disc">
+                    <li>
+ if the transactions have differing priority, the lowest priority transaction is aborted 
+</li>
+                    <li>
+ if all transactions have the same priority, the same poilcy that existed before priorities were introduced is used [#17604]
+</li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                <p>
+ Added a feature in which log_archive uses group-wide information for archiving purposes if Replication Manager is in use. [#17664]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added a feature by which the Replication Manager application clients now automatically request any missing information, even when there is no master transaction activity. [#17665]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added support for sharing logs across mixed-endian systems. [#18032]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added an option to specify the first and last pages to the db_dump utility. You can do this by providing -F and -L flags to the db_dump -d option. [#18072]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added Intel Performance Primitive (IPP) AES encryption support. [#18110]
+            </p>
+              </li>
+              <li>
+                <p>
+ Removed support for the configuration option --with-mutex=UNIX/fcntl as of version 4.8. If Berkeley DB was configured to use this type of mutex in an earlier release, switch to a different mutex type or contact Oracle for support. [#18361]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51371720"></a>Database Environment Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed a bug to reflect the correct configuration of the logging subsystem when the  DB_ENV-&gt;log_set_config method is called with the DB_LOG_ZERO flag in a situation where a DB_ENV handle is open and an environment exists. [#17532]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to prevent memory leak caused when the environment is closed by the named in-memory database in a private database environment which has open named in-memory databases. [#17816]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixd a race condition in an internal directory-scanning function that returns the ENOENT ("No such file or directory") error, if a file is removed just before a call to stat() or its eqivalent. [#17850]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51401408"></a>Access Method Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed a bug to prevent a page in the hash database from carrying the wrong header information when a group allocation is rolled forward by recovery. [#15414]
+            </p>
+              </li>
+              <li>
+                <p>
+ Improved the sort function for bulk put operations. [#17440]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug in the DB-&gt;compact method to ensure locking of leaf pages when merging higher level interior nodes or when freeing interior nodes when descending to find a non-zero length key. [#17485][#16466]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to prevent a trap if a cursor is opened or closed when another thread is adjusting cursors due to an update in the same database. [#17602]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that incorrectly lead to the error message "library build did not include support for the Hash access method" [#17672]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to ensure that the DB-&gt;exists method accepts the DB_AUTO_COMMIT flag. [#17687]
+            </p>
+              </li>
+              <li>
+                <p>
+ In the past, removing a database from a multi-database file that was opened in an environment always caused dirty pages in the file to be flushed from the cache.  In this release, there is no implicit flush as part of a DB-&gt;remove for handles opened in an environment.  Applications that expect the database file to be flushed will need to add an explicit flush.  [#17775]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug so that the code does not loop if a DB-&gt;compact operation processed a 3 or more level non-sorted off page duplicate tree. [#17831]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that could leave pages pinned in the cache if an allocation failed during a DB-&gt;compact operation. [#17845]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to ensure sequences are closed when an EntityStore is closed. [#17951]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that prevented retrieval of a non-duplicate record with DB_GET_BOTH_RANGE in hash sorted duplicate db. In a database configured with sorted duplicate support, when the DBcursor-&gt;get method is passed the DB_GET_BOTH_RANGE flag, the data item should be retrieved that is the smallest value greater than or equal to the value provided by the data parameter (as determined by the comparison function). [#17997]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that causes the wrong file to be removed if multiple cascading renames are done in the same transaction. [#18069]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to prevent the DB-&gt;compact method specified with the DB_AUTO_COMMIT flag from acquiring too many locks. [#18072]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that might cause DB-&gt;compact on a DB_BTREE database to get a spurious read lock on the metadata page.  If the database was opened non-transactionally the lock would get left behind. [#18257]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that could lead to btree structure corruption if the DB-&gt;compact method ran out of locks [#18361]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that would generate an error if a non-BDB file was used to create a database and the DB_TRUNCATE flag was specified.  [#18373]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that might cause a trap reading unitialized memory when backing out a merge of a duplicate tree leaf page during DB-&gt;compact.  [#18461]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51401816"></a>Locking Subsystem Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed a bug to ensure deadlock detection works even when there are blocked transactions, configured with and without timeouts. [#17555]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to ensure a call to the DB-&gt;key_range method from outside a transaction does not lock pages. [#17930]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that could cause a segmentation fault if the lock manager ran out of mutexes [#18428]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51377544"></a>Logging Subsystem Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Limited the size of a log record generated by freeing pages from a database, so that it fits in the log file size. [#17313]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51401880"></a>Memory Pool Subsystem Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed a bug to ensure mulitple versions of a buffer are not created when MVCC is not set. [#17495]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to detect if cache size is being set when the cache is not configured. [#17556]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to ensure the error message "unable to allocate space from the buffer cache" generated when there is still some space available, can be cleared by running recovery.[#17630]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a race condition that causes an operation to return EPERM  when the buffer cache is nearly filled with pages belonging to recently closed queue extents. [#17840]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that could cause a page needed by a snapshot reader to be overwritten rather than copied when it was freed. [#17973]
+            </p>
+              </li>
+              <li>
+                <p>
+ Enabled set_mp_pagesize to be specified in the DB_CONFIG file. [#18015]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to ensure single-version or obsolete buffers were selected over any intermediate version. [#18114]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51407208"></a>Mutex Subsystem Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed a bug on HP-UX when specifying --with-mutex=HP/msem_init during configure. It would generate the error "TAS: mutex not appropriately aligned" at runtime, when initializing the first mutex. [#17489]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a race condition which could cause unnecessary retrying of btree searches when several threads simulatenously attempted to get a shared latch. [#18078]
+            </p>
+              </li>
+              <li>
+                <p>
+ Exclusive Transactions have been implemented for the SQL API.  See the documentation for details on the behavior of this feature.  [#17822]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51362384"></a>Tcl-specific API Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed a bug in Tcl API to prevent a segmentation fault from occurring when the get_dbname method is called to get the db name and the db handle is opened without providing either the filename or dbname. [#18037]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51371976"></a>C#-specific API Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed a bug in C# to prevent a System.AccessViolationException from occurring on Windows7 when trying to open new database. [#18422]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug in the C# API to make DB_COMPACT consistent with __db_compact in teh C API. [#18246]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51410128"></a>API Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Added the dbstl_thread_exit method to release thread specific resouces on thread exit. [#17595]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed the parser to allow configuration API flags set in the DB_CONFIG file to accept an optional ON/OFF string.  The DB_REP_CONF_NOAUTOINIT flag has been removed. It is replaced by DB_REP_CONF_AUTOINIT. However, replication's default behavior remains the same.  [#17795]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51398840"></a>Replication Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed bug where a not-in-sync client could service a peer request. [#18279]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed bug where page gaps, once filled, would not immediately request the next page gap it finds.  This was already fixed for logs. [#18219]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug so that only one thread waits for the meta-page lock during internal initialization and broadcasts out the information rather than all threads waiting.  Removed the former retry code. [#17871]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added a feature by which the DB-&gt;open method now allows the DB_CREATE flag on a replication client. It is ignored, but this allows a replication application to make one call that can work on either master or client. It fixes a possible race that could develop in a Replication Manager application if a call to DB-&gt;open is made around the same time as a master/client role change. [#15167]
+            </p>
+              </li>
+              <li>
+                <p>
+ The DB_ENV-&gt;repmgr_site_list method now returns an indication on whether the site is a client-to-client peer. [#16113]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that could occasionally lead to elections failing to complete.  [#17105]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug that could cause DB_ENV-&gt;txn_stat to trap. [#17198]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added a new JOIN_FAILURE event to notify Replication Manager applications which refuse auto-initialization. [#17319]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug where a failed master lease check at a client site causes an ASSERT when processing a master lease grant at the master site. [#17869]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to ensure a second simultaneous call to the DB_ENV-&gt;rep_elect method does not incorrectly clear a bit flag. [#17875]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug in client-side autoremoval of log files. [#17899]
+            </p>
+              </li>
+              <li>
+                <p>
+ Removed the likelihood of dual data streams to enhance network traffic. [#17955]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug such that non-txn dup cursors are accounted for in the replication API lockout. [#18080]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to ensure checking for other sync states for the rerequest thread. [#18126]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to avoid getting stuck in an election forever. [#18151]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug where using client-to-client synchronization with Master Leases could have resulted in failure of a new master to get initial lease grants from sufficient number of clients, resulting in a master environment panic.  [#18254]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug which had prevented Replication Manager socket operations from working on HP/UX systems. [#18382]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug where starting as a client in multiple threads after receiving dupmaster messages could have resulted in a failure to find a new log file, resulting in a panic. [#18388]
+            </p>
+              </li>
+              <li>
+                <p>
+ The default thread stack size is no longer overridden by default for Berkeley DB threads. [#18383]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51399904"></a>Transaction Subsystem Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed a bug that caused transactions to deadlock on the mutex in the sequence object. [#17731]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to ensure that the failure checking mechanism reconstructs child transactions correctly when a process dies with active sub-transactions. [#18154]
+            </p>
+              </li>
+              <li>
+                <p>
+ Removed a memory leak during recovery related to a deleted database [#18273]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51402072"></a>Utility Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed compiler warnings in the db_sql_codegen utility. [#17503]
+            </p>
+              </li>
+              <li>
+                <p>
+ Enhanced the db_recover -v utility to display the message, "No log files found", if no logs are present. [#17504]
+            </p>
+              </li>
+              <li>
+                <p>
+ Modified the db_verify utility to verify all files instead of aborting on the first failure. [#17513]
+            </p>
+              </li>
+              <li>
+                <p>
+ Modified the db_verify utility to display a message after verification is completed. [#17545]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug in the db_sql_codegen utility where the primary key is stored in both key and data fields. Removed it from the data field. [#17925]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51430032"></a>Example Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Fixed a bug that causes the ex_txn C# example to hang. [#17376]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed Solaris alignment issues in Stl port test code. [#17459]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added GCC 4.4 compatibility support for all examples. [#17584]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added new command line arguments(-h and -d) to the env examples. [#17624]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed configuration problems related to running java API tests. [#17625]
+            </p>
+              </li>
+              <li>
+                <p>
+ Updated the bench_001 example to include bulk testing examples. [#17766]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added a new Stl example to demo advanced feature usage. The Stl test cases referred earlier are replaced by these new examples in the Stl reference document. [#18175]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51431168"></a>Deprecated Features</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ The configuration options --disable-cryptography and --enable-cryptoraphy are being deprecated. [#18110]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51431920"></a>Configuration, Documentation, Sample Apps, Portability and Build Changes</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+ Remove build files for Windows Visual Studio 6.0. [#16848]
+            </p>
+              </li>
+              <li>
+                <p>
+ Added an API, DBENV-&gt;db_full_version, to return db full version.
+            </p>
+              </li>
+              <li>
+                <p>
+ Berkeley DB no longer supports Win9X, Windows Me (Millenium edition) and NT 4.0.  The minimum supported windows platform is Win 2k.
+            </p>
+              </li>
+              <li>
+                <p>
+ Berkeley DB no longer supports Visual Studio 6.0.  The earliest version supported is Visual Studio 2005.
+            </p>
+              </li>
+              <li>
+                <p>
+ Added "+u1" to CFLAGS for HP ANSI C Compiler on HP-UX(IA64) to fix the alignment issue found with the allocation functions DB-&gt;set-alloc and DB_ENV-&gt;set_alloc. [#17257]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug such that the thread local storage (TLS) definition modifier is correctly deduced from the m4 script on all platforms. [#17609][#17713]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug such that TLS key is not initialized on platforms which do not support thread local storage (TLS) keywords, such as MAC OSX, and where TLS is implemented using pthread API. [#18001]
+            </p>
+              </li>
+              <li>
+                <p>
+ Fixed a bug to ensure that when using Intel C++ compiler (icpc), the TLS code builds successfully. A stricter criteria is adopted to deduce the TLS keyword, and hence pthread API is more likely to be used to implement TLS. [#18038]
+            </p>
+              </li>
+              <li>
+                <p>
+ Adding new configuration option, --with-cryptography={yes|no|ipp}. Using --with-cryptography=yes, will give equivalent behavior to the old --enable-cryptography option.  Using --with-cryptography=no, will give equivalent behavior to the old --disable-cryptography option.  Using --with-cryptograhy=ipp will enable Intel's Performance Primitive (IPP) encryption on linux. [#18110]
+            </p>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51378624"></a>Known Bugs</h3>
+            </div>
+          </div>
+        </div>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p>
+ The configure option --with-uniquename may cause macro redefinition warnings on platforms where BDB implements parts of the standard C library. These warnings (e.g., '"db_int_def.h", line 586: warning: macro redefined: strsep') may occur when functions in the "clib" directory are included during configuration. This cosmetic affect does not affect the correct operation of the library.  [#17172]
+            </p>
+            </li>
+            <li>
+              <p>
+ A multithreaded application using a private environment and multi-version concurrency control could, on very rare occasions,  generate an illegal pointer access error during the final steps of a clean environment shutdown.  [#17507]
+            </p>
+            </li>
+            <li>
+              <p>
+ Although rare, it is possible for a partial log record header at the end of a transaction log to be erroneously accepted as if it were valid, causing the error "Illegal record type 0 in log" during recovery. [#17851]
+            </p>
+            </li>
+            <li>
+              <p>
+ It is possible to get the error "unable to allocate space from the buffer cache" when there are disk errors on the freezer files used by multi-version concurrency control . [#17902]
+            </p>
+            </li>
+            <li>
+              <p>
+ Java API does not support partitioning by keys and the C# API doesn't support partitioning. [#18350]
+            </p>
+            </li>
+            <li>
+              <p>
+ If a database is removed from an environment and it was still opened transactionally and recovery is run, then a future recovery that must process that part of the log may fail. [#18459]
+            </p>
+            </li>
+            <li>
+              <p>
+ Replication "bulk transfer" does not work if Berkeley DB is unable to determine, at environment open time, whether the Replication Manager will be used.  To work around this problem, an application using the Replication Manager should call DB_ENV-&gt;repmgr_set_local_site() before opening the environment. An application using the replication Base API should call DB_ENV-&gt;rep_set_transport() before opening the environment. [#18476]
+            </p>
+            </li>
+            <li>
+              <p>
+ The BTree prefix comparison function behaves slightly differently in the C API vs the C# API.  In the C# API it returns a signed int and in the C API it returns an unsigned int.  This can be a problem if the application needs to save more than 2^31 bytes.
+            </p>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="build_unix_stacksize.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_11gr2_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="upgrade_4_8_toc.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Changing Stack Size </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 14. Upgrading Berkeley DB 4.7 applications to Berkeley DB 4.8</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,92 @@
+Source: libnet
+Section: net
+Priority: optional
+Maintainer: David Paleino <d.paleino@gmail.com>
+Uploaders: Chris Hanson <cph@debian.org>
+Build-Depends: debhelper, sharutils, libpcap-dev, quilt,
+ autotools-dev, automake, autoconf, libtool
+Standards-Version: 3.8.0
+Homepage: http://www.packetfactory.net/libnet
+
+Package: libnet1-lua
+Architecture: any
+Section: libdevel
+Depends: libc6-dev, libnet1 (= ${binary:Version})
+Description: lua bindings for libnet, pcap, and nfq
+ lua bindings for libnet, pcap, and nfq
+
+Package: libnet1
+Architecture: any
+Section: libs
+Depends: ${shlibs:Depends}
+Description: library for the construction and handling of network packets
+ libnet provides a portable framework for low-level network packet
+ writing and handling.
+ .
+ libnet features portable packet creation interfaces at the IP layer
+ and link layer, as well as a host of supplementary functionality.
+ .
+ Using libnet, quick and simple packet assembly applications can be
+ whipped up with little effort. With a bit more time, more complex
+ programs can be written (Traceroute and ping were easily rewritten
+ using libnet and libpcap).
+ .
+ This package contains the shared library.
+
+Package: libnet1-dbg
+Architecture: any
+Priority: extra
+Section: libs
+Depends: ${shlibs:Depends}, libnet1 (= ${binary:Version})
+Description: debugging symbols for libnet
+ libnet provides a portable framework for low-level network packet
+ writing and handling.
+ .
+ libnet features portable packet creation interfaces at the IP layer
+ and link layer, as well as a host of supplementary functionality.
+ .
+ Using libnet, quick and simple packet assembly applications can be
+ whipped up with little effort. With a bit more time, more complex
+ programs can be written (Traceroute and ping were easily rewritten
+ using libnet and libpcap).
+ .
+ This package contains the debugging symbols for libnet.
+
+Package: libnet1-dev
+Architecture: any
+Section: libdevel
+Provides: libnet-dev
+Conflicts: libnet-dev
+Depends: libc6-dev, libnet1 (= ${binary:Version})
+Description: development files for libnet
+ libnet provides a portable framework for low-level network packet
+ writing and handling.
+ .
+ libnet features portable packet creation interfaces at the IP layer
+ and link layer, as well as a host of supplementary functionality.
+ .
+ Using libnet, quick and simple packet assembly applications can be
+ whipped up with little effort. With a bit more time, more complex
+ programs can be written (Traceroute and ping were easily rewritten
+ using libnet and libpcap).
+ .
+ This package contains the files needed to compile and link programs
+ that use libnet.
+
+Package: libnet1-doc
+Architecture: all
+Section: doc
+Suggests: libnet1-dev
+Description: developers documentation files for libnet
+ libnet provides a portable framework for low-level network packet
+ writing and handling.
+ .
+ libnet features portable packet creation interfaces at the IP layer
+ and link layer, as well as a host of supplementary functionality.
+ .
+ Using libnet, quick and simple packet assembly applications can be
+ whipped up with little effort. With a bit more time, more complex
+ programs can be written (Traceroute and ping were easily rewritten
+ using libnet and libpcap).
+ .
+ This package contains the documentation files for developers.

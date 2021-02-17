@@ -1,0 +1,25 @@
+#ifndef _KERNEL_IPX_H
+#define _KERNEL_IPX_H
+
+#include <ncp/ext/socket.h>
+@ncp_ipx_headers_1@
+@ncp_ipx_headers_2@
+
+@ncp_ipx_defsiocprotoprivate@
+#undef SIOCPROTOPRIVATE
+#define SIOCPROTOPRIVATE 0x89E0
+#endif
+@ncp_ipx_defsiocaipx@
+#undef SIOCAIPXITFCRT
+#undef SIOCAIPXPRISLT
+#undef SIOCIPXCFGDATA
+#define SIOCAIPXITFCRT	(SIOCPROTOPRIVATE)
+#define SIOCAIPXPRISLT	(SIOCPROTOPRIVATE+1)
+#define SIOCIPXCFGDATA	(SIOCPROTOPRIVATE+2)
+#endif
+
+#ifndef IPXPROTO_IPX
+#define	IPXPROTO_IPX	(PF_IPX)
+#endif
+
+#endif

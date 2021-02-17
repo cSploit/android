@@ -1,0 +1,101 @@
+############################################################################
+#                                                                          #
+#  ettercap -- etter.filter.examples -- filter source file                 #
+#                                                                          #
+#  Copyright (C) ALoR & NaGA                                               #
+#                                                                          #
+#  This program is free software; you can redistribute it and/or modify    #
+#  it under the terms of the GNU General Public License as published by    #
+#  the Free Software Foundation; either version 2 of the License, or       #
+#  (at your option) any later version.                                     #
+#                                                                          #
+############################################################################
+
+# make sure this filter will not be used...
+exit();
+
+
+# display a message if the tcp port is 22
+if (ip.proto == TCP) {
+   if (tcp.src == 22 || tcp.dst == 22) {
+      msg("SSH packet\n");
+   }
+}
+
+
+# log all telnet traffic, also execute ./program on every packet
+if (ip.proto == TCP) {
+   if (tcp.src == 23 || tcp.dst == 23) {
+      log(DATA.data, "./logfile.log");
+      exec("./program");
+   }
+}
+
+
+# log all traffic except http
+if (ip.proto == TCP && tcp.src != 80 && tcp.dst != 80) {
+   log(DATA.data, "./logfile.log");
+}
+
+
+# some operation on the payload of the packet
+if ( DATA.data + 20 == 0x4142 ) {
+   DATA.data + 20 = 0x4243;
+} else {
+   DATA.data = "modified";
+   DATA.data + 20 = 0x4445;
+}
+
+
+# drop any packet containing "ettercap"
+if (search(DECODED.data, "ettercap")) {
+   msg("some one is talking about us...\n");
+   drop();
+   kill();
+}
+
+
+# log ssh decrypted packets matching the regexp
+if (ip.proto == TCP) {
+   if (tcp.src == 22 || tcp.dst == 22) {
+      if (regex(DECODED.data, ".*login.*")) {
+         log(DECODED.data, "./decrypted_log");
+      }
+   }
+}
+
+# dying packets
+if (ip.ttl < 5) {
+   msg("The packet will die soon\n");
+}
+
+# string comparison at a given offset
+if (DATA.data + 40 == "ette") {
+   log(DATA.data, "./logfile");
+}
+
+# inject a file after a specific packet
+if (tcp.src == 21 && search(DATA.data, "root")) {
+   inject("./fake_response");
+}
+
+# replace the entire packet with another
+if (tcp.src == 23 && search(DATA.data, "microsoft")) {
+   drop();
+   inject("./fake_telnet");
+}
+
+# filter only a specific ip address
+if (ip.src == '192.168.0.2') {
+   drop();
+}
+
+# translate the port of the tcp packet from 80 to 81
+if (tcp.dst == 80) {
+   tcp.dst -= 1;
+   tcp.dst += 2;
+}
+
+# eof
+
+# vim:ts=3:expandtab

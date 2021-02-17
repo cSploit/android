@@ -1,0 +1,92 @@
+Documentation Design Policy, User Guide versus FAQ.
+James Cameron, 9th November 2001.
+
+There are two primary documents in this project, the User Guide and
+the FAQ.  They serve different purposes.
+
+The User Guide
+
+- is the FreeTDS 'product' documentation,
+- is specific to each release,
+- is included in the release, and on the FreeTDS web site,
+- is structured as a HOWTO, or a list of steps, to get the software working.
+
+The FAQ
+
+- is the FreeTDS Mailing List documentation,
+- is FreeTDS release independent,
+- is on the FreeTDS web site,
+- is structured as a list of questions.
+
+The risks we need to address are:
+
+- duplication of content, increasing cost of maintenance,
+- conflicts between the documents, causing mail traffic,
+- outdated content is left present, causing mail traffic,
+- insufficient content, causing mail traffic,
+- too much content and too little indexing, causing mail traffic.
+
+So some policy suggestions ...
+
+The FAQ should not duplicate content found in the User Guide, and
+vice versa.  If they have access to the FAQ, they can read the User
+Guide.  If they have access to the User Guide, they shouldn't need the
+FAQ, unless they hit a defect.
+
+To avoid duplication, the FAQ should point to the User Guide to
+address specific questions, unless the User Guide hasn't got the
+answer.
+
+The User Guide should only point to the FAQ base URL, and should never
+need to point to specific FAQ content.
+
+New content between releases should first go into the FAQ in CVS,
+with an effective date and FreeTDS version number.  The FAQ maintainer
+will then transfer this to the FreeTDS web site.  This new content
+for the FAQ may breed code changes, or new content for the User
+Guide.
+
+New content for the next release should be inserted into the User
+Guide in CVS.  Once the User Guide is released (by nature of a FreeTDS
+release), old FAQ entries should be reviewed.
+
+--
+Date: Fri, 9 Nov 2001 08:07:18 -0500 (EST)
+From: Brian Bruns <brian@bruns.org>
+To: <james.cameron@compaq.com>
+Cc: <jklowden@freetds.org>
+Subject: Re: FreeTDS Documentation Design Policy, Draft
+In-Reply-To: <3BEB6E09.9BC32E58@stl.dec.com>
+Message-ID: <Pine.LNX.4.33.0111090753430.2606-100000@localhost.localdomain>
+
+My .02$
+
+The FAQ is 
+
+1) A brief description of what freetds is/does (for completeness) as this 
+is the first document many people see.
+
+2) A pointer to other resources: mailing list, user guide, CVS, protocol 
+docs
+
+3) what is supported/not supported. ie Do you support feature X? Including 
+'are you planning...?'
+
+4) Specific known bugs/build problems with work arounds or dates of fix
+
+I think what there is good, except we need to rip out the programming 
+section in favor of the user guide, and section 5 (CVS) needs to go under 
+a more general 'Other Resources' section. Problems Building/Problems 
+Running (4 & 6) probably belong next to each other.  
+
+I don't know quite where to put 'Which Perl library should I use' but it 
+seems to me to be FAQ fodder, but it doesn't fit the criteria above.
+
+The user guide is more detailed.  It should explain everything you ever 
+wanted to know about TDS/FreeTDS, discuss its many options in detail, and 
+detail steps for building each type of configuration.
+
+I'd personally like to add a section on porting MS dblib/ODBC programs to 
+Unix/Linux.
+
+Brian

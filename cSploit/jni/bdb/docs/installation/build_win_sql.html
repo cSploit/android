@@ -1,0 +1,872 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Building the SQL API</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="build_win.html" title="Chapter 5.  Building Berkeley DB for Windows" />
+    <link rel="prev" href="build_win_csharp.html" title="Building the C# API" />
+    <link rel="next" href="build_win_tcl.html" title="Building the Tcl API" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Building the SQL API</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="build_win_csharp.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5.  Building Berkeley DB for Windows </th>
+          <td width="20%" align="right"> <a accesskey="n" href="build_win_tcl.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="build_win_sql"></a>Building the SQL API</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="build_win_sql.html#idp50407728">Binary Compatibility With SQLite</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="build_win_sql.html#idp50380592">Setting Encryption</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="build_win_sql.html#idp50382040">Changing Compile Options</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="build_win_sql.html#idp50330000">Enabling Extensions</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="build_win_sql.html#win-disablechecksums">Disabling Log
+                Checksums</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="build_win_sql.html#build_jdbc">Building the JDBC Driver</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="build_win_sql.html#idp50431536">Using the JDBC Driver</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="build_win_sql.html#idp50437400">Building the ODBC Driver</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="build_win_sql.html#idp50452776"> Using the ADO.NET Driver </a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+            SQL support is built as part of the default build on
+            Windows. For information on the build instructions, see
+                <a class="xref" href="build_win.html" title="Chapter 5.  Building Berkeley DB for Windows"> Building Berkeley DB for Windows </a>.
+        </p>
+      <p>
+            The SQL library is built as
+                <code class="literal">libdb_sql60.dll</code> in the Release mode
+            or <code class="literal">libdb_sql60d.dll</code> in the Debug mode.
+            An SQL command line interpreter called
+                <code class="literal">dbsql.exe</code> is also built.
+        </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50407728"></a>Binary Compatibility With SQLite</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                <code class="literal">libdb_sql60.dll</code> is compatible with
+                    <code class="literal">sqlite3.dll</code>. You can copy
+                    <code class="literal">libdb_sql60.dll</code> to
+                    <code class="literal">sqlite3.dll</code> and
+                    <code class="literal">dbsql.exe</code> to
+                    <code class="literal">sqlite3.exe</code>, and use these
+                applications as a replacement for the standard SQLite
+                binaries with the same names. However, if you want to
+                do this, then any legacy data in use by those tools
+                must be migrated from the standard SQLite database to
+                a Berkeley DB SQL database <span class="emphasis"><em>before</em></span>
+                you replace the standard SQLite dll and executable
+                with the Berkeley DB equivalent. For information on
+                migrating data from standard SQLite databases to a
+                Berkeley DB SQL database, see the
+                    <em class="citetitle">Berkeley DB Getting Started with the SQL APIs</em> guide. 
+            </p>
+        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
+          <h3 class="title">Warning</h3>
+          <p>
+                    Rename your dlls and executables to the
+                    standard SQLite names with
+                        <span class="emphasis"><em>extreme</em></span> care. Doing this
+                    will cause all existing tools to break that
+                    currently have data stored in a standard SQLite
+                    database. 
+                </p>
+          <p>
+                    <span class="emphasis"><em> For best results, rename your dlls and
+                        command line tool to use the standard SQLite
+                        names only if you know there are no other
+                        tools on your production platform that rely on
+                        standard SQLite. </em></span>
+                </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50380592"></a>Setting Encryption</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                To enable encryption in the Berkeley DB SQL API,
+                specify <span class="emphasis"><em>SQLITE_HAS_CODEC</em></span> in
+                    <span class="emphasis"><em>Preprocessor Definitions </em></span>of
+                the <code class="literal">db_sql</code> project. See
+                <a href="../bdb-sql/sql_encryption.html" class="olink">SQL Encryption</a> in the
+                    <em class="citetitle">Berkeley DB Getting Started with the SQL APIs</em> guide for
+                usage details. 
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50382040"></a>Changing Compile Options</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                There are several configuration options you can add
+                to the <span class="emphasis"><em>Preprocessor Definitions
+                </em></span>of the <code class="literal">db_sql</code> project.
+                For example, to enable the option
+                BDBSQL_FILE_PER_TABLE, add
+                    <code class="literal">BDBSQL_FILE_PER_TABLE=1;</code> to the
+                    <span class="emphasis"><em>Preprocessor Definitions </em></span>of
+                the <code class="literal">db_sql</code> project.
+            </p>
+        <div class="variablelist">
+          <dl>
+            <dt>
+              <span class="term">BDBSQL_DEFAULT_PAGE_SIZE</span>
+            </dt>
+            <dd> 
+                        To set the default page size when you
+                        create a database, specify the
+                        BDBSQL_DEFAULT_PAGE_SIZE flag. The assigned
+                        value must be 0, 512, 1024, 2048, 4096, 8192,
+                        16384, 32768, or 65536. The default value is
+                        4096. If the value is set to zero, Berkeley DB
+                        queries the file system to determine the best
+                        page size, and the value of
+                        SQLITE_DEFAULT_PAGE_SIZE is used to calculate
+                        the cache size, because the cache size is
+                        specified as a number of pages.
+                    </dd>
+            <dt>
+              <span class="term">BDBSQL_FILE_PER_TABLE</span>
+            </dt>
+            <dd>
+                        To generate each table in a separate
+                        file, rather than as subdatabases in a single
+                        file, specify the BDBSQL_FILE_PER_TABLE flag.
+                        When this option is enabled, the SQL database
+                        name is used as a directory name. This
+                        directory contains one file for the metadata
+                        and one file each for every table created by
+                        the SQL API. Note that adding or deleting
+                        files from the database directory may corrupt
+                        your database. To backup the metadata
+                        (schema), make a copy of the
+                            <code class="literal">metadata</code> and
+                            <code class="literal">table00001</code> files from
+                        the database directory. Make a new copy
+                        whenever the schema is changed. 
+                    </dd>
+            <dt>
+              <span class="term">BDBSQL_LOG_REGIONMAX</span>
+            </dt>
+            <dd>
+                        To configure the log region size for
+                        the underlying storage engine, specify the
+                        BDBSQL_LOG_REGIONMAX flag. For more
+                        information, see <a href="../api_reference/C/envget_lg_regionmax.html" class="olink">DB_ENV-&gt;get_lg_regionmax()</a>.
+                    </dd>
+            <dt>
+              <span class="term">BDBSQL_OMIT_LEAKCHECK</span>
+            </dt>
+            <dd>
+                        For Berkeley DB to use the default
+                        system allocation routines rather than the
+                        SQLite allocation routines, specify the
+                        BDBSQL_OMIT_LEAKCHECK flag. 
+                    </dd>
+            <dt>
+              <span class="term">BDBSQL_OMIT_LOG_REMOVE</span>
+            </dt>
+            <dd> 
+                        Berkeley DB automatically removes log
+                        files that are no longer required That is,
+                        files that are older than the most recent
+                        checkpoint. To disable this functionality,
+                        specify the BDBSQL_OMIT_LOG_REMOVE flag. It is
+                        necessary to provide this flag if you are
+                        using replication with Berkeley DB SQL.
+                    </dd>
+            <dt>
+              <span class="term">BDBSQL_OMIT_SHARING</span>
+            </dt>
+            <dd>
+                        To create a private environment rather
+                        than a shared environment, specify the
+                        BDBSQL_OMIT_SHARING flag. That is, the cache
+                        and other region files will be created in
+                        memory rather than using file backed shared
+                        memory. For more information, see the
+                        DB_PRIVATE flag of <a href="../api_reference/C/envopen.html" class="olink">DB_ENV-&gt;open()</a></dd>
+            <dt>
+              <span class="term">BDBSQL_SINGLE_THREAD</span>
+            </dt>
+            <dd>
+                        To disable locking and thread safe
+                        connections, specify the BDBSQL_SINGLE_THREAD
+                        flag. If an application is going to use
+                        Berkeley DB from a single thread and a single
+                        process, enabling this flag can deliver
+                        significant performance advantages.
+                    </dd>
+            <dt>
+              <span class="term">SQLITE_DEFAULT_CACHE_SIZE</span>
+            </dt>
+            <dd> 
+                        SQLite provides an in-memory cache
+                        which you size according to the maximum number
+                        of database pages that you want to hold in
+                        memory at any given time. Berkeley DB's
+                        in-memory cache feature performs the same
+                        function as SQLite. To specify the suggested
+                        maximum number of pages of disk cache that
+                        will be allocated per open database file
+                        specify the SQLITE_DEFAULT_CACHE_SIZE flag.
+                        Default value is 2000 pages. For more
+                        information, see the SQLite documentation on
+                            <a class="ulink" href="http://www.sqlite.org/pragma.html#pragma_default_cache_size" target="_top">PRAGMA default_cache_size</a>.
+                    </dd>
+            <dt>
+              <span class="term">SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT</span>
+            </dt>
+            <dd>
+                        For SQLite, this pragma identifies the
+                        maximum size that the journal file is allowed
+                        to be. Berkeley DB does not have a journal
+                        file, but it writes and uses log files. A new
+                        log file is created when the current log file
+                        has reached the defined maximum size. To
+                        define this maximum size for a log file,
+                        specify the SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT
+                        flag. Default value is 10 MB for the Berkeley
+                        DB SQL interface. 
+                    </dd>
+          </dl>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50330000"></a>Enabling Extensions</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                The Berkeley DB SQL API provides extensions such as
+                full text search and R-Tree index. To enable these
+                extensions, do the following: 
+            </p>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+                    Open the Berkeley DB solution in Visual
+                    Studio.
+                </li>
+            <li> 
+                    Specify
+                        <span class="emphasis"><em>SQLITE_ENABLE_FTS3</em></span> or
+                        <span class="emphasis"><em>SQLITE_ENABLE_RTREE</em></span> in
+                        <span class="emphasis"><em>Preprocessor Definitions</em></span>
+                    of the <code class="literal">db_sql</code> project. </li>
+            <li> Re-build the <code class="literal">db_sql</code>
+                    project.
+                </li>
+          </ol>
+        </div>
+        <p> 
+                See the SQLite Documentation for more information
+                on <a class="ulink" href="http://www.sqlite.org/fts3.html" target="_top">full
+                    text search</a> and <a class="ulink" href="http://www.sqlite.org/rtree.html" target="_top">R-Tree</a>. 
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="win-disablechecksums"></a>Disabling Log
+                Checksums</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                You can disable checksums in log records so as to
+                provide a boost to database performance. However, this
+                comes at the risk of having undetectable log file
+                corruption that could prevent data recovery in the
+                event of database corruption.
+            </p>
+        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+          <h3 class="title">Note</h3>
+          <p>
+                    Note that disabling log record checksums is
+                    meant to only be used with the SQL interface.
+                    However, disabling checksums for the SQL interface
+                    also disables checksums for the non-SQL
+                    interfaces.
+                </p>
+        </div>
+        <p>
+                To disable log checksums, before you build the
+                library edit the
+                    <code class="literal">build_windows/db_config.h</code> file,
+                and delete the following line:
+            </p>
+        <pre class="programlisting">#define HAVE_LOG_CHECKSUM 1</pre>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="build_jdbc"></a>Building the JDBC Driver</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                This section describes the steps to build the JDBC
+                driver. 
+            </p>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p> 
+                        Configure your build environment. For
+                        information on how to configure to build Java
+                        applications, see <a class="xref" href="build_win_java.html" title="Building the Java API">Building the Java API</a>. 
+                    </p>
+            </li>
+            <li>
+              <p> 
+                        Build the SQL project in Debug mode.
+                    </p>
+            </li>
+            <li>
+              <p>
+                        Open Berkeley_DB.sln or
+                        Berkeley_DB_vs2010.sln in Visual Studio. If
+                        you are using Java 1.6, do the following:
+                    </p>
+              <div class="itemizedlist">
+                <ul type="disc">
+                  <li>
+                    <p> 
+                                In the Solution Explorer,
+                                right-click the
+                                   <code class="literal">db_sql_jdbc</code>
+                                project and select
+                                   <span class="emphasis"><em>properties</em></span>.
+                            </p>
+                  </li>
+                  <li>
+                    <p>
+                                In the <span class="emphasis"><em>Configuration
+                                   Properties -&gt; Build Events -&gt;
+                                   Pre-Build Event</em></span> section,
+                                alter the command to refer to
+                                   <code class="literal">JDBC2z</code> instead
+                                of <code class="literal">JDBC2x</code>. 
+                            </p>
+                  </li>
+                </ul>
+              </div>
+              <p>
+                        If you are using Java 1.7, do the
+                        following:
+                    </p>
+              <div class="itemizedlist">
+                <ul type="disc">
+                  <li>
+                    <p>
+                                In the Solution Explorer,
+                                right-click the
+                                   <code class="literal">db_sql_jdbc</code>
+                                project and select
+                                   <span class="emphasis"><em>properties</em></span>.
+                            </p>
+                  </li>
+                  <li>
+                    <p>
+                                In the <span class="emphasis"><em>Configuration
+                                   Properties -&gt; Build Events -&gt;
+                                   Pre-Build Event</em></span> section,
+                                alter the command to refer to
+                                   <code class="literal">JDBC2z1</code> instead
+                                of <code class="literal">JDBC2x</code>. Also,
+                                remove the option of "-target 1.5".
+                            </p>
+                  </li>
+                  <li>
+                    <p>
+                                Go to
+                                   <code class="literal">db\lang\sql\jdbc\SQLite</code>,
+                                and replace
+                                   <code class="literal">JDBCDriver.java</code>
+                                with
+                                   <code class="literal">JDBCDriver.java17</code>,
+                                and replace
+                                   <code class="literal">JDBCDataSource.java</code>
+                                with
+                                   <code class="literal">JDBCDataSource.java17</code>.
+                            </p>
+                  </li>
+                </ul>
+              </div>
+            </li>
+            <li>
+              <p>
+                        To enable encryption in the Berkeley DB SQL
+                        JDBC driver, specify
+                            <code class="literal">HAVE_SQLITE3_KEY</code> in
+                            <code class="literal">Preprocessor
+                            Definitions</code> of the
+                            <code class="filename">db_sql_jdbc</code> project.
+                        See <a href="../bdb-sql/sql_encryption.html" class="olink">SQL Encryption</a> in the
+                            <em class="citetitle">Berkeley DB Getting Started with the SQL APIs</em> guide
+                        for usage details.
+                    </p>
+            </li>
+            <li>
+              <p> 
+                        Build the <code class="filename">db_sql_jdbc</code>
+                        project in Visual Studio. 
+                    </p>
+            </li>
+          </ol>
+        </div>
+        <p> 
+                You can test the build by entering
+                the following commands from the
+                    <code class="literal">db\build_windows\Win32\Debug</code>
+                directory: 
+            </p>
+        <table class="simplelist" border="0" summary="Simple list">
+          <tr>
+            <td> javac -cp ".;jdbc.jar" -d .
+                    ..\..\..\lang\sql\jdbc\test3.java </td>
+          </tr>
+          <tr>
+            <td>java -cp ".;jdbc.jar" test3 </td>
+          </tr>
+        </table>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50431536"></a>Using the JDBC Driver</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                This section describes the steps to download,
+                build, and run sample programs using the built JDBC
+                driver.
+            </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50408312"></a>Downloading JDBC Sample Code</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    The download link for JDBC sample code is
+                    available on the <a class="ulink" href="http://www.oracle.com/technetwork/java/index-139949.html" target="_top"> Oracle Technology Network (OTN) </a>.
+                    You can identify the link by the "JDBC programming
+                    examples from all three editions (ZIP format)"
+                    text beside it.
+                </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50457760"></a>Modifying Sample Code</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    Before running the sample code, do the
+                    following:
+                </p>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                        Unzip the file containing the sample
+                        code to a new directory (for example,
+                        jdbc_ex).
+                    </li>
+              <li>
+                        Substitute
+                            <code class="literal">jdbc:sqlite:/&lt;db-file-name&gt;</code>
+                        for the generic JDBC URL that appears in the
+                        code. That is, put
+                            <code class="literal">jdbc:sqlite:/&lt;db-file-name&gt;</code>
+                        between the quotation marks in the line:
+                                <p>
+                                    <code class="literal"> String url =
+                                "jdbc:mySubprotocol:myDataSource";</code>
+                                </p><p>
+                            Note: The &lt;db-file-name&gt; can
+                            either be an absolute path name like
+                                <code class="literal">"jdbc:sqlite:/D:\\jdbc_ex_db\\myDataSource"</code>,
+                            or a relative path-file-name like
+                                <code class="literal">"jdbc:sqlite:/..\\jdbc_ex_db\myDataSource"</code>,
+                            or a file name, like
+                                <code class="literal">"jdbc:sqlite:/myDataSource"</code>,
+                            in which the database file will be stored
+                            at the current directory. Note that all
+                            path arguments require a leading slash,
+                            even in the case of relative paths or a
+                            database in the local directory. Please
+                            refer to the above examples.
+                        </p></li>
+              <li>
+                        Substitute
+                            <code class="literal">SQLite.JDBCDriver</code> for
+                            <code class="literal">myDriver.ClassName</code> in
+                        the line:
+                            <code class="literal">Class.forName("myDriver.ClassName");</code></li>
+              <li>
+                        Substitute the username and password you
+                        use for your database in the following:
+                            <code class="literal">"myLogin",
+                        "myPassword"</code>. <p>This is
+                            optional.</p></li>
+              <li>
+                        If your JDK version is above 1.5, change
+                        the variable name <code class="literal">enum</code> in
+                            <code class="literal">OutputApplet.java</code> to
+                        some other variable name because, as of JDK
+                        release 5 <code class="literal">enum</code> is a keyword
+                        and can not be used as an
+                        identifier.
+                    </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50452472"></a>Building and Running the JDBC Sample code</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    See <a class="xref" href="build_win_sql.html#build_jdbc" title="Building the JDBC Driver">Building the JDBC Driver</a> for instructions
+                    about building JDBC driver.
+                </p>
+          <p>
+                    To build and run the JDBC examples do the
+                    following:
+                </p>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                        In the
+                            <code class="literal">db\build_windows\Win32\Debug</code>
+                        directory, run following commands:
+                        <pre class="programlisting">
+    $ javac -classpath ".;jdbc.jar" -d . \path\to\jdbc_ex\*.java
+    $ java  -classpath ".;jdbc.jar" &lt;ClassName, eg. CreateCoffees&gt;
+    </pre></li>
+              <li>
+                        After you run the CreateCoffees example,
+                        use the <code class="literal">dbsql</code> executable to
+                        open the <code class="literal">myDataSource</code>
+                        database file and check if the table
+                            <code class="literal">COFFEES</code> has been
+                        successfully created in the database.
+                        <pre class="programlisting">
+    $ dbsql myDataSourcedbsql&gt; .tables
+    COFFEES
+    dbsql&gt; .dump
+    PRAGMA foreign_keys=OFF;
+    BEGIN TRANSACTION;
+    CREATE TABLE COFFEES (COF_NAME varchar(32),/
+    SUP_ID int, PRICE float, SALES int, TOTAL int);
+    COMMIT;
+    dbsql&gt;
+    </pre></li>
+              <li>
+                        Repeat step 2 to run other examples.
+                            <p>Note: Some examples like AutoGenKeys
+                            are not yet supported by BDB JDBC driver.
+                            The
+                                <code class="literal">SQLFeatureNotSupportedException</code>
+                            is displayed for those unsupported
+                            examples.</p></li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50437400"></a>Building the ODBC Driver</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                This section describes the steps required to build
+                the ODBC driver.
+            </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50440304"></a>Configuring Your System</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    To configure your system prior to building the
+                    ODBC driver, do the following:
+                </p>
+          <div class="orderedlist">
+            <ol type="1">
+              <li> 
+                        Download and install the latest SQLite
+                        ODBC driver Windows installer package for
+                            <a class="ulink" href="http://www.ch-werner.de/sqliteodbc/sqliteodbc.exe" target="_top">32 bit Windows</a> or <a class="ulink" href="http://www.ch-werner.de/sqliteodbc/sqliteodbc_w64.exe" target="_top">64 bit Windows</a>.
+                        </li>
+              <li> Download and install the latest 
+                            <a class="ulink" href="http://www.microsoft.com/en-us/download/details.aspx?id=21995" target="_top">
+                                Microsoft Data Access Components (MDAC) SDK 
+                            </a>. The MDAC SDK is only required for
+                            testing the installation.
+                    </li>
+            </ol>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50477512"></a>Building the Library</h4>
+              </div>
+            </div>
+          </div>
+          <div class="orderedlist">
+            <ol type="1">
+              <li> 
+                        Build the SQL project in Release mode.
+                        See <a class="xref" href="build_win_sql.html" title="Building the SQL API">Building the SQL API</a>. 
+                    </li>
+              <li>
+                        Open Visual Studio.
+                    </li>
+              <li>
+                        Load the Berkeley_DB solution file into
+                        Visual Studio.
+                    </li>
+              <li>
+                        Set the build target to
+                        <span class="emphasis"><em>Release</em></span></li>
+              <li>
+                        Build the solution.
+                    </li>
+              <li>
+                        Select <span class="emphasis"><em>File</em></span> -&gt;
+                            <span class="emphasis"><em>Add</em></span> -&gt;
+                            <span class="emphasis"><em>Existing Project</em></span>. 
+                    </li>
+              <li>
+                        Select
+                        <code class="filename">build_windows</code>.
+                    </li>
+              <li>
+                        Select the appropriate directory for
+                        your compiler: <code class="filename">VS8</code> or
+                            <code class="filename">VS10</code>.
+                    </li>
+              <li>
+                        Select
+                            <code class="filename">db_sql_odbc.vcproj</code>
+                        and add it to the Berkeley_DB solution. This
+                        adds the <code class="filename">db_sql_odbc</code>
+                        Visual Studio project to the Berkeley_DB
+                        solution file.
+                    </li>
+              <li>
+                        Build the
+                            <code class="filename">db_sql_odbc</code> project.
+                        This can be done by right-clicking the
+                            <code class="filename">db_sql_odbc</code> project
+                        in the project explorer panel, and selecting
+                            <code class="literal">build</code>.
+                    </li>
+            </ol>
+          </div>
+          <p>
+                    The <code class="literal">sqlite3odbc.dll</code>,
+                        <code class="literal">libdb_sql60.dll</code> and
+                        <code class="literal">libdb60.dll</code> files are now
+                    built.
+                </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50464624"></a>Installing the Library</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    Copy the dll files built in the
+                        <span class="emphasis"><em>Building the Library</em></span>
+                    section to the Windows system folder.
+                </p>
+          <p>The Windows system folder is different on
+                    different systems, but is often
+                        <code class="literal">C:\WINDOWS\System32</code>.
+                </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50468192"></a>Testing the ODBC Install</h4>
+              </div>
+            </div>
+          </div>
+          <p>The steps to verify that the installed driver
+                    works are as follows:
+                </p>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                        Open the Unicode ODBCTest application.
+                        On Windows XP: <span class="emphasis"><em>Windows
+                            start</em></span> -&gt; <span class="emphasis"><em>Microsoft
+                            Data Access SDK 2.8</em></span> -&gt;
+                            <span class="emphasis"><em>ODBCTest (Unicode,
+                            x86).</em></span></li>
+              <li>
+                        Select the <span class="emphasis"><em>Conn</em></span> -&gt;
+                            <span class="emphasis"><em>Full Connect...</em></span> menu
+                        item.
+                    </li>
+              <li>
+                        Select <code class="literal">SQLite3
+                            Datasource</code> and click
+                            <code class="literal">OK</code>.</li>
+              <li>
+                        Select the <span class="emphasis"><em>Stmt</em></span> -&gt;
+                            <span class="emphasis"><em>SQLExecDirect...</em></span> menu
+                        item.
+                    </li>
+              <li>
+                        Enter <code class="literal">CREATE TABLE
+                            t1(x);</code> in the
+                            <code class="literal">Statement</code> text box and
+                        click <code class="literal">OK</code>.
+                    </li>
+              <li>Verify that no error messages were
+                        output to the error window.
+                    </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50452776"></a> Using the ADO.NET Driver </h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                Go to the <a class="ulink" href="http://www.oracle.com/technetwork/database/berkeleydb/downloads/index.html" target="_top">Oracle
+                    Berkeley DB download page</a>, and download
+                the ADO.NET package. Build the package by following
+                the <a href="../bdb-sql/buildinstall.html#ado_net" class="olink">instructions</a> included in the package.
+            </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="build_win_csharp.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="build_win.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="build_win_tcl.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Building the C# API </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Building the Tcl API</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

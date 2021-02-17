@@ -1,0 +1,45 @@
+# Makefile.in for back-meta
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+SRCS	= init.c config.c search.c bind.c unbind.c add.c compare.c \
+		delete.c modify.c modrdn.c suffixmassage.c map.c \
+		conn.c candidates.c dncache.c
+OBJS	= init.lo config.lo search.lo bind.lo unbind.lo add.lo compare.lo \
+		delete.lo modify.lo modrdn.lo suffixmassage.lo map.lo \
+		conn.lo candidates.lo dncache.lo
+
+LDAP_INCDIR= ../../../include       
+LDAP_LIBDIR= ../../../libraries
+
+BUILD_OPT = "--enable-meta"
+BUILD_MOD = @BUILD_META@
+
+mod_DEFS = -DSLAPD_IMPORT
+MOD_DEFS = $(@BUILD_META@_DEFS)
+
+shared_LDAP_LIBS = $(LDAP_LIBLDAP_R_LA) $(LDAP_LIBLBER_LA)
+NT_LINK_LIBS = -L.. -lslapd $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+UNIX_LINK_LIBS = $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+
+LIBBASE = back_meta
+
+XINCPATH = -I.. -I$(srcdir)/..
+XDEFS = $(MODULES_CPPFLAGS)
+
+all-local-lib:	../.backend
+
+../.backend: lib$(LIBBASE).a
+	@touch $@
+

@@ -1,0 +1,484 @@
+/* config.h.in.  Generated from configure.in by autoheader.  */
+
+/* Encoding to use for CHAR */
+#undef ASCII_ENCODING
+
+/* Install bindir */
+#undef BIN_PREFIX
+
+/* Use a semaphore to allow ODBCConfig to display running counts */
+#undef COLLECT_STATS
+
+/* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
+   systems. This function is required for `alloca.c' support on those systems.
+   */
+#undef CRAY_STACKSEG_END
+
+/* Define to 1 if using `alloca.c'. */
+#undef C_ALLOCA
+
+/* Lib directory */
+#undef DEFLIB_PATH
+
+/* Using ini cacheing */
+#undef ENABLE_INI_CACHING
+
+/* Install exec_prefix */
+#undef EXEC_PREFIX
+
+/* Disable the precise but slow checking of the validity of handles */
+#undef FAST_HANDLE_VALIDATE
+
+/* Define to 1 if you have `alloca', as a function or macro. */
+#undef HAVE_ALLOCA
+
+/* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
+   */
+#undef HAVE_ALLOCA_H
+
+/* Define to 1 if you have the `argz_add' function. */
+#undef HAVE_ARGZ_ADD
+
+/* Define to 1 if you have the `argz_append' function. */
+#undef HAVE_ARGZ_APPEND
+
+/* Define to 1 if you have the `argz_count' function. */
+#undef HAVE_ARGZ_COUNT
+
+/* Define to 1 if you have the `argz_create_sep' function. */
+#undef HAVE_ARGZ_CREATE_SEP
+
+/* Define to 1 if you have the <argz.h> header file. */
+#undef HAVE_ARGZ_H
+
+/* Define to 1 if you have the `argz_insert' function. */
+#undef HAVE_ARGZ_INSERT
+
+/* Define to 1 if you have the `argz_next' function. */
+#undef HAVE_ARGZ_NEXT
+
+/* Define to 1 if you have the `argz_stringify' function. */
+#undef HAVE_ARGZ_STRINGIFY
+
+/* Define to 1 if you have the `atoll' function. */
+#undef HAVE_ATOLL
+
+/* Define to 1 if you have the `closedir' function. */
+#undef HAVE_CLOSEDIR
+
+/* Define to 1 if you have the <crypt.h> header file. */
+#undef HAVE_CRYPT_H
+
+/* Define to 1 if you have the declaration of `cygwin_conv_path', and to 0 if
+   you don't. */
+#undef HAVE_DECL_CYGWIN_CONV_PATH
+
+/* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_DIRENT_H
+
+/* Define if you have the GNU dld library. */
+#undef HAVE_DLD
+
+/* Define to 1 if you have the <dld.h> header file. */
+#undef HAVE_DLD_H
+
+/* Define to 1 if you have the `dlerror' function. */
+#undef HAVE_DLERROR
+
+/* Define to 1 if you have the <dlfcn.h> header file. */
+#undef HAVE_DLFCN_H
+
+/* Define to 1 if you have the <dl.h> header file. */
+#undef HAVE_DL_H
+
+/* Define to 1 if you don't have `vprintf' but do have `_doprnt.' */
+#undef HAVE_DOPRNT
+
+/* Define if you have the _dyld_func_lookup function. */
+#undef HAVE_DYLD
+
+/* Define to 1 if you have the `endpwent' function. */
+#undef HAVE_ENDPWENT
+
+/* Define to 1 if the system has the type `error_t'. */
+#undef HAVE_ERROR_T
+
+/* Define to 1 if you have the `ftime' function. */
+#undef HAVE_FTIME
+
+/* Define to 1 if you have the `ftok' function. */
+#undef HAVE_FTOK
+
+/* Define to 1 if you have the `getpwuid' function. */
+#undef HAVE_GETPWUID
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
+
+/* Define to 1 if you have the `getuid' function. */
+#undef HAVE_GETUID
+
+/* Define if you have the iconv() function. */
+#undef HAVE_ICONV
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the <langinfo.h> header file. */
+#undef HAVE_LANGINFO_H
+
+/* Add -lcrypt to lib list */
+#undef HAVE_LIBCRYPT
+
+/* Define if you have the libdl library or equivalent. */
+#undef HAVE_LIBDL
+
+/* Define if libdlloader will be built on this platform */
+#undef HAVE_LIBDLLOADER
+
+/* Use the -lpth thread library */
+#undef HAVE_LIBPTH
+
+/* Use -lpthread threading lib */
+#undef HAVE_LIBPTHREAD
+
+/* Use the -lthread threading lib */
+#undef HAVE_LIBTHREAD
+
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
+
+/* Define to 1 if you have the <locale.h> header file. */
+#undef HAVE_LOCALE_H
+
+/* Use rentrant version of localtime */
+#undef HAVE_LOCALTIME_R
+
+/* Define if you have long long */
+#undef HAVE_LONG_LONG
+
+/* Define this if a modern libltdl is already installed */
+#undef HAVE_LTDL
+
+/* Define to 1 if you have the <mach-o/dyld.h> header file. */
+#undef HAVE_MACH_O_DYLD_H
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the <msql.h> header file. */
+#undef HAVE_MSQL_H
+
+/* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
+#undef HAVE_NDIR_H
+
+/* Define to 1 if you have the `nl_langinfo' function. */
+#undef HAVE_NL_LANGINFO
+
+/* Define to 1 if you have the `opendir' function. */
+#undef HAVE_OPENDIR
+
+/* Define if libtool can extract symbol lists from object files. */
+#undef HAVE_PRELOADED_SYMBOLS
+
+/* Define to 1 if you have the `putenv' function. */
+#undef HAVE_PUTENV
+
+/* Define to 1 if you have the <pwd.h> header file. */
+#undef HAVE_PWD_H
+
+/* Define to 1 if you have the `readdir' function. */
+#undef HAVE_READDIR
+
+/* Add readline support */
+#undef HAVE_READLINE
+
+/* Define to 1 if you have the <readline/history.h> header file. */
+#undef HAVE_READLINE_HISTORY_H
+
+/* Use the scandir lib */
+#undef HAVE_SCANDIR
+
+/* Define to 1 if you have the `semget' function. */
+#undef HAVE_SEMGET
+
+/* Define to 1 if you have the `semop' function. */
+#undef HAVE_SEMOP
+
+/* Define to 1 if you have the `setenv' function. */
+#undef HAVE_SETENV
+
+/* Define to 1 if you have the `setlocale' function. */
+#undef HAVE_SETLOCALE
+
+/* Define if you have the shl_load function. */
+#undef HAVE_SHL_LOAD
+
+/* Define to 1 if you have the `shmget' function. */
+#undef HAVE_SHMGET
+
+/* Define to 1 if you have the `snprintf' function. */
+#undef HAVE_SNPRINTF
+
+/* Define to 1 if you have the `socket' function. */
+#undef HAVE_SOCKET
+
+/* Define to 1 if you have the <stdarg.h> header file. */
+#undef HAVE_STDARG_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strcasecmp' function. */
+#undef HAVE_STRCASECMP
+
+/* Define to 1 if you have the `strchr' function. */
+#undef HAVE_STRCHR
+
+/* Define to 1 if you have the `strdup' function. */
+#undef HAVE_STRDUP
+
+/* Define to 1 if you have the `stricmp' function. */
+#undef HAVE_STRICMP
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strlcat' function. */
+#undef HAVE_STRLCAT
+
+/* Define to 1 if you have the `strlcpy' function. */
+#undef HAVE_STRLCPY
+
+/* Define to 1 if you have the `strncasecmp' function. */
+#undef HAVE_STRNCASECMP
+
+/* Define to 1 if you have the `strnicmp' function. */
+#undef HAVE_STRNICMP
+
+/* Define to 1 if you have the `strstr' function. */
+#undef HAVE_STRSTR
+
+/* Define to 1 if you have the `strtol' function. */
+#undef HAVE_STRTOL
+
+/* Define to 1 if you have the `strtoll' function. */
+#undef HAVE_STRTOLL
+
+/* Define to 1 if you have the <synch.h> header file. */
+#undef HAVE_SYNCH_H
+
+/* Define to 1 if you have the <sys/dir.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_SYS_DIR_H
+
+/* Define to 1 if you have the <sys/dl.h> header file. */
+#undef HAVE_SYS_DL_H
+
+/* Define to 1 if you have the <sys/malloc.h> header file. */
+#undef HAVE_SYS_MALLOC_H
+
+/* Define to 1 if you have the <sys/ndir.h> header file, and it defines `DIR'.
+   */
+#undef HAVE_SYS_NDIR_H
+
+/* Define to 1 if you have the <sys/sem.h> header file. */
+#undef HAVE_SYS_SEM_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/timeb.h> header file. */
+#undef HAVE_SYS_TIMEB_H
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#undef HAVE_SYS_TIME_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the `time' function. */
+#undef HAVE_TIME
+
+/* Define to 1 if you have the <time.h> header file. */
+#undef HAVE_TIME_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <varargs.h> header file. */
+#undef HAVE_VARARGS_H
+
+/* Define to 1 if you have the `vprintf' function. */
+#undef HAVE_VPRINTF
+
+/* Define to 1 if you have the `vsnprintf' function. */
+#undef HAVE_VSNPRINTF
+
+/* This value is set to 1 to indicate that the system argz facility works */
+#undef HAVE_WORKING_ARGZ
+
+/* Define as const if the declaration of iconv() needs const. */
+#undef ICONV_CONST
+
+/* Install includedir */
+#undef INCLUDE_PREFIX
+
+/* Lib directory */
+#undef LIB_PREFIX
+
+/* Define if the OS needs help to load dependent libraries for dlopen(). */
+#undef LTDL_DLOPEN_DEPLIBS
+
+/* Define to the system default library search path. */
+#undef LT_DLSEARCH_PATH
+
+/* The archive extension */
+#undef LT_LIBEXT
+
+/* The archive prefix */
+#undef LT_LIBPREFIX
+
+/* Define to the extension used for runtime loadable modules, say, ".so". */
+#undef LT_MODULE_EXT
+
+/* Define to the name of the environment variable that determines the run-time
+   module search path. */
+#undef LT_MODULE_PATH_VAR
+
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
+#undef LT_OBJDIR
+
+/* Define to the shared library suffix, say, ".dylib". */
+#undef LT_SHARED_EXT
+
+/* Define if you need semundo union */
+#undef NEED_SEMUNDO_UNION
+
+/* Define if dlsym() requires a leading underscore in symbol names. */
+#undef NEED_USCORE
+
+/* Using OSX */
+#undef OSXHEADER
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the home page for this package. */
+#undef PACKAGE_URL
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Platform is 64 bit */
+#undef PLATFORM64
+
+/* Install prefix */
+#undef PREFIX
+
+/* Using QNX */
+#undef QNX_LIBLTDL
+
+/* Shared lib extension */
+#undef SHLIBEXT
+
+/* The size of `long', as computed by sizeof. */
+#undef SIZEOF_LONG
+
+/* The size of `long int', as computed by sizeof. */
+#undef SIZEOF_LONG_INT
+
+/* If using the C implementation of alloca, define if you know the
+   direction of stack growth for your system; otherwise it will be
+   automatically deduced at runtime.
+	STACK_DIRECTION > 0 => grows toward higher addresses
+	STACK_DIRECTION < 0 => grows toward lower addresses
+	STACK_DIRECTION = 0 => direction of growth unknown */
+#undef STACK_DIRECTION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* don't include unixODBC prefix in driver error messages */
+#undef STRICT_ODBC_ERROR
+
+/* System file path */
+#undef SYSTEM_FILE_PATH
+
+/* Lib path */
+#undef SYSTEM_LIB_PATH
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Define to 1 if your <sys/time.h> declares `struct tm'. */
+#undef TM_IN_SYS_TIME
+
+/* Encoding to use for UNICODE */
+#undef UNICODE_ENCODING
+
+/* Flag that we are not using another DM */
+#undef UNIXODBC
+
+/* We are building inside the unixODBC source tree */
+#undef UNIXODBC_SOURCE
+
+/* Version number of package */
+#undef VERSION
+
+/* Work with IBM drivers that use 32 bit handles on 64 bit platforms */
+#undef WITH_HANDLE_REDIRECT
+
+/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
+   `char[]'. */
+#undef YYTEXT_POINTER
+
+/* Build flag for AIX */
+#undef _ALL_SOURCE
+
+/* Build flag for AIX */
+#undef _LONG_LONG
+
+/* Build flag for AIX */
+#undef _THREAD_SAFE
+
+/* Define so that glibc/gnulib argp.h does not typedef error_t. */
+#undef __error_t_defined
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
+
+/* Define to a type to use for `error_t' if it is not otherwise available. */
+#undef error_t
+
+/* Define to `int' if <sys/types.h> doesn't define. */
+#undef gid_t
+
+/* Define to `unsigned int' if <sys/types.h> does not define. */
+#undef size_t
+
+/* Define to `int' if <sys/types.h> doesn't define. */
+#undef uid_t

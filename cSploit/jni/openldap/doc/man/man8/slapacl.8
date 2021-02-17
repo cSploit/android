@@ -1,0 +1,203 @@
+.TH SLAPACL 8C "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2004-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapacl \- Check access to a list of attributes.
+.SH SYNOPSIS
+.B SBINDIR/slapacl
+.BI \-b \ DN
+[\c
+.BI \-d \ debug-level\fR]
+[\c
+.BI \-D \ authcDN\ \fR|
+.BI \-U \ authcID\fR]
+[\c
+.BI \-f \ slapd.conf\fR]
+[\c
+.BI \-F \ confdir\fR]
+[\c
+.BI \-o \ option\fR[ = value\fR]]
+[\c
+.BR \-u ]
+[\c
+.BR \-v ]
+[\c
+.BI \-X \ authzID\ \fR|
+.BI "\-o \ authzDN=" DN\fR]
+[\c
+.IR attr [\fB/\fI access ][\fB:\fI value ]]\fR\ [...]
+.LP
+.SH DESCRIPTION
+.LP
+.B slapacl
+is used to check the behavior of 
+.BR slapd (8) 
+by verifying access to directory data according to the access control list
+directives defined in its configuration.
+.
+It opens the
+.BR slapd.conf (5)
+configuration file or the 
+.BR slapd\-config (5) 
+backend, reads in the  
+.BR access / olcAccess
+directives, and then parses the 
+.B attr
+list given on the command-line; if none is given, access to the
+.B entry
+pseudo-attribute is tested.
+.LP
+.SH OPTIONS
+.TP
+.BI \-b \ DN
+specify the 
+.I DN 
+which access is requested to; the corresponding entry is fetched 
+from the database, and thus it must exist.
+The
+.I DN
+is also used to determine what rules apply; thus, it must be
+in the naming context of a configured database.  See also
+.BR \-u .
+.TP
+.BI \-d \ debug-level
+enable debugging messages as defined by the specified
+.IR debug-level ;
+see
+.BR slapd (8)
+for details.
+.TP
+.BI \-D \ authcDN
+specify a DN to be used as identity through the test session
+when selecting appropriate
+.B <by> 
+clauses in access lists.
+.TP
+.BI \-f \ slapd.conf
+specify an alternative
+.BR slapd.conf (5)
+file.
+.TP
+.BI \-F \ confdir
+specify a config directory.
+If both
+.B \-f
+and
+.B \-F
+are specified, the config file will be read and converted to
+config directory format and written to the specified directory.
+If neither option is specified, an attempt to read the
+default config directory will be made before trying to use the default
+config file. If a valid config directory exists then the
+default config file is ignored.
+.TP
+.BI \-o \ option\fR[ = value\fR]
+Specify an
+.I option
+with a(n optional)
+.IR value .
+Possible generic options/values are:
+.LP
+.nf
+              syslog=<subsystems>  (see `\-s' in slapd(8))
+              syslog\-level=<level> (see `\-S' in slapd(8))
+              syslog\-user=<user>   (see `\-l' in slapd(8))
+
+.fi
+.RS
+Possible options/values specific to
+.B slapacl
+are:
+.RE
+.nf
+
+              authzDN
+              domain
+              peername
+              sasl_ssf
+              sockname
+              sockurl
+              ssf
+              tls_ssf
+              transport_ssf
+
+.fi
+.RS
+See the related fields in
+.BR slapd.access (5)
+for details.
+.RE
+.TP
+.BI \-u
+do not fetch the entry from the database.
+In this case, if the entry does not exist, a fake entry with the
+.I DN
+given with the
+.B \-b
+option is used, with no attributes.
+As a consequence, those rules that depend on the contents 
+of the target object will not behave as with the real object.
+The
+.I DN
+given with the
+.B \-b
+option is still used to select what rules apply; thus, it must be
+in the naming context of a configured database.
+See also
+.BR \-b .
+.TP
+.BI \-U \ authcID
+specify an ID to be mapped to a 
+.B DN 
+as by means of 
+.B authz\-regexp
+or
+.B authz\-rewrite
+rules (see 
+.BR slapd.conf (5)
+for details); mutually exclusive with
+.BR \-D .
+.TP
+.B \-v
+enable verbose mode.
+.TP
+.BI \-X \ authzID
+specify an authorization ID to be mapped to a
+.B DN
+as by means of
+.B authz\-regexp
+or
+.B authz\-rewrite
+rules (see
+.BR slapd.conf (5)
+for details); mutually exclusive with \fB\-o\fP \fBauthzDN=\fIDN\fR.
+.SH EXAMPLES
+The command
+.LP
+.nf
+.ft tt
+	SBINDIR/slapacl \-f ETCDIR/slapd.conf \-v \\
+            \-U bjorn \-b "o=University of Michigan,c=US" \\
+	    "o/read:University of Michigan"
+
+.ft
+.fi
+tests whether the user
+.I bjorn
+can access the attribute 
+.I o
+of the entry
+.I o=University of Michigan,c=US
+at
+.I read
+level.
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR slapd (8),
+.BR slaptest (8),
+.BR slapauth (8)
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

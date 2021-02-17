@@ -1,0 +1,146 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Constructing a Distributed Directory Service
+
+For many sites, running one or more {{slapd}}(8) that hold an
+entire subtree of data is sufficient. But often it is desirable
+to have one {{slapd}} refer to other directory services for a
+certain part of the tree (which may or may not be running {{slapd}}).
+
+!if 0
+{{slapd}} supports {{subordinate}}, {{immediate superior}},
+and {{superior}} knowledge information.
+!else
+{{slapd}} supports {{subordinate}} and {{superior}} knowledge information.
+Subordinate knowledge information is held in {{EX:referral}}
+objects ({{REF:RFC3296}}).
+!endif
+
+
+H2: Subordinate Knowledge Information
+
+Subordinate knowledge information may be provided to delegate
+a subtree.
+Subordinate knowledge information is maintained in the directory
+as a special {{referral}} object at the delegate point.
+The referral object acts as a delegation point, gluing two services
+together.
+This mechanism allows for hierarchical directory services to be
+constructed.
+
+A referral object has a structural object class of
+{{EX:referral}} and has the same {{TERM[expand]DN}} as the
+delegated subtree.  Generally, the referral object will also
+provide the auxiliary object class {{EX:extensibleObject}}.
+This allows the entry to contain appropriate {{TERM[expand]RDN}}
+values.  This is best demonstrated by example.
+
+If the server {{EX:a.example.net}} holds {{EX:dc=example,dc=net}}
+and wished to delegate the subtree {{EX:ou=subtree,dc=example,dc=net}}
+to another server {{EX:b.example.net}}, the following named referral
+object would be added to {{EX:a.example.net}}:
+
+>	dn: dc=subtree,dc=example,dc=net
+>	objectClass: referral
+>	objectClass: extensibleObject
+>	dc: subtree
+>	ref: ldap://b.example.net/dc=subtree,dc=example,dc=net
+
+The server uses this information to generate referrals and
+search continuations to subordinate servers.
+
+For those familiar with {{TERM:X.500}}, a {{named referral}} object is
+similar to an X.500 knowledge reference held in a {{subr}}
+{{TERM:DSE}}.
+
+
+!if 0
+H2: Immediate Superior Knowledge Information
+
+Immediate superior knowledge information may be provided in the
+entry at the root of a delegated subtree.  The knowledge information
+is contained with {{EX:ref}} operational attribute.
+
+Extending the example above, a {{ref}} attribute can be added
+to the entry {{EX:dc=subtree,dc=example,dc=net}} in server B indicating
+that A holds the immediate superior naming context.
+
+>	dn: dc=subtree,dc=example,dc=net
+>	changetype: modify
+>	add: ref
+>	ref: ldap://a.example.net/
+
+The server uses this information to generate referrals to
+management operations.
+
+For those familiar with {{TERM:X.500}}, this use of the {{EX:ref}}
+attribute is similar to an X.500 knowledge reference held in a
+{{immSupr}} {{TERM:DSE}}.
+!endif
+
+
+H2: Superior Knowledge Information
+
+Superior knowledge information may be specified using the {{EX:referral}}
+directive.  The value is a list of {{TERM:URI}}s referring to
+superior directory services.  For servers without immediate superiors,
+such as for {{EX:a.example.net}} in the example above, the server
+can be configured to use a directory service with {{global knowledge}},
+such as the {{OpenLDAP Root Service}}
+({{URL:http://www.openldap.org/faq/index.cgi?file=393}}).
+
+>	referral	ldap://root.openldap.org/
+
+However, as {{EX:a.example.net}} is the {{immediate superior}}
+to {{EX:b.example.net}}, {{b.example.net}} would be configured
+as follows:
+
+>	referral	ldap://a.example.net/
+
+The server uses this information to generate referrals for operations
+acting upon entries not within or subordinate to any of the naming
+contexts held by the server.
+
+For those familiar with {{TERM:X.500}}, this use of the {{EX:ref}}
+attribute is similar to an X.500 knowledge reference held in a
+{{Supr}} {{TERM:DSE}}.
+
+
+H2: The ManageDsaIT Control
+
+Adding, modifying, and deleting referral objects is generally done
+using {{ldapmodify}}(1) or similar tools which support the ManageDsaIT
+control.  The ManageDsaIT control informs the server that you intend
+to manage the referral object as a regular entry.  This keeps the
+server from sending a referral result for requests which interrogate
+or update referral objects.
+
+The ManageDsaIT control should not be specified when managing regular
+entries.
+
+The {{EX:-M}} option of {{ldapmodify}}(1) (and other tools) enables
+ManageDsaIT.  For example:
+
+>	ldapmodify -M -f referral.ldif -x -D "cn=Manager,dc=example,dc=net" -W
+
+or with {{ldapsearch}}(1):
+
+>	ldapsearch -M -b "dc=example,dc=net" -x "(objectclass=referral)" '*' ref
+
+Note: the {{EX:ref}} attribute is operational and must be explicitly
+requested when desired in search results.
+
+Note: the use of referrals to construct a Distributed Directory Service is
+extremely clumsy and not well supported by common clients. If an existing
+installation has already been built using referrals, the use of the
+{{chain}} overlay to hide the referrals will greatly improve the usability
+of the Directory system. A better approach would be to use explicitly
+defined local and proxy databases in {{subordinate}} configurations to
+provide a seamless view of the Distributed Directory.
+
+Note: LDAP operations, even subtree searches, normally access only one
+database. That can be changed by gluing databases together with the
+{{B:subordinate}}/{{B:olcSubordinate}} keyword. Please see {{slapd.conf}}(5) 
+and {{slapd-config}}(5).

@@ -1,0 +1,489 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 2.  System Installation Notes</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="prev" href="ch01s02.html" title="Supported Platforms" />
+    <link rel="next" href="install_multiple.html" title="Building with multiple versions of Berkeley DB" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 2. 
+		System Installation Notes
+        </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="ch01s02.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="install_multiple.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="install"></a>Chapter 2. 
+		System Installation Notes
+        </h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="install.html#install_file">File utility /etc/magic information</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="install.html#magic">Magic information</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="install.html#big-endian">Big-endian magic information</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="install.html#little-endian">Little-endian magic information</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="install_multiple.html">Building with multiple versions of Berkeley DB</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="install_file"></a>File utility /etc/magic information</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <dl>
+            <dt>
+              <span class="sect2">
+                <a href="install.html#magic">Magic information</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="install.html#big-endian">Big-endian magic information</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="install.html#little-endian">Little-endian magic information</a>
+              </span>
+            </dt>
+          </dl>
+        </div>
+        <p>
+        The <code class="literal">file</code>(1) utility is a UNIX utility that
+        examines and classifies files, based on information found in its
+        database of file types, the /etc/magic file.  The following
+        information may be added to your system's /etc/magic file to enable
+        <code class="literal">file</code>(1) to correctly identify Berkeley DB
+        database files.
+    </p>
+        <p>
+        The <code class="literal">file</code>(1) utility <code class="literal">magic</code>(5)
+        information for the standard System V UNIX implementation of the
+        <code class="literal">file</code>(1) utility is included in the Berkeley DB
+        distribution for both big-endian (for example, Sparc)
+        and little-endian (for example, x86) architectures. 
+        See <a class="xref" href="install.html#big-endian" title="Big-endian magic information">Big-endian magic information</a>
+        and <a class="xref" href="install.html#little-endian" title="Little-endian magic information">Little-endian magic information</a>
+        respectively for this information.
+    </p>
+        <p>
+        The <code class="literal">file</code>(1) utility <code class="literal">magic</code>(5)
+        information for Release 3.X of Ian Darwin's implementation of the
+        file utility (as distributed by FreeBSD and most Linux
+        distributions) is included in the Berkeley DB distribution.  This
+        <code class="literal">magic.txt</code> information is correct for
+        both big-endian and little-endian architectures. See the next
+        section for this information.
+    </p>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="magic"></a>Magic information</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="programlisting"># Berkeley DB
+#
+# Ian Darwin's file /etc/magic files: big/little-endian version.
+#
+# Hash 1.85/1.86 databases store metadata in network byte order.
+# Btree 1.85/1.86 databases store the metadata in host byte order.
+# Hash and Btree 2.X and later databases store the metadata in 
+# host byte order.
+
+0	long	0x00061561	Berkeley DB
+&gt;8	belong	4321
+&gt;&gt;4	belong	&gt;2		1.86
+&gt;&gt;4	belong	&lt;3		1.85
+&gt;&gt;4	belong	&gt;0		(Hash, version %d, native byte-order)
+&gt;8	belong	1234
+&gt;&gt;4	belong	&gt;2		1.86
+&gt;&gt;4	belong	&lt;3		1.85
+&gt;&gt;4	belong	&gt;0		(Hash, version %d, little-endian)
+
+0	belong	0x00061561	Berkeley DB
+&gt;8	belong	4321
+&gt;&gt;4	belong	&gt;2		1.86
+&gt;&gt;4	belong	&lt;3		1.85
+&gt;&gt;4	belong	&gt;0		(Hash, version %d, big-endian)
+&gt;8	belong	1234
+&gt;&gt;4	belong	&gt;2		1.86
+&gt;&gt;4	belong	&lt;3		1.85
+&gt;&gt;4	belong	&gt;0		(Hash, version %d, native byte-order)
+
+0	long	0x00053162	Berkeley DB 1.85/1.86
+&gt;4	long	&gt;0		(Btree, version %d, native byte-order)
+0	belong	0x00053162	Berkeley DB 1.85/1.86
+&gt;4	belong	&gt;0		(Btree, version %d, big-endian)
+0	lelong	0x00053162	Berkeley DB 1.85/1.86
+&gt;4	lelong	&gt;0		(Btree, version %d, little-endian)
+
+12	long	0x00061561	Berkeley DB
+&gt;16	long	&gt;0		(Hash, version %d, native byte-order)
+12	belong	0x00061561	Berkeley DB
+&gt;16	belong	&gt;0		(Hash, version %d, big-endian)
+12	lelong	0x00061561	Berkeley DB
+&gt;16	lelong	&gt;0		(Hash, version %d, little-endian)
+
+12	long	0x00053162	Berkeley DB
+&gt;16	long	&gt;0		(Btree, version %d, native byte-order)
+12	belong	0x00053162	Berkeley DB
+&gt;16	belong	&gt;0		(Btree, version %d, big-endian)
+12	lelong	0x00053162	Berkeley DB
+&gt;16	lelong	&gt;0		(Btree, version %d, little-endian)
+
+12	long	0x00042253	Berkeley DB
+&gt;16	long	&gt;0		(Queue, version %d, native byte-order)
+12	belong	0x00042253	Berkeley DB
+&gt;16	belong	&gt;0		(Queue, version %d, big-endian)
+12	lelong	0x00042253	Berkeley DB
+&gt;16	lelong	&gt;0		(Queue, version %d, little-endian)
+
+12	long	0x00040988	Berkeley DB
+&gt;16	long	&gt;0		(Log, version %d, native byte-order)
+12	belong	0x00040988	Berkeley DB
+&gt;16	belong	&gt;0		(Log, version %d, big-endian)
+12	lelong	0x00040988	Berkeley DB
+&gt;16	lelong	&gt;0		(Log, version %d, little-endian) </pre>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="big-endian"></a>Big-endian magic information</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="programlisting"># Berkeley DB
+#
+# System V /etc/magic files: big-endian version.
+#
+# Hash 1.85/1.86 databases store metadata in network byte order.
+# Btree 1.85/1.86 databases store the metadata in host byte order.
+# Hash and Btree 2.X and later databases store the metadata in 
+# host byte order.
+
+0	long	0x00053162	Berkeley DB 1.85/1.86 (Btree,
+&gt;4	long	0x00000002	version 2,
+&gt;4	long	0x00000003	version 3,
+&gt;0	long	0x00053162	native byte-order)
+
+0	long	0x62310500	Berkeley DB 1.85/1.86 (Btree,
+&gt;4	long	0x02000000	version 2,
+&gt;4	long	0x03000000	version 3,
+&gt;0	long	0x62310500	little-endian)
+
+12	long	0x00053162	Berkeley DB (Btree,
+&gt;16	long	0x00000004	version 4,
+&gt;16	long	0x00000005	version 5,
+&gt;16	long	0x00000006	version 6,
+&gt;16	long	0x00000007	version 7,
+&gt;16	long	0x00000008	version 8,
+&gt;16	long	0x00000009	version 9,
+&gt;12	long	0x00053162	native byte-order)
+
+12	long	0x62310500	Berkeley DB (Btree,
+&gt;16	long	0x04000000	version 4,
+&gt;16	long	0x05000000	version 5,
+&gt;16	long	0x06000000	version 6,
+&gt;16	long	0x07000000	version 7,
+&gt;16	long	0x08000000	version 8,
+&gt;16	long	0x09000000	version 9,
+&gt;12	long	0x62310500	little-endian)
+
+0	long	0x00061561	Berkeley DB
+&gt;4	long	&gt;2		1.86
+&gt;4	long	&lt;3		1.85
+&gt;0	long	0x00061561	(Hash,
+&gt;4	long	2		version 2,
+&gt;4	long	3		version 3,
+&gt;8	long	0x000004D2	little-endian)
+&gt;8	long	0x000010E1	native byte-order)
+
+12	long	0x00061561	Berkeley DB (Hash,
+&gt;16	long	0x00000004	version 4,
+&gt;16	long	0x00000005	version 5,
+&gt;16	long	0x00000006	version 6,
+&gt;16	long	0x00000007	version 7,
+&gt;16	long	0x00000008	version 8,
+&gt;16	long	0x00000009	version 9,
+&gt;12	long	0x00061561	native byte-order)
+
+12	long	0x61150600	Berkeley DB (Hash,
+&gt;16	long	0x04000000	version 4,
+&gt;16	long	0x05000000	version 5,
+&gt;16	long	0x06000000	version 6,
+&gt;16	long	0x07000000	version 7,
+&gt;16	long	0x08000000	version 8,
+&gt;16	long	0x09000000	version 9,
+&gt;12	long	0x61150600	little-endian)
+
+12	long	0x00042253	Berkeley DB (Queue,
+&gt;16	long	0x00000001	version 1,
+&gt;16	long	0x00000002	version 2,
+&gt;16	long	0x00000003	version 3,
+&gt;16	long	0x00000004	version 4,
+&gt;16	long	0x00000005	version 5,
+&gt;16	long	0x00000006	version 6,
+&gt;16	long	0x00000007	version 7,
+&gt;16	long	0x00000008	version 8,
+&gt;16	long	0x00000009	version 9,
+&gt;12	long	0x00042253	native byte-order)
+
+12	long	0x53220400	Berkeley DB (Queue,
+&gt;16	long	0x01000000	version 1,
+&gt;16	long	0x02000000	version 2,
+&gt;16	long	0x03000000	version 3,
+&gt;16	long	0x04000000	version 4,
+&gt;16	long	0x05000000	version 5,
+&gt;16	long	0x06000000	version 6,
+&gt;16	long	0x07000000	version 7,
+&gt;16	long	0x08000000	version 8,
+&gt;16	long	0x09000000	version 9,
+&gt;12	long	0x53220400	little-endian)
+
+12	long	0x00040988	Berkeley DB (Log,
+&gt;16	long	0x00000001	version 1,
+&gt;16	long	0x00000002	version 2,
+&gt;16	long	0x00000003	version 3,
+&gt;16	long	0x00000004	version 4,
+&gt;16	long	0x00000005	version 5,
+&gt;16	long	0x00000006	version 6,
+&gt;16	long	0x00000007	version 7,
+&gt;16	long	0x00000008	version 8,
+&gt;16	long	0x00000009	version 9,
+&gt;16	long	0x0000000a	version 10,
+&gt;16	long	0x0000000b	version 11,
+&gt;16	long	0x0000000c	version 12,
+&gt;16	long	0x0000000d	version 13,
+&gt;16	long	0x0000000e	version 14,
+&gt;16	long	0x0000000f	version 15,
+&gt;12	long	0x00040988	native byte-order)
+
+12	long	0x88090400	Berkeley DB (Log,
+&gt;16	long	0x01000000	version 1,
+&gt;16	long	0x02000000	version 2,
+&gt;16	long	0x03000000	version 3,
+&gt;16	long	0x04000000	version 4,
+&gt;16	long	0x05000000	version 5,
+&gt;16	long	0x06000000	version 6,
+&gt;16	long	0x07000000	version 7,
+&gt;16	long	0x08000000	version 8,
+&gt;16	long	0x09000000	version 9,
+&gt;16	long	0x0a000000	version 10,
+&gt;16	long	0x0b000000	version 11,
+&gt;16	long	0x0c000000	version 12,
+&gt;16	long	0x0d000000	version 13,
+&gt;16	long	0x0e000000	version 14,
+&gt;16	long	0x0f000000	version 15,
+&gt;12	long	0x88090400	little-endian)</pre>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="little-endian"></a>Little-endian magic information</h3>
+              </div>
+            </div>
+          </div>
+          <pre class="programlisting"># Berkeley DB
+#
+# System V /etc/magic files: little-endian version.
+#
+# Hash 1.85/1.86 databases store metadata in network byte order.
+# Btree 1.85/1.86 databases store the metadata in host byte order.
+# Hash and Btree 2.X and later databases store the metadata in 
+# host byte order.
+
+0	long	0x00053162	Berkeley DB 1.85/1.86 (Btree,
+&gt;4	long	0x00000002	version 2,
+&gt;4	long	0x00000003	version 3,
+&gt;0	long	0x00053162	native byte-order)
+
+0	long	0x62310500	Berkeley DB 1.85/1.86 (Btree,
+&gt;4	long	0x02000000	version 2,
+&gt;4	long	0x03000000	version 3,
+&gt;0	long	0x62310500	big-endian)
+
+12	long	0x00053162	Berkeley DB (Btree,
+&gt;16	long	0x00000004	version 4,
+&gt;16	long	0x00000005	version 5,
+&gt;16	long	0x00000006	version 6,
+&gt;16	long	0x00000007	version 7,
+&gt;16	long	0x00000008	version 8,
+&gt;16	long	0x00000009	version 9,
+&gt;12	long	0x00053162	native byte-order)
+
+12	long	0x62310500	Berkeley DB (Btree,
+&gt;16	long	0x04000000	version 4,
+&gt;16	long	0x05000000	version 5,
+&gt;16	long	0x06000000	version 6,
+&gt;16	long	0x07000000	version 7,
+&gt;16	long	0x08000000	version 8,
+&gt;16	long	0x09000000	version 9,
+&gt;12	long	0x62310500	big-endian)
+
+0	long	0x61150600	Berkeley DB
+&gt;4	long	&gt;0x02000000	1.86
+&gt;4	long	&lt;0x03000000	1.85
+&gt;0	long	0x00061561	(Hash,
+&gt;4	long	0x02000000	version 2,
+&gt;4	long	0x03000000	version 3,
+&gt;8	long	0xD2040000	native byte-order)
+&gt;8	long	0xE1100000	big-endian)
+
+12	long	0x00061561	Berkeley DB (Hash,
+&gt;16	long	0x00000004	version 4,
+&gt;16	long	0x00000005	version 5,
+&gt;16	long	0x00000006	version 6,
+&gt;16	long	0x00000007	version 7,
+&gt;16	long	0x00000008	version 8,
+&gt;16	long	0x00000009	version 9,
+&gt;12	long	0x00061561	native byte-order)
+
+12	long	0x61150600	Berkeley DB (Hash,
+&gt;16	long	0x04000000	version 4,
+&gt;16	long	0x05000000	version 5,
+&gt;16	long	0x06000000	version 6,
+&gt;16	long	0x07000000	version 7,
+&gt;16	long	0x08000000	version 8,
+&gt;16	long	0x09000000	version 9,
+&gt;12	long	0x61150600	big-endian)
+
+12	long	0x00042253	Berkeley DB (Queue,
+&gt;16	long	0x00000001	version 1,
+&gt;16	long	0x00000002	version 2,
+&gt;16	long	0x00000003	version 3,
+&gt;16	long	0x00000004	version 4,
+&gt;16	long	0x00000005	version 5,
+&gt;16	long	0x00000006	version 6,
+&gt;16	long	0x00000007	version 7,
+&gt;16	long	0x00000008	version 8,
+&gt;16	long	0x00000009	version 9,
+&gt;12	long	0x00042253	native byte-order)
+
+12	long	0x53220400	Berkeley DB (Queue,
+&gt;16	long	0x01000000	version 1,
+&gt;16	long	0x02000000	version 2,
+&gt;16	long	0x03000000	version 3,
+&gt;16	long	0x04000000	version 4,
+&gt;16	long	0x05000000	version 5,
+&gt;16	long	0x06000000	version 6,
+&gt;16	long	0x07000000	version 7,
+&gt;16	long	0x08000000	version 8,
+&gt;16	long	0x09000000	version 9,
+&gt;12	long	0x53220400	big-endian)
+
+12	long	0x00040988	Berkeley DB (Log,
+&gt;16	long	0x00000001	version 1,
+&gt;16	long	0x00000002	version 2,
+&gt;16	long	0x00000003	version 3,
+&gt;16	long	0x00000004	version 4,
+&gt;16	long	0x00000005	version 5,
+&gt;16	long	0x00000006	version 6,
+&gt;16	long	0x00000007	version 7,
+&gt;16	long	0x00000008	version 8,
+&gt;16	long	0x00000009	version 9,
+&gt;16	long	0x0000000a	version 10,
+&gt;16	long	0x0000000b	version 11,
+&gt;16	long	0x0000000c	version 12,
+&gt;16	long	0x0000000d	version 13,
+&gt;16	long	0x0000000e	version 14,
+&gt;16	long	0x0000000f	version 15,
+&gt;12	long	0x00040988	native byte-order)
+
+12	long	0x88090400	Berkeley DB (Log,
+&gt;16	long	0x01000000	version 1,
+&gt;16	long	0x02000000	version 2,
+&gt;16	long	0x03000000	version 3,
+&gt;16	long	0x04000000	version 4,
+&gt;16	long	0x05000000	version 5,
+&gt;16	long	0x06000000	version 6,
+&gt;16	long	0x07000000	version 7,
+&gt;16	long	0x08000000	version 8,
+&gt;16	long	0x09000000	version 9,
+&gt;16	long	0x0a000000	version 10,
+&gt;16	long	0x0b000000	version 11,
+&gt;16	long	0x0c000000	version 12,
+&gt;16	long	0x0d000000	version 13,
+&gt;16	long	0x0e000000	version 14,
+&gt;16	long	0x0f000000	version 15,
+&gt;12	long	0x88090400	big-endian) </pre>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="ch01s02.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="install_multiple.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Supported Platforms </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Building with multiple versions of Berkeley DB</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

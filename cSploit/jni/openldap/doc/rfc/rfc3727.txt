@@ -1,0 +1,283 @@
+
+
+
+
+
+
+Network Working Group                                            S. Legg
+Request for Comments: 3727                           Adacel Technologies
+Category: Standards Track                                  February 2004
+
+
+                    ASN.1 Module Definition for the
+                LDAP and X.500 Component Matching Rules
+
+Status of this Memo
+
+   This document specifies an Internet standards track protocol for the
+   Internet community, and requests discussion and suggestions for
+   improvements.  Please refer to the current edition of the "Internet
+   Official Protocol Standards" (STD 1) for the standardization state
+   and status of this protocol.  Distribution of this memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2004).  All Rights Reserved.
+
+Abstract
+
+   This document updates the specification of the component matching
+   rules for Lightweight Directory Access Protocol (LDAP) and X.500
+   directories (RFC3687) by collecting the Abstract Syntax Notation One
+   (ASN.1) definitions of the component matching rules into an
+   appropriately identified ASN.1 module so that other specifications
+   may reference the component matching rule definitions from within
+   their own ASN.1 modules.
+
+1.  Introduction
+
+   The structure or data type of data held in an attribute of a
+   Lightweight Directory Access Protocol (LDAP) [LDAP] or X.500 [X500]
+   directory is described by the attribute's syntax.  Attribute syntaxes
+   range from simple data types, such as text string, integer, or
+   boolean, to complex data types, for example, the syntaxes of the
+   directory schema operational attributes.  RFC 3687 [CMR] defines a
+   generic way of matching user selected components in a directory
+   attribute value of any arbitrarily complex attribute syntax.
+
+   This document updates RFC 3687 by collecting the Abstract Syntax
+   Notation One (ASN.1) [ASN1] definitions of RFC 3687 into an
+   appropriately identified ASN.1 module so that other specifications
+   may reference these definitions from within their own ASN.1 modules.
+
+
+
+
+
+
+Legg                        Standards Track                     [Page 1]
+
+RFC 3727             Module for Component Matching         February 2004
+
+
+2.  Module Definition for Component Matching
+
+   ComponentMatching
+       {iso(1) 2 36 79672281 xed(3) module(0) component-matching(4)}
+
+   --  Copyright (C) The Internet Society (2004).  This version of
+   --  this ASN.1 module is part of RFC 3727; see the RFC itself
+   --  for full legal notices.
+
+   DEFINITIONS
+   EXPLICIT TAGS
+   EXTENSIBILITY IMPLIED ::= BEGIN
+
+   IMPORTS
+       MATCHING-RULE,
+       RelativeDistinguishedName
+           FROM InformationFramework
+               {joint-iso-itu-t ds(5) module(1)
+                   informationFramework(1) 4} ;
+
+   ComponentAssertion ::= SEQUENCE {
+       component         ComponentReference (SIZE(1..MAX)) OPTIONAL,
+       useDefaultValues  BOOLEAN DEFAULT TRUE,
+       rule              MATCHING-RULE.&id,
+       value             MATCHING-RULE.&AssertionType }
+
+   ComponentReference ::= UTF8String
+
+   ComponentFilter ::= CHOICE {
+       item  [0] ComponentAssertion,
+       and   [1] SEQUENCE OF ComponentFilter,
+       or    [2] SEQUENCE OF ComponentFilter,
+       not   [3] ComponentFilter }
+
+   componentFilterMatch MATCHING-RULE ::= {
+       SYNTAX  ComponentFilter
+       ID      { 1 2 36 79672281 1 13 2 } }
+
+   allComponentsMatch MATCHING-RULE ::= {
+       ID      { 1 2 36 79672281 1 13 6 } }
+
+   directoryComponentsMatch MATCHING-RULE ::= {
+       ID      { 1 2 36 79672281 1 13 7 } }
+
+
+   -- Additional Useful Matching Rules --
+
+   rdnMatch MATCHING-RULE ::= {
+
+
+
+Legg                        Standards Track                     [Page 2]
+
+RFC 3727             Module for Component Matching         February 2004
+
+
+       SYNTAX  RelativeDistinguishedName
+       ID      { 1 2 36 79672281 1 13 3 } }
+
+   presentMatch MATCHING-RULE ::= {
+       SYNTAX  NULL
+       ID      { 1 2 36 79672281 1 13 5 } }
+
+   END
+
+   The InformationFramework ASN.1 module from which the MATCHING-RULE
+   and RelativeDistinguishedName definitions are imported is defined in
+   X.501 [X501].
+
+   The object identifiers used in this document have been assigned for
+   use in specifying the component matching rules by Adacel
+   Technologies, under an arc assigned to Adacel by Standards Australia.
+
+3.  Security Considerations
+
+   This document collects together the ASN.1 definitions of the
+   component matching rules into an ASN.1 module, but does not modify
+   those definitions in any way.  See RFC 3687 [CMR] for the security
+   considerations of using the component matching rules.
+
+4.  References
+
+4.1.  Normative References
+
+   [CMR]   Legg, S., "Lightweight Directory Access Protocol (LDAP) and
+           X.500 Component Matching Rules", RFC 3687, February 2004.
+
+   [X501]  ITU-T Recommendation X.501 (1993) | ISO/IEC 9594-2:1994,
+           Information Technology - Open Systems Interconnection - The
+           Directory: Models
+
+   [ASN1]  ITU-T Recommendation X.680 (07/02) | ISO/IEC 8824-1:2002,
+           Information technology - Abstract Syntax Notation One
+           (ASN.1): Specification of basic notation
+
+4.2.  Informative References
+
+   [LDAP]  Hodges, J. and R. Morgan, "Lightweight Directory Access
+           Protocol (v3): Technical Specification", RFC 3377, September
+           2002.
+
+   [X500]  ITU-T Recommendation X.500 (1993) | ISO/IEC 9594-1:1994,
+           Information Technology - Open Systems Interconnection - The
+           Directory: Overview of concepts, models and services
+
+
+
+Legg                        Standards Track                     [Page 3]
+
+RFC 3727             Module for Component Matching         February 2004
+
+
+5.  Author's Address
+
+   Steven Legg
+   Adacel Technologies Ltd.
+   250 Bay Street
+   Brighton, Victoria 3186
+   AUSTRALIA
+
+   Phone: +61 3 8530 7710
+   Fax:   +61 3 8530 7888
+   EMail: steven.legg@adacel.com.au
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Legg                        Standards Track                     [Page 4]
+
+RFC 3727             Module for Component Matching         February 2004
+
+
+6.  Full Copyright Statement
+
+   Copyright (C) The Internet Society (2004).  This document is subject
+   to the rights, licenses and restrictions contained in BCP 78 and
+   except as set forth therein, the authors retain all their rights.
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE
+   REPRESENTS OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE
+   INTERNET ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF
+   THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Intellectual Property
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed
+   to pertain to the implementation or use of the technology
+   described in this document or the extent to which any license
+   under such rights might or might not be available; nor does it
+   represent that it has made any independent effort to identify any
+   such rights.  Information on the procedures with respect to
+   rights in RFC documents can be found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use
+   of such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository
+   at http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention
+   any copyrights, patents or patent applications, or other
+   proprietary rights that may cover technology that may be required
+   to implement this standard.  Please address the information to the
+   IETF at ietf-ipr@ietf.org.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+Legg                        Standards Track                     [Page 5]
+

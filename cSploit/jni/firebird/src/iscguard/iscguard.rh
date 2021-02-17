@@ -1,0 +1,75 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+/****************************************************************************
+iscguard.rh
+*****************************************************************************/
+
+/* Dialogs */
+#define IDS_PROP_TITLE			217
+#define IDS_NORMAL_TERM			216
+#define IDS_ABNORMAL_TERM		215
+#define IDS_STARTUP_ERROR		214
+#define IDS_STARTING_GUARD		213
+#define IDS_REGISTRY_INFO_MISSING	212
+#define IDS_CANT_START_THREAD		211
+#define IDD_PROPSHEET			1001
+
+/* Icons */
+#define IDI_IBGUARD			101
+#define IDI_IBGUARDALRT			102
+
+/* Controls */
+#define IDC_RESTARTS			1
+#define IDC_LOCATION			2
+#define IDC_VERSION			4
+#define IDC_LOG				102
+
+/* Menu Items */
+#define IDM_SHUTDOWN			5
+#define IDM_CANCEL			6
+#define IDM_OPEN			8
+#define IDM_OPENPOPUP			9
+#define IDM_PROPERTIES			10
+#define IDM_INTRSVRPROPERTIES	 	12
+#define IDM_SVRPROPERTIES		13
+#define IDM_GUARDED			14
+
+/* Defines for String Table */
+#define IDS_QUIT			201
+#define IDS_REGERROR			202
+#define IDS_PROPERTIES			203
+#define IDS_STARTUPCFG			204
+#define IDS_SHUTDOWN			205
+#define IDS_ALREADYSTARTED		206
+#define IDS_STARTUP_NODLL      		207
+#define IDS_STARTUP_LAUNCHER    	208
+#define IDS_INTRSVRPROPERTIES 		209
+#define IDS_SVRPROPERTIES		210
+#define IDS_ACTION			220
+#define IDS_DATE			230
+#define IDS_TIME			240
+#define IDS_LOG_START			250
+#define IDS_EVTLOG_START		251
+#define IDS_LOG_STOP			260
+#define IDS_EVTLOG_STOP			261
+#define IDS_LOG_RESTART			270
+#define IDS_EVTLOG_RESTART		271
+#define IDS_LOG_TERM			280
+#define IDS_EVTLOG_TERM			281

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+set -x
+
+./efence-wrapper net-test
+
+for f in `ls *.pcap | grep -v recoded-`;
+do
+    ./efence-wrapper recoding-test $f;
+done
+

@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+# $Id: check_symbols,v 1.1 2008-12-16 15:35:21 freddy77 Exp $
+# Check use of functions in client libraries
+
+use strict;
+
+sub getExpSymbols($)
+{
+	my $objs = shift;
+	my %out;
+	open(SYMS, "nm -B $objs |") or die('getting symbols');
+	while(<SYMS>) {
+		next if !/^.*\s+([ABCDGIRSTW])\s+(.+?)\s+.*$/;
+		my ($type, $sym) = ($1, $2);
+#		print "adding $sym type $type\n";
+		$out{$sym} = $type;
+	}
+	close(SYMS);
+	return \%out;
+}
+
+sub getImpSymbols($)
+{
+	my $objs = shift;
+	my %out;
+	open(SYMS, "nm -B $objs |") or die('getting symbols');
+	while(<SYMS>) {
+		next if !/^.*\s+([U])\s+(.+?)\s+.*$/;
+		my ($type, $sym) = ($1, $2);
+		$out{$sym} = $type;
+	}
+	close(SYMS);
+	return \%out;
+}
+
+my %tdsSymbols = %{&getExpSymbols('src/tds/*.o')};
+
+my %syms;
+open(F, '<', './misc/check_symbols.txt') or die('getting list');
+while (<F>) {
+	chomp;
+	s/#.*//;
+	s/\s.*//;
+#	print "marking $_\n";
+	if (/^!(.*)/) {
+#		print "symbol $1 is private\n";
+		$syms{$1} = 0;
+	} else {
+		$syms{$_} = 1;
+	}
+}
+close(F);
+
+# check all tds symbols are known
+foreach my $sym (sort keys %tdsSymbols) {
+	if (!defined($syms{$sym})) {
+		print STDERR "UNKNOWN $sym\n";
+		$tdsSymbols{$sym} = 1;
+	} else {
+		$tdsSymbols{$sym} = $syms{$sym};
+	}
+#	print "$sym state ".$tdsSymbols{$sym}."\n";
+}
+
+
+sub checkLib($$)
+{
+	my ($lib, $objs) = @_;
+	print "Checking $lib library\n";
+	foreach my $sym (sort keys %{&getImpSymbols($objs)}) {
+#		print "proc $sym\n";
+		next if !defined($tdsSymbols{$sym});
+		print "Symbols $sym referenced by $lib but marked as private\n" if (!$tdsSymbols{$sym});
+	}
+	print "\n";
+}
+
+&checkLib('dblib', 'src/dblib/*.o');
+&checkLib('CTLib', 'src/ctlib/*.o');
+&checkLib('ODBC', 'src/odbc/*.o');
+

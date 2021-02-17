@@ -1,0 +1,233 @@
+# Makefile template for SQLite ODBC Driver
+
+prefix =	@prefix@
+exec_prefix =	@exec_prefix@
+libdir =	@libdir@
+drvdir =	$(libdir)@DRVDIR@
+CC =		@CC@
+INSTALL =	@INSTALL@
+LIBTOOL =	./libtool
+CFLAGS=		@CFLAGS@ -DDRIVER_VER_INFO=\"@VER_INFO@\" @SQLITE3_A10N_FLAGS@
+SQLITE_INC =	@SQLITE_INC@
+SQLITE_LIB =	@SQLITE_LIB@
+SQLITE_FLAGS =	-DHAVE_LIBVERSION=@SQLITE_LIBVERSION@ \
+		-DHAVE_ENCDEC=@SQLITE_ENCDEC@ \
+		-DHAVE_SQLITEATOF=@SQLITE_ATOF@ \
+		-DHAVE_SQLITEMPRINTF=@SQLITE_MPRINTF@ \
+		-DHAVE_SQLITETRACE=@SQLITE_TRACE@
+SQLITE3_INC =	@SQLITE3_INC@
+SQLITE3_LIB =	@SQLITE3_LIB@
+SQLITE3_FLAGS = -DHAVE_SQLITE3COLUMNTABLENAME=@SQLITE3_COLUMNTABLENAME@ \
+		-DHAVE_SQLITE3LOADEXTENSION=@SQLITE3_LOADEXTENSION@ \
+		-DHAVE_SQLITE3OVERLOADFUNCTION=@SQLITE3_OVERLOADFUNCTION@ \
+		-DHAVE_SQLITE3PREPAREV2=@SQLITE3_PREPARE_V2@ \
+		-DHAVE_SQLITE3CLEARBINDINGS=@SQLITE3_CLEARBINDINGS@ \
+		-DHAVE_SQLITE3CREATEMODULEV2=@SQLITE3_CREATEMODULE_V2@ \
+		-DHAVE_SQLITE3VFS=@SQLITE3_VFS@ \
+		-DHAVE_SQLITE3PROFILE=@SQLITE3_PROFILE@ \
+		-DHAVE_SQLITE3STRNICMP=@SQLITE3_STRNICMP@ \
+		-DHAVE_SQLITE3TABLECOLUMNMETADATA=@SQLITE3_TABLECOLUMNMETADATA@ \
+		@DL_OPTS@
+SQLITE3_A10N_C =	@SQLITE3_A10N_C@
+SQLITE3_A10N_O =	@SQLITE3_A10N_O@
+
+SQLITE4_INC =		@SQLITE4_INC@
+SQLITE4_FLAGS =		@SQLITE4_A10N_FLAGS@ @DL_OPTS@
+SQLITE4_A10N_C =	@SQLITE4_A10N_C@
+SQLITE4_A10N_O =	@SQLITE4_A10N_O@
+
+ODBC_FLAGS =	@ODBC_FLAGS@
+ODBC_LIB =	@ODBC_LIB@ @LDFLAGS@
+VER_INFO =	@VER_INFO@
+
+XML2_FLAGS =	@XML2_FLAGS@
+XML2_LIBS =	@XML2_LIBS@
+
+all:		@LIB_TARGETS@
+
+libsqliteodbc.la:	sqliteodbc.lo
+		$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o libsqliteodbc.la \
+		    sqliteodbc.lo -rpath $(drvdir) $(SQLITE_LIB) \
+		    $(ODBC_LIB) -release $(VER_INFO)
+
+libsqlite3odbc.la:	sqlite3odbc.lo $(SQLITE3_A10N_O)
+		$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o libsqlite3odbc.la \
+		    sqlite3odbc.lo $(SQLITE3_A10N_O) -rpath $(drvdir) \
+		    $(SQLITE3_LIB) $(ODBC_LIB) -release $(VER_INFO) \
+		    @DL_INITFINI@
+
+libsqlite4odbc.la:	sqlite4odbc.lo $(SQLITE4_A10N_O)
+		$(LIBTOOL) --mode=link $(CC) $(CFLAGS) -o libsqlite4odbc.la \
+		    sqlite4odbc.lo $(SQLITE4_A10N_O) -rpath $(drvdir) \
+		    $(ODBC_LIB) -release $(VER_INFO) @DL_INITFINI@
+
+libsqlite3_mod_blobtoxy.la:	blobtoxy.lo
+		$(LIBTOOL) --mode=link $(CC) $(CFLAGS) \
+		    -o libsqlite3_mod_blobtoxy.la \
+		    blobtoxy.lo -rpath $(drvdir) -release $(VER_INFO)
+
+libsqlite3_mod_impexp.la:	impexp.lo
+		$(LIBTOOL) --mode=link $(CC) $(CFLAGS) \
+		    -o libsqlite3_mod_impexp.la \
+		    impexp.lo -rpath $(drvdir) -release $(VER_INFO)
+
+libsqlite3_mod_csvtable.la:	csvtable.lo
+		$(LIBTOOL) --mode=link $(CC) $(CFLAGS) \
+		    -o libsqlite3_mod_csvtable.la \
+		    csvtable.lo -rpath $(drvdir) -release $(VER_INFO)
+
+libsqlite3_mod_zipfile.la:	zipfile.lo
+		$(LIBTOOL) --mode=link $(CC) $(CFLAGS) \
+		    -o libsqlite3_mod_zipfile.la \
+		    zipfile.lo -rpath $(drvdir) -release $(VER_INFO) -lz
+
+libsqlite3_mod_xpath.la:	xpath.lo
+		$(LIBTOOL) --mode=link $(CC) $(CFLAGS) \
+		    -o libsqlite3_mod_xpath.la \
+		    xpath.lo -rpath $(drvdir) -release $(VER_INFO) $(XML2_LIBS)
+
+sqliteodbc.lo:	sqliteodbc.c sqliteodbc.h
+		$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c \
+		    -I$(SQLITE_INC) $(ODBC_FLAGS) \
+		    $(SQLITE_FLAGS) sqliteodbc.c
+
+sqlite3odbc.lo:	sqlite3odbc.c sqlite3odbc.h
+		$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c \
+		    -I$(SQLITE3_INC) $(ODBC_FLAGS) \
+		    $(SQLITE3_FLAGS) sqlite3odbc.c
+
+sqlite4odbc.lo:	sqlite4odbc.c sqlite4odbc.h
+		$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c \
+		    -I$(SQLITE4_INC) $(ODBC_FLAGS) \
+		    $(SQLITE4_FLAGS) sqlite4odbc.c
+
+$(SQLITE3_A10N_O):	$(SQLITE3_A10N_C)
+		$(LIBTOOL) --mode=compile $(CC) -c $(CFLAGS) $(SQLITE3_A10N_C)
+
+$(SQLITE4_A10N_O):	$(SQLITE4_A10N_C)
+		$(LIBTOOL) --mode=compile $(CC) -c $(CFLAGS) \
+		    @SQLITE4_A10N_FLAGS@ $(SQLITE4_A10N_C)
+
+blobtoxy.lo:	blobtoxy.c
+		$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c \
+		    -I$(SQLITE3_INC) \
+		    $(SQLITE3_FLAGS) blobtoxy.c
+
+impexp.lo:	impexp.c
+		$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c \
+		    -I$(SQLITE3_INC) \
+		    $(SQLITE3_FLAGS) impexp.c
+
+csvtable.lo:	csvtable.c
+		$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c \
+		    -I$(SQLITE3_INC) \
+		    $(SQLITE3_FLAGS) csvtable.c
+
+zipfile.lo:	zipfile.c
+		$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c \
+		    -I$(SQLITE3_INC) \
+		    $(SQLITE3_FLAGS) zipfile.c
+
+xpath.lo:	xpath.c
+		$(LIBTOOL) --mode=compile $(CC) $(CFLAGS) -c \
+		    -I$(SQLITE3_INC) \
+		    $(SQLITE3_FLAGS) $(XML2_FLAGS) xpath.c
+
+install-2:	libsqliteodbc.la
+		$(LIBTOOL) --mode=install $(INSTALL) \
+		    libsqliteodbc.la $(DESTDIR)$(drvdir)
+
+drvinst-2:	install-2
+		sh drvdsninst.sh SQLITE "SQLite Datasource" \
+			libsqliteodbc.la $(drvdir)
+
+drvuninst-2:	uninstall-2
+		sh drvdsnuninst.sh SQLITE "SQLite Datasource"
+
+uninstall-2:
+		$(LIBTOOL) --mode=uninstall \
+		    $(RM) $(DESTDIR)$(drvdir)/libsqliteodbc.la
+
+install-3:	libsqlite3odbc.la @EXT_BLOBTOXY@ @EXT_IMPEXP@ \
+		@EXT_CSVTABLE@ @EXT_ZIPFILE@ @EXT_XPATH@
+		$(LIBTOOL) --mode=install $(INSTALL) \
+		    libsqlite3odbc.la $(DESTDIR)$(drvdir)
+		test -z "@EXT_BLOBTOXY@" || \
+		    $(LIBTOOL) --mode=install $(INSTALL) \
+		    @EXT_BLOBTOXY@ $(DESTDIR)$(drvdir)
+		test -z "@EXT_IMPEXP@" || \
+		    $(LIBTOOL) --mode=install $(INSTALL) \
+		    @EXT_IMPEXP@ $(DESTDIR)$(drvdir)
+		test -z "@EXT_CSVTABLE@" || \
+		    $(LIBTOOL) --mode=install $(INSTALL) \
+		    @EXT_CSVTABLE@ $(DESTDIR)$(drvdir)
+		test -z "@EXT_ZIPFILE@" || \
+		    $(LIBTOOL) --mode=install $(INSTALL) \
+		    @EXT_ZIPFILE@ $(DESTDIR)$(drvdir)
+		test -z "@EXT_XPATH@" || \
+		    $(LIBTOOL) --mode=install $(INSTALL) \
+		    @EXT_XPATH@ $(DESTDIR)$(drvdir)
+
+uninstall-3:
+		$(LIBTOOL) --mode=uninstall \
+		    $(RM) $(DESTDIR)$(drvdir)/libsqlite3odbc.la
+		test -z "@EXT_BLOBTOXY@" || \
+		    $(LIBTOOL) --mode=uninstall \
+		        $(RM) $(DESTDIR)$(drvdir)/@EXT_BLOBTOXY@
+		test -z "@EXT_IMPEXP@" || \
+		    $(LIBTOOL) --mode=uninstall \
+		        $(RM) $(DESTDIR)$(drvdir)/@EXT_IMPEXP@
+		test -z "@EXT_CSVTABLE@" || \
+		    $(LIBTOOL) --mode=uninstall \
+		        $(RM) $(DESTDIR)$(drvdir)/@EXT_CSVTABLE@
+		test -z "@EXT_ZIPFILE@" || \
+		    $(LIBTOOL) --mode=uninstall \
+		        $(RM) $(DESTDIR)$(drvdir)/@EXT_ZIPFILE@
+		test -z "@EXT_XPATH@" || \
+		    $(LIBTOOL) --mode=uninstall \
+		        $(RM) $(DESTDIR)$(drvdir)/@EXT_XPATH@
+
+drvinst-3:	install-3
+		sh drvdsninst.sh SQLITE3 "SQLite3 Datasource" \
+			libsqlite3odbc.la $(drvdir)
+
+drvuninst-3:	uninstall-3
+		sh drvdsnuninst.sh SQLITE3 "SQLite3 Datasource"
+
+
+install-4:	libsqlite4odbc.la
+		$(LIBTOOL) --mode=install $(INSTALL) \
+		    libsqlite4odbc.la $(DESTDIR)$(drvdir)
+
+uninstall-4:
+		$(LIBTOOL) --mode=uninstall \
+		    $(RM) $(DESTDIR)$(drvdir)/libsqlite4odbc.la
+
+drvinst-4:	install-4
+		sh drvdsninst.sh SQLITE4 "SQLite4 Datasource" \
+			libsqlite4odbc.la $(drvdir)
+
+drvuninst-4:	uninstall-4
+		sh drvdsnuninst.sh SQLITE4 "SQLite4 Datasource"
+
+install:	@INST_TARGETS@
+
+uninstall:	@UNINST_TARGETS@
+
+drvinst:	@DRVINST_TARGETS@
+
+drvuninst:	@DRVUNINST_TARGETS@
+
+doxy:
+		doxygen doxygen.conf
+
+deb:
+		dpkg-buildpackage $(DPKG_BUILD_OPTS) -tc
+
+clean:
+		rm -f *.lo *.la libsqliteodbc.la libsqlite3odbc.la *~ core
+		rm -f *.o
+		rm -rf .libs .deps
+
+distclean:	clean
+		rm -f config.status config.log config.cache Makefile

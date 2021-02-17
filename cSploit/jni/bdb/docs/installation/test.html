@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 15.  Test Suite</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="prev" href="changelog_4_8.html" title="Berkeley DB 4.8.28 Change Log" />
+    <link rel="next" href="test_faq.html" title="Test suite FAQ" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 15. 
+		Test Suite
+        </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="changelog_4_8.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="test_faq.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="test"></a>Chapter 15. 
+		Test Suite
+        </h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="test.html#test_run">Running the test suite</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="test.html#idp51546072">Running SQL Test Suite on Unix</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="test.html#idp51537184">Running SQL Test Suite on Windows</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="test_faq.html">Test suite FAQ</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="test_run"></a>Running the test suite</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <dl>
+            <dt>
+              <span class="sect2">
+                <a href="test.html#idp51546072">Running SQL Test Suite on Unix</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="test.html#idp51537184">Running SQL Test Suite on Windows</a>
+              </span>
+            </dt>
+          </dl>
+        </div>
+        <p>Once you have started tclsh and have loaded the test.tcl source file
+(see <a class="xref" href="build_unix_test.html" title="Running the test suite under UNIX">Running the test suite under UNIX</a> and 
+<a class="xref" href="build_win_test.html" title="Running the test suite under Windows">Running the test suite under
+        Windows</a> for more information), 
+you are ready to run the test
+suite.  At the tclsh prompt, to run the standard test suite, enter the
+following:</p>
+        <pre class="programlisting">% run_std</pre>
+        <p>A more exhaustive version of the test suite runs all the tests several
+more times, testing encryption, replication, and different page sizes.
+After you have a clean run for run_std, you may choose to run this
+lengthier set of tests.  At the tclsh prompt, enter:</p>
+        <pre class="programlisting">% run_all</pre>
+        <p>Running the standard tests can take from several hours to a few days to
+complete, depending on your hardware, and running all the tests will
+take at least twice as long.  For this reason, the output from these
+commands are redirected to a file in the current directory named
+<code class="filename">ALL.OUT</code>.  Periodically, a line will be written to the standard
+output, indicating what test is being run.  When the test suite has
+finished, a final message will be written indicating the test suite has
+completed successfully or that it has failed.  If the run failed, you
+should review the <code class="filename">ALL.OUT</code> file to determine which tests failed.
+Errors will appear in that file as output lines, beginning with the
+string "FAIL".</p>
+        <p>Tests are run in the directory <code class="filename">TESTDIR</code>, by default.  However,
+the test files are often large, and you should use a filesystem with at
+least several hundred megabytes of free space.  To use a different
+directory for the test directory, edit the file include.tcl in your
+build directory, and change the following line to a more appropriate
+value for your system:</p>
+        <pre class="programlisting">set testdir ./TESTDIR</pre>
+        <p>For example, you might change it to the following:</p>
+        <pre class="programlisting">set testdir /var/tmp/db.test</pre>
+        <p>Alternatively, you can create a symbolic link named TESTDIR in your
+build directory to an appropriate location for running the tests.
+Regardless of where you run the tests, the TESTDIR directory should be
+on a local filesystem.  Using a remote filesystem (for example, an NFS
+mounted filesystem) will almost certainly cause spurious test
+failures.</p>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="idp51546072"></a>Running SQL Test Suite on Unix</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+ Once the test suite is built (see <a class="xref" href="build_unix_test.html#build_unix_test_sql" title="Building SQL Test Suite on Unix">Building SQL Test Suite on Unix</a> for more information), run the entire test suite by executing the following command in the <code class="literal">../build_unix/sql</code> directory:
+ </p>
+          <pre class="programlisting">
+sh ../../sql/adapter/bdb-test.sh
+</pre>
+          <p>
+This runs a set of tests and lists the errors each test encountered, if any.  A detailed list of the test results is written to <code class="literal">test.log</code>.
+</p>
+          <p>To run an individual test, such as insert.test, execute the following command in the <code class="literal">../build_unix/sql</code> directory:
+</p>
+          <pre class="programlisting">
+./textfixture ../../sql/sqlite/test/insert.test 
+</pre>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="idp51537184"></a>Running SQL Test Suite on Windows</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+ After the test suite is built (see <a class="xref" href="build_win_test.html#build_win_test_sql" title="Building the software needed by the SQL tests">Building the software needed by the SQL tests</a> for more information) and before running the entire test suite, go to <code class="literal">../sql/adapter/bdb-test.sh</code> and edit the line:
+ </p>
+          <pre class="programlisting">
+echo $t: `alarm $TIMEOUT ./testfixture.exe 
+$tpath 2&gt;&amp;1 | tee -a test.log | grep "errors out of" 
+|| echo "failed"`
+</pre>
+          <p>to</p>
+          <pre class="programlisting">
+echo $t: `alarm $TIMEOUT Win32/Debug/testfixture.exe 
+$tpath 2&gt;&amp;1 | tee -a test.log | grep "errors out of" 
+|| echo "failed"`
+</pre>
+          <p>Running the test suite requires an Unix emulator, such as Cygwin.  In a Cygwin window go to the <code class="literal">../build_windows</code> directory and execute the command:
+</p>
+          <pre class="programlisting">
+sh ../sql/adapter/bdb-test.sh
+</pre>
+          <p>This runs a set of tests and lists errors that each test encountered, if any.  A detailed list of the test results is written to <code class="literal">test.log</code>.
+</p>
+          <p>To run an individual test, such as insert.test, execute the following command in the <code class="literal">../build_windows</code> directory: 
+</p>
+          <pre class="programlisting">
+Win32/Debug/testfixture.exe ../sql/sqlite/test/insert.test 
+</pre>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="changelog_4_8.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="test_faq.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Berkeley DB 4.8.28 Change Log </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Test suite FAQ</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

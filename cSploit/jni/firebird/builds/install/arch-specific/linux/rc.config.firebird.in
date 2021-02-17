@@ -1,0 +1,4 @@
+#
+# Start the Firebird RDBMS ?
+#
+START_FIREBIRD="yes"

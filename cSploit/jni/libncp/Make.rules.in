@@ -1,0 +1,60 @@
+# ########################################################
+INSTALL := @INSTALL@
+INSTALL_DATA := @INSTALL_DATA@
+CC := @CC@
+
+prefix := @prefix@
+exec_prefix := @exec_prefix@
+bindir := @bindir@
+sbindir := @sbindir@
+libsodir := @libdir@
+#libsodir := /lib
+libadir := @libdir@
+mandir := @mandir@
+srcdir := @srcdir@
+includedir := @includedir@
+sysconfdir := @sysconfdir@
+localedir := @localedir@
+VPATH = @srcdir@
+
+NDS_SUPPORT := @NDS_SUPPORT@
+SIGNATURES := @SIGNATURES@
+
+PACKAGE := @PACKAGE_NAME@
+VERSION := @PACKAGE_VERSION@
+
+CC_WARNINGS := @CC_WARNINGS@
+
+ifeq ($(CC_WARNINGS),yes)
+#CWARN := -Wall -Wstrict-prototypes -Wpointer-arith -Wcast-qual -Waggregate-return -Wnested-externs -Winline -Wbad-function-cast -W #-Werror #-Wwrite-strings -Wtraditional -Wshadow
+#CWARN := -Wall -Wstrict-prototypes -Wcast-qual -Waggregate-return -Wnested-externs -Winline -Wbad-function-cast -W #-Wpointer-arith #-Werror #-Wwrite-strings -Wtraditional -Wshadow
+CWARN := -Wall -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wwrite-strings -Wmissing-prototypes -Wmissing-noreturn -Wredundant-decls   -Wstrict-prototypes -Wcast-qual -Waggregate-return -Wnested-externs -Winline -Wbad-function-cast -W #-Wpointer-arith #-Werror #-Wwrite-strings -Wtraditional -Wshadow
+else
+CWARN := 
+endif
+
+# ########################################################
+
+INCLUDES := -I$(top_srcdir)/include -I$(top_srcdir)/intl -I$(top_builddir)/include
+
+CFLAGS_OPTIONS += @CFLAGS@
+CFLAGS_OPTIONS += $(CWARN)
+CFLAGS_DEFINES := -DN_PLAT_LINUX -DLOCALEDIR=\"${localedir}\" -DNCPFS_VERSION=\"${VERSION}\" -DNCPFS_PACKAGE=\"${PACKAGE}\"
+
+CCFLAGS := $(CFLAGS_DEFINES) $(CFLAGS_OPTIONS) $(INCLUDES)
+
+# If your system is ELF, either also do a 'make install', or append the util/
+# directory where the dynamic library resides to the environment
+# variable LD_LIBRARY_PATH
+HAVE_ELF := @ELF_TARGET@
+
+VERSION_SOLIB := 2.3.0
+VERSION_SONAME := 2.3
+
+NEED_DEP := yes
+ifneq ($(MAKECMDGOALS),)
+ifeq ($(filter-out clean distclean mrproper, $(MAKECMDGOALS)),)
+NEED_DEP := no
+endif
+endif
+

@@ -1,0 +1,17 @@
+Run msvcbuild.bat to build for Win32 with MSVC.
+
+The batch file depends on the MSVC build environment being set (PATH, etc.),
+this can be done with Visual Studio's vsvars32.bat, or by starting a Visual
+Studio shell.
+
+The batch file copies pre-prepared headers out of win32/, avoiding the
+requirement for a gnu (cygwin or mingw) build environment.
+
+The batch file hard-codes the location of the WinPcap developer's tools,
+you may have to modify it for your environment, or install the developer's
+pack in the expected location.
+
+For Visual Studio 2010, the shell can be found at:
+
+    Program Files >> Microsoft Visual Studio 2010 >> Visual Studio Tools >> Visual Studio Command Prompt
+

@@ -1,0 +1,9 @@
+s/#include "types_pub.h"//g
+s/#include "blr.h"//g
+s/#include "iberror.h"//g
+s/#include "sqlda_pub.h"//g
+s/#include "..\/dsql\/sqlda_pub.h"//g
+s/#include "inf_pub.h"//g
+s/#include "..\/jrd\/inf_pub.h"//g
+s/#include "dsc_pub.h"//g
+s/#include "..\/common\/dsc_pub.h"//g

@@ -1,0 +1,154 @@
+<project name="RepmgrTests" default="test" basedir=".">
+    <property name="tests" value="Test*"/>
+    <property name="verbose" value="false"/>
+    <property name="db" location="../../../build_unix"/>
+    <property name="db46" location="../../../../db-4.6.21/build_unix"/>
+    <property name="db47" location="../../../../db-4.7.25/build_unix"/>
+    <property name="junit.jar" location="${user.home}/lib/junit-4.4.jar"/>
+    <property name="upgrades.cp.propfile" 
+              location="${basedir}/upgrades/test/repmgrtests/classpaths.properties"/>
+
+    <condition property="jlp" value="${db}/.libs:${db46}/.libs:${db47}/.libs">
+        <not>
+            <os family="windows"/>
+        </not>
+    </condition>
+
+    <path id="class.path">
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${db}/db.jar"/>
+        <pathelement location="${basedir}/tests"/>
+    </path>
+
+    <path id="upgrades.class.path">
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${basedir}/upgrades/test"/>
+        <pathelement location="${basedir}/tests"/>
+    </path>
+
+    <path id="upgrades.v46.class.path">
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${db46}/db.jar"/>
+        <pathelement location="${basedir}/upgrades/test"/>
+        <pathelement location="${basedir}/upgrades/v46"/>
+    </path>
+
+    <path id="upgrades.v47.class.path">
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${db47}/db.jar"/>
+        <pathelement location="${basedir}/upgrades/test"/>
+        <pathelement location="${basedir}/upgrades/v47"/>
+        <pathelement location="${basedir}/tests"/>
+    </path>
+
+    <path id="upgrades.new.class.path">
+        <pathelement location="${junit.jar}"/>
+        <pathelement location="${db}/db.jar"/>
+        <pathelement location="${basedir}/upgrades/test"/>
+        <pathelement location="${basedir}/upgrades/current"/>
+    </path>
+
+    <target name="compile.upgrades">
+        <javac srcdir="${basedir}/upgrades/test" 
+               includeantruntime="false" debug="true">
+            <classpath refid="upgrades.class.path"/>
+        </javac>
+    </target>
+
+    <target name="compile.upgrades.v46">
+        <javac srcdir="${basedir}/upgrades/v46" 
+               includeantruntime="false" debug="true">
+            <classpath refid="upgrades.v46.class.path"/>
+        </javac>
+    </target>
+    
+    <target name="compile.upgrades.v47">
+        <javac srcdir="${basedir}/upgrades/v47" 
+               includeantruntime="false" debug="true">
+            <classpath refid="upgrades.v47.class.path"/>
+        </javac>
+    </target>
+    
+    <target name="compile.upgrades.new">
+        <javac srcdir="${basedir}/upgrades/current" 
+               includeantruntime="false" debug="true">
+            <classpath refid="upgrades.new.class.path"/>
+        </javac>
+    </target>
+    
+    <target name="compile">
+        <javac srcdir="${basedir}/tests" 
+               includeantruntime="false" debug="true">
+            <classpath refid="class.path"/>
+        </javac>
+    </target>
+
+    <target name="clean" depends="clean.java,clean.beam,clean.tests">
+      <delete file="${upgrades.cp.propfile}"/>
+    </target>
+
+    <target name="clean.java">
+      <delete>
+        <fileset dir="${basedir}/tests" includes="**/*.class"/>
+        <fileset dir="${basedir}/upgrades" includes="**/*.class"/>
+      </delete>
+    </target>
+
+    <target name="clean.beam">
+      <delete>
+        <fileset dir="${basedir}/fiddler" includes="*.beam"/>
+      </delete>
+    </target>
+
+    <target name="clean.tests">
+      <delete>
+        <fileset dir="${basedir}" includes="TEST-*.txt"/>
+        <fileset dir="${basedir}" includes="*.fiddler.out"/>
+      </delete>
+      <delete dir="${basedir}/TESTDIR"/>
+    </target>
+
+    <target name="test" description="run tests" depends="compile">
+        <junit failureproperty="testsfailed" printsummary="withOutAndErr">
+            <classpath refid="class.path"/>
+
+            <sysproperty key="java.library.path" value="${jlp}"/>
+            <sysproperty key="VERB_REPLICATION" value="${verbose}"/>
+
+            <batchtest fork="yes">
+                <fileset dir="${basedir}/tests">
+                    <include name="**/${tests}.java"/>
+                </fileset>
+            </batchtest>
+            <formatter type="brief"/>
+        </junit>
+        <fail if="testsfailed"/>
+    </target>
+
+    <target name="test.upgrades" description="run mixed-version tests" 
+    depends="compile,compile.upgrades,compile.upgrades.new,compile.upgrades.v46,compile.upgrades.v47,config.upgrade.classpaths">
+        <junit failureproperty="testsfailed" printsummary="withOutAndErr">
+            <classpath refid="upgrades.class.path"/>
+            <sysproperty key="java.library.path" value="${jlp}"/>
+            <sysproperty key="VERB_REPLICATION" value="${verbose}"/>
+            <batchtest fork="yes">
+                <fileset dir="${basedir}/upgrades/test">
+                    <include name="**/${tests}.java"/>
+                </fileset>
+            </batchtest>
+            <formatter type="brief"/>
+        </junit>
+        <fail if="testsfailed"/>
+    </target>
+
+    <target name="config.upgrade.classpaths">
+        <propertyfile file="${upgrades.cp.propfile}">
+            <entry key="db.46" value="${db46}/db.jar"/>
+            <entry key="db.47" value="${db47}/db.jar"/>
+            <entry key="db" value="${db}/db.jar"/>
+            <entry key="test.46" value="${basedir}/upgrades/v46/"/>
+            <entry key="test.47" value="${basedir}/upgrades/v47/"/>
+            <entry key="test" value="${basedir}/upgrades/current/"/>
+        </propertyfile>
+    </target>
+</project>

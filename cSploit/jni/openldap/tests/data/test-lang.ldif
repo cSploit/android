@@ -1,0 +1,12 @@
+dn: dc=example,dc=com
+dc: example
+objectClass: organization
+objectClass: extensibleObject
+o: Example, Inc.
+o;lang-zz;lang-y;lang-yy;lang-xx;lang-x;lang-z: Example, Inc.
+name;lang-en-US: Billy Ray
+name;lang-en-US: Billy Bob
+CN;lang-en-US: Billy Ray
+name: Billy Ray
+SN;lang-en-US;lang-en-GB: Billy Ray
+SN: Ray

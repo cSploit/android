@@ -1,0 +1,183 @@
+#!/bin/bash
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+if test $CONSTRAINT = constraintno; then
+	echo "Constraint overlay not available, test skipped"
+	exit 0
+fi
+
+CONSTRAINTDIR="$DATADIR/constraint"
+ROOTLDIF="$CONSTRAINTDIR/root.ldif"
+USERLDIF="$CONSTRAINTDIR/user.ldif"
+RESULTOUT="$CONSTRAINTDIR/constraint.out"
+SCRIPTOUT="$TESTDIR/constraint.out"
+USERDN="cn=John Doe,ou=users,$BASEDN"
+
+CONFDIR=$TESTDIR/slapd.d
+mkdir -p $TESTDIR $CONFDIR $DBDIR1
+
+$SLAPPASSWD -g -n >$CONFIGPWF
+
+cat > $TESTDIR/config.ldif <<EOF
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+olcArgsFile: $TESTDIR/slapd.args
+olcPidFile: $TESTDIR/slapd.pid
+
+dn: cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: schema
+
+include: file://$TESTWD/schema/core.ldif
+include: file://$TESTWD/schema/cosine.ldif
+include: file://$TESTWD/schema/inetorgperson.ldif
+
+dn: olcDatabase=config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: config
+olcRootPW:< file://$CONFIGPWF
+EOF
+
+if [ "$BACKENDTYPE" = mod ]; then
+	cat >> $TESTDIR/config.ldif <<EOF
+
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/back-$BACKEND
+olcModuleLoad: back_$BACKEND.la
+EOF
+fi
+
+if [ "$CONSTRAINT" = constraintmod ]; then
+	cat >> $TESTDIR/config.ldif <<EOF
+
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/overlays
+olcModuleLoad: constraint.la
+EOF
+fi
+
+cat >> $TESTDIR/config.ldif <<EOF
+
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olc${BACKEND}Config
+olcDatabase: $BACKEND
+olcSuffix: $BASEDN
+olcRootDN: $MANAGERDN
+olcRootPW: $PASSWD
+olcDbDirectory: $TESTDIR/db.1.a
+EOF
+
+if [ "$INDEXDB" = indexdb ]; then
+	cat >> $TESTDIR/config.ldif <<EOF
+olcDbIndex: objectClass eq,pres
+olcDbIndex: ou,cn,mail,surname,givenname eq,pres,sub
+EOF
+fi
+
+cat >> $TESTDIR/config.ldif <<EOF
+
+dn: olcOverlay=constraint,olcDatabase={1}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcConstraintConfig
+olcOverlay: constraint
+olcConstraintAttribute: mail
+  count 3
+  restrict="ldap:///ou=users,$BASEDN??one?(objectClass=inetOrgPerson)"
+# check if restrict works (if not, this will apply to ou=users subtree as well
+# and some tests will fail)
+olcConstraintAttribute: mail count 1 restrict="ldap:///ou=groups,$BASEDN??one"
+olcConstraintAttribute: mail regex ^[[:alnum:]]+@example.com$
+olcConstraintAttribute: description count 2
+# cn value has to be concatenated givenName SP sn
+olcConstraintAttribute: cn,sn,givenName
+  set "(this/givenName + [ ] + this/sn) & this/cn"
+  restrict="ldap:///$USERDN??sub?(objectClass=inetOrgPerson)"
+olcConstraintAttribute: uid
+  uri "ldap:///ou=groups,$BASEDN?uid?one?(objectClass=inetOrgPerson)"
+  restrict="ldap:///ou=users,$BASEDN??one"
+EOF
+
+$SLAPADD -F $CONFDIR -n 0 -l $TESTDIR/config.ldif
+
+echo "Starting slapd on TCP/IP port $PORT1..."
+$SLAPD -F $CONFDIR -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+	echo PID $PID
+	read foo
+fi
+sleep 1
+
+echo "Adding basic structure..."
+$LDAPADD -D "$MANAGERDN" -H $URI1 -w $PASSWD -f $ROOTLDIF &>/dev/null
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $PID
+	exit $RC
+fi
+$LDAPADD -D "$MANAGERDN" -H $URI1 -w $PASSWD -f $USERLDIF &>/dev/null
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $PID
+	exit $RC
+fi
+
+echo "Running constraint tests..."
+for ldif in $SRCDIR/data/constraint/{*ok*,*fail*}.ldif; do
+	### reload
+	$LDAPDELETE -D "$MANAGERDN" -H $URI1 -w $PASSWD "$USERDN" &>/dev/null
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapdelete failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $PID
+		exit $RC
+	fi
+	$LDAPADD -D "$MANAGERDN" -H $URI1 -w $PASSWD -f $USERLDIF &>/dev/null
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $PID
+		exit $RC
+	fi
+
+	### info
+	echo -n "  [$ldif]: "
+
+	### modify
+	$LDAPMODIFY -H $URI1 -x -D "$MANAGERDN" -f $ldif -w $PASSWD &>/dev/null
+	RC=$?
+	if test $RC == 0 ; then
+		echo "OK" | tee -a $SCRIPTOUT
+	elif test $RC == 19 ; then
+		echo "FAIL" | tee -a $SCRIPTOUT
+	else
+		echo "UNEXPECTED ($RC)"
+	fi
+done
+
+echo "Comparing output..."
+$DIFF $SCRIPTOUT $RESULTOUT > $CMPOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "Comparison failed"
+	test $KILLSERVERS != no && kill -HUP $PID
+	exit $RC
+fi
+
+test $KILLSERVERS != no && kill -HUP $PID
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

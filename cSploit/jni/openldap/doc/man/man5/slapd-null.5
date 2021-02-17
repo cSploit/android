@@ -1,0 +1,67 @@
+.TH SLAPD-NULL 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2002-2014 The OpenLDAP Foundation.  All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd\-null \- Null backend to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The Null backend to
+.BR slapd (8)
+is surely the most useful part of
+.BR slapd :
+.br
+- Searches return success but no entries.
+.br
+- Compares return compareFalse.
+.br
+- Updates return success (unless readonly is on) but do nothing.
+.br
+- Binds other than as the rootdn fail unless the database option "bind
+on" is given.
+.br
+- The
+.BR slapadd (8)
+and
+.BR slapcat (8)
+tools are equally exciting.
+.br
+Inspired by the /dev/null device.
+.SH CONFIGURATION
+This
+.B slapd.conf
+option applies to the NULL backend database.
+That is, it must follow a "database null" line and come before
+any subsequent "database" lines.
+Other database options are described in the
+.BR slapd.conf (5)
+manual page.
+.TP
+.B bind <on/off>
+Allow binds as any DN in this backend's suffix, with any password.
+The default is "off".
+.SH EXAMPLE
+Here is a possible slapd.conf extract using the Null backend:
+.LP
+.RS
+.nf
+database null
+suffix   "cn=Nothing"
+bind     on
+.fi
+.RE
+.SH ACCESS CONTROL
+The
+.B null
+backend does not honor any of the access control semantics described in
+.BR slapd.access (5).
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd (8),
+.BR slapadd (8),
+.BR slapcat (8).

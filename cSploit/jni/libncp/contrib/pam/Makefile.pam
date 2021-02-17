@@ -1,0 +1,108 @@
+# $Header$
+#
+# This Makefile controls a build process of the pam_unix modules
+# for Linux-PAM. You should not modify this Makefile.
+#
+# $Log$
+#
+#
+
+########################################################################
+# some options... uncomment to take effect
+########################################################################
+
+ifdef DYNAMIC
+#LIBSESSSH = pam_ncp_session.so
+LIBAUTHSH = pam_ncp_auth.so
+#LIBPASSWDSH = pam_ncp_passwd.so
+#LIBACCOUNT = pam_ncp_acct.so
+endif
+
+ifdef STATIC
+LIBSTATIC = libpam_ncp.o
+endif
+
+LIBAUTHOBJ = pam_ncp_auth.o support.o
+LIBAUTHSRC = pam_ncp_auth.c support.c
+LIBOBJ = $(LIBAUTHOBJ) 
+LIBSRC = $(LIBAUTHSRC) 
+
+LIBSHARED = $(LIBAUTHSH) 
+
+LIBOBJD = $(addprefix dynamic/,$(LIBOBJ))
+LIBOBJS = $(addprefix static/,$(LIBOBJ))
+
+dynamic/%.o : %.c
+	$(CC) $(CFLAGS) -Iinclude $(DYNAMIC) $(CPPFLAGS) -c $< -o $@
+
+static/%.o: %.c
+	$(CC) $(CFLAGS) -Iinclude $(STATIC) $(CPPFLAGS) -c $< -o $@
+
+
+########################### don't edit below #######################
+
+dummy:
+
+	@echo "**** This is not a top-level Makefile "
+	@echo "**** You need to compile this as part of a PAM source tree. "
+	exit
+
+info:
+	@echo
+	@echo "*** Building pam-unix(alpha) module of the framework..."
+	@echo
+
+all: dirs info $(LIBSHARED) $(LIBSTATIC) register
+
+dirs:
+ifdef DYNAMIC
+	mkdir -p ./dynamic
+endif
+ifdef STATIC
+	mkdir -p ./static
+endif
+
+register:
+ifdef STATIC
+	( cd .. ; \
+	  ./register_static pam_ncp_auth  pam_ncp/$(LIBSTATIC) ; \
+	)
+endif
+
+ifdef DYNAMIC
+$(LIBOBJD): $(LIBSRC)
+
+$(LIBAUTHSH):	$(LIBAUTHSRC) $(LIBOBJD)
+		$(CC) -shared -o $@ $(addprefix dynamic/,$(LIBAUTHOBJ)) -lncp
+endif
+
+
+ifdef STATIC
+$(LIBOBJS): $(LIBSRC)
+
+$(LIBSTATIC): $(LIBOBJS)
+	      $(CC) -Wl,-r -o $@ $(LIBOBJS) -lncp -nostdlib
+	####    Following line gives up on my system (P.V.)
+	####    It works with -L/usr/lib -lncp, but in that case
+	####    we have to pass this Makefile through configure magic
+	####	$(LD) -r -o $@ $(LIBOBJS) -lncp
+endif
+
+install: all
+	mkdir -p $(FAKEROOT)$(SECUREDIR)
+ifdef DYNAMIC
+	install -m644 $(LIBSHARED) $(FAKEROOT)$(SECUREDIR)
+endif
+
+remove:
+	cd $(FAKEROOT)$(SECUREDIR) && rm -f $(LIBSHARED)
+
+clean:
+	rm -f $(LIBOBJD) $(LIBOBJS) a.out core *~
+
+extraclean: clean
+	rm -f *.a *.out *.o *.so *.bak
+
+.c.o:	
+	$(CC) -c $(CFLAGS) $<
+

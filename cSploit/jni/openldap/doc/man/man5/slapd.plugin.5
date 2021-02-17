@@ -1,0 +1,123 @@
+.TH SLAPD.PLUGIN 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2002-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+slapd.plugin \- plugin configuration for slapd, the stand-alone LDAP daemon
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The 
+.BR slapd.conf (5)
+file contains configuration information for the
+.BR slapd (8)
+daemon. This configuration file is also used by the SLAPD tools
+.BR slapadd (8),
+.BR slapcat (8),
+and
+.BR slapindex (8).
+.LP
+The
+.B slapd.conf
+file consists of a series of global configuration options that apply to
+.B slapd
+as a whole (including all backends), followed by zero or more database
+backend definitions that contain information specific to a backend
+instance.
+.LP
+The general format of
+.B slapd.conf
+is as follows:
+.LP
+.nf
+    # comment - these options apply to every database
+    <global configuration options>
+    # first database definition & configuration options
+    database    <backend 1 type>
+    <configuration options specific to backend 1>
+    # subsequent database definitions & configuration options
+    ...
+.fi
+.LP
+If slapd is compiled with \fI\-\-enable\-slapi\fP, support for plugins
+according to \fINetscape's Directory Server Plug-Ins\fP.
+Version 4 of the API is currently implemented, with some extensions
+from version 5.
+.LP
+Both global and database specific data may contain plugin information.
+Plugins associated with a specific database are called before global
+plugins.
+This manpage details the
+.BR slapd (8)
+configuration statements that affect the loading of SLAPI \fIplugins\fP.
+.LP
+Arguments that should be replaced by actual text are shown in brackets <>.
+.LP
+The structure of the plugin directives is
+.TP
+.B plugin "<type> <lib_path> <init_function> [<arguments>]"
+Load a plugin of the specified type for the current database.
+.LP
+The 
+.BR <type>
+can be one of
+.BR preoperation ,
+that is executed before processing the operation for the specified
+database, 
+.BR postoperation ,
+that is executed after the operation for the specified database
+has been processed,
+.BR extendedop ,
+that is used when executing an extended operation, or
+.BR object .
+The latter is used for miscellaneous types such as ACL, computed
+attribute and search filter rewriter plugins.
+.LP
+The
+.BR <libpath>
+argument specifies the path to the plugin loadable object; if a relative
+path is given, the object is looked for according to the underlying
+dynamic loading package (libtool's ltdl is used).
+.LP
+The 
+.BR <init_function>
+argument specifies what symbol must be called when the plugin is first
+loaded.
+This function should register the functions provided by the plugin
+for the desired operations. It should be noted that it is this 
+init function, not the plugin type specified as the first argument,
+that determines when and for what operations the plugin will be invoked.
+The optional
+.BR <arguments>
+list is passed to the init function.
+.TP
+.B pluginlog <file>
+Specify an alternative path for the plugin log file (default is
+LOCALSTATEDIR/errors).
+.TP
+.B modulepath <pathspec>
+This statement sets the module load path for dynamically loadable 
+backends, as described in
+.BR slapd.conf (5); 
+however, since both the dynamically loadable backends 
+and the SLAPI plugins use the same underlying library (libtool's ltdl)
+its value also affects the plugin search path.
+In general the search path is made of colon-separated paths; usually
+the user-defined path is searched first; then the value of the
+\fILTDL_LIBRARY_PATH\fP environment variable, if defined, is used;
+finally, the system-specific dynamic load path is attempted (e.g. on
+Linux the value of the environment variable \fILD_LIBRARY_PATH\fP).
+Please carefully read the documentation of ltdl because its behavior 
+is very platform dependent.
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.TP
+LOCALSTATEDIR/errors
+default plugin log file
+.SH SEE ALSO
+.BR slapd (8),
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

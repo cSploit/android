@@ -1,0 +1,73 @@
+<VisualStudioProject ProjectType="Visual C++" Version="8.00" Name="test_cutest" ProjectGUID="{086BD200-FDC6-11DF-8CFF-0800200C9A66}">
+  <Platforms>
+    <Platform Name="Win32"/>
+    <Platform Name="x64"/>
+  </Platforms>
+  <Configurations>
+    <Configuration Name="Debug|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/test_cutest" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../test/c/cutest,../../test/c/suite,../../test/c/common" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;TEST_HARNESS_C;_CONSOLE" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/test_cutest.pch" AssemblerListingLocation="$(OutDir)/test_cutest/" ObjectFile="$(OutDir)/test_cutest/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="libdb60d.lib ws2_32.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/test_cutest.exe" ProgramDatabaseFile="$(OutDir)/test_cutest.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/test_cutest" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../test/c/cutest,../../test/c/suite,../../test/c/common" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;TEST_HARNESS_C;_CONSOLE" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/test_cutest.pch" AssemblerListingLocation="$(OutDir)/test_cutest/" ObjectFile="$(OutDir)/test_cutest/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="libdb60.lib ws2_32.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/test_cutest.exe" ProgramDatabaseFile="$(OutDir)/test_cutest.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Debug|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/test_cutest" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../test/c/cutest,../../test/c/suite,../../test/c/common" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;TEST_HARNESS_C;_CONSOLE" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/test_cutest.pch" AssemblerListingLocation="$(OutDir)/test_cutest/" ObjectFile="$(OutDir)/test_cutest/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="libdb60d.lib ws2_32.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/test_cutest.exe" ProgramDatabaseFile="$(OutDir)/test_cutest.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/test_cutest" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../test/c/cutest,../../test/c/suite,../../test/c/common" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;TEST_HARNESS_C;_CONSOLE" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/test_cutest.pch" AssemblerListingLocation="$(OutDir)/test_cutest/" ObjectFile="$(OutDir)/test_cutest/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="libdb60.lib ws2_32.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/test_cutest.exe" ProgramDatabaseFile="$(OutDir)/test_cutest.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+  </Configurations>
+  <References/>
+  <Files>
+    <File RelativePath="..\..\src\clib\getopt.c"/>
+    <File RelativePath="..\..\test\c\cutest\CuTest.c"/>
+    <File RelativePath="..\..\test\c\cutest\CuTests.c"/>
+    <File RelativePath="..\..\test\c\cutest\Runner.c"/>
+    <File RelativePath="..\..\test\c\suites\TestCallbackSetterAndGetter.c"/>
+    <File RelativePath="..\..\test\c\suites\TestChannel.c"/>
+    <File RelativePath="..\..\test\c\suites\TestDbHotBackup.c"/>
+    <File RelativePath="..\..\test\c\suites\TestDbTuner.c"/>
+    <File RelativePath="..\..\test\c\suites\TestEncryption.c"/>
+    <File RelativePath="..\..\test\c\suites\TestEnvConfig.c"/>
+    <File RelativePath="..\..\test\c\suites\TestEnvMethod.c"/>
+    <File RelativePath="..\..\test\c\suites\TestKeyExistErrorReturn.c"/>
+    <File RelativePath="..\..\test\c\suites\TestMutexAlignment.c"/>
+    <File RelativePath="..\..\test\c\suites\TestPartial.c"/>
+    <File RelativePath="..\..\test\c\suites\TestPartition.c"/>
+    <File RelativePath="..\..\test\c\suites\TestPreOpenSetterAndGetter.c"/>
+    <File RelativePath="..\..\test\c\suites\TestQueue.c"/>
+  </Files>
+  <Globals/>
+</VisualStudioProject>

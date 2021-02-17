@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>db_log_verify</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="utilities.html" title="Appendix A.  Berkeley DB Command Line Utilities" />
+    <link rel="prev" href="db_load.html" title="db_load" />
+    <link rel="next" href="db_printlog.html" title="db_printlog" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">db_log_verify</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="db_load.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix A. 
+                Berkeley DB Command Line Utilities
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="db_printlog.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="db_log_verify"></a>db_log_verify</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting"> 
+    
+	db_log_verify [-cNvV] [-h home to verify] [-H temporary home] 
+	[-P password] [-C cache size]
+	[-b start lsn] [-e end lsn] [-s start time] [-z end time]
+	[-d database file name] [-D database name]  
+	</pre>
+      <p>
+         The <span class="command"><strong>db_log_verify</strong></span> utility verifies the log files of a specific database environment.
+         This utility verifies a specific range of log records, or changed log records of a specific database.
+    </p>
+      <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+        <h3 class="title">Note</h3>
+        <p>
+                If the application(s) that use the environment make use of
+                the <a class="xref" href="envset_lg_dir.html" title="DB_ENV-&gt;set_lg_dir()">DB_ENV-&gt;set_lg_dir()</a>
+                method, then in order for this utility to run correctly,
+                you need a
+                <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a>
+                file which sets the proper paths using the
+                <a class="xref" href="set_lg_dir_parameter.html" title="set_lg_dir">set_lg_dir</a>
+                configuration parameter.
+            </p>
+      </div>
+      <p>
+        The options are as follows:
+    </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+              <span class="bold"><strong>-C</strong></span>
+            </p>
+            <p>
+            	Specify the cache size (in megabytes) of the temporary database environment internally used during the log verification.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-b</strong></span>
+            </p>
+            <p>
+            	Specify the starting log record (by lsn) to verify.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-c</strong></span>
+            </p>
+            <p>
+            	Specify whether to continue the verification after an error is detected. 
+            	If not specified, the verification stops when the first error is detected.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-D</strong></span>
+            </p>
+            <p>
+                 Specify a database name. Only log records related to this database are verified.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-d</strong></span>
+            </p>
+            <p>
+                 Specify a database file name. Only log records related this database file are verified.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-e</strong></span>
+            </p>
+            <p>
+            	Specify the ending log record by lsn.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-h</strong></span>
+            </p>
+            <p>
+                 Specify a home directory of the database environment whose log is to be verified.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-H</strong></span>
+            </p>
+            <p>
+                 Specify a home directory for this utility to create a temporarily database 
+                 environment to store runtime data during the verification. 
+            </p>
+            <p>
+
+                 It is an error to specify the same directory as the -h option. If this directory is not specified, all 
+                 temporary databases created during the verification will be in-memory, which is not
+                 a problem if the log files to verify are not huge.
+            </p>
+          </li>
+          <li>
+            <p>
+                 <span class="bold"><strong>-N</strong></span>
+            </p>
+            <p>
+                 Do not acquire shared region mutexes while running.  Other problems,
+                 such as potentially fatal errors in Berkeley DB, are ignored as
+                 well. This option is intended only for debugging errors, and should
+                 not be used under any other circumstances.
+            </p>
+          </li>
+          <li>
+            <p>
+                 <span class="bold"><strong>-P</strong></span>
+            </p>
+            <p>
+                 Specify an environment password.  Although Berkeley DB utilities
+                 overwrite password strings as soon as possible, there may be
+                 a window of vulnerability on systems where unprivileged users can see
+                 command-line arguments or where utilities are not able to overwrite
+                 the memory containing the command-line arguments.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-s</strong></span>
+            </p>
+            <p>
+            	Specify the starting log record by time. The time range specified is not precise because the lsn of the most recent time point is used as the starting lsn.
+            </p>
+          </li>
+          <li>
+            <p>
+                 <span class="bold"><strong>-V</strong></span>
+            </p>
+            <p>
+                 Write the library version number to the standard output and exit.
+            </p>
+          </li>
+          <li>
+            <p>
+                 <span class="bold"><strong>-v</strong></span>
+            </p>
+            <p>
+            	Enable verbose mode to display verbose output during the verification process.
+            </p>
+          </li>
+          <li>
+            <p>
+              <span class="bold"><strong>-z</strong></span>
+            </p>
+            <p>
+            	Specify the ending log record by time. The time range specified is not precise because the lsn of the most recent time point is used as the ending lsn.
+            </p>
+          </li>
+        </ul>
+      </div>
+      <p>
+		To specify a range of log records, you must provide 
+		either an lsn range or a time range. You can neither specify both nor specify an lsn and a time as a range.
+	</p>
+      <p>
+		If the log footprint is over several megabytes, specify a home 
+		directory and a big cache size for log verification internal use. Else, the process'
+		private memory may be exhausted before the verification completes.</p>
+      <p>
+         The <span class="command"><strong>db_log_verify</strong></span> utility does not perform the 
+         locking function, even in Berkeley DB environments that are configured with a
+         locking subsystem. All errors are written to stderr, and all normal and verbose messages 
+         are written to stdout.
+    </p>
+      <p>
+         The <span class="command"><strong>db_log_verify</strong></span> utility can be used with a Berkeley DB environment (as
+         described for the <span class="bold"><strong>-h</strong></span> option, the
+         environment variable <span class="bold"><strong>DB_HOME</strong></span>).
+
+	 To avoid environment corruption when using a
+         Berkeley DB environment, <span class="command"><strong>db_log_verify</strong></span> must be given the chance
+         to detach from the environment and exit gracefully. For the 
+         <span class="command"><strong>db_log_verify</strong></span> utility to release all environment resources and exit, send
+         an interrupt signal (SIGINT) to it.
+    </p>
+      <p>
+         The <span class="command"><strong>db_log_verify</strong></span> utility returns a non-zero error value on failure and 0 on success.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp55492848"></a>Environment Variables</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp55493040"></a>DB_HOME</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          If the <span class="bold"><strong>-h</strong></span> option is not specified and
+                          the environment variable DB_HOME is set, it is used as the path of the
+                          database home, as described in the
+                          <a class="xref" href="envopen.html" title="DB_ENV-&gt;open()">DB_ENV-&gt;open()</a>
+                          method.
+                     </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="db_load.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="utilities.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="db_printlog.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">db_load </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> db_printlog</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,662 @@
+# $OpenLDAP$
+# Copyright 2007-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Common errors encountered when using OpenLDAP Software
+
+The following sections attempt to summarize the most common causes of LDAP errors 
+when using OpenLDAP
+
+H2: Common causes of LDAP errors
+
+H3: ldap_*: Can't contact LDAP server
+
+The {{B:Can't contact LDAP server}} error is usually returned when the LDAP 
+server cannot be contacted. This may occur for many reasons:
+
+* the LDAP server is not running; this can be checked by running, for example,
+
+>      telnet <host> <port>
+
+replacing {{<host>}} and {{<port>}} with the hostname and the port the server 
+is supposed to listen on.
+* the client has not been instructed to contact a running server; with OpenLDAP 
+command-line tools this is accomplished by providing the -H switch, whose 
+argument is a valid LDAP url corresponding to the interface the server is 
+supposed to be listening on.
+
+H3: ldap_*: No such object
+
+The {{B:no such object}} error is generally returned when the target DN of the 
+operation cannot be located. This section details reasons common to all 
+operations. You should also look for answers specific to the operation 
+(as indicated in the error message).
+
+The most common reason for this error is non-existence of the named object. First, 
+check for typos.
+
+Also note that, by default, a new directory server holds no objects 
+(except for a few system entries). So, if you are setting up a new directory 
+server and get this message, it may simply be that you have yet to add the 
+object you are trying to locate.
+
+The error commonly occurs because a DN was not specified and a default was not 
+properly configured.
+
+If you have a suffix specified in slapd.conf eg.
+
+>      suffix "dc=example,dc=com"
+
+You should use
+
+>      ldapsearch -b 'dc=example,dc=com' '(cn=jane*)'
+
+to tell it where to start the search.
+
+The {{F:-b}} should be specified for all LDAP commands unless you have an 
+{{ldap.conf}}(5) default configured.
+
+See {{ldapsearch}}(1), {{ldapmodify}}(1) 
+
+Also, {{slapadd}}(8) and its ancillary programs are very strict about the 
+syntax of the LDIF file. 
+
+Some liberties in the LDIF file may result in an apparently successful creation 
+of the database, but accessing some parts of it may be difficult.
+
+One known common error in database creation is putting a blank line before the 
+first entry in the LDIF file. {{B:There must be no leading blank lines in the 
+LDIF file.}}
+
+It is generally recommended that {{ldapadd}}(1) be used instead of {{slapadd}}(8) 
+when adding new entries your directory. {{slapadd}}(8) should be used to bulk 
+load entries known to be valid.
+
+Another cause of this message is a referral 
+({SECT:Constructing a Distributed Directory Service}}) entry to an unpopulated 
+directory. 
+
+Either remove the referral, or add a single record with the referral base DN 
+to the empty directory.
+
+This error may also occur when slapd is unable to access the contents of its 
+database because of file permission problems. For instance, on a Red Hat Linux 
+system, slapd runs as user 'ldap'. When slapadd is run as root to create a 
+database from scratch, the contents of {{F:/var/lib/ldap}} are created with 
+user and group root and with permission 600, making the contents inaccessible 
+to the slapd server.
+
+H3: ldap_*: Can't chase referral
+
+This is caused by the line
+
+>      referral        ldap://root.openldap.org
+
+In {{F:slapd.conf}}, it was provided as an example for how to use referrals 
+in the original file. However if your machine is not permanently connected to 
+the Internet, it will fail to find the server, and hence produce an error message.
+
+To resolve, just place a # in front of line and restart slapd or point it to 
+an available ldap server.
+
+See also: {{ldapadd}}(1), {{ldapmodify}}(1) and {{slapd.conf}}(5)
+
+H3: ldap_*: server is unwilling to perform
+
+slapd will return an unwilling to perform error if the backend holding the 
+target entry does not support the given operation.
+
+The password backend is only willing to perform searches. It will return an 
+unwilling to perform error for all other operations.
+
+The shell backend is configurable and may support a limited subset of operations.
+Check for other errors indicating a shortage of resources required by the 
+directory server. i.e. you may have a full disk etc
+
+H3: ldap_*: Insufficient access
+
+This error occurs when server denies the operation due to insufficient access. 
+This is usually caused by binding to a DN with insufficient privileges 
+(or binding anonymously) to perform the operation. 
+
+You can bind as the rootdn/rootpw specified in {{slapd.conf}}(5) to gain full 
+access. Otherwise, you must bind to an entry which has been granted the 
+appropriate rights through access controls.
+
+
+H3: ldap_*: Invalid DN syntax
+
+The target (or other) DN of the operation is invalid. This implies that either 
+the string representation of the DN is not in the required form, one of the 
+types in the attribute value assertions is not defined, or one of the values 
+in the attribute value assertions does not conform to the appropriate syntax.
+
+H3: ldap_*: Referral hop limit exceeded
+
+This error generally occurs when the client chases a referral which refers 
+itself back to a server it already contacted. The server responds as it did 
+before and the client loops. This loop is detected when the hop limit is exceeded.
+
+This is most often caused through misconfiguration of the server's default 
+referral. The default referral should not be itself:
+
+That is, on {{F:ldap://myldap/}} the default referral should not be {{F:ldap://myldap/}}
+ (or any hostname/ip which is equivalent to myldap).
+
+H3: ldap_*: operations error
+
+In some versions of {{slapd}}(8), {{operationsError}} was returned instead of other.
+
+H3: ldap_*: other error
+
+The other result code indicates an internal error has occurred. 
+While the additional information provided with the result code might provide 
+some hint as to the problem, often one will need to consult the server's log files.
+
+H3: ldap_add/modify: Invalid syntax
+
+This error is reported when a value of an attribute does not conform to syntax 
+restrictions. Additional information is commonly provided stating which value 
+of which attribute was found to be invalid. Double check this value and other 
+values (the server will only report the first error it finds).
+
+Common causes include:
+
+* extraneous whitespace (especially trailing whitespace)
+* improperly encoded characters (LDAPv3 uses UTF-8 encoded Unicode)
+* empty values (few syntaxes allow empty values)
+
+
+For certain syntax, like OBJECT IDENTIFIER (OID), this error can indicate that 
+the OID descriptor (a "short name") provided is unrecognized. For instance, 
+this error is returned if the {{objectClass}} value provided is unrecognized.
+
+H3: ldap_add/modify: Object class violation
+
+This error is returned with the entry to be added or the entry as modified 
+violates the object class schema rules. Normally additional information is 
+returned the error detailing the violation. Some of these are detailed below.
+
+Violations related to the entry's attributes:
+
+>      Attribute not allowed
+
+A provided attribute is not allowed by the entry's object class(es). 
+
+>      Missing required attribute
+
+An attribute required by the entry's object class(es) was not provided. 
+
+Violations related to the entry's class(es):
+
+>      Entry has no objectClass attribute
+
+The entry did not state which object classes it belonged to. 
+
+>      Unrecognized objectClass
+
+One (or more) of the listed objectClass values is not recognized. 
+
+>      No structural object class provided
+
+None of the listed objectClass values is structural. 
+
+>      Invalid structural object class chain
+
+Two or more structural objectClass values are not in same structural object 
+class chain. 
+
+>      Structural object class modification
+
+Modify operation attempts to change the structural class of the entry. 
+
+>      Instanstantiation of abstract objectClass.
+
+An abstract class is not subordinate to any listed structural or auxiliary class. 
+
+>      Invalid structural object class
+
+Other structural object class problem. 
+
+>      No structuralObjectClass operational attribute
+
+This is commonly returned when a shadow server is provided an entry which does 
+not contain the structuralObjectClass operational attribute. 
+
+
+Note that the above error messages as well as the above answer assumes basic 
+knowledge of LDAP/X.500 schema.
+
+H3: ldap_add: No such object
+
+The "ldap_add: No such object" error is commonly returned if parent of the 
+entry being added does not exist. Add the parent entry first...
+
+For example, if you are adding "cn=bob,dc=domain,dc=com" and you get:
+
+>      ldap_add: No such object
+
+The entry "dc=domain,dc=com" likely doesn't exist. You can use ldapsearch to 
+see if does exist:
+
+>      ldapsearch -b 'dc=domain,dc=com' -s base '(objectclass=*)'
+
+If it doesn't, add it. See {{SECT:A Quick-Start Guide}} for assistance.
+
+Note: if the entry being added is the same as database suffix, it's parent 
+isn't required. i.e.: if your suffix is "dc=domain,dc=com", "dc=com" doesn't 
+need to exist to add "dc=domain,dc=com".
+
+This error will also occur if you try to add any entry that the server is not 
+configured to hold.
+
+For example, if your database suffix is "dc=domain,dc=com" and you attempt to 
+add "dc=domain2,dc=com", "dc=com", "dc=domain,dc=org", "o=domain,c=us", or an 
+other DN in the "dc=domain,dc=com" subtree, the server will return a
+ "No such object" (or referral) error.
+
+{{slapd}}(8) will generally return "no global superior knowledge" as additional 
+information indicating its return noSuchObject instead of a referral as the 
+server is not configured with knowledge of a global superior server.
+
+
+H3: ldap add: invalid structural object class chain
+
+This particular error refers to the rule about STRUCTURAL objectclasses, which 
+states that an object is of one STRUCTURAL class, the structural class of the 
+object. The object is said to belong to this class, zero or more auxiliaries
+ classes, and their super classes. 
+
+While all of these classes are commonly listed in the objectClass attribute of 
+the entry, one of these classes is the structural object class of the entry. 
+Thus, it is OK for an objectClass attribute 
+to contain inetOrgPerson, organizationalPerson, and person because they inherit
+ one from another to form a single super class chain. That is, inetOrgPerson SUPs 
+organizationPerson SUPs person. On the other hand, it is invalid for both inetOrgPerson 
+and account to be listed in objectClass as inetOrgPerson and account are not 
+part of the same super class chain (unless some other class is also listed 
+with is a subclass of both).
+
+To resolve this problem, one must determine which class will better serve 
+structural object class for the entry, adding this class to the objectClass 
+attribute (if not already present), and remove any other structural class from 
+the entry's objectClass attribute which is not a super class of the structural 
+object class.
+
+Which object class is better depends on the particulars of the situation. 
+One generally should consult the documentation for the applications one is 
+using for help in making the determination.
+
+H3: ldap_add: no structuralObjectClass operational attribute
+
+ldapadd(1) may error:
+
+>      adding new entry "uid=XXX,ou=People,o=campus,c=ru"
+>        ldap_add: Internal (implementation specific) error (80)
+>           additional info: no structuralObjectClass operational attribute
+
+when slapd(8) cannot determine, based upon the contents of the objectClass 
+attribute, what the structural class of the object should be.
+
+
+H3: ldap_add/modify/rename: Naming violation
+
+OpenLDAP's slapd checks for naming attributes and distinguished values consistency, 
+according to RFC 4512.
+
+Naming attributes are those attributeTypes that appear in an entry's RDN;
+ distinguished values are the values of the naming attributes that appear in 
+an entry's RDN, e.g, in
+
+>      cn=Someone+mail=someone@example.com,dc=example,dc=com
+
+the naming attributes are cn and mail, and the distinguished values are 
+Someone and someone@example.com.
+
+OpenLDAP's slapd checks for consistency when:
+
+* adding an entry
+* modifying an entry, if the values of the naming attributes are changed
+* renaming an entry, if the RDN of the entry changes
+
+Possible causes of error are:
+
+* the naming attributes are not present in the entry; for example:
+
+>                dn: dc=example,dc=com
+>                objectClass: organization
+>                o: Example
+>                # note: "dc: example" is missing
+
+* the naming attributes are present in the entry, but in the attributeType 
+definition they are marked as:
+- collective
+- operational
+- obsolete
+
+* the naming attributes are present in the entry, but the distinguished values 
+are not; for example:
+
+>                dn: dc=example,dc=com
+>                objectClass: domain
+>                dc: foobar
+>                # note: "dc" is present, but the value is not "example"
+
+* the naming attributes are present in the entry, with the distinguished values, but the naming attributes:
+- do not have an equality field, so equality cannot be asserted
+- the matching rule is not supported (yet)
+- the matching rule is not appropriate
+
+* the given distinguished values do not comply with their syntax
+
+* other errors occurred during the validation/normalization/match process; 
+this is a catchall: look at previous logs for details in case none of the above 
+apply to your case.
+
+In any case, make sure that the attributeType definition for the naming attributes 
+contains an appropriate EQUALITY field; or that of the superior, if they are 
+defined based on a superior attributeType (look at the SUP field). See RFC 4512 for details.
+
+
+H3: ldap_add/delete/modify/rename: no global superior knowledge
+
+If the target entry name places is not within any of the databases the server 
+is configured to hold and the server has no knowledge of a global superior, 
+the server will indicate it is unwilling to perform the operation and provide 
+the text "no global superior knowledge" as additional text.
+
+Likely the entry name is incorrect, or the server is not properly configured 
+to hold the named entry, or, in distributed directory environments, a default 
+referral was not configured.
+
+
+H3: ldap_bind: Insufficient access
+
+Current versions of slapd(8) requires that clients have authentication 
+permission to attribute types used for authentication purposes before accessing 
+them to perform the bind operation. As all bind operations are done anonymously 
+(regardless of previous bind success), the auth access must be granted to anonymous.
+
+In the example ACL below grants the following access:
+
+* to anonymous users:
+- permission to authenticate using values of userPassword
+* to authenticated users:
+- permission to update (but not read) their userPassword
+- permission to read any object excepting values of userPassword 
+
+All other access is denied.
+
+>        access to attr=userPassword
+>          by self =w
+>          by anonymous auth
+
+>        access *
+>          by self write
+>          by users read
+
+
+H3: ldap_bind: Invalid credentials
+
+The error usually occurs when the credentials (password) provided does not 
+match the userPassword held in entry you are binding to.
+
+The error can also occur when the bind DN specified is not known to the server.
+
+Check both! In addition to the cases mentioned above you should check if the 
+server denied access to userPassword on selected parts of the directory. In 
+fact, slapd always returns "Invalid credentials" in case of failed bind, 
+regardless of the failure reason, since other return codes could reveal the 
+validity of the user's name.
+
+To debug access rules defined in slapd.conf, add "ACL" to log level.
+
+H3: ldap_bind: Protocol error
+
+There error is generally occurs when the LDAP version requested by the 
+client is not supported by the server.
+
+The OpenLDAP Software 2.x server, by default, only accepts version 3 LDAP Bind 
+requests but can be configured to accept a version 2 LDAP Bind request. 
+
+Note: The 2.x server expects LDAPv3 [RFC4510] to be used when the client 
+requests version 3 and expects a limited LDAPv3 variant (basically, LDAPv3 
+syntax and semantics in an LDAPv2 PDUs) to be used when version 2 is expected. 
+
+This variant is also sometimes referred to as LDAPv2+, but differs from the U-Mich 
+LDAP variant in a number of ways.
+
+H3: ldap_modify: cannot modify object class
+
+This message is commonly returned when attempting to modify the objectClass 
+attribute in a manner inconsistent with the LDAP/X.500 information model. In 
+particular, it commonly occurs when one tries to change the structure of the 
+object from one class to another, for instance, trying to change an 'apple' 
+into a 'pear' or a 'fruit' into a 'pear'. 
+
+Such changes are disallowed by the slapd(8) in accordance with LDAP and X.500 restrictions.
+
+
+H3: ldap_sasl_interactive_bind_s: ...
+
+If you intended to bind using a DN and password and get an error from 
+ldap_sasl_interactive_bind_s, you likely forgot to provide a '-x' option to 
+the command. By default, SASL authentication is used. '-x' is necessary to 
+select "simple" authentication.
+
+
+H3: ldap_sasl_interactive_bind_s: No such Object
+
+This indicates that LDAP SASL authentication function could not read the 
+Root DSE.
+The error will occur when the server doesn't provide a root DSE. This may be 
+due to access controls.
+
+
+H3: ldap_sasl_interactive_bind_s: No such attribute
+
+This indicates that LDAP SASL authentication function could read the Root 
+DSE but it contained no supportedSASLMechanism attribute.
+
+The supportedSASLmechanism attribute lists mechanisms currently available. 
+The list may be empty because none of the supported mechanisms are currently 
+available. For example, EXTERNAL is listed only if the client has established 
+its identity by authenticating at a lower level (e.g. TLS).
+
+Note: the attribute may not be visible due to access controls
+
+Note: SASL bind is the default for all OpenLDAP tools, e.g. ldapsearch(1), ldapmodify(1). To force use of "simple" bind, use the "-x" option. Use of "simple" bind is not recommended unless one has adequate confidentiality protection in place (e.g. TLS/SSL, IPSEC).
+
+H3: ldap_sasl_interactive_bind_s: Unknown authentication method
+
+This indicates that none of the SASL authentication supported by the server 
+are supported by the client, or that they are too weak or otherwise inappropriate 
+for use by the client. Note that the default security options disallows the use 
+of certain mechanisms such as ANONYMOUS and PLAIN (without TLS).
+
+Note: SASL bind is the default for all OpenLDAP tools. To force use of "simple" bind, use the "-x" option. Use of "simple" bind is not recommended unless one has adequate confidentiality protection in place (e.g. TLS/SSL, IPSEC).
+
+H3: ldap_sasl_interactive_bind_s: Local error (82)
+
+Apparently not having forward and reverse DNS entries for the LDAP server can result in this error.
+
+
+H3: ldap_search: Partial results and referral received
+
+This error is returned with the server responses to an LDAPv2 search query 
+with both results (zero or more matched entries) and references (referrals to other servers).
+See also: ldapsearch(1).
+
+If the updatedn on the replica does not exist, a referral will be returned. 
+It may do this as well if the ACL needs tweaking.
+
+H3: ldap_start_tls: Operations error
+
+ldapsearch(1) and other tools will return
+
+>        ldap_start_tls: Operations error (1)
+>              additional info: TLS already started
+
+When the user (though command line options and/or ldap.conf(5)) has requested 
+TLS (SSL) be started twice. For instance, when specifying both "-H ldaps://server.do.main" and "-ZZ".
+
+H2: Other Errors
+
+H3: ber_get_next on fd X failed errno=34 (Numerical result out of range)
+
+This slapd error generally indicates that the client sent a message that 
+exceeded an administrative limit. See sockbuf_max_incoming and sockbuf_max_incoming_auth 
+configuration directives in slapd.conf(5).
+
+H3: ber_get_next on fd X failed errno=11 (Resource temporarily unavailable)
+
+This message is not indicative of abnormal behavior or error. It simply means 
+that expected data is not yet available from the resource, in this context, a 
+network socket. slapd(8) will process the data once it does becomes available.
+
+H3: daemon: socket() failed errno=97 (Address family not supported)
+
+This message indicates that the operating system does not support one of the 
+(protocol) address families which slapd(8) was configured to support. Most 
+commonly, this occurs when slapd(8) was configured to support IPv6 yet the 
+operating system kernel wasn't. In such cases, the message can be ignored.
+
+H3: GSSAPI: gss_acquire_cred: Miscellaneous failure; Permission denied;
+
+This message means that slapd is not running as root and, thus, it cannot get 
+its Kerberos 5 key from the keytab, usually file /etc/krb5.keytab.
+
+A keytab file is used to store keys that are to be used by services or daemons 
+that are started at boot time. It is very important that these secrets are kept 
+beyond reach of intruders.
+
+That's why the default keytab file is owned by root and protected from being 
+read by others. Do not mess with these permissions, build a different keytab 
+file for slapd instead, and make sure it is owned by the user that slapd
+runs as.
+
+To do this, start kadmin, and enter the following commands:
+
+>     addprinc -randkey ldap/ldap.example.com@EXAMPLE.COM
+>     ktadd -k /etc/openldap/ldap.keytab ldap/ldap.example.com@EXAMPLE.COM 
+
+Then, on the shell, do:
+
+>     chown ldap:ldap /etc/openldap/ldap.keytab
+>     chmod 600 /etc/openldap/ldap.keytab 
+
+Now you have to tell slapd (well, actually tell the gssapi library in Kerberos 5 
+that is invoked by Cyrus SASL) where to find the new keytab. You do this by 
+setting the environment variable KRB5_KTNAME like this:
+
+>     export KRB5_KTNAME="FILE:/etc/openldap/ldap.keytab"
+
+Set that environment variable on the slapd start script (Red Hat users might 
+find /etc/sysconfig/ldap a perfect place).
+
+This only works if you are using MIT kerberos. It doesn't work with Heimdal, 
+for instance.
+
+
+In Heimdal there is a function gsskrb5_register_acceptor_identity() that sets 
+the path of the keytab file you want to use. In Cyrus SASL 2 you can add
+
+>    keytab: /path/to/file
+
+to your application's SASL config file to use this feature. This only works with Heimdal.
+
+
+H3: access from unknown denied
+
+This related to TCP wrappers. See hosts_access(5) for more information.
+in the log file: "access from unknown denied" This related to TCP wrappers. 
+See hosts_access(5) for more information.
+for example: add the line "slapd: .hosts.you.want.to.allow" in /etc/hosts.allow 
+to get rid of the error.
+
+H3: ldap_read: want=# error=Resource temporarily unavailable
+
+This message occurs normally. It means that pending data is not yet available 
+from the resource, a network socket. slapd(8) will process the data once it 
+becomes available.
+
+H3: `make test' fails
+
+Some times, `make test' fails at the very first test with an obscure message like
+
+>    make test
+>    make[1]: Entering directory `/ldap_files/openldap-2.4.6/tests'
+>    make[2]: Entering directory `/ldap_files/openldap-2.4.6/tests'
+>    Initiating LDAP tests for MDB...
+>    Cleaning up test run directory leftover from previous run.
+>     Running ./scripts/all...
+>    >>>>> Executing all LDAP tests for mdb
+>    >>>>> Starting test000-rootdse ...
+>    running defines.sh
+>    Starting slapd on TCP/IP port 9011...
+>    Using ldapsearch to retrieve the root DSE...
+>    Waiting 5 seconds for slapd to start...
+>    ./scripts/test000-rootdse: line 40: 10607 Segmentation fault $SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING >$LOG1 2>&1
+>    Waiting 5 seconds for slapd to start...
+>    Waiting 5 seconds for slapd to start...
+>    Waiting 5 seconds for slapd to start...
+>    Waiting 5 seconds for slapd to start...
+>    Waiting 5 seconds for slapd to start...
+>    ./scripts/test000-rootdse: kill: (10607) - No such pid
+>    ldap_sasl_bind_s: Can't contact LDAP server (-1)
+>    >>>>> Test failed
+>    >>>>> ./scripts/test000-rootdse failed (exit 1)
+>    make[2]: *** [mdb-yes] Error 1
+>    make[2]: Leaving directory `/ldap_files/openldap-2.4.6/tests'
+>    make[1]: *** [test] Error 2
+>    make[1]: Leaving directory `/ldap_files/openldap-2.4.6/tests'
+>    make: *** [test] Error 2
+
+or so. Usually, the five lines
+
+    Waiting 5 seconds for slapd to start...
+
+indicate that slapd didn't start at all.
+
+In tests/testrun/slapd.1.log there is a full log of what slapd wrote while 
+trying to start. The log level can be increased by setting the environment 
+variable SLAPD_DEBUG to the corresponding value; see loglevel in slapd.conf(5) 
+for the meaning of log levels.
+
+A typical reason for this behavior is a runtime link problem, i.e. slapd cannot 
+find some dynamic libraries it was linked against. Try running ldd(1) on slapd 
+(for those architectures that support runtime linking).
+
+There might well be other reasons; the contents of the log file should help 
+clarifying them.
+
+Tests that fire up multiple instances of slapd typically log to tests/testrun/slapd.<n>.log, 
+with a distinct <n> for each instance of slapd; list tests/testrun/ for possible 
+values of <n>.
+
+H3: ldap_*: Internal (implementation specific) error (80) - additional info: entry index delete failed
+
+This seems to be related with wrong ownership of the BDB's dir (/var/lib/ldap) 
+and files. The files must be owned by the user that slapd runs as.
+
+>    chown -R ldap:ldap /var/lib/ldap 
+
+fixes it in Debian
+
+
+H3: ldap_sasl_interactive_bind_s: Can't contact LDAP server (-1)
+
+Using SASL, when a client contacts LDAP server, the slapd service dies 
+immediately and client gets an error :
+
+>     SASL/GSSAPI authentication started ldap_sasl_interactive_bind_s: Can't contact LDAP server (-1)
+
+Then check the slapd service, it stopped.
+
+This may come from incompatible of using different versions of BerkeleyDB for 
+installing of SASL and installing of OpenLDAP. The problem arises in case of 
+using multiple version of BerkeleyDB. Solution: - Check which version of 
+BerkeleyDB when install Cyrus SASL. 
+
+Reinstall OpenLDAP with the version of BerkeleyDB above.
+

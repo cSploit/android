@@ -1,0 +1,219 @@
+# $OpenLDAP$
+# Copyright 2007-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Changes Since Previous Release
+
+The following sections attempt to summarize the new features and changes in OpenLDAP
+software since the 2.3.x release and the OpenLDAP Admin Guide.
+
+H2: New Guide Sections
+
+In order to make the Admin Guide more thorough and cover the majority of questions
+asked on the OpenLDAP mailing lists and scenarios discussed there, we have added the following new sections:
+
+* {{SECT:When should I use LDAP?}}
+* {{SECT:When should I not use LDAP?}}
+* {{SECT:LDAP vs RDBMS}}
+* {{SECT:Access Control}}
+* {{SECT:Backends}}
+* {{SECT:Overlays}}
+* {{SECT:Replication}}
+* {{SECT:Maintenance}}
+* {{SECT:Monitoring}}
+* {{SECT:Tuning}}
+* {{SECT:Troubleshooting}}
+* {{SECT:Changes Since Previous Release}}
+* {{SECT:Upgrading from 2.3.x}}
+* {{SECT:Common errors encountered when using OpenLDAP Software}}
+* {{SECT:Recommended OpenLDAP Software Dependency Versions}}
+* {{SECT:Real World OpenLDAP Deployments and Examples}}
+* {{SECT:OpenLDAP Software Contributions}}
+* {{SECT:Configuration File Examples}}
+* {{SECT:LDAP Result Codes}}
+* {{SECT:Glossary}}
+
+Also, the table of contents is now 3 levels deep to ease navigation.
+
+
+H2: New Features and Enhancements in 2.4
+
+H3: Better {{B:cn=config}} functionality
+
+There is a new slapd-config(5) manpage for the {{B:cn=config}} backend. The 
+original design called for auto-renaming of config entries when you insert or 
+delete entries with ordered names, but that was not implemented in 2.3. It is 
+now in 2.4. This means, e.g., if you have
+
+>   olcDatabase={1}bdb,cn=config
+>   olcSuffix: dc=example,dc=com
+
+and you want to add a new subordinate, now you can ldapadd:
+
+>   olcDatabase={1}bdb,cn=config
+>   olcSuffix: dc=foo,dc=example,dc=com
+
+This will insert a new BDB database in slot 1 and bump all following databases
+ down one, so the original BDB database will now be named:
+
+>   olcDatabase={2}bdb,cn=config
+>   olcSuffix: dc=example,dc=com
+
+H3: Better {{B:cn=schema}} functionality
+
+In 2.3 you were only able to add new schema elements, not delete or modify 
+existing elements. In 2.4 you can modify schema at will. (Except for the 
+hardcoded system schema, of course.)
+
+H3: More sophisticated Syncrepl configurations
+
+The original implementation of Syncrepl in OpenLDAP 2.2 was intended to support 
+multiple consumers within the same database, but that feature never worked and 
+was removed from OpenLDAP 2.3; you could only configure a single consumer in 
+any database.
+
+In 2.4 you can configure multiple consumers in a single database. The configuration 
+possibilities here are quite complex and numerous. You can configure consumers 
+over arbitrary subtrees of a database (disjoint or overlapping). Any portion 
+of the database may in turn be provided to other consumers using the Syncprov 
+overlay. The Syncprov overlay works with any number of consumers over a single 
+database or over arbitrarily many glued databases.
+
+H3: N-Way Multimaster Replication
+
+As a consequence of the work to support multiple consumer contexts, the syncrepl 
+system now supports full N-Way multimaster replication with entry-level conflict 
+resolution. There are some important constraints, of course: In order to maintain 
+consistent results across all servers, you must maintain tightly synchronized 
+clocks across all participating servers (e.g., you must use NTP on all servers). 
+
+The entryCSNs used for replication now record timestamps with microsecond resolution, 
+instead of just seconds. The delta-syncrepl code has not been updated to support 
+multimaster usage yet, that will come later in the 2.4 cycle.
+
+H3: Replicating {{slapd}} Configuration (syncrepl and {{B:cn=config}})
+
+Syncrepl was explicitly disabled on cn=config in 2.3. It is now fully supported 
+in 2.4; you can use syncrepl to replicate an entire server configuration from 
+one server to arbitrarily many other servers. It's possible to clone an entire 
+running slapd using just a small (less than 10 lines) seed configuration, or 
+you can just replicate the schema subtrees, etc. Tests 049 and 050 in the test 
+suite provide working examples of these capabilities.
+
+
+H3: Push-Mode Replication
+
+In 2.3 you could configure syncrepl as a full push-mode replicator by using it 
+in conjunction with a back-ldap pointed at the target server. But because the 
+back-ldap database needs to have a suffix corresponding to the target's suffix, 
+you could only configure one instance per slapd.
+
+In 2.4 you can define a database to be "hidden", which means that its suffix is 
+ignored when checking for name collisions, and the database will never be used 
+to answer requests received by the frontend. Using this "hidden" database feature 
+allows you to configure multiple databases with the same suffix, allowing you to 
+set up multiple back-ldap instances for pushing replication of a single database 
+to multiple targets. There may be other uses for hidden databases as well (e.g., 
+using a syncrepl consumer to maintain a *local* mirror of a database on a separate filesystem).
+
+
+H3: More extensive TLS configuration control
+
+In 2.3, the TLS configuration in slapd was only used by the slapd listeners. For 
+outbound connections used by e.g. back-ldap or syncrepl their TLS parameters came 
+from the system's ldap.conf file.
+
+In 2.4 all of these sessions inherit their settings from the main slapd configuration, 
+but settings can be individually overridden on a per-config-item basis. This is 
+particularly helpful if you use certificate-based authentication and need to use a 
+different client certificate for different destinations.
+
+
+H3: Performance enhancements
+
+Too many to list. Some notable changes - ldapadd used to be a couple of orders 
+of magnitude slower than "slapadd -q". It's now at worst only about half the 
+speed of slapadd -q. Some comparisons of all the 2.x OpenLDAP releases are available 
+at {{URL:http://www.openldap.org/pub/hyc/scale2007.pdf}}
+
+That compared 2.0.27, 2.1.30, 2.2.30, 2.3.33, and CVS HEAD). Toward the latter end 
+of the "Cached Search Performance" chart it gets hard to see the difference 
+because the run times are so small, but the new code is about 25% faster than 2.3, 
+which was about 20% faster than 2.2, which was about 100% faster than 2.1, which 
+was about 100% faster than 2.0, in that particular search scenario. That test 
+basically searched a 1.3GB DB of 380836 entries (all in the slapd entry cache) 
+in under 1 second. i.e., on a 2.4GHz CPU with DDR400 ECC/Registered RAM we can 
+search over 500 thousand entries per second. The search was on an unindexed 
+attribute using a filter that would not match any entry, forcing slapd to examine 
+every entry in the DB, testing the filter for a match.
+
+Essentially the slapd entry cache in back-bdb/back-hdb is so efficient the search 
+processing time is almost invisible; the runtime is limited only by the memory 
+bandwidth of the machine. (The search data rate corresponds to about 3.5GB/sec; 
+the memory bandwidth on the machine is only about 4GB/sec due to ECC and register latency.)
+
+H3: New overlays
+
+* slapo-constraint (Attribute value constraints)
+* slapo-dds (Dynamic Directory Services, RFC 2589)
+* slapo-memberof (reverse group membership maintenance)
+
+H3: New features in existing Overlays
+
+* slapo-pcache
+  - Inspection/Maintenance 
+    -- the cache database can be directly accessed via
+       LDAP by adding a specific control to each LDAP request; a specific
+       extended operation allows to consistently remove cached entries and entire
+       cached queries
+  - Hot Restart
+    -- cached queries are saved on disk at shutdown, and reloaded if
+      not expired yet at subsequent restart
+
+* slapo-rwm can safely interoperate with other overlays
+* Dyngroup/Dynlist merge, plus security enhancements
+  - added dgIdentity support (draft-haripriya-dynamicgroup)
+
+H3: New features in slapd
+
+* monitoring of back-{b,h}db: cache fill-in, non-indexed searches,
+* session tracking control (draft-wahl-ldap-session)
+* subtree delete in back-sql (draft-armijo-ldap-treedelete)
+* sorted values in multivalued attributes for faster matching 
+* lightweight dispatcher for greater throughput under heavy load and on
+multiprocessor machines. (33% faster than 2.3 on AMD quad-socket dual-core server.)
+
+
+H3: New features in libldap
+
+* ldap_sync client API (LDAP Content Sync Operation, RFC 4533)
+
+H3: New clients, tools and tool enhancements
+
+* ldapexop for arbitrary extended operations
+* Complete support of controls in request/response for all clients
+* LDAP Client tools now honor SRV records 
+
+H3: New build options
+
+* Support for building against GnuTLS
+
+
+H2: Obsolete Features Removed From 2.4
+
+These features were strongly deprecated in 2.3 and removed in 2.4.
+
+H3: Slurpd
+
+Please read the {{SECT:Replication}} section as to why this is no longer in
+OpenLDAP
+
+H3: back-ldbm
+
+back-ldbm was both slow and unreliable. Its byzantine indexing code was
+prone to spontaneous corruption, as were the underlying database libraries
+that were commonly used (e.g. GDBM or NDBM). back-bdb and back-hdb are
+superior in every aspect, with simplified indexing to avoid index corruption,
+fine-grained locking for greater concurrency, hierarchical caching for
+greater performance, streamlined on-disk format for greater efficiency
+and portability, and full transaction support for greater reliability.

@@ -1,0 +1,15 @@
+dn: cn=Entries,cn=Statistics,cn=Monitor
+structuralObjectClass: monitorCounterObject
+monitorCounter: 12
+entryDN: cn=Entries,cn=Statistics,cn=Monitor
+
+dn: cn=PDU,cn=Statistics,cn=Monitor
+structuralObjectClass: monitorCounterObject
+monitorCounter: 18
+entryDN: cn=PDU,cn=Statistics,cn=Monitor
+
+dn: cn=Referrals,cn=Statistics,cn=Monitor
+structuralObjectClass: monitorCounterObject
+monitorCounter: 0
+entryDN: cn=Referrals,cn=Statistics,cn=Monitor
+

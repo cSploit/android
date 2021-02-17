@@ -1,0 +1,128 @@
+depot
+layout_version 1.0
+vendor
+tag Firebird
+title Firebird Project
+description "Firebird Database"
+end
+
+product
+tag Firebird
+title "Firebird Database for HP-UX"
+description "Firebird Relational Database Classic"
+revision 2.1.0
+category database
+category_title Database
+preinstall install/scripts/preInstall.sh
+postinstall install/scripts/postInstall.sh
+preremove install/scripts/preUninstall.sh
+postremove install/scripts/postUninstall.sh
+#
+architecture HP-UX_B.11_64
+os_name HP-UX
+os_release ?.11.*
+os_version ? 
+#
+fileset
+tag main
+file -u 0660 -g firebird -o firebird buildroot@prefix@/security2.fdb @prefix@/security2.fdb
+file -u 0644 -g firebird -o firebird buildroot@prefix@/firebird.conf @prefix@/firebird.conf
+file -u 0644 -g firebird -o firebird buildroot@prefix@/databases.conf @prefix@/databases.conf
+file -u 0644 -g firebird -o firebird buildroot@prefix@/WhatsNew @prefix@/WhatsNew
+end
+#
+fileset 
+tag include
+directory buildroot@prefix@/include=@prefix@/include
+file_permissions -u 0644 -g firebird -o firebird
+file *
+end
+#
+fileset
+tag intl
+file -u 0755 -g firebird -o firebird buildroot@prefix@/intl/fbintl @prefix@/intl/fbintl
+file -u 0644 -g firebird -o firebird buildroot@prefix@/intl/fbintl.conf @prefix@/intl/fbintl.conf
+end
+#
+fileset
+tag UDF
+file -u 0755 -g firebird -o firebird buildroot@prefix@/UDF/ib_udf.sl @prefix@/UDF/ib_udf.sl
+file -u 0755 -g firebird -o firebird buildroot@prefix@/UDF/fbudf.sl @prefix@/UDF/fbudf.sl
+file -u 0644 -g firebird -o firebird buildroot@prefix@/UDF/ib_udf.sql @prefix@/UDF/ib_udf.sql 
+file -u 0644 -g firebird -o firebird buildroot@prefix@/UDF/ib_udf2.sql @prefix@/UDF/ib_udf2.sql 
+file -u 0644 -g firebird -o firebird buildroot@prefix@/UDF/fbudf.sql @prefix@/UDF/fbudf.sql 
+end
+#
+fileset
+tag bin
+directory buildroot@prefix@/bin=@prefix@/bin
+file_permissions -u 0755 -g firebird -o firebird
+file *
+end
+#
+fileset
+tag misc
+directory buildroot@prefix@/misc=@prefix@/misc
+file_permissions -u 0644 -g firebird -o firebird
+file *
+directory buildroot@prefix@/misc/upgrade/ib_udf=@prefix@/misc/upgrade/ib_udf
+file_permissions -u 0644 -g firebird -o firebird
+file *
+directory buildroot@prefix@/misc/upgrade/metadata=@prefix@/misc/upgrade/metadata
+file_permissions -u 0644 -g firebird -o firebird
+file *
+directory buildroot@prefix@/misc/upgrade/security=@prefix@/misc/upgrade/security
+file_permissions -u 0644 -g firebird -o firebird
+file *
+end
+#
+fileset 
+tag examples
+file -u 0644 -g firebird -o firebird firebird/examples/README @prefix@/examples/README
+file -u 0644 -g firebird -o firebird firebird/examples/functions.c @prefix@/examples/functions/functions.c
+directory firebird/examples/api=@prefix@/examples/api
+file_permissions -u 0644 -g firebird -o firebird
+file *
+directory firebird/examples/dyn=@prefix@/examples/dyn
+file_permissions -u 0644 -g firebird -o firebird
+file *
+directory firebird/examples/empbuild=@prefix@/examples/empbuild
+file_permissions -u 0644 -g firebird -o firebird
+file *
+directory firebird/examples/include=@prefix@/examples/include
+file_permissions -u 0644 -g firebird -o firebird
+file *
+directory firebird/examples/stat=@prefix@/examples/stat
+file_permissions -u 0644 -g firebird -o firebird
+file *
+directory firebird/examples/udf=@prefix@/examples/udf
+file_permissions -u 0644 -g firebird -o firebird
+file *
+end
+#
+fileset
+tag lib
+directory buildroot@prefix@/lib=@prefix@/lib
+file_permissions -u 0755 -g firebird -o firebird
+file *
+end
+#
+fileset
+tag help
+file -u 0444 -g firebird -o firebird firebird/help/help.fdb @prefix@/help/help.fdb
+end
+#
+fileset
+tag messages
+file -u 0444 -g firebird -o firebird firebird/firebird.msg @prefix@/firebird.msg
+file -u 0444 -g firebird -o firebird firebird/fr_FR.msg @prefix@/fr_FR.msg
+file -u 0444 -g firebird -o firebird firebird/de_DE.msg @prefix@/de_DE.msg
+end
+#
+fileset
+tag docs
+directory ../doc=@prefix@/doc
+file_permissions -u 0644 -g firebird -o firebird
+file *
+end
+end

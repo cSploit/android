@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="412.04193"
+   height="172.80376"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   version="1.0"
+   sodipodi:docbase="/home/andreas/palestra"
+   sodipodi:docname="refint.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend"
+       style="overflow:visible">
+      <path
+         id="path8347"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.97309,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.386"
+     inkscape:cx="381.27532"
+     inkscape:cy="98.970161"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     showguides="false"
+     inkscape:window-width="1278"
+     inkscape:window-height="724"
+     inkscape:window-x="0"
+     inkscape:window-y="25" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Camada 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-29.66815,-34.695504)">
+    <g
+       id="g7325"
+       transform="translate(-297.25829,101.81818)">
+      <g
+         transform="translate(233.76623,-28.71069)"
+         id="g7289">
+        <text
+           xml:space="preserve"
+           style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+           x="124.81962"
+           y="80.50071"
+           id="text2160"><tspan
+             sodipodi:role="line"
+             id="tspan2162"
+             x="124.81962"
+             y="80.50071"
+             style="font-weight:normal">DN: uid=john,ou=people,dc=example,dc=com</tspan><tspan
+             sodipodi:role="line"
+             x="124.81962"
+             y="95.50071"
+             id="tspan2164">uid: john</tspan><tspan
+             sodipodi:role="line"
+             x="124.81962"
+             y="110.50071"
+             id="tspan2166">mail: john@example.com</tspan><tspan
+             sodipodi:role="line"
+             x="124.81962"
+             y="125.50071"
+             id="tspan2168">(...)</tspan></text>
+        <rect
+           style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.79348463px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+           id="rect2182"
+           width="298.90784"
+           height="68.027596"
+           x="121.10886"
+           y="65.967438" />
+        <rect
+           style="opacity:0.28915663;fill:#aa9ab2;fill-opacity:1;stroke:none;stroke-width:0.69669151;stroke-opacity:1"
+           id="rect3159"
+           width="298.28311"
+           height="17.619322"
+           x="121.06046"
+           y="66.674454" />
+      </g>
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="358.58585"
+         y="51.79002"
+         id="text7300"><tspan
+           sodipodi:role="line"
+           id="tspan7302"
+           x="358.58585"
+           y="51.79002"
+           style="font-weight:normal">DN: uid=john,ou=people,dc=example,dc=com</tspan><tspan
+           sodipodi:role="line"
+           x="358.58585"
+           y="66.79002"
+           id="tspan7304">uid: john</tspan><tspan
+           sodipodi:role="line"
+           x="358.58585"
+           y="81.79002"
+           id="tspan7306">mail: john@example.com</tspan><tspan
+           sodipodi:role="line"
+           x="358.58585"
+           y="96.79002"
+           id="tspan7308">(...)</tspan></text>
+      <rect
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.79348463px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         id="rect7310"
+         width="298.90784"
+         height="68.027596"
+         x="354.87509"
+         y="37.256748" />
+      <rect
+         style="opacity:0.28915663;fill:#aa9ab2;fill-opacity:1;stroke:none;stroke-width:0.69669151;stroke-opacity:1"
+         id="rect7312"
+         width="298.28311"
+         height="17.619322"
+         x="354.82669"
+         y="37.963764" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="116.88309"
+       y="48.033184"
+       id="text2170"><tspan
+         sodipodi:role="line"
+         id="tspan2172"
+         x="116.88309"
+         y="48.033184">DN: cn=tech,ou=group,dc=example,dc=com</tspan><tspan
+         sodipodi:role="line"
+         x="116.88309"
+         y="63.033184"
+         id="tspan2174">cn: tech</tspan><tspan
+         sodipodi:role="line"
+         x="116.88309"
+         y="78.033184"
+         id="tspan2176"
+         style="font-weight:normal">member: uid=john,ou=people,dc=example,dc=com</tspan><tspan
+         sodipodi:role="line"
+         x="116.88309"
+         y="93.033184"
+         id="tspan2178">member: uid=mary,ou=people,dc=example,dc=com</tspan><tspan
+         sodipodi:role="line"
+         x="116.88309"
+         y="108.03318"
+         id="tspan2180">(...)</tspan></text>
+    <rect
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.8948347px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="rect7321"
+       width="328.38803"
+       height="78.748756"
+       x="112.59964"
+       y="35.142921" />
+    <rect
+       style="opacity:0.28915663;fill:#aa9ab2;fill-opacity:1;stroke:none;stroke-width:0.69669151;stroke-opacity:1"
+       id="rect7323"
+       width="329.30765"
+       height="17.619322"
+       x="112.40244"
+       y="65.054672" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow2Lend);stroke-opacity:1"
+       d="M 54.112554,146.87878 C -1.5132611,141.59779 49.816091,72.233662 106.06061,73.285704"
+       id="path7352"
+       sodipodi:nodetypes="cc" />
+  </g>
+</svg>

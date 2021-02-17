@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+
+<?include $(sys.SOURCEFILEDIR)\VCCRT_Shared_Header.wxi ?>
+<?include $(sys.SOURCEFILEDIR)\VCCRT_Win32.wxi ?>
+
+<Wix xmlns='http://schemas.microsoft.com/wix/2003/01/wi'>
+
+<?include $(sys.SOURCEFILEDIR)\VCCRT_Shared_Body.wxi ?>
+
+</Wix>
+
+

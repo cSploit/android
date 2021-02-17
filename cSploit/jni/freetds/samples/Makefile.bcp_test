@@ -1,0 +1,12 @@
+# This file is not part of Makefile.am because the source code is C++, 
+# and FreeTDS requires only a C compiler.  
+#
+
+DBLIB_H = /usr/local
+DBLIB_L = ../build/src/dblib/.libs
+FLAGS = -D MSDBLIB -fmessage-length=$$(stty -a | awk '/^speed/ {print $$6}')
+INC = -I $(DBLIB_H)/include
+LIB = -L $(DBLIB_L) -Wl,-R$(DBLIB_L) -lsybdb
+
+bcp_test: bcp_test.cpp
+	$(CXX) -o $@ bcp_test.cpp -g -O0 $(FLAGS) $(INC) $(LIB)

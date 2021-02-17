@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# chkconfig: 345 20 80
+# description: Start/Stop firebird database server
+#
+# This file belongs in /etc/init.d where it will be run
+# on system startup and shutdown to start the background
+# Firebird/interbase database server daemon 
+
+
+
+FIREBIRD=@prefix@
+ISC_USER=SYSDBA
+ISC_PASSWORD=masterkey
+FBRunUser=firebird
+# WARNING: in a real-world installation, you should not put the 
+# SYSDBA password in a publicly-readable file. 
+# Eventually this file should not need to contain any passwords.
+# as root user alone should be sufficient privledge to stop/start 
+# the server. 
+
+
+export FIREBIRD 
+export ISC_USER
+export ISC_PASSWORD
+
+
+# Check the file is there and is executable.
+[ -x $FIREBIRD/bin/fbmgr ] || exit 0
+
+
+
+# See how we were called.
+case "$1" in
+  start)
+	echo -n "Starting Firebird server: "
+        echo '$FIREBIRD/bin/fbmgr -start -forever' | su $FBRunUser
+	RETVAL=$?
+	;;
+  stop)
+	echo -n "Stopping Firebird server: "
+        $FIREBIRD/bin/fbmgr -shut
+	RETVAL=$?
+#	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/identd
+	;;
+  status)
+	RETVAL=0
+	;;
+  restart|reload)
+	$0 stop
+	$0 start
+	RETVAL=$?
+	;;
+  *)
+	echo "Usage: firebird {start|stop|status|restart|reload}"
+	exit 1
+esac
+
+exit $RETVAL
+

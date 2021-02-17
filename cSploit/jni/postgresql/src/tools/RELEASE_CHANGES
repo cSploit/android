@@ -1,0 +1,171 @@
+For All Releases (major, minor, beta, RC)
+================
+
+* Release version number changes
+	o run src/tools/version_stamp.pl, then run autoconf
+	  (by packager) (beta)
+
+* Release notes
+	o run git log and, if useful, src/tools/git_changelog
+	o update doc/src/sgml/release.sgml
+	o run spellchecker on result
+	o add SGML markup
+	o check if 'gmake HISTORY.html' works for <link>s
+
+* Update timezone data to match latest zic database and new
+  Windows releases, if any (see src/timezone/README)
+
+* Translation updates
+	Translations are kept in the project "pgtranslation" on PgFoundry.
+	1. Check out the messages module (of the right branch).
+	2. Tag the messages: cvs tag -c RELx_y_z
+	3. Check out the admin module.
+	4. From babel.postgresql.org, download the "qualified list"
+	   for the respective branch.
+	5. Run "sh .../admin/cp-po -L qualified-list-xxx.txt .../messages .../pgsql
+	6. Commit.
+
+
+For Major Releases
+==================
+(in addition to the above)
+
+* Release notes
+	o use git log or src/tools/git_changelog to find the relevant commits
+	o check completion of items that have been marked as completed at
+	  http://wiki.postgresql.org/wiki/Todo
+	o remove completed TODO items
+	o group items into categories
+	o select major features
+	o select incompatibilities
+	o add documentation for items
+
+* Documentation
+	o document all new features
+	o update help output from inside the programs
+	o doc/src/sgml/ref manual pages
+	o convert any literal "<" and ">" characters, use tools/find_gt_lt
+	o update the sizes specified for installation requirements
+	  (doc/src/sgml/installation.sgml, section "install-requirements")
+	o update the shared memory size requirement table
+	  (doc/src/sgml/runtime.sgml, section "shared-memory-parameters")
+
+* Ports
+	o update config.guess and config.sub at the start of beta
+	  (from http://savannah.gnu.org/projects/config)
+	o update ports list in doc/src/sgml/installation.sgml
+	o update platform-specific FAQ's, if needed
+
+* Update inet/cidr data types with newest Bind patches
+
+
+Starting a New Development Cycle
+================================
+
+* Create a branch in git for maintenance of the previous release
+
+* Increment the major version number in src/tools/version_stamp.pl
+
+* Run "src/tools/version_stamp.pl devel", then run autoconf
+
+* Bump minor library versions, major if appropriate (see below)
+	o src/interfaces/*/Makefile
+	o src/interfaces/*/*/Makefile
+
+
+Creating Back-Branch Release Notes
+==================================
+
+* Run src/tools/git_changelog to generate a list of relevant commits
+
+* On the git master branch, edit and create SGML markup for the most recent
+  branch in that branch's release-N.N.sgml file
+
+* Copy this into older branches' release-N.N.sgml files, then remove
+  items that do not apply based on commit logs for that branch (and add
+  any that are needed)
+
+* Copy the appropriate release-N.N.sgml files into each back branch
+
+
+---------------------------------------------------------------------------
+
+                       Library Version Changes
+                       =======================
+
+Major Version
+=============
+
+The major version number should be updated whenever the source of the
+library changes to make it binary incompatible. Such changes include,
+but are not limited to:
+
+1. Removing a public function or structure (or typedef, enum, ...)
+
+2. Modifying a public functions arguments.
+
+3. Removing a field from a public structure.
+
+4. Adding a field to a public structure, unless steps have been
+previously taken to shield users from such a change, for example by
+such structures only ever being allocated/instantiated by a library
+function which would give the new field a suitable default value.
+
+Adding a new function should NOT force an increase in the major version
+number. (Packagers will see the standard minor number update and install
+the new library.)  When the major version is increased all applications
+which link to the library MUST be recompiled - this is not desirable. When
+the major version is updated the minor version gets reset.
+
+Minor Version
+=============
+
+The minor version number should be updated whenever the functionality of
+the library has changed, typically a change in source code between releases
+would mean an increase in the minor version number so long as it does not
+require a major version increase.
+
+Given that we make at least minor changes to our libraries in every major
+PostgreSQL version, we always bump all minor library version numbers at the
+start of each development cycle as a matter of policy.
+
+Minimizing Changes
+==================
+
+When modifying public functions arguments, steps should be taken to
+maintain binary compatibility across minor PostgreSQL releases (e.g. the
+7.2 series, the 7.3 series, the 7.4/8.0 series). Consider the following
+function:
+
+	void print_stuff(int arg1, int arg2)
+	{
+	    printf("stuff: %d %d\n", arg1, arg2);
+	}
+
+If we wanted to add a third argument:
+
+	void print_stuff(int arg1, int arg2, int arg3)
+	{
+	    printf("stuff: %d %d %d\n", arg1, arg2, arg3);
+	}
+
+Then doing it like this:
+
+	void print_stuff2(int arg1, int arg2, int arg3)
+	{
+	    printf("stuff: %d %d %d\n", arg1, arg2, arg3);
+	}
+
+	void print_stuff(int arg1, int arg2)
+	{
+	    print_stuff(arg1, arg2, 0);
+	}
+
+would maintain binary compatibility. Obviously this would add a fair
+bit of cruft if used extensively, but considering the changes between
+minor versions would probably be worthwhile to avoid bumping library
+major version. Naturally in the next major version print_stuff() would
+assume the functionality and arguments of print_stuff2().
+
+
+Lee Kindness

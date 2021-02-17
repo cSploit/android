@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Dynamic Environment Configuration</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_52_toc.html" title="Chapter 11.  Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2" />
+    <link rel="prev" href="upgrade_11gr2_52_rep_dbt_readonly.html" title="Read Only flag for DBT" />
+    <link rel="next" href="upgrade_11gr2_52_excl_txn_sql.html" title="Exclusive Transactions in the SQL Layer" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Dynamic Environment Configuration </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="upgrade_11gr2_52_rep_dbt_readonly.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 11. 
+        Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="upgrade_11gr2_52_excl_txn_sql.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="upgrade_11gr2_52_dyn_env"></a>Dynamic Environment Configuration </h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="upgrade_11gr2_52_dyn_env.html#idp51148640">New Functions</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="upgrade_11gr2_52_dyn_env.html#idp51157880">Deprecated Functions</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        Memory is now allocated incrementally as needed, instead of all at
+        once during environment initialization, for structures that support
+        locks, transactions, threads, and mutexes.  With this change new
+        functions have been added that configure how much memory is
+        allocated initially, and how much that memory is allowed to grow.
+        The old memory configuration functions have been deprecated.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51148640"></a>New Functions</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <a href="../api_reference/C/envset_memory_init.html" class="olink">DB_ENV-&gt;set_memory_init()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envget_memory_init.html" class="olink">DB_ENV-&gt;get_memory_init()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envset_memory_max.html" class="olink">DB_ENV-&gt;set_memory_max()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envget_memory_max.html" class="olink">DB_ENV-&gt;get_memory_max()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envset_lk_tablesize.html" class="olink">DB_ENV-&gt;set_lk_tablesize()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envget_lk_tablesize.html" class="olink">DB_ENV-&gt;get_lk_tablesize()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/mutexset_init.html" class="olink">DB_ENV-&gt;mutex_set_init()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/mutexget_init.html" class="olink">DB_ENV-&gt;mutex_get_init()</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51157880"></a>Deprecated Functions</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <a href="../api_reference/C/mutexset_max.html" class="olink">DB_ENV-&gt;mutex_set_max()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/mutexget_max.html" class="olink">DB_ENV-&gt;mutex_get_max()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envset_lk_max_lockers.html" class="olink">DB_ENV-&gt;set_lk_max_lockers()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envget_lk_max_lockers.html" class="olink">DB_ENV-&gt;get_lk_max_lockers()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envset_lk_max_locks.html" class="olink">DB_ENV-&gt;set_lk_max_locks()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envget_lk_max_locks.html" class="olink">DB_ENV-&gt;get_lk_max_locks()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envset_lk_max_objects.html" class="olink">DB_ENV-&gt;set_lk_max_objects()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envget_lk_max_objects.html" class="olink">DB_ENV-&gt;get_lk_max_objects()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envset_thread_count.html" class="olink">DB_ENV-&gt;set_thread_count()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envget_thread_count.html" class="olink">DB_ENV-&gt;get_thread_count()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envset_tx_max.html" class="olink">DB_ENV-&gt;set_tx_max()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/envget_tx_max.html" class="olink">DB_ENV-&gt;get_tx_max()</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="upgrade_11gr2_52_rep_dbt_readonly.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_52_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="upgrade_11gr2_52_excl_txn_sql.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Read Only flag for DBT </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Exclusive Transactions in the SQL Layer</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

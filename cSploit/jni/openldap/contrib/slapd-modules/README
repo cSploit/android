@@ -1,0 +1,64 @@
+Copyright 2008-2014 The OpenLDAP Foundation. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+This directory contains native-API slapd modules (overlays etc):
+
+acl (plugins)
+	Plugins implementing access rules.  Currently one plugin
+	which implements access control based on posixGroup membership.
+
+addpartial (overlay)
+	Treat Add requests as Modify requests if the entry exists.
+
+allop (overlay)
+	Return operational attributes for root DSE even when not
+	requested, since some clients expect this.
+
+autogroup (overlay)
+	Automated updates of group memberships.
+
+cloak (overlay)
+	Hide specific attributes unless explicitely requested
+
+comp_match (plugin)
+	Component Matching rules (RFC 3687).
+
+denyop (overlay)
+	Deny selected operations, returning unwillingToPerform.
+
+dsaschema (plugin)
+	Permit loading DSA-specific schema, including operational attrs.
+
+lastbind (overlay)
+	Record the last successful authentication on an entry.
+
+lastmod (overlay)
+	Track the time of the last write operation to a database.
+
+nops (overlay)
+	Remove null operations, e.g. changing a value to same as before.
+
+nssov (listener overlay)
+	Handle NSS lookup requests through a local Unix Domain socket.
+
+passwd (plugins)
+	Support additional password mechanisms.
+	Currently Kerberos, Netscape MTA-MD5 and RADIUS.
+
+proxyOld (plugin)
+	Proxy Authorization compatibility with obsolete internet-draft.
+
+smbk5pwd (overlay)
+	Make the PasswordModify Extended Operation update Kerberos
+	keys and Samba password hashes as well as userPassword.
+
+trace (overlay)
+	Trace overlay invocation.
+
+usn (overlay)
+	Maintain usnCreated and usnChanged attrs similar to Microsoft AD.
+
+$OpenLDAP$

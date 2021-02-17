@@ -1,0 +1,149 @@
+.TH SLAPO-CONSTRAINT 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2005-2006 Hewlett-Packard Company
+.\" Copyright 2006-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-constraint \- Attribute Constraint Overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The constraint overlay is used to ensure that attribute values match
+some constraints beyond basic LDAP syntax.  Attributes can
+have multiple constraints placed upon them, and all must be satisfied
+when modifying an attribute value under constraint.
+.LP
+This overlay is intended to be used to force syntactic regularity upon
+certain string represented data which have well known canonical forms,
+like telephone numbers, post codes, FQDNs, etc.
+.LP
+It constrains only LDAP \fIadd\fP, \fImodify\fP and \fIrename\fP commands
+and only seeks to control the \fIadd\fP and \fIreplace\fP values
+of \fImodify\fP and \fIrename\fP requests.
+.LP
+No constraints are applied for operations performed with the
+.I relax
+control set.
+.SH CONFIGURATION
+This
+.B slapd.conf
+option applies to the constraint overlay.
+It should appear after the
+.B overlay
+directive.
+.TP
+.B constraint_attribute <attribute_name>[,...] <type> <value> [<extra> [...]]
+Specifies the constraint which should apply to the comma-separated
+attribute list named as the first parameter.
+Five types of constraint are currently supported -
+.BR regex ,
+.BR size ,
+.BR count ,
+.BR uri ,
+and
+.BR set .
+
+The parameter following the
+.B regex
+type is a Unix style regular expression (See
+.BR regex (7)
+). The parameter following the
+.B uri
+type is an LDAP URI. The URI will be evaluated using an internal search.
+It must not include a hostname, and it must include a list of attributes
+to evaluate.
+
+The parameter following the
+.B set
+type is a string that is interpreted according to the syntax in use
+for ACL sets.  This allows to construct constraints based on the contents
+of the entry.
+
+The 
+.B size
+type can be used to enforce a limit on an attribute length, and the
+.B count
+type limits the number of values of an attribute.
+
+Extra parameters can occur in any order after those described above.
+.RS
+.TP
+.B <extra> : restrict=<uri>
+.RE
+
+.RS
+This extra parameter allows to restrict the application of the corresponding
+constraint only to entries that match the
+.IR base ,
+.I scope
+and
+.I filter
+portions of the LDAP URI.
+The
+.IR base ,
+if present, must be within the naming context of the database.
+The
+.I scope
+is only used when the
+.I base
+is present; it defaults to
+.BR base .
+The other parameters of the URI are not allowed.
+.RE
+
+.LP
+Any attempt to add or modify an attribute named as part of the
+constraint overlay specification which does not fit the 
+constraint listed will fail with a
+LDAP_CONSTRAINT_VIOLATION error.
+.SH EXAMPLES
+.LP
+.RS
+.nf
+overlay constraint
+constraint_attribute jpegPhoto size 131072
+constraint_attribute userPassword count 3
+constraint_attribute mail regex ^[[:alnum:]]+@mydomain.com$
+constraint_attribute title uri
+  ldap:///dc=catalog,dc=example,dc=com?title?sub?(objectClass=titleCatalog)
+constraint_attribute cn,sn,givenName set
+  "(this/givenName + [ ] + this/sn) & this/cn"
+  restrict="ldap:///ou=People,dc=example,dc=com??sub?(objectClass=inetOrgPerson)"
+.fi
+
+.RE
+A specification like the above would reject any
+.B mail
+attribute which did not look like
+.BR "<alpha-numeric string>@mydomain.com" .
+It would also reject any
+.B title
+attribute whose values were not listed in the
+.B title
+attribute of any
+.B titleCatalog
+entries in the given scope. (Note that the
+"dc=catalog,dc=example,dc=com" subtree ought to reside
+in a separate database, otherwise the initial set of
+titleCatalog entries could not be populated while the
+constraint is in effect.)
+Finally, it requires the values of the attribute
+.B cn
+to be constructed by pairing values of the attributes
+.B sn
+and 
+.BR givenName ,
+separated by a space, but only for entries derived from the objectClass
+.BR inetOrgPerson .
+.RE
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.SH ACKNOWLEDGEMENTS
+This module was written in 2005 by Neil Dunbar of Hewlett-Packard and subsequently
+extended by Howard Chu and Emmanuel Dreyfus.
+.so ../Project

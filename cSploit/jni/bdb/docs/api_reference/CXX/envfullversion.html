@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbEnv::full_version()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="env.html" title="Chapter 5.  The DbEnv Handle" />
+    <link rel="prev" href="envfileid_reset.html" title="DbEnv::fileid_reset()" />
+    <link rel="next" href="envget_create_dir.html" title="DbEnv::get_create_dir()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbEnv::full_version()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envfileid_reset.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. 
+                The DbEnv Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envget_create_dir.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envfullversion"></a>DbEnv::full_version()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+
+static char * 
+DbEnv::full_version(int *family, int *release, int *major, int *minor, 
+                    int *patch); </pre>
+      <p>
+         The 
+          
+         <code class="methodname">DbEnv::full_version()</code> 
+         method returns a pointer to a string, suitable for
+         display, containing Berkeley DB version information.  The string
+	 includes Oracle family and release numbers, as well as
+	 Berkeley DB's traditional major, minor, and patch numbers.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp1356360"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1321768"></a>family</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          If <span class="bold"><strong>family</strong></span>
+                          is non-NULL, the Oracle family number of the
+                          Berkeley DB release is copied to the memory
+                          to which it refers.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1354136"></a>release</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          If <span class="bold"><strong>release</strong></span>
+                          is non-NULL, the Oracle release number of
+                          the Berkeley DB release is copied to the
+                          memory to which it refers.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1349456"></a>major</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          If <span class="bold"><strong>major</strong></span> is non-NULL, the major
+                          version of the Berkeley DB release is copied to the memory to which it
+                          refers.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1354024"></a>minor</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          If <span class="bold"><strong>minor</strong></span> is non-NULL, the minor
+                          version of the Berkeley DB release is copied to the memory to which it
+                          refers.
+                     </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp1343272"></a>patch</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                          If <span class="bold"><strong>patch</strong></span> is non-NULL, the patch
+                          version of the Berkeley DB release is copied to the memory to which it
+                          refers.
+                     </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp1343896"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a>  
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp1326448"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                     <a class="xref" href="env.html#envlist" title="Database Environments and Related Methods">Database Environments and Related Methods</a> 
+                </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envfileid_reset.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="env.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envget_create_dir.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbEnv::fileid_reset() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbEnv::get_create_dir()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

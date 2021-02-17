@@ -1,0 +1,462 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/pt.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/pt.xml
+ */
+pt{
+    AuxExemplarCharacters{"[ă å ä ā æ è ĕ ë ē ì ĭ î ï ī ñ ŏ ö ø ō œ ù ŭ û ü ū ÿ]"}
+    ExemplarCharacters{
+        "[a á à â ã b c ç d e é ê f g h i í j k l m n o ó ò ô õ p q r s t u ú v w x y"
+        " z]"
+    }
+    ExemplarCharactersCurrency{"[a b c č d e f g h i j k l ł m n o p q r s t u v w x y z]"}
+    ExemplarCharactersIndex{"[A B C D E F G H I J K L M N O P Q R S T U V W X Y Z]"}
+    LocaleScript{
+        "Latn",
+    }
+    NumberElements{
+        ",",
+        ".",
+        ";",
+        "%",
+        "0",
+        "#",
+        "-",
+        "E",
+        "‰",
+        "∞",
+        "NaN",
+        "+",
+    }
+    NumberPatterns{
+        "#,##0.###",
+        "¤#,##0.00;(¤#,##0.00)",
+        "#,##0%",
+        "#E0",
+    }
+    Version{"2.0.48.46"}
+    calendar{
+        buddhist{
+            DateTimePatterns{
+                "HH'h'mm'min'ss's' zzzz",
+                "HH'h'mm'min'ss's' z",
+                "HH:mm:ss",
+                "HH:mm",
+                "EEEE, d 'de' MMMM 'de' y G",
+                "d 'de' MMMM 'de' y G",
+                "d 'de' MMMM 'de' y G",
+                "d/M/yyyy",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+        }
+        gregorian{
+            DateTimePatterns{
+                "HH'h'mm'min'ss's' zzzz",
+                "HH'h'mm'min'ss's' z",
+                "HH:mm:ss",
+                "HH:mm",
+                "EEEE, d 'de' MMMM 'de' y",
+                "d 'de' MMMM 'de' y",
+                "dd/MM/yyyy",
+                "dd/MM/yy",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            availableFormats{
+                EEEd{"EEE, d"}
+                HHmm{"HH'h'mm"}
+                HHmmss{"HH'h'mm'min'ss's'"}
+                Hm{"HH'h'mm"}
+                M{"L"}
+                MEd{"EEE, dd/MM"}
+                MMM{"LLL"}
+                MMMEd{"EEE, d 'de' MMM"}
+                MMMd{"d 'de' MMM"}
+                MMdd{"dd/MM"}
+                Md{"d/M"}
+                d{"d"}
+                ms{"mm'min'ss's'"}
+                y{"y"}
+                yM{"MM/yyyy"}
+                yMEd{"EEE, dd/MM/yyyy"}
+                yMMM{"MMM 'de' y"}
+                yMMMEd{"EEE, d 'de' MMM 'de' y"}
+                yQ{"yyyy Q"}
+                yQQQ{"y QQQ"}
+                yyMM{"MM/yy"}
+                yyMMM{"MMM 'de' yy"}
+                yyMMMEEEd{"EEE, d 'de' MMM 'de' yy"}
+                yyMMMd{"d 'de' MMM 'de' yy"}
+                yyQ{"Q yy"}
+                yyyyMM{"MM/yyyy"}
+                yyyyMMM{"MMM 'de' y"}
+            }
+            dayNames{
+                format{
+                    abbreviated{
+                        "dom",
+                        "seg",
+                        "ter",
+                        "qua",
+                        "qui",
+                        "sex",
+                        "sáb",
+                    }
+                    wide{
+                        "domingo",
+                        "segunda-feira",
+                        "terça-feira",
+                        "quarta-feira",
+                        "quinta-feira",
+                        "sexta-feira",
+                        "sábado",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "D",
+                        "S",
+                        "T",
+                        "Q",
+                        "Q",
+                        "S",
+                        "S",
+                    }
+                }
+            }
+            eras{
+                abbreviated{
+                    "a.C.",
+                    "d.C.",
+                }
+                wide{
+                    "Antes de Cristo",
+                    "Ano do Senhor",
+                }
+            }
+            fields{
+                day{
+                    dn{"Dia"}
+                    relative{
+                        "-1"{"Ontem"}
+                        "-2"{"Anteontem"}
+                        "-3"{"Há três dias"}
+                        "0"{"Hoje"}
+                        "1"{"Amanhã"}
+                        "2"{"Depois de amanhã"}
+                        "3"{"Daqui a três dias"}
+                    }
+                }
+                dayperiod{
+                    dn{"Período do dia"}
+                }
+                era{
+                    dn{"Era"}
+                }
+                hour{
+                    dn{"Hora"}
+                }
+                minute{
+                    dn{"Minuto"}
+                }
+                month{
+                    dn{"Mês"}
+                }
+                second{
+                    dn{"Segundo"}
+                }
+                week{
+                    dn{"Semana"}
+                }
+                weekday{
+                    dn{"Dia da semana"}
+                }
+                year{
+                    dn{"Ano"}
+                }
+                zone{
+                    dn{"Fuso"}
+                }
+            }
+            intervalFormats{
+                H{
+                    H{"HH'h' - HH'h'"}
+                    a{"HH'h' - HH'h'"}
+                }
+                Hm{
+                    H{"HH'h'mm - HH'h'mm"}
+                    a{"HH'h'mm - HH'h'mm"}
+                    m{"HH'h'mm - HH'h'mm"}
+                }
+                Hmv{
+                    H{"HH'h'mm - HH'h'mm v"}
+                    a{"HH'h'mm - HH'h'mm v"}
+                    m{"HH'h'mm - HH'h'mm v"}
+                }
+                Hv{
+                    H{"HH'h'mm - HH'h'mm v"}
+                    a{"HH'h'mm - HH'h'mm v"}
+                }
+                M{
+                    M{"M-M"}
+                }
+                MEd{
+                    M{"E, dd/MM - E, dd/MM"}
+                    d{"E, dd/MM - E, dd/MM"}
+                }
+                MMM{
+                    M{"MMM - MMM"}
+                }
+                MMMEd{
+                    M{"E, d 'de' MMM - E, d 'de' MMM"}
+                    d{"E, d - E, d 'de' MMM"}
+                }
+                MMMM{
+                    M{"LLLL - LLLL"}
+                }
+                MMMd{
+                    M{"d 'de' MMM - d 'de' MMM"}
+                    d{"d-d 'de' MMM"}
+                }
+                Md{
+                    M{"dd/MM - dd/MM"}
+                    d{"dd/MM - dd/MM"}
+                }
+                d{
+                    d{"d-d"}
+                }
+                fallback{"{0} - {1}"}
+                h{
+                    a{"h'h' a - h'h' a"}
+                    h{"h'h' - h'h' a"}
+                }
+                hm{
+                    a{"h'h'mm a - h'h'mm a"}
+                    h{"h'h'mm - h'h'mm a"}
+                    m{"h'h'mm - h'h'mm a"}
+                }
+                hmv{
+                    a{"h'h'mm a - h'h'mm a v"}
+                    h{"h'h'mm - h'h'mm a v"}
+                    m{"h'h'mm - h'h'mm a v"}
+                }
+                hv{
+                    a{"h'h'mm a - h'h'mm a v"}
+                    h{"h'h'mm - h'h'mm a v"}
+                }
+                y{
+                    y{"y - y"}
+                }
+                yM{
+                    M{"MM/yy - MM/yy"}
+                    y{"MM/yy - MM/yy"}
+                }
+                yMEd{
+                    M{"E, dd/MM/yy - E, dd/MM/yy"}
+                    d{"E, dd/MM/yy - E, dd/MM/yy"}
+                    y{"E, dd/MM/yy - E, dd/MM/yy"}
+                }
+                yMMM{
+                    M{"MMM-MMM 'de' y"}
+                    y{"MMM 'de' y - MMM 'de' y"}
+                }
+                yMMMEd{
+                    M{"E, d 'de' MMM - E, d 'de' MMM 'de' y"}
+                    d{"E, d - E, d 'de' MMM 'de' y"}
+                    y{"E, d 'de' MMM 'de' y - E, d 'de' MMM 'de' y"}
+                }
+                yMMMM{
+                    M{"MM – MM-yyyy"}
+                    y{"MM-yyyy – MM-yyyy"}
+                }
+                yMMMd{
+                    M{"d 'de' MMM - d 'de' MMM 'de' y"}
+                    d{"d-d 'de' MMM 'de' y"}
+                    y{"d 'de' MMM 'de' y - d 'de' MMM 'de' y"}
+                }
+                yMd{
+                    M{"dd/MM/yy - dd/MM/yy"}
+                    d{"dd/MM/yy - dd/MM/yy"}
+                    y{"dd/MM/yy - dd/MM/yy"}
+                }
+            }
+            monthNames{
+                format{
+                    abbreviated{
+                        "jan",
+                        "fev",
+                        "mar",
+                        "abr",
+                        "mai",
+                        "jun",
+                        "jul",
+                        "ago",
+                        "set",
+                        "out",
+                        "nov",
+                        "dez",
+                    }
+                    wide{
+                        "janeiro",
+                        "fevereiro",
+                        "março",
+                        "abril",
+                        "maio",
+                        "junho",
+                        "julho",
+                        "agosto",
+                        "setembro",
+                        "outubro",
+                        "novembro",
+                        "dezembro",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "J",
+                        "F",
+                        "M",
+                        "A",
+                        "M",
+                        "J",
+                        "J",
+                        "A",
+                        "S",
+                        "O",
+                        "N",
+                        "D",
+                    }
+                }
+            }
+            quarters{
+                format{
+                    abbreviated{
+                        "T1",
+                        "T2",
+                        "T3",
+                        "T4",
+                    }
+                    wide{
+                        "1º trimestre",
+                        "2º trimestre",
+                        "3º trimestre",
+                        "4º trimestre",
+                    }
+                }
+            }
+        }
+        japanese{
+            DateTimePatterns{
+                "HH'h'mm'min'ss's' zzzz",
+                "HH'h'mm'min'ss's' z",
+                "HH:mm:ss",
+                "HH:mm",
+                "EEEE, d MMMM y G",
+                "d 'de' MMMM 'de' y G",
+                "d MMM y G",
+                "d/M/yy",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+        }
+        roc{
+            eras{
+                abbreviated{
+                    "Antes de R.O.C.",
+                    "R.O.C.",
+                }
+            }
+        }
+    }
+    delimiters{
+        alternateQuotationEnd{"’"}
+        alternateQuotationStart{"‘"}
+        quotationEnd{"”"}
+        quotationStart{"“"}
+    }
+    listPattern{
+        standard{
+            2{"{0} e {1}"}
+            end{"{0} e {1}"}
+        }
+    }
+    measurementSystemNames{
+        US{"americano"}
+        metric{"métrico"}
+    }
+    units{
+        day{
+            one{"{0} dia"}
+            other{"{0} dias"}
+        }
+        hour{
+            one{"{0} hora"}
+            other{"{0} horas"}
+        }
+        minute{
+            one{"{0} minuto"}
+            other{"{0} minutos"}
+        }
+        month{
+            one{"{0} mês"}
+            other{"{0} meses"}
+        }
+        second{
+            one{"{0} segundo"}
+            other{"{0} segundos"}
+        }
+        week{
+            one{"{0} semana"}
+            other{"{0} semanas"}
+        }
+        year{
+            one{"{0} ano"}
+            other{"{0} anos"}
+        }
+    }
+    unitsShort{
+        day{
+            one{"{0} dia"}
+            other{"{0} dias"}
+        }
+        hour{
+            one{"{0} h"}
+            other{"{0} h"}
+        }
+        minute{
+            one{"{0} min"}
+            other{"{0} min"}
+        }
+        month{
+            one{"{0} m."}
+        }
+        second{
+            one{"{0} seg"}
+            other{"{0} seg"}
+        }
+        week{
+            one{"{0} sem."}
+            other{"{0} sem."}
+        }
+        year{
+            one{"{0} ano"}
+            other{"{0} anos"}
+        }
+    }
+}

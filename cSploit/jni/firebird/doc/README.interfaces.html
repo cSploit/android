@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice 4.0.1  (Unix)">
+	<META NAME="AUTHOR" CONTENT="alex ">
+	<META NAME="CREATED" CONTENT="20130531;10003100">
+	<META NAME="CHANGEDBY" CONTENT="Alex Peshkoff">
+	<META NAME="CHANGED" CONTENT="20131106;14262300">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { size: 8.5in 11in; margin: 0.79in }
+		P { margin-bottom: 0.08in }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>Interfaces and objects
+oriented API.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>Why did we decide to add a
+new API in Firebird 3? There was not single reason for it. May be the
+first one is limited to 16 bit size of very many integers (for
+example - message size, SQL operator length, portion of BLOB data) in
+existing API. This probably was enough when that API was introduced &ndash;
+but puts a lot of artificial limits today. The trivial way is to add
+new functions that support 32 bit variables. But this solution does
+not look beautiful because we obviously need to support old API too,
+i.e. have 2 sets of functions with same functionality but different
+integer sizes. To make such functions differ in 'plain C' API they
+should have different names, i.e. a lot of isc_some_thing() calls
+will have to have isc32_some_thing() (or fb32_some_thing()) pair.
+Such solution was used to support 64 bit performance counters but not
+because it's good and clear, we just could not suggest better one at
+that moment with at the same time great need in 64 bit counters.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>The second reason is not
+so clear from the first look but it's also important. It comes from
+old times when Firebird's predecessor did not support SQL &ndash;
+another language was used to manage databases (you may get an idea
+what it was reading QLI's help). Data was delivered between client
+and server using messages with format defined at request compilation
+time by BLR (binary language representation) of that request. But SQL
+operator does not contain description of message format and therefore
+decision was taken &ndash; surround each message with short BLR
+sequence (hard to call that program) describing it's format. For a
+reason they had decided to follow that rule too exactly &ndash; and
+each fetch of data from server now required sending BLR for it, i.e.
+formatting BLR was sent not only at SQL compile time. The reason for
+such strange at the first glance solution was presence of one more
+layer on top of that messages based API - familiar to you SQLDA
+(XSQLDA). Rather obvious that manually accompanying each SQL
+statement with BLR is not efficient programming style, therefore
+SQLDA was invented. But it encapsulates in same object both location
+of data and there format making it formally possible to change
+between fetch calls not only location but format too causing need in
+BLR in each message-based fetch call. And to finish with this &ndash;
+changing data format between fetches was broken at network layer in
+pre-Firebird times. </FONT>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>So what we have with calls
+processing data &ndash; hard to extend (adding something to it is far
+non-trivial task) and not very clear to use SQLDA, multilayer API
+moving data from layer top layer and wasting time for it and &hellip;
+big desire to fix that nonsense.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>There are a lot of other
+reasons to change API like enhancing status vector or optimizing
+dynamic library loading, but even mentioned two are enough to move to
+the new one. BTW, in README.providers you will find the information
+how interfaces help to use messages API easily and comfortably.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>When making any change in
+software it's always desired to avoid loose of performance. And it
+was performance issues that caused the choice of interfaces not
+compatible with COM. To describe them I need to say a few words about
+providers architecture of Firebird. The central part of it is YValve,
+which is aimed on dispatching API call to correct provider, including
+old providers that potentially have older interfaces than current
+one. That means that to make sure that provider really has some new
+API method we must (when using COM) call IUnknown method for each
+fetch call. Taken together with the fact that new API calls are
+sometimes added to optimize performance COM-based solution looks bad
+for future Firebird versions.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>Unlike COM, Firebird
+interfaces support multiple versions. Version of Firebird interface
+is defined in a rather native manner &ndash; it's a total number of
+virtual functions in interface. And version of interface may be
+upgraded! That does not mean that one gets full new functionality:
+certainly that's impossible. But after upgrade virtual table is
+expanded with function defined by the caller of interface upgrade,
+and that function can perform minimum reasonable action &ndash; for
+example in a case of providers return an error. This may seem a very
+poor kind of upgrade, but at first - this is exactly what will be
+done without upgrade after working with IUnknown and next &ndash;
+after checking error code one can try to use other methods to do what
+he wants. Certainly, not only error return may be done. Imagine that
+we added something like phone number to an interface, listing users
+from security database. When upgrading old interface it's OK to add a
+function returning empty string as a phone number to get reasonable
+behavior of old plugin.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>As an additional reason to
+use non-COM interfaces it's good to notice that use of reference
+counted interfaces in all cases is often an extra overhead. Some
+interfaces have by definition unlimited lifetime (like IMaster &ndash;
+main interfaces calling which functions one gets access to all the
+rest of Firebird API), others &ndash; API strictly defined by
+lifetime of parent interface, and for not multi-threaded things like
+IStatus it's better to have simpler way to destroy it, i.e. dispose()
+function.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT COLOR="#ff0000"><FONT SIZE=4>Careful!</FONT></FONT><FONT SIZE=4>
+An ability to upgrade interface version places one important limit on
+implementation of interfaces: it should not contain virtual functions
+(including virtual destructor) except those defined in interface
+definition. This is because interface upgrade process modifies table
+of virtual functions, and for successful upgrade, number of functions
+in interface implementation should exactly match one in its
+definition. Pointer to functions, missing in interface definition but
+added in its implementation, may be </FONT><FONT COLOR="#ff0000"><FONT SIZE=4>overwritten</FONT></FONT><FONT SIZE=4>
+with a pointer to function used to upgrade interface.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>Discussing in details all
+functions present in all interfaces is out of this document's scope.
+Here I describe only hierarchy of them in general. The base of it is
+IVersioned &ndash; interface that enables version upgrade. A lot of
+interfaces, that do not require additional lifetime control, are
+based directly on IVersioned. A sample is already mentioned IMaster
+and a number of callback interfaces which lifetime must match the
+lifetime of the object from which they may be used for callback.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>Two interfaces, dealing
+with lifetime control &ndash; IDisposable and IRefCounted. The last
+one is used specially active to create other interfaces &ndash;
+IPlugin is reference counted and a lot of other interfaces, used by
+plugins, are reference counted too including interfaces that describe
+database attachment, transaction and SQL statement.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>Each plugin has one and
+only one main interface IPlugin which <SPAN LANG="en">is responsible
+for basic plugin's functionality (a lot of plugins have only that
+interface, but this is not a requirement). </SPAN></FONT>
+</P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en" STYLE="margin-bottom: 0in"><FONT SIZE=4>To finish with
+general interfaces hierarchy is IProvider, a kind of 'main' plugin in
+Firebird API. IProvider is derived from IPlugin and implemented by
+any provider (i.e. if you want to write your own provider you must
+implement IProvider) and also implemented by YValve. It's
+implementation from YValve which is returned to the user when
+getDispatcher() function from master interface is called. IProvider
+contains functions making it possible to create an attachment to
+database (attach and create) or attach to services manager.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>Questions and answers.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en" STYLE="margin-bottom: 0in"><FONT SIZE=4>Q. We access new
+API using IMaster. But how to get access to IMaster itself?</FONT></P>
+<P LANG="en" STYLE="margin-bottom: 0in"><FONT SIZE=4>A. This is done
+using the only one new API function fb_get_master_interface(). It's
+exported by fbclient library.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+<P LANG="en" STYLE="margin-bottom: 0in"><FONT SIZE=4>Q. It's said in
+this document that COM-based interfaces are not used in order not to
+work with IUnknown methods and that this is done due to performance
+issues. But instead you have to upgrade interfaces. Why is it faster
+than using IUnknown?</FONT></P>
+<P LANG="en" STYLE="margin-bottom: 0in"><FONT SIZE=4>A. Upgrading
+interface certainly requires some job to do. In a case when version
+matches caller's requirements it's not too big &ndash; just check it,
+when real upgrade is needed more CPU cycles will be spent. The main
+difference with COM approach is that upgrade performed for interface
+only once, after it's creation, but IUnknown methods must be called
+each time we are going to call an interface with unknown version (or
+that version should be stored separately and later checked). For once
+upgraded Firebird interface there is absolutely no waste of time when
+performing calls to it during all it's lifetime.</FONT></P>
+<P STYLE="margin-bottom: 0in"><BR>
+</P>
+</BODY>
+</HTML>

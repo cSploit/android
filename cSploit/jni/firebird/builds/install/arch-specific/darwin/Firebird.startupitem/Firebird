@@ -1,0 +1,37 @@
+#!/bin/sh
+
+##
+# Firebird SQL Database Server
+##
+
+. /etc/rc.common
+
+StartService ()
+{
+    ConsoleMessage "Starting Firebird SQL Database server"
+    mkdir /tmp/firebird
+    chown firebird /tmp/firebird
+    chgrp firebird /tmp/firebird
+    chmod 0770 /tmp/firebird
+    /Library/Frameworks/Firebird.framework/Resources/bin/fbguard -daemon -forever
+}
+
+StopService ()
+{
+    ConsoleMessage "Stopping Firebird SQL Database server"
+    killall fbguard
+    killall fbserver
+    killall fb_smp_server
+    rm -fr /tmp/firebird
+}
+
+RestartService ()
+{
+    ConsoleMessage "Restarting Firebird SQL Database server"
+    killall fbguard
+    killall fbserver
+    killall fb_smp_server
+    /Library/Frameworks/Firebird.framework/Resources/bin/fbguard -daemon -forever
+}
+
+RunService "$1"

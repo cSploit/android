@@ -1,0 +1,24 @@
+#-------------------------------------------------------------------------------
+
+!SRCDIR=/usr/local/gcc/lib
+
+i pkginfo=pkginfolg
+#i preinstall=Preinstall
+#i postinstall=Postinstall
+#i postremove=Postremove
+i prototype=prototypelg
+
+!default 755 root root
+d none  /usr         ? ? ?
+d none  /usr/lib     ? ? ?
+
+d none @prefix@ ? ? ?
+d none @prefix@/lib ? ? ?
+
+f none @prefix@/lib/libstdc++.so.5.0.5=$SRCDIR/libstdc++.so.5.0.5  0755 root root
+f none @prefix@/lib/libgcc_s.so.1=$SRCDIR/libgcc_s.so.1  0755 root root
+
+s none @prefix@/lib/libstdc++.so.5=@prefix@/lib/libstdc++.so.5.0.5
+s none @prefix@/lib/libstdc++.so=@prefix@/lib/libstdc++.so.5
+s none @prefix@/lib/libgcc_s.so=@prefix@/lib/libgcc_s.so.1
+# EOF

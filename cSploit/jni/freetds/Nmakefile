@@ -1,0 +1,430 @@
+# $Id: Nmakefile,v 1.14 2011-07-07 07:24:22 freddy77 Exp $
+# Build FreeTDS and assorted utilities for Win32/Win64 without an IDE. 
+# Makefiles, unlike Visual Studio project files, are stable over time.  
+# Contributed to the public domain by James K. Lowden, February 2009
+
+# Define in the environment or on the command line:
+# 1. CONFIGURATION = debug/release
+# 2. PLATFORM = win32/x64
+# These will determine what is built and where outputs are placed. 
+#
+# Example invocations:
+#	nmake.exe -f Nmakefile -nologo PLATFORM=win32 CONFIGURATION=debug
+#	nmake.exe -f Nmakefile -nologo build-win32d
+#	
+
+!IFNDEF PLATFORM
+PLATFORM = Win32
+!ENDIF
+!IFNDEF CONFIGURATION
+CONFIGURATION = Debug
+!ENDIF
+
+MKDIR = MD
+MV = move /Y
+
+DBLIB_DIR        = src\dblib
+CTLIB_DIR        = src\ctlib
+REPLACEMENTS_DIR = src\replacements
+TDS_DIR          = src\tds
+APPS_DIR         = src\apps
+
+DBLIB_OUT        = $(DBLIB_DIR)\$(PLATFORM)\$(CONFIGURATION)
+CTLIB_OUT        = $(CTLIB_DIR)\$(PLATFORM)\$(CONFIGURATION)
+REPLACEMENTS_OUT = $(REPLACEMENTS_DIR)\$(PLATFORM)\$(CONFIGURATION)
+TDS_OUT          = $(TDS_DIR)\$(PLATFORM)\$(CONFIGURATION)
+APPS_OUT         = $(APPS_DIR)\$(PLATFORM)\$(CONFIGURATION)
+
+DBLIB_SRC = 	$(DBLIB_DIR)\bcp.c \
+		$(DBLIB_DIR)\dblib.c \
+		$(DBLIB_DIR)\dbopen.c \
+		$(DBLIB_DIR)\dbutil.c \
+		$(DBLIB_DIR)\rpc.c \
+		$(DBLIB_DIR)\xact.c 
+
+DBLIB_OBJ = 	$(DBLIB_OUT)\bcp.obj \
+		$(DBLIB_OUT)\dblib.obj \
+		$(DBLIB_OUT)\dbopen.obj \
+		$(DBLIB_OUT)\dbutil.obj \
+		$(DBLIB_OUT)\rpc.obj \
+		$(DBLIB_OUT)\xact.obj 
+
+CTLIB_SRC =	$(CTLIB_DIR)\blk.c \
+		$(CTLIB_DIR)\cs.c \
+		$(CTLIB_DIR)\ct.c \
+		$(CTLIB_DIR)\ctutil.c
+
+CTLIB_OBJ =	$(CTLIB_OUT)\blk.obj \
+		$(CTLIB_OUT)\cs.obj \
+		$(CTLIB_OUT)\ct.obj \
+		$(CTLIB_OUT)\ctutil.obj
+
+REPLACEMENTS_SRC =	$(REPLACEMENTS_DIR)\asprintf.c \
+			$(REPLACEMENTS_DIR)\basename.c \
+			$(REPLACEMENTS_DIR)\fakepoll.c \
+			$(REPLACEMENTS_DIR)\gettimeofday.c \
+			$(REPLACEMENTS_DIR)\getopt.c \
+			$(REPLACEMENTS_DIR)\iconv.c \
+			$(REPLACEMENTS_DIR)\readpassphrase.c \
+			$(REPLACEMENTS_DIR)\strlcat.c \
+			$(REPLACEMENTS_DIR)\strlcpy.c \
+			$(REPLACEMENTS_DIR)\strtok_r.c \
+			$(REPLACEMENTS_DIR)\vasprintf.c \
+			$(REPLACEMENTS_DIR)\win_mutex.c
+
+REPLACEMENTS_OBJ =	$(REPLACEMENTS_OUT)\asprintf.obj \
+			$(REPLACEMENTS_OUT)\basename.obj \
+			$(REPLACEMENTS_OUT)\fakepoll.obj \
+			$(REPLACEMENTS_OUT)\gettimeofday.obj \
+			$(REPLACEMENTS_OUT)\getopt.obj \
+			$(REPLACEMENTS_OUT)\iconv.obj \
+			$(REPLACEMENTS_OUT)\readpassphrase.obj \
+			$(REPLACEMENTS_OUT)\strlcat.obj \
+			$(REPLACEMENTS_OUT)\strlcpy.obj \
+			$(REPLACEMENTS_OUT)\strtok_r.obj \
+			$(REPLACEMENTS_OUT)\vasprintf.obj \
+			$(REPLACEMENTS_OUT)\win_mutex.obj
+
+TDS_SRC =	$(TDS_DIR)\bulk.c \
+		$(TDS_DIR)\challenge.c \
+		$(TDS_DIR)\config.c \
+		$(TDS_DIR)\convert.c \
+		$(TDS_DIR)\data.c \
+		$(TDS_DIR)\des.c \
+		$(TDS_DIR)\getmac.c \
+		$(TDS_DIR)\gssapi.c \
+		$(TDS_DIR)\hmac_md5.c \
+		$(TDS_DIR)\iconv.c \
+		$(TDS_DIR)\locale.c \
+		$(TDS_DIR)\log.c \
+		$(TDS_DIR)\login.c \
+		$(TDS_DIR)\md4.c \
+		$(TDS_DIR)\md5.c \
+		$(TDS_DIR)\mem.c \
+		$(TDS_DIR)\net.c \
+		$(TDS_DIR)\numeric.c \
+		$(TDS_DIR)\query.c \
+		$(TDS_DIR)\read.c \
+		$(TDS_DIR)\sspi.c \
+		$(TDS_DIR)\stream.c \
+		$(TDS_DIR)\tds_checks.c \
+		$(TDS_DIR)\tdsstring.c \
+		$(TDS_DIR)\threadsafe.c \
+		$(TDS_DIR)\token.c \
+		$(TDS_DIR)\util.c \
+		$(TDS_DIR)\vstrbuild.c \
+		$(TDS_DIR)\write.c 
+
+TDS_OBJ =	$(TDS_OUT)\bulk.obj \
+		$(TDS_OUT)\challenge.obj \
+		$(TDS_OUT)\config.obj \
+		$(TDS_OUT)\convert.obj \
+		$(TDS_OUT)\data.obj \
+		$(TDS_OUT)\des.obj \
+		$(TDS_OUT)\getmac.obj \
+		$(TDS_OUT)\gssapi.obj \
+		$(TDS_OUT)\hmac_md5.obj \
+		$(TDS_OUT)\iconv.obj \
+		$(TDS_OUT)\locale.obj \
+		$(TDS_OUT)\log.obj \
+		$(TDS_OUT)\login.obj \
+		$(TDS_OUT)\md4.obj \
+		$(TDS_OUT)\md5.obj \
+		$(TDS_OUT)\mem.obj \
+		$(TDS_OUT)\net.obj \
+		$(TDS_OUT)\numeric.obj \
+		$(TDS_OUT)\query.obj \
+		$(TDS_OUT)\read.obj \
+		$(TDS_OUT)\sspi.obj \
+		$(TDS_OUT)\stream.obj \
+		$(TDS_OUT)\tds_checks.obj \
+		$(TDS_OUT)\tdsstring.obj \
+		$(TDS_OUT)\threadsafe.obj \
+		$(TDS_OUT)\token.obj \
+		$(TDS_OUT)\util.obj \
+		$(TDS_OUT)\vstrbuild.obj \
+		$(TDS_OUT)\write.obj 
+
+# not yet:	$(APPS_DIR)\bsqlodbc.c 
+
+APPS_SRC =	$(APPS_DIR)\bsqldb.c \
+		$(APPS_DIR)\datacopy.c \
+		$(APPS_DIR)\defncopy.c \
+		$(APPS_DIR)\freebcp.c \
+		$(APPS_DIR)\tsql.c 
+
+APPS_OBJ =	$(APPS_OUT)\bsqldb.obj \
+		$(APPS_OUT)\datacopy.obj \
+		$(APPS_OUT)\defncopy.obj \
+		$(APPS_OUT)\freebcp.obj \
+		$(APPS_OUT)\tsql.obj 
+
+APPS_EXE =	$(APPS_OUT)\bsqldb.exe \
+		$(APPS_OUT)\datacopy.exe \
+		$(APPS_OUT)\defncopy.exe \
+		$(APPS_OUT)\freebcp.exe \
+		$(APPS_OUT)\tsql.exe 
+
+db-lib: $(DBLIB_OUT)\db-lib.lib 
+libct: $(CTLIB_OUT)\libct.lib
+apps: $(DBLIB_OUT)\db-lib.lib $(APPS_EXE)
+tsql: $(APPS_OUT)\tsql.exe 
+bsqldb: $(APPS_OUT)\bsqldb.exe
+help:
+	@echo targets: db-lib, apps, tsql, bsqldb
+
+##(APPS_OUT)\bsqldb.exe: $(APPS_DIR)\bsqldb.exe $(DBLIB_OUT)\db-lib.lib
+# Don't know how to create this dependency without explicitly defining every output. 
+
+#
+# Sadly the environment settings for building for different architectures
+# is undocumented.  Microsoft's directions are to run the requisite 
+# batch file without explaining what it does.  While it's possible to 
+# read the file -- and it's not complicated -- it's impossible to 
+# know the purpose of setting PATH/INCLUDE/LIB just so.  Worse, the 
+# settings are per-machine, and if the file is lost, the only way to 
+# recreate it is to reinstall the compiler.  
+#
+# The "solution" is to follow their advice.  Run vcvarsall.bat with the 
+# appropriate argument to set up the environment, and go from there.  
+#
+# As of this writing, the variables are:
+# x86 Native: Vcvarsall "x86" 
+# x64 Native: Vcvarsall "amd64"
+# x64 Cross:  Vcvarsall "x86_amd64"
+#
+
+# Check that cl.exe is in the PATH.  Cf. "help FOR" to see how this works.  
+# See above comments regarding environment setup.  
+#
+COMPILER = cl.exe
+!IF 0 != [for /f %I in ("$(COMPILER)") DO @dir /b "%~dp$$PATH:I\$(COMPILER)" > NUL:]
+!MESSAGE cl.exe not in PATH
+!ERROR Perhaps run vcvarsall.bat to set up the command-line development environment?
+!ENDIF
+
+all: build-win32d build-win32r build-win64d build-win64r
+
+build-win32d: 
+	$(MAKE) -fNmakefile -nologo apps PLATFORM=win32 CONFIGURATION=debug
+build-win32r: 
+	$(MAKE) -fNmakefile -nologo apps PLATFORM=win32 CONFIGURATION=release
+build-win64d: 
+	$(MAKE) -fNmakefile -nologo apps PLATFORM=win64 CONFIGURATION=debug
+build-win64r: 
+	$(MAKE) -fNmakefile -nologo apps PLATFORM=win64 CONFIGURATION=release
+
+clean:
+	@if "" equ "$(PLATFORM)" 	PLATFORM not defined, see comments in Nmakefile >&2 && exit 1
+	@if "" equ "$(CONFIGURATION)" 	CONFIGURATION not defined, see comments in Nmakefile >&2 && exit 1
+	if exist $(DBLIB_OUT) 		del /q $(DBLIB_OUT)\*.obj  $(DBLIB_OUT)\*.lib 
+	if exist $(CTLIB_OUT)		del /q $(CTLIB_OUT)\*.obj  $(CTLIB_OUT)\*.lib
+	if exist $(REPLACEMENTS_OUT) 	del /q $(REPLACEMENTS_OUT)\*.obj $(REPLACEMENTS_OUT)\*.lib
+	if exist $(TDS_OUT) 		del /q $(TDS_OUT)\*.obj $(TDS_OUT)\*.lib
+	if exist $(APPS_OUT) 		del /q $(APPS_OUT)\*.obj $(APPS_OUT)\*.exe
+
+clean-app:
+	@if "" equ "$(PLATFORM)" 	PLATFORM not defined, see comments in Nmakefile >&2 && exit 1
+	@if "" equ "$(CONFIGURATION)" 	CONFIGURATION not defined, see comments in Nmakefile >&2 && exit 1
+	if exist $(APPS_OUT) 		del /q $(APPS_OUT)\*.obj $(APPS_OUT)\*.exe
+
+# Create output directories
+$(DBLIB_OUT) $(CTLIB_OUT) $(REPLACEMENTS_OUT) $(TDS_OUT) $(APPS_OUT):
+	@echo creating output directory for configuration: "$(PLATFORM)|$(CONFIGURATION)"
+	@if "" equ "$(PLATFORM)" 	PLATFORM not defined, see comments in Nmakefile >&2 && exit 1
+	@if "" equ "$(CONFIGURATION)" 	CONFIGURATION not defined, see comments in Nmakefile >&2 && exit 1
+	$(MKDIR) $@
+
+#
+# Some header files are generated with Perl for consistency.  
+# The Perl scripts are maintained in CVS, and someone developing 
+# with CVS needs Perl to build FreeTDS.  
+#
+# To avoid any dependency on Perl for everyone else, the 
+# distribution tarball contains the pre-generated files.  
+#
+# The preprocessing test below checks for the existence of a CVS 
+# directory, which wouldn't be present in a freshly unpacked tarball.  
+# If it finds one, it enables the code to generate the header files. 
+#
+
+!IF 0 == [dir /b /ad CVS 2>NUL:]
+#
+# Generate distributed header files
+#
+include\freetds\version.h:
+	perl -e"@a=localtime; printf qq(#undef  TDS_VERSION_NO\n#define TDS_VERSION_NO \"freetds v0.83.dev.%d%02d%02d\"\n), 1900+$$a[5], 1+$$a[-1], $$a[3]" \
+	> $@.err 
+	move /Y $@.err $@
+
+src\tds\tds_types.h:
+	perl src\tds\types.pl misc\types.csv > $@.err
+	move /Y $@.err $@
+
+src\tds\tds_willconvert.h: src\tds\tds_willconvert.pl
+	perl src\tds\tds_willconvert.pl > $@.tmp
+	$(MV) $@.tmp $@
+
+src\tds\encodings.h: src\tds\encodings.pl src\tds\alternative_character_sets.h
+	perl src\tds\encodings.pl src\tds > $@.tmp 2> NUL:
+	$(MV) $@.tmp $@
+
+src\tds\num_limits.h: src\tds\num_limits.pl
+	perl src\tds\num_limits.pl > $@.tmp
+	$(MV) $@.tmp $@
+!ENDIF
+
+GENERATED_FILES = include\freetds\version.h src\tds\tds_types.h \
+	src\tds\tds_willconvert.h src\tds\encodings.h src\tds\num_limits.h
+$(CTLIB_OUT)\libct.lib: $(GENERATED_FILES) $(CTLIB_OUT) $(CTLIB_OBJ) $(REPLACEMENTS_OUT)\replacements.lib $(TDS_OUT)\tds.lib
+	@echo building $@ >&2
+	lib -nologo -out:"$@"	$(CTLIB_OBJ) \
+				$(REPLACEMENTS_OUT)\replacements.lib \
+				$(TDS_OUT)\tds.lib
+$(DBLIB_OUT)\db-lib.lib: $(GENERATED_FILES) $(DBLIB_OUT) $(DBLIB_OBJ) $(REPLACEMENTS_OUT)\replacements.lib $(TDS_OUT)\tds.lib
+	@echo building $@ >&2
+	lib -nologo -out:"$@" 	$(DBLIB_OBJ) \
+				$(REPLACEMENTS_OUT)\replacements.lib \
+				$(TDS_OUT)\tds.lib
+$(REPLACEMENTS_OUT)\replacements.lib: $(REPLACEMENTS_OUT) $(REPLACEMENTS_OBJ)
+	lib -nologo -out:"$@" $(REPLACEMENTS_OBJ) 
+$(TDS_OUT)\tds.lib: $(TDS_OUT) $(TDS_OBJ)
+	lib -nologo -out:"$@" $(TDS_OBJ) 
+
+#
+# set compiler flags
+#
+INC = 	-I "include" -I "win32" -I "include\x64" 
+FLG = 	-nologo	-W3 -Wp64 -EHsc -TC -Gm  -errorReport:prompt 
+DEF = 	-D "_MBCS" -D "_LIB" -D "WIN32" \
+	-D MSDBLIB \
+	-D "_CRT_SECURE_NO_WARNINGS" -D _CRT_NONSTDC_NO_DEPRECATE
+DBG = -MTd -Od -D "_DEBUG"  -ZI -RTC1	
+REL = -MT  -O2 -D "_NDEBUG" -Zi
+
+MSLIBS = Ws2_32.lib shell32.lib	
+
+CC = cl $(CFLAGS) $(FLG) $(DEF) $(INC)
+CC32 = $(CC)
+CC64 = $(CC)
+
+## Rules ##
+
+#
+# dblib
+#
+#c.{$(DBLIB_DIR)\win32\debug}.obj::
+{$(DBLIB_DIR)}.c{$(DBLIB_DIR)\win32\debug}.obj::
+	$(CC32) -c $(DBG) 	-Fo"$(DBLIB_OUT)\\" \
+				-Fd"$(DBLIB_OUT)\vc80.pdb" \
+	$<
+
+{$(DBLIB_DIR)\}.c{$(DBLIB_DIR)\win32\release}.obj::
+	$(CC32) -c $(REL) 	-Fo"$(DBLIB_OUT)\\" \
+				-Fd"$(DBLIB_OUT)\vc80.pdb" \
+	$<
+
+{$(DBLIB_DIR)}.c{$(DBLIB_DIR)\x64\debug}.obj::
+	$(CC64) -c $(DBG) 	-Fo"$(DBLIB_OUT)\\" \
+				-Fd"$(DBLIB_OUT)\vc80.pdb" \
+	$<
+
+{$(DBLIB_DIR)}.c{$(DBLIB_DIR)\x64\release}.obj::
+	$(CC64) -c $(REL) 	-Fo"$(DBLIB_OUT)\\" \
+				-Fd"$(DBLIB_OUT)\vc80.pdb" \
+	$<
+
+#
+# ctlib
+#
+{$(CTLIB_DIR)\}.c{$(CTLIB_DIR)\win32\debug}.obj::
+	$(CC32) -c $(DBG)	-Fo"$(CTLIB_OUT)\\" \
+				-Fd"$(CTLIB_OUT)\vc80.pdb" \
+	$<
+
+{$(CTLIB_DIR)\}.c{$(CTLIB_DIR)\win32\release}.obj::
+	$(CC32) -c $(REL)	-Fo"$(CTLIB_OUT)\\" \
+				-Fd"$(CTLIB_OUT)\vc80.pdb" \
+	$<
+
+{$(CTLIB_DIR)\}.c{$(CTLIB_DIR)\x64\debug}.obj::
+	$(CC64) -c $(DBG)	-Fo"$(CTLIB_OUT)\\" \
+				-Fd"$(CTLIB_OUT)\vc80.pdb" \
+	$<
+
+{$(CTLIB_DIR)\}.c{$(CTLIB_DIR)\x64\release}.obj::
+	$(CC64) -c $(REL)	-Fo"$(CTLIB_OUT)\\" \
+				-Fd"$(CTLIB_OUT)\vc80.pdb" \
+	$<
+
+#
+# replacements
+#
+{$(REPLACEMENTS_DIR)}.c{$(REPLACEMENTS_DIR)\win32\debug}.obj::
+	$(CC32) -c $(DBG) 	-Fo"$(REPLACEMENTS_OUT)\\" \
+				-Fd"$(REPLACEMENTS_OUT)\vc80.pdb" \
+	$<
+
+{$(REPLACEMENTS_DIR)}.c{$(REPLACEMENTS_DIR)\win32\release}.obj::
+	$(CC32) -c $(REL) 	-Fo"$(REPLACEMENTS_OUT)\\" \
+				-Fd"$(REPLACEMENTS_OUT)\vc80.pdb" \
+	$<
+
+{$(REPLACEMENTS_DIR)}.c{$(REPLACEMENTS_DIR)\x64\debug}.obj::
+	$(CC64) -c $(DBG) 	-Fo"$(REPLACEMENTS_OUT)\\" \
+			-Fd"$(REPLACEMENTS_OUT)\vc80.pdb" \
+	$<		
+
+{$(REPLACEMENTS_DIR)}.c{$(REPLACEMENTS_DIR)\x64\release}.obj::
+	$(CC64) -c $(REL) 	-Fo"$(REPLACEMENTS_OUT)\\" \
+				-Fd"$(REPLACEMENTS_OUT)\vc80.pdb" \
+	$<
+
+#
+# tds
+#
+{$(TDS_DIR)}.c{$(TDS_DIR)\win32\debug}.obj::
+	$(CC32) -c $(DBG) 	-Fo"$(TDS_OUT)\\" \
+				-Fd"$(TDS_OUT)\vc80.pdb" \
+	$<
+
+{$(TDS_DIR)}.c{$(TDS_DIR)\win32\release}.obj::
+	$(CC32) -c $(REL) 	-Fo"$(TDS_OUT)\\" \
+				-Fd"$(TDS_OUT)\vc80.pdb" \
+	$<
+
+{$(TDS_DIR)}.c{$(TDS_DIR)\x64\debug}.obj::
+	$(CC64) -c $(DBG) 	-Fo"$(TDS_OUT)\\" \
+				-Fd"$(TDS_OUT)\vc80.pdb" \
+	$<
+
+{$(TDS_DIR)}.c{$(TDS_DIR)\x64\release}.obj::
+	$(CC64) -c $(REL) 	-Fo"$(TDS_OUT)\\" \
+				-Fd"$(TDS_OUT)\vc80.pdb" \
+	$<
+
+#
+# Utilities
+#
+$(APPS_EXE): $(DBLIB_OUT)\db-lib.lib
+
+{$(APPS_DIR)}.c{$(APPS_DIR)\win32\debug}.exe:
+	@if not exist $(APPS_OUT) $(MKDIR) $(APPS_OUT)
+	$(CC32) $(DBG) 	-Fd"$(APPS_OUT)\vc80.pdb" -Fe$@ \
+	$< -link -LIBPATH:$(DBLIB_OUT) db-lib.lib $(MSLIBS)
+	
+{$(APPS_DIR)\}.c{$(APPS_DIR)\win32\release}.exe:
+	@if not exist $(APPS_OUT) $(MKDIR) $(APPS_OUT)
+	$(CC32) $(REL) -Fe$@ -Fd"$(APPS_OUT)\vc80.pdb" \
+	$< -link -LIBPATH:$(DBLIB_OUT) db-lib.lib $(MSLIBS)
+
+{$(APPS_DIR)}.c{$(APPS_DIR)\x64\debug}.exe:
+	@if not exist $(APPS_OUT) $(MKDIR) $(APPS_OUT)
+	$(CC64) $(DBG) -Fe$@ -Fd"$(APPS_OUT)\vc80.pdb" \
+	$< -link -LIBPATH:$(DBLIB_OUT) db-lib.lib $(MSLIBS)
+
+{$(APPS_DIR)}.c{$(APPS_DIR)\x64\release}.exe:
+	@if not exist $(APPS_OUT) $(MKDIR) $(APPS_OUT)
+	$(CC64) $(REL) -Fe$@ -Fd"$(APPS_OUT)\vc80.pdb" \
+	$< -link -LIBPATH:$(DBLIB_OUT) db-lib.lib $(MSLIBS)
+

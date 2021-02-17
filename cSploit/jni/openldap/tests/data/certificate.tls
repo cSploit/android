@@ -1,0 +1,240 @@
+# (userCertificate;binary=*)
+dn: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+objectClass: OpenLDAPperson
+objectClass: strongAuthenticationUser
+cn: Jennifer Smith
+cn: Jen Smith
+sn: Smith
+uid: jen
+postalAddress: Alumni Association $ 111 Maple St $ Anytown, MI 48109
+seeAlso: cn=All Staff,ou=Groups,dc=example,dc=com
+drink: Sam Adams
+homePostalAddress: 1000 Maple #44 $ Anytown, MI 48103
+title: Telemarketer, UM Alumni Association
+mail: jen@mail.alumni.example.com
+homePhone: +1 313 555 2333
+pager: +1 313 555 6442
+facsimileTelephoneNumber: +1 313 555 2756
+telephoneNumber: +1 313 555 8232
+userCertificate;binary:: MIIDjDCCAvWgAwIBAgIBAzANBgkqhkiG9w0BAQQFADB3MQswCQYDV
+ QQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTH
+ RkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5jb20wHhc
+ NMDMxMDE3MTYzNTM1WhcNMDQxMDE2MTYzNTM1WjCBnjELMAkGA1UEBhMCVVMxETAPBgNVBAgTCE1p
+ Y2hpZ2FuMR8wHQYDVQQKExZPcGVuTERBUCBFeGFtcGxlLCBMdGQuMRswGQYDVQQLExJBbHVtbmkgQ
+ XNzb2ljYXRpb24xEjAQBgNVBAMTCUplbiBTbWl0aDEqMCgGCSqGSIb3DQEJARYbamVuQG1haWwuYW
+ x1bW5pLmV4YW1wbGUuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDpnXWAL0VkROGO1Rg
+ 8J3u6F4F7yMqQCbUMsV9rxQisYj45+pmqiHV5urogvT4MGD6eLNFZKBn+0KRni++uu7gbartzpmBa
+ HOlzRII9ZdVMFfrT2xYNgAlkne6pb6IZIN9UONuH/httENCDJ5WEpjZ48D1Lrml/HYO/W+SAMkpEq
+ QIDAQABo4H/MIH8MAkGA1UdEwQCMAAwLAYJYIZIAYb4QgENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIE
+ NlcnRpZmljYXRlMB0GA1UdDgQWBBTB2saht/od/nis76b9m+pjxfhSPjCBoQYDVR0jBIGZMIGWgBR
+ LbyEaNiTSkPlDsFNHLX3hwOaYI6F7pHkwdzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3Ju
+ aWExHzAdBgNVBAoTFk9wZW5MREFQIEV4YW1wbGUsIEx0ZC4xEzARBgNVBAMTCkV4YW1wbGUgQ0ExH
+ TAbBgkqhkiG9w0BCQEWDmNhQGV4YW1wbGUuY29tggEAMA0GCSqGSIb3DQEBBAUAA4GBAIoGPc/AS0
+ cNkMRDNoMIzcFdF9lONMduKBiSuFvv+x8nCek+LUdXxF59V2NPKh2V5gFh5xbAchyv6FVBnpVtPdB
+ 5akCr5tdFQhuBLUXXDk/tTHGpIWt7OAjEmpuMzsz3GUB8Zf9rioHOs1DMw+GpzWdnFITxXhAqEDc3
+ quqPrpxZ
+
+dn: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+objectClass: OpenLDAPperson
+objectClass: strongAuthenticationUser
+cn: Ursula Hampster
+sn: Hampster
+uid: uham
+title: Secretary, UM Alumni Association
+postalAddress: Alumni Association $ 111 Maple St $ Anytown, MI 48109
+seeAlso: cn=All Staff,ou=Groups,dc=example,dc=com
+homePostalAddress: 123 Anystreet $ Anytown, MI 48104
+mail: uham@mail.alumni.example.com
+homePhone: +1 313 555 8421
+pager: +1 313 555 2844
+facsimileTelephoneNumber: +1 313 555 9700
+telephoneNumber: +1 313 555 5331
+userCertificate;binary:: MIIDazCCAtSgAwIBAgIBAjANBgkqhkiG9w0BAQQFADB3MQswCQYDV
+ QQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTH
+ RkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5jb20wHhc
+ NMDMxMDE3MTYzMzE5WhcNMDQxMDE2MTYzMzE5WjB+MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2Fs
+ aWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTHRkLjEYMBYGA1UEAxMPVXJzdWxhI
+ EhhbXBzdGVyMR8wHQYJKoZIhvcNAQkBFhB1aGFtQGV4YW1wbGUuY29tMIGfMA0GCSqGSIb3DQEBAQ
+ UAA4GNADCBiQKBgQDuxgp5ELV9LmhxWMpV7qc4028QQT3+zzFDXhruuXE7ji2n3S3ea8bOwDtJh+q
+ nsDe561DhHHHlgIjMKCiDEizYMpxvJPYEXmvp0huRkMgpKZgmel95BSkt6TYmJ0erS3aoimOHLEFi
+ mmnTLolNRMiWqNBvqwobx940PGwUWEePKQIDAQABo4H/MIH8MAkGA1UdEwQCMAAwLAYJYIZIAYb4Q
+ gENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1UdDgQWBBSjI94TbBmuDEeUUO
+ iC37EK0Uf0XjCBoQYDVR0jBIGZMIGWgBRLbyEaNiTSkPlDsFNHLX3hwOaYI6F7pHkwdzELMAkGA1U
+ EBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExHzAdBgNVBAoTFk9wZW5MREFQIEV4YW1wbGUsIEx0
+ ZC4xEzARBgNVBAMTCkV4YW1wbGUgQ0ExHTAbBgkqhkiG9w0BCQEWDmNhQGV4YW1wbGUuY29tggEAM
+ A0GCSqGSIb3DQEBBAUAA4GBAIgUcARb3OlWYNbmr1nmqESuxLn16uqI1Ot6WkcICvpkdQ+Bo+R9AP
+ 05xpoXocZtKdNvBu3FNxB/jFkiOcLU2lX7Px1Ijnsjh60qVRy9HOsHCungIKlGcnXLKHmKu0y//5j
+ ds/HnaJsGcHI5JRG7CBJbW+wrwge3trJ1xHJI8prN
+
+# (cAcertificate=*)
+dn: dc=example,dc=com
+objectClass: top
+objectClass: organization
+objectClass: domainRelatedObject
+objectClass: dcObject
+objectClass: extensibleObject
+dc: example
+l: Anytown, Michigan
+st: Michigan
+o: Example, Inc.
+o: EX
+o: Ex.
+description: The Example, Inc. at Anytown
+postalAddress: Example, Inc. $ 535 W. William St. $ Anytown, MI 48109 $ US
+telephoneNumber: +1 313 555 1817
+associatedDomain: example.com
+cACertificate;binary:: MIIDVDCCAr2gAwIBAgIBADANBgkqhkiG9w0BAQQFADB3MQswCQYDVQQ
+ GEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTHRk
+ LjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5jb20wHhcNM
+ DMxMDE3MTYzMDQxWhcNMDQxMDE2MTYzMDQxWjB3MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2FsaW
+ Zvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTHRkLjETMBEGA1UEAxMKRXhhbXBsZSB
+ DQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5jb20wgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJ
+ AoGBANljUGxiisAzEiALukzt3Gj/24MRw1J0AZx6GncXLhpNJsAFyA0bYZdAzgvydKeq/uX0i5o/4
+ Byc3G71XAAcbJZxDPtrLwpDAdMNOBvKV2r67yTgnpatFLfGRt/FWazj5EbFYkorWWTe+4eEBd9VPz
+ ebHdIm+DPHipUfIAzRoNejAgMBAAGjge8wgewwHQYDVR0OBBYEFEtvIRo2JNKQ+UOwU0ctfeHA5pg
+ jMIGhBgNVHSMEgZkwgZaAFEtvIRo2JNKQ+UOwU0ctfeHA5pgjoXukeTB3MQswCQYDVQQGEwJVUzET
+ MBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTHRkLjETMBEGA
+ 1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5jb22CAQAwDAYDVR0TBA
+ UwAwEB/zAZBgNVHREEEjAQgQ5jYUBleGFtcGxlLmNvbTANBgkqhkiG9w0BAQQFAAOBgQCgXD/+28E
+ l3GXi/uxMNEKqtnIhQdTnNU4il0fZ6pcmHPFC+61Bddow90ZZZh5Gbg5ZBxFRhDXN8K/fix3ewRSj
+ ASt40dGlEODkE+FsLMt04sYl6kX7RGKg9a46DkeG+uzZnN/3252uCgh+rjNMFAglueUTERv3EtUB1
+ iXEoU3GyA==
+
+# (userCertificate=2$EMAIL=ca@example.com,CN=Example CA,O=Openldap Example\5C, Ltd.,ST=California,C=US)
+dn: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+objectClass: OpenLDAPperson
+objectClass: strongAuthenticationUser
+cn: Ursula Hampster
+sn: Hampster
+uid: uham
+title: Secretary, UM Alumni Association
+postalAddress: Alumni Association $ 111 Maple St $ Anytown, MI 48109
+seeAlso: cn=All Staff,ou=Groups,dc=example,dc=com
+homePostalAddress: 123 Anystreet $ Anytown, MI 48104
+mail: uham@mail.alumni.example.com
+homePhone: +1 313 555 8421
+pager: +1 313 555 2844
+facsimileTelephoneNumber: +1 313 555 9700
+telephoneNumber: +1 313 555 5331
+userCertificate;binary:: MIIDazCCAtSgAwIBAgIBAjANBgkqhkiG9w0BAQQFADB3MQswCQYDV
+ QQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTH
+ RkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5jb20wHhc
+ NMDMxMDE3MTYzMzE5WhcNMDQxMDE2MTYzMzE5WjB+MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2Fs
+ aWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTHRkLjEYMBYGA1UEAxMPVXJzdWxhI
+ EhhbXBzdGVyMR8wHQYJKoZIhvcNAQkBFhB1aGFtQGV4YW1wbGUuY29tMIGfMA0GCSqGSIb3DQEBAQ
+ UAA4GNADCBiQKBgQDuxgp5ELV9LmhxWMpV7qc4028QQT3+zzFDXhruuXE7ji2n3S3ea8bOwDtJh+q
+ nsDe561DhHHHlgIjMKCiDEizYMpxvJPYEXmvp0huRkMgpKZgmel95BSkt6TYmJ0erS3aoimOHLEFi
+ mmnTLolNRMiWqNBvqwobx940PGwUWEePKQIDAQABo4H/MIH8MAkGA1UdEwQCMAAwLAYJYIZIAYb4Q
+ gENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1UdDgQWBBSjI94TbBmuDEeUUO
+ iC37EK0Uf0XjCBoQYDVR0jBIGZMIGWgBRLbyEaNiTSkPlDsFNHLX3hwOaYI6F7pHkwdzELMAkGA1U
+ EBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExHzAdBgNVBAoTFk9wZW5MREFQIEV4YW1wbGUsIEx0
+ ZC4xEzARBgNVBAMTCkV4YW1wbGUgQ0ExHTAbBgkqhkiG9w0BCQEWDmNhQGV4YW1wbGUuY29tggEAM
+ A0GCSqGSIb3DQEBBAUAA4GBAIgUcARb3OlWYNbmr1nmqESuxLn16uqI1Ot6WkcICvpkdQ+Bo+R9AP
+ 05xpoXocZtKdNvBu3FNxB/jFkiOcLU2lX7Px1Ijnsjh60qVRy9HOsHCungIKlGcnXLKHmKu0y//5j
+ ds/HnaJsGcHI5JRG7CBJbW+wrwge3trJ1xHJI8prN
+
+# (userCertificate={ serialNumber 2, issuer "EMAIL=ca@example.com,CN=Example CA,O=Openldap Example\5C, Ltd.,ST=California,C=US" })
+dn: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+objectClass: OpenLDAPperson
+objectClass: strongAuthenticationUser
+cn: Ursula Hampster
+sn: Hampster
+uid: uham
+title: Secretary, UM Alumni Association
+postalAddress: Alumni Association $ 111 Maple St $ Anytown, MI 48109
+seeAlso: cn=All Staff,ou=Groups,dc=example,dc=com
+homePostalAddress: 123 Anystreet $ Anytown, MI 48104
+mail: uham@mail.alumni.example.com
+homePhone: +1 313 555 8421
+pager: +1 313 555 2844
+facsimileTelephoneNumber: +1 313 555 9700
+telephoneNumber: +1 313 555 5331
+userCertificate;binary:: MIIDazCCAtSgAwIBAgIBAjANBgkqhkiG9w0BAQQFADB3MQswCQYDV
+ QQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTH
+ RkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5jb20wHhc
+ NMDMxMDE3MTYzMzE5WhcNMDQxMDE2MTYzMzE5WjB+MQswCQYDVQQGEwJVUzETMBEGA1UECBMKQ2Fs
+ aWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTHRkLjEYMBYGA1UEAxMPVXJzdWxhI
+ EhhbXBzdGVyMR8wHQYJKoZIhvcNAQkBFhB1aGFtQGV4YW1wbGUuY29tMIGfMA0GCSqGSIb3DQEBAQ
+ UAA4GNADCBiQKBgQDuxgp5ELV9LmhxWMpV7qc4028QQT3+zzFDXhruuXE7ji2n3S3ea8bOwDtJh+q
+ nsDe561DhHHHlgIjMKCiDEizYMpxvJPYEXmvp0huRkMgpKZgmel95BSkt6TYmJ0erS3aoimOHLEFi
+ mmnTLolNRMiWqNBvqwobx940PGwUWEePKQIDAQABo4H/MIH8MAkGA1UdEwQCMAAwLAYJYIZIAYb4Q
+ gENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIENlcnRpZmljYXRlMB0GA1UdDgQWBBSjI94TbBmuDEeUUO
+ iC37EK0Uf0XjCBoQYDVR0jBIGZMIGWgBRLbyEaNiTSkPlDsFNHLX3hwOaYI6F7pHkwdzELMAkGA1U
+ EBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExHzAdBgNVBAoTFk9wZW5MREFQIEV4YW1wbGUsIEx0
+ ZC4xEzARBgNVBAMTCkV4YW1wbGUgQ0ExHTAbBgkqhkiG9w0BCQEWDmNhQGV4YW1wbGUuY29tggEAM
+ A0GCSqGSIb3DQEBBAUAA4GBAIgUcARb3OlWYNbmr1nmqESuxLn16uqI1Ot6WkcICvpkdQ+Bo+R9AP
+ 05xpoXocZtKdNvBu3FNxB/jFkiOcLU2lX7Px1Ijnsjh60qVRy9HOsHCungIKlGcnXLKHmKu0y//5j
+ ds/HnaJsGcHI5JRG7CBJbW+wrwge3trJ1xHJI8prN
+
+# (userCertificate:certificateExactMatch:=3$EMAIL=ca@example.com,CN=Example CA,O=Openldap Example\5C, Ltd.,ST=California,C=US)
+dn: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+objectClass: OpenLDAPperson
+objectClass: strongAuthenticationUser
+cn: Jennifer Smith
+cn: Jen Smith
+sn: Smith
+uid: jen
+postalAddress: Alumni Association $ 111 Maple St $ Anytown, MI 48109
+seeAlso: cn=All Staff,ou=Groups,dc=example,dc=com
+drink: Sam Adams
+homePostalAddress: 1000 Maple #44 $ Anytown, MI 48103
+title: Telemarketer, UM Alumni Association
+mail: jen@mail.alumni.example.com
+homePhone: +1 313 555 2333
+pager: +1 313 555 6442
+facsimileTelephoneNumber: +1 313 555 2756
+telephoneNumber: +1 313 555 8232
+userCertificate;binary:: MIIDjDCCAvWgAwIBAgIBAzANBgkqhkiG9w0BAQQFADB3MQswCQYDV
+ QQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTH
+ RkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5jb20wHhc
+ NMDMxMDE3MTYzNTM1WhcNMDQxMDE2MTYzNTM1WjCBnjELMAkGA1UEBhMCVVMxETAPBgNVBAgTCE1p
+ Y2hpZ2FuMR8wHQYDVQQKExZPcGVuTERBUCBFeGFtcGxlLCBMdGQuMRswGQYDVQQLExJBbHVtbmkgQ
+ XNzb2ljYXRpb24xEjAQBgNVBAMTCUplbiBTbWl0aDEqMCgGCSqGSIb3DQEJARYbamVuQG1haWwuYW
+ x1bW5pLmV4YW1wbGUuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDpnXWAL0VkROGO1Rg
+ 8J3u6F4F7yMqQCbUMsV9rxQisYj45+pmqiHV5urogvT4MGD6eLNFZKBn+0KRni++uu7gbartzpmBa
+ HOlzRII9ZdVMFfrT2xYNgAlkne6pb6IZIN9UONuH/httENCDJ5WEpjZ48D1Lrml/HYO/W+SAMkpEq
+ QIDAQABo4H/MIH8MAkGA1UdEwQCMAAwLAYJYIZIAYb4QgENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIE
+ NlcnRpZmljYXRlMB0GA1UdDgQWBBTB2saht/od/nis76b9m+pjxfhSPjCBoQYDVR0jBIGZMIGWgBR
+ LbyEaNiTSkPlDsFNHLX3hwOaYI6F7pHkwdzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3Ju
+ aWExHzAdBgNVBAoTFk9wZW5MREFQIEV4YW1wbGUsIEx0ZC4xEzARBgNVBAMTCkV4YW1wbGUgQ0ExH
+ TAbBgkqhkiG9w0BCQEWDmNhQGV4YW1wbGUuY29tggEAMA0GCSqGSIb3DQEBBAUAA4GBAIoGPc/AS0
+ cNkMRDNoMIzcFdF9lONMduKBiSuFvv+x8nCek+LUdXxF59V2NPKh2V5gFh5xbAchyv6FVBnpVtPdB
+ 5akCr5tdFQhuBLUXXDk/tTHGpIWt7OAjEmpuMzsz3GUB8Zf9rioHOs1DMw+GpzWdnFITxXhAqEDc3
+ quqPrpxZ
+
+# (userCertificate:certificateExactMatch:={ issuer "EMAIL=ca@example.com,CN=Example CA,O=Openldap Example\5C, Ltd.,ST=California,C=US", serialNumber 3 })
+dn: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+objectClass: OpenLDAPperson
+objectClass: strongAuthenticationUser
+cn: Jennifer Smith
+cn: Jen Smith
+sn: Smith
+uid: jen
+postalAddress: Alumni Association $ 111 Maple St $ Anytown, MI 48109
+seeAlso: cn=All Staff,ou=Groups,dc=example,dc=com
+drink: Sam Adams
+homePostalAddress: 1000 Maple #44 $ Anytown, MI 48103
+title: Telemarketer, UM Alumni Association
+mail: jen@mail.alumni.example.com
+homePhone: +1 313 555 2333
+pager: +1 313 555 6442
+facsimileTelephoneNumber: +1 313 555 2756
+telephoneNumber: +1 313 555 8232
+userCertificate;binary:: MIIDjDCCAvWgAwIBAgIBAzANBgkqhkiG9w0BAQQFADB3MQswCQYDV
+ QQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEfMB0GA1UEChMWT3BlbkxEQVAgRXhhbXBsZSwgTH
+ RkLjETMBEGA1UEAxMKRXhhbXBsZSBDQTEdMBsGCSqGSIb3DQEJARYOY2FAZXhhbXBsZS5jb20wHhc
+ NMDMxMDE3MTYzNTM1WhcNMDQxMDE2MTYzNTM1WjCBnjELMAkGA1UEBhMCVVMxETAPBgNVBAgTCE1p
+ Y2hpZ2FuMR8wHQYDVQQKExZPcGVuTERBUCBFeGFtcGxlLCBMdGQuMRswGQYDVQQLExJBbHVtbmkgQ
+ XNzb2ljYXRpb24xEjAQBgNVBAMTCUplbiBTbWl0aDEqMCgGCSqGSIb3DQEJARYbamVuQG1haWwuYW
+ x1bW5pLmV4YW1wbGUuY29tMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDpnXWAL0VkROGO1Rg
+ 8J3u6F4F7yMqQCbUMsV9rxQisYj45+pmqiHV5urogvT4MGD6eLNFZKBn+0KRni++uu7gbartzpmBa
+ HOlzRII9ZdVMFfrT2xYNgAlkne6pb6IZIN9UONuH/httENCDJ5WEpjZ48D1Lrml/HYO/W+SAMkpEq
+ QIDAQABo4H/MIH8MAkGA1UdEwQCMAAwLAYJYIZIAYb4QgENBB8WHU9wZW5TU0wgR2VuZXJhdGVkIE
+ NlcnRpZmljYXRlMB0GA1UdDgQWBBTB2saht/od/nis76b9m+pjxfhSPjCBoQYDVR0jBIGZMIGWgBR
+ LbyEaNiTSkPlDsFNHLX3hwOaYI6F7pHkwdzELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3Ju
+ aWExHzAdBgNVBAoTFk9wZW5MREFQIEV4YW1wbGUsIEx0ZC4xEzARBgNVBAMTCkV4YW1wbGUgQ0ExH
+ TAbBgkqhkiG9w0BCQEWDmNhQGV4YW1wbGUuY29tggEAMA0GCSqGSIb3DQEBBAUAA4GBAIoGPc/AS0
+ cNkMRDNoMIzcFdF9lONMduKBiSuFvv+x8nCek+LUdXxF59V2NPKh2V5gFh5xbAchyv6FVBnpVtPdB
+ 5akCr5tdFQhuBLUXXDk/tTHGpIWt7OAjEmpuMzsz3GUB8Zf9rioHOs1DMw+GpzWdnFITxXhAqEDc3
+ quqPrpxZ
+

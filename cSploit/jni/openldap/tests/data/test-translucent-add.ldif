@@ -1,0 +1,10 @@
+dn: uid=danger,ou=users,o=translucent
+objectClass: inetOrgPerson
+uid: danger
+sn: danger
+cn: henry
+businessCategory: frontend-override
+carLicense: LIVID
+employeeType: special
+departmentNumber: 9999999
+roomNumber: 41L-535

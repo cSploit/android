@@ -1,0 +1,95 @@
+How to setup a buildslave?
+--------------------------
+
+1. Install Buildbot
+-------------------
+Buildbot is a Python application, you need to install Python 2.2+.
+
+Download & install:
+- Twisted 2.2: http://twistedmatrix.com/trac/
+- ZopeInterface 3.0.1: http://www.zope.org/Products/ZopeInterface
+- Buildbot 0.7.2: http://sourceforge.net/project/showfiles.php?group_id=73177
+
+The Buildbot installer creates a buildbot script in /usr/bin. On Windows, 
+buildbot.bat is installed in the %PYTHON\Scripts folder.
+
+Test your buildbot install by running the buildbot script.
+
+2. Creating a buildslave
+------------------------
+Creating a buildslave is explained in the Buildbot manual: 
+http://buildbot.sourceforge.net/manual-0.7.2.html#Creating-a-buildslave
+
+Before you can install the buildslave, you'll need some information from 
+the buildmaster administrator:
+
+- your botname and password. The botname is a unique id for your buildslave.
+Current botnames include the OS+version, compiler and processor architecture.
+(eg. osx10.4-gcc4.0.1-ia32, xp-vs2003-ia32...)
+- hostname and port on which the buildmaster is listening.
+- hostname and port on which the TryScheduler is listening.
+- username and password for the FTP server where you can send the test log-
+  files.
+
+The buildmaster administrator for http://www.mobsol.be/buildbot/ can be 
+reached at lgo@mobsol.be.
+
+Make sure you fill in the info/host file with some information concerning your
+buildslave.
+
+3. Setting up the buildslave
+----------------------------
+A build on a slave is always triggered and managed by the Buildmaster. In fact,
+by connecting to the buildmaster, the slave gives full shell access on his 
+machine to the buildmaster! Make sure you run the slave in an account with 
+limited access.
+
+The build process is split in 4 steps. 
+- svn checkout or update
+- build
+- check
+- clean
+
+The first step is handled by the buildbot code (SVNStep) and can not be 
+further configured on the buildslave. 
+For all the other steps you have to provide scripts and put them in the 
+slavedir/[botname] folder.
+
+You can copy and reuse the scripts the other buildbot slave owners use for 
+Windows, Linux or Mac buildslaves. You can find them here: 
+http://svn.apache.org/repos/asf/subversion/trunk/tools/buildbot/slaves
+
+4. Builds
+---------
+A build will be triggered each time someone commits changes on trunk or 
+branches/1.4.x. If the buildslave is not online, then the build will be 
+stored in the queue and started when the buildslave connects.
+
+Normally each build only includes the changes of one commit. However, when 
+multiple changes arive during a previous build, those will be combined in 
+a next build.
+
+The buildmaster looks at each commit and decides if they are important enough
+to trigger a build. Documentation, contrib, www... changes are typically 
+ignored.
+
+5. Try
+------
+Buildbot has a feature that allows a Subversion developer to test a patch she's
+working on on one of the builders. Example, someone working on Linux might want
+to test a major change first on a Windows builder before committing the patch.
+
+It's up to you to choose whether your buildslave can accept patches or not, 
+there's no obligation. Basically by allowing patches to be tried on your 
+buildslave you give people the ability to compile and execute arbitrary code 
+on your machine.
+Try access is password protected and will be reserved to Subversion full 
+committers.
+
+How to use the try feature:
+TryScheduler is installed on its own dedicated port. It can be used by 
+a client with 'buildbot try':
+http://buildbot.sourceforge.net/manual-0.7.5.html#try
+
+Contact the buildmaster administrator for the username & password which you
+need to use 'buildbot try'.

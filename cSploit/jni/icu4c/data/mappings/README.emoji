@@ -1,0 +1,64 @@
+== Notes on {kddi,docomo,softbank}-*.ucm mappings.
+
+kddi-jisx-208 is a variant of JIS X 208 used by KDDI, a Japanese cell
+phone carrier.
+
+kddi-shift_jis, docomo-shift_jis, and softbank-shift_jis are variants
+of Shift_JIS used by KDDI, DoCoMo and SoftBank.
+
+  - kddi-jisx-208 contains Emoji (emoticon) code points in
+    0x75xx, 0x76xx, 0x77xx, 0x78xx, 0x79xx, 0x7Axx, 0x7Bxx,
+    where xx means 21-7E.
+
+  - kddi-shift_jis contains Emoji code points in
+    0xEBxx, 0xECxx, 0xEDxx, and 0xEExx, 0xF3xx, 0xF4xx, 0xF6xx, 0xF7xx,
+    where xx means 40-7E, 80-FC.
+
+  - docomo-shift_jis contains Emoji code points in
+    0xF8xx, and 0xF9xx, where xx means 40-7E, 80-FC.
+
+  - softbank-shift_jis contains Emoji code points in
+    0xF7xx, 0xF9xx, and 0xFBxx, where xx means 40-7E, 80-FC.
+
+  - softbank-jisx-208 contains Emoji code points in
+    0x75xx, 0x76xx, 0x77xx, 0x78xx, 0x79xx, 0x7Axx, 0x7Bxx, 0x7Dxx
+    where xx means 21-7E.
+
+
+== How the tables were created
+
+The most authoritative sources we have seen are:
+
+* NTT docomo:
+    <http://www.nttdocomo.co.jp/service/imode/make/content/pictograph/basic/index.html> (Basic)
+    <http://www.nttdocomo.co.jp/service/imode/make/content/pictograph/extention/index.html> (Extended)
+
+* KDDI/AU:
+    <http://www.au.kddi.com/ezfactory/tec/spec/pdf/typeD.pdf>
+
+* SoftBank: 
+    <http://creation.mb.softbank.jp/download.php?docid=103>
+    (requires free registration)
+
+We also have seen this informative, but unofficial, source:
+    <http://trialgoods.com/emoji/>
+
+kddi-jisx-208-2007.ucm is based on jisx-208.ucm in this directory.
+The original table's mappings to codes 0x75xx to 0x7Bxx are excluded
+to avoid collisions with emoji.
+
+kddi-shift_jis-2007.ucm is based on windows-932-2000.ucm.
+The original table's mappings to codes 0xEBxx to 0xEExx, and 0xF0xx to
+0xF90xx (EUDC block), are excluded to avoid collisions with emoji.
+
+docomo-shift_jis-2007.ucm is based on windows-932-2000.ucm.
+The original table's mappings to codes 0xF0xx to 0xF90xx (EUDC block)
+are excluded to avoid collisions with emoji.
+
+softbank-shift_jis-2007.ucm is based on windows-932-2000.ucm.
+The original table's mappings to codes 0xF0xx to 0xF90xx (EUDC block),
+and 0xFBxx, are excluded to avoid collisions with emoji.
+
+softbank-jisx-208-2007.ucm is based on jisx-208.ucm in this directory.
+The original table's mappings to codes 0x75xx to 0x7Bxx, and 0x7Dxx
+are excluded to avoid collisions with emoji.

@@ -1,0 +1,148 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>No Earthly Reason for MARS</title>
+	<meta name="author" content="">
+	<!-- $Id$ -->
+	<link href="freetds.css" type="text/css" rel="stylesheet" />
+
+	<!-- generic header -->
+	<div id="Navigation">
+	<table>
+		<tr valign="bottom">
+			<td> <a href="index.html">
+				<img src="freetdslogo3.gif" alt="FreeTDS.org" /> </a></td>
+			<td><ul>
+					<li> <a href="index.html">Home</a> </li>
+					<li> <a href="news.html">News</a> </li>
+					<li> <a href="software.html">Software</a> </li>
+					<li> <a href="docs.html">Documentation</a> </li>
+					<li> <a href="support.html">Support</a> </li>
+					<li> <a href="contrib.html">Contribute</a> </li>	
+					</ul>
+				</td></tr>
+		</table>
+				</div>
+  <hr size="1" noshade="noshade" />
+
+</head>
+
+<body bgcolor="#f9f9f9">
+
+<H1>No Earthly Reason for MARS</H1>
+<h4 align="right">Or, why FreeTDS will implement MARS under protest</h4>
+
+<p>FreeTDS will support MARS in ODBC because Frediano wants to do it and
+it's a compatibility feature.  </p>
+
+<p>We will not add MARS support to DB-Library or CT-Library.  This page explains why, and <a href="mailto:freetds@lists.ibiblio.org">invites your comments</a> if you find the reasoning flawed.</p>  
+
+<p>DB-Library and CT-Library need not support MARS because neither vendor's implementation does, nor will.  No application written to these libraries expects MARS support, and it's quite possible introducing MARS would break valid assumptions in existing programs.  </p>
+
+<h2>Problems with MARS</h2>
+
+<ul>
+	<li>Complexity without power</li>
+	<li>Protocol Complexity</li>
+	<li>Lost efficiency</li>
+	<li>Server Resources</li>
+</ul>
+
+<h2>Complexity without Power</h2>
+
+<p>MARS re-implements within TDS something very similar to TCP.  If you read the MARS specification and are familiar with TCP/IP, you will experience <i>deja vu</i>: sliding windows, window negotiation, syn/ack/data/fin/ack.  In effect, TDS becomes a psuedo-tunnel inside TCP.  </p>
+
+<p>If all those things already exist in the TCP stack, though, why repeat them in the TDS layer?  If TCP/IP already has sliding windows, what benefit is there to another header?  </p>  
+
+<p>None.  There really is no benefit.  There seems to be a benefit, but it is illusory.  Microsoft created MARS at least in part because that illusion is widely shared.  Microsoft, after all, is in the business of providing software to paying market, and the customer is always right.  FreeTDS has no customers and is free to say, plainly, that the MARS customer is wrong.  </p>
+
+<h3>The Illusory Feature</h3>
+
+<P>The TDS protocol has long required that the client read all results returned by a query, or explicitly cancel the query, before issuing another request to the server.  In particular, TDS does not support this style of row-at-a-time processing:
+
+<ol>
+	<li>fetch row from table A</li>
+	<li>update table B</li>
+</ol>
+
+using a single connection to the server.  An attempt to use one connection in this way results in the dread 20019 error: &ldquo;Attempt to initiate a new Adaptive Server operation with results pending&rdquo;.  </p>
+
+<p>  To implement the above, a TDS client uses two connections: one for selecting, the other for updating.  </p>
+
+<p>Application programmers want none of it.  <em>Why do I have to open another connection?</em> they demand to know.  Actually, they don't ask; they requested (thousands of times, we can be sure) that the &ldquo;server&rdquo; permit the connection to be used in exactly that way.  </p>
+
+<p>MARS stands for <em>Multiple Active Result Sets</em>.  With MARS turned on, a connection supports the above row-at-a-time pattern.  Feature implemented?  Check.  Job done. </p>
+
+<h3>ODBC Provokes</h3>
+
+<p>It would seem the application programmer wins.  Having many active statements for each connection means having only one connection.  Being able to interact with a TDS server in just the way they interact with, say, an Oracle server surely has merits.  But very little is gained, and most of that gain is due to the design of ODBC.  </p>
+
+<p>In ODBC, one creates a connection, uses that connection to create a statement, and executes the statement.  The connection isn't good for anything but generating statement handles.   In traditional TDS, it's pretty much pointless; until you've got a statement handle, you can't do anything, and once you have a statement handle, you can't have another (until you deallocate it).  </p>
+
+<p>What use is a connection if you can use it for only one statement at a time?  ODBC was designed to be &ldquo;open&rdquo; i.e., used with any SQL DBMS, not just Microsoft and Sybase servers.  With non-TDS servers, where more than one statement can be used at one time, the connection/statement separation makes more sense.  </p>
+
+<p>DB-Library, by contrast, has no connection/statement separation.  There is no statement handle.  The SQL is passed to the connection; results are read from the connection.  That of course reflects the underlying reality of the TDS protocol.<sup><a href="#footnote.1">1</a></sup></p>
+
+<p>DB-Library simplifies making connections by collecting client parameters in a <code>LOGIN</code> structure.  The <code>dbconnect()</code> function takes two parameters: the server name and the <code>LOGIN</code>.  In ODBC, by contrast, the <code>SQLConnect()</code> function takes <em>seven</em> parameters, whereas allocating a statement handle requires only three.  No wonder ODBC programmers aren't eager to connect more than once!  </p>
+
+<h3>Isn't MARS needed for Microsoft servers to be more like other SQL DBMSs?</h3>
+
+<p>No.  Microsoft might have chosen to support multiple statements for a connection <em>handle</em> by letting a <em>connection handle</em> stand for more than one <em>connection</em>.  A connection property could have been the number of simultaneous real connections to pre-allocate.  Additional connections could be made as the client requested additional statements.  </p>
+
+<p>As a driver provider, FreeTDS could in fact choose to implement that approach.  It would, however, be very difficult to achieve perfect compatibility.  What happens in FreeTDS is up to the developers, and the guy writing the ODBC driver prefers to implement MARS to stay as close as possible to what Microsoft did.  </p>
+
+<h3>No Benefit</h3>
+
+<p>There is no benefit to multiplexing a connection, nothing two statements on one connection can do that two connections can't.  It's that simple.  </p>
+
+<p>The only benefit accrues to the ODBC programmer, and it is very small: the reuse of a single connection for multiple statements.  The application is not simplified.  The complexity of managing multiple statements is identical to that of managing multiple connections.  The disadvantages in lost efficiency &mdash; on the network and on the server &mdash; far outweigh these meager gains. </p>
+
+<h2>Protocol Complexity</h2>
+
+<p>MARS converts TDS from an application protocol &mdash; a tabular data stream &mdash; into a tunnelling protocol.  What's wrong with that?  </p>
+
+<p>If you think tunnels are easy to do, you should talk to people who implement VPNs.  If you think sliding windows and window negotiation is easy to do, read the history of the development of TCP.  Understand slow start, the Nagle algorithm, and silly window syndrome.  Easy it is not.  It seems easy, and the basics are easy.  But it took years to get right.  </p>
+
+<P>But that's not your problem, you say?  That's the FreeTDS guys' problem?  Well, yes and no.  Much depends on Microsoft's host-side implementation, for one thing.  More important, effort that goes into supporting MARS is effort that can't be expended elsewhere.  FreeTDS needs all the development resources it can get.  By adding complexity with no benefit, MARS robs FreeTDS of developer time that could be better spent elsewhere.  </p>
+
+<h2>Lost Efficiency</h2>
+
+<p>The programming paradigm that MARS promotes interferes with the inherent efficiency TDS.  </p>
+
+<p>The TDS protocol is very efficient.  It sends the bare minimum of metadata, and avoids unnecessary client-server interaction.  In particular, when sending data to the client (or uploading via bcp) the sender needs no acknowledgement from the receiver.  TCP handles all flow-control.  The TDS connection is strictly half-duplex.  Each side knows its own state and its peer's state.  </p>
+
+<p>The great advantage of TDS's minimalism is seen at the TCP level when sending rows of data.  It can also be seen at the userspace-kernel boundary, where the number of context switches is minimized by allowing continuous uninterrupted reading or writing.  The design encourages the TCP to fill its windows, maximizing its bandwidth-delay product.  </p>
+
+<p>Row-at-a-time interaction doesn't merely undermine that efficiency: it absolutely destroys it.  </p>
+
+<p>Does that matter?  Is your server fast enough?  How much slower are you willing to make your applications?  If speed is no concern, efficiency is no concern.  </p>
+
+<p>OK, you say, but how much?  That depends on your data, your server, and your network.  Ping your server.  Every interaction with your server takes roughly as long as your ping plus the time to transmit the data.  If the data never leave the office, we may be talking a millisecond.  If the server is 10,000 miles away, 300 ms wouldn't be unusual.  If your data don't fit in a TCP packet (1500 bytes, minus overhead for IP, TCP, TDS, and MARS), TCP's slow-start strategy will entail at least 2X that delay while the server waits for the initial packet's ACK.  </p>
+
+<p>The server isn't free, either.  Resources devoted to holding pending rows are not available to answer other queries.  Try estimating the memory needed to support each such interaction, and multiply by the number of users.  As the lock count increases, more resources &mdash; CPU time, memory, I/O &mdash; are devoted to maintaining and searching them.  Resource contention is anathema to a server because all machines wait at the same speed.  </p>
+
+<p>On an unloaded server of suitable size, the network delay will dominate.  As the load increases, the server delay will play a greater role.  </p>
+
+<h2>Server Resources</h2>
+
+<p>Server resources are devoted to locks and buffers while query results are pending.  MARS does nothing to mitigate that; in fact, it encourages the waste of server resources by making no requirement that they be freed (by closing the statement handle).   </p>
+
+<p>The ODBC programmer can allocate a statement, find the row he wants, and never bother to fetch further rows (possibly unaware they're pending).  The dialog closes, the application proceeds merrily along.  Only the server suffers, until someone &mdash; perhaps someone else, perhaps the same person &mdash; tries to update the same table.  Error?  Not right away.  First, everything hangs, waiting for the server.  The server is waiting for the pending results to be fetched, to free the locks preventing the update.  That won't happen until the connection is closed.  Eventually the update times out and fails, but the message gives no indication who is holding the locks or why.  Enter the DBA, and let the fur fly.  </p>
+
+<p>Of course, nowadays there seldom is an &ldquo;ODBC programmer&rdquo;; likely as not the application uses a framework, perhaps an ORM.  The programmer has little knowledge of how the framework is implemented, and the framework little knowledge of how MARS works or its ramifications.  That is why so many people are tempted to give up, deciding that SQL DBMSs are irremediably difficult to use and unredeemably slow.  For want of a nail.  </p>
+
+<h2>MARS and FreeTDS</h2>
+
+<p>As stated at the outset, FreeTDS will implement MARS to keep our ODBC driver as compatible as possible with Microsoft's.  It won't be added to the other libraries unless and until MARS becomes somehow mandatory from the servers's point of view, or someone both makes a convincing case of its advantages <em>and</em> does the work.  </p>
+
+<p>Even after it's implemented, though, the programmer interested in efficiency and simplicity will eschew MARS.  He will maximize the go-fast feature of TDS by minimizing client-server interactions, and by avoiding row-at-a-time updates.  His users will thank him.  </p>
+
+<p>Should you wish to contribute your insights or to correct anything you see here, you have two options, both over the efficient but decidedly flawed SMTP protocol: post to the FreeTDS <a href="mailto:freetds@lists.ibiblio.org">mailing list</a>, or <a href="mailto:jklowden@freetds.org">email the author</a>.  </p>
+
+<p>--jkl</p>
+
+<hr>
+<p id="footnote.1"><b>1.</b> This is <i>completely reasonable</i>.  Think about other kinds of handles through which data flow, such as TCP sockets or file handles.  Internet protocols e.g. SMTP, HTTP, and FTP also move one file at a time.  (FTP is unpopular nowadays, but its two-channel design is much simpler than the single-connection design of HTTP.)  </p>
+
+</body>
+</html>

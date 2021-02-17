@@ -1,0 +1,45 @@
+# Makefile.in for back-sql
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+SRCS	= init.c config.c search.c bind.c compare.c operational.c \
+		entry-id.c schema-map.c sql-wrap.c modify.c util.c \
+		add.c delete.c modrdn.c api.c
+OBJS	= init.lo config.lo search.lo bind.lo compare.lo operational.lo \
+		entry-id.lo schema-map.lo sql-wrap.lo modify.lo util.lo \
+		add.lo delete.lo modrdn.lo api.lo
+
+LDAP_INCDIR= ../../../include       
+LDAP_LIBDIR= ../../../libraries
+
+BUILD_OPT = "--enable-sql"
+BUILD_MOD = @BUILD_SQL@
+
+mod_DEFS = -DSLAPD_IMPORT
+MOD_DEFS = $(@BUILD_SQL@_DEFS)
+
+shared_LDAP_LIBS = $(LDAP_LIBLDAP_R_LA) $(LDAP_LIBLBER_LA)
+NT_LINK_LIBS = -L.. -lslapd $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+UNIX_LINK_LIBS = $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS) $(SLAPD_SQL_LIBS)
+
+LIBBASE = back_sql
+
+XINCPATH = -I.. -I$(srcdir)/.. $(SLAPD_SQL_INCLUDES)
+XDEFS = $(MODULES_CPPFLAGS)
+
+all-local-lib:	../.backend
+
+../.backend: lib$(LIBBASE).a
+	@touch $@
+

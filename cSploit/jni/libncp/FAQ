@@ -1,0 +1,75 @@
+There is certainly not enough material to call this an FAQ, but some
+questions reach me regularly. Probably the documentation is not clear
+enough.
+
+-------------------------------------------------------------------------------
+
+Q: The ncpfs utilities like slist or ncpmount tell me that they can
+   not find a server, although I'm sure there are servers on my
+   net. What's wrong?
+
+You probably used 
+
+ipx_configure --auto_interface=on --auto_primary=on 
+
+and you have Windows (95?) workstations on your network. Windows 95
+makes Linux configure IPX interfaces for non-existent frame types. To
+solve this problem, you have to configure your IPX interface manually
+with the command
+
+ipx_interface add -p <device> <frame>
+
+For <device> use eth0, eth1 or whatever you network adapter is
+called. The value for <frame> must match the frame type used on your
+network. Possible values are 802.2, 802.3, SNAP and EtherII.
+
+-------------------------------------------------------------------------------
+
+Q: I have difficulties with NetWare 4.1. What can I do?
+
+To be honest, I do not really know. Currently my only test equipment
+is a NetWare 3.11 server. You should make your 4.1 Server as
+3.x-compatible as it can be. As I do not know 4.1, you are on your own
+doing this.
+
+A promising hint that has already helped some people is to switch off
+packet signatures on the 4.1 server, as ncpfs does not support them.
+
+Note: ncpfs, as of 2.0.12, and kernel 2.1.89, does now support packet 
+signatures.
+Note2: My test environment currently consist of couple of NW4.11/NW5 servers.
+I have no 3.x servers around anymore.
+
+-------------------------------------------------------------------------------
+
+Q: When I re-export ncpfs-mounted directories via nfs, I get messages like
+   'pwd: cannot get current directory', and other strange things happen to
+   the nfs clients. What's wrong?
+
+When you want to export a directory via NFS, you have to do two things:
+
+- You have to invoke mountd and nfsd with the option --re-export. On my
+  computer, both are invoked at system startup from the file
+  /etc/rc.d/rc.inet2.
+
+- You can not export a complete NetWare server hierarchy with all volumes
+  under a single mount point. You have to mount a single server volume to
+  make it re-exportable. Invoke ncpmount with the option -V volume to do
+  this.
+
+-------------------------------------------------------------------------------
+
+Q: I cannot login into server with these utilities. It was possible with an
+older version.
+
+A: You are probably connecting into Netware 4.x or IntraNetware. If you want a
+temporary workaround, add the option "-b" to the ncpmount commandline.
+For the future you should determine your Directory Services user name and
+use that instead of your bindery name. 
+
+-------------------------------------------------------------------------------
+
+Q: I found bug. What I should do?
+
+A: Report it to "Petr Vandrovec" <vandrove@vc.cvut.cz>.
+

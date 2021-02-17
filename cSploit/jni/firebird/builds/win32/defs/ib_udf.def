@@ -1,0 +1,56 @@
+; The contents of this file are subject to the Interbase Public
+; License Version 1.0 (the "License"); you may not use this file
+; except in compliance with the License. You may obtain a copy
+; of the License at http://www.Inprise.com/IPL.html
+;
+; Software distributed under the License is distributed on an
+; "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+; or implied. See the License for the specific language governing
+; rights and limitations under the License.
+;
+; The Original Code was created by Inprise Corporation
+; and its predecessors. Portions created by Inprise Corporation are
+; Copyright (C) Inprise Corporation.
+;
+; All Rights Reserved.
+; Contributor(s): ______________________________________.
+
+EXPORTS
+	IB_UDF_abs
+	IB_UDF_acos
+	IB_UDF_ascii_char
+	IB_UDF_ascii_val
+	IB_UDF_asin
+	IB_UDF_atan
+	IB_UDF_atan2
+	IB_UDF_bin_and
+	IB_UDF_bin_or
+	IB_UDF_bin_xor
+	IB_UDF_ceiling
+	IB_UDF_cos
+	IB_UDF_cosh
+	IB_UDF_cot
+	IB_UDF_div
+	IB_UDF_floor
+	IB_UDF_ln
+	IB_UDF_log
+	IB_UDF_log10
+	IB_UDF_lower
+	IB_UDF_lpad
+	IB_UDF_ltrim
+	IB_UDF_mod
+	IB_UDF_pi
+	IB_UDF_rand
+	IB_UDF_rpad
+	IB_UDF_rtrim
+	IB_UDF_sign
+	IB_UDF_sin
+	IB_UDF_sinh
+	IB_UDF_sqrt
+	IB_UDF_srand
+	IB_UDF_substr
+	IB_UDF_strlen
+	IB_UDF_tan
+	IB_UDF_tanh
+	IB_UDF_substrlen
+	IB_UDF_frac

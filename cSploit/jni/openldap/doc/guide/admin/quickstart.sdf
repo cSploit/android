@@ -1,0 +1,300 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: A Quick-Start Guide
+
+The following is a quick start guide to [[DOC_NAME]],
+including the Standalone {{TERM:LDAP}} Daemon, {{slapd}}(8).
+
+It is meant to walk you through the basic steps needed to install
+and configure {{PRD:OpenLDAP Software}}.  It should be used in
+conjunction with the other chapters of this document, manual pages,
+and other materials provided with the distribution (e.g. the
+{{F:INSTALL}} document) or on the {{PRD:OpenLDAP}} web site
+({{URL: http://www.OpenLDAP.org}}), in particular the OpenLDAP
+Software {{TERM:FAQ}} ({{URL: http://www.OpenLDAP.org/faq/?file=2}}).
+
+If you intend to run OpenLDAP Software seriously, you should review
+all of this document before attempting to install the software.
+
+Note: This quick start guide does not use strong authentication
+nor any integrity or confidential protection services.  These
+services are described in other chapters of the
+OpenLDAP Administrator's Guide.
+
+
+.{{S: }}
+^{{B: Get the software}}
+
+. You can obtain a copy of the software by following the
+instructions on the OpenLDAP Software download page
+({{URL: http://www.openldap.org/software/download/}}).  It is
+recommended that new users start with the latest {{release}}.
+
+
+.{{S: }}
++{{B: Unpack the distribution}}
+
+.Pick a directory for the source to live under, change
+directory to there, and unpack the distribution using the
+following commands:
+
+..{{EX:gunzip -c openldap-VERSION.tgz | tar xvfB -}}
+
+. then relocate yourself into the distribution directory:
+
+..{{EX:cd openldap-VERSION}}
+
+. You'll have to replace {{F:VERSION}} with the version
+name of the release.
+
+
+.{{S: }}
++{{B: Review documentation}}
+
+. You should now review the {{F:COPYRIGHT}}, {{F:LICENSE}},
+{{F:README}} and {{F:INSTALL}} documents provided with the distribution.
+The {{F:COPYRIGHT}} and {{F:LICENSE}} provide information on
+acceptable use, copying, and limitation of warranty of OpenLDAP
+Software. 
+
+.{{S: }}
+. You should also review other chapters of this document.
+In particular, the {{SECT:Building and Installing OpenLDAP Software}}
+chapter of this document provides detailed information on prerequisite
+software and installation procedures.
+
+
+.{{S: }}
++{{B: Run {{EX:configure}}}}
+
+. You will need to run the provided {{EX:configure}} script to
+{{configure}} the distribution for building on your system.  The
+{{EX:configure}} script accepts many command line options that enable or
+disable optional software features.  Usually the defaults are okay,
+but you may want to change them.  To get a complete list of options
+that {{EX:configure}} accepts, use the {{EX:--help}} option:
+
+..{{EX:./configure --help}}
+
+. However, given that you are using this guide, we'll assume you
+are brave enough to just let {{EX:configure}} determine
+what's best:
+
+..{{EX:./configure}}
+
+. Assuming {{EX:configure}} doesn't dislike your system, you can
+proceed with building the software.  If {{EX:configure}} did
+complain, well, you'll likely need to go to the Software FAQ
+{{Installation}} section ({{URL:http://www.openldap.org/faq/?file=8}})
+and/or actually read the {{SECT:Building and Installing OpenLDAP Software}}
+chapter of this document.
+
+
+.{{S: }}
++{{B:Build the software}}.
+
+. The next step is to build the software.  This step has two
+parts, first we construct dependencies and then we compile the
+software:
+
+..{{EX:make depend}}
+..{{EX:make}}
+
+
+. Both makes should complete without error.
+
+
+.{{S: }}
++{{B:Test the build}}.
+
+. To ensure a correct build, you should run the test suite
+(it only takes a few minutes):
+
+..{{EX:make test}}
+
+. Tests which apply to your configuration will run and they
+should pass.  Some tests, such as the replication test, may
+be skipped.
+
+
+.{{S: }}
++{{B:Install the software}}.
+
+. You are now ready to install the software; this usually requires
+{{super-user}} privileges: 
+
+..{{EX:su root -c 'make install'}}
+
+. Everything should now be installed under {{F:/usr/local}} (or
+whatever installation prefix was used by {{EX:configure}}).
+
+.{{S: }}
++{{B:Edit the configuration file}}.
+
+. Use your favorite editor to edit the provided {{slapd.ldif}}
+example (usually installed as {{F:/usr/local/etc/openldap/slapd.ldif}})
+to contain a MDB database definition of the form:
+
+..{{EX:dn: olcDatabase=mdb,cn=config}}
+..{{EX:objectClass: olcDatabaseConfig}}
+..{{EX:objectClass: olcMdbConfig}}
+..{{EX:olcDatabase: mdb}}
+..{{EX:OlcDbMaxSize: 1073741824}}
+..{{EX:olcSuffix: dc=<MY-DOMAIN>,dc=<COM>}}
+..{{EX:olcRootDN: cn=Manager,dc=<MY-DOMAIN>,dc=<COM>}}
+..{{EX:olcRootPW: secret}}
+..{{EX:olcDbDirectory: /usr/local/var/openldap-data}}
+..{{EX:olcDbIndex: objectClass eq}}
+
+. Be sure to replace {{EX:<MY-DOMAIN>}} and {{EX:<COM>}} with
+the appropriate domain components of your domain name.  For
+example, for {{EX:example.com}}, use:
+
+..{{EX:dn: olcDatabase=mdb,cn=config}}
+..{{EX:objectClass: olcDatabaseConfig}}
+..{{EX:objectClass: olcMdbConfig}}
+..{{EX:olcDatabase: mdb}}
+..{{EX:OlcDbMaxSize: 1073741824}}
+..{{EX:olcSuffix: dc=example,dc=com}}
+..{{EX:olcRootDN: cn=Manager,dc=example,dc=com}}
+..{{EX:olcRootPW: secret}}
+..{{EX:olcDbDirectory: /usr/local/var/openldap-data}}
+..{{EX:olcDbIndex: objectClass eq}}
+
+.If your domain contains additional components, such as
+{{EX:eng.uni.edu.eu}}, use:
+
+..{{EX:dn: olcDatabase=mdb,cn=config}}
+..{{EX:objectClass: olcDatabaseConfig}}
+..{{EX:objectClass: olcMdbConfig}}
+..{{EX:olcDatabase: mdb}}
+..{{EX:OlcDbMaxSize: 1073741824}}
+..{{EX:olcSuffix: dc=eng,dc=uni,dc=edu,dc=eu}}
+..{{EX:olcRootDN: cn=Manager,dc=eng,dc=uni,dc=edu,dc=eu}}
+..{{EX:olcRootPW: secret}}
+..{{EX:olcDbDirectory: /usr/local/var/openldap-data}}
+..{{EX:olcDbIndex: objectClass eq}}
+
+. Details regarding configuring {{slapd}}(8) can be found
+in the {{slapd-config}}(5) manual page and the {{SECT:Configuring
+slapd}} chapter of this document.  Note that the
+specified olcDbDirectory must exist prior to starting {{slapd}}(8).
+
+
+.{{S: }}
++{{B:Import the configuration database}}
+. You are now ready to import your configration database for use by
+{{slapd}}(8), by running the command:
+
+..{{EX: su root -c /usr/local/sbin/slapadd -F /usr/local/etc/cn=config -l /usr/local/etc/openldap/slapd.ldif}}
+
+.{{S: }}
++{{B:Start SLAPD}}.
+
+. You are now ready to start the Standalone LDAP Daemon, {{slapd}}(8),
+by running the command:
+
+..{{EX:su root -c /usr/local/libexec/slapd -F /usr/local/etc/cn=config}}
+
+
+. To check to see if the server is running and configured correctly,
+you can run a search against it with {{ldapsearch}}(1).  By default,
+{{ldapsearch}} is installed as {{F:/usr/local/bin/ldapsearch}}:
+
+..{{EX:ldapsearch -x -b '' -s base '(objectclass=*)' namingContexts}}
+
+. Note the use of single quotes around command parameters to prevent
+special characters from being interpreted by the shell.  This should return:
+
+..{{EX:dn:}}
+..{{EX:namingContexts: dc=example,dc=com}}
+
+. Details regarding running {{slapd}}(8) can be found
+in the {{slapd}}(8) manual page and the
+{{SECT:Running slapd}} chapter of this document.
+
+
+.{{S: }}
++{{B:Add initial entries to your directory}}.
+
+. You can use {{ldapadd}}(1) to add entries to your LDAP directory.
+{{ldapadd}} expects input in {{TERM:LDIF}} form.  We'll do it in two
+steps:
+
+^^ create an LDIF file
+++ run ldapadd
+
+. Use your favorite editor and create an LDIF file that contains:
+
+..{{EX:dn: dc=<MY-DOMAIN>,dc=<COM>}}
+..{{EX:objectclass: dcObject}}
+..{{EX:objectclass: organization}}
+..{{EX:o: <MY ORGANIZATION>}}
+..{{EX:dc: <MY-DOMAIN>}}
+..{{EX:}}
+..{{EX:dn: cn=Manager,dc=<MY-DOMAIN>,dc=<COM>}}
+..{{EX:objectclass: organizationalRole}}
+..{{EX:cn: Manager}}
+
+. Be sure to replace {{EX:<MY-DOMAIN>}} and {{EX:<COM>}} with the
+appropriate domain components of your domain name.  {{EX:<MY
+ORGANIZATION>}} should be replaced with the name of your organization.
+When you cut and paste, be sure to trim any leading and trailing
+whitespace from the example.
+
+..{{EX:dn: dc=example,dc=com}}
+..{{EX:objectclass: dcObject}}
+..{{EX:objectclass: organization}}
+..{{EX:o: Example Company}}
+..{{EX:dc: example}}
+..{{EX:}}
+..{{EX:dn: cn=Manager,dc=example,dc=com}}
+..{{EX:objectclass: organizationalRole}}
+..{{EX:cn: Manager}}
+
+. Now, you may run {{ldapadd}}(1) to insert these entries into
+your directory.
+
+..{{EX:ldapadd -x -D "cn=Manager,dc=<MY-DOMAIN>,dc=<COM>" -W -f example.ldif}}
+
+. Be sure to replace {{EX:<MY-DOMAIN>}} and {{EX:<COM>}} with the
+appropriate domain components of your domain name.  You will be
+prompted for the "{{EX:secret}}" specified in {{F:slapd.conf}}. 
+For example, for {{EX:example.com}}, use:
+
+..{{EX:ldapadd -x -D "cn=Manager,dc=example,dc=com" -W -f example.ldif}}
+
+. where {{F:example.ldif}} is the file you created above.
+..{{EX: }}
+. Additional information regarding directory creation can be found
+in the {{SECT:Database Creation and Maintenance Tools}} chapter of
+this document.
+
+.{{S: }}
++{{B:See if it works}}.
+
+. Now we're ready to verify the added entries are in your directory.  
+You can use any LDAP client to do this, but our example uses the
+{{ldapsearch}}(1) tool.  Remember to replace {{EX:dc=example,dc=com}}
+with the correct values for your site:
+
+..{{EX:ldapsearch -x -b 'dc=example,dc=com' '(objectclass=*)'}}
+
+. This command will search for and retrieve every entry in the database.
+
+You are now ready to add more entries using {{ldapadd}}(1) or
+another LDAP client, experiment with various configuration options,
+backend arrangements, etc..
+
+Note that by default, the {{slapd}}(8) database grants {{read access
+to everybody}} excepting the {{super-user}} (as specified by the
+{{EX:rootdn}} configuration directive).  It is highly recommended
+that you establish controls to restrict access to authorized users.
+Access controls are discussed in the {{SECT:Access Control}} chapter.
+You are also encouraged to read the {{SECT:Security Considerations}},
+{{SECT:Using SASL}} and {{SECT:Using TLS}} sections.
+
+The following chapters provide more detailed information on making,
+installing, and running {{slapd}}(8).

@@ -1,0 +1,48 @@
+SVN-fs-dump-format-version: 2
+
+UUID: f8e39098-bf12-0410-85ab-a169258d30d2
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2006-05-01T20:06:54.550716Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 99
+Content-length: 99
+
+K 7
+svn:log
+V 3
+msg
+K 10
+svn:author
+V 2
+pl
+K 8
+svn:date
+V 27
+2006-05-01T20:08:34.088612Z
+PROPS-END
+
+Node-path: file
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 12
+Content-length: 52
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+line
+line2
+
+

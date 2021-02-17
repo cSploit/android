@@ -1,0 +1,10 @@
+[Unit]
+Description=Firebird Database Server ( Classic )
+After=local-fs.target
+
+[Service]
+User=firebird
+Group=firebird
+ExecStart=@FB_SBINDIR@/firebird
+StandardInput=socket
+StandardError=syslog

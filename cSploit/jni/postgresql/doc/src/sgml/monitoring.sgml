@@ -1,0 +1,2064 @@
+<!-- doc/src/sgml/monitoring.sgml -->
+
+<chapter id="monitoring">
+ <title>Monitoring Database Activity</title>
+
+ <indexterm zone="monitoring">
+  <primary>monitoring</primary>
+  <secondary>database activity</secondary>
+ </indexterm>
+
+ <indexterm zone="monitoring">
+  <primary>database activity</primary>
+  <secondary>monitoring</secondary>
+ </indexterm>
+
+ <para>
+  A database administrator frequently wonders, <quote>What is the system
+  doing right now?</quote>
+  This chapter discusses how to find that out.
+ </para>
+
+  <para>
+   Several tools are available for monitoring database activity and
+   analyzing performance.  Most of this chapter is devoted to describing
+   <productname>PostgreSQL</productname>'s statistics collector,
+   but one should not neglect regular Unix monitoring programs such as
+   <command>ps</>, <command>top</>, <command>iostat</>, and <command>vmstat</>.
+   Also, once one has identified a
+   poorly-performing query, further investigation might be needed using
+   <productname>PostgreSQL</productname>'s <xref linkend="sql-explain"> command.
+   <xref linkend="using-explain"> discusses <command>EXPLAIN</>
+   and other methods for understanding the behavior of an individual
+   query.
+  </para>
+
+ <sect1 id="monitoring-ps">
+  <title>Standard Unix Tools</title>
+
+  <indexterm zone="monitoring-ps">
+   <primary>ps</primary>
+   <secondary>to monitor activity</secondary>
+  </indexterm>
+
+  <para>
+   On most Unix platforms, <productname>PostgreSQL</productname> modifies its
+   command title as reported by <command>ps</>, so that individual server
+   processes can readily be identified.  A sample display is
+
+<screen>
+$ ps auxww | grep ^postgres
+postgres   960  0.0  1.1  6104 1480 pts/1    SN   13:17   0:00 postgres -i
+postgres   963  0.0  1.1  7084 1472 pts/1    SN   13:17   0:00 postgres: writer process
+postgres   965  0.0  1.1  6152 1512 pts/1    SN   13:17   0:00 postgres: stats collector process
+postgres   998  0.0  2.3  6532 2992 pts/1    SN   13:18   0:00 postgres: tgl runbug 127.0.0.1 idle
+postgres  1003  0.0  2.4  6532 3128 pts/1    SN   13:19   0:00 postgres: tgl regression [local] SELECT waiting
+postgres  1016  0.1  2.4  6532 3080 pts/1    SN   13:19   0:00 postgres: tgl regression [local] idle in transaction
+</screen>
+
+   (The appropriate invocation of <command>ps</> varies across different
+   platforms, as do the details of what is shown.  This example is from a
+   recent Linux system.)  The first process listed here is the
+   master server process.  The command arguments
+   shown for it are the same ones used when it was launched.  The next two
+   processes are background worker processes automatically launched by the
+   master process.  (The <quote>stats collector</> process will not be present
+   if you have set
+   the system not to start the statistics collector.)  Each of the remaining
+   processes is a server process handling one client connection.  Each such
+   process sets its command line display in the form
+
+<screen>
+postgres: <replaceable>user</> <replaceable>database</> <replaceable>host</> <replaceable>activity</>
+</screen>
+
+  The user, database, and (client) host items remain the same for
+  the life of the client connection, but the activity indicator changes.
+  The activity can be <literal>idle</> (i.e., waiting for a client command),
+  <literal>idle in transaction</> (waiting for client inside a <command>BEGIN</> block),
+  or a command type name such as <literal>SELECT</>.  Also,
+  <literal>waiting</> is appended if the server process is presently waiting
+  on a lock held by another session.  In the above example we can infer
+  that process 1003 is waiting for process 1016 to complete its transaction and
+  thereby release some lock.
+  </para>
+
+  <para>
+   If you have turned off <xref linkend="guc-update-process-title"> then the
+   activity indicator is not updated; the process title is set only once
+   when a new process is launched.  On some platforms this saves a measurable
+   amount of per-command overhead;  on others it's insignificant.
+  </para>
+
+  <tip>
+  <para>
+  <productname>Solaris</productname> requires special handling. You must
+  use <command>/usr/ucb/ps</command>, rather than
+  <command>/bin/ps</command>. You also must use two <option>w</option>
+  flags, not just one. In addition, your original invocation of the
+  <command>postgres</command> command must have a shorter
+  <command>ps</command> status display than that provided by each
+  server process.  If you fail to do all three things, the <command>ps</>
+  output for each server process will be the original <command>postgres</>
+  command line.
+  </para>
+  </tip>
+ </sect1>
+
+ <sect1 id="monitoring-stats">
+  <title>The Statistics Collector</title>
+
+  <indexterm zone="monitoring-stats">
+   <primary>statistics</primary>
+  </indexterm>
+
+  <para>
+   <productname>PostgreSQL</productname>'s <firstterm>statistics collector</>
+   is a subsystem that supports collection and reporting of information about
+   server activity.  Presently, the collector can count accesses to tables
+   and indexes in both disk-block and individual-row terms.  It also tracks
+   the total number of rows in each table, and information about vacuum and
+   analyze actions for each table.  It can also count calls to user-defined
+   functions and the total time spent in each one.
+  </para>
+
+  <para>
+   <productname>PostgreSQL</productname> also supports reporting of the exact
+   command currently being executed by other server processes.  This
+   facility is independent of the collector process.
+  </para>
+
+ <sect2 id="monitoring-stats-setup">
+  <title>Statistics Collection Configuration</title>
+
+  <para>
+   Since collection of statistics adds some overhead to query execution,
+   the system can be configured to collect or not collect information.
+   This is controlled by configuration parameters that are normally set in
+   <filename>postgresql.conf</>.  (See <xref linkend="runtime-config"> for
+   details about setting configuration parameters.)
+  </para>
+
+  <para>
+   The parameter <xref linkend="guc-track-counts"> controls whether
+   statistics are collected about table and index accesses.
+  </para>
+
+  <para>
+   The parameter <xref linkend="guc-track-functions"> enables tracking of
+   usage of user-defined functions.
+  </para>
+
+  <para>
+   The parameter <xref linkend="guc-track-activities"> enables monitoring
+   of the current command being executed by any server process.
+  </para>
+
+  <para>
+   Normally these parameters are set in <filename>postgresql.conf</> so
+   that they apply to all server processes, but it is possible to turn
+   them on or off in individual sessions using the <xref
+   linkend="sql-set"> command. (To prevent
+   ordinary users from hiding their activity from the administrator,
+   only superusers are allowed to change these parameters with
+   <command>SET</>.)
+  </para>
+
+  <para>
+   The statistics collector transmits the collected
+   information to backends (including autovacuum) through temporary files.
+   These files are stored in the <filename>pg_stat_tmp</filename> subdirectory.
+   When the postmaster shuts down, a permanent copy of the statistics
+   data is stored in the <filename>global</filename> subdirectory. For increased
+   performance, the parameter <xref linkend="guc-stats-temp-directory"> can
+   be pointed at a RAM-based file system, decreasing physical I/O requirements.
+  </para>
+
+ </sect2>
+
+ <sect2 id="monitoring-stats-views">
+  <title>Viewing Collected Statistics</title>
+
+  <para>
+   Several predefined views, listed in <xref
+   linkend="monitoring-stats-views-table">, are available to show the results
+   of statistics collection.  Alternatively, one can
+   build custom views using the underlying statistics functions.
+  </para>
+
+  <para>
+   When using the statistics to monitor current activity, it is important
+   to realize that the information does not update instantaneously.
+   Each individual server process transmits new statistical counts to
+   the collector just before going idle; so a query or transaction still in
+   progress does not affect the displayed totals.  Also, the collector itself
+   emits a new report at most once per <varname>PGSTAT_STAT_INTERVAL</varname>
+   milliseconds (500 unless altered while building the server).  So the
+   displayed information lags behind actual activity.  However, current-query
+   information collected by <varname>track_activities</varname> is
+   always up-to-date.
+  </para>
+
+  <para>
+   Another important point is that when a server process is asked to display
+   any of these statistics, it first fetches the most recent report emitted by
+   the collector process and then continues to use this snapshot for all
+   statistical views and functions until the end of its current transaction.
+   So the statistics will show static information as long as you continue the
+   current transaction.  Similarly, information about the current queries of
+   all sessions is collected when any such information is first requested
+   within a transaction, and the same information will be displayed throughout
+   the transaction.
+   This is a feature, not a bug, because it allows you to perform several
+   queries on the statistics and correlate the results without worrying that
+   the numbers are changing underneath you.  But if you want to see new
+   results with each query, be sure to do the queries outside any transaction
+   block.  Alternatively, you can invoke
+   <function>pg_stat_clear_snapshot</function>(), which will discard the
+   current transaction's statistics snapshot (if any).  The next use of
+   statistical information will cause a new snapshot to be fetched.
+  </para>
+
+  <para>
+   A transaction can also see its own statistics (as yet untransmitted to the
+   collector) in the views <structname>pg_stat_xact_all_tables</>,
+   <structname>pg_stat_xact_sys_tables</>,
+   <structname>pg_stat_xact_user_tables</>, and
+   <structname>pg_stat_xact_user_functions</>, or via these views' underlying
+   functions.  These numbers do not act as stated above; instead they update
+   continuously throughout the transaction.
+  </para>
+
+  <table id="monitoring-stats-views-table">
+   <title>Standard Statistics Views</title>
+
+   <tgroup cols="2">
+    <thead>
+     <row>
+      <entry>View Name</entry>
+      <entry>Description</entry>
+     </row>
+    </thead>
+
+    <tbody>
+     <row>
+      <entry><structname>pg_stat_activity</><indexterm><primary>pg_stat_activity</primary></indexterm></entry>
+      <entry>One row per server process, showing database OID, database
+      name, process <acronym>ID</>, user OID, user name, application name,
+      client's address, host name (if available), and port number, times at
+      which the server process, current transaction, and current query began
+      execution, process's waiting status, and text of the current query.
+      The columns that report data on the current query are available unless
+      the parameter <varname>track_activities</varname> has been turned off.
+      Furthermore, these columns are only visible if the user examining
+      the view is a superuser or the same as the user owning the process
+      being reported on.  The client's host name will be available only if
+      <xref linkend="guc-log-hostname"> is set or if the user's host name
+      needed to be looked up during <filename>pg_hba.conf</filename>
+      processing.
+     </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_bgwriter</><indexterm><primary>pg_stat_bgwriter</primary></indexterm></entry>
+      <entry>One row only, showing cluster-wide statistics from the
+      background writer: number of scheduled checkpoints, requested
+      checkpoints, buffers written by checkpoints and cleaning scans,
+      and the number of times the background writer stopped a cleaning scan
+      because it had written too many buffers.  Also includes
+      statistics about the shared buffer pool, including buffers written
+      by backends (that is, not by the background writer), how many times
+      those backends had to execute their own fsync calls (normally the
+      background writer handles those even when the backend does its own
+      write), total buffers allocated, and time of last statistics reset.
+     </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_database</><indexterm><primary>pg_stat_database</primary></indexterm></entry>
+      <entry>One row per database, showing database OID, database name,
+      number of active server processes connected to that database,
+      number of transactions committed and rolled back in that database,
+      total disk blocks read, total buffer hits (i.e., block
+      read requests avoided by finding the block already in buffer cache),
+      number of rows returned, fetched, inserted, updated and deleted, the
+      total number of queries canceled due to conflict with recovery (on
+      standby servers), and time of last statistics reset.
+     </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_database_conflicts</><indexterm><primary>pg_stat_database_conflicts</primary></indexterm></entry>
+      <entry>One row per database, showing database OID, database name and
+      the number of queries that have been canceled in this database due to
+      dropped tablespaces, lock timeouts, old snapshots, pinned buffers and
+      deadlocks. Will only contain information on standby servers, since
+      conflicts do not occur on master servers.
+     </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_replication</><indexterm><primary>pg_stat_replication</primary></indexterm></entry>
+      <entry>One row per WAL sender process, showing process <acronym>ID</>,
+      user OID, user name, application name, client's address, host name
+      (if available) and port number, time at which the server process began
+      execution, and the current WAL sender state and transaction log
+      location.  In addition, the standby reports the last transaction log
+      position it received and wrote, the last position it flushed to disk,
+      and the last position it replayed, and this information is also
+      displayed here. If the standby's application names matches one of the
+      settings in <varname>synchronous_standby_names</> then the sync_priority
+      is shown here also, that is the order in which standbys will become
+      the synchronous standby. The columns detailing what exactly the connection
+      is doing are only visible if the user examining the view is a superuser.
+      The client's host name will be available only if
+      <xref linkend="guc-log-hostname"> is set or if the user's host name
+      needed to be looked up during <filename>pg_hba.conf</filename>
+      processing.
+     </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_all_tables</><indexterm><primary>pg_stat_all_tables</primary></indexterm></entry>
+      <entry>For each table in the current database (including TOAST tables),
+      the table OID, schema and table name, number of sequential
+      scans initiated, number of live rows fetched by sequential
+      scans, number of index scans initiated (over all indexes
+      belonging to the table), number of live rows fetched by index
+      scans, numbers of row insertions, updates, and deletions,
+      number of row updates that were HOT (i.e., no separate index update),
+      numbers of live and dead rows,
+      the last time the table was non-<option>FULL</> vacuumed manually,
+      the last time it was vacuumed by the autovacuum daemon,
+      the last time it was analyzed manually,
+      the last time it was analyzed by the autovacuum daemon,
+      number of times it has been non-<option>FULL</> vacuumed manually,
+      number of times it has been vacuumed by the autovacuum daemon,
+      number of times it has been analyzed manually,
+      and the number of times it has been analyzed by the autovacuum daemon.
+      </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_sys_tables</><indexterm><primary>pg_stat_sys_tables</primary></indexterm></entry>
+      <entry>Same as <structname>pg_stat_all_tables</>, except that only
+      system tables are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_user_tables</><indexterm><primary>pg_stat_user_tables</primary></indexterm></entry>
+      <entry>Same as <structname>pg_stat_all_tables</>, except that only user
+      tables are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_xact_all_tables</><indexterm><primary>pg_stat_xact_all_tables</primary></indexterm></entry>
+      <entry>Similar to <structname>pg_stat_all_tables</>, but counts actions
+      taken so far within the current transaction (which are <emphasis>not</>
+      yet included in <structname>pg_stat_all_tables</> and related views).
+      The columns for numbers of live and dead rows and vacuum and
+      analyze actions are not present in this view.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_xact_sys_tables</><indexterm><primary>pg_stat_xact_sys_tables</primary></indexterm></entry>
+      <entry>Same as <structname>pg_stat_xact_all_tables</>, except that only
+      system tables are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_xact_user_tables</><indexterm><primary>pg_stat_xact_user_tables</primary></indexterm></entry>
+      <entry>Same as <structname>pg_stat_xact_all_tables</>, except that only
+      user tables are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_all_indexes</><indexterm><primary>pg_stat_all_indexes</primary></indexterm></entry>
+      <entry>For each index in the current database,
+      the table and index OID, schema, table and index name,
+      number of index scans initiated on that index, number of
+      index entries returned by index scans, and number of live table rows
+      fetched by simple index scans using that index.
+      </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_sys_indexes</><indexterm><primary>pg_stat_sys_indexes</primary></indexterm></entry>
+      <entry>Same as <structname>pg_stat_all_indexes</>, except that only
+      indexes on system tables are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_user_indexes</><indexterm><primary>pg_stat_user_indexes</primary></indexterm></entry>
+      <entry>Same as <structname>pg_stat_all_indexes</>, except that only
+      indexes on user tables are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_statio_all_tables</><indexterm><primary>pg_statio_all_tables</primary></indexterm></entry>
+      <entry>For each table in the current database (including TOAST tables),
+      the table OID, schema and table name, number of disk
+      blocks read from that table, number of buffer hits, numbers of
+      disk blocks read and buffer hits in all indexes of that table,
+      numbers of disk blocks read and buffer hits from that table's
+      auxiliary TOAST table (if any), and numbers of disk blocks read
+      and buffer hits for the TOAST table's index.
+      </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_statio_sys_tables</><indexterm><primary>pg_statio_sys_tables</primary></indexterm></entry>
+      <entry>Same as <structname>pg_statio_all_tables</>, except that only
+      system tables are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_statio_user_tables</><indexterm><primary>pg_statio_user_tables</primary></indexterm></entry>
+      <entry>Same as <structname>pg_statio_all_tables</>, except that only
+      user tables are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_statio_all_indexes</><indexterm><primary>pg_statio_all_indexes</primary></indexterm></entry>
+      <entry>For each index in the current database,
+      the table and index OID, schema, table and index name,
+      numbers of disk blocks read and buffer hits in that index.
+      </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_statio_sys_indexes</><indexterm><primary>pg_statio_sys_indexes</primary></indexterm></entry>
+      <entry>Same as <structname>pg_statio_all_indexes</>, except that only
+      indexes on system tables are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_statio_user_indexes</><indexterm><primary>pg_statio_user_indexes</primary></indexterm></entry>
+      <entry>Same as <structname>pg_statio_all_indexes</>, except that only
+      indexes on user tables are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_statio_all_sequences</><indexterm><primary>pg_statio_all_sequences</primary></indexterm></entry>
+      <entry>For each sequence object in the current database,
+      the sequence OID, schema and sequence name,
+      numbers of disk blocks read and buffer hits in that sequence.
+      </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_statio_sys_sequences</><indexterm><primary>pg_statio_sys_sequences</primary></indexterm></entry>
+      <entry>Same as <structname>pg_statio_all_sequences</>, except that only
+      system sequences are shown.  (Presently, no system sequences are defined,
+      so this view is always empty.)</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_statio_user_sequences</><indexterm><primary>pg_statio_user_sequences</primary></indexterm></entry>
+      <entry>Same as <structname>pg_statio_all_sequences</>, except that only
+      user sequences are shown.</entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_user_functions</><indexterm><primary>pg_stat_user_functions</primary></indexterm></entry>
+      <entry>For all tracked functions, function OID, schema, name, number
+      of calls, total time, and self time.  Self time is the
+      amount of time spent in the function itself, total time includes the
+      time spent in functions it called. Time values are in milliseconds.
+     </entry>
+     </row>
+
+     <row>
+      <entry><structname>pg_stat_xact_user_functions</><indexterm><primary>pg_stat_xact_user_functions</primary></indexterm></entry>
+      <entry>Similar to <structname>pg_stat_user_functions</>, but counts only
+      calls during the current transaction (which are <emphasis>not</>
+      yet included in <structname>pg_stat_user_functions</>).</entry>
+     </row>
+
+    </tbody>
+   </tgroup>
+  </table>
+
+  <para>
+   The per-index statistics are particularly useful to determine which
+   indexes are being used and how effective they are.
+  </para>
+
+  <para>
+   Indexes can be
+   used either directly or via <quote>bitmap scans</>.  In a bitmap scan
+   the output of several indexes can be combined via AND or OR rules;
+   so it is difficult to associate individual heap row fetches
+   with specific indexes when a bitmap scan is used.  Therefore, a bitmap
+   scan increments the
+   <structname>pg_stat_all_indexes</>.<structfield>idx_tup_read</>
+   count(s) for the index(es) it uses, and it increments the
+   <structname>pg_stat_all_tables</>.<structfield>idx_tup_fetch</>
+   count for the table, but it does not affect
+   <structname>pg_stat_all_indexes</>.<structfield>idx_tup_fetch</>.
+  </para>
+
+  <note>
+   <para>
+    Before <productname>PostgreSQL</productname> 8.1, the
+    <structfield>idx_tup_read</> and <structfield>idx_tup_fetch</> counts
+    were essentially always equal.  Now they can be different even without
+    considering bitmap scans, because <structfield>idx_tup_read</> counts
+    index entries retrieved from the index while <structfield>idx_tup_fetch</>
+    counts live rows fetched from the table; the latter will be less if any
+    dead or not-yet-committed rows are fetched using the index.
+   </para>
+  </note>
+
+  <para>
+   The <structname>pg_statio_</> views are primarily useful to
+   determine the effectiveness of the buffer cache.  When the number
+   of actual disk reads is much smaller than the number of buffer
+   hits, then the cache is satisfying most read requests without
+   invoking a kernel call. However, these statistics do not give the
+   entire story: due to the way in which <productname>PostgreSQL</>
+   handles disk I/O, data that is not in the
+   <productname>PostgreSQL</> buffer cache might still reside in the
+   kernel's I/O cache, and might therefore still be fetched without
+   requiring a physical read. Users interested in obtaining more
+   detailed information on <productname>PostgreSQL</> I/O behavior are
+   advised to use the <productname>PostgreSQL</> statistics collector
+   in combination with operating system utilities that allow insight
+   into the kernel's handling of I/O.
+  </para>
+
+  <para>
+   Other ways of looking at the statistics can be set up by writing
+   queries that use the same underlying statistics access functions as
+   these standard views do.  These functions are listed in <xref
+   linkend="monitoring-stats-funcs-table">.  The per-database access
+   functions take a database OID as argument to identify which
+   database to report on.  The per-table and per-index functions take
+   a table or index OID.  The functions for function-call statistics
+   take a function OID.  (Note that only tables, indexes, and functions
+   in the current database can be seen with these functions.)  The
+   per-server-process access functions take a server process
+   number, which ranges from one to the number of currently active
+   server processes.
+  </para>
+
+  <table id="monitoring-stats-funcs-table">
+   <title>Statistics Access Functions</title>
+
+   <tgroup cols="3">
+    <thead>
+     <row>
+      <entry>Function</entry>
+      <entry>Return Type</entry>
+      <entry>Description</entry>
+     </row>
+    </thead>
+
+    <tbody>
+     <row>
+      <entry><literal><function>pg_stat_get_db_numbackends</function>(<type>oid</type>)</literal></entry>
+      <entry><type>integer</type></entry>
+      <entry>
+       Number of active server processes for database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_xact_commit</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of transactions committed in database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_xact_rollback</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of transactions rolled back in database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_blocks_fetched</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of disk block fetch requests for database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_blocks_hit</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of disk block fetch requests found in cache for database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_tuples_returned</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of tuples returned for database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_tuples_fetched</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of tuples fetched for database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_tuples_inserted</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of tuples inserted in database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_tuples_updated</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of tuples updated in database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_tuples_deleted</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of tuples deleted in database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_conflict_tablespace</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of queries canceled because of recovery conflict with dropped tablespaces in database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_conflict_lock</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of queries canceled because of recovery conflict with locks in database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_conflict_snapshot</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of queries canceled because of recovery conflict with old snapshots in database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_conflict_bufferpin</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of queries canceled because of recovery conflict with pinned buffers in database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_conflict_startup_deadlock</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of queries canceled because of recovery conflict with deadlocks in database
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_db_stat_reset_time</function>(<type>oid</type>)</literal></entry>
+      <entry><type>timestamptz</type></entry>
+      <entry>
+       Time of the last statistics reset for the database.  Initialized to the
+       system time during the first connection to each database.  The reset time
+       is updated when you call <function>pg_stat_reset</function> on the
+       database, as well as upon execution of
+       <function>pg_stat_reset_single_table_counters</function> against any
+       table or index in it.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_numscans</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of sequential scans done when argument is a table,
+       or number of index scans done when argument is an index
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_tuples_returned</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of rows read by sequential scans when argument is a table,
+       or number of index entries returned when argument is an index
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_tuples_fetched</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of table rows fetched by bitmap scans when argument is a table,
+       or table rows fetched by simple index scans using the index
+       when argument is an index
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_tuples_inserted</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of rows inserted into table
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_tuples_updated</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of rows updated in table (includes HOT updates)
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_tuples_deleted</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of rows deleted from table
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_tuples_hot_updated</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of rows HOT-updated in table
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_live_tuples</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of live rows in table
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_dead_tuples</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of dead rows in table
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_blocks_fetched</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of disk block fetch requests for table or index
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_blocks_hit</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of disk block requests found in cache for table or index
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_last_vacuum_time</function>(<type>oid</type>)</literal></entry>
+      <entry><type>timestamptz</type></entry>
+      <entry>
+       Time of the last non-<option>FULL</option> vacuum initiated by the user on this table
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_last_autovacuum_time</function>(<type>oid</type>)</literal></entry>
+      <entry><type>timestamptz</type></entry>
+      <entry>
+       Time of the last vacuum initiated by the autovacuum daemon on this table
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_last_analyze_time</function>(<type>oid</type>)</literal></entry>
+      <entry><type>timestamptz</type></entry>
+      <entry>
+       Time of the last analyze initiated by the user on this table
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_last_autoanalyze_time</function>(<type>oid</type>)</literal></entry>
+      <entry><type>timestamptz</type></entry>
+      <entry>
+       Time of the last analyze initiated by the autovacuum daemon on this
+       table
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_vacuum_count</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       The number of times this table has been non-<option>FULL</> vacuumed manually
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_autovacuum_count</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       The number of times this table has been vacuumed by the autovacuum daemon
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_analyze_count</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       The number of times this table has been analyzed manually
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_autoanalyze_count</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       The number of times this table has been analyzed by the autovacuum daemon
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_numscans</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of sequential scans done when argument is a table,
+       or number of index scans done when argument is an index, in the current transaction
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_tuples_returned</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of rows read by sequential scans when argument is a table,
+       or number of index entries returned when argument is an index, in the current transaction
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_tuples_fetched</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of table rows fetched by bitmap scans when argument is a table,
+       or table rows fetched by simple index scans using the index
+       when argument is an index, in the current transaction
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_tuples_inserted</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of rows inserted into table, in the current transaction
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_tuples_updated</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of rows updated in table (includes HOT updates), in the current transaction
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_tuples_deleted</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of rows deleted from table, in the current transaction
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_tuples_hot_updated</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of rows HOT-updated in table, in the current transaction
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_blocks_fetched</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of disk block fetch requests for table or index, in the current transaction
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_blocks_hit</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of disk block requests found in cache for table or index, in the current transaction
+      </entry>
+     </row>
+
+     <row>
+       <!-- See also the entry for this in func.sgml -->
+      <entry><literal><function>pg_backend_pid()</function></literal></entry>
+      <entry><type>integer</type></entry>
+      <entry>
+       Process ID of the server process attached to the current session
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_activity</function>(<type>integer</type>)</literal></entry>
+      <entry><type>setof record</type></entry>
+      <entry>
+       Returns a record of information about the backend with the specified PID, or
+       one record for each active backend in the system if <symbol>NULL</symbol> is
+       specified. The fields returned are a subset of those in the
+       <structname>pg_stat_activity</structname> view.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_function_calls</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of times the function has been called
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_function_time</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Total wall clock time spent in the function, in microseconds.  Includes
+       the time spent in functions called by this one.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_function_self_time</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Time spent in only this function. Time spent in called functions
+       is excluded.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_function_calls</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of times the function has been called, in the current transaction.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_function_time</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Total wall clock time spent in the function, in microseconds, in the
+       current transaction.  Includes the time spent in functions called by
+       this one.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_xact_function_self_time</function>(<type>oid</type>)</literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Time spent in only this function, in the current transaction. Time
+       spent in called functions is excluded.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_idset()</function></literal></entry>
+      <entry><type>setof integer</type></entry>
+      <entry>
+       Set of currently active server process numbers (from 1 to the
+       number of active server processes).  See usage example in the text.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_pid</function>(<type>integer</type>)</literal></entry>
+      <entry><type>integer</type></entry>
+      <entry>
+       Process ID of the given server process
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_dbid</function>(<type>integer</type>)</literal></entry>
+      <entry><type>oid</type></entry>
+      <entry>
+       Database ID of the given server process
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_userid</function>(<type>integer</type>)</literal></entry>
+      <entry><type>oid</type></entry>
+      <entry>
+       User ID of the given server process
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_activity</function>(<type>integer</type>)</literal></entry>
+      <entry><type>text</type></entry>
+      <entry>
+       Active command of the given server process, but only if the
+       current user is a superuser or the same user as that of
+       the session being queried (and
+       <varname>track_activities</varname> is on)
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_waiting</function>(<type>integer</type>)</literal></entry>
+      <entry><type>boolean</type></entry>
+      <entry>
+       True if the given server process is waiting for a lock,
+       but only if the current user is a superuser or the same user as that of
+       the session being queried (and
+       <varname>track_activities</varname> is on)
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_activity_start</function>(<type>integer</type>)</literal></entry>
+      <entry><type>timestamp with time zone</type></entry>
+      <entry>
+       The time at which the given server process' currently
+       executing query was started, but only if the
+       current user is a superuser or the same user as that of
+       the session being queried (and
+       <varname>track_activities</varname> is on)
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_xact_start</function>(<type>integer</type>)</literal></entry>
+      <entry><type>timestamp with time zone</type></entry>
+      <entry>
+       The time at which the given server process' currently
+       executing transaction was started, but only if the
+       current user is a superuser or the same user as that of
+       the session being queried (and
+       <varname>track_activities</varname> is on)
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_start</function>(<type>integer</type>)</literal></entry>
+      <entry><type>timestamp with time zone</type></entry>
+      <entry>
+       The time at which the given server process was started, or
+       null if the current user is not a superuser nor the same user
+       as that of the session being queried
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_client_addr</function>(<type>integer</type>)</literal></entry>
+      <entry><type>inet</type></entry>
+      <entry>
+       The IP address of the client connected to the given
+       server process; null if the connection is over a Unix domain
+       socket, also null if the current user is not a superuser nor
+       the same user as that of the session being queried
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_backend_client_port</function>(<type>integer</type>)</literal></entry>
+      <entry><type>integer</type></entry>
+      <entry>
+       The TCP port number of the client connected to the given
+       server process; -1 if the connection is over a Unix domain
+       socket, null if the current user is not a superuser nor the
+       same user as that of the session being queried
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_bgwriter_timed_checkpoints()</function></literal></entry>
+       <entry><type>bigint</type></entry>
+       <entry>
+        Number of times the background writer has started timed checkpoints
+        (because the <varname>checkpoint_timeout</varname> time has expired)
+       </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_bgwriter_requested_checkpoints()</function></literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of times the background writer has started checkpoints based
+       on requests from backends because the <varname>checkpoint_segments</varname>
+       has been exceeded or because the <command>CHECKPOINT</command>
+       command has been issued
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_bgwriter_buf_written_checkpoints()</function></literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of buffers written by the background writer during checkpoints
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_bgwriter_buf_written_clean()</function></literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of buffers written by the background writer for routine cleaning of
+       dirty pages
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_bgwriter_maxwritten_clean()</function></literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of times the background writer has stopped its cleaning scan because
+       it has written more buffers than specified in the
+       <varname>bgwriter_lru_maxpages</varname> parameter
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_bgwriter_stat_reset_time()</function></literal></entry>
+      <entry><type>timestamptz</type></entry>
+      <entry>
+        Time of the last statistics reset for the background writer, updated
+        when executing <function>pg_stat_reset_shared('bgwriter')</function>
+        on the database cluster.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_buf_written_backend()</function></literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Number of buffers written by backends because they needed
+       to allocate a new buffer
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_buf_alloc()</function></literal></entry>
+      <entry><type>bigint</type></entry>
+      <entry>
+       Total number of buffer allocations
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_get_wal_senders()</function></literal></entry>
+      <entry><type>setof record</type></entry>
+      <entry>
+       One record for each active wal sender. The fields returned are a subset
+       of those in the <structname>pg_stat_replication</structname> view.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_clear_snapshot()</function></literal></entry>
+      <entry><type>void</type></entry>
+      <entry>
+       Discard the current statistics snapshot
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_reset()</function></literal></entry>
+      <entry><type>void</type></entry>
+      <entry>
+       Reset all statistics counters for the current database to zero
+       (requires superuser privileges)
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_reset_shared</function>(text)</literal></entry>
+      <entry><type>void</type></entry>
+      <entry>
+       Reset some of the shared statistics counters for the database cluster to
+       zero (requires superuser privileges).  Calling
+       <literal>pg_stat_reset_shared('bgwriter')</> will zero all the values shown by
+       <structname>pg_stat_bgwriter</>.
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_reset_single_table_counters</function>(oid)</literal></entry>
+      <entry><type>void</type></entry>
+      <entry>
+       Reset statistics for a single table or index in the current database to
+       zero (requires superuser privileges)
+      </entry>
+     </row>
+
+     <row>
+      <entry><literal><function>pg_stat_reset_single_function_counters</function>(oid)</literal></entry>
+      <entry><type>void</type></entry>
+      <entry>
+       Reset statistics for a single function in the current database to
+       zero (requires superuser privileges)
+      </entry>
+     </row>
+    </tbody>
+   </tgroup>
+  </table>
+
+   <note>
+    <para>
+     <function>pg_stat_get_blocks_fetched</function> minus
+     <function>pg_stat_get_blocks_hit</function> gives the number of kernel
+     <function>read()</> calls issued for the table, index, or
+     database; the number of actual physical reads is usually
+     lower due to kernel-level buffering.  The <literal>*_blks_read</>
+     statistics columns use this subtraction, i.e., fetched minus hit.
+    </para>
+   </note>
+
+  <para>
+   All functions to access information about backends are indexed by backend id
+   number, except <function>pg_stat_get_activity</function> which is indexed by PID.
+   The function <function>pg_stat_get_backend_idset</function> provides
+   a convenient way to generate one row for each active server process.  For
+   example, to show the <acronym>PID</>s and current queries of all server processes:
+
+<programlisting>
+SELECT pg_stat_get_backend_pid(s.backendid) AS procpid,
+       pg_stat_get_backend_activity(s.backendid) AS current_query
+    FROM (SELECT pg_stat_get_backend_idset() AS backendid) AS s;
+</programlisting>
+  </para>
+
+ </sect2>
+ </sect1>
+
+ <sect1 id="monitoring-locks">
+  <title>Viewing Locks</title>
+
+  <indexterm zone="monitoring-locks">
+   <primary>lock</primary>
+   <secondary>monitoring</secondary>
+  </indexterm>
+
+  <para>
+   Another useful tool for monitoring database activity is the
+   <structname>pg_locks</structname> system table.  It allows the
+   database administrator to view information about the outstanding
+   locks in the lock manager. For example, this capability can be used
+   to:
+
+   <itemizedlist>
+    <listitem>
+     <para>
+      View all the locks currently outstanding, all the locks on
+      relations in a particular database, all the locks on a
+      particular relation, or all the locks held by a particular
+      <productname>PostgreSQL</productname> session.
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      Determine the relation in the current database with the most
+      ungranted locks (which might be a source of contention among
+      database clients).
+     </para>
+    </listitem>
+
+    <listitem>
+     <para>
+      Determine the effect of lock contention on overall database
+      performance, as well as the extent to which contention varies
+      with overall database traffic.
+     </para>
+    </listitem>
+   </itemizedlist>
+
+   Details of the <structname>pg_locks</structname> view appear in
+   <xref linkend="view-pg-locks">.
+   For more information on locking and managing concurrency with
+   <productname>PostgreSQL</productname>, refer to <xref linkend="mvcc">.
+  </para>
+ </sect1>
+
+ <sect1 id="dynamic-trace">
+  <title>Dynamic Tracing</title>
+
+ <indexterm zone="dynamic-trace">
+  <primary>DTrace</primary>
+ </indexterm>
+
+  <para>
+   <productname>PostgreSQL</productname> provides facilities to support
+   dynamic tracing of the database server. This allows an external
+   utility to be called at specific points in the code and thereby trace
+   execution.
+  </para>
+
+  <para>
+   A number of probes or trace points are already inserted into the source
+   code. These probes are intended to be used by database developers and
+   administrators. By default the probes are not compiled into
+   <productname>PostgreSQL</productname>; the user needs to explicitly tell
+   the configure script to make the probes available.
+  </para>
+
+  <para>
+   Currently, only the
+   <ulink url="http://opensolaris.org/os/community/dtrace/">DTrace</ulink>
+   utility is supported, which is available
+   on OpenSolaris, Solaris 10, and Mac OS X Leopard. It is expected that
+   DTrace will be available in the future on FreeBSD and possibly other
+   operating systems.  The
+   <ulink url="http://sourceware.org/systemtap/">SystemTap</ulink> project
+   for Linux also provides a DTrace equivalent.  Supporting other dynamic
+   tracing utilities is theoretically possible by changing the definitions for
+   the macros in <filename>src/include/utils/probes.h</>.
+  </para>
+
+  <sect2 id="compiling-for-trace">
+   <title>Compiling for Dynamic Tracing</title>
+
+  <para>
+   By default, probes are not available, so you will need to
+   explicitly tell the configure script to make the probes available
+   in <productname>PostgreSQL</productname>. To include DTrace support
+   specify <option>--enable-dtrace</> to configure.  See <xref
+   linkend="install-procedure"> for further information.
+  </para>
+  </sect2>
+
+  <sect2 id="trace-points">
+   <title>Built-in Probes</title>
+
+  <para>
+   A number of standard probes are provided in the source code,
+   as shown in <xref linkend="dtrace-probe-point-table">;
+   <xref linkend="typedefs-table">
+   shows the types used in the probes.  More probes can certainly be
+   added to enhance <productname>PostgreSQL</>'s observability.
+  </para>
+
+ <table id="dtrace-probe-point-table">
+  <title>Built-in DTrace Probes</title>
+  <tgroup cols="3">
+   <thead>
+    <row>
+     <entry>Name</entry>
+     <entry>Parameters</entry>
+     <entry>Description</entry>
+    </row>
+   </thead>
+
+   <tbody>
+
+    <row>
+     <entry>transaction-start</entry>
+     <entry>(LocalTransactionId)</entry>
+     <entry>Probe that fires at the start of a new transaction.
+      arg0 is the transaction ID.</entry>
+    </row>
+    <row>
+     <entry>transaction-commit</entry>
+     <entry>(LocalTransactionId)</entry>
+     <entry>Probe that fires when a transaction completes successfully.
+      arg0 is the transaction ID.</entry>
+    </row>
+    <row>
+     <entry>transaction-abort</entry>
+     <entry>(LocalTransactionId)</entry>
+     <entry>Probe that fires when a transaction completes unsuccessfully.
+      arg0 is the transaction ID.</entry>
+    </row>
+    <row>
+     <entry>query-start</entry>
+     <entry>(const char *)</entry>
+     <entry>Probe that fires when the processing of a query is started.
+      arg0 is the query string.</entry>
+    </row>
+    <row>
+     <entry>query-done</entry>
+     <entry>(const char *)</entry>
+     <entry>Probe that fires when the processing of a query is complete.
+      arg0 is the query string.</entry>
+    </row>
+    <row>
+     <entry>query-parse-start</entry>
+     <entry>(const char *)</entry>
+     <entry>Probe that fires when the parsing of a query is started.
+      arg0 is the query string.</entry>
+    </row>
+    <row>
+     <entry>query-parse-done</entry>
+     <entry>(const char *)</entry>
+     <entry>Probe that fires when the parsing of a query is complete.
+      arg0 is the query string.</entry>
+    </row>
+    <row>
+     <entry>query-rewrite-start</entry>
+     <entry>(const char *)</entry>
+     <entry>Probe that fires when the rewriting of a query is started.
+      arg0 is the query string.</entry>
+    </row>
+    <row>
+     <entry>query-rewrite-done</entry>
+     <entry>(const char *)</entry>
+     <entry>Probe that fires when the rewriting of a query is complete.
+      arg0 is the query string.</entry>
+    </row>
+    <row>
+     <entry>query-plan-start</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when the planning of a query is started.</entry>
+    </row>
+    <row>
+     <entry>query-plan-done</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when the planning of a query is complete.</entry>
+    </row>
+    <row>
+     <entry>query-execute-start</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when the execution of a query is started.</entry>
+    </row>
+    <row>
+     <entry>query-execute-done</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when the execution of a query is complete.</entry>
+    </row>
+    <row>
+     <entry>statement-status</entry>
+     <entry>(const char *)</entry>
+     <entry>Probe that fires anytime the server process updates its
+      <structname>pg_stat_activity</>.<structfield>current_query</> status.
+      arg0 is the new status string.</entry>
+    </row>
+    <row>
+     <entry>checkpoint-start</entry>
+     <entry>(int)</entry>
+     <entry>Probe that fires when a checkpoint is started.
+      arg0 holds the bitwise flags used to distinguish different checkpoint
+      types, such as shutdown, immediate or force.</entry>
+    </row>
+    <row>
+     <entry>checkpoint-done</entry>
+     <entry>(int, int, int, int, int)</entry>
+     <entry>Probe that fires when a checkpoint is complete.
+      (The probes listed next fire in sequence during checkpoint processing.)
+      arg0 is the number of buffers written. arg1 is the total number of
+      buffers. arg2, arg3 and arg4 contain the number of xlog file(s) added,
+      removed and recycled respectively.</entry>
+    </row>
+    <row>
+     <entry>clog-checkpoint-start</entry>
+     <entry>(bool)</entry>
+     <entry>Probe that fires when the CLOG portion of a checkpoint is started.
+      arg0 is true for normal checkpoint, false for shutdown
+      checkpoint.</entry>
+    </row>
+    <row>
+     <entry>clog-checkpoint-done</entry>
+     <entry>(bool)</entry>
+     <entry>Probe that fires when the CLOG portion of a checkpoint is
+      complete. arg0 has the same meaning as for clog-checkpoint-start.</entry>
+    </row>
+    <row>
+     <entry>subtrans-checkpoint-start</entry>
+     <entry>(bool)</entry>
+     <entry>Probe that fires when the SUBTRANS portion of a checkpoint is
+      started.
+      arg0 is true for normal checkpoint, false for shutdown
+      checkpoint.</entry>
+    </row>
+    <row>
+     <entry>subtrans-checkpoint-done</entry>
+     <entry>(bool)</entry>
+     <entry>Probe that fires when the SUBTRANS portion of a checkpoint is
+      complete. arg0 has the same meaning as for
+      subtrans-checkpoint-start.</entry>
+    </row>
+    <row>
+     <entry>multixact-checkpoint-start</entry>
+     <entry>(bool)</entry>
+     <entry>Probe that fires when the MultiXact portion of a checkpoint is
+      started.
+      arg0 is true for normal checkpoint, false for shutdown
+      checkpoint.</entry>
+    </row>
+    <row>
+     <entry>multixact-checkpoint-done</entry>
+     <entry>(bool)</entry>
+     <entry>Probe that fires when the MultiXact portion of a checkpoint is
+      complete. arg0 has the same meaning as for
+      multixact-checkpoint-start.</entry>
+    </row>
+    <row>
+     <entry>buffer-checkpoint-start</entry>
+     <entry>(int)</entry>
+     <entry>Probe that fires when the buffer-writing portion of a checkpoint
+      is started.
+      arg0 holds the bitwise flags used to distinguish different checkpoint
+      types, such as shutdown, immediate or force.</entry>
+    </row>
+    <row>
+     <entry>buffer-sync-start</entry>
+     <entry>(int, int)</entry>
+     <entry>Probe that fires when we begin to write dirty buffers during
+      checkpoint (after identifying which buffers must be written).
+      arg0 is the total number of buffers.
+      arg1 is the number that are currently dirty and need to be written.</entry>
+    </row>
+    <row>
+     <entry>buffer-sync-written</entry>
+     <entry>(int)</entry>
+     <entry>Probe that fires after each buffer is written during checkpoint.
+      arg0 is the ID number of the buffer.</entry>
+    </row>
+    <row>
+     <entry>buffer-sync-done</entry>
+     <entry>(int, int, int)</entry>
+     <entry>Probe that fires when all dirty buffers have been written.
+      arg0 is the total number of buffers.
+      arg1 is the number of buffers actually written by the checkpoint process.
+      arg2 is the number that were expected to be written (arg1 of
+      buffer-sync-start); any difference reflects other processes flushing
+      buffers during the checkpoint.</entry>
+    </row>
+    <row>
+     <entry>buffer-checkpoint-sync-start</entry>
+     <entry>()</entry>
+     <entry>Probe that fires after dirty buffers have been written to the
+      kernel, and before starting to issue fsync requests.</entry>
+    </row>
+    <row>
+     <entry>buffer-checkpoint-done</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when syncing of buffers to disk is
+      complete.</entry>
+    </row>
+    <row>
+     <entry>twophase-checkpoint-start</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when the two-phase portion of a checkpoint is
+      started.</entry>
+    </row>
+    <row>
+     <entry>twophase-checkpoint-done</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when the two-phase portion of a checkpoint is
+      complete.</entry>
+    </row>
+    <row>
+     <entry>buffer-read-start</entry>
+     <entry>(ForkNumber, BlockNumber, Oid, Oid, Oid, int, bool)</entry>
+     <entry>Probe that fires when a buffer read is started.
+      arg0 and arg1 contain the fork and block numbers of the page (but
+      arg1 will be -1 if this is a relation extension request).
+      arg2, arg3, and arg4 contain the tablespace, database, and relation OIDs
+      identifying the relation.
+      arg5 is the ID of the backend which created the temporary relation for a
+      local buffer, or InvalidBackendId (-1) for a shared buffer.
+      arg6 is true for a relation extension request, false for normal
+      read.</entry>
+    </row>
+    <row>
+     <entry>buffer-read-done</entry>
+     <entry>(ForkNumber, BlockNumber, Oid, Oid, Oid, int, bool, bool)</entry>
+     <entry>Probe that fires when a buffer read is complete.
+      arg0 and arg1 contain the fork and block numbers of the page (if this
+      is a relation extension request, arg1 now contains the block number
+      of the newly added block).
+      arg2, arg3, and arg4 contain the tablespace, database, and relation OIDs
+      identifying the relation.
+      arg5 is the ID of the backend which created the temporary relation for a
+      local buffer, or InvalidBackendId (-1) for a shared buffer.
+      arg6 is true for a relation extension request, false for normal
+      read.
+      arg7 is true if the buffer was found in the pool, false if not.</entry>
+    </row>
+    <row>
+     <entry>buffer-flush-start</entry>
+     <entry>(ForkNumber, BlockNumber, Oid, Oid, Oid)</entry>
+     <entry>Probe that fires before issuing any write request for a shared
+      buffer.
+      arg0 and arg1 contain the fork and block numbers of the page.
+      arg2, arg3, and arg4 contain the tablespace, database, and relation OIDs
+      identifying the relation.</entry>
+    </row>
+    <row>
+     <entry>buffer-flush-done</entry>
+     <entry>(ForkNumber, BlockNumber, Oid, Oid, Oid)</entry>
+     <entry>Probe that fires when a write request is complete.  (Note
+      that this just reflects the time to pass the data to the kernel;
+      it's typically not actually been written to disk yet.)
+      The arguments are the same as for buffer-flush-start.</entry>
+    </row>
+    <row>
+     <entry>buffer-write-dirty-start</entry>
+     <entry>(ForkNumber, BlockNumber, Oid, Oid, Oid)</entry>
+     <entry>Probe that fires when a server process begins to write a dirty
+      buffer.  (If this happens often, it implies that
+      <xref linkend="guc-shared-buffers"> is too
+      small or the bgwriter control parameters need adjustment.)
+      arg0 and arg1 contain the fork and block numbers of the page.
+      arg2, arg3, and arg4 contain the tablespace, database, and relation OIDs
+      identifying the relation.</entry>
+    </row>
+    <row>
+     <entry>buffer-write-dirty-done</entry>
+     <entry>(ForkNumber, BlockNumber, Oid, Oid, Oid)</entry>
+     <entry>Probe that fires when a dirty-buffer write is complete.
+      The arguments are the same as for buffer-write-dirty-start.</entry>
+    </row>
+    <row>
+     <entry>wal-buffer-write-dirty-start</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when when a server process begins to write a
+      dirty WAL buffer because no more WAL buffer space is available.
+      (If this happens often, it implies that
+      <xref linkend="guc-wal-buffers"> is too small.)</entry>
+    </row>
+    <row>
+     <entry>wal-buffer-write-dirty-done</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when a dirty WAL buffer write is complete.</entry>
+    </row>
+    <row>
+     <entry>xlog-insert</entry>
+     <entry>(unsigned char, unsigned char)</entry>
+     <entry>Probe that fires when a WAL record is inserted.
+      arg0 is the resource manager (rmid) for the record.
+      arg1 contains the info flags.</entry>
+    </row>
+    <row>
+     <entry>xlog-switch</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when a WAL segment switch is requested.</entry>
+    </row>
+    <row>
+     <entry>smgr-md-read-start</entry>
+     <entry>(ForkNumber, BlockNumber, Oid, Oid, Oid, int)</entry>
+     <entry>Probe that fires when beginning to read a block from a relation.
+      arg0 and arg1 contain the fork and block numbers of the page.
+      arg2, arg3, and arg4 contain the tablespace, database, and relation OIDs
+      identifying the relation.
+      arg5 is the ID of the backend which created the temporary relation for a
+      local buffer, or InvalidBackendId (-1) for a shared buffer.</entry>
+    </row>
+    <row>
+     <entry>smgr-md-read-done</entry>
+     <entry>(ForkNumber, BlockNumber, Oid, Oid, Oid, int, int, int)</entry>
+     <entry>Probe that fires when a block read is complete.
+      arg0 and arg1 contain the fork and block numbers of the page.
+      arg2, arg3, and arg4 contain the tablespace, database, and relation OIDs
+      identifying the relation.
+      arg5 is the ID of the backend which created the temporary relation for a
+      local buffer, or InvalidBackendId (-1) for a shared buffer.
+      arg6 is the number of bytes actually read, while arg7 is the number
+      requested (if these are different it indicates trouble).</entry>
+    </row>
+    <row>
+     <entry>smgr-md-write-start</entry>
+     <entry>(ForkNumber, BlockNumber, Oid, Oid, Oid, int)</entry>
+     <entry>Probe that fires when beginning to write a block to a relation.
+      arg0 and arg1 contain the fork and block numbers of the page.
+      arg2, arg3, and arg4 contain the tablespace, database, and relation OIDs
+      identifying the relation.
+      arg5 is the ID of the backend which created the temporary relation for a
+      local buffer, or InvalidBackendId (-1) for a shared buffer.</entry>
+    </row>
+    <row>
+     <entry>smgr-md-write-done</entry>
+     <entry>(ForkNumber, BlockNumber, Oid, Oid, Oid, int, int, int)</entry>
+     <entry>Probe that fires when a block write is complete.
+      arg0 and arg1 contain the fork and block numbers of the page.
+      arg2, arg3, and arg4 contain the tablespace, database, and relation OIDs
+      identifying the relation.
+      arg5 is the ID of the backend which created the temporary relation for a
+      local buffer, or InvalidBackendId (-1) for a shared buffer.
+      arg6 is the number of bytes actually written, while arg7 is the number
+      requested (if these are different it indicates trouble).</entry>
+    </row>
+    <row>
+     <entry>sort-start</entry>
+     <entry>(int, bool, int, int, bool)</entry>
+     <entry>Probe that fires when a sort operation is started.
+      arg0 indicates heap, index or datum sort.
+      arg1 is true for unique-value enforcement.
+      arg2 is the number of key columns.
+      arg3 is the number of kilobytes of work memory allowed.
+      arg4 is true if random access to the sort result is required.</entry>
+    </row>
+    <row>
+     <entry>sort-done</entry>
+     <entry>(bool, long)</entry>
+     <entry>Probe that fires when a sort is complete.
+      arg0 is true for external sort, false for internal sort.
+      arg1 is the number of disk blocks used for an external sort,
+      or kilobytes of memory used for an internal sort.</entry>
+    </row>
+    <row>
+     <entry>lwlock-acquire</entry>
+     <entry>(LWLockId, LWLockMode)</entry>
+     <entry>Probe that fires when an LWLock has been acquired.
+      arg0 is the LWLock's ID.
+      arg1 is the requested lock mode, either exclusive or shared.</entry>
+    </row>
+    <row>
+     <entry>lwlock-release</entry>
+     <entry>(LWLockId)</entry>
+     <entry>Probe that fires when an LWLock has been released (but note
+      that any released waiters have not yet been awakened).
+      arg0 is the LWLock's ID.</entry>
+    </row>
+    <row>
+     <entry>lwlock-wait-start</entry>
+     <entry>(LWLockId, LWLockMode)</entry>
+     <entry>Probe that fires when an LWLock was not immediately available and
+      a server process has begun to wait for the lock to become available.
+      arg0 is the LWLock's ID.
+      arg1 is the requested lock mode, either exclusive or shared.</entry>
+    </row>
+    <row>
+     <entry>lwlock-wait-done</entry>
+     <entry>(LWLockId, LWLockMode)</entry>
+     <entry>Probe that fires when a server process has been released from its
+      wait for an LWLock (it does not actually have the lock yet).
+      arg0 is the LWLock's ID.
+      arg1 is the requested lock mode, either exclusive or shared.</entry>
+    </row>
+    <row>
+     <entry>lwlock-condacquire</entry>
+     <entry>(LWLockId, LWLockMode)</entry>
+     <entry>Probe that fires when an LWLock was successfully acquired when the
+      caller specified no waiting.
+      arg0 is the LWLock's ID.
+      arg1 is the requested lock mode, either exclusive or shared.</entry>
+    </row>
+    <row>
+     <entry>lwlock-condacquire-fail</entry>
+     <entry>(LWLockId, LWLockMode)</entry>
+     <entry>Probe that fires when an LWLock was not successfully acquired when
+      the caller specified no waiting.
+      arg0 is the LWLock's ID.
+      arg1 is the requested lock mode, either exclusive or shared.</entry>
+    </row>
+    <row>
+     <entry>lock-wait-start</entry>
+     <entry>(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, LOCKMODE)</entry>
+     <entry>Probe that fires when a request for a heavyweight lock (lmgr lock)
+      has begun to wait because the lock is not available.
+      arg0 through arg3 are the tag fields identifying the object being
+      locked.  arg4 indicates the type of object being locked.
+      arg5 indicates the lock type being requested.</entry>
+    </row>
+    <row>
+     <entry>lock-wait-done</entry>
+     <entry>(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, LOCKMODE)</entry>
+     <entry>Probe that fires when a request for a heavyweight lock (lmgr lock)
+      has finished waiting (i.e., has acquired the lock).
+      The arguments are the same as for lock-wait-start.</entry>
+    </row>
+    <row>
+     <entry>deadlock-found</entry>
+     <entry>()</entry>
+     <entry>Probe that fires when a deadlock is found by the deadlock
+      detector.</entry>
+    </row>
+
+   </tbody>
+   </tgroup>
+  </table>
+
+ <table id="typedefs-table">
+  <title>Defined Types Used in Probe Parameters</title>
+  <tgroup cols="2">
+   <thead>
+    <row>
+     <entry>Type</entry>
+     <entry>Definition</entry>
+    </row>
+   </thead>
+
+   <tbody>
+
+    <row>
+     <entry>LocalTransactionId</entry>
+     <entry>unsigned int</entry>
+    </row>
+    <row>
+     <entry>LWLockId</entry>
+     <entry>int</entry>
+    </row>
+    <row>
+     <entry>LWLockMode</entry>
+     <entry>int</entry>
+    </row>
+    <row>
+     <entry>LOCKMODE</entry>
+     <entry>int</entry>
+    </row>
+    <row>
+     <entry>BlockNumber</entry>
+     <entry>unsigned int</entry>
+    </row>
+    <row>
+     <entry>Oid</entry>
+     <entry>unsigned int</entry>
+    </row>
+    <row>
+     <entry>ForkNumber</entry>
+     <entry>int</entry>
+    </row>
+    <row>
+     <entry>bool</entry>
+     <entry>char</entry>
+    </row>
+
+   </tbody>
+   </tgroup>
+  </table>
+
+
+  </sect2>
+
+  <sect2 id="using-trace-points">
+   <title>Using Probes</title>
+
+  <para>
+   The example below shows a DTrace script for analyzing transaction
+   counts in the system, as an alternative to snapshotting
+   <structname>pg_stat_database</> before and after a performance test:
+<programlisting>
+#!/usr/sbin/dtrace -qs
+
+postgresql$1:::transaction-start
+{
+      @start["Start"] = count();
+      self->ts  = timestamp;
+}
+
+postgresql$1:::transaction-abort
+{
+      @abort["Abort"] = count();
+}
+
+postgresql$1:::transaction-commit
+/self->ts/
+{
+      @commit["Commit"] = count();
+      @time["Total time (ns)"] = sum(timestamp - self->ts);
+      self->ts=0;
+}
+</programlisting>
+   When executed, the example D script gives output such as:
+<screen>
+# ./txn_count.d `pgrep -n postgres` or ./txn_count.d &lt;PID&gt;
+^C
+
+Start                                          71
+Commit                                         70
+Total time (ns)                        2312105013
+</screen>
+  </para>
+
+  <note>
+   <para>
+    SystemTap uses a different notation for trace scripts than DTrace does,
+    even though the underlying trace points are compatible.  One point worth
+    noting is that at this writing, SystemTap scripts must reference probe
+    names using double underscores in place of hyphens.  This is expected to
+    be fixed in future SystemTap releases.
+   </para>
+  </note>
+
+  <para>
+   You should remember that DTrace scripts need to be carefully written and
+   debugged, otherwise the trace information collected might
+   be meaningless. In most cases where problems are found it is the
+   instrumentation that is at fault, not the underlying system. When
+   discussing information found using dynamic tracing, be sure to enclose
+   the script used to allow that too to be checked and discussed.
+  </para>
+
+  <para>
+   More example scripts can be found in the PgFoundry
+   <ulink url="http://pgfoundry.org/projects/dtrace/">dtrace project</ulink>.
+  </para>
+  </sect2>
+
+  <sect2 id="defining-trace-points">
+   <title>Defining New Probes</title>
+
+  <para>
+   New probes can be defined within the code wherever the developer
+   desires, though this will require a recompilation. Below are the steps
+   for inserting new probes:
+  </para>
+
+  <procedure>
+   <step>
+    <para>
+     Decide on probe names and data to be made available through the probes
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Add the probe definitions to <filename>src/backend/utils/probes.d</>
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Include <filename>pg_trace.h</> if it is not already present in the
+     module(s) containing the probe points, and insert
+     <literal>TRACE_POSTGRESQL</> probe macros at the desired locations
+     in the source code
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Recompile and verify that the new probes are available
+    </para>
+   </step>
+  </procedure>
+
+  <formalpara>
+   <title>Example:</title>
+   <para>
+    Here is an example of how you would add a probe to trace all new
+    transactions by transaction ID.
+   </para>
+  </formalpara>
+
+  <procedure>
+   <step>
+    <para>
+     Decide that the probe will be named <literal>transaction-start</> and
+     requires a parameter of type LocalTransactionId
+    </para>
+   </step>
+
+   <step>
+    <para>
+     Add the probe definition to <filename>src/backend/utils/probes.d</>:
+<programlisting>
+probe transaction__start(LocalTransactionId);
+</programlisting>
+     Note the use of the double underline in the probe name. In a DTrace
+     script using the probe, the double underline needs to be replaced with a
+     hyphen, so <literal>transaction-start</> is the name to document for
+     users.
+    </para>
+   </step>
+
+   <step>
+    <para>
+     At compile time, <literal>transaction__start</> is converted to a macro
+     called <literal>TRACE_POSTGRESQL_TRANSACTION_START</> (notice the
+     underscores are single here), which is available by including
+     <filename>pg_trace.h</>.  Add the macro call to the appropriate location
+     in the source code.  In this case, it looks like the following:
+
+<programlisting>
+TRACE_POSTGRESQL_TRANSACTION_START(vxid.localTransactionId);
+</programlisting>
+    </para>
+   </step>
+
+   <step>
+    <para>
+     After recompiling and running the new binary, check that your newly added
+     probe is available by executing the following DTrace command.  You
+     should see similar output:
+<screen>
+# dtrace -ln transaction-start
+   ID    PROVIDER          MODULE           FUNCTION NAME
+18705 postgresql49878     postgres     StartTransactionCommand transaction-start
+18755 postgresql49877     postgres     StartTransactionCommand transaction-start
+18805 postgresql49876     postgres     StartTransactionCommand transaction-start
+18855 postgresql49875     postgres     StartTransactionCommand transaction-start
+18986 postgresql49873     postgres     StartTransactionCommand transaction-start
+</screen>
+    </para>
+   </step>
+  </procedure>
+
+  <para>
+   There are a few things to be careful about when adding trace macros
+   to the C code:
+
+   <itemizedlist>
+    <listitem>
+     <para>
+      You should take care that the data types specified for a probe's
+      parameters match the data types of the variables used in the macro.
+      Otherwise, you will get compilation errors.
+     </para>
+    </listitem>
+
+
+    <listitem>
+     <para>
+      On most platforms, if <productname>PostgreSQL</productname> is
+      built with <option>--enable-dtrace</>, the arguments to a trace
+      macro will be evaluated whenever control passes through the
+      macro, <emphasis>even if no tracing is being done</>.  This is
+      usually not worth worrying about if you are just reporting the
+      values of a few local variables.  But beware of putting expensive
+      function calls into the arguments.  If you need to do that,
+      consider protecting the macro with a check to see if the trace
+      is actually enabled:
+
+<programlisting>
+if (TRACE_POSTGRESQL_TRANSACTION_START_ENABLED())
+    TRACE_POSTGRESQL_TRANSACTION_START(some_function(...));
+</programlisting>
+
+      Each trace macro has a corresponding <literal>ENABLED</> macro.
+     </para>
+    </listitem>
+   </itemizedlist>
+
+  </para>
+
+  </sect2>
+
+ </sect1>
+
+</chapter>

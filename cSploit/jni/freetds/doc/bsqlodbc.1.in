@@ -1,0 +1,110 @@
+.\" cf. groff_mdoc
+.Dd April 26, 2012
+.Os FreeTDS @VERSION@
+.Dt BSQLODBC FreeTDS "FreeTDS Reference Manual"
+.\"
+.Sh NAME
+.Nm bsqlodbc
+.Nd batch SQL script processor using ODBC
+.\"
+.Sh SYNOPSIS
+.Pp
+.Nm
+.Op Fl qv
+.Op Fl U Ar username
+.Op Fl P Ar password
+.Op Fl S Ar server
+.Op Fl D Ar database
+.Op Fl i Ar input_file
+.Op Fl o Ar output_file
+.Op Fl e Ar error_file
+.Op Fl t Ar field_term
+.\"
+.Sh DESCRIPTION
+.Pp
+.Nm
+is a utility program distributed with FreeTDS.
+.Pp
+.Nm
+is a non-interactive equivalent of the 
+.Ql isql
+utility programs distributed by Sybase and Microsoft. Like them, 
+.Nm
+uses the command 
+.Ql go
+on a line by itself as a separator between batches. The last
+batch need not be followed by 
+.Ql go .
+.Pp
+.Nm
+makes use of the ODBC API provided by FreeTDS. This
+API is of course also available to application developers.
+.\"
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl U Ar username
+Database server login name.
+.It Fl P Ar password
+Database server password.
+.It Fl S Ar server
+Database server to which to connect.
+.It Fl D Ar database
+Database to use.
+.It Fl i Ar input_file
+Name of script file, containing SQL.
+.It Fl o Ar output_file
+Name of output file, holding result data.
+.It Fl e Ar error_file
+Name of file for errors.
+.It Fl t Ar field_term
+Specifies the field terminator. Default is two spaces (
+.Ql \ \ 
+.Ns ).
+Recognized escape sequences are tab (
+.Ql \et
+.Ns ), 
+carriage return (
+.Ql \er
+.Ns ), 
+newline (
+.Ql \en
+.Ns ),
+and backslash (
+.Ql \e\e
+.Ns ).
+.It Fl h
+Print column headers with the data to the same file.
+.It Fl q 
+Do not print column metadata, return status, or rowcount. Overrides
+.Fl h .
+.It Fl v
+Verbose mode, for more information about the ODBC interaction.
+This also reports the result set metadata, including and return code. All
+verbose data are written to standard error (or 
+.Fl e Ns ),
+so as not to interfere with the data stream.
+.El
+.\"
+.Sh NOTES
+.Pp
+.Nm
+is a filter; it reads from standard input, writes to standard output,
+and writes errors to standard error. The
+.Fl i ,
+.Fl o ,
+and
+.Fl e
+options override these defaults.
+.Sh EXIT STATUS
+.Nm
+exits 0 on success, and >0 if the server cannot process the query.
+.\"
+.Sh HISTORY
+.Nm
+first appeared in FreeTDS 0.65.
+.\"
+.Sh AUTHORS
+The 
+.Nm
+utility was written by 
+.An James K. Lowden Aq jklowden@freetds.org .

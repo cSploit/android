@@ -1,0 +1,313 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+ 
+#
+# Preamble for all OpenLDAP SDF documents
+#
+
+!default VERSION 2.4
+
+#
+# Paths are relative to the main subdirectories
+#
+
+!define DOC_AUTHOR	"The OpenLDAP Project <{{URL:http://www.openldap.org/}}>"
+!define DOC_NAME    "OpenLDAP Software 2.4"
+!define DOC_TYPE    "Guide"
+
+!define DOC_LOGO	"../images/LDAPlogo.gif"
+!define DOC_LOGO_BASE "../images/"
+!define DOC_HTML_LOGO ""
+
+!define DOC_LOF_TITLE	"Figures"
+!define DOC_LOF
+
+!define HTML_URL_HOME		"http://www.openldap.org/"
+!define HTML_URL_CATALOG	"../index.html"
+
+!macro HTML_HEADER
+#	!block inline
+#<FONT FACE="Arial,Verdana,Helvetica">
+#	!endblock
+	!if DOC_LOGO
+		!block inline
+<A HREF="http://www.OpenLDAP.org/">
+		!endblock
+		!import DOC_LOGO; align="Left"; border="0"; base=$var{'DOC_LOGO_BASE'}
+		!block inline
+</A>
+		!endblock
+		!HTML_NAVIGATE
+		!clear "Left"
+	!else
+		!HTML_NAVIGATE
+	!endif
+!endmacro
+
+!macro HTML_FOOTER
+	!HTML_PRE_SECTION
+	!HTML_NAVIGATE
+#	!block inline; expand
+#</FONT>
+#	!endblock
+	!block inline; expand
+<P>
+<FONT COLOR="#808080" FACE="Arial,Verdana,Helvetica" SIZE="1"><B>
+________________<BR>
+<SMALL>&copy; Copyright 2011, <A HREF="http://www.OpenLDAP.org/foundation/">OpenLDAP Foundation</A>, <A HREF="mailto:info@OpenLDAP.org">info@OpenLDAP.org</A></SMALL></B></FONT>
+
+	!endblock
+!endmacro
+
+!macro HTML_TOPIC_HEADER
+#	!block inline; expand
+#<FONT FACE="Arial,Verdana,Helvetica">
+#	!endblock
+	!define DOC_TOPIC_LOGO $var{'DOC_LOGO'}
+	!if DOC_TOPIC_LOGO
+		!default DOC_TOPIC_LOGO_BASE $var{'DOC_LOGO_BASE'}
+		!block inline
+<A HREF="http://www.OpenLDAP.org/">
+		!endblock
+		!import DOC_TOPIC_LOGO; align="Left"; border="0"; base=$var{'DOC_TOPIC_LOGO_BASE'}
+		!block inline
+</A>
+		!endblock
+		!HTML_TOPIC_NAVIGATE
+		!clear "Left"
+	!else
+		!HTML_TOPIC_NAVIGATE
+	!endif
+!endmacro
+
+!macro HTML_TOPIC_FOOTER
+	!HTML_PRE_SECTION
+	!HTML_TOPIC_NAVIGATE
+#	!block inline; expand
+#</FONT>
+#	!endblock
+	!block inline; expand
+<P>
+<FONT COLOR="#808080" FACE="Arial,Verdana,Helvetica" SIZE="1"><B>
+________________<BR>
+<SMALL>&copy; Copyright 2011, <A HREF="http://www.OpenLDAP.org/foundation/">OpenLDAP Foundation</A>, <A HREF="mailto:info@OpenLDAP.org">info@OpenLDAP.org</A></SMALL></B></FONT>
+
+	!endblock
+!endmacro
+
+
+# OpenLDAP related organization
+!block organisations; data; sort='Name'
+Name|Long|Jump
+ANSI|American National Standards Institute|http://www.ansi.org/
+BSI|British Standards Institute|http://www.bsi-global.com/
+COSINE|Co-operation and Open Systems Interconnection in Europe
+CPAN|Comprehensive Perl Archive Network|http://cpan.org/
+Cyrus|Project Cyrus|http://cyrusimap.web.cmu.edu/
+FSF|Free Software Foundation|http://www.fsf.org/
+GNU|GNU Not Unix Project|http://www.gnu.org/
+IAB|Internet Architecture Board|http://www.iab.org/
+IANA|Internet Assigned Numbers Authority|http://www.iana.org/
+IEEE|Institute of Electrical and Electronics Engineers|http://www.ieee.org
+IESG|Internet Engineering Steering Group|http://www.ietf.org/iesg/
+IETF|Internet Engineering Task Force|http://www.ietf.org/
+IRTF|Internet Research Task Force|http://www.irtf.org/
+ISO|International Standards Organisation|http://www.iso.org/
+ISOC|Internet Society|http://www.isoc.org/
+ITU|International Telephone Union|http://www.itu.int/
+OLF|OpenLDAP Foundation|http://www.openldap.org/foundation/
+OLP|OpenLDAP Project|http://www.openldap.org/project/
+OpenSSL|OpenSSL Project|http://www.openssl.org/
+RFC Editor|RFC Editor|http://www.rfc-editor.org/
+Oracle|Oracle Corporation|http://www.oracle.com/
+UM|University of Michigan|http://www.umich.edu/
+UMLDAP|University of Michigan LDAP Team|http://www.umich.edu/~dirsvcs/ldap/ldap.html
+!endblock
+
+!block products; data; sort='Name'
+Name|Jump
+Berkeley DB|http://www.oracle.com/database/berkeley-db/db/index.html
+Cyrus|http://cyrusimap.web.cmu.edu/generalinfo.html
+Cyrus SASL|http://asg.web.cmu.edu/sasl/sasl-library.html
+Git|http://git-scm.com/
+GNU|http://www.gnu.org/software/
+GnuTLS|http://www.gnu.org/software/gnutls/
+Heimdal|http://www.pdc.kth.se/heimdal/
+JLDAP|http://www.openldap.org/jldap/
+MIT Kerberos|http://web.mit.edu/kerberos/www/
+MozNSS|http://developer.mozilla.org/en/NSS
+OpenLDAP|http://www.openldap.org/
+OpenLDAP FAQ|http://www.openldap.org/faq/
+OpenLDAP ITS|http://www.openldap.org/its/
+OpenLDAP Software|http://www.openldap.org/software/
+OpenSSL|http://www.openssl.org/
+Perl|http://www.perl.org/
+SDF|http://search.cpan.org/src/IANC/sdf-2.001/doc/catalog.html
+UMLDAP|http://www.umich.edu/~dirsvcs/ldap/ldap.html
+!endblock
+
+# Internet and X.500 terms
+!block terms; data; sort='Term'
+Term|Definition
+3DES|Triple DES
+ABNF|Augmented Backus-Naur Form
+ACDF|Access Control Decision Function
+ACE|ASCII Compatible Encoding
+ASCII|American Standard Code for Information Interchange
+ACID|Atomicity, Consistency, Isolation, and Durability
+ACI|Access Control Information
+ACL|Access Control List
+AES|Advance Encryption Standard
+ABI|Application Binary Interface
+API|Application Program Interface
+ASN.1|Abstract Syntax Notation - One
+AVA|Attribute Value Assertion
+AuthcDN|Authentication DN
+AuthcId|Authentication Identity
+AuthzDN|Authorization DN
+AuthzId|Authorization Identity
+BCP|Best Current Practice
+BDB|Berkeley DB (Backend)
+BER|Basic Encoding Rules
+BNF|Backus-Naur Form
+C|The C Programming Language
+CA|Certificate Authority
+CER|Canonical Encoding Rules
+CLDAP|Connection-less LDAP
+CN|Common Name
+CRAM-MD5|SASL MD5 Challenge/Response Authentication Mechanism
+CRL|Certificate Revocation List
+DAP|Directory Access Protocol
+DC|Domain Component
+DER|Distinguished Encoding Rules
+DES|Data Encryption Standard
+DIB|Directory Information Base
+DIGEST-MD5|SASL Digest MD5 Authentication Mechanism
+DISP|Directory Information Shadowing Protocol
+DIT|Directory Information Tree
+DNS|Domain Name System
+DN|Distinguished Name
+DOP|Directory Operational Binding Management Protocol
+DSAIT|DSA Information Tree
+DSA|Directory System Agent
+DSE|DSA-specific Entry
+DSP|Directory System Protocol
+DS|Draft Standard
+DUA|Directory User Agent
+EXTERNAL|SASL External Authentication Mechanism
+FAQ|Frequently Asked Questions
+FTP|File Transfer Protocol
+FYI|For Your Information
+GSER|Generic String Encoding Rules
+GSS-API|Generic Security Service Application Program Interface
+GSSAPI|SASL Kerberos V GSS-API Authentication Mechanism
+HDB|Hierarchical Database (Backend)
+I-D|Internet-Draft
+IA5|International Alphabet 5
+IDNA|Internationalized Domain Names in Applications
+IDN|Internationalized Domain Name
+ID|Identification
+ID|Identifier
+IDL|Index Data Lookups
+IP|Internet Protocol
+IPC|Inter-process communication
+IPsec|Internet Protocol Security
+IPv4|Internet Protocol, version 4
+IPv6|Internet Protocol, version 6
+ITS|Issue Tracking System
+JPEG|Joint Photographic Experts Group
+Kerberos|Kerberos Authentication Service
+LBER|Lightweight BER
+LDAP|Lightweight Directory Access Protocol
+LDAP Sync|LDAP Content Synchronization
+LDAPv3|LDAP, version 3
+LDIF|LDAP Data Interchange Format
+LMDB|Lightning Memory-Mapped Database
+MD5|Message Digest 5
+MIB|Management Information Base
+MODDN|Modify DN
+MODRDN|Modify RDN
+NSSR|Non-specific Subordinate Reference
+OID|Object Identifier
+OSI|Open Systems Interconnect
+OTP|One Time Password
+PDU|Protocol Data Unit
+PEM|Privacy Enhanced eMail
+PEN|Private Enterprise Number
+PKCS|Public Key Cryptosystem
+PKI|Public Key Infrastructure
+PKIX|Public Key Infrastructure (X.509)
+PLAIN|SASL Plaintext Password Authentication Mechanism
+POSIX|Portable Operating System Interface
+PS|Proposed Standard
+RDN|Relative Distinguished Name
+RFC|Request for Comments
+RPC|Remote Procedure Call
+RXER|Robust XML Encoding Rules
+SASL|Simple Authentication and Security Layer
+SDF|Simple Document Format
+SDSE|Shadowed DSE
+SHA1|Secure Hash Algorithm 1
+SLAPD|Standalone LDAP Daemon
+SLURPD|Standalone LDAP Update Replication Daemon
+SMTP|Simple Mail Transfer Protocol
+SNMP|Simple Network Management Protocol
+SQL|Structured Query Language
+SRP|Secure Remote Password
+SSF|Security Strength Factor
+SSL|Secure Socket Layer
+STD|Internet Standard
+TCP|Transmission Control Protocol
+TLS|Transport Layer Security
+UCS|Universal Multiple-Octet Coded Character Set
+UDP|User Datagram Protocol
+UID|User Identifier
+Unicode|The Unicode Standard
+UNIX|Unix
+URI|Uniform Resource Identifier
+URL|Uniform Resource Locator
+URN|Uniform Resource Name
+UTF-8|8-bit UCS/Unicode Transformation Format
+UTR|Unicode Technical Report
+UUID|Universally Unique Identifier
+WWW|World Wide Web
+X.500|X.500 Directory Services
+X.509|X.509 Public Key and Attribute Certificate Frameworks
+XED|XML Enabled Directory
+XER|XML Encoding Rules
+XML|Extensible Markup Language
+syncrepl|LDAP Sync-based Replication
+!endblock
+
+!block references; data; sort=Reference; style=grid
+Reference|Status|Document|Jump
+UM-GUIDE|O|The SLAPD and SLURPD Administrators Guide|http://www.umich.edu/~dirsvcs/ldap/doc/guides/slapd/guide.pdf
+RFC2079|PS|Definition of an X.500 Attribute Type and an Object Class to Hold Uniform Resource Identifers|http://www.rfc-editor.org/rfc/rfc2079.txt
+RFC2296|PS|Use of Language Codes in LDAP|http://www.rfc-editor.org/rfc/rfc2296.txt
+RFC2307|X|An Approach for Using LDAP as a Network Information Service|http://www.rfc-editor.org/rfc/rfc2307.txt
+RFC2589|PS|Lightweight Directory Access Protocol (v3): Extensions for Dynamic Directory Services|http://www.rfc-editor.org/rfc/rfc2589.txt
+RFC2798|I|Definition of the inetOrgPerson LDAP Object Class|http://www.rfc-editor.org/rfc/rfc2798.txt
+RFC2831|PS|Using Digest Authentication as a SASL Mechanism|http://www.rfc-editor.org/rfc/rfc2831.txt
+RFC2849|PS|The LDAP Data Interchange Format|http://www.rfc-editor.org/rfc/rfc2849.txt
+RFC3088|X|OpenLDAP Root Service|http://www.rfc-editor.org/rfc/rfc3088.txt
+RFC3296|PS|Named Subordinate References in LDAP|http://www.rfc-editor.org/rfc/rfc3296.txt
+RFC3384|I|Lightweight Directory Access Protocol (version 3) Replication Requirements|http://www.rfc-editor.org/rfc/rfc3384.txt
+RFC3494|I|Lightweight Directory Access Protocol version 2 (LDAPv2) to Historic Status|http://www.rfc-editor.org/rfc/rfc3494.txt
+RFC4013|PS|SASLprep: Stringprep Profile for User Names and Passwords|http://www.rfc-editor.org/rfc/rfc4013.txt
+RFC4346|PS|The Transport Layer Security (TLS) Protocol, Version 1.1|http://www.rfc-editor.org/rfc/rfc4346.txt
+RFC4422|PS|Simple Authentication and Security Layer (SASL)|http://www.rfc-editor.org/rfc/rfc4422.txt
+RFC4510|PS|Lightweight Directory Access Protocol (LDAP): Technical Specification Roadmap|http://www.rfc-editor.org/rfc/rfc4510.txt
+RFC4511|PS|Lightweight Directory Access Protocol (LDAP): The Protocol|http://www.rfc-editor.org/rfc/rfc4511.txt
+RFC4512|PS|Lightweight Directory Access Protocol (LDAP): Directory Information Models|http://www.rfc-editor.org/rfc/rfc4512.txt
+RFC4513|PS|Lightweight Directory Access Protocol (LDAP): Authentication Methods and Security Mechanisms|http://www.rfc-editor.org/rfc/rfc4513.txt
+RFC4514|PS|Lightweight Directory Access Protocol (LDAP): String Representation of Distinguished Names|http://www.rfc-editor.org/rfc/rfc4514.txt
+RFC4515|PS|Lightweight Directory Access Protocol (LDAP): String Representation of Search Filters|http://www.rfc-editor.org/rfc/rfc4515.txt
+RFC4516|PS|Lightweight Directory Access Protocol (LDAP): Uniform Resource Locator|http://www.rfc-editor.org/rfc/rfc4516.txt
+RFC4517|PS|Lightweight Directory Access Protocol (LDAP): Syntaxes and Matching Rules|http://www.rfc-editor.org/rfc/rfc4517.txt
+RFC4518|PS|Lightweight Directory Access Protocol (LDAP): Internationalized String Preparation|http://www.rfc-editor.org/rfc/rfc4518.txt
+RFC4519|PS|Lightweight Directory Access Protocol (LDAP): Schema for User Applications|http://www.rfc-editor.org/rfc/rfc4519.txt
+RFC4520|BCP|IANA Considerations for LDAP|http://www.rfc-editor.org/rfc/rfc4520.txt
+RFC4533|X|The Lightweight Directory Access Protocol (LDAP) Content Synchronization Operation|http://www.rfc-editor.org/rfc/rfc4533.txt
+Chu-LDAPI|ID|Using LDAP Over IPC Mechanisms|http://tools.ietf.org/html/draft-chu-ldap-ldapi-00
+!endblock

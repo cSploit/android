@@ -1,0 +1,209 @@
+The FreeTDS coding style for C code is close to K&R/Linux kernel style.  
+This document makes explicit the coding style found through most of the 
+project.  There are likely to be portions of code that do not follow this 
+style, but ideally all would.
+
+We are of course not trying to dictate how you code, but patches or submissions 
+to CVS should be converted to this style prior to committing.  The indent 
+program found on most Unix systems will do this nicely.
+
+Code Blocks
+-----------
+
+Blocks of code should start with the { on the line with the control statement.
+
+For example,
+
+for (i=0;i<x;i++) {
+	...
+}
+
+This applies to for, do, while, switch, if and any other looping or branching
+constructs.  The exception to this is function declarations, in which the { 
+should follow the declaration, as in
+
+void 
+foo(int bar)
+{
+	...
+}
+
+Indenting
+---------
+
+Indenting should be done with one tab character per level. Default tabspace 
+is 8 characters. You can set in your editor whatever tabspace you want
+but be sure that you indent using tabs and that line break work well with a
+tabspace of 8.
+
+Variables
+---------
+
+Variables in FreeTDS should be all lower case with words separated by '_' 
+(underscore).  Furthermore, brevity is valued but not at the expense of clarity.
+For instance, the variable 'minor_ver' is clear enough in context and doesn't 
+need to be labeled 'minor_version'.  The counter example to this is that the 
+variable 'can' is rather ambiguous and be expanded to 'canceled' for clarity.
+
+The sole exception to this is arguments to the ODBC functions.  ODBC because of 
+its lineage uses hungarian notation for the names of the function arguments.
+Variables that are internal to the functions should still follow the coding
+style, but function arguments retain their Microsoft given names.
+
+Variable declarations at the top of the function should be left aligned. This is
+a departure from K&R style but one I find is helpful when scanning through the 
+code.  Example,
+
+void 
+foo(int bar)
+{
+int i;
+
+	for (i=0;i<bar;i++) {
+
+	...
+
+}
+
+a single space is generally preferred to separate the type from the variable
+name, although some code pushes variable names to the right for clarity. 
+Which ever looks better is fine.
+
+Function Declarations
+---------------------
+
+Function declarations started out a little like this:
+
+void 
+foo(int bar, int baz)
+{
+}
+
+with no spaces between the function name 'foo' and the left paren, between the 
+left paren and the first argument, nor the last argument and the right paren. A
+single space should follow the comma after each argument.
+
+In recent times, the functions have been moving towards the GNU style 
+declaration with the return type and modifiers on the line above, and the next
+line starting with the name of the function
+
+static void
+foo(int bar, int baz)
+{
+}
+
+Spacing remains the same, but having the function aligned to the left side makes
+searching for functions, and not the calls to them, easier.  This style is now
+preferred, but much of the code does not implement it.
+
+When creating a function with no arguments there should be no spacing between
+the parens.
+
+void
+foobar()
+{
+}
+ 
+Comments
+--------
+
+FreeTDS is a fairly portable package and runs on a number of platforms that 
+have either no C++ style comments or need special switches to turn them on 
+(the AIX C compiler comes to mind).  Therefore, all comments must be C-style
+comments and not the C++ // comments.
+
+void
+foo()
+{
+	// incorrect
+}
+
+void
+foo()
+{
+	/* correct */
+}
+
+The second comments related item is function documentation.  While not really 
+widely implemented yet, we are moving towards doxygen (JavaDoc) comments so 
+that function declarations can be extracted into a programmers manual.  
+
+See http://www.stack.nl/~dimitri/doxygen/manual.html for details.
+
+
+
+indent(1)
+---------
+
+The indent tool is a handy way to spiff up your formatting and bring it into
+conformance.  It will compile faster!  No, it won't.  But it will be more
+understandable to the lesser beings who want to try to follow you.  
+
+We are currently using GNU indent 2.2.6.  
+
+These are the settings we use in our .indent.pro profile file.  I have listed our
+choice first, its alternative second (in case we change our minds). When the
+default follows some other setting, I've placed a '#' to indicate it's (sort of)
+commented out, and won't appear in .indent.pro.  Same goes for options e.g.  
+'-troff' that have no opposite.  
+
+  -bad, -nbad	  If -bad is specified, a blank line is forced after every
+		  block of declarations.  Default: -nbad.
+  -bap, -nbap	  If -bap is specified, a blank line is forced after every
+		  procedure body.  Default: -nbap.
+  -nbbb, -bbb	  If -bbb is specified, a blank line is forced before every
+		  block comment.  Default: -nbbb.
+  -nbc, -bc	  If -bc is specified, then a newline is forced after each
+		  comma in a declaration.  -nbc turns off this option.  The
+		  default is -bc.
+  -br, -bl	  K & R braces, see above.
+  -c33 		  The column in which comments on code start.  The default.
+  #cd -n	  Indent declarations as code.  
+  -ncdb, -cdb	  Allow single-line comments e.g.:
+                              /* this is a comment */  
+                  The default is -cdb.
+  -ce, -nce	  Forcing `else's to cuddle up to the
+		  immediately preceding `}'.  The default is -ce.
+  #cin  	  Sets the continuation indent to be n.  -ci defaults to 
+                  the same value as -i.
+  -cli0 	  Causes case labels to be indented n tab stops to the
+		  right of the containing switch statement.  -cli0 -.5
+                  causes case labels to be indented half a tab stop.  The
+		  default is -cli0.
+  -d0		  Controls the placement of comments which are not to the
+		  right of code.  The default -d1 means that such comments
+                  are placed one indentation level to the left of code.
+		  Specifying -d0 lines up these comments with the code.
+  -di1  	  Specifies the indentation, in character positions, from a
+		  declaration keyword to the following identifier.  The de-
+		  fault is -di16.
+  -dj, -ndj	  -dj left justifies declarations.  -ndj indents declara-
+		  tions the same as code.  The default is -ndj.
+  -nei, -ei	  Disable special else-if processing.  
+  -nfc1, -fc1	  Disable formatting comments that start in column 1.  
+  -i8		  The number of spaces for one indentation level.
+  -ts8		  Tab stops at 8 postitions.
+  -ut             Use Tabs
+  -ip, -nip	  Enable the indentation of parameter declarations 
+		  from the left margin.  The default is -ip.
+  -l80		  Maximum length of an output line.  The default is 75.
+  -lp, -nlp	  Line up code surrounded by parenthesis:
+                           p1 = first_procedure(second_procedure(p2, p3),
+                                                third_procedure(p4,p5));
+		  -lp is the default.
+  #npro 	  Causes the profile files, `./.indent.pro' and
+  -pcs, -npcs	  Procedure calls will have a space inserted between the 
+                  name and the `('.  The default is -npcs.
+  -psl, -npsl	  The return type of a procedure is placed on the line above 
+                  its name.  The default is -psl.
+  -sc, -nsc	  Put asterisks (`*'s) at the left edge of all comments.
+  -nsob, -sob	  If -sob is specified, indent will swallow optional blank
+		  declarations.  Default: -nsob.
+  #st		  Causes indent to take its input from stdin, and put its
+  #Ttypename	  Adds typename to the list of type keywords.  Names accu-
+		  mulate: -T can be specified more than once.  You need to
+		  that are defined by typedef - nothing will be harmed if
+		  typedef causes a syntactic change in the language and in-
+  #troff	  Causes indent to format the program for processing by
+  -nv, -v	  -v turns on `verbose' mode; -nv turns it off.  When in
+                     size statistics at completion. The default is -nv.

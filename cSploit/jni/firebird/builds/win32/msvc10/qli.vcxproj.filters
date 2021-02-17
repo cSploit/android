@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="QLI files">
+      <UniqueIdentifier>{da3cf9eb-a5b6-4478-87a3-3da5fa0c95a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JRD files">
+      <UniqueIdentifier>{f6c663b8-6259-4bf6-b108-0d891c74d097}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{ea691fcc-ce86-44c7-b53b-40b660c82329}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{34f2b335-6604-4188-a20b-e9916b80b05c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QLI files\GPRE epp">
+      <UniqueIdentifier>{a1a82d81-9dc5-4076-8daa-a05176116840}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="QLI files\GPRE cpp">
+      <UniqueIdentifier>{28befd96-6561-4892-8120-10fe6777523c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\qli\all.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\command.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\compile.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\dtr.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\err.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\eval.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\exe.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\expand.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\format.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\gener.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\hsh.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\lex.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\mov.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\parse.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\picstr.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\qli\report.cpp">
+      <Filter>QLI files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\jrd\status.cpp">
+      <Filter>JRD files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\qli\help.cpp">
+      <Filter>QLI files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\qli\proc.cpp">
+      <Filter>QLI files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\qli\meta.cpp">
+      <Filter>QLI files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\qli\show.cpp">
+      <Filter>QLI files\GPRE cpp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\qli\help.epp">
+      <Filter>QLI files\GPRE epp</Filter>
+    </None>
+    <None Include="..\..\..\src\qli\meta.epp">
+      <Filter>QLI files\GPRE epp</Filter>
+    </None>
+    <None Include="..\..\..\src\qli\proc.epp">
+      <Filter>QLI files\GPRE epp</Filter>
+    </None>
+    <None Include="..\..\..\src\qli\show.epp">
+      <Filter>QLI files\GPRE epp</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\qli\words.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\all_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\blk.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\comma_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\compi_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\compile.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\dtr.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\err_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\eval_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\exe.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\exe_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\expan_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\forma_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\format.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\gener_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\help_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\hsh_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\lex_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\meta_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\mov_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\parse.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\parse_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\picst_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\proc_ddl.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\proc_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\procddl1.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\procddl2.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\procddl3.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\procddl4.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\qliswi.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\repor_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\report.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\reqs.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\show_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\qli\symbols.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

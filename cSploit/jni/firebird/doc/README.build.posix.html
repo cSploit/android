@@ -1,0 +1,888 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <meta name="generator" content=
+        "HTML Tidy for Windows (vers 12 April 2005), see www.w3.org">
+<style type="text/css">
+body {
+    font-family: Helvetica,sans-serif; 
+    font-size: 9pt;
+    font-style: normal; 
+    font-weight: normal; 
+    background-color: #FFFFFF;
+    margin-left: 54px;
+    margin-right: 54px;
+    margin-top: 10px;
+    margin-bottom: 36px;
+    padding:0px; 
+}
+
+h1  {
+    font-family: Helvetica, sans-serif;
+    font-size: 16pt;
+    font-weight: bold;
+    font-variant: small-caps;
+}
+
+h2  { 
+    font-family: Helvetica, sans-serif; 
+    font-size: 14pt; 
+    font-weight: bold; 
+    color: #000000;
+}
+
+h3  { 
+    font-family: Helvetica, sans-serif; 
+    font-size: 12pt; 
+    font-weight: bold; 
+    color: #000000;
+}
+
+h4  { 
+    font-family: Helvetica, sans-serif; 
+    font-size: 10pt; 
+    font-weight: bold; 
+    color: #000000;
+}
+
+
+h5  { 
+    font-family: Helvetica, sans-serif; 
+    font-size: 9pt; 
+    font-weight: bold; 
+    font-style: italic;
+    color: #000000;
+}
+
+
+
+p {
+    font-family: Helvetica,sans-serif; 
+    font-size: 10pt;
+    font-style: normal; 
+    font-weight: normal; 
+    padding-left: 0%;
+}
+
+pre {
+    padding: 1em;
+    border: 1px dashed #2f6fab;
+    color: black;
+    background-color: #f9f9f9;
+    line-height: 1.1em;
+}
+
+p.caption {
+    font-weight: bold;
+    color: black;
+    padding-top: 0px;
+    padding-bottom: 12px;
+}
+
+
+div {
+    font-family: Helvetica,sans-serif; 
+    font-size: 9pt;
+    font-style: normal; 
+    font-weight: normal; 
+    padding-left: 7%; 
+    padding-right: 5%;
+}
+
+b{
+    font-family:  Helvetica, sans-serif; 
+    font-size: 9pt; 
+    font-weight: bold;
+}
+
+table {
+    cellpadding: 0;
+    cellspacing: 0;
+}
+
+table.fbtable {
+    font-size: 10pt; 
+    border-width: 1px 1px 1px 1px;
+    border-spacing: 2px;
+    border-style: outset outset outset outset;
+    border-color: gray gray gray gray;
+    border-collapse: separate;
+    background-color: white;
+}
+table.fbtable th {
+    border-width: 1px 1px 1px 1px;
+    padding: 1px 1px 1px 1px;
+    border-style: inset inset inset inset;
+    border-color: gray gray gray gray;
+    background-color: white;
+    -moz-border-radius: 0px 0px 0px 0px;
+}
+table.fbtable td {
+    border-width: 1px 1px 1px 1px;
+    padding: 1px 1px 1px 1px;
+    border-style: inset inset inset inset;
+    border-color: gray gray gray gray;
+    background-color: white;
+    -moz-border-radius: 0px 0px 0px 0px;
+}
+
+table.fbtable td.code {
+    font-size: 10pt; 
+    font-family: Courier New,monospace; 
+    color: black;
+}
+
+
+table.platform_table caption {
+    margin-left: 2px;
+    margin-right: 2px;
+    padding: 1px;
+    font-weight: bold;
+    background-color: #dee2ff;
+    text-align: left;
+}
+
+table.platform_table tr.works td {
+    background-color: lightgreen;
+    border: 1px solid gray;
+}
+
+table.platform_table tr.broken td {
+    background-color: darkred;
+    border: 1px solid gray;
+    padding: 1px;
+}
+
+table.platform_table tr.rarely td {
+    background-color: lightyellow;
+    border: 1px solid gray;
+    padding: 1px;
+    font-style: italic;
+}
+
+td.left     {
+    text-align: left;
+    font-size: 9pt; 
+    width: 33%;
+    padding-top: 10px;
+    padding-bottom: 10px;}
+
+td.center   {
+    text-align: center;
+    font-size: 9pt; 
+    width: 33%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+td.right    {
+    text-align: right;
+    font-size: 9pt; 
+    width: 33%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+</style>
+        <title></title>
+    </head>
+    <body>
+        <h1>
+            <a name="intro" id="intro">1.0 Introduction</a>
+        </h1>
+        <p>
+            Firebird builds on many POSIX compatible Unix and Linux platforms.
+            This document describes the process for building on these systems
+            and lists the supported configurations - including compiler
+            revision and OS level for best results.
+        </p>
+        <h1>
+            <a name="contents" id="contents">2.0 Contents</a>
+        </h1><a href="#intro">Introduction</a><br>
+        <a href="#contents">Contents</a><br>
+        <a href="#preparing">Preparing to Build Firebird</a><br>
+        <ul>
+            <li>
+                <a href="#configure1">Generating a configure file with
+                autogen.sh</a>
+            </li>
+            <li>
+                <a href="#configure2">Running configure</a>
+            </li>
+        </ul><a href="#supported">Supported Platforms</a>
+        <ul>
+            <li>
+                <a href="#aix1">AIX 6.1, Power</a>
+            </li>
+            <li>
+                <a href="#hp1">HP-UX 11i v3, Itanium</a>
+            </li>
+            <li>
+                <a href="#hp2">HP-UX 11i v3, PA-RISC</a>
+            </li>
+            <li>
+                <a href="#linux1">64-bit Linux</a>
+            </li>
+            <li>
+                <a href="#linux2">32-bit Linux</a>
+            </li>
+            <li>
+                <a href="#sol1">Solaris 10, Sparc</a>
+            </li>
+            <li>
+                <a href="#sol2">Solaris 10, Intel</a>
+            </li>
+        </ul>
+        <h1>
+            <a name="preparing" id="preparing">3.0 Preparing to Build
+            Firebird</a>
+        </h1>
+        <h2>
+            <a name="configure1" id="configure1">3.1 Generating a configure
+            file with autogen.sh</a>
+        </h2>
+        <p>
+            Before building Firebird it is necessary to create the "configure"
+            script, if one is not included with your distrubtion. The configure
+            script is generated by running the "autogen.sh" script. Autogen.sh
+            is a shell script located in the root directory of the Firebird
+            build.
+        </p>
+        <p>
+            Autogen.sh depends on the GNU autotools to create "configure".
+            Modern LINUX distributions will already have the GNU autotools
+            installed, but if you are attempting to build on
+            AIX, HP-UX, or Solaris, you may need to install the
+            necessary GNU utilities.
+        </p>
+        <p>
+            The table below shows the versions of the GNU tools that we use to
+            build Firebird 2.5 on the different POSIX hosts. We take measures
+            to make configure buildable with as wide range of autotools as
+            possible, but we can't check all possible combinations.
+        </p>
+        <table class="Fbtable">
+            <tr>
+                <th>
+                    GNU Tool
+                </th>
+                <th>
+                    Recommended Version
+                </th>
+                <th>
+                    Notes
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    m4
+                </td>
+                <td>
+                    1.4.12
+                </td>
+                <td>
+                    autoconf and libtool depend on m4
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    gmake
+                </td>
+                <td>
+                    3.81
+                </td>
+                <td>
+                    3.80 tested ok, too
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    autoconf
+                </td>
+                <td>
+                    2.63
+                </td>
+                <td>
+                    2.56 is minimum version per configure.in file
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    automake
+                </td>
+                <td>
+                    1.10.1
+                </td>
+                <td>
+                    1.10.2 tested ok, too
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    libtool
+                </td>
+                <td>
+                    2.2.6a
+                </td>
+                <td>
+                    1.5.26 tested ok, too
+                </td>
+            </tr>
+        </table>
+        <p class="caption">
+            Recommended Version(s) of GNU Tool Chain Utilities
+        </p>
+        <pre>
+./autogen.sh --with-system-editline=yes --with-system-icu --enable-debug
+</pre>
+        <p class="caption">
+            Sample invocation of autogen with configure options
+        </p>
+        <p>
+            Tip! It is possible to pass the configure options directly to
+            autogen, as shown in the example above.
+        </p>
+        <h2>
+            <a name="configure2" id="configure2">3.2 Running configure</a>
+        </h2>
+        <p>
+            Once the "configure" script is generated, it can be run repeatedly
+            without re-running the autogen.sh script. This allows the user to
+            retest with different configuration options.
+        </p>
+        <table class="fbtable">
+            <tr>
+                <th>
+                    Configure Option
+                </th>
+                <th>
+                    Description
+                </th>
+                <th>
+                    Default Value
+                </th>
+            </tr>
+            <tr>
+                <td class="code">
+                    --enable-debug
+                </td>
+                <td>
+                    Build debug version
+                </td>
+                <td class="code">
+                    no
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --enable-raw-devices
+                </td>
+                <td>
+                    Enable databases on raw devices
+                </td>
+                <td class="code">
+                    yes
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --enable-superserver
+                </td>
+                <td>
+                    Build SuperServer architecture
+                </td>
+                <td class="code">
+                    no
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --prefix
+                </td>
+                <td>
+                    Installation location
+                </td>
+                <td class="code">
+                    /usr/local/firebird
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --with-editline
+                </td>
+                <td>
+                    Advanced editing and command retrieval for ISQL
+                </td>
+                <td class="code">
+                    no
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --with-ipc-name
+                </td>
+                <td>
+                    Specify local IPC name
+                </td>
+                <td class="code">
+                    FirebirdIPI
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --with-system-editline
+                </td>
+                <td>
+                    Use system version of editline, instead of bundled version
+                    of ICU
+                </td>
+                <td class="code">
+                    no
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --with-system-icu
+                </td>
+                <td>
+                    Use system version of ICU, instead of bundled version of
+                    ICU
+                </td>
+                <td class="code">
+                    no
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --with-service-name
+                </td>
+                <td>
+                    Specify inet service name
+                </td>
+                <td class="code">
+                    gds_db
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --with-service-port
+                </td>
+                <td>
+                    Specify inet service port
+                </td>
+                <td class="code">
+                    3050
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --with-gpre-ada
+                </td>
+                <td>
+                    Support ADA in gpre
+                </td>
+                <td class="code">
+                    no
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --with-gpre-cobol
+                </td>
+                <td>
+                    Support COBOL in gpre
+                </td>
+                <td class="code">
+                    no
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --with-gpre-fortran
+                </td>
+                <td>
+                    Support FORTRAN in gpre
+                </td>
+                <td class="code">
+                    no
+                </td>
+            </tr>
+            <tr>
+                <td class="code">
+                    --with-gpre-pascal
+                </td>
+                <td>
+                    Support PASCAL in gpre
+                </td>
+                <td class="code">
+                    no
+                </td>
+            </tr>
+        </table>
+        <p class="caption">
+            Firebird Configure Options
+        </p>
+        <h1>
+            <a name="supported" id="supported">4.0 Supported Platforms</a>
+        </h1>
+        <p>
+            This section lists platforms, compilers, and compiler options where
+            Firebird has been succesfully tested. Optional flags for
+            enthusiasts are provided.
+        </p>
+        <p>
+            When Autoconf environment variables are provided, you must export
+            these before running configure.
+        </p>
+        <p>
+            Unless otherwise noted, all builds are 64-bit.
+        </p>
+        <table class="platform_table" summary=
+        "ICU can be built on many platforms.">
+            <caption>
+                Firebird POSIX platforms
+            </caption>
+            <tr class="works">
+                <td>
+                    AIX 6.1, Power
+                </td>
+                <td>
+                    XL C++ Compiler, 10.1
+                </td>
+                <td class="works">
+                    Frequently Tested
+                </td>
+            </tr>
+            <tr class="rarely">
+                <td>
+                    AIX 5.3, Power
+                </td>
+                <td>
+                    XL C++ Compiler, 10.1
+                </td>
+                <td>
+                    Rarely Tested
+                </td>
+            </tr>
+            <tr class="works">
+                <td>
+                    HP-UX 11.31 (11i v3), Itanium
+                </td>
+                <td>
+                    aCC C++ Compiler 6.23
+                </td>
+                <td class="works">
+                    Frequently Tested
+                </td>
+            </tr>
+            <tr class="works">
+                <td>
+                    HP-UX 11.31 (11i v3), PA-RISC
+                </td>
+                <td>
+                    aCC C++ Compiler 3.85
+                </td>
+                <td class="works">
+                    Frequently Tested
+                </td>
+            </tr>
+            <tr class="rarely">
+                <td>
+                    HP-UX 11.23 (11i v2), Itanium
+                </td>
+                <td>
+                    aCC C++ Compiler 6.23
+                </td>
+                <td>
+                    Rarely Tested
+                </td>
+            </tr>
+            <tr class="rarely">
+                <td>
+                    HP-UX 11.23 (11i v2), PA-RISC
+                </td>
+                <td>
+                    aCC C++ Compiler 3.85
+                </td>
+                <td>
+                    Rarely Tested
+                </td>
+            </tr>
+            <tr class="works">
+                <td>
+                    Linux, Red Hat Enterprise 5.3, AMD64
+                </td>
+                <td>
+                    g++ 4.3.3
+                </td>
+                <td>
+                    Frequently Tested
+                </td>
+            </tr>
+            <tr class="works">
+                <td>
+                    Linux, Open SUSE 11.0, AMD64
+                </td>
+                <td>
+                    g++ 4.3.3
+                </td>
+                <td>
+                    Frequently Tested
+                </td>
+            </tr>
+            <tr class="works">
+                <td>
+                    Linux, Open SUSE 10.2, AMD64
+                </td>
+                <td>
+                    g++ 4.3.3
+                </td>
+                <td>
+                    Frequently Tested
+                </td>
+            </tr>
+            <tr class="works">
+                <td>
+                    Solaris 10, SPARC
+                </td>
+                <td>
+                    Sun Studio 12, Update 1
+                </td>
+                <td>
+                    Frequently Tested
+                </td>
+            </tr>
+            <tr class="rarely">
+                <td>
+                    Solaris 9 SPARC
+                </td>
+                <td>
+                    Sun Studio 12
+                </td>
+                <td>
+                    Rarely Tested
+                </td>
+            </tr>
+            <tr class="works">
+                <td>
+                    Solaris 10, AMD64
+                </td>
+                <td>
+                    Sun Studio 12, Update 1
+                </td>
+                <td class="works">
+                    Frequently Tested
+                </td>
+            </tr>
+        </table>
+        <h2>
+            <a name="aix1" id="aix1">4.1 AIX 6.1 on Power, IBM XL C++</a>
+        </h2>
+        <pre>
+   export CC=cc_r
+   export CXX=xlC_r
+   export CFLAGS=-q64
+   export CXXFLAGS=-q64
+</pre>
+        <p class="caption">
+            Autoconf Environment Variables for AIX
+        </p>
+        <p>
+            This configuration was also succesfully tested against AIX 5.3.
+        </p>
+        <p>
+            Compiler version was XL C++ compiler, version 10.1.
+        </p>
+        <h2>
+            <a name="hp1" id="hp1">4.2 HP-UX 11i v3 on Itanium, HP aCC C++
+            Compiler</a>
+        </h2>
+        <pre>
+   export CC=cc
+   export CXX=aCC
+   export CFLAGS=+DD64
+   export CXXFLAGS=+DD64
+</pre>
+        <p class="caption">
+            Autoconf Environment Variables for HP-UX 11i v3, Itanium
+        </p>
+        <P>
+        	Firebird requires the HP-UX Atomic APIs ("AtomicAPI" bundle),
+        	released as an optional Software Pack (SPK) for HP-UX 11i v2 or v3.
+        </P> 
+        <P>
+            The Firebird build process requires HP linker (ld) option
+            "-concatrpath." -concatrpath is provided in the June 2007 patch bundle.
+            This update is available for HP-UX 11i v2 and v3.
+        </p>
+        <p>
+            Compiler version was HP ANSI C++ A.06.23.
+        </p>
+        <p>
+            The default instruction set architecture for HP-UX Itanium is
+            blended. Enthusiasts may add +DSnative to the CFLAGS/CXXFLAGS,
+            which tunes for the processor on which the compiler is running.
+        </p>
+        <h2>
+            <a name="hp2" id="hp2">4.3 HP-UX 11i v3 on PA-RISC, HP aCC C++
+            Compiler</a>
+        </h2>
+        <pre>
+   export CC=cc
+   export CXX=aCC
+   export CFLAGS=+DD64
+   export CXXFLAGS=+DD64
+</pre>
+        <p class="caption">
+            Autoconf Environment Variables for HP-UX 11i v3, PA-RISC
+        </p>
+        <P>
+        	Firebird requires the HP-UX Atomic APIs ("AtomicAPI" bundle),
+        	released as an optional Software Pack (SPK) for HP-UX 11i v2 or v3.
+        </P> 
+        <P>
+            The Firebird build process requires HP linker (ld) option
+            "-concatrpath." -concatrpath is provided in the June 2007 patch bundle.
+            This update is available for HP-UX 11i v2 and v3.
+        </p>
+        <p>
+            Compiler version was HP ANSI C++ A.03.85. <b><i>Note, A.03.85 is
+            the latest and last release of the aCC compiler on PA-RISC</i></b>.
+        </p>
+        <p>
+            This configuration was also succesfully tested using HP-UX 11iv2.
+        </p>
+        <h2>
+            <a name="linux1" id="linux1">4.4 Linux on 64-bit AMD64, GNU C++
+            compiler (g++)</a>
+        </h2>
+        <p>
+            g++ 4.3.3 is reference compiler for Firebird 2.5.
+        </p>
+        <p>
+            Firebird 2.5 has been tested on the following distributions:
+        </p>
+        <ul>
+            <li>Open SUSE 11.0
+            </li>
+            <li>Open SUSE 10.2
+            </li>
+            <li>Red Hat Enterprise 5.3
+            </li>
+            <li>Debian
+            </li>
+        </ul>
+        <p>
+            No Autoconf Environment variables are required to build on 64-bit
+            Linux when using g++.
+        </p>
+        <h2>
+            <a name="linux2" id="linux2">4.5 Linux on 32-bit i386, GNU C++
+            compiler (g++)</a>
+        </h2>
+        <p>
+            g++ 4.3.3 is reference compiler for Firebird 2.5.
+        </p>
+        <p>
+            No Autoconf Environment variables are required to build on 32-bit
+            Linux when using g++.
+        </p>
+        <h2>
+            <a name="sol1" id="sol1">4.6 Solaris 10 on SPARC, Sun Studio 12
+            Update 1</a>
+        </h2>
+        <pre>
+   export CC=cc
+   export CXX=CC
+   export CFLAGS="-m64"
+   export CXXFLAGS="-m64"
+</pre>
+        <p class="caption">
+            Autoconf Environment Variables for Solaris 10, SPARC
+        </p>
+        <p>
+            This configuration was also tested on Solaris 9, SPARC, using Sun
+            Studio 12.
+        </p>
+        <p>
+            The default instruction set architecture for Solaris SPARC is
+            generic (-xarch=generic). Enthusiasts may add -xarch=native to the CFLAGS/CXXFLAGS,
+            which tunes for the processor on which the compiler is running.
+        </p>
+        <p>
+            <b>Note!</b> Sun Studio 12 is the last Sun Studio release to
+            support Solaris 9. Sun Studio "Update 1" requires Solaris 10 or
+            greater.
+        </p>
+        <h2>
+            <a name="sol2" id="sol2">4.7 Solaris 10 on AMD64, Sun Studio 12
+            Update 1</a>
+        </h2>
+        <pre>
+   export CC=cc
+   export CXX=CC
+   export CFLAGS="-m64"
+   export CXXFLAGS="-m64"
+</pre>
+        <p class="caption">
+            Autoconf Environment Variables Solaris 10, AMD64
+        </p>
+        <p>
+            Firebird requires Solaris 10 or later when using Sun Studio on
+            Solaris AMD64. Solaris 9 is not supported on AMD64.
+        </p>
+        <p>
+            The default instruction set architecture for Solaris on AMD64 is
+            generic (-xarch=generic). Enthusiasts may add -xarch=native to the CFLAGS/CXXFLAGS,
+            which tunes for the processor on which the compiler is running.
+        </p>
+        <h1>
+            <a name="testing" id="testing">5.0 Testing in Place</a>
+        </h1>
+        <p>
+            Firebird is using current (one being built) engine to complete
+            build, therefore successfully finished build is somewhat tested,
+            but it does not provide a "make check" option. This may be added in
+            a future release.
+        </p>
+        <p>
+            After the build has finished, you may prepare your build in-place,
+            and run regession tests deploying it.
+        </p>
+        <p>
+            To prepare you build for "in-place" testing, you need to execute
+            the following commands. This assumes that Firebird was downloaded
+            and built in the /u/fbtest/firebird2h1 directory:
+        </p>
+        <pre>
+   cd /u/fbtest/firebird2h1/gen/firebird
+   export FIREBIRD=/u/fbtest/firebird2h1/gen/firebird
+   export PATH=$FIREBIRD/bin:$PATH
+   cp misc/firebird.conf .
+   cp misc/fbintl.conf intl
+   cp intl/libfbintl.so lib/fbintl.so
+   export LD_LIBRARY_PATH=$FIREBIRD/lib
+</pre>
+        <p class="caption">
+            Commands for In Place Testing of Firebird
+        </p>
+        <p>
+            <b>Note!</b> You may also need to edit the firebird.conf file and
+            change <code>RemoteFileOpenAbility=1</code> if you are testing on
+            an NFS drive. <b><i>PLEASE do NOT use this option in production
+            unless you really understand what are you doing!!!</i></b>
+        </p>
+        <p>
+            At this point you can run regression tests using ISQL client.
+        </p>
+        <h1>
+            <a name="deploying" id="deploying">6.0 Deploying</a>
+        </h1>
+        <p>
+            The hard work is done. To install, just type
+        </p>
+        <pre>
+make install
+</pre>
+    </body>
+</html>

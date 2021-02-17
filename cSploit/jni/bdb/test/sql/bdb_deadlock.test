@@ -1,0 +1,517 @@
+#
+#    May you do good and not evil.
+#    May you find forgiveness for yourself and forgive others.
+#    May you share freely, never taking more than you give.
+#
+#***********************************************************************
+# This file implements regression tests for statement level
+# deadlock resolution.
+
+set testdir [file dirname $argv0]/../../lang/sql/sqlite/test
+
+source $testdir/../../../../test/sql/bdb_util.tcl
+if {[run_thread_tests]==0} { finish_test ; return }
+
+sqlite3 db test.db -fullmutex 1
+
+proc table_cleanup {} {
+  db eval { 
+   BEGIN;
+   DROP TABLE t1;
+   DROP TABLE t2;
+   DROP TABLE t3;
+   CREATE TABLE t1(a);
+   CREATE TABLE t2(a);
+   CREATE TABLE t3(a);
+   COMMIT;
+  }
+}
+
+proc table_cleanup_incrblob {} {
+  db eval { 
+   BEGIN;
+   DROP TABLE t1;
+   DROP TABLE t2;
+   DROP TABLE t3;
+   CREATE TABLE t1(a BLOB);
+   CREATE TABLE t2(a BLOB);
+   CREATE TABLE t3(a BLOB);
+   COMMIT;
+  }
+}
+
+do_test bdb_deadlock-1.0 {
+   db eval { 
+     CREATE TABLE t1(a);
+     CREATE TABLE t2(a);
+     CREATE TABLE t3(a);
+   }
+} {}
+
+# Executes operations under an exclusive txn
+set exclusive_test {
+  set key ""
+  if {[sqlite -has-codec]} {
+    set key "xyzzy"
+  }
+  set ::DB [sqlthread open test.db $key]
+  do_test e1 {
+    execsql { BEGIN IMMEDIATE }
+  } {SQLITE_OK} 
+  do_test e2 {
+    execsql { PRAGMA txn_priority=10000; }
+  } {SQLITE_OK} 
+  do_test e3 {
+    execsql { INSERT INTO t2 VALUES(2) }
+  } {SQLITE_OK}
+  do_test e4 {
+    execsql { INSERT INTO t1 VALUES(2) } 
+  } {SQLITE_OK}
+  do_test e5 {
+    execsql { COMMIT } 
+  } {SQLITE_OK}
+  sqlite3_close $::DB
+}
+
+# Experience deadlock after read-only operations then commit
+do_test bdb_deadlock-2.0 {
+  db eval {
+    BEGIN;
+    SELECT * from t1;
+  }
+} {}
+
+# The exclusive thread will block when it attempts to insert into t1
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive_test
+
+after 5000
+
+do_test bdb_deadlock-2.1 {
+  db eval { SELECT * FROM t2 }
+} {}
+
+do_test bdb_deadlock-2.2 {
+  db eval { INSERT INTO t3 VALUES(1) }
+} {}
+
+do_test bdb_deadlock-2.3 {
+  db eval { COMMIT }
+} {}
+
+vwait finished(0)
+
+do_test bdb_deadlock-2.4 {
+  db eval { SELECT * FROM t3 }
+} {1}
+
+do_test bdb_deadlock-2.5 {
+  table_cleanup
+} {}
+
+# Experience deadlock after real-only operations then rollback
+do_test bdb_deadlock-3.0 {
+  db eval {
+    BEGIN;
+    SELECT * from t1
+  }
+} {}
+
+# The exclusive thread will block when it attempts to insert into t1
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive_test
+
+after 5000
+
+do_test bdb_deadlock-3.1 {
+  catchsql { SELECT * FROM t2 }
+} {1 {database table is locked}}
+
+do_test bdb_deadlock-3.2 {
+  db eval { INSERT INTO t3 VALUES(1) }
+} {}
+
+do_test bdb_deadlock-3.3 {
+  db eval { ROLLBACK }
+} {}
+
+vwait finished(0)
+
+do_test bdb_deadlock-3.4 {
+  db eval { SELECT * FROM t3 }
+} {}
+
+do_test bdb_deadlock-3.5 {
+  table_cleanup
+} {}
+
+# Tests 4 check that an insert interrupted due to deadlock
+# does not change the table it was inserting into.
+do_test bdb_deadlock-4.0 {
+  db eval {
+    BEGIN;
+    INSERT INTO T1 values(1);
+  }
+} {}
+
+# The exclusive thread will block when it attempts to insert into t1
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive_test
+
+after 5000
+
+do_test bdb_deadlock-4.1 {
+  catchsql {
+    INSERT INTO T2 values(1)
+  }
+} {1 {database table is locked}}
+
+do_test bdb_deadlock-4.2 {
+  db eval {
+    COMMIT;
+  }
+} {}
+
+vwait finished(0)
+
+do_test bdb_deadlock-4.3 {
+  db eval {
+    SELECT * from t1;
+  }
+} {1 2}
+
+do_test bdb_deadlock-4.4 {
+  db eval {
+    SELECT * from t2;
+  }
+} {2}
+
+do_test bdb_deadlock-4.5 {
+  table_cleanup
+} {}
+
+# Tests 5 check that rollback still works after an insert
+# is interrupted due to deadlock.
+do_test bdb_deadlock-5.0 {
+  db eval {
+    BEGIN;
+    INSERT INTO T1 values(1);
+  }
+} {}
+
+# The exclusive thread will block when it attempts to insert into t1
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive_test
+
+after 5000
+
+do_test bdb_deadlock-5.1 {
+  catchsql {
+    INSERT INTO T2 values(1)
+  }
+} {1 {database table is locked}}
+
+do_test bdb_deadlock-5.2 {
+  db eval {
+    ROLLBACK
+  }
+} {}
+
+vwait finished(0)
+
+do_test bdb_deadlock-5.3 {
+  db eval {
+    SELECT * from t1;
+  }
+} {2}
+
+do_test bdb_deadlock-5.4 {
+  db eval {
+    SELECT * from t2;
+  }
+} {2}
+
+do_test bdb_deadlock-5.5 {
+  table_cleanup
+} {}
+
+# Tests 6 check that inserts still work after an insert
+# is interrupted by deadlock detection
+do_test bdb_deadlock-6.0 {
+  db eval {
+    BEGIN;
+    INSERT INTO T1 values(1);
+  }
+} {}
+
+# The exclusive thread will block when it attempts to insert into t1
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive_test
+
+after 5000
+
+do_test bdb_deadlock-6.1 {
+  catchsql {
+    INSERT INTO T2 values(1)
+  }
+} {1 {database table is locked}}
+
+do_test bdb_deadlock-6.2 {
+  db eval {
+    INSERT INTO T3 values(1)
+  }
+} {}
+
+do_test bdb_deadlock-6.3 {
+  db eval {
+    COMMIT;
+  }
+} {}
+
+vwait finished(0)
+
+do_test bdb_deadlock-6.4 {
+  db eval {
+    SELECT * from t1;
+  }
+} {1 2}
+
+do_test bdb_deadlock-6.5 {
+  db eval {
+    SELECT * from t2;
+  }
+} {2}
+
+do_test bdb_deadlock-6.6 {
+  db eval {
+    SELECT * from t3;
+  }
+} {1}
+
+do_test bdb_deadlock-6.7 {
+  table_cleanup_incrblob
+} {}
+
+# Experience deadlock after read-only incrblob operations then commit
+do_test bdb_deadlock-7.0 {
+  db eval {
+    INSERT INTO t1 VALUES('1');
+    BEGIN;
+  }
+  set fd1 [db incrblob -readonly t1 a 1]
+} {incrblob_1}
+
+# The exclusive thread will block when it attempts to insert into t1
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive_test
+
+after 5000
+
+do_test bdb_deadlock-7.1 {
+  set rc [catch {db incrblob -readonly t2 a 1} msg]
+  list $rc $msg
+} {1 {database table is locked}}
+
+do_test bdb_deadlock-7.2 {
+  db eval { INSERT INTO t3 VALUES(1) }
+} {}
+
+do_test bdb_deadlock-7.3 {
+  close $fd1
+} {}
+
+do_test bdb_deadlock-7.4 {
+  db eval { COMMIT }
+} {}
+
+vwait finished(0)
+
+do_test bdb_deadlock-7.5 {
+  db eval { SELECT * FROM t3 }
+} {1}
+
+do_test bdb_deadlock-7.6 {
+  table_cleanup_incrblob
+} {}
+
+# Experience deadlock after read-only incrblob operations then aborts
+do_test bdb_deadlock-8.0 {
+  db eval {
+    INSERT INTO t1 VALUES('1');
+    BEGIN;
+  }
+  set fd1 [db incrblob -readonly t1 a 1]
+} {incrblob_2}
+
+# The exclusive thread will block when it attempts to insert into t1
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive_test
+
+after 5000
+
+do_test bdb_deadlock-8.1 {
+  set rc [catch {db incrblob -readonly t2 a 1} msg]
+  list $rc $msg
+} {1 {database table is locked}}
+
+do_test bdb_deadlock-8.2 {
+  db eval { INSERT INTO t3 VALUES(1) }
+} {}
+
+do_test bdb_deadlock-8.3 {
+  close $fd1
+} {}
+
+do_test bdb_deadlock-8.4 {
+  db eval { ROLLBACK }
+} {}
+
+vwait finished(0)
+
+do_test bdb_deadlock-8.5 {
+  db eval { SELECT * FROM t3 }
+} {}
+
+do_test bdb_deadlock-8.6 {
+  table_cleanup_incrblob
+} {}
+
+# Experience deadlock after incrblob operations then commits
+do_test bdb_deadlock-9.0 {
+  db eval {
+    INSERT INTO t1 VALUES('1');
+    BEGIN;
+  }
+  set fd1 [db incrblob t1 a 1]
+  sqlite3_blob_write $fd1 0 3 1
+} {}
+
+# The exclusive thread will block when it attempts to insert into t1
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive_test
+
+after 5000
+
+do_test bdb_deadlock-9.1 {
+  set rc [catch {db incrblob t2 a 1} msg]
+  list $rc $msg
+} {1 {database table is locked}}
+
+do_test bdb_deadlock-9.2 {
+  close $fd1
+} {}
+
+do_test bdb_deadlock-9.3 {
+  db eval { COMMIT }
+} {}
+
+vwait finished(0)
+
+do_test bdb_deadlock-9.4 {
+  db eval { SELECT * FROM t1 }
+} {3 2}
+
+do_test bdb_deadlock-9.5 {
+  table_cleanup_incrblob
+} {}
+
+# Experience deadlock after incrblob operations then aborts
+do_test bdb_deadlock-10.0 {
+  db eval {
+    INSERT INTO t1 VALUES('1');
+    BEGIN;
+  }
+  set fd1 [db incrblob t1 a 1]
+  sqlite3_blob_write $fd1 0 3 1
+} {}
+
+# The exclusive thread will block when it attempts to insert into t1
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive_test
+
+after 5000
+
+do_test bdb_deadlock-10.1 {
+  set rc [catch {db incrblob t2 a 1} msg]
+  list $rc $msg
+} {1 {database table is locked}}
+
+do_test bdb_deadlock-10.2 {
+  close $fd1
+} {}
+
+do_test bdb_deadlock-10.3 {
+  db eval { ROLLBACK }
+} {}
+
+vwait finished(0)
+
+do_test bdb_deadlock-10.4 {
+  db eval { SELECT * FROM t1 }
+} {1 2}
+
+do_test bdb_deadlock-10.5 {
+  table_cleanup_incrblob
+} {}
+
+# Executes operations under an exclusive txn
+set read_test {
+  set key ""
+  if {[sqlite -has-codec]} {
+    set key "xyzzy"
+  }
+  set ::DB [sqlthread open test.db $key]
+  do_test e1 {
+    execsql { BEGIN IMMEDIATE }
+  } {SQLITE_OK} 
+  do_test e2 {
+    execsql { PRAGMA txn_priority=10000; }
+  } {SQLITE_OK} 
+  do_test e3 {
+    execsql { INSERT INTO t2 VALUES(2) }
+  } {SQLITE_OK}
+  do_test e4 {
+    execsql { SELECT * FROM t1; } 
+  } {SQLITE_OK}
+  do_test e5 {
+    execsql { COMMIT } 
+  } {SQLITE_OK}
+  sqlite3_close $::DB
+}
+
+# Check that read-only operations can be executed after the
+# read-only transaction experiences deadlock
+do_test bdb_deadlock-11.0 {
+  db eval {
+    BEGIN;
+    INSERT INTO t1 VALUES(1);
+  }
+} {}
+
+# The exclusive thread will block when it attempts to select from t1
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $read_test
+
+after 5000
+
+do_test bdb_deadlock-11.1 {
+  catchsql { SELECT * FROM t2 }
+} {1 {database table is locked}}
+
+do_test bdb_deadlock-11.2 {
+  db eval { SELECT * FROM t1 }
+} {1}
+
+do_test bdb_deadlock-11.3 {
+  db eval { COMMIT }
+} {}
+
+vwait finished(0)
+
+do_test bdb_deadlock-11.5 {
+  table_cleanup
+} {}
+
+db close
+
+finish_test

@@ -1,0 +1,267 @@
+<!--
+doc/src/sgml/ref/alter_domain.sgml
+PostgreSQL documentation
+-->
+
+<refentry id="SQL-ALTERDOMAIN">
+ <refmeta>
+  <refentrytitle>ALTER DOMAIN</refentrytitle>
+  <manvolnum>7</manvolnum>
+  <refmiscinfo>SQL - Language Statements</refmiscinfo>
+ </refmeta>
+
+ <refnamediv>
+  <refname>ALTER DOMAIN</refname>
+  <refpurpose>
+   change the definition of a domain
+  </refpurpose>
+ </refnamediv>
+
+ <indexterm zone="sql-alterdomain">
+  <primary>ALTER DOMAIN</primary>
+ </indexterm>
+
+ <refsynopsisdiv>
+<synopsis>
+ALTER DOMAIN <replaceable class="PARAMETER">name</replaceable>
+    { SET DEFAULT <replaceable class="PARAMETER">expression</replaceable> | DROP DEFAULT }
+ALTER DOMAIN <replaceable class="PARAMETER">name</replaceable>
+    { SET | DROP } NOT NULL
+ALTER DOMAIN <replaceable class="PARAMETER">name</replaceable>
+    ADD <replaceable class="PARAMETER">domain_constraint</replaceable>
+ALTER DOMAIN <replaceable class="PARAMETER">name</replaceable>
+    DROP CONSTRAINT <replaceable class="PARAMETER">constraint_name</replaceable> [ RESTRICT | CASCADE ]
+ALTER DOMAIN <replaceable class="PARAMETER">name</replaceable>
+    OWNER TO <replaceable class="PARAMETER">new_owner</replaceable>
+ALTER DOMAIN <replaceable class="PARAMETER">name</replaceable>
+    SET SCHEMA <replaceable class="PARAMETER">new_schema</replaceable>
+</synopsis>
+ </refsynopsisdiv>
+
+ <refsect1>
+  <title>Description</title>
+
+  <para>
+   <command>ALTER DOMAIN</command> changes the definition of an existing domain.
+   There are several sub-forms:
+  </para>
+
+  <variablelist>
+   <varlistentry>
+    <term>SET/DROP DEFAULT</term>
+    <listitem>
+     <para>
+      These forms set or remove the default value for a domain. Note
+      that defaults only apply to subsequent <command>INSERT</command>
+      commands; they do not affect rows already in a table using the domain.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>SET/DROP NOT NULL</term>
+    <listitem>
+     <para>
+      These forms change whether a domain is marked to allow NULL
+      values or to reject NULL values.  You can only <literal>SET NOT NULL</>
+      when the columns using the domain contain no null values.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>ADD <replaceable class="PARAMETER">domain_constraint</replaceable></term>
+    <listitem>
+     <para>
+      This form adds a new constraint to a domain using the same syntax as
+      <xref linkend="SQL-CREATEDOMAIN">.
+      This will only succeed if all columns using the domain satisfy the
+      new constraint.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>DROP CONSTRAINT</term>
+    <listitem>
+     <para>
+      This form drops constraints on a domain.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>OWNER</term>
+    <listitem>
+     <para>
+      This form changes the owner of the domain to the specified user.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term>SET SCHEMA</term>
+    <listitem>
+     <para>
+      This form changes the schema of the domain.  Any constraints
+      associated with the domain are moved into the new schema as well.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+
+  <para>
+   You must own the domain to use <command>ALTER DOMAIN</>.
+   To change the schema of a domain, you must also have
+   <literal>CREATE</literal> privilege on the new schema.
+   To alter the owner, you must also be a direct or indirect member of the new
+   owning role, and that role must have <literal>CREATE</literal> privilege on
+   the domain's schema.  (These restrictions enforce that altering the owner
+   doesn't do anything you couldn't do by dropping and recreating the domain.
+   However, a superuser can alter ownership of any domain anyway.)
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>Parameters</title>
+
+   <para>
+    <variablelist>
+     <varlistentry>
+      <term><replaceable class="PARAMETER">name</replaceable></term>
+      <listitem>
+       <para>
+        The name (possibly schema-qualified) of an existing domain to
+        alter.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><replaceable class="PARAMETER">domain_constraint</replaceable></term>
+      <listitem>
+       <para>
+        New domain constraint for the domain.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><replaceable class="PARAMETER">constraint_name</replaceable></term>
+      <listitem>
+       <para>
+        Name of an existing constraint to drop.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>CASCADE</literal></term>
+      <listitem>
+       <para>
+        Automatically drop objects that depend on the constraint.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><literal>RESTRICT</literal></term>
+      <listitem>
+       <para>
+        Refuse to drop the constraint if there are any dependent
+        objects. This is the default behavior.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><replaceable class="PARAMETER">new_owner</replaceable></term>
+      <listitem>
+       <para>
+        The user name of the new owner of the domain.
+       </para>
+      </listitem>
+     </varlistentry>
+
+     <varlistentry>
+      <term><replaceable class="PARAMETER">new_schema</replaceable></term>
+      <listitem>
+       <para>
+        The new schema for the domain.
+       </para>
+      </listitem>
+     </varlistentry>
+
+    </variablelist>
+   </para>
+  </refsect1>
+
+ <refsect1>
+  <title>Notes</title>
+
+  <para>
+   Currently, <command>ALTER DOMAIN ADD CONSTRAINT</> and
+   <command>ALTER DOMAIN SET NOT NULL</> will fail if the named domain or
+   any derived domain is used within a composite-type column of any
+   table in the database.  They should eventually be improved to be
+   able to verify the new constraint for such nested columns.
+  </para>
+
+ </refsect1>
+
+ <refsect1>
+  <title>Examples</title>
+
+  <para>
+   To add a <literal>NOT NULL</literal> constraint to a domain:
+<programlisting>
+ALTER DOMAIN zipcode SET NOT NULL;
+</programlisting>
+   To remove a <literal>NOT NULL</literal> constraint from a domain:
+<programlisting>
+ALTER DOMAIN zipcode DROP NOT NULL;
+</programlisting>
+  </para>
+
+  <para>
+   To add a check constraint to a domain:
+<programlisting>
+ALTER DOMAIN zipcode ADD CONSTRAINT zipchk CHECK (char_length(VALUE) = 5);
+</programlisting>
+  </para>
+
+  <para>
+   To remove a check constraint from a domain:
+<programlisting>
+ALTER DOMAIN zipcode DROP CONSTRAINT zipchk;
+</programlisting>
+  </para>
+
+  <para>
+   To move the domain into a different schema:
+<programlisting>
+ALTER DOMAIN zipcode SET SCHEMA customers;
+</programlisting></para>
+ </refsect1>
+
+ <refsect1 id="SQL-ALTERDOMAIN-compatibility">
+  <title>Compatibility</title>
+
+  <para>
+   <command>ALTER DOMAIN</command> conforms to the <acronym>SQL</acronym>
+   standard,
+   except for the <literal>OWNER</> and <literal>SET SCHEMA</> variants,
+   which are <productname>PostgreSQL</productname> extensions.
+  </para>
+ </refsect1>
+
+ <refsect1 id="SQL-ALTERDOMAIN-see-also">
+  <title>See Also</title>
+
+  <simplelist type="inline">
+   <member><xref linkend="sql-createdomain"></member>
+   <member><xref linkend="sql-dropdomain"></member>
+  </simplelist>
+ </refsect1>
+
+</refentry>

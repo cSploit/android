@@ -1,0 +1,41 @@
+dn: uid=danger,ou=users,o=translucent
+objectClass: inetOrgPerson
+uid: danger
+sn: danger
+cn: henry
+businessCategory: frontend-override
+initials: dw
+carLicense: LIVID
+departmentNumber: 9999999
+displayName: Warning
+employeeNumber: 5150
+employeeType: special
+givenName: Danger Warning
+roomNumber: 41L-535
+
+dn: uid=example,ou=users,o=translucent
+objectClass: inetOrgPerson
+uid: example
+sn: user
+cn: example
+businessCategory: backend-opaque
+carLicense: SAMPLE
+departmentNumber: 7341
+displayName: Example
+employeeNumber: 5150
+employeeType: fulltime
+givenName: Example User
+
+dn: uid=fred,ou=users,o=translucent
+objectClass: inetOrgPerson
+uid: fred
+sn: said
+cn: said
+businessCategory: backend-opaque
+carLicense: RIGHT
+departmentNumber: 9919
+displayName: Right Said Fred
+employeeNumber: 44199
+employeeType: fulltime
+givenName: Right Said
+

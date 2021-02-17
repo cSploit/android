@@ -1,0 +1,105 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+# Copyright (C) Inprise Corporation.
+#
+# All Rights Reserved.
+# Contributor(s): Bill Oliver
+#
+# Compiler settings for AIX/powerpc, using the IBM XL C/C++ compiler.
+# "xlC_r" is the preferred C++ invocation.
+#
+# History
+# May-2009 Firebird 2.5 tested ok against AIX 6.1
+# Jun-2009 Firebird 2.5 tested ok against AIX 5.3
+# 
+# From the xlc documentation... Firebird requires xlC_r invocation.
+# All _r-suffixed invocations allow for threadsafe compilation and you
+# can use them to link the programs that use multi-threading. Use these
+# commands if you want to create threaded applications. The _r7 invocations
+# are provided to help migrate programs based on Posix Draft 7 to Posix
+# Draft 10. The _r4 invocations should be used for DCE threaded applications.
+#
+# Notes:
+#
+# 1) gcc is default compiler on AIX. To use xlC you must export these
+#    environment variables before running autogen.sh and make sure xlc is
+#    in your path.
+#
+#    export CC=cc_r
+#    export CXX=xlC_r
+#    export CFLAGS="-q64 -qtls=default"
+#    export CXXFLAGS="-q64 -qtls=default"
+#
+
+# Useful predefined macros from IBM XL C++
+# __IBMCPP__, indicates the level of the XL C++ compiler, e.g. 1010
+
+# These macros are predefined by the compiler
+# xlC does not define _POWER or _AIX, which gcc does. xlC does define
+# __powerpc and __PPC, which Firebird code base doesn't check.
+# __BIG_ENDIAN__
+# __powerpc
+# __PPC
+# __unix
+
+
+# AIX ld option to set run-time library path is -blibpath:path1:path2
+# Additional -blibpath options are not additive! All paths must be provided as a colon separated list.
+LIB_PATH_OPTS= -blibpath:@FB_LIBDIR@:@FB_INTLDIR@:/usr/local/lib:/usr/lib:/lib
+
+# non-firebird libraries have .a extension
+SHRLIB_FOREIGN_EXT=a
+
+# Flags shared by production and debug build
+COMMON_FLAGS= -qchars=signed -qlanglvl=newexcp -qroconst -qpic \
+	-D__IBM_ALLOW_OVERRIDE_PLACEMENT_NEW \
+	-qsuppress=1540-1103 \
+	$(TLS_OPTIONS)
+
+# -qinfo=all:noppt:nopor:notrd:nouse, useful, but gives *so* many warnings!
+# -qextchk, ***AVOID***, causes "type mismatches for symbol" building gpre_static
+# -qcheck, generate code to perform *runtime* bounds, null-pointer, and div by zero checking
+# -qformat, warn of problems with string put and output format specifiers.
+#    most qformat options tested useless to us, but zln (zero-length formats) and
+#    exarg (excess arguments) are handy
+# -qinitauto, initialize uninitialized automatic vars to value for debugging
+# -qwarn64, warn about data conversion problems between 32-bit and 64-bit modes
+# -qstrict, ensure optimizations don't alter the semantics of the program.
+#    -O2 implies -qstrict, but -O3 and higher does not.
+# -qmaxmem, limits the amount of memory that the compiler allocates while performing
+#    specific, memory-intensive optimizations. Only need when using -O | -O2.
+# -qstaticinline, treat inline functions as static instead of extern
+# -O, same as -O2. 2009-05, tried -O3 unsuccessfully.
+PROD_FLAGS=$(COMMON_FLAGS) -O -qstaticinline -qmaxmem=-1 \
+	-qsuppress=1540-1401
+
+DEV_FLAGS=$(COMMON_FLAGS) -g \
+	-qcheck -qformat=noall:exarg:zln
+
+EXE_LINK_OPTIONS= $(LDFLAGS) $(THR_FLAGS) $(UNDEF_FLAGS) $(LIB_PATH_OPTS) -brtl
+
+# -G is shorthand to create shared objects with run-time linking. -G includes
+#   -berok, -brtl, -bnosymbolic, -bnortllib, -bnoautoexp, -bM:SRE
+# -qmkshrobj, need this when creating a C++ shared object
+LIB_LINK_OPTIONS= $(LDFLAGS) $(THR_FLAGS) $(LIB_PATH_OPTS) -G -bnoentry -qmkshrobj
+
+# AIX ld uses "export files" to manage symbol visibility. Export files are
+# functionally similar to "version files" on ELF systems and are specified
+# with the "-bE:exportfile.exp" option.
+LIB_LINK_MAPFILE=-bE:$(1)
+
+# These options aren't used by AIX (XCOFF) object files...
+LIB_LINK_RPATH=
+LIB_LINK_SONAME=
+
+UNDEF_PLATFORM=

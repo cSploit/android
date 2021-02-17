@@ -1,0 +1,291 @@
+.\" $Id: freetds.conf.5,v 1.4 2009-12-14 01:02:27 jklowden Exp $
+.Dd December 23, 2007
+.Os FreeTDS @VERSION@
+.Dt FREETDS.CONF "FreeTDS 5" "FreeTDS Reference Manual"
+.
+.Sh NAME
+.Nm freetds.conf
+.Nd configuration file for FreeTDS
+.
+.Sh SYNOPSIS
+The 
+.Pa freetds.conf
+file describes Sybase and Microsoft database servers to the FreeTDS
+library.  It comprises sections headed by a servername, followed by a
+list of connection properties denoted as name-value pairs.  Defaults
+are defined via a
+.Bq global
+section.  This file supersedes the 
+.Pa interfaces
+file that
+Sybase defines for the same purpose, although the latter is still supported.
+.
+.Sh DESCRIPTION
+A section begins with a servername \(em the name of the server \(em in
+square brackets. The servername is chosen at the client's descretion.
+(One exception: with Sybase ASA the servername must match the database
+name to be used.)
+.Pp
+Sections contain properties, one per line, in the form
+.Pp
+.Dl       name = value
+.Pp
+where
+.Ar name
+is the connection property to be described.  Servernames and properties
+are not case sensitive.  Values are case-preserving i.e., copied literally.
+Comments begin with either a semicolon
+.Pq So ; Sc
+or pound sign
+.Pq So # Sc
+and continue to end of line.  Blank lines are ignored.  Whitespace surrounding the
+.So = Sc is ignored.
+.
+.Sh PROPERTIES
+.Bl -tag -width "emulate little endian" -compact
+.
+.It client charset
+encoding of client data; overrides locale(1) settings
+.Bl -tag -width "default:" -compact
+.It Domain:
+iconv character set names
+.It Default:
+ISO-8859-1
+.El
+.
+.It connect timeout
+seconds to wait for response from connect request
+.Bl -tag -width "default:" -compact
+.It Domain:
+0 to MAX_INT
+.It Default:
+none
+.El
+.
+.It debug flags
+logging granularity
+.Bl -tag -width "default:" -compact
+.It Domain:
+32-bit integer
+.It Default:
+0x4fff
+.El
+.
+.It dump file
+specifies location of a logfile and turns on logging
+.Bl -tag -width "default:" -compact
+.It Domain:
+valid file name
+.It Default:
+none
+.El
+.
+.It dump file append
+log data appended to file instead of re-writing for each connection
+.Bl -tag -width "default:" -compact
+.It Domain:
+yes/no
+.It Default:
+no
+.El
+.
+.It emulate little endian
+forces big endian machines to act as little endian to communicate with
+Microsoft Servers
+.Bl -tag -width "default:" -compact
+.It Domain:
+yes/no
+.It Default:
+no
+.El
+.
+.It encryption
+.Bl -tag -compact
+.It Em off
+disables encryption (default)
+.It Em request
+use if available
+.It Em required
+allow encrypted connections only
+.El
+.
+.It host
+Name of the host the server is running on.
+.Bl -tag -width "default:" -compact
+.It Domain:
+host name or IP address
+.It Default:
+SYBASE
+.El
+.
+.It initial block size
+maximum size of a protocol block
+.Bl -tag -width "default:" -compact
+.It Domain:
+multiple of 512
+.It Default:
+512
+.El
+.
+.It instance
+name of Microsoft SQL Server instance to connect to (supersedes
+.Em port )
+.Bl -tag -width "default:" -compact
+.It Domain:
+instance name
+.It Default:
+none
+.El
+.
+.It port
+port number that the server is listening to
+.Bl -tag -width "default:" -compact
+.It Domain:
+any valid port
+.It Default:
+TDS 5.0, 5000; TDS 7.0 and up, 1433
+.El
+.
+.It tds version
+TDS protocol version to use
+.Bl -tag -width "default:" -compact
+.It Domain:
+4.2, 5.0, 7.0, 7.1, 7.2
+.It Default:
+.Fl -with-tdsver
+value (5.0 if unspecified)
+.El
+.
+.It text size
+default value of TEXTSIZE, in bytes
+.Bl -tag -width "default:" -compact
+.It Domain:
+0 to 4,294,967,295
+.It Default:
+4,294,967,295
+.El
+.
+.It timeout
+seconds to wait for response to a query
+.Bl -tag -width "default:" -compact
+.It Domain:
+0 to MAX_INT
+.It Default:
+none (wait forever)
+.El
+.
+.El
+.Pp
+Do not define both 
+.Fa port
+and
+.Fa instance Ns
+\&.  One implies the other.  
+
+
+.Pp
+Boolean property values may be denoted as on/off, true/false, or 1/0.
+.
+.Ss DEBUG FLAGS 
+The log's granularity can be controlled with the 
+.Em debug flags
+property. 
+.Bl -column -offset indent ".Sy 0x8000" ".Sy show source level info (source file and line)"
+.It Sy Value Ta Sy Meaning
+.It Li \ \ 0x02	severe error
+.It Li \ \ 0x04	error
+.It Li \ \ 0x08	warning
+.It Li \ \ 0x10	network
+.It Li \ \ 0x20	information level 1
+.It Li \ \ 0x40	information level 2
+.It Li \ \ 0x80	function trace and info
+.It Li 0x1000	show pid
+.It Li 0x2000	show time
+.It Li 0x4000	show source level info (source file and line)
+.It Li 0x8000	thread id (not implemented).
+.El
+.
+.Sh NAMES AND LOCATIONS
+The file is normally named
+.Pa /etc/freetds.conf
+or
+.Pa ${HOME}/.freetds.conf .
+That name can be overridden with the FREETDSCONF environment variable.
+.Pp
+FreeTDS will search conf files for a servername in the following order:
+.Bl -enum -offset indent -compact
+.It
+a filename set programatically via dbsetifile() that is in .conf format
+.It
+a filename in the environment variable FREETDSCONF that is in .conf format
+.It
+.Pa ${HOME}/.freetds.conf
+if extant
+.It
+.Pa @sysconfdir@/freetds.conf
+.El
+.Pp
+The search stops with the first file containing the servername.
+.Pp
+If no conf file is found, FreeTDS searches for
+an
+.Pa interfaces
+file in the following order:
+.Bl -enum -offset indent -compact
+.It
+a filename set programatically via dbsetifile() that is in
+.Pa interfaces
+format
+.It
+.Pa ${HOME}/.interfaces
+.It
+.Pa $SYBASE/interfaces
+(where
+.Ev $SYBASE is an environment variable)
+.El
+.Pp
+If the requested servername is not found in any configuration file, the fallback
+mechanism is:
+.Bl -enum -offset indent -compact
+.It
+attempt to convert the name to an IP address with inet_addr(3), else
+.It
+attempt to convert the name to an IP address with gethostbyname(3), else
+.It
+attempt to look up the literal name
+.Dq SYBASE
+.El
+.
+.Sh ENVIRONMENT
+.Bl -tag -width "TDSDUMPCONFIG" -compact
+.It Ev FREETDSCONF
+overrides name and location of the system-wide conf file
+.It Ev TDSDUMP
+overrides the name and location of the FreeTDS log file
+.It Ev TDSDUMPCONFIG
+specifies a name and location of a file that logs the search of
+configuration files
+.It Ev TDSHOST
+overrides the host property
+.It Ev TDSPORT
+overrides the port property
+.It Ev TDSQUERY
+synonym for DSQUERY, the default servername
+.It Ev TDSVER
+overrides the version specified in the freetds.conf
+.El
+.Pp
+The environment variables
+.Ev TDSVER, Ev TDSDUMP, Ev TDSPORT, Ev TDSQUERY, and Ev TDSHOST
+override values set by a .conf or
+.Pa interfaces
+file.
+.
+.Sh FILES
+.Pa @sysconfdir@/freetds.conf , ${HOME}/.freetds.conf
+.
+.Sh SEE ALSO
+.%B FreeTDS User Guide
+.
+.Sh HISTORY
+\.conf files first appeared with version 0.53 of FreeTDS.

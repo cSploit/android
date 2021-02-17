@@ -1,0 +1,146 @@
+<!--
+doc/src/sgml/ref/alter_view.sgml
+PostgreSQL documentation
+-->
+
+<refentry id="SQL-ALTERVIEW">
+ <refmeta>
+  <refentrytitle>ALTER VIEW</refentrytitle>
+  <manvolnum>7</manvolnum>
+  <refmiscinfo>SQL - Language Statements</refmiscinfo>
+ </refmeta>
+
+ <refnamediv>
+  <refname>ALTER VIEW</refname>
+  <refpurpose>change the definition of a view</refpurpose>
+ </refnamediv>
+
+ <indexterm zone="sql-alterview">
+  <primary>ALTER VIEW</primary>
+ </indexterm>
+
+ <refsynopsisdiv>
+<synopsis>
+ALTER VIEW <replaceable class="parameter">name</replaceable> ALTER [ COLUMN ] <replaceable class="PARAMETER">column</replaceable> SET DEFAULT <replaceable class="PARAMETER">expression</replaceable>
+ALTER VIEW <replaceable class="parameter">name</replaceable> ALTER [ COLUMN ] <replaceable class="PARAMETER">column</replaceable> DROP DEFAULT
+ALTER VIEW <replaceable class="parameter">name</replaceable> OWNER TO <replaceable class="PARAMETER">new_owner</replaceable>
+ALTER VIEW <replaceable class="parameter">name</replaceable> RENAME TO <replaceable class="parameter">new_name</replaceable>
+ALTER VIEW <replaceable class="parameter">name</replaceable> SET SCHEMA <replaceable class="parameter">new_schema</replaceable>
+</synopsis>
+ </refsynopsisdiv>
+
+ <refsect1>
+  <title>Description</title>
+
+  <para>
+   <command>ALTER VIEW</command> changes various auxiliary properties
+   of a view.  (If you want to modify the view's defining query,
+   use <command>CREATE OR REPLACE VIEW</>.)
+  </para>
+
+  <para>
+   You must own the view to use <command>ALTER VIEW</>.
+   To change a view's schema, you must also have <literal>CREATE</>
+   privilege on the new schema.
+   To alter the owner, you must also be a direct or indirect member of the new
+   owning role, and that role must have <literal>CREATE</literal> privilege on
+   the view's schema.  (These restrictions enforce that altering the owner
+   doesn't do anything you couldn't do by dropping and recreating the view.
+   However, a superuser can alter ownership of any view anyway.)
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>Parameters</title>
+
+  <variablelist>
+   <varlistentry>
+    <term><replaceable class="parameter">name</replaceable></term>
+    <listitem>
+     <para>
+      The name (optionally schema-qualified) of an existing view.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>SET</literal>/<literal>DROP DEFAULT</literal></term>
+    <listitem>
+     <para>
+      These forms set or remove the default value for a column.
+      A default value associated with a view column is
+      inserted into <command>INSERT</> statements on the view before
+      the view's <literal>ON INSERT</literal> rule is applied, if
+      the <command>INSERT</> does not specify a value for the column.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="PARAMETER">new_owner</replaceable></term>
+    <listitem>
+     <para>
+      The user name of the new owner of the view.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="parameter">new_name</replaceable></term>
+    <listitem>
+     <para>
+      The new name for the view.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="parameter">new_schema</replaceable></term>
+    <listitem>
+     <para>
+      The new schema for the view.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </refsect1>
+
+ <refsect1>
+  <title>Notes</title>
+
+  <para>
+   For historical reasons, <command>ALTER TABLE</command> can be used with
+   views too; but the only variants of <command>ALTER TABLE</command>
+   that are allowed with views are equivalent to the ones shown above.
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>Examples</title>
+
+  <para>
+   To rename the view <literal>foo</literal> to
+   <literal>bar</literal>:
+<programlisting>
+ALTER VIEW foo RENAME TO bar;
+</programlisting></para>
+ </refsect1>
+
+ <refsect1>
+  <title>Compatibility</title>
+
+  <para>
+   <command>ALTER VIEW</command> is a <productname>PostgreSQL</>
+   extension of the SQL standard.
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>See Also</title>
+
+  <simplelist type="inline">
+   <member><xref linkend="sql-createview"></member>
+   <member><xref linkend="sql-dropview"></member>
+  </simplelist>
+ </refsect1>
+</refentry>

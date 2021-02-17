@@ -1,0 +1,52 @@
+.TH SLAPO-COLLECT 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2003-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-collect \- Collective attributes overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The collect overlay is used to provide a relatively coarse
+implementation of RFC 3671 collective attributes.
+In X.500, a collective attribute is "a user attribute whose
+values are the same for each member of an entry collection".
+
+Collective attributes are added to entries returned by a search operation
+when the entry is within the scope of the related ancestor.
+Collective attributes can only be modified when the modification affects
+the related ancestor.
+
+.SH CONFIGURATION
+This
+.B slapd.conf
+option applies to the collect overlay.
+It should appear after the
+.B overlay
+directive.
+.TP
+.B collectinfo <DN> <attrlist>
+Specify the
+.B DN
+of the ancestor entry and the set of related collective attributes, where
+.B attrlist
+is a comma-separated list of attributes.
+The
+.B DN 
+should be within the naming context of the database.
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+The
+.BR slapo\-collect (5)
+overlay supports dynamic configuration via
+.BR back-config .
+.SH ACKNOWLEDGEMENTS
+This module was written in 2003 by Howard Chu.
+This man page was written in 2008 by Pierangelo Masarati.
+.so ../Project

@@ -1,0 +1,1474 @@
+#
+#    May you do good and not evil.
+#    May you find forgiveness for yourself and forgive others.
+#    May you share freely, never taking more than you give.
+#
+#***********************************************************************
+# This file implements regression tests for parallel multi-process 
+# access to a database.
+set sqldir [file dirname $argv0]
+set testdir $sqldir/../../lang/sql/sqlite/test
+
+source $testdir/tester.tcl
+# Contains the definition of do_sync and do_multi_proc_test
+source $sqldir/../../test/tcl_utils/multi_proc_utils.tcl
+# Contains the definition of available_ports
+source $sqldir/../../test/tcl_utils/common_test_utils.tcl
+source $testdir/../../../../test/sql/bdb_util.tcl
+# Skip this test if threads are not enabled.  The do_sync function
+# requires threads.
+if {![run_thread_tests]} { 
+    puts "Tcl built without threads enabled, skipping test."
+    finish_test ; return 
+}
+if [catch {package require Thread}] {
+    puts "Tcl does not contain the Thread library, skipping test."
+    finish_test ; return 
+}
+
+#
+# Test 1: Tests that one process can read data inserted
+# into the database by another process.
+#
+set myports [ available_ports 2]
+set syncPort1 [ lindex $myports 0]
+set syncPort2 [ lindex $myports 1]
+do_multi_proc_test bdb_multi_proc-1 [list {
+    # Process 1 code
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts [lindex $cmd_args 1 ]
+    set timeout 20
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db procs.db
+
+    # Create the tables
+    do_test bdb_multi_proc-1.1.1 {
+	db eval { 
+	    BEGIN;
+	    CREATE TABLE t1(a);
+	    COMMIT;
+	}
+    } {}
+
+    # Wake up the other process
+    do_test bdb_multi_proc-1.1.2 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Pause while the other process inserts into the table
+    do_test bdb_multi_proc-1.1.3 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Read from the table
+    do_test bdb_multi_proc-1.1.4 {
+	db eval { 
+	    SELECT * from t1;
+	}
+    } {1}
+
+    # Wake up the other process
+    do_test bdb_multi_proc-1.1.5 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    db close
+    finish_test
+} {
+    # Process 2 code.
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts [lindex $cmd_args 1 ]
+    set timeout 20
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db procs.db
+
+    # Wait while the other process creates the table
+    do_test bdb_multi_proc-1.2.1 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Insert into the table
+    do_test bdb_multi_proc-1.2.2 {
+	db eval { 
+	    INSERT INTO t1 values(1);
+	}
+    } {}
+
+    # Wake up the other process
+    do_test bdb_multi_proc-1.2.3 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Wait while the other process reads the table
+    do_test bdb_multi_proc-1.2.4 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    db close
+    finish_test
+
+# Below is the argument list for the processes.  The first list is
+# passed to Process 1, and the second list is passed to Process 2.
+# The lists consist of:
+# first syncPort - Port for the server of the current process
+# last syncPort - Port for the server of the other process
+}] [list [list $syncPort1 $syncPort2] \
+	[list $syncPort2 $syncPort1]]
+
+catch {file delete -force -- procs.db}
+catch {file delete -force -- procs.db-journal}
+
+#
+# Test 2: Tests that three processes can write data to the 
+# database and read each other's work.
+#
+set myports [ available_ports 3]
+set syncPort1 [ lindex $myports 0]
+set syncPort2 [ lindex $myports 1]
+set syncPort3 [ lindex $myports 2]
+do_multi_proc_test bdb_multi_proc-2 [list {
+    # Process 1
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts {}
+    lappend remoteSyncPorts [lindex $cmd_args 1 ]
+    lappend remoteSyncPorts [lindex $cmd_args 2 ]
+    set timeout 20
+
+    # The scripts are run relative to the build_X directory  
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db procs.db
+
+    # Create the tables
+    do_test bdb_multi_proc-2.1.1 {
+	db eval { 
+	    BEGIN;
+	    CREATE TABLE t1(a);
+	    COMMIT;
+	}
+    } {}
+
+    # Wake up the other proceses
+    do_test bdb_multi_proc-2.1.2 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Pause while process 2 inserts into the table
+    do_test bdb_multi_proc-2.1.3 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Read from the table
+    do_test bdb_multi_proc-2.1.4 {
+	db eval { 
+	    SELECT * from t1;
+	}
+    } {2}
+
+    # Wake up the other processes after verifying process 2 write
+    do_test bdb_multi_proc-2.1.5 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Pause while process 3 writes to the table
+    do_test bdb_multi_proc-2.1.5 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Read from the table
+    do_test bdb_multi_proc-2.1.6 {
+	db eval { 
+	    SELECT * from t1;
+	}
+    } {2 3}
+
+    db close
+    finish_test
+} {
+    # Process 2
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts {}
+    lappend remoteSyncPorts [lindex $cmd_args 1 ]
+    lappend remoteSyncPorts [lindex $cmd_args 2 ]
+    set timeout 20
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db procs.db
+
+    # Wait while process 1 creates the table
+    do_test bdb_multi_proc-2.2.1 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Read from the table
+    do_test bdb_multi_proc-2.2.2 {
+	db eval { 
+	    SELECT * from t1;
+	}
+    } {}
+
+    # Insert into the table
+    do_test bdb_multi_proc-2.2.3 {
+	db eval { 
+	    INSERT INTO t1 values(2);
+	}
+    } {}
+
+    # Wake up the other processes
+    do_test bdb_multi_proc-2.2.4 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Wait while process 1 verifies our write
+    do_test bdb_multi_proc-2.2.5 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Wait while process 3 inserts into the table
+    do_test bdb_multi_proc-2.2.5 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Read from the table
+    do_test bdb_multi_proc-2.2.6 {
+	db eval { 
+	    SELECT * from t1;
+	}
+    } {2 3}
+
+    db close
+    finish_test
+} {
+    # Process 3
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts {}
+    lappend remoteSyncPorts [lindex $cmd_args 1 ]
+    lappend remoteSyncPorts [lindex $cmd_args 2 ]
+    set timeout 20
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db procs.db
+
+    # Wait while process 1 creates the table
+    do_test bdb_multi_proc-2.3.1 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Wait while process 2 inserts into the table
+    do_test bdb_multi_proc-2.3.2 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Wait while process 1 verifies the write from process 2
+    do_test bdb_multi_proc-2.3.2 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Read from the table
+    do_test bdb_multi_proc-2.3.3 {
+	db eval { 
+	    SELECT * from t1;
+	}
+    } {2}
+
+    # Insert into the table
+    do_test bdb_multi_proc-2.3.4 {
+	db eval { 
+	    INSERT INTO t1 values(3);
+	}
+    } {}
+
+    # Wake up the other processes
+    do_test bdb_multi_proc-2.3.5 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    db close
+    finish_test
+# Below is the argument lists for the processes, consisting of
+# first syncPort - Port for the server of the current process
+# last two syncPort - Ports for the servers of the other processes
+}] [list [list $syncPort1 $syncPort2 $syncPort3] \
+	[list $syncPort2 $syncPort1 $syncPort3] \
+	[list $syncPort3 $syncPort1 $syncPort2]]
+
+catch {file delete -force -- procs.db}
+catch {file delete -force -- procs.db-journal}
+
+#
+# Test 3: Check for a bug that could cause deadlock between
+# two processes that create new tables.
+#
+sqlite3 db procs2.db
+
+do_test bdb_multi_proc-3.0 {
+    db eval { CREATE TABLE atable(a); }
+} {}
+
+db close
+
+set myports [ available_ports 2]
+set syncPort1 [ lindex $myports 0]
+set syncPort2 [ lindex $myports 1]
+do_multi_proc_test bdb_multi_proc-3 [list {
+    # Process 1 code
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts [lindex $cmd_args 1 ]
+    set timeout 20
+
+    set testdir ../lang/sql/sqlite/test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db procs2.db
+
+    # Create the table 1
+    do_test bdb_multi_proc-3.1.1 {
+	db eval { 
+	    CREATE TABLE t1(a);
+	}
+    } {}
+
+    # Wait on process 2
+    do_test bdb_multi_proc-3.1.2 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Start the transaction
+    do_test bdb_multi_proc-3.1.3 {
+	db eval { 
+	    BEGIN IMMEDIATE;
+	}
+    } {}
+
+    # Wait on process 2
+    do_test bdb_multi_proc-3.1.4 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Insert into the table we created
+    do_test bdb_multi_proc-3.1.5 {
+	db eval { 
+	    INSERT INTO t1 VALUES(1);
+	}
+    } {}
+
+    # Wake up process 2
+    do_test bdb_multi_proc-3.1.6 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Let process 2 become blocked
+    after 3000
+
+    # Insert into the table Process 2 created
+    do_test bdb_multi_proc-3.1.7 {
+	db eval { 
+	    INSERT INTO t2 VALUES(2);
+	}
+    } {}
+
+    # End the transaction letting process 2 continue
+    do_test bdb_multi_proc-3.1.8 {
+	db eval { 
+	    COMMIT;
+	}
+    } {}
+
+    db close
+    finish_test
+} {
+    # Process 2 code.
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts [lindex $cmd_args 1 ]
+    set timeout 5
+
+    set testdir ../lang/sql/sqlite/test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db procs2.db
+
+    # Create the table2
+    do_test bdb_multi_proc-3.2.1 {
+	db eval { 
+	    CREATE TABLE t2(a);
+	}
+    } {}
+
+    # Wait on process 1
+    do_test bdb_multi_proc-3.2.2 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Start the transaction
+    do_test bdb_multi_proc-3.2.3 {
+	db eval { 
+	    BEGIN IMMEDIATE;
+	}
+    } {}
+
+    # Wait on process 1
+    do_test bdb_multi_proc-3.2.4 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Let process 1 insert first
+    do_test bdb_multi_proc-3.2.5 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Insert into the table we created, will become
+    # blocked here until process 1 commits
+    do_test bdb_multi_proc-3.2.6 {
+	db eval { 
+	    INSERT INTO t2 VALUES(2);
+	}
+    } {}
+
+    # End the transaction
+    do_test bdb_multi_proc-3.2.8 {
+	db eval { 
+	    COMMIT;
+	}
+    } {}
+
+    db close
+    finish_test
+
+# Below is the argument list for the processes.  The first list is
+# passed to Process 1, and the second list is passed to Process 2.
+# The lists consist of:
+# first syncPort - Port for the server of the current process
+# last syncPort - Port for the server of the other process
+}] [list [list $syncPort1 $syncPort2] \
+	[list $syncPort2 $syncPort1]]
+
+catch {file delete -force -- procs2.db}
+catch {file delete -force -- procs2.db-journal}
+
+#
+# Test 4: Tests that one process can read/write sequence that was created
+# by another process.
+#
+set myports [ available_ports 2]
+set syncPort1 [ lindex $myports 0]
+set syncPort2 [ lindex $myports 1]
+do_multi_proc_test bdb_multi_proc-4 [list {
+    # Process 1 code
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts [lindex $cmd_args 1 ]
+    set timeout 20
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db procs.db
+	
+    do_test bdb_sequences-4.1.1 {
+        execsql {
+            select create_sequence("a");
+        }
+    } {0}
+
+    # Wake up the other process
+    do_test bdb_multi_proc-4.1.2 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Pause while the other process operate the sequence
+    do_test bdb_multi_proc-4.1.3 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Get value from sequence.
+    do_test bdb_multi_proc-4.1.4 {
+	db eval { 
+            select nextval("a");
+	}
+    } {2}
+
+    # Wake up the other process
+    do_test bdb_multi_proc-4.1.5 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    db close
+    finish_test
+} {
+    # Process 2 code.
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts [lindex $cmd_args 1 ]
+    set timeout 20
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db procs.db
+
+    # Wait while the other process creates the sequence.
+    do_test bdb_multi_proc-4.2.1 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Get value from sequence.
+    do_test bdb_multi_proc-4.2.2 {
+	db eval { 
+            select nextval("a");
+	}
+    } {0}
+
+    # Get value from sequence again.
+    do_test bdb_multi_proc-4.2.3 {
+	db eval { 
+            select nextval("a");
+	}
+    } {1}
+
+    # Wake up the other process
+    do_test bdb_multi_proc-4.2.4 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Wait while the other process reads the sequence
+    do_test bdb_multi_proc-4.2.5 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    db close
+    finish_test
+
+# Below is the argument list for the processes.  The first list is
+# passed to Process 1, and the second list is passed to Process 2.
+# The lists consist of:
+# first syncPort - Port for the server of the current process
+# last syncPort - Port for the server of the other process
+}] [list [list $syncPort1 $syncPort2] \
+	[list $syncPort2 $syncPort1]]
+
+catch {file delete -force -- procs.db}
+catch {file delete -force -- procs.db-journal}
+
+#
+# Test 5: Tests multi-process replication applications.
+#
+
+global site1addr site2addr site3addr site1dir site2dir site3dir
+set delay 12000
+
+#
+# Test 5.1: Basic test that a multi-process master can insert data
+# on all processes, and a multi-process client can read data
+# on all processes.  There are three processes in this test, the
+# process that runs the main tests file, which opens handles to
+# the master and both clients, Process 1 created by do_multi_proc_test,
+# which opens a handle to the master, and Process 2 created by
+# do_multi_proc_test, which opens a handle to the client at site2addr.
+#
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+  create table t1(a);
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+db3 eval "
+  pragma replication_local_site='$site3addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+# Get the ports for the synchronization servers to use.
+set myports [ available_ports 2]
+set syncPort1 [ lindex $myports 0]
+set syncPort2 [ lindex $myports 1]
+do_multi_proc_test bdb_multi_proc-5.1 [list {
+    # Process 1 code to access master
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts [lindex $cmd_args 1 ]
+    set sitedir [lindex $cmd_args 2 ]
+    set timeout 60
+    set delay 12000
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db $sitedir/rep.db
+
+    do_test bdb_multi_proc-5.1.1.1 {
+        execsql {
+            insert into t1 values(1);
+        }
+    } {}
+
+    # replication delay
+    after $delay
+
+    # Wake up the other process
+    do_test bdb_multi_proc-5.1.1.2 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    db close
+    finish_test
+} {
+    # Process 2 code to access client
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts [lindex $cmd_args 1 ]
+    set sitedir [lindex $cmd_args 2 ]
+    set timeout 60
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db $sitedir/rep.db
+
+    # Wait while the other process inserts data
+    do_test bdb_multi_proc-5.1.2.1 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Check that the value replicated.
+    do_test bdb_multi_proc-5.1.2.2 {
+        db eval { 
+            select * from t1;
+        }
+    } {1}
+
+    db close
+    finish_test
+
+# Below is the argument list for the processes.  The first list is
+# passed to Process 1, and the second list is passed to Process 2.
+# The lists consist of:
+# first syncPort - Port for the sync server of the current process
+# last syncPort - Port for the sync server of the other process
+# sitedir - Directory of the replication site
+}] [list [list $syncPort1 $syncPort2 $site1dir] \
+	[list $syncPort2 $syncPort1 $site2dir]]
+
+# Main test process code.
+
+# Check that the other client process got the data
+do_test multi_proc-5.1.3 {
+  execsql {
+    select * from t1;
+  } db2
+} {1}
+
+# Check that the master is still accepting updates
+do_test multi_proc-5.1.4 {
+  execsql {
+    insert into t1 values(2);
+  } db
+} {}
+
+# replication delay
+after $delay
+
+# Check that the second client got all the data.
+do_test multi_proc-5.1.5 {
+  execsql {
+    select * from t1;
+  } db3
+} {1 2}
+
+catch {db3 close}
+catch {db2 close}
+catch {db close}
+
+#
+# Test 5.2: Tests that calling pragma replication=on works when another
+# process is running replication on that site.  This test uses 3 processes,
+# the main test process that opens handles to the master and two clients,
+# a process created by do_multi_proc_test that opens a handle to the
+# master using "pragma replication=ON;", and another process created by
+# do_multi_proc_test that opens a handle to a client using 
+# "pragma replication=ON;".
+#
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+  create table t1(a);
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+db3 eval "
+  pragma replication_local_site='$site3addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+# Get the ports for the synchronization servers to use.
+set myports [ available_ports 2]
+set syncPort1 [ lindex $myports 0]
+set syncPort2 [ lindex $myports 1]
+do_multi_proc_test bdb_multi_proc-5.2 [list {
+    # Process 1 code to access master
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts [lindex $cmd_args 1 ]
+    set sitedir [lindex $cmd_args 2 ]
+    set localaddr [lindex $cmd_args 3 ]
+    set timeout 60
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db $sitedir/rep.db
+
+    db eval "pragma replication_local_site='$localaddr';"
+	
+    do_test bdb_multi_proc-5.2.1.1 {
+        execsql {
+            pragma replication_initial_master=ON;
+            pragma replication=ON;
+        }
+    } {1 {Replication started}}
+
+    do_test bdb_multi_proc-5.2.1.2 {
+        execsql {
+            insert into t1 values(1);
+        }
+    } {}
+
+    # replication delay
+    after 12000
+
+    # Wake up the other process
+    do_test bdb_multi_proc-5.2.1.3 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    db close
+    finish_test
+} {
+    # Process 2 code to access client
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts [lindex $cmd_args 1 ]
+    set sitedir [lindex $cmd_args 2 ]
+    set localaddr [lindex $cmd_args 3 ]
+    set remoteaddr [lindex $cmd_args 4 ]
+    set timeout 60
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db $sitedir/rep.db
+
+    db eval "
+        pragma replication_local_site='$localaddr';
+        pragma replication_remote_site='$remoteaddr';
+        "
+
+    do_test bdb_multi_proc-5.2.1.1 {
+        execsql {
+            pragma replication=ON;
+        }
+    } {{Replication started}}
+
+    # Wait while the other process inserts data
+    do_test bdb_multi_proc-5.2.2.2 {
+	set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Check that the value replicated
+    do_test bdb_multi_proc-5.2.2.3 {
+        db eval { 
+            select * from t1;
+        }
+    } {1}
+
+    db close
+    finish_test
+
+# Below is the argument list for the processes.  The first list is
+# passed to Process 1, and the second list is passed to Process 2.
+# The lists consist of:
+# first syncPort - Port for the server of the current process
+# last syncPort - Port for the server of the other process
+# sitedir - Directory of the replication site
+# siteaddr - Address of the local site and master if the process
+#  is operating on a client
+}] [list [list $syncPort1 $syncPort2 $site1dir $site1addr] \
+	[list $syncPort2 $syncPort1 $site2dir $site2addr $site1addr]]
+
+# Main test process code.
+
+# Check that the other client process got the data
+do_test multi_proc-5.2.3 {
+  execsql {
+    select * from t1;
+  } db2
+} {1}
+
+# Check that the master is still accepting updates
+do_test multi_proc-5.2.4 {
+  execsql {
+    insert into t1 values(2);
+  } db
+} {}
+
+# replication delay
+after $delay
+
+# Check that the second client got all the data.
+do_test multi_proc-5.2.5 {
+  execsql {
+    select * from t1;
+  } db3
+} {1 2}
+
+catch {db3 close}
+catch {db2 close}
+catch {db close}
+
+#
+# Test 5.3: Tests that a autotakeover can switch the listener process on
+# the master multiple times.  Also tests that the client listener can
+# change after the first client listener is shut down.
+#
+# The test is as follows:
+# Master Process 1 starts
+# Master Process 2 starts
+# Client Process 4 starts
+# Master Process 1 closes, so Master Process 2 becomes the listener
+# Client Process 5 starts
+# Master Process 3 starts
+# Client Process 4 closes, so Client Process 5 becomes the listener
+# Master Process 2 closes, so Master Process 3 becomes the listener
+# Master Process 3 and Client Process 2 closes.
+#
+# Below is a chart showing the order of operations executing in the 5 
+# processes.
+# Master Process 3 starts, then 
+# Process M1      | Process M2      | Process M3      | Process C4    | Process C5
+# 5.3.1.1 Open    |                 |                 |               |
+# Master Listener |                 |                 |               |
+# 5.3.1.2 Create  |                 |                 |               |
+# 5.3.1.3 Sync 1  | 5.3.2.1 Sync 1  | 5.3.3.1 Sync 1  | 5.3.4.1 Sync 1| 5.3.5.1 Sync 1
+# 5.3.1.4 Insert 2| 5.3.2.2 Insert 1|                 |               |
+# 5.3.1.5 Sync 2  | 5.3.2.3 Sync 2  | 5.3.3.2 Sync 2  | 5.3.4.2 Sync 2| 5.3.5.2 Sync 2
+#                 |                 |                 | 5.3.4.3 Open  |
+#                 |                 |                 |Client Listener|
+#                 |                 |                 | 5.3.4.4 Read  |
+# 5.3.1.6 Sync 3  | 5.3.2.4 Sync 3  | 5.3.3.3 Sync 3  | 5.3.4.5 Sync 3| 5.3.5.3 Sync 3
+# Close           | Master Listener |                 |               |
+# 5.3.1.7 Sync 4  | 5.3.2.5 Sync 4  | 5.3.3.4 Sync 4  | 5.3.4.6 Sync 4| 5.3.5.4 Sync 4
+#                 | 5.3.2.6 Insert 3|                 |               |
+#                 | 5.3.2.7 Sync 5  | 5.3.3.5 Sync 5  | 5.3.4.7 Sync 5| 5.3.5.5 Sync 5
+#                 |                 |                 | 5.3.4.8 Read  | 5.3.5.6 Open
+#                 |                 |                 |               | 5.3.5.7 Read
+#                 | 5.3.2.8 Sync 6  | 5.3.3.6 Sync 6  | 5.3.4.9 Sync 6| 5.3.5.8 Sync 6
+#                 | 5.3.2.9 Insert 4| 5.3.3.7 Open    |               |
+#                 |                 | 5.3.3.8 Insert 5|               |
+#                 | 5.3.2.10 Sync 7 | 5.3.3.9 Sync 7  |5.3.4.10 Sync 7| 5.3.5.9 Sync 7
+#                 |                 |                 | 5.3.4.11 Read |
+#                 |                 |                 | Close         | Client Listener
+#                 | 5.3.2.11 Sync 8 | 5.3.3.10 Sync 8 |5.3.4.12 Sync 8|5.3.5.10 Sync 8
+#                 | Close           | Master Listener |               |
+#                 | 5.3.2.12 Sync 9 | 5.3.3.11 Sync 9 |               |5.3.5.11 Sync 9
+#                 |                 | 5.3.3.12 Insert6|               |
+#                 |                 | 5.3.3.13 Sync 10|               | 5.3.5.12 Sync 10
+#                 |                 |                 |               | 5.3.5.13 Read
+#                 |                 | 5.3.3.14 Sync 11|               | 5.3.5.14 Sync 11
+#                 |                 | Close           |               | Close
+#
+setup_rep_sites
+
+# The first two ports returned by available_ports were taken as
+# the ports used by the 2 replication sites.
+set myports [ available_ports 7]
+set syncPort1 [ lindex $myports 2]
+set syncPort2 [ lindex $myports 3]
+set syncPort3 [ lindex $myports 4]
+set syncPort4 [ lindex $myports 5]
+set syncPort5 [ lindex $myports 6]
+do_multi_proc_test bdb_multi_proc-5.3 [list {
+    # Master Process 1
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts {}
+    lappend remoteSyncPorts [lindex $cmd_args 1 ]
+    lappend remoteSyncPorts [lindex $cmd_args 2 ]
+    lappend remoteSyncPorts [lindex $cmd_args 3 ]
+    lappend remoteSyncPorts [lindex $cmd_args 4 ]
+    set sitedir [lindex $cmd_args 5 ]
+    set localaddr [lindex $cmd_args 6 ]
+    set timeout 60
+    set delay 12000
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+    sqlite3 db $sitedir/rep.db
+
+    db eval "pragma replication_local_site='$localaddr';"
+
+    do_test bdb_multi_proc-5.3.1.1 {
+        execsql {
+            pragma replication_initial_master=ON;
+            pragma replication=ON;
+        }
+    } {1 {Replication started}}
+
+    do_test bdb_multi_proc-5.3.1.2 {
+        execsql {
+            create table t1(a);
+        }
+    } {}
+
+    # Replication delay
+    after $delay
+
+    # Sync 1, Wake up the other process
+    do_test bdb_multi_proc-5.3.1.3 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    do_test bdb_multi_proc-5.3.1.4 {
+        execsql {
+            insert into t1 values(2);
+        }
+    } {}
+
+    # Replication delay
+    after $delay
+
+    # Sync 2, Wake up the other process
+    do_test bdb_multi_proc-5.3.1.5 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 3, Block while other processes work
+    do_test bdb_multi_proc-5.3.1.6 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Close to let Master Process 2 take over
+    db close
+
+    # Takeover delay
+    after $delay
+
+    # Sync 4, Block while other processes take over
+    do_test bdb_multi_proc-5.3.1.7 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    finish_test
+} {
+    # Master Process 2
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts {}
+    lappend remoteSyncPorts [lindex $cmd_args 1 ]
+    lappend remoteSyncPorts [lindex $cmd_args 2 ]
+    lappend remoteSyncPorts [lindex $cmd_args 3 ]
+    lappend remoteSyncPorts [lindex $cmd_args 4 ]
+    set sitedir [lindex $cmd_args 5 ]
+    set timeout 60
+    set delay 12000
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+
+    # Sync 1, Wait while Master Process 1 starts up
+    do_test bdb_multi_proc-5.3.2.1 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Open the database
+    sqlite3 db $sitedir/rep.db
+
+    # Insert data
+    do_test bdb_multi_proc-5.3.2.2 {
+        execsql {
+            insert into t1 values(1);
+        }
+    } {}
+
+    # Replication delay
+    after $delay
+
+    # Sync 2, Wake the other processes up
+    do_test bdb_multi_proc-5.3.2.3 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 3, Wait while Client Process 4 starts up
+    do_test bdb_multi_proc-5.3.2.4 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+     # Sync 4, Wait while Master Process 1 shuts down
+    do_test bdb_multi_proc-5.3.2.5 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Remove the Master Process 1 port
+    set remoteSyncPorts [lreplace $remoteSyncPorts 0 0]
+
+    # Insert data as new listener process
+    do_test bdb_multi_proc-5.3.2.6 {
+        execsql {
+            insert into t1 values(3);
+        }
+    } {}
+
+    # Replication delay
+    after $delay
+
+    # Sync 5, Wake the other processes up
+    do_test bdb_multi_proc-5.3.2.7 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 6, Wait while the client processes read the replicated data
+    do_test bdb_multi_proc-5.3.2.8 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Insert data while there is another master process
+    do_test bdb_multi_proc-5.3.2.9 {
+        execsql {
+            insert into t1 values(4);
+        }
+    } {}
+
+    # Replication delay
+    after $delay
+
+    # Sync 7, Wake the other processes up
+    do_test bdb_multi_proc-5.3.2.10 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 8, Wait while Client Process 4 closes
+    do_test bdb_multi_proc-5.3.2.11 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Remove Client Process 4
+    set remoteSyncPorts [lreplace $remoteSyncPorts 0 0]
+
+    # Shutdown, letting Master Process 3 take over
+    db close
+
+    # Sync 9, Wake the other processes up
+    do_test bdb_multi_proc-5.3.2.12 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    finish_test
+} {
+    # Master Process 3
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts {}
+    lappend remoteSyncPorts [lindex $cmd_args 1 ]
+    lappend remoteSyncPorts [lindex $cmd_args 2 ]
+    lappend remoteSyncPorts [lindex $cmd_args 3 ]
+    lappend remoteSyncPorts [lindex $cmd_args 4 ]
+    set sitedir [lindex $cmd_args 5 ]
+    set timeout 60
+    set delay 12000
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+
+    # Spend a lot of time waiting for other processes
+    # to do work, before joining.
+
+    # Sync 1, Wait while Master Process 1 starts up
+    do_test bdb_multi_proc-5.3.3.1 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 2, Wait while Master Process 2 starts up
+    do_test bdb_multi_proc-5.3.3.2 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 3, Wait while Client Process 4 starts up
+    do_test bdb_multi_proc-5.3.3.3 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 4, Wait while Master Process 1 shuts down
+    do_test bdb_multi_proc-5.3.3.4 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Remove the port for Master Process 1
+    set remoteSyncPorts [lreplace $remoteSyncPorts 0 0]
+
+    # Sync 5, Have Master Process 2 insert data
+    do_test bdb_multi_proc-5.3.3.5 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 6, Wait while Client Process 5 starts up
+    do_test bdb_multi_proc-5.3.3.6 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    sqlite3 db $sitedir/rep.db
+
+    # Execute a statment to start replication
+    do_test bdb_multi_proc-5.3.3.7 {
+        db eval { 
+            drop table if exists does_not_exist;
+        }
+    } {}
+
+    # Insert data as a subordinate process
+    do_test bdb_multi_proc-5.3.3.8 {
+        db eval { 
+            insert into t1 values(5);
+        }
+    } {}
+
+    # Replication delay
+    after $delay
+
+    # Sync 7, Wake up other processes
+    do_test bdb_multi_proc-5.3.3.9 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 8, Wait while Client Process 4 shuts down
+    do_test bdb_multi_proc-5.3.3.10 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Remove Client Process 4 from the list of ports
+    set remoteSyncPorts [lreplace $remoteSyncPorts 0 0]
+
+    # Sync 9, Wait while Master process 2 shuts down
+    do_test bdb_multi_proc-5.3.3.11 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Remove Master Process 2 from the list of ports
+    set remoteSyncPorts [lreplace $remoteSyncPorts 0 0]
+
+    # Insert data as new listener process
+    do_test bdb_multi_proc-5.3.3.12 {
+        db eval { 
+            insert into t1 values(6);
+        }
+    } {}
+
+    # Replication delay
+    after $delay
+
+    # Sync 10, Wake up other processes
+    do_test bdb_multi_proc-5.3.3.13 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 11, Wait while Client Process 5 reads data
+    do_test bdb_multi_proc-5.3.3.14 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    db close
+    finish_test
+} {
+    # Client Process 1
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts {}
+    lappend remoteSyncPorts [lindex $cmd_args 1 ]
+    lappend remoteSyncPorts [lindex $cmd_args 2 ]
+    lappend remoteSyncPorts [lindex $cmd_args 3 ]
+    lappend remoteSyncPorts [lindex $cmd_args 4 ]
+    set sitedir [lindex $cmd_args 5 ]
+    set localaddr [lindex $cmd_args 6 ]
+    set remoteaddr [lindex $cmd_args 7 ]
+    set timeout 60
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+
+    # Sync 1, Wait while Master Process 1 starts up
+    do_test bdb_multi_proc-5.3.4.1 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 2, Wait while Master Process 2 starts up
+    do_test bdb_multi_proc-5.3.4.2 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Start up as a client
+    sqlite3 db $sitedir/rep.db
+
+    db eval "
+        pragma replication_local_site='$localaddr';
+        pragma replication_remote_site='$remoteaddr';
+        "
+
+    do_test bdb_multi_proc-5.3.4.3 {
+        execsql {
+            pragma replication=ON;
+        }
+    } {{Replication started}}
+
+    # Let the Client sync
+    after 3000
+
+    do_test bdb_multi_proc-5.3.4.4 {
+        execsql {
+            select * from t1 order by a;
+        }
+    } {1 2}
+
+    # Sync 3, Wake up other processes
+    do_test bdb_multi_proc-5.3.4.5 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 4, Wait while Master Process 1 closes
+    do_test bdb_multi_proc-5.3.4.6 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Remove Master Process 1 from the list of ports
+    set remoteSyncPorts [lreplace $remoteSyncPorts 0 0]
+
+    # Sync 5, Wait while Master Process 2 inserts data
+    do_test bdb_multi_proc-5.3.4.7 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Read replicated data
+    do_test bdb_multi_proc-5.3.4.8 {
+        execsql {
+            select * from t1 order by a;
+        }
+    } {1 2 3}
+
+    # Sync 6, Wake up other processes
+    do_test bdb_multi_proc-5.3.4.9 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 7, Wait while Master Processes 2 and 3 inserts data
+    do_test bdb_multi_proc-5.3.4.10 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Read replicated data
+    do_test bdb_multi_proc-5.3.4.11 {
+        execsql {
+            select * from t1 order by a;
+        }
+    } {1 2 3 4 5}
+
+    # Shut down
+    db close
+
+    # Sync 8, Wake up other processes
+    do_test bdb_multi_proc-5.3.4.12 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    finish_test
+} {
+    # Client Process 2
+    set cmd_args [ lindex $argv 0 ]
+    set syncPort [ lindex $cmd_args 0 ]
+    set remoteSyncPorts {}
+    lappend remoteSyncPorts [lindex $cmd_args 1 ]
+    lappend remoteSyncPorts [lindex $cmd_args 2 ]
+    lappend remoteSyncPorts [lindex $cmd_args 3 ]
+    lappend remoteSyncPorts [lindex $cmd_args 4 ]
+    set sitedir [lindex $cmd_args 5 ]
+    set localaddr [lindex $cmd_args 6 ]
+    set remoteaddr [lindex $cmd_args 7 ]
+    set timeout 60
+
+    # The scripts are run relative to the build_X directory 
+    set testdir ../lang/sql/sqlite/test
+    # For the definition of do_test
+    source $testdir/tester.tcl
+    source ../test/tcl_utils/multi_proc_utils.tcl
+
+    # Sync 1, Wait while Master Process 1 starts up
+    do_test bdb_multi_proc-5.3.5.1 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 2, Wait while Master Process 2 starts up
+    do_test bdb_multi_proc-5.3.5.2 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 3, Wait while Client Process 4 starts up
+    do_test bdb_multi_proc-5.3.5.3 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 4, Wait while Master Process 1 shuts down
+    do_test bdb_multi_proc-5.3.5.4 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Remove Master Process 1 from the list of ports
+    set remoteSyncPorts [lreplace $remoteSyncPorts 0 0]
+
+    # Sync 5, Wait while Master Process 2 inserts data
+    do_test bdb_multi_proc-5.3.5.5 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Start up as a client
+    sqlite3 db $sitedir/rep.db
+
+    db eval "
+        pragma replication_local_site='$localaddr';
+        pragma replication_remote_site='$remoteaddr';
+        "
+
+    do_test bdb_multi_proc-5.3.5.6 {
+        execsql {
+            pragma replication=ON;
+        }
+    } {{Replication started}}
+
+    # Let the Client sync
+    after 3000
+
+    # Read replicated data
+    do_test bdb_multi_proc-5.3.5.7 {
+        execsql {
+            select * from t1 order by a;
+        }
+    } {1 2 3}
+
+    # Sync 6, Wake up other processes
+    do_test bdb_multi_proc-5.3.5.8 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 7, Wait while Master Processes 1 and 2 insert data
+    do_test bdb_multi_proc-5.3.5.9 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Sync 8, Wait while Client Process 4 shuts down
+    do_test bdb_multi_proc-5.3.5.10 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Remove Client Process 4 from the list of ports
+    set remoteSyncPorts [lreplace $remoteSyncPorts 0 0]
+
+    # Sync 9, Wait while Master Process 2 shuts down
+    do_test bdb_multi_proc-5.3.5.11 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Remove Master Process 2 from ports list
+    set remoteSyncPorts [lreplace $remoteSyncPorts 0 0]
+
+    # Sync 10, Wait for Master Process 3 to insert data
+    do_test bdb_multi_proc-5.3.5.12 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Read replicated data as the new listener process
+    do_test bdb_multi_proc-5.3.5.13 {
+        execsql {
+            select * from t1 order by a;
+        }
+    } {1 2 3 4 5 6}
+
+    # Sync 11, Wake up other processes
+    do_test bdb_multi_proc-5.3.5.14 {
+        set ret [do_sync $syncPort $remoteSyncPorts $timeout]
+    } {0}
+
+    # Shutdown
+    db close
+    finish_test
+# Below is the argument list for the processes.
+# The lists consist of:
+# first syncPort - Port for the server of the current process
+# 4 syncPorts - Ports for the server of the other processes
+# sitedir - Directory of the replication site
+# siteaddr - Address of the local site and master if the process
+#  is operating on a client
+}] [list [list $syncPort1 $syncPort4 $syncPort2 $syncPort3 $syncPort5 $site1dir $site1addr] \
+	[list $syncPort2 $syncPort1 $syncPort4 $syncPort3 $syncPort5 $site1dir] \
+	[list $syncPort3 $syncPort1 $syncPort4 $syncPort2 $syncPort5 $site1dir] \
+	[list $syncPort4 $syncPort1 $syncPort2 $syncPort3 $syncPort5 $site2dir $site2addr $site1addr] \
+	[list $syncPort5 $syncPort1 $syncPort4 $syncPort2 $syncPort3 $site2dir $site2addr $site1addr]]
+
+finish_test

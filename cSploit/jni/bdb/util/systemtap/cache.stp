@@ -1,0 +1,104 @@
+#!/usr/bin/stap
+/*
+ * Copyright (c) 2012, 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * cache.stp - Display DB cache activity groups by file.
+ *
+ * The path to the DB library is required to be the first argument.
+ *
+ * usage:
+ *	cache <library-path> [<stap options, e.g. -x <pid>>] \
+ *		[interval [#iterations [warmup period]]]
+ *
+ *	The defaults are
+ *		interval - 1 second
+ *		iterations - 0: unlimited)
+ *		warmup - 0: start measuring right away)
+ *
+ *	For each 'interval' seconds display overall and per-file cache stats:
+ *		hits
+ *		misses
+ *		evictions
+ *	Empty lines are displayed when where was no cache activity for that
+ *	file & counter during that interval
+ */
+global interval, current, iterations;
+global warmup, hits, misses, evictions, secs, tick;
+
+probe begin
+{
+	interval = 10;
+	iterations = 60;
+	warmup = 0;
+	%( $# >= 2 %? interval = $2 %)
+	%( $# >= 3 %? iterations = $3 %)
+	%( $# >= 4 %? warmup = $4 %)
+	secs = interval;
+
+	tick = 0;
+	current = 0;
+}
+
+function printstats()
+{
+	foreach ([file+] in hits)
+		printf("Hits for %s %d\n", file, @count(hits[file]));
+	foreach ([file+] in misses)
+		printf("Misses for %s %d\n", file, @count(misses[file]));
+	foreach ([file+] in evictions)
+		printf("Evictions for %s %d\n", file, @count(evictions[file]));
+	delete hits;
+	delete misses;
+	delete evictions;
+}
+
+/* mpool-miss(unsigned misses, char *file, unsigned pgno)
+ */
+
+probe process(@1).mark("mpool__miss")
+{
+	if (tick >= warmup)
+		misses[$arg2 == 0 ? "<null>" : user_string($arg2)] <<< 1;
+}
+
+/* mpool-hit(unsigned hits, char *file, unsigned pgno) */
+probe process(@1).mark("mpool__hit")
+{
+	if (tick >= warmup)
+		hits[$arg2 == 0 ? "<null>" : user_string($arg2)] <<< 1;
+}
+
+/* mpool-evict(char *file, unsigned pgno, BH *buf */
+probe process(@1).mark("mpool__evict")
+{
+	if (tick >= warmup)
+		evictions[$arg1 == 0 ? "<null>" : user_string($arg1)] <<< 1;
+}
+
+probe timer.sec(1)
+{
+	/* Print a banner when starting the first measurement interval. */
+	if (tick == warmup) {
+		printf("Cache info: %8s %8s %8s %sstarting @ %s\n", "hits",
+		    "misses", "evictions",
+		    iterations == 0 ? "" : sprintf("%d iterations ", iterations),
+		    ctime(gettimeofday_s()));
+		secs = interval;
+	}
+	tick++;
+	secs--;
+	/* Display and erase statistics when ending an interval */
+	if (secs == 0 && tick >= warmup) {
+		printf(" %6d  %8d %8d %8d\n", tick, hits, misses, evictions);
+		hits = misses = evictions = 0;
+		printstats();
+		secs = interval;
+		if (++current == iterations)
+			exit();
+	}
+}
+
+probe end
+{
+	printf("\ncache.stp completed\n");
+}

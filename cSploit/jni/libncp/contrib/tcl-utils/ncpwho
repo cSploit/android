@@ -1,0 +1,4 @@
+#! /bin/sh
+ncpwhoami -g  $1 $2 $3 $4
+
+

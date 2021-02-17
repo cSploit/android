@@ -1,0 +1,405 @@
+.TH LDAPMODIFY 1 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldapmodify, ldapadd \- LDAP modify entry and LDAP add entry tools
+.SH SYNOPSIS
+.B ldapmodify
+[\c
+.BR \-V [ V ]]
+[\c
+.BI \-d \ debuglevel\fR]
+[\c
+.BR \-n ]
+[\c
+.BR \-v ]
+[\c
+.BR \-a ]
+[\c
+.BR \-c ]
+[\c
+.BI \-f \ file\fR]
+[\c
+.BI \-S \ file\fR]
+[\c
+.BR \-M [ M ]]
+[\c
+.BR \-x ]
+[\c
+.BI \-D \ binddn\fR]
+[\c
+.BR \-W ]
+[\c
+.BI \-w \ passwd\fR]
+[\c
+.BI \-y \ passwdfile\fR]
+[\c
+.BI \-H \ ldapuri\fR]
+[\c
+.BI \-h \ ldaphost\fR]
+[\c
+.BI \-p \ ldapport\fR]
+[\c
+.BR \-P \ { 2 \||\| 3 }]
+[\c
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BI \-o \ opt \fR[= optparam \fR]]
+[\c
+.BI \-O \ security-properties\fR]
+[\c
+.BR \-I ]
+[\c
+.BR \-Q ]
+[\c
+.BR \-N ]
+[\c
+.BI \-U \ authcid\fR]
+[\c
+.BI \-R \ realm\fR]
+[\c
+.BI \-X \ authzid\fR]
+[\c
+.BI \-Y \ mech\fR]
+[\c
+.BR \-Z [ Z ]]
+.LP
+.B ldapadd
+[\c
+.BR \-V [ V ]]
+[\c
+.BI \-d \ debuglevel\fR]
+[\c
+.BR \-n ]
+[\c
+.BR \-v ]
+[\c
+.BR \-c ]
+[\c
+.BI \-f \ file\fR]
+[\c
+.BI \-S \ file\fR]
+[\c
+.BR \-M [ M ]]
+[\c
+.BR \-x ]
+[\c
+.BI \-D \ binddn\fR]
+[\c
+.BR \-W ]
+[\c
+.BI \-w \ passwd\fR]
+[\c
+.BI \-y \ passwdfile\fR]
+[\c
+.BI \-H \ ldapuri\fR]
+[\c
+.BI \-h \ ldaphost\fR]
+[\c
+.BI \-p \ ldapport\fR]
+[\c
+.BR \-P \ { 2 \||\| 3 }]
+[\c
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BI \-o \ opt \fR[= optparam \fR]]
+[\c
+.BI \-O \ security-properties\fR]
+[\c
+.BR \-I ]
+[\c
+.BR \-Q ]
+[\c
+.BR \-N ]
+[\c
+.BI \-U \ authcid\fR]
+[\c
+.BI \-R \ realm\fR]
+[\c
+.BI \-X \ authzid\fR]
+[\c
+.BI \-Y \ mech\fR]
+[\c
+.BR \-Z [ Z ]]
+.SH DESCRIPTION
+.B ldapmodify
+is a shell-accessible interface to the
+.BR ldap_add_ext (3),
+.BR ldap_modify_ext (3),
+.BR ldap_delete_ext (3)
+and
+.BR ldap_rename (3).
+library calls.
+.B ldapadd
+is implemented as a hard link to the ldapmodify tool.  When invoked as
+.B ldapadd
+the \fB\-a\fP (add new entry) flag is turned on automatically.
+.LP
+.B ldapmodify
+opens a connection to an LDAP server, binds, and modifies or adds entries.
+The entry information is read from standard input or from \fIfile\fP through
+the use of the \fB\-f\fP option.
+.SH OPTIONS
+.TP
+.BR \-V [ V ]
+Print version info.
+If \fB\-VV\fP is given, only the version information is printed.
+.TP
+.BI \-d \ debuglevel
+Set the LDAP debugging level to \fIdebuglevel\fP.
+.B ldapmodify
+must be compiled with LDAP_DEBUG defined for this option to have any effect.
+.TP
+.B \-n
+Show what would be done, but don't actually modify entries.  Useful for
+debugging in conjunction with \fB\-v\fP.
+.TP
+.B \-v
+Use verbose mode, with many diagnostics written to standard output.
+.TP
+.B \-a
+Add new entries.  The default for
+.B ldapmodify
+is to modify existing entries.  If invoked as
+.BR ldapadd ,
+this flag is always set.
+.TP
+.B \-c
+Continuous operation mode.  Errors are reported, but
+.B ldapmodify
+will continue with modifications.  The default is to exit after
+reporting an error.
+.TP
+.BI \-f \ file
+Read the entry modification information from \fIfile\fP instead of from
+standard input.
+.TP
+.BI \-S \ file
+Add or change records which were skipped due to an error are written to \fIfile\fP 
+and the error message returned by the server is added as a comment. Most useful in 
+conjunction with \fB\-c\fP.
+.TP
+.BR \-M [ M ]
+Enable manage DSA IT control.
+.B \-MM
+makes control critical.
+.TP
+.B \-x 
+Use simple authentication instead of SASL.
+.TP
+.BI \-D \ binddn
+Use the Distinguished Name \fIbinddn\fP to bind to the LDAP directory.
+For SASL binds, the server is expected to ignore this value.
+.TP
+.B \-W
+Prompt for simple authentication.
+This is used instead of specifying the password on the command line.
+.TP
+.BI \-w \ passwd
+Use \fIpasswd\fP as the password for simple authentication.
+.TP
+.BI \-y \ passwdfile
+Use complete contents of \fIpasswdfile\fP as the password for
+simple authentication.
+.TP
+.BI \-H \ ldapuri
+Specify URI(s) referring to the ldap server(s); only the protocol/host/port
+fields are allowed; a list of URI, separated by whitespace or commas
+is expected.
+.TP
+.BI \-h \ ldaphost
+Specify an alternate host on which the ldap server is running.
+Deprecated in favor of \fB\-H\fP.
+.TP
+.BI \-p \ ldapport
+Specify an alternate TCP port where the ldap server is listening.
+Deprecated in favor of \fB\-H\fP.
+.TP
+.BR \-P \ { 2 \||\| 3 }
+Specify the LDAP protocol version to use.
+.TP
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+.TP
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+
+Specify general extensions with \fB\-e\fP and modify extensions with \fB\-E\fP.
+\'\fB!\fP\' indicates criticality.
+
+General extensions:
+.nf
+  [!]assert=<filter>    (an RFC 4515 Filter)
+  !authzid=<authzid>    ("dn:<dn>" or "u:<user>")
+  [!]bauthzid           (RFC 3829 authzid control)
+  [!]chaining[=<resolve>[/<cont>]]
+  [!]manageDSAit
+  [!]noop
+  ppolicy
+  [!]postread[=<attrs>] (a comma-separated attribute list)
+  [!]preread[=<attrs>]  (a comma-separated attribute list)
+  [!]relax
+  sessiontracking[=<username>]
+  abandon,cancel,ignore (SIGINT sends abandon/cancel,
+  or ignores response; if critical, doesn't wait for SIGINT.
+  not really controls)
+.fi
+
+Modify extensions:
+.nf
+  [!]txn[=abort|commit]
+.fi
+.TP
+.BI \-o \ opt \fR[= optparam \fR]]
+
+Specify general options.
+
+General options:
+.nf
+  nettimeout=<timeout>  (in seconds, or "none" or "max")
+  ldif-wrap=<width>     (in columns, or "no" for no wrapping)
+.fi
+.TP
+.BI \-O \ security-properties
+Specify SASL security properties.
+.TP
+.B \-I
+Enable SASL Interactive mode.  Always prompt.  Default is to prompt
+only as needed.
+.TP
+.B \-Q
+Enable SASL Quiet mode.  Never prompt.
+.TP
+.B \-N
+Do not use reverse DNS to canonicalize SASL host name.
+.TP
+.BI \-U \ authcid
+Specify the authentication ID for SASL bind. The form of the ID
+depends on the actual SASL mechanism used.
+.TP
+.BI \-R \ realm
+Specify the realm of authentication ID for SASL bind. The form of the realm
+depends on the actual SASL mechanism used.
+.TP
+.BI \-X \ authzid
+Specify the requested authorization ID for SASL bind.
+.I authzid
+must be one of the following formats:
+.BI dn: "<distinguished name>"
+or
+.BI u: <username>
+.TP
+.BI \-Y \ mech
+Specify the SASL mechanism to be used for authentication. If it's not
+specified, the program will choose the best mechanism the server knows.
+.TP
+.BR \-Z [ Z ]
+Issue StartTLS (Transport Layer Security) extended operation. If you use
+.B \-ZZ\c
+, the command will require the operation to be successful.
+.SH INPUT FORMAT
+The contents of \fIfile\fP (or standard input if no \fB\-f\fP flag is given on
+the command line) must conform to the format defined in
+.BR ldif (5)
+(LDIF as defined in RFC 2849).
+.SH EXAMPLES
+Assuming that the file
+.B /tmp/entrymods
+exists and has the contents:
+.LP
+.nf
+    dn: cn=Modify Me,dc=example,dc=com
+    changetype: modify
+    replace: mail
+    mail: modme@example.com
+    \-
+    add: title
+    title: Grand Poobah
+    \-
+    add: jpegPhoto
+    jpegPhoto:< file:///tmp/modme.jpeg
+    \-
+    delete: description
+    \-
+.fi
+.LP
+the command:
+.LP
+.nf
+    ldapmodify \-f /tmp/entrymods
+.fi
+.LP
+will replace the contents of the "Modify Me" entry's
+.I mail
+attribute with the value "modme@example.com", add a
+.I title
+of "Grand Poobah", and the contents of the file "/tmp/modme.jpeg"
+as a
+.IR jpegPhoto ,
+and completely remove the
+.I description
+attribute.
+.LP
+Assuming that the file
+.B /tmp/newentry
+exists and has the contents:
+.LP
+.nf
+    dn: cn=Barbara Jensen,dc=example,dc=com
+    objectClass: person
+    cn: Barbara Jensen
+    cn: Babs Jensen
+    sn: Jensen
+    title: the world's most famous mythical manager
+    mail: bjensen@example.com
+    uid: bjensen
+.fi
+.LP
+the command:
+.LP
+.nf
+    ldapadd \-f /tmp/newentry
+.fi
+.LP
+will add a new entry for Babs Jensen, using the values from the
+file
+.B /tmp/newentry.
+.LP
+Assuming that the file
+.B /tmp/entrymods
+exists and has the contents:
+.LP
+.nf
+    dn: cn=Barbara Jensen,dc=example,dc=com
+    changetype: delete
+.fi
+.LP
+the command:
+.LP
+.nf
+    ldapmodify \-f /tmp/entrymods
+.fi
+.LP
+will remove Babs Jensen's entry.
+.SH DIAGNOSTICS
+Exit status is zero if no errors occur.  Errors result in a non-zero
+exit status and a diagnostic message being written to standard error.
+.SH "SEE ALSO"
+.BR ldapadd (1),
+.BR ldapdelete (1),
+.BR ldapmodrdn (1),
+.BR ldapsearch (1),
+.BR ldap.conf (5),
+.BR ldap (3),
+.BR ldap_add_ext (3),
+.BR ldap_delete_ext (3),
+.BR ldap_modify_ext (3),
+.BR ldap_modrdn_ext (3),
+.BR ldif (5).
+.SH AUTHOR
+The OpenLDAP Project <http://www.openldap.org/>
+.SH ACKNOWLEDGEMENTS
+.so ../Project

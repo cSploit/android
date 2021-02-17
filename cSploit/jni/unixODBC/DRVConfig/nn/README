@@ -1,0 +1,27 @@
+***************************************************************
+* This code is LGPL. You CAN make commercial solutions using  *
+* LGPL software.                                              *
+***************************************************************
+
++-------------------------------------------------------------+
+| unixODBC                                                    |
+| Driver Config for the Internet News Server (NN) driver      |
++-------------------------------------------------------------+
+
+This is a driver setup which can be called
+by ODBC Config to allow the driver specific options to
+be set for the internet News Server (NN) ODBC driver.
+
+Each driver in /etc/odbcinst.ini should have a Setup
+entry such as;
+
+Setup = /usr/lib/libodbcnnS.so
+
+This will allow ODBCConfig to prompt for Data Source
+options.
+
++-------------------------------------------------------------+
+| Peter Harvey pharvey@codebydesign.com                       |
+| http://www.genix.net/unixODBC                               |
++-------------------------------------------------------------+
+

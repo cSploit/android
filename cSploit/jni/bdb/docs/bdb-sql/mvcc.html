@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Using Multiversion Concurrency Control</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="dbfeatures.html" title="Chapter 3. Berkeley DB Features" />
+    <link rel="prev" href="dbfeatures.html" title="Chapter 3. Berkeley DB Features" />
+    <link rel="next" href="selectpage_size.html" title="Selecting the Page Size" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Using Multiversion Concurrency Control</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbfeatures.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 3. Berkeley DB Features</th>
+          <td width="20%" align="right"> <a accesskey="n" href="selectpage_size.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="mvcc"></a>Using Multiversion Concurrency Control</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                Multiversion Concurrency Control (MVCC) enables snapshot
+                isolation. Snapshot isolation means that whenever a 
+                transaction would take a read lock on a page, it
+                makes a copy of the page instead, and then performs its
+                operations on that copied page. This frees other writers
+                from blocking due to a read locks held by other
+                transactions.
+            </p>
+      <p>
+                You should use snapshot isolation whenever you have a lot
+                of read-only transactions operating at the same time that
+                read-write transactions. In this case, snapshot isolation
+                will improve transaction throughput, albeit at the cost of
+                greater resource usage.
+            </p>
+      <p>
+                MVCC is described in more detail in 
+                <a href="../programmer_reference/transapp_read.html#snapshot_isolation" class="olink">Snapshot Isolation.</a>
+            </p>
+      <p>
+                To use MVCC, you must enable it before you access any
+                database tables. Once MVCC is enabled, you can turn
+                snapshot isolation on and off at anytime during the life of
+                your application.
+            </p>
+      <p>
+                To turn MVCC on, use:
+            </p>
+      <p>
+                    <span class="bold"><strong>PRAGMA multiversion</strong></span> = on | off;
+            </p>
+      <p>
+                This PRAGMA must be enabled before you access any database
+                tables during your application runtime, or an error is
+                returned. Turning MVCC on automatically enables snapshot
+                isolation. By default MVCC is turned off.
+            </p>
+      <p>
+                Once MVCC is enabled, you can turn snapshot isolation on
+                and off using:
+            </p>
+      <p>
+                    <span class="bold"><strong>PRAGMA snapshot_isolation</strong></span> = on | off;
+            </p>
+      <p>
+                This PRAGMA can be used at any time during the life of your
+                application <span class="emphasis"><em>after</em></span> MVCC has been turned
+                on. If you attempt to enable or disable snapshot isolation
+                before MVCC is enabled, an error is returned.
+            </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbfeatures.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="dbfeatures.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="selectpage_size.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 3. Berkeley DB Features </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Selecting the Page Size</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

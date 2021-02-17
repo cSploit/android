@@ -1,0 +1,9 @@
+#!/bin/sh
+
+set -e
+
+../Clean
+../Prepare
+../Build
+../Stow
+

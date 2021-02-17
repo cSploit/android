@@ -1,0 +1,169 @@
+.\" cf. groff_mdoc
+.Dd April 26, 2012
+.Os FreeTDS @VERSION@
+.Dt FISQL FreeTDS "FreeTDS Reference Manual"
+.\"
+.Sh NAME
+.Nm fisql
+.Nd interactive SQL shell
+.\"
+.Sh SYNOPSIS
+.Pp
+.Nm
+.Op Fl eFgpnvXY
+.Op Fl a Ar display_charset
+.Op Fl c Ar cmdend
+.Op Fl D Ar database
+.Op Fl E Ar editor
+.Op Fl h Ar headers
+.Op Fl H Ar hostname
+.Op Fl i Ar inputfile
+.Op Fl I Ar interfaces_file
+.Op Fl J Ar client_charset
+.Op Fl l Ar login_timeout
+.Op Fl m Ar errorlevel
+.Op Fl o Ar outputfile
+.Op Fl P Ar password
+.Op Fl s Ar colseparator
+.Op Fl S Ar server
+.Op Fl t Ar timeout
+.Op Fl U Ar username
+.Op Fl w Ar width
+.Op Fl y Ar sybase_dir
+.Op Fl z Ar language
+.\"
+.Sh DESCRIPTION
+.Pp
+.Nm
+is very similar to the 
+.Ql isql
+utility programs distributed by Sybase and Microsoft. Like them, 
+.Nm
+uses the command 
+.Ql go
+on a line by itself as a separator between batches.
+.\"
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl a Ar display_charset
+The client charset name. Not implemented.
+.It Fl c Ar cmdend
+Command terminator, defaults to
+.Ql go Ns .
+.It Fl D
+Database name on the server to use.
+.It Fl e
+Echo SQL input (usually in outputfile)
+.It Fl E Ar editor
+Specify
+an editor to invoke. Defaults to vi.
+.It Fl F
+FIPS mode ON. Server returns a message (but processes the query anyway)
+when it encounters a non-standard SQL command.
+.It Fl g
+Display a brief help message
+.It Fl h Ar headers
+Number
+of rows after which to repeat the column headers. Default is once per resultset.
+.It Fl H Ar hostname
+Hostname
+of the client machine as it will be told to the server.
+.It Fl I Ar interfaces_file
+Name
+of the interfaces or freetds.conf file to use.
+.It Fl i Ar inputfile
+Name
+of script file, containing SQL.
+.It Fl J Ar client_charset
+Not
+implemented.
+.It Fl l Ar login_timeout
+How
+long to wait for the server to acknowledge a login attempt.
+.It Fl m Ar errorlevel
+For
+errors of the severity level specified or higher,
+print only the message number, state, and error level.
+Below that level, print nothing.
+.It Fl n
+Suppress line numbers in echoed output.
+.It Fl o Ar outputfile
+Name
+of output file, holding result data.
+.It Fl p
+Prints performance statistics. Not implemented.
+.It Fl P Ar password
+Database
+server password.
+.It Fl s Ar colseparator
+The
+column separator. Default is space. Shell metacharacters require quoting.
+.It Fl S Ar server
+Database
+server to which to connect.
+.It Fl t Ar timeout
+The
+query timeout, in seconds. How long to wait for a query to be processed.
+The default is indefinitely, or as determined by freetds.conf.
+.It Fl U Ar username
+Database
+server login name.
+.It Fl v
+Display version and copyright.
+.It Fl w Ar width
+How
+many characters wide to print the output. Defaults to 80.
+.It Fl X
+Use encrypted login. Not implemented in FreeTDS.
+.It Fl y Pa sybase_dir
+Sets
+the 
+.Ev SYBASE
+environment variable. Not used by FreeTDS.
+.It Fl Y
+Use chained transactions.
+.It Fl z Ar language
+Name
+of a language for fisql's prompts and messages.
+Cf. DBSETLNATLANG.
+.El
+.\"
+.Sh NOTES
+.Nm
+is a filter; it reads from standard input, writes to standard output,
+and writes errors to standard error. The
+.Fl i Ns ,
+.FL o Ns ,
+and
+.Fl e
+options override these defaults.
+.Pp
+.Nm
+uses the DB-Library API provided by FreeTDS. It was first implemented using
+Sybase's own library and continues to work with it. Before (and after) modifying
+it, it would be well to test it with Sybase's library to assure compatibility
+between it and FreeTDS.
+EXIT STATUS
+.Pp
+.Nm
+exits 0 on success, and >0 if the server cannot process the query.
+.Pp
+.Nm
+will report any errors returned by the server, but will continue
+processing. In a production environment, this behavior may be insufficiently
+stringent. To make it extremely intolerant of errors, change the message and
+error handlers to call exit(3).
+.\"
+.Sh HISTORY
+.Nm
+first appeared in FreeTDS 0.65.
+.\"
+.Sh AUTHORS
+The 
+.Nm
+utility was written by 
+.An Nicholas S. Castellano Aq entropy@freetds.org Ns ,
+who contributed it to the FreeTDS project under the terms of the GPL.
+.\"
+.Sh BUGS
+Requires the GNU readline library.

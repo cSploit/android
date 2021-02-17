@@ -1,0 +1,78 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 6ad9f820-0205-0410-94a2-c8cf366bb2b3
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2005-11-07T23:36:48.095832Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 112
+Content-length: 112
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-07T23:37:17.705159Z
+K 7
+svn:log
+V 11
+add foo.txt
+PROPS-END
+
+Node-path: foo.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 0
+Text-content-md5: d41d8cd98f00b204e9800998ecf8427e
+Text-content-sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 135
+Content-length: 135
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-07T23:37:44.549695Z
+K 7
+svn:log
+V 34
+copy and change at the same time.
+
+PROPS-END
+
+Node-path: bar.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 1
+Node-copyfrom-path: foo.txt
+Text-copy-source-md5: d41d8cd98f00b204e9800998ecf8427e
+Text-copy-source-sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709
+Text-content-length: 9
+Text-content-md5: d2508118d0d39e198d1129d87d692d59
+Text-content-sha1: e2fb5f2139d086ded2cb600d5a91a196e76bf020
+Content-length: 9
+
+modified
+
+

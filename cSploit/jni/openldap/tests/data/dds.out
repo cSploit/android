@@ -1,0 +1,70 @@
+# [1] Searching the dynamic portion of the database...
+dn: cn=Dynamic Object,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: dynamicObject
+cn: Dynamic Object
+sn: Object
+entryTtl: 120
+userPassword:: ZHluYW1pYw==
+
+dn: cn=Subordinate Dynamic Object,cn=Dynamic Object,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: dynamicObject
+cn: Subordinate Dynamic Object
+sn: Object
+userPassword:: ZHluYW1pYw==
+entryTtl: 3600
+
+# [2] Searching the dynamic portion of the database...
+dn: cn=Dynamic Object,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: dynamicObject
+cn: Dynamic Object
+sn: Object
+entryTtl: 120
+userPassword:: ZHluYW1pYw==
+
+dn: cn=Renamed Dynamic Object,cn=Dynamic Object,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: dynamicObject
+sn: Object
+userPassword:: ZHluYW1pYw==
+entryTtl: 3600
+cn: Renamed Dynamic Object
+
+# [3] Searching the dynamic portion of the database...
+dn: cn=Dynamic Object,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: dynamicObject
+cn: Dynamic Object
+sn: Object
+userPassword:: ZHluYW1pYw==
+entryTtl: 120
+
+dn: cn=Renamed Dynamic Object,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: dynamicObject
+sn: Object
+userPassword:: ZHluYW1pYw==
+entryTtl: 3600
+cn: Renamed Dynamic Object
+
+# [4] Searching the dynamic portion of the database...
+dn: cn=Renamed Dynamic Object,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: dynamicObject
+sn: Object
+userPassword:: ZHluYW1pYw==
+entryTtl: 3600
+cn: Renamed Dynamic Object
+
+# [5] Searching the dynamic portion of the database...
+dn: cn=Renamed Dynamic Object,dc=example,dc=com
+objectClass: inetOrgPerson
+objectClass: dynamicObject
+sn: Object
+userPassword:: ZHluYW1pYw==
+cn: Renamed Dynamic Object
+entryTtl: 10
+
+# [6] Searching the dynamic portion of the database...

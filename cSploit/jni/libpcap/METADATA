@@ -1,0 +1,19 @@
+name: "libpcap"
+description: "A system-independent interface for user-level packet capture."
+third_party {
+  url {
+    type: HOMEPAGE
+    value: "https://www.tcpdump.org/"
+  }
+  url {
+    type: ARCHIVE
+    value: "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.10.0.tar.gz"
+  }
+  version: "libpcap-1.10.0"
+  license_type: NOTICE
+  last_upgrade_date {
+    year: 2021
+    month: 1
+    day: 5
+  }
+}

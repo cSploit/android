@@ -1,0 +1,85 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+# 
+
+P1: Preface
+
+
+# document's copyright
+P2[notoc] Copyright
+
+Copyright 1998-2013, The {{ORG[expand]OLF}}, {{All Rights Reserved}}.
+
+Copyright 1992-1996, Regents of the {{ORG[expand]UM}}, {{All Rights Reserved}}.
+
+This document is considered a part of OpenLDAP Software.  This
+document is subject to terms of conditions set forth in {{SECT:OpenLDAP
+Software Copyright Notices}} and the {{SECT:OpenLDAP Public License}}.
+Complete copies of the notices and associated license can be found
+in Appendix K and L, respectively.
+
+Portions of OpenLDAP Software and this document may be copyright
+by other parties and/or subject to additional restrictions.  Individual
+source files should be consulted for additional copyright notices.
+
+P2[notoc] Scope of this Document
+
+This document provides a guide for installing [[DOC_NAME]]
+({{URL:http://www.openldap.org/software/}}) on {{TERM:UNIX}} (and
+UNIX-like) systems.  The document is aimed at experienced system
+administrators with basic understanding of {{TERM:LDAP}}-based
+directory services.
+
+This document is meant to be used in conjunction with other OpenLDAP
+information resources provided with the software package and on the
+project's site ({{URL:http://www.OpenLDAP.org/}}) on the
+{{TERM[expand]WWW}}.  The site makes available a number of resources.
+
+!block table; align=Center; coltags="N,URL"; \
+	title="OpenLDAP Resources"
+Resource|URL
+Document Catalog|http://www.OpenLDAP.org/doc/
+Frequently Asked Questions|http://www.OpenLDAP.org/faq/
+Issue Tracking System|http://www.OpenLDAP.org/its/
+Mailing Lists|http://www.OpenLDAP.org/lists/
+Manual Pages|http://www.OpenLDAP.org/software/man.cgi
+Software Pages|http://www.OpenLDAP.org/software/
+Support Pages|http://www.OpenLDAP.org/support/
+!endblock
+ 
+This document is not a complete reference for OpenLDAP software; the
+manual pages are the definitive documentation. For best results,
+you should use the manual pages that were installed on your system
+with your version of OpenLDAP software so that you're looking at
+documentation that matches the code. While the OpenLDAP web site
+also provides the manual pages for convenience, you can not assume
+that they corresond to the particular version you're running.
+
+P2[notoc] Acknowledgments
+
+The {{ORG[expand]OLP}} is comprised of a team of volunteers.  This
+document would not be possible without their contribution of time
+and energy.
+
+The OpenLDAP Project would also like to thank the {{ORG[expand]UMLDAP}}
+for building the foundation of LDAP software and information to
+which OpenLDAP Software is built upon.  This document is based upon
+University of Michigan document: {{REF[expand]UM-GUIDE}}.
+
+
+P2[notoc] Amendments
+
+Suggested enhancements and corrections to this document should be
+submitted using the {{PRD:OpenLDAP}} {{TERM[expand]ITS}}
+({{URL: http://www.openldap.org/its/}}).
+
+
+P2[notoc] About this document
+
+This document was produced using the {{TERM[expand]SDF}} ({{TERM:SDF}})
+documentation system
+({{URL:http://search.cpan.org/src/IANC/sdf-2.001/doc/catalog.html}})
+developed by {{Ian Clatworthy}}.  Tools for SDF are available from
+{{ORG:CPAN}} ({{URL:http://search.cpan.org/search?query=SDF&mode=dist}}).
+

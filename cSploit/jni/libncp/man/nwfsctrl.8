@@ -1,0 +1,160 @@
+.TH NWFSCTRL 1 2/12/1999 nwfsctrl nwfsctrl
+.SH NAME
+nwfsctrl \- Perform server command
+.SH SYNOPSIS
+.B nwfsctrl
+[ \fB-h\fP ]
+[ \fB-S\fP \fIserver\fP ]
+[ \fB-U\fP \fIuser name\fP ]
+[ \fB-P\fP \fIpassword\fP | \fB-n\fP ]
+[ \fB-C\fP ]
+[ \fB-p\fP \fIncpfs path\fP ]
+\fB-c\fP | \fB-o\fP | \fB-\fP[\fBf\fP]\fBd\fP
+
+\fBnwfsctrl
+[ \fB-h\fP ]
+[ \fB-S\fP \fIserver\fP ]
+[ \fB-U\fP \fIuser name\fP ]
+[ \fB-P\fP \fIpassword\fP | \fB-n\fP ]
+[ \fB-C\fP ]
+[ \fB-p\fP \fIncpfs path\fP ]
+\fIserver command\fP
+
+.SH DESCRIPTION
+.B nwfsctrl
+performs command on server.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+With -h nwfsctrl prints a little help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user
+.RS 3
+.B user
+is the user name to use for login. To set the server's time, you need
+supervisor privileges.
+.RE
+
+.B -P
+.I password
+.RS 3
+.B password
+is the password to use for login. If neither
+.B -n
+nor
+.B -P
+are given, and the user has no open connection to the server, nwfstime
+prompts for a password.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given if no password is required for the login. As you need
+supervisor privileges for setting the date and time, this option is
+probably not used very often.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.B -o
+.RS 3
+Open bindery.
+.RE
+
+.B -c
+.RS 3
+Close bindery.
+.RE
+
+.B -d
+.RS 3
+Down fileserver. This command will complain if there are open files on server.
+.RE
+
+.B -fd
+.RS 3
+Down fileserver, regardless of opened files.
+.RE
+
+\fBload\fP \fImodule options...\fP
+.RS 3
+Load module \fImodule\fP with options \fIoptions...\fP on server. Program
+will complain if \fImodule\fP is already loaded.
+.RE
+
+\fBunload\fP \fImodule\fP
+.RS 3
+Unload module \fImodule\fP from server. Program will complain if \fImodule\fP
+is not loaded.
+.RE
+
+\fBmount\fP \fIvolume\fP
+.RS 3
+Mount volume \fIvolume\fP.
+.RE
+
+\fBdismount\fP \fIvolume\fP
+.RS 3
+Dismount volume \fIvolume\fP. \fBIf there are open files on volume, server
+displays prompt on console. You must go to the server (or telnet/xconsole) and 
+hit \fP\fIY\fP \fBor\fP \fIN\fP \fBto get beyond this point).\fP
+.RE
+
+\fBset\fP \fIvariable\fP \fB=\fP \fIvalue\fP
+.RS 3
+Set server settable variable \fIvariable\fP to value \fIvalue\fP.
+.RE
+
+\fBopen bindery\fP
+.RS 3
+Open bindery.
+.RE
+
+\fBclose bindery\fP
+.RS 3
+Close bindery.
+.RE
+
+\fBenable login\fP
+.RS 3
+Enable login to file server.
+.RE
+
+\fBdisable login\fP
+.RS 3
+Disable login to file server.
+.RE
+
+\fBdisable tts\fP
+.RS 3
+Disable TTS. This probably does not work on Netware 4.11.
+.RE
+
+\fBenable tts\fP
+.RS 3
+Enable TTS. This probably does not work on Netware 4.11.
+.RE
+
+.SH BUGS
+Other commands are not written yet (\fBvolume\fP, \fBclear connection\fP ...)
+
+.SH CREDITS
+This utility was created by Petr Vandrovec (vandrove@vc.cvut.cz) and
+is part of ncpfs since 2.2.0.11.

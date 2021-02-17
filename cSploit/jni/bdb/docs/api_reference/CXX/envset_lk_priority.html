@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbEnv::set_lk_priority()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="lock.html" title="Chapter 7.  The DbLock Handle" />
+    <link rel="prev" href="envset_lk_partitions.html" title="DbEnv::set_lk_partitions()" />
+    <link rel="next" href="envset_lk_tablesize.html" title="DbEnv::set_lk_tablesize()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbEnv::set_lk_priority()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envset_lk_partitions.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 7. 
+                The DbLock Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envset_lk_tablesize.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envset_lk_priority"></a>DbEnv::set_lk_priority()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+
+int
+DbEnv::set_lk_priority(u_int32_t u_int32_t lockerid, u_int32_t priority); </pre>
+      <p>
+        Set the priority of the given locker.  This value is used when
+        resolving deadlocks, the deadlock resolution algorithm will reject
+        a lock request from a locker with a lower priority before a request
+        from a locker with a higher priority.
+    </p>
+      <p>
+	    By default, all lockers are created with a priority of 100.
+    </p>
+      <p>
+         The <code class="methodname">DbEnv::set_lk_priority()</code> method may be
+         called at any time during the life of the application.
+    </p>
+      <p>
+         The <code class="methodname">DbEnv::set_lk_priority()</code> <span>
+            
+            <span>
+                method either returns a non-zero error value or throws an
+                exception that encapsulates a non-zero error value on
+                failure, and returns 0 on success.
+            </span>
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2585128"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp2584480"></a>lockerid</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>lockerid</strong></span> parameter
+                  represents a locker returned by
+                  <code class="methodname">DbEnv::lock_id()</code>.
+              </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp2575136"></a>priority</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    The <span class="bold"><strong>priority</strong></span> parameter
+                    must be a value between 0 and 2^32-1.
+              </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2573872"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                         The <code class="methodname">DbEnv::set_lk_priority()</code> <span>
+            
+            <span>
+                method may fail and throw a <a class="link" href="dbexception.html" title="Chapter 6. The DbException Class">DbException</a> 
+                exception, encapsulating one of the following non-zero errors, or return one
+                of the following non-zero errors:
+            </span>
+        </span>
+                    </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp2591936"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                An invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2589960"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a>, 
+                    <a class="link" href="lock.html" title="Chapter 7.  The DbLock Handle">DbLock</a> 
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2574424"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                     <a class="xref" href="lock.html#locklist" title="Locking Subsystem and Related Methods">Locking Subsystem and Related Methods</a> 
+                </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envset_lk_partitions.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="lock.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envset_lk_tablesize.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbEnv::set_lk_partitions() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbEnv::set_lk_tablesize()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

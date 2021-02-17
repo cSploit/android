@@ -1,0 +1,101 @@
+#!/bin/sh
+
+RunUser=firebird
+export RunUser
+RunGroup=firebird
+export RunGroup
+PidDir=/var/run/firebird
+export PidDir
+
+#------------------------------------------------------------------------
+# Get correct options & misc.
+
+tarExt=tar
+export tarExt
+
+#------------------------------------------------------------------------
+#  Add new user and group
+
+TryAddGroup() {
+
+	AdditionalParameter=$1
+	testStr=`grep firebird /etc/group`
+	
+    if [ -z "$testStr" ]
+      then
+        groupadd $AdditionalParameter firebird
+    fi
+	
+}
+
+
+TryAddUser() {
+
+	AdditionalParameter=$1
+	testStr=`grep firebird /etc/passwd`
+	
+    if [ -z "$testStr" ]
+      then
+        useradd $AdditionalParameter -d @FB_CONFDIR@ -s /bin/false \
+            -c "Firebird Database Owner" -g firebird firebird 
+    fi
+
+}
+
+
+addFirebirdUser() {
+
+	TryAddGroup "-g 84 -r" >/dev/null 2>&1
+	TryAddGroup "-g 84" >/dev/null 2>&1
+	TryAddGroup "-r" >/dev/null 2>&1
+	TryAddGroup " "
+	
+	TryAddUser "-u 84 -r" >/dev/null 2>&1
+	TryAddUser "-u 84" >/dev/null 2>&1
+	TryAddUser "-r" >/dev/null 2>&1
+	TryAddUser " "
+
+}
+
+
+#------------------------------------------------------------------------
+#  print location of init script
+
+getInitScriptLocation() {
+    if [ -f /etc/rc.d/init.d/firebird ]
+	then
+		echo -n /etc/rc.d/init.d/firebird
+    elif [ -f /etc/rc.d/rc.firebird ]
+	then
+		echo -n /etc/rc.d/rc.firebird
+    elif [ -f /etc/init.d/firebird ]
+	then
+		echo -n /etc/init.d/firebird
+    fi
+}
+
+
+#------------------------------------------------------------------------
+#  stop super server if it is running
+
+stopSuperServerIfRunning() {
+    checkString=`ps -eaf | egrep "\b(fbserver|fbguard)\b" |grep -v grep`
+
+    if [ ! -z "$checkString" ]
+    then
+		init_d=`getInitScriptLocation`
+
+        if [ -x "$init_d" ]
+		then
+       	    $init_d stop
+		fi
+    fi
+}
+
+#-----------------------------------------------------------------------
+# Blank stub on HPUX - don't use openssl
+
+generateNewDBAPassword() {
+	return 0
+}
+

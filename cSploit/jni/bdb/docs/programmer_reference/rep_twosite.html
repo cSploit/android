@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Special considerations for two-site replication groups</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="rep.html" title="Chapter 12.  Berkeley DB Replication" />
+    <link rel="prev" href="repmgr_channels.html" title="Using Replication Manager message channels" />
+    <link rel="next" href="rep_partition.html" title="Network partitions" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Special considerations for two-site replication groups</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="repmgr_channels.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 12. 
+		Berkeley DB Replication
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="rep_partition.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="rep_twosite"></a>Special considerations for two-site replication groups</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+        One of the benefits of replication is that it helps your
+        application remain available for writes even when a site crashes.
+        Another benefit is the added durability achieved by storing multiple
+        copies of your application data at different sites.  However, if
+        your replication group contains only two sites, you must prioritize
+        which of these benefits is more important to your
+        application.
+    </p>
+      <p>
+        A two-site replication group is particularly vulnerable to
+        duplicate masters if there is a loss of communication between the
+        sites.  The original master continues to accept new transactions.
+        If the original client detects the loss of the master and elects
+        itself master, it also starts accepting new transactions.  When
+        communications are restored, there are duplicate masters and one
+        site's new transactions will be rolled back.
+    </p>
+      <p>
+        If it is unacceptable to your application for any new transactions
+        to be rolled back, the alternative in a two-site replication group
+        is to require both sites to be present in order to elect a master.
+        This stops a client from electing itself master when it loses
+        contact with the master and prevents creation of parallel sets of
+        transactions, one of which must be rolled back.
+    </p>
+      <p>
+        However, requiring both sites to be present to elect a master
+        results in a loss of write availability when the master crashes.
+        The client cannot take over as master and the replication group
+        exists in a read-only state until the original master site rejoins
+        the replication group.
+    </p>
+      <p>
+        Replication Manager applications use the <a href="../api_reference/C/repconfig.html" class="olink">DB_ENV-&gt;rep_set_config()</a> method
+        <a href="../api_reference/C/repconfig.html#config_DB_REPMGR_CONF_2SITE_STRICT" class="olink">DB_REPMGR_CONF_2SITE_STRICT</a> flag to make this tradeoff between
+        write availability and transaction durability.  When this flag is
+        turned on, Replication Manager favors transaction durability.  When
+        it is turned off, Replication Manager favors write
+        availability.
+    </p>
+      <p>
+        A two-site Replication Manager application that uses heartbeats in
+        an environment with frequent communications disruptions generally
+        should operate with the <a href="../api_reference/C/repconfig.html#config_DB_REPMGR_CONF_2SITE_STRICT" class="olink">DB_REPMGR_CONF_2SITE_STRICT</a> flag turned
+        on.  Otherwise, frequent heartbeat failures will cause frequent
+        duplicate masters and the resulting elections and client
+        synchronizations will make one or both sites unavailable for
+        extended periods of time.
+    </p>
+      <p>
+        Base API applications use the values of the 
+        <span class="bold"><strong>nvotes</strong></span> and 
+        <span class="bold"><strong>nsites</strong></span> parameters in calls to the
+        <a href="../api_reference/C/repelect.html" class="olink">DB_ENV-&gt;rep_elect()</a> method to make this tradeoff.  For more information, see
+        <a class="xref" href="rep_elect.html" title="Elections">Elections</a>.</p>
+      <p>
+        A replication group containing only two electable sites is subject
+        to duplicate masters and rollback of one site's new transactions
+        even when it contains additional unelectable sites.  The
+        <a href="../api_reference/C/repconfig.html#config_DB_REPMGR_CONF_2SITE_STRICT" class="olink">DB_REPMGR_CONF_2SITE_STRICT</a> does not apply in this case because
+        the replication group is larger than two sites.
+    </p>
+      <p>
+        If both write availability and transaction durability are important
+        to your application, you should strongly consider having three or
+        more electable sites in your replication group.  You should also
+        carefully choose an acknowledgement policy that requires at least a
+        quorum of sites.  It is best to have an odd number of electable
+        sites to provide a clear majority in the event of a network
+        partition.
+    </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="repmgr_channels.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="rep_partition.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Using Replication Manager message channels </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Network partitions</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

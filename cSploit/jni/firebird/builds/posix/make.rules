@@ -1,0 +1,106 @@
+#
+#   The contents of this file are subject to the Mozilla Public
+#   License Version 1.1 (the "License"); you may not use this file
+#   except in compliance with the License. You may obtain a copy of
+#   the License at http://www.mozilla.org/MPL/
+#   Alternatively, the contents of this file may be used under the
+#   terms of the GNU General Public License Version 2 or later (the
+#   "GPL"), in which case the provisions of the GPL are applicable
+#   instead of those above. You may obtain a copy of the Licence at
+#   http://www.gnu.org/copyleft/gpl.html
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   Relevant for more details.
+#
+#   This file was created by members of the firebird development team.
+#   All individual contributions remain the Copyright (C) of those
+#   individuals.  Contributors to this file are either listed here or
+#   can be obtained from a CVS history command.
+#
+#   All rights reserved.
+#
+#   Created by: Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#
+#   Contributor(s):
+#
+#
+#
+
+#____________________________________________________________________________
+
+
+# Please don't use compiler/platform specific flags here - nmcc 02-Nov-2002
+WFLAGS:=-I$(SRC_ROOT)/include/gen -I$(SRC_ROOT)/include $(CPPFLAGS)
+
+ifeq ($(TARGET),Release)
+  WFLAGS:= $(PROD_FLAGS) $(WFLAGS)
+else
+  WFLAGS:= $(DEV_FLAGS) $(WFLAGS) -DDEV_BUILD
+endif
+
+WCFLAGS:= $(WFLAGS) $(THR_FLAGS) $(CFLAGS) $(GLOB_OPTIONS)
+WCXXFLAGS:= $(WFLAGS) $(THR_FLAGS) $(RTTI_FLAG) $(CXXFLAGS) $(GLOB_OPTIONS)
+
+# Here we have definitions for using the preprocessor.
+
+# The GPRE_FLAGS is overwritten in Makefile.in.jrd Makefile.in.gpre and
+# since they do something extra to allow the boot build to work.
+#
+# One other point is that sometimes a failure in compile with gpre does not
+# result in an error being generated.  The generated source file still
+# compiles and throws the make off the path.
+#
+# This bit of code is part of unfinished bit to let make determine if
+# gpre gpre_static or gpre_boot should be used based on which ones exist.
+#
+# testgpre = $(shell if [ -f $(GPRE) ]; then; echo $(GPRE); else; echo ""; fi)
+#test1:
+#	$(ECHO) $(testgpre)
+
+
+GPRE_FLAGS= -m -z -n
+JRD_GPRE_FLAGS = -n -z -gds_cxx -ids
+ISQL_GPRE_FLAGS = -m -z -n -ocxx
+
+
+.SUFFIXES: .c .e .epp .cpp
+
+.e.c:
+	$(GPRE_CURRENT) $(GPRE_FLAGS) $< $@
+
+
+$(OBJ)/jrd/%.cpp: $(SRC_ROOT)/jrd/%.epp
+	$(GPRE_CURRENT) $(JRD_GPRE_FLAGS) $(firstword $<) $@
+
+$(OBJ)/isql/%.cpp: $(SRC_ROOT)/isql/%.epp
+	$(GPRE_CURRENT) $(ISQL_GPRE_FLAGS) $< $@
+
+$(OBJ)/%.cpp: $(SRC_ROOT)/%.epp
+	$(GPRE_CURRENT) $(GPRE_FLAGS) $(firstword $<) $@
+
+
+.SUFFIXES: .lo .o .cpp .c
+
+%.o: %.c
+	$(CC) $(WCFLAGS) -c $(firstword $<) -o $@
+
+$(OBJ)/%.o: $(SRC_ROOT)/%.c
+	$(CC) $(WCFLAGS) -c $(firstword $<) -o $@
+	@sed $(INLINE_EDIT_SED) -e "1,2s/:/: \$$(wildcard/" -e "\$$s/\(.*\)/\\1)/" $(patsubst %.o,%.d,$@)
+
+$(OBJ)/%.o: $(OBJ)/%.cpp
+	$(CXX) $(WCXXFLAGS) -c $(firstword $<) -o $@
+	@sed $(INLINE_EDIT_SED) -e "1,2s/:/: \$$(wildcard/" -e "\$$s/\(.*\)/\\1)/" $(patsubst %.o,%.d,$@)
+
+$(OBJ)/%.o: $(SRC_ROOT)/%.cpp
+	$(CXX) $(WCXXFLAGS) -c $(firstword $<) -o $@
+	@sed $(INLINE_EDIT_SED) -e "1,2s/:/: \$$(wildcard/" -e "\$$s/\(.*\)/\\1)/" $(patsubst %.o,%.d,$@)
+
+.SUFFIXES: .epp .e
+
+# Rules for making resource files
+
+$(GEN_ROOT)/%.res: $(SRC_ROOT)/%.rc
+	windres --output-format=coff --include-dir=$(<D) $< $@

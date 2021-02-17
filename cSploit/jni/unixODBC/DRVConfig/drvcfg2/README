@@ -1,0 +1,33 @@
+***************************************************************
+* This code is LGPL. You CAN make commercial solutions using  *
+* LGPL software.                                              *
+*                                                             *
+* Peter Harvey 21.FEB.99 pharvey@codebydesign.com             *
+***************************************************************
+
++-------------------------------------------------------------+
+| unixODBC                                                    |
+| Driver Config for basic file options                        |
++-------------------------------------------------------------+
+
+This is an example of a driver setup which can be called
+by ODBC Config to allow the driver specific options to
+be set.
+
+This particular example is for File Based data sources.
+
+Each driver in /etc/odbcinst.ini should have a Setup
+entry such as;
+
+Setup = /usr/lib/libodbcminiS.so
+
+This will allow ODBCConfig to prompt for Data Source
+options.
+
++-------------------------------------------------------------+
+| Peter Harvey                                                |
+| pharvey@codebydesign.com                                    |
+| http://www.genix.net/unixODBC                               |
+| 10.APR.99                                                   |
++-------------------------------------------------------------+
+

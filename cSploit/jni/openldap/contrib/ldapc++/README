@@ -1,0 +1,37 @@
+This is an unstable development release of a LDAPv3 C++ Class Library.
+It was created as the diploma thesis (final project) of my computer 
+science studies.
+It is based upon the OpenLDAP C-API and so it needs the C-library and
+Headerfiles installed.
+
+Installation:
+=============
+Just run the "configure" script with the apropriate options. Especially
+these two options can be imported, if you didn't install the OpenLDAP-
+libraries in the default place:
+
+--with-libldap=<path to libldap> : To tell configure where the OpenLDAP
+        C-libraries are located.
+--with-ldap-includes=<path to ldap include files> : To tell configure
+        where the OpenLDAP include files are located.
+--enable-debug to enable compliation with debugging symbols and stderr
+        output
+(run "configure --help" to see all possible command line options)
+
+If configure finishes without problems. You can simply call "make" to 
+build the library and "make install" to install it.
+
+Documentation:
+==============
+Docs are very incomplete. You can either look in the source files for 
+the documentation comment of generate documentation  using "doxygen"
+or any other javadoc compatible documentation generator.
+
+Bugreports and other feedback:
+==============================
+If you find bugs please feel free to send me a detailed report. All 
+other kinds of feedback are welcomed as well.
+
+
+	Ralf Haferkamp <rhafer@suse.de>
+

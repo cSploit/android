@@ -1,0 +1,104 @@
+# $OpenLDAP$
+# Copyright 2007-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Troubleshooting
+
+If you're having trouble using OpenLDAP, get onto the
+OpenLDAP-Software mailing list, or:
+
+* Browse the list archives at {{URL:http://www.openldap.org/lists/#archives}} 
+* Search the FAQ at {{URL:http://www.openldap.org/faq/}}
+* Search the Issue Tracking System at {{URL:http://www.openldap.org/its/}}
+
+Chances are the problem has been solved and explained in detail many times before.
+
+H2: User or Software errors?
+
+More often than not, an error is caused by a configuration problem or a misunderstanding
+of what you are trying to implement and/or achieve. 
+
+We will now attempt to discuss common user errors.
+
+H2: Checklist
+
+The following checklist can help track down your problem. Please try to use if {{B:before}}
+posting to the list, or in the rare circumstances of reporting a bug.
+
+.{{S: }}
+^{{B: Use the {{slaptest}} tool to verify configurations before starting {{slapd}}}}
+
+.{{S: }}
++{{B: Verify that {{slapd}} is listening to the specified port(s) (389 and 636, generally) before trying the {{ldapsearch}}}}
+
+.{{S: }}
++{{B: Can you issue an {{ldapsearch}}?}}
+
+.{{S: }}
++{{B: If not, have you enabled complex ACLs without fully understanding them?}}
+
+.{{S: }}
++{{B: Do you have a system wide LDAP setting pointing to the wrong LDAP Directory?}}
+
+.{{S: }}
++{{B: Are you using TLS?}}
+
+.{{S: }}
++{{B: Have your certificates expired?}}
+
+H2: OpenLDAP Bugs
+
+Sometimes you may encounter an actual OpenLDAP bug, in which case please visit 
+our Issue Tracking system {{URL:http://www.openldap.org/its/}} and report it.
+However, make sure it's not already a known bug or a common user problem.
+
+* bugs in historic versions of OpenLDAP will not be considered;
+* bugs in released versions that are no longer present in the Git master branch, 
+either because they have been fixed or because they no longer apply, 
+will not be considered as well;
+* bugs in distributions of OpenLDAP software that are not related to the 
+software as provided by OpenLDAP will not be considered; in those cases please 
+refer to the distributor.
+
+Note: Our Issue Tracking system is {{B:NOT}} for OpenLDAP {{B:Support}}, please join our
+mailing Lists: {{URL:http://www.openldap.org/lists/}} for that.
+
+The information you should provide in your bug report is discussed in our FAQ-O-MATIC at
+{{URL:http://www.openldap.org/faq/data/cache/59.html}}
+
+H2: 3rd party software error
+
+The OpenLDAP Project only supports OpenLDAP software. 
+
+You may however seek commercial support ({{URL:http://www.openldap.org/support/}}) or join 
+the general LDAP forum for non-commercial discussions and information relating to LDAP at: 
+{{URL:http://www.umich.edu/~dirsvcs/ldap/mailinglist.html}}
+
+
+H2: How to contact the OpenLDAP Project
+
+* Mailing Lists: {{URL:http://www.openldap.org/lists/}}
+* Project: {{URL: http://www.openldap.org/project/}}
+* Issue Tracking: {{URL:http://www.openldap.org/its/}}
+
+
+H2: How to present your problem
+
+
+H2: Debugging {{slapd}}(8)
+
+After reading through the above sections and before e-mailing the OpenLDAP lists, you
+might want to try out some of the following to track down the cause of your problems:
+
+* Loglevel stats (256) is generally a good first loglevel to try for getting 
+  information useful to list members on issues
+* Running {{slapd -d -1}} can often track down fairly simple issues, such as 
+  missing schemas and incorrect file permissions for the {{slapd}} user to things like certs
+* Check your logs for errors, as discussed at {{URL:http://www.openldap.org/faq/data/cache/358.html}}
+
+H2: Commercial Support
+
+The firms listed at {{URL:http://www.openldap.org/support/}} offer technical support services catering to OpenLDAP community. 
+
+The listing of any given firm should not be viewed as an endorsement or recommendation of any kind, nor as otherwise indicating 
+there exists a business relationship or an affiliation between any listed firm and the OpenLDAP Foundation or the OpenLDAP Project or its contributors.

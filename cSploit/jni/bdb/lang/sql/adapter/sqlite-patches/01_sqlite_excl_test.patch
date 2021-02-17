@@ -1,0 +1,58 @@
+--- test/tester.tcl
++++ test/tester.tcl
+@@ -471,6 +471,11 @@
+   }
+ }
+ 
++# Pull in the list of test cases that are excluded and ignored when running
++# with Berkeley DB.
++#
++source $testdir/../../../../test/sql/bdb_excl.test
++
+ # Record the fact that a sequence of tests were omitted.
+ #
+ proc omit_test {name reason {append 1}} {
+@@ -506,12 +511,20 @@
+ # Invoke the do_test procedure to run a single test 
+ #
+ proc do_test {name cmd expected} {
+-  global argv cmdlinearg
++  global argv cmdlinearg IGNORE_CASES EXCLUDE_CASES
+ 
+   fix_testname name
+ 
+   sqlite3_memdebug_settitle $name
+ 
++  foreach pattern $EXCLUDE_CASES {
++    if {[string match $pattern $name]} {
++      puts "$name... Skipping"
++      flush stdout
++      return
++    }
++  }
++
+ #  if {[llength $argv]==0} { 
+ #    set go 1
+ #  } else {
+@@ -552,8 +565,19 @@
+         # if {![info exists ::testprefix] || $::testprefix eq ""} {
+         #   error "no test prefix"
+         # }
+-        puts "\nExpected: \[$expected\]\n     Got: \[$result\]"
+-        fail_test $name
++        set ignore 0
++        foreach pattern $IGNORE_CASES {
++            if {[string match $pattern $name]} {
++                set ignore 1
++                break
++            }
++        }
++        if {$ignore} {
++            puts " Ignored"
++        } else {
++            puts "\nExpected: \[$expected\]\n     Got: \[$result\]"
++            fail_test $name
++        }
+       } else {
+         puts " Ok"
+       }

@@ -1,0 +1,258 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+case "$BACKEND" in ldif | null)
+	echo "$BACKEND backend does not support access controls, test skipped"
+	exit 0
+	;;
+esac
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+if test "$ACI" = "acino" ; then
+	echo "ACI not enabled, test skipped"
+	exit 0
+fi
+
+mkdir -p $TESTDIR $DBDIR1
+
+echo "Running slapadd to build slapd database..."
+. $CONFFILTER $BACKEND $MONITORDB < $ACICONF > $CONF1
+$SLAPADD -f $CONF1 -l $LDIFORDERED
+RC=$?
+if test $RC != 0 ; then
+	echo "slapadd failed ($RC)!"
+	exit $RC
+fi
+
+echo "Starting slapd on TCP/IP port $PORT1..."
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID"
+
+sleep 1
+
+echo "Testing slapd ACI access control..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT1 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+cat /dev/null > $SEARCHOUT
+cat /dev/null > $TESTOUT
+
+# Search must fail
+BASEDN="dc=example,dc=com"
+echo "Searching \"$BASEDN\" (should fail)..."
+echo "# Searching \"$BASEDN\" (should fail)..." >> $SEARCHOUT
+$LDAPSEARCH -s base -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(objectclass=*)' >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 32 ; then
+	echo "ldapsearch should have failed with noSuchObject ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	if test $RC = 0 ; then
+		exit -1
+	fi
+	exit $RC
+fi
+
+# Bind must fail
+BINDDN="cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com"
+BINDPW=bjensen
+echo "Testing ldapwhoami as ${BINDDN} (should fail)..."
+$LDAPWHOAMI -h $LOCALHOST -p $PORT1 -D "$BINDDN" -w $BINDPW
+RC=$?
+if test $RC = 0 ; then
+	echo "ldapwhoami should have failed!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit -1
+fi
+
+# Populate ACIs
+echo "Writing ACIs as \"$MANAGERDN\"..."
+$LDAPMODIFY -D "$MANAGERDN" -w $PASSWD -h $LOCALHOST -p $PORT1 \
+	>> $TESTOUT 2>&1 << EOMODS0
+dn: dc=example,dc=com
+changetype: modify
+add: OpenLDAPaci
+OpenLDAPaci: 0#subtree#grant;d,c,s,r;[all]#group/groupOfUniqueNames/uniqueMe
+ mber#cn=ITD Staff,ou=Groups,dc=example,dc=com
+OpenLDAPaci: 1#entry#grant;d;[all]#public#
+
+dn: ou=People,dc=example,dc=com
+changetype: modify
+add: OpenLDAPaci
+OpenLDAPaci: 0#subtree#grant;x;userPassword#public#
+OpenLDAPaci: 1#subtree#grant;w;userPassword#self#
+OpenLDAPaci: 2#subtree#grant;w;userPassword#access-id#cn=Bjorn Jensen,ou=Inf
+ ormation Technology Division,ou=People,dc=example,dc=com
+
+dn: ou=Groups,dc=example,dc=com
+changetype: modify
+add: OpenLDAPaci
+OpenLDAPaci: 0#entry#grant;s;[all]#public#
+OpenLDAPaci: 1#children#grant;r;member;r;uniqueMember#access-id#cn=Bjorn Jen
+ sen,ou=Information Technology Division,ou=People,dc=example,dc=com
+EOMODS0
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Search must succeed with no results
+BASEDN="dc=example,dc=com"
+echo "Searching \"$BASEDN\" (should succeed with no results)..."
+echo "# Searching \"$BASEDN\" (should succeed with no results)..." >> $SEARCHOUT
+$LDAPSEARCH -s base -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(objectclass=*)' >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	### TEMPORARY (see ITS#3963)
+	echo "ldapsearch failed ($RC)! IGNORED..."
+	###echo "ldapsearch failed ($RC)!"
+	###test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	###exit $RC
+fi
+
+BINDDN="cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com"
+BINDPW=bjensen
+echo "Testing ldapwhoami as ${BINDDN}..."
+$LDAPWHOAMI -h $LOCALHOST -p $PORT1 -D "$BINDDN" -w $BINDPW
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapwhoami failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Search must succeed 
+BINDDN="cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com"
+BINDPW=bjorn
+BASEDN="dc=example,dc=com"
+echo "Searching \"$BASEDN\" as \"$BINDDN\" (should succeed)..."
+echo "# Searching \"$BASEDN\" as \"$BINDDN\" (should succeed)..." >> $SEARCHOUT
+$LDAPSEARCH -s base -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	-D "$BINDDN" -w "$BINDPW" \
+	'(objectClass=*)' >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Passwd must succeed 
+BINDDN="cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com"
+BINDPW=bjorn
+TGT="cn=John Doe,ou=Information Technology Division,ou=People,dc=example,dc=com"
+NEWPW=jdoe
+echo "Setting \"$TGT\" password..."
+$LDAPPASSWD -h $LOCALHOST -p $PORT1 \
+	-w "$BINDPW" -s "$NEWPW" \
+	-D "$BINDDN" "$TGT" >> $TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldappasswd failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Re-change as self...
+echo "Changing self password..."
+BINDDN="$TGT"
+BINDPW=$NEWPW
+TGT="cn=John Doe,ou=Information Technology Division,ou=People,dc=example,dc=com"
+NEWPW=newcred
+$LDAPPASSWD -h $LOCALHOST -p $PORT1 \
+	-w "$BINDPW" -s "$NEWPW" \
+	-D "$BINDDN" "$TGT" >> $TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldappasswd failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Searching groups
+BINDPW=$NEWPW
+BASEDN="ou=Groups,dc=example,dc=com"
+echo "Searching \"$BASEDN\" as \"$BINDDN\" (should succeed)..."
+echo "# Searching \"$BASEDN\" as \"$BINDDN\" (should succeed)..." >> $SEARCHOUT
+$LDAPSEARCH -s one -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	-D "$BINDDN" -w "$BINDPW" \
+	'(objectClass=*)' >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Search must fail
+BINDDN="cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com"
+BINDPW=bjensen
+echo "Searching \"$BASEDN\" as \"$BINDDN\" (should succeed with no results)..."
+echo "# Searching \"$BASEDN\" as \"$BINDDN\" (should succeed with no results)..." >> $SEARCHOUT
+$LDAPSEARCH -s one -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	-D "$BINDDN" -w "$BINDPW" \
+	'(objectClass=*)' >> $SEARCHOUT 2>> $TESTOUT
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+LDIF=$ACIOUT
+
+echo "Filtering ldapsearch results..."
+$LDIFFILTER -s mdb=e < $SEARCHOUT > $SEARCHFLT
+echo "Filtering original ldif used to create database..."
+$LDIFFILTER -s mdb=e < $LDIF > $LDIFFLT
+echo "Comparing filter output..."
+$CMP $SEARCHFLT $LDIFFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "comparison failed - operations did not complete correctly"
+	exit 1
+fi
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

@@ -1,0 +1,126 @@
+.TH LDAP_OPEN 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_dup, ldap_destroy, \- Duplicate and destroy LDAP session handles
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+LDAP *ldap_dup(
+.RS
+.ft B
+LDAP *\fIold\fB );
+.RE
+.LP
+.ft B
+int ldap_destroy(
+.RS
+.ft B
+LDAP *\fIold\fB );
+.RE
+.SH DESCRIPTION
+.LP
+.B ldap_dup()
+duplicates an existing LDAP
+.RB ( "LDAP *" )
+session handle.
+The new session handle may be used concurrently with the
+original session handle.
+In a threaded environment, different threads may execute concurrent
+requests on the same connection/session without fear of contamination.
+Each session handle manages its own private error results.
+.LP
+.B ldap_destroy()
+destroys an existing session handle.
+.LP
+The
+.B ldap_dup()
+and
+.B ldap_destroy()
+functions are used in conjunction with a "thread safe" version
+of
+.B libldap
+.RB ( libldap_r )
+to enable operation thread safe API calls, so that a single session
+may be simultaneously used across multiple threads with consistent
+error handling.
+.LP
+When a session is created through the use of one of the session creation
+functions including
+.BR ldap_open (3),
+.BR ldap_init (3),
+.BR ldap_initialize (3)
+or
+.BR ldap_init_fd (3)
+an
+.B "LDAP *"
+session handle is returned to the application.
+The session handle may be shared amongst threads, however the
+error codes are unique to a session handle.
+Multiple threads performing different operations using the same
+session handle will result in inconsistent error codes and
+return values.
+.LP
+To prevent this confusion,
+.B ldap_dup()
+is used duplicate an existing session handle so that multiple threads
+can share the session, and maintain consistent error information
+and results.
+.LP
+The message queues for a session are shared between sibling session handles.
+Results of operations on a sibling session handles are accessible
+to all the sibling session handles.
+Applications desiring results associated with a specific operation
+should provide the appropriate msgid to
+.BR ldap_result() .
+Applications should avoid calling
+.B ldap_result()
+with
+.B LDAP_RES_ANY
+as that may "steal" and return results in the calling thread
+that another operation in a different thread, using a
+different session handle, may require to complete.
+.LP
+When
+.B ldap_unbind()
+is called on a session handle with siblings, all the 
+siblings become invalid.
+.LP
+Siblings must be destroyed using
+.BR ldap_destroy() .
+Session handle resources associated with the original
+.RB ( "LDAP *" )
+will be freed when the last session handle is destroyed or when
+.B ldap_unbind()
+is called, if no other session handles currently exist.
+.SH ERRORS
+If an error occurs,
+.B ldap_dup()
+will return NULL and 
+.I errno
+should be set appropriately.
+.B ldap_destroy()
+will directly return the LDAP code associated to the error (or
+.I LDAP_SUCCESS
+in case of success);
+.I errno
+should be set as well whenever appropriate.
+.SH SEE ALSO
+.BR ldap_open (3),
+.BR ldap_init (3),
+.BR ldap_initialize (3),
+.BR ldap_init_fd (3),
+.BR errno (3)
+.SH ACKNOWLEDGEMENTS
+This work is based on the previously proposed
+.B LDAP C API Concurrency Extensions
+draft
+.BR ( draft-zeilenga-ldap-c-api-concurrency-00.txt )
+effort.
+.so ../Project

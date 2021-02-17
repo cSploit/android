@@ -1,0 +1,664 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: The slapd Configuration File
+
+This chapter describes configuring {{slapd}}(8) via the {{slapd.conf}}(5)
+configuration file.  {{slapd.conf}}(5) has been deprecated and should
+only be used if your site requires one of the backends that hasn't yet
+been updated to work with the newer {{slapd-config}}(5) system.  Configuring
+{{slapd}}(8) via {{slapd-config}}(5) is described in the previous chapter.
+
+The {{slapd.conf}}(5) file is normally installed in the
+{{EX:/usr/local/etc/openldap}} directory.  An alternate configuration
+file location can be specified via a command-line option to {{slapd}}(8).
+
+
+H2: Configuration File Format
+
+The {{slapd.conf}}(5) file consists of three types of configuration
+information: global, backend specific, and database specific.  Global
+information is specified first, followed by information associated
+with a particular backend type, which is then followed by information
+associated with a particular database instance.  Global directives can
+be overridden in backend and/or database directives, and backend directives
+can be overridden by database directives.
+
+Blank lines and comment lines beginning with a '{{EX:#}}' character
+are ignored.  If a line begins with whitespace, it is considered a
+continuation of the previous line (even if the previous line is a
+comment).
+
+The general format of slapd.conf is as follows:
+
+>	# global configuration directives
+>	<global config directives>
+>
+>	# backend definition
+>	backend <typeA>
+>	<backend-specific directives>
+>
+>	# first database definition & config directives
+>	database <typeA>
+>	<database-specific directives>
+>
+>	# second database definition & config directives
+>	database <typeB>
+>	<database-specific directives>
+>
+>	# second database definition & config directives
+>	database <typeA>
+>	<database-specific directives>
+>
+>	# subsequent backend & database definitions & config directives
+>	...
+
+A configuration directive may take arguments.  If so, they are
+separated by whitespace.  If an argument contains whitespace,
+the argument should be enclosed in double quotes {{EX:"like this"}}. If
+an argument contains a double quote or a backslash character `{{EX:\}}',
+the character should be preceded by a backslash character `{{EX:\}}'.
+
+The distribution contains an example configuration file that will
+be installed in the {{F: /usr/local/etc/openldap}} directory.
+A number of files containing schema definitions (attribute types
+and object classes) are also provided in the
+{{F: /usr/local/etc/openldap/schema}} directory.
+
+
+H2: Configuration File Directives
+
+This section details commonly used configuration directives.  For
+a complete list, see the {{slapd.conf}}(5) manual page.  This section
+separates the configuration file directives into global,
+backend-specific and data-specific categories, describing each
+directive and its default value (if any), and giving an example of
+its use.
+
+
+
+H3: Global Directives
+
+Directives described in this section apply to all backends
+and databases unless specifically overridden in a backend or
+database definition.  Arguments that should be replaced
+by actual text are shown in brackets {{EX:<>}}.
+
+
+H4: access to <what> [ by <who> [<accesslevel>] [<control>] ]+
+
+This directive grants access (specified by <accesslevel>) to a set
+of entries and/or attributes (specified by <what>) by one or more
+requestors (specified by <who>).  See the {{SECT:Access Control}} section of 
+this guide for basic usage.
+
+!if 0
+More details discussion of this directive can be found in the
+{{SECT:Advanced Access Control}} chapter.
+!endif
+
+Note: If no {{EX:access}} directives are specified, the default
+access control policy, {{EX:access to * by * read}}, allows all
+both authenticated and anonymous users read access.
+
+
+H4: attributetype <{{REF:RFC4512}} Attribute Type Description>
+
+This directive defines an attribute type.
+Please see the {{SECT:Schema Specification}} chapter
+for information regarding how to use this directive.
+
+H4: idletimeout <integer>
+
+Specify the number of seconds to wait before forcibly closing
+an idle client connection.  An idletimeout of 0, the default,
+disables this feature.
+
+
+H4: include <filename>
+
+This directive specifies that slapd should read additional
+configuration information from the given file before continuing
+with the next line of the current file. The included file should
+follow the normal slapd config file format.  The file is commonly
+used to include files containing schema specifications.
+
+Note: You should be careful when using this directive - there is
+no small limit on the number of nested include directives, and no
+loop detection is done.
+
+H4: loglevel <level>
+
+This directive specifies the level at which debugging statements
+and operation statistics should be syslogged (currently logged to
+the {{syslogd}}(8) {{EX:LOG_LOCAL4}} facility). You must have
+configured OpenLDAP {{EX:--enable-debug}} (the default) for this
+to work (except for the two statistics levels, which are always
+enabled). Log levels may be specified as integers or by keyword.
+Multiple log levels may be used and the levels are additive. To display what
+numbers correspond to what kind of debugging, invoke slapd with {{EX:-d?}}
+or consult the table below. The possible values for <integer> are:
+
+!block table; colaligns="RL"; align=Center; \
+	title="Table 6.1: Debugging Levels"
+Level	Keyword		Description
+-1	any		enable all debugging
+0			no debugging
+1	(0x1 trace)	trace function calls
+2	(0x2 packets)	debug packet handling
+4	(0x4 args)	heavy trace debugging
+8	(0x8 conns)	connection management
+16	(0x10 BER)	print out packets sent and received
+32	(0x20 filter)	search filter processing
+64	(0x40 config)	configuration processing
+128	(0x80 ACL)	access control list processing
+256	(0x100 stats)	stats log connections/operations/results
+512	(0x200 stats2)	stats log entries sent
+1024	(0x400 shell)	print communication with shell backends
+2048	(0x800 parse)	print entry parsing debugging
+16384	(0x4000 sync)	syncrepl consumer processing
+32768	(0x8000 none)	only messages that get logged whatever log level is set
+!endblock
+
+The desired log level can be input as a single integer that
+combines the (ORed) desired levels, both in decimal or in hexadecimal 
+notation, as a list of integers (that are ORed internally), or as a list of the names that are shown between brackets, such that
+
+>		loglevel 129
+>		loglevel 0x81
+>		loglevel 128 1
+>		loglevel 0x80 0x1
+>		loglevel acl trace
+
+are equivalent.
+
+\Examples:
+
+E: loglevel -1
+
+This will cause lots and lots of debugging information to be
+logged.
+
+E: loglevel conns filter
+
+Just log the connection and search filter processing.
+
+E: loglevel none
+
+Log those messages that are logged regardless of the configured loglevel. This
+differs from setting the log level to 0, when no logging occurs. At least the
+{{EX:None}} level is required to have high priority messages logged.
+
+\Default:
+
+E: loglevel stats
+
+Basic stats logging is configured by default. However, if no loglevel is
+defined, no logging occurs (equivalent to a 0 level).
+
+H4: objectclass <{{REF:RFC4512}} Object Class Description>
+
+This directive defines an object class.
+Please see the {{SECT:Schema Specification}} chapter for
+information regarding how to use this directive.
+
+
+H4: referral <URI>
+
+This directive specifies the referral to pass back when slapd
+cannot find a local database to handle a request.
+
+\Example:
+
+>	referral ldap://root.openldap.org
+
+This will refer non-local queries to the global root LDAP server
+at the OpenLDAP Project. Smart LDAP clients can re-ask their
+query at that server, but note that most of these clients are
+only going to know how to handle simple LDAP URLs that
+contain a host part and optionally a distinguished name part.
+
+
+H4: sizelimit <integer>
+
+This directive specifies the maximum number of entries to return
+from a search operation.
+
+\Default:
+
+>	sizelimit 500
+
+See the {{SECT:Limits}} section of this guide and slapd.conf(5)
+for more details.
+
+H4: timelimit <integer>
+
+This directive specifies the maximum number of seconds (in real
+time) slapd will spend answering a search request. If a
+request is not finished in this time, a result indicating an
+exceeded timelimit will be returned.
+
+\Default:
+
+>	timelimit 3600
+
+See the {{SECT:Limits}} section of this guide and slapd.conf(5)
+for more details.
+
+
+H3: General Backend Directives
+
+Directives in this section apply only to the backend in which
+they are defined. They are supported by every type of backend.
+Backend directives apply to all databases instances of the
+same type and, depending on the directive, may be overridden
+by database directives.
+
+H4: backend <type>
+
+This directive marks the beginning of a backend declaration.
+{{EX:<type>}} should be one of the
+supported backend types listed in Table 6.2.
+
+!block table; align=Center; coltags="EX,N"; \
+	title="Table 6.2: Database Backends"
+Types	Description
+bdb	Berkeley DB transactional backend (deprecated)
+dnssrv	DNS SRV backend
+hdb	Hierarchical variant of bdb backend (deprecated)
+ldap	Lightweight Directory Access Protocol (Proxy) backend
+mdb	Memory-Mapped DB backend
+meta	Meta Directory backend
+monitor	Monitor backend
+passwd	Provides read-only access to {{passwd}}(5)
+perl	Perl Programmable backend
+shell	Shell (extern program) backend
+sql	SQL Programmable backend
+!endblock
+
+\Example:
+
+>	backend bdb
+
+This marks the beginning of a new {{TERM:BDB}} backend
+definition.
+
+
+H3: General Database Directives
+
+Directives in this section apply only to the database in which
+they are defined. They are supported by every type of database.
+
+H4: database <type>
+
+This directive marks the beginning of a database instance
+declaration.
+{{EX:<type>}} should be one of the
+supported backend types listed in Table 6.2.
+
+\Example:
+
+>	database bdb
+
+This marks the beginning of a new {{TERM:BDB}} database instance
+declaration.
+
+
+H4: limits <who> <limit> [<limit> [...]]
+
+Specify time and size limits based on who initiated an operation.
+
+See the {{SECT:Limits}} section of this guide and slapd.conf(5)
+for more details.
+
+
+H4: readonly { on | off }
+
+This directive puts the database into "read-only" mode. Any
+attempts to modify the database will return an "unwilling to
+perform" error.  If set on a consumer, modifications sent by
+syncrepl will still occur.
+
+\Default:
+
+>	readonly off
+
+
+H4: rootdn <DN>
+
+This directive specifies the DN that is not subject to
+access control or administrative limit restrictions for
+operations on this database.  The DN need not refer to
+an entry in this database or even in the directory. The
+DN may refer to a SASL identity.
+
+Entry-based Example:
+
+>	rootdn "cn=Manager,dc=example,dc=com"
+
+SASL-based Example:
+
+>	rootdn "uid=root,cn=example.com,cn=digest-md5,cn=auth"
+
+See the {{SECT:SASL Authentication}} section for information on
+SASL authentication identities.
+
+
+H4: rootpw <password>
+
+This directive can be used to specifies a password for the DN for
+the rootdn (when the rootdn is set to a DN within the database).
+
+\Example:
+
+>	rootpw secret
+
+It is also permissible to provide hash of the password in {{REF:RFC2307}}
+form.  {{slappasswd}}(8) may be used to generate the password hash.
+
+\Example:
+
+>	rootpw {SSHA}ZKKuqbEKJfKSXhUbHG3fG8MDn9j1v4QN
+
+The hash was generated using the command {{EX:slappasswd -s secret}}.
+
+
+H4: suffix <dn suffix>
+
+This directive specifies the DN suffix of queries that will be
+passed to this backend database. Multiple suffix lines can be
+given, and at least one is required for each database
+definition.
+
+\Example:
+
+>	suffix "dc=example,dc=com"
+
+Queries with a DN ending in "dc=example,dc=com"
+will be passed to this backend.
+
+Note: When the backend to pass a query to is selected, slapd
+looks at the suffix line(s) in each database definition in the
+order they appear in the file. Thus, if one database suffix is a
+prefix of another, it must appear after it in the config file.
+
+
+H4: syncrepl
+
+>	syncrepl rid=<replica ID>
+>		provider=ldap[s]://<hostname>[:port]
+>		[type=refreshOnly|refreshAndPersist]
+>		[interval=dd:hh:mm:ss]
+>		[retry=[<retry interval> <# of retries>]+]
+>		searchbase=<base DN>
+>		[filter=<filter str>]
+>		[scope=sub|one|base]
+>		[attrs=<attr list>]
+>		[attrsonly]
+>		[sizelimit=<limit>]
+>		[timelimit=<limit>]
+>		[schemachecking=on|off]
+>		[bindmethod=simple|sasl]
+>		[binddn=<DN>]
+>		[saslmech=<mech>]
+>		[authcid=<identity>]
+>		[authzid=<identity>]
+>		[credentials=<passwd>]
+>		[realm=<realm>]
+>		[secprops=<properties>]
+>		[starttls=yes|critical]
+>		[tls_cert=<file>]
+>		[tls_key=<file>]
+>		[tls_cacert=<file>]
+>		[tls_cacertdir=<path>]
+>		[tls_reqcert=never|allow|try|demand]
+>		[tls_ciphersuite=<ciphers>]
+>		[tls_crlcheck=none|peer|all]
+>		[logbase=<base DN>]
+>		[logfilter=<filter str>]
+>		[syncdata=default|accesslog|changelog]
+
+
+This directive specifies the current database as a replica of the
+master content by establishing the current {{slapd}}(8) as a
+replication consumer site running a syncrepl replication engine.
+The master database is located at the replication provider site
+specified by the {{EX:provider}} parameter. The replica database is
+kept up-to-date with the master content using the LDAP Content
+Synchronization protocol. See {{REF:RFC4533}}
+for more information on the protocol.
+
+The {{EX:rid}} parameter is used for identification of the current
+{{EX:syncrepl}} directive within the replication consumer server,
+where {{EX:<replica ID>}} uniquely identifies the syncrepl specification
+described by the current {{EX:syncrepl}} directive. {{EX:<replica ID>}}
+is non-negative and is no more than three decimal digits in length.
+
+The {{EX:provider}} parameter specifies the replication provider site
+containing the master content as an LDAP URI. The {{EX:provider}}
+parameter specifies a scheme, a host and optionally a port where the
+provider slapd instance can be found. Either a domain name or IP
+address may be used for <hostname>. Examples are
+{{EX:ldap://provider.example.com:389}} or {{EX:ldaps://192.168.1.1:636}}.
+If <port> is not given, the standard LDAP port number (389 or 636) is used.
+Note that the syncrepl uses a consumer-initiated protocol, and hence its
+specification is located at the consumer site, whereas the {{EX:replica}}
+specification is located at the provider site. {{EX:syncrepl}} and
+{{EX:replica}} directives define two independent replication
+mechanisms. They do not represent the replication peers of each other.
+
+The content of the syncrepl replica is defined using a search
+specification as its result set. The consumer slapd will
+send search requests to the provider slapd according to the search
+specification. The search specification includes {{EX:searchbase}},
+{{EX:scope}}, {{EX:filter}}, {{EX:attrs}}, {{EX:attrsonly}},
+{{EX:sizelimit}}, and {{EX:timelimit}} parameters as in the normal
+search specification. The {{EX:searchbase}} parameter has no
+default value and must always be specified. The {{EX:scope}} defaults
+to {{EX:sub}}, the {{EX:filter}} defaults to {{EX:(objectclass=*)}},
+{{EX:attrs}} defaults to {{EX:"*,+"}} to replicate all user and operational
+attributes, and {{EX:attrsonly}} is unset by default. Both {{EX:sizelimit}}
+and {{EX:timelimit}} default to "unlimited", and only positive integers
+or "unlimited" may be specified.
+
+The {{TERM[expand]LDAP Sync}} protocol has two operation
+types: {{EX:refreshOnly}} and {{EX:refreshAndPersist}}.
+The operation type is specified by the {{EX:type}} parameter.
+In the {{EX:refreshOnly}} operation, the next synchronization search operation
+is periodically rescheduled at an interval time after each
+synchronization operation finishes. The interval is specified
+by the {{EX:interval}} parameter. It is set to one day by default.
+In the {{EX:refreshAndPersist}} operation, a synchronization search
+remains persistent in the provider {{slapd}} instance. Further updates to the
+master replica will generate {{EX:searchResultEntry}} to the consumer slapd
+as the search responses to the persistent synchronization search.
+
+If an error occurs during replication, the consumer will attempt to reconnect
+according to the retry parameter which is a list of the <retry interval>
+and <# of retries> pairs. For example, retry="60 10 300 3" lets the consumer
+retry every 60 seconds for the first 10 times and then retry every 300 seconds
+for the next three times before stop retrying. + in <#  of retries> means
+indefinite number of retries until success.
+
+The schema checking can be enforced at the LDAP Sync consumer site
+by turning on the {{EX:schemachecking}} parameter.
+If it is turned on, every replicated entry will be checked for its
+schema as the entry is stored into the replica content.
+Every entry in the replica should contain those attributes
+required by the schema definition.
+If it is turned off, entries will be stored without checking
+schema conformance. The default is off.
+
+The {{EX:binddn}} parameter gives the DN to bind as for the
+syncrepl searches to the provider slapd. It should be a DN
+which has read access to the replication content in the
+master database. 
+
+The {{EX:bindmethod}} is {{EX:simple}} or {{EX:sasl}},
+depending on whether simple password-based authentication or
+{{TERM:SASL}} authentication is to be used when connecting
+to the provider {{slapd}} instance.
+
+Simple authentication should not be used unless adequate data
+integrity and confidentiality protections are in place (e.g. TLS
+or IPsec). Simple authentication requires specification of {{EX:binddn}}
+and {{EX:credentials}} parameters.
+
+SASL authentication is generally recommended.  SASL authentication
+requires specification of a mechanism using the {{EX:saslmech}} parameter.
+Depending on the mechanism, an authentication identity and/or
+credentials can be specified using {{EX:authcid}} and {{EX:credentials}},
+respectively.  The {{EX:authzid}} parameter may be used to specify
+an authorization identity.
+
+The {{EX:realm}} parameter specifies a realm which a certain
+mechanisms authenticate the identity within. The {{EX:secprops}}
+parameter specifies Cyrus SASL security properties.
+
+The {{EX:starttls}} parameter specifies use of the StartTLS extended
+operation to establish a TLS session before authenticating to the provider.
+If the {{EX:critical}} argument is supplied, the session will be aborted
+if the StartTLS request fails.  Otherwise the syncrepl session continues
+without TLS.  Note that the main slapd TLS settings are not used by the
+syncrepl engine; by default the TLS parameters from a {{ldap.conf}}(5)
+configuration file will be used.  TLS settings may be specified here,
+in which case any {{ldap.conf}}(5) settings will be completely ignored.
+
+Rather than replicating whole entries, the consumer can query logs
+of data modifications.  This mode of operation is referred to as
+{{delta syncrepl}}.  In addition to the above parameters, the
+{{EX:logbase}} and {{EX:logfilter}} parameters must be set appropriately
+for the log that will be used. The {{EX:syncdata}} parameter must
+be set to either {{EX:"accesslog"}} if the log conforms to the
+{{slapo-accesslog}}(5) log format, or {{EX:"changelog"}} if the log
+conforms to the obsolete {{changelog}} format. If the {{EX:syncdata}}
+parameter is omitted or set to {{EX:"default"}} then the log
+parameters are ignored.
+
+The {{syncrepl}} replication mechanism is supported by the {{bdb}},
+{{hdb}}, and {{mdb}} backends.
+
+See the {{SECT:LDAP Sync Replication}} chapter of this guide for
+more information on how to use this directive.
+
+
+H4: updateref <URL>
+
+This directive is only applicable in a {{slave}} (or {{shadow}})
+{{slapd}}(8) instance. It
+specifies the URL to return to clients which submit update
+requests upon the replica.
+If specified multiple times, each {{TERM:URL}} is provided.
+
+\Example:
+
+>	updateref	ldap://master.example.net
+
+
+H3: BDB and HDB Database Directives
+
+Directives in this category only apply to both the {{TERM:BDB}}
+and the {{TERM:HDB}} database.
+That is, they must follow a "database bdb" or "database hdb" line
+and come before any
+subsequent "backend" or "database" line.  For a complete reference
+of BDB/HDB configuration directives, see {{slapd-bdb}}(5).
+
+
+H4: directory <directory>
+
+This directive specifies the directory where the BDB files
+containing the database and associated indices live.
+
+\Default:
+
+>	directory /usr/local/var/openldap-data
+
+
+H2: Configuration File Example
+
+The following is an example configuration file, interspersed
+with explanatory text. It defines two databases to handle
+different parts of the {{TERM:X.500}} tree; both are {{TERM:BDB}}
+database instances. The line numbers shown are provided for
+reference only and are not included in the actual file. First, the
+global configuration section:
+
+E:  1.    # example config file - global configuration section
+E:  2.    include /usr/local/etc/schema/core.schema
+E:  3.    referral ldap://root.openldap.org
+E:  4.    access to * by * read
+ 
+Line 1 is a comment. Line 2 includes another config file
+which contains {{core}} schema definitions.
+The {{EX:referral}} directive on line 3
+means that queries not local to one of the databases defined
+below will be referred to the LDAP server running on the
+standard port (389) at the host {{EX:root.openldap.org}}.
+
+Line 4 is a global access control.  It applies to all
+entries (after any applicable database-specific access
+controls).
+
+The next section of the configuration file defines a BDB
+backend that will handle queries for things in the
+"dc=example,dc=com" portion of the tree. The
+database is to be replicated to two slave slapds, one on
+truelies, the other on judgmentday. Indices are to be
+maintained for several attributes, and the {{EX:userPassword}}
+attribute is to be protected from unauthorized access.
+
+E:  5.    # BDB definition for the example.com
+E:  6.    database bdb
+E:  7.    suffix "dc=example,dc=com"
+E:  8.    directory /usr/local/var/openldap-data
+E:  9.    rootdn "cn=Manager,dc=example,dc=com"
+E: 10.    rootpw secret
+E: 11.    # indexed attribute definitions
+E: 12.    index uid pres,eq
+E: 13.    index cn,sn pres,eq,approx,sub
+E: 14.    index objectClass eq
+E: 15.    # database access control definitions
+E: 16.    access to attrs=userPassword
+E: 17.        by self write
+E: 18.        by anonymous auth
+E: 19.        by dn.base="cn=Admin,dc=example,dc=com" write
+E: 20.        by * none
+E: 21.    access to *
+E: 22.        by self write
+E: 23.        by dn.base="cn=Admin,dc=example,dc=com" write
+E: 24.        by * read
+
+Line 5 is a comment. The start of the database definition is marked
+by the database keyword on line 6. Line 7 specifies the DN suffix
+for queries to pass to this database. Line 8 specifies the directory
+in which the database files will live.
+
+Lines 9 and 10 identify the database {{super-user}} entry and associated
+password. This entry is not subject to access control or size or
+time limit restrictions.
+
+Lines 12 through 14 indicate the indices to maintain for various
+attributes.
+
+Lines 16 through 24 specify access control for entries in this
+database. For all applicable entries, the {{EX:userPassword}} attribute is writable
+by the entry itself and by the "admin" entry.  It may be used for
+authentication/authorization purposes, but is otherwise not readable.
+All other attributes are writable by the entry and the "admin"
+entry, but may be read by all users (authenticated or not).
+
+The next section of the example configuration file defines another
+BDB database. This one handles queries involving the
+{{EX:dc=example,dc=net}} subtree but is managed by the same entity
+as the first database.  Note that without line 39, the read access
+would be allowed due to the global access rule at line 4.
+
+E: 33.    # BDB definition for example.net
+E: 34.    database bdb
+E: 35.    suffix "dc=example,dc=net"
+E: 36.    directory /usr/local/var/openldap-data-net
+E: 37.    rootdn "cn=Manager,dc=example,dc=com"
+E: 38.    index objectClass eq
+E: 39.    access to * by users read

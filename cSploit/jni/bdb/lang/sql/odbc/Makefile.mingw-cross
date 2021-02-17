@@ -1,0 +1,273 @@
+# Makefile for SQLite ODBC Drivers
+# using MinGW cross compiler
+
+MINGW =		/opt/mingw64/bin/x86_64-w64-mingw32-
+CC =		$(MINGW)gcc -m32 -march=i386 -mtune=i386
+STRIP =		$(MINGW)strip
+RC =		$(MINGW)windres -F pe-i386
+MAKENSIS =	makensis
+
+DRV_VER=	$(shell cat VERSION)
+
+CFLAGS=		-O2 -Wall -DNDEBUG=1 -DDRIVER_VER_INFO=\"$(DRV_VER)\"
+
+
+SQLITE_INC =	sqlite
+SQLITE_LIB =	sqlite/libsqlite.a
+SQLITE_FLAGS =	-DHAVE_LIBVERSION=1 \
+		-DHAVE_ENCDEC=1 \
+		-DHAVE_SQLITEATOF=1 \
+		-DHAVE_SQLITEMPRINTF=1 \
+		-DHAVE_SQLITETRACE=1
+
+SQLITE3_INC =	sqlite3
+SQLITE3_SRC =	sqlite3/src
+SQLITE3_LIB =	sqlite3/libsqlite3.a
+SQLITE3_FLAGS=	-DHAVE_SQLITE3COLUMNTABLENAME=1 \
+		-DHAVE_SQLITE3LOADEXTENSION=1 \
+		-DHAVE_SQLITE3PREPAREV2=1 \
+		-DHAVE_SQLITE3VFS=1 \
+		-DHAVE_SQLITE3PROFILE=1
+SQLITE3_A10N =	sqlite3/sqlite3.c
+SQLITE3_A10N_FLAGS = \
+		-DWIN32=1 -DNDEBUG=1 -DNO_TCL -DTHREADSAFE=1 \
+		-DSQLITE_ENABLE_COLUMN_METADATA=1 \
+		-DSQLITE_DLL=1 \
+		-DSQLITE_THREADSAFE=1 \
+		-DSQLITE_OS_WIN=1 \
+		-DSQLITE_ASCII=1 \
+		-DSQLITE_SOUNDEX=1 \
+		-DSQLITE_OMIT_EXPLAIN=1
+
+TCC_INC =	TCC/libtcc
+TCC_LIB =	TCC/libtcc/libtcc.a
+
+
+ODBC_FLAGS =	-DHAVE_LONG_LONG=1 -DHAVE_SQLROWOFFSET=1
+ODBC_LIB =	-lodbc
+
+all:		sqliteodbc.dll sqlite3odbc$(SEEEXT).dll \
+		sqlite3_mod_blobtoxy.dll \
+		sqlite3_mod_impexp.dll \
+		sqlite3_mod_csvtable.dll \
+		sqlite3_mod_zipfile.dll \
+		sqlite.exe \
+		inst.exe instq.exe uninst.exe uninstq.exe \
+		adddsn.exe remdsn.exe \
+		addsysdsn.exe remsysdsn.exe \
+		SQLiteODBCInstaller.exe $(SQLITE3_EXE) $(SQLITE_TCC_DLL)
+
+all_no2:	sqlite3odbc$(SEEEXT).dll \
+		sqlite3_mod_blobtoxy.dll \
+		sqlite3_mod_impexp.dll \
+		sqlite3_mod_csvtable.dll \
+		sqlite3_mod_zipfile.dll \
+		inst.exe instq.exe uninst.exe uninstq.exe \
+		adddsn.exe remdsn.exe \
+		addsysdsn.exe remsysdsn.exe \
+		SQLiteODBCInstaller.exe $(SQLITE3_EXE) $(SQLITE_TCC_DLL)
+
+
+sqliteodbc.o:	sqliteodbc.c sqliteodbc.h resource.h
+		$(CC) $(CFLAGS) -mdll -c -I$(SQLITE_INC) $(ODBC_FLAGS) \
+		    $(SQLITE_FLAGS) $(ADD_CFLAGS) sqliteodbc.c
+
+sqliteodbcu.o:	sqliteodbc.c sqliteodbc.h resource.h
+		$(CC) $(CFLAGS) -mdll -c -I$(SQLITE_INC) $(ODBC_FLAGS) \
+		    $(SQLITE_FLAGS) $(ADD_CFLAGS) -o sqliteodbcu.o sqliteodbc.c
+
+sqliteodbc.dll:		sqliteodbc.o sqliteodbcres.o
+		$(CC) $(CFLAGS) -shared -Wl,--kill-at \
+		    -Wl,--out-implib,libsqliteodbc.a -Wl,--strip-all \
+		    -o sqliteodbc.dll \
+		    sqliteodbc.o sqliteodbcres.o \
+		    -lodbc32 -lodbccp32 -lcomdlg32 \
+		    -lkernel32 -luser32 -lmsvcrt $(SQLITE_LIB)
+
+sqlite.exe:		sqliteodbc.dll sqlite/src/minshell.c sqlite/sqlite.h \
+			sqliteres.o
+		$(CC) $(CFLAGS) $(SQLITE_FLAGS) -Isqlite -o sqlite.exe \
+		    sqlite/src/minshell.c sqliteres.o -L. -lsqliteodbc \
+		    $(SQLITE_LIB)
+		$(STRIP) sqlite.exe
+
+sqliteodbcu.dll:	sqliteodbcu.o sqliteodbcures.o
+		$(CC) $(CFLAGS) -shared -Wl,--kill-at \
+		    -Wl,--out-implib,libsqliteodbcu.a -Wl,--strip-all \
+		    -o sqliteodbcu.dll \
+		    sqliteodbcu.o sqliteodbcures.o \
+		    -lodbc32 -lodbccp32 -lcomdlg32 \
+		    -lkernel32 -luser32 -lmsvcrt $(SQLITE_LIB)
+
+sqliteu.exe:		sqliteodbcu.dll sqlite/src/minshell.c sqlite/sqlite.h \
+			sqliteres.o
+		$(CC) $(CFLAGS) -Isqlite -o sqliteu.exe \
+		    sqlite/src/minshell.c sqliteres.o -L. -lsqliteodbcu \
+		    $(SQLITE_LIB)
+		$(STRIP) sqliteu.exe
+
+sqliteodbcres.o:	sqliteodbc.rc resource.h
+		$(RC) -o sqliteodbcres.o -I$(SQLITE_INC) sqliteodbc.rc
+
+sqliteodbcures.o:	sqliteodbc.rc resource.h
+		$(RC) -o sqliteodbcures.o -I$(SQLITE_INC) sqliteodbc.rc
+
+resource.h:	resource.h.in
+		VERS=`cat VERSION` ;\
+		VERS_C=`echo $$VERS | sed -e 's/\([0-9]\+\)[.]\([0-9]\+\).*/\1,\2/g'` ;\
+		sed -e 's/--VERS_C--/'$$VERS_C'/g' < resource.h.in | \
+		sed -e 's/--VERS--/'$$VERS'/g' > resource.h
+
+sqlite3a10n.o:	$(SQLITE3_A10N)
+		$(CC) $(CFLAGS) -c -I$(SQLITE3_INC) $(SQLITE3_A10N_FLAGS) \
+		    $(ADD_CFLAGS) -o sqlite3a10n.o $(SQLITE3_A10N)
+
+sqlite3odbc.o:	sqlite3odbc.c sqlite3odbc.h resource3.h
+		$(CC) $(CFLAGS) -c -I$(SQLITE3_INC) $(ODBC_FLAGS) \
+		    $(SQLITE3_FLAGS) $(ADD_CFLAGS) sqlite3odbc.c
+
+sqlite3odbcnw.o:	sqlite3odbc.c sqlite3odbc.h resource3.h
+		$(CC) $(CFLAGS) -c -I$(SQLITE3_INC) $(ODBC_FLAGS) \
+		    $(SQLITE3_FLAGS) $(ADD_CFLAGS) -DWITHOUT_WINTERFACE=1 \
+		    -o sqlite3odbcnw.o sqlite3odbc.c
+
+sqlite3odbc$(SEEEXT).dll:	sqlite3odbc.o sqlite3odbcres.o $(SQLITE3_A10N_O)
+		$(CC) $(CFLAGS) -shared -Wl,--kill-at \
+		    -Wl,--out-implib,libsqlite3odbc.a -Wl,--strip-all \
+		    -o sqlite3odbc$(SEEEXT).dll \
+		    sqlite3odbc.o sqlite3odbcres.o $(SQLITE3_A10N_O) \
+		    -lodbc32 -lodbccp32 -lcomdlg32 \
+		    -lkernel32 -luser32 -lmsvcrt $(SQLITE3_DLL)
+		$(STRIP) sqlite3odbc$(SEEEXT).dll
+
+sqlite3odbc$(SEEEXT)nw.dll:	sqlite3odbcnw.o sqlite3odbcres.o $(SQLITE3_A10N_O)
+		$(CC) $(CFLAGS) -shared -Wl,--kill-at \
+		    -Wl,--out-implib,libsqlite3odbcnw.a -Wl,--strip-all \
+		    -o sqlite3odbc$(SEEEXT)nw.dll \
+		    sqlite3odbcnw.o sqlite3odbcres.o $(SQLITE3_A10N_O) \
+		    -lodbc32 -lodbccp32 -lcomdlg32 \
+		    -lkernel32 -luser32 -lmsvcrt $(SQLITE3_DLL)
+		$(STRIP) sqlite3odbc$(SEEEXT)nw.dll
+
+sqlite3.exe:		sqlite3odbc$(SEEEXT).dll sqlite3/src/minshell.c \
+			sqliteres.o
+		$(CC) $(CFLAGS) $(SQLITE3_FLAGS) -Isqlite3 -o sqlite3.exe \
+		    sqlite3/src/minshell.c sqliteres.o \
+		    -L. -lsqlite3odbc$(SEEEXT)
+		$(STRIP) sqlite3.exe
+
+sqlite3odbcres.o:	sqlite3odbc.rc resource3.h
+		$(RC) -o sqlite3odbcres.o -I$(SQLITE3_INC) sqlite3odbc.rc
+
+resource3.h:	resource.h.in
+		VERS=`cat VERSION` ;\
+		VERS_C=`echo $$VERS | sed -e 's/\([0-9]\+\)[.]\([0-9]\+\).*/\1,\2/g'` ;\
+		sed -e 's/--VERS_C--/'$$VERS_C'/g' < resource.h.in | \
+		sed -e 's/--VERS--/'$$VERS'/g' > resource3.h
+
+sqliteres.rc:
+		@echo "ico ICON sqlite.ico" > sqliteres.rc
+
+sqliteres.o:	sqliteres.rc
+		$(RC) -o sqliteres.o sqliteres.rc
+
+instres.o:	inst.rc
+		$(RC) -o instres.o -I$(SQLITE3_INC) inst.rc
+
+inst.exe:	inst.c instres.o
+		$(CC) $(CFLAGS) $(ADD_CFLAGS) -mwindows -o inst.exe \
+		    inst.c instres.o -lodbc32 -lodbccp32 -lkernel32 \
+		    -luser32
+		$(STRIP) inst.exe
+
+instq.exe:	inst.exe
+		cp -p inst.exe instq.exe
+
+uninst.exe:	inst.exe
+		cp -p inst.exe uninst.exe
+
+uninstq.exe:	inst.exe
+		cp -p inst.exe uninstq.exe
+
+adddsnres.o:	adddsn.rc
+		$(RC) -o adddsnres.o -I$(SQLITE3_INC) adddsn.rc
+
+adddsn.exe:	adddsn.c adddsnres.o
+		$(CC) $(CFLAGS) $(ADD_CFLAGS) -mwindows -o adddsn.exe \
+		    adddsn.c adddsnres.o -lodbc32 -lodbccp32 -lkernel32 \
+		    -luser32
+		$(STRIP) adddsn.exe
+
+remdsn.exe:	adddsn.exe
+		cp -p adddsn.exe remdsn.exe
+
+addsysdsn.exe:	adddsn.exe
+		cp -p adddsn.exe addsysdsn.exe
+
+remsysdsn.exe:	adddsn.exe
+		cp -p adddsn.exe remsysdsn.exe
+
+SQLiteODBCInstaller.exe:	SQLiteODBCInstaller.c sqliteres.o
+		$(CC) $(CFLAGS) $(ADD_CFLAGS) -o SQLiteODBCInstaller.exe \
+		SQLiteODBCInstaller.c sqliteres.o -lkernel32 -luser32
+		$(STRIP) SQLiteODBCInstaller.exe
+
+blobtoxyres.o:	blobtoxy.rc resource3.h
+		$(RC) -o blobtoxyres.o -I$(SQLITE3_INC) blobtoxy.rc
+
+blobtoxy.o:	blobtoxy.c
+		$(CC) $(CFLAGS) -mdll -c -I$(SQLITE3_INC) -I$(SQLITE3_SRC) \
+		    blobtoxy.c
+
+sqlite3_mod_blobtoxy.dll:	blobtoxy.o blobtoxyres.o
+		$(CC) $(CFLAGS) -shared -Wl,--kill-at \
+		    -Wl,--strip-all -o sqlite3_mod_blobtoxy.dll \
+		    blobtoxy.o blobtoxyres.o
+
+impexp.o:	impexp.c
+		$(CC) $(CFLAGS) -mdll -c -I$(SQLITE3_INC) -I$(SQLITE3_SRC) \
+		    impexp.c
+
+sqlite3_mod_impexp.dll:	impexp.o
+		$(CC) $(CFLAGS) -shared -Wl,--kill-at \
+		    -Wl,--strip-all -o sqlite3_mod_impexp.dll \
+		    impexp.o -lcomdlg32
+
+csvtable.o:	csvtable.c
+		$(CC) $(CFLAGS) -mdll -c -I$(SQLITE3_INC) -I$(SQLITE3_SRC) \
+		    csvtable.c
+
+sqlite3_mod_csvtable.dll:	csvtable.o
+		$(CC) $(CFLAGS) -shared -Wl,--kill-at \
+		    -Wl,--strip-all -o sqlite3_mod_csvtable.dll \
+		    csvtable.o
+
+zipfile.o:	zipfile.c
+		$(CC) $(CFLAGS) -mdll -c -I$(SQLITE3_INC) -I$(SQLITE3_SRC) \
+		    -Izlib zipfile.c
+
+sqlite3_mod_zipfile.dll:	zipfile.o
+		$(CC) $(CFLAGS) -shared -Wl,--kill-at \
+		    -Wl,--strip-all -o sqlite3_mod_zipfile.dll \
+		    zipfile.o -Lzlib -lz
+
+sqlite+tcc.o:	sqlite+tcc.c
+		$(CC) $(CFLAGS) -mdll -c -I$(SQLITE3_INC) -I$(SQLITE3_SRC) \
+		    -I$(TCC_INC) sqlite+tcc.c
+
+sqlite+tcc.dll:	sqlite+tcc.o
+		$(CC) $(CFLAGS) -shared -Wl,--kill-at \
+		    -Wl,--strip-all -o sqlite+tcc.dll \
+		    sqlite+tcc.o $(TCC_LIB)
+
+clean:
+		rm -f *.o sqliteodbc*.dll sqlite3odbc$(SEEEXT).dll \
+		    sqlite3_mod_blobtoxy.dll \
+		    sqlite3_mod_impexp.dll \
+		    sqlite3_mod_csvtable.dll \
+		    sqlite3_mod_zipfile.dll \
+		    sqlite+tcc.dll \
+		    *inst.exe *dsn.exe sqlite*.exe sqliteres.rc *~ \
+		    core core.*
+		rm -f resource.h resource3.h
+

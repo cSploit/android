@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>set_lg_filemode</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="configuration_reference.html" title="Appendix B. DB_CONFIG Parameter Reference" />
+    <link rel="prev" href="set_lg_dir_parameter.html" title="set_lg_dir" />
+    <link rel="next" href="set_lg_max_parameter.html" title="set_lg_max" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">set_lg_filemode</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="set_lg_dir_parameter.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix B. DB_CONFIG Parameter Reference</th>
+          <td width="20%" align="right"> <a accesskey="n" href="set_lg_max_parameter.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="set_lg_filemode_parameter"></a>set_lg_filemode</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                Sets the absolute file mode for created log files. This method is only useful for the rare
+				Berkeley DB application that does not control its umask value. 
+				</p>
+      <p>
+				Normally, if Berkeley DB applications set their umask appropriately, all processes in the
+				application suite will have read permission on the log files created by any process in the
+				application suite. However, if the Berkeley DB application is a library, a process using the
+				library might set its umask to a value preventing other processes in the application suite from
+				reading the log files it creates. In this rare case, use the set_lg_filemode parameter
+				to set the mode of created log files to an absolute value.
+            </p>
+      <p>
+                 The syntax of this parameter in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file is a
+                 single line with the string
+                 <code class="literal">set_lg_filemode</code>, one or more whitespace
+                 characters, and the absolute mode of created log files. 
+            </p>
+      <p>For more information, see <a class="xref" href="envset_lg_filemode.html" title="DbEnv::set_lg_filemode()">DbEnv::set_lg_filemode()</a>. </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="set_lg_dir_parameter.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="configuration_reference.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="set_lg_max_parameter.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">set_lg_dir </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> set_lg_max</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

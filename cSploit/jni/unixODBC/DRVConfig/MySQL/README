@@ -1,0 +1,27 @@
+***************************************************************
+* This code is LGPL. You CAN make commercial solutions using  *
+* LGPL software. This software is a LinuxODBC component and   *
+* may NOT be distributed seperately.                          *
+*                                                             *
+* Peter Harvey 21.FEB.99 pharvey@codebydesign.com             *
+***************************************************************
+
++-------------------------------------------------------------+
+| unixODBC                                                    |
+| Driver Config for MySQL ODBC driver                         |
++-------------------------------------------------------------+
+
+Use this Driver Config when using the MySQL
+ODBC Driver.
+
+It allows ODBCConfig to prompt the user for Data Source
+options.
+
+ODBCConfig will read the "Setup" entry in
+/etc/odbcinst.ini to determine the name of the config
+lib to use.
+
+Peter Harvey
+pharvey@codebydesign.com
+19.FEB.99
+

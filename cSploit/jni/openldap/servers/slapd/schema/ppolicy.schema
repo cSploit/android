@@ -1,0 +1,531 @@
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 2004-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+## Portions Copyright (C) The Internet Society (2004).
+## Please see full copyright statement below.
+
+# Definitions from Draft behera-ldap-password-policy-07 (a work in progress)
+#	Password Policy for LDAP Directories
+# With extensions from Hewlett-Packard:
+#	pwdCheckModule etc.
+
+# Contents of this file are subject to change (including deletion)
+# without notice.
+#
+# Not recommended for production use!
+# Use with extreme caution!
+
+#Network Working Group                                     J. Sermersheim
+#Internet-Draft                                               Novell, Inc
+#Expires: April 24, 2005                                        L. Poitou
+#                                                        Sun Microsystems
+#                                                        October 24, 2004
+#
+#
+#                  Password Policy for LDAP Directories
+#                draft-behera-ldap-password-policy-08.txt
+#
+#Status of this Memo
+#
+#   This document is an Internet-Draft and is subject to all provisions
+#   of section 3 of RFC 3667.  By submitting this Internet-Draft, each
+#   author represents that any applicable patent or other IPR claims of
+#   which he or she is aware have been or will be disclosed, and any of
+#   which he or she become aware will be disclosed, in accordance with
+#   RFC 3668.
+#
+#   Internet-Drafts are working documents of the Internet Engineering
+#   Task Force (IETF), its areas, and its working groups.  Note that
+#   other groups may also distribute working documents as
+#   Internet-Drafts.
+#
+#   Internet-Drafts are draft documents valid for a maximum of six months
+#   and may be updated, replaced, or obsoleted by other documents at any
+#   time.  It is inappropriate to use Internet-Drafts as reference
+#   material or to cite them other than as "work in progress."
+#
+#   The list of current Internet-Drafts can be accessed at
+#   http://www.ietf.org/ietf/1id-abstracts.txt.
+#
+#   The list of Internet-Draft Shadow Directories can be accessed at
+#   http://www.ietf.org/shadow.html.
+#
+#   This Internet-Draft will expire on April 24, 2005.
+#
+#Copyright Notice
+#
+#   Copyright (C) The Internet Society (2004).
+#
+#Abstract
+#
+#   Password policy as described in this document is a set of rules that
+#   controls how passwords are used and administered in Lightweight
+#   Directory Access Protocol (LDAP) based directories.  In order to
+#   improve the security of LDAP directories and make it difficult for
+#   password cracking programs to break into directories, it is desirable
+#   to enforce a set of rules on password usage.  These rules are made to
+#
+#  [trimmed]
+#
+#5.  Schema used for Password Policy
+#
+#   The schema elements defined here fall into two general categories.  A
+#   password policy object class is defined which contains a set of
+#   administrative password policy attributes, and a set of operational
+#   attributes are defined that hold general password policy state
+#   information for each user.
+#
+#5.2  Attribute Types used in the pwdPolicy ObjectClass
+#
+#   Following are the attribute types used by the pwdPolicy object class.
+#
+#5.2.1  pwdAttribute
+#
+#   This holds the name of the attribute to which the password policy is
+#   applied.  For example, the password policy may be applied to the
+#   userPassword attribute.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.1
+      NAME 'pwdAttribute'
+      EQUALITY objectIdentifierMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.38 )
+
+#5.2.2  pwdMinAge
+#
+#   This attribute holds the number of seconds that must elapse between
+#   modifications to the password.  If this attribute is not present, 0
+#   seconds is assumed.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.2
+      NAME 'pwdMinAge'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+#5.2.3  pwdMaxAge
+#
+#   This attribute holds the number of seconds after which a modified
+#   password will expire.
+#
+#   If this attribute is not present, or if the value is 0 the password
+#   does not expire.  If not 0, the value must be greater than or equal
+#   to the value of the pwdMinAge.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.3
+      NAME 'pwdMaxAge'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+#5.2.4  pwdInHistory
+#
+#   This attribute specifies the maximum number of used passwords stored
+#   in the pwdHistory attribute.
+#
+#   If this attribute is not present, or if the value is 0, used
+#   passwords are not stored in the pwdHistory attribute and thus may be
+#   reused.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.4
+      NAME 'pwdInHistory'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+#5.2.5  pwdCheckQuality
+#
+#   {TODO: Consider changing the syntax to OID.  Each OID will list a
+#   quality rule (like min len, # of special characters, etc).  These
+#   rules can be specified outsid ethis document.}
+#
+#   {TODO: Note that even though this is meant to be a check that happens
+#   during password modification, it may also be allowed to happen during
+#   authN.  This is useful for situations where the password is encrypted
+#   when modified, but decrypted when used to authN.}
+#
+#   This attribute indicates how the password quality will be verified
+#   while being modified or added.  If this attribute is not present, or
+#   if the value is '0', quality checking will not be enforced.  A value
+#   of '1' indicates that the server will check the quality, and if the
+#   server is unable to check it (due to a hashed password or other
+#   reasons) it will be accepted.  A value of '2' indicates that the
+#   server will check the quality, and if the server is unable to verify
+#   it, it will return an error refusing the password.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.5
+      NAME 'pwdCheckQuality'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+#5.2.6  pwdMinLength
+#
+#   When quality checking is enabled, this attribute holds the minimum
+#   number of characters that must be used in a password.  If this
+#   attribute is not present, no minimum password length will be
+#   enforced.  If the server is unable to check the length (due to a
+#   hashed password or otherwise), the server will, depending on the
+#   value of the pwdCheckQuality attribute, either accept the password
+#   without checking it ('0' or '1') or refuse it ('2').
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.6
+      NAME 'pwdMinLength'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+#5.2.7  pwdExpireWarning
+#
+#   This attribute specifies the maximum number of seconds before a
+#   password is due to expire that expiration warning messages will be
+#   returned to an authenticating user.
+#
+#   If this attribute is not present, or if the value is 0 no warnings
+#   will be returned.  If not 0, the value must be smaller than the value
+#   of the pwdMaxAge attribute.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.7
+      NAME 'pwdExpireWarning'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+#5.2.8  pwdGraceAuthNLimit
+#
+#   This attribute specifies the number of times an expired password can
+#   be used to authenticate.  If this attribute is not present or if the
+#   value is 0, authentication will fail.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.8
+      NAME 'pwdGraceAuthNLimit'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+#5.2.9  pwdLockout
+#
+#   This attribute indicates, when its value is "TRUE", that the password
+#   may not be used to authenticate after a specified number of
+#   consecutive failed bind attempts.  The maximum number of consecutive
+#   failed bind attempts is specified in pwdMaxFailure.
+#
+#   If this attribute is not present, or if the value is "FALSE", the
+#   password may be used to authenticate when the number of failed bind
+#   attempts has been reached.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.9
+      NAME 'pwdLockout'
+      EQUALITY booleanMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+      SINGLE-VALUE )
+
+#5.2.10  pwdLockoutDuration
+#
+#   This attribute holds the number of seconds that the password cannot
+#   be used to authenticate due to too many failed bind attempts.  If
+#   this attribute is not present, or if the value is 0 the password
+#   cannot be used to authenticate until reset by a password
+#   administrator.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.10
+      NAME 'pwdLockoutDuration'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+#5.2.11  pwdMaxFailure
+#
+#   This attribute specifies the number of consecutive failed bind
+#   attempts after which the password may not be used to authenticate.
+#   If this attribute is not present, or if the value is 0, this policy
+#   is not checked, and the value of pwdLockout will be ignored.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.11
+      NAME 'pwdMaxFailure'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+#5.2.12  pwdFailureCountInterval
+#
+#   This attribute holds the number of seconds after which the password
+#   failures are purged from the failure counter, even though no
+#   successful authentication occurred.
+#
+#   If this attribute is not present, or if its value is 0, the failure
+#   counter is only reset by a successful authentication.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.12
+      NAME 'pwdFailureCountInterval'
+      EQUALITY integerMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+
+#5.2.13  pwdMustChange
+#
+#   This attribute specifies with a value of "TRUE" that users must
+#   change their passwords when they first bind to the directory after a
+#   password is set or reset by a password administrator.  If this
+#   attribute is not present, or if the value is "FALSE", users are not
+#   required to change their password upon binding after the password
+#   administrator sets or resets the password.  This attribute is not set
+#   due to any actions specified by this document, it is typically set by
+#   a password administrator after resetting a user's password.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.13
+      NAME 'pwdMustChange'
+      EQUALITY booleanMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+      SINGLE-VALUE )
+
+#5.2.14  pwdAllowUserChange
+#
+#   This attribute indicates whether users can change their own
+#   passwords, although the change operation is still subject to access
+#   control.  If this attribute is not present, a value of "TRUE" is
+#   assumed.  This attribute is intended to be used in the absense of an
+#   access control mechanism.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.14
+      NAME 'pwdAllowUserChange'
+      EQUALITY booleanMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+      SINGLE-VALUE )
+
+#5.2.15  pwdSafeModify
+#
+#   This attribute specifies whether or not the existing password must be
+#   sent along with the new password when being changed.  If this
+#   attribute is not present, a "FALSE" value is assumed.
+
+attributetype ( 1.3.6.1.4.1.42.2.27.8.1.15
+      NAME 'pwdSafeModify'
+      EQUALITY booleanMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+      SINGLE-VALUE )
+
+# HP extensions
+#
+# pwdCheckModule
+#
+#    This attribute names a user-defined loadable module that provides
+#    a check_password() function. If pwdCheckQuality is set to '1' or '2'
+#    this function will be called after all of the internal password
+#    quality checks have been passed. The function has this prototype:
+#
+#    int check_password( char *password, char **errormessage, void *arg )
+#
+#    The function should return LDAP_SUCCESS for a valid password.
+
+attributetype ( 1.3.6.1.4.1.4754.1.99.1
+     NAME 'pwdCheckModule'
+     EQUALITY caseExactIA5Match
+     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+     DESC 'Loadable module that instantiates "check_password() function'
+     SINGLE-VALUE )
+
+objectclass ( 1.3.6.1.4.1.4754.2.99.1
+      NAME 'pwdPolicyChecker'
+      SUP top
+      AUXILIARY
+      MAY ( pwdCheckModule ) )
+
+#5.1  The pwdPolicy Object Class
+#
+#   This object class contains the attributes defining a password policy
+#   in effect for a set of users.  Section 10 describes the
+#   administration of this object, and the relationship between it and
+#   particular objects.
+#
+objectclass ( 1.3.6.1.4.1.42.2.27.8.2.1
+      NAME 'pwdPolicy'
+      SUP top
+      AUXILIARY
+      MUST ( pwdAttribute )
+      MAY ( pwdMinAge $ pwdMaxAge $ pwdInHistory $ pwdCheckQuality $
+      pwdMinLength $ pwdExpireWarning $ pwdGraceAuthNLimit $ pwdLockout
+      $ pwdLockoutDuration $ pwdMaxFailure $ pwdFailureCountInterval $
+      pwdMustChange $ pwdAllowUserChange $ pwdSafeModify ) )
+
+#5.3  Attribute Types for Password Policy State Information
+#
+#   Password policy state information must be maintained for each user.
+#   The information is located in each user entry as a set of operational
+#   attributes.  These operational attributes are: pwdChangedTime,
+#   pwdAccountLockedTime, pwdFailureTime, pwdHistory, pwdGraceUseTime,
+#   pwdReset, pwdPolicySubEntry.
+#
+#5.3.1  Password Policy State Attribute Option
+#
+#   Since the password policy could apply to several attributes used to
+#   store passwords, each of the above operational attributes must have
+#   an option to specify which pwdAttribute it applies to.  The password
+#   policy option is defined as the following:
+#
+#   pwd-<passwordAttribute>
+#
+#   where passwordAttribute a string following the OID syntax
+#   (1.3.6.1.4.1.1466.115.121.1.38).  The attribute type descriptor
+#   (short name) MUST be used.
+#
+#   For example, if the pwdPolicy object has for pwdAttribute
+#   "userPassword" then the pwdChangedTime operational attribute, in a
+#   user entry, will be:
+#
+#   pwdChangedTime;pwd-userPassword: 20000103121520Z
+#
+#   This attribute option follows sub-typing semantics.  If a client
+#   requests a password policy state attribute to be returned in a search
+#   operation, and does not specify an option, all subtypes of that
+#   policy state attribute are returned.
+#
+#5.3.2  pwdChangedTime
+#
+#   This attribute specifies the last time the entry's password was
+#   changed.  This is used by the password expiration policy.  If this
+#   attribute does not exist, the password will never expire.
+#
+#      ( 1.3.6.1.4.1.42.2.27.8.1.16
+#      NAME 'pwdChangedTime'
+#      DESC 'The time the password was last changed'
+#      EQUALITY generalizedTimeMatch
+#      ORDERING generalizedTimeOrderingMatch
+#      SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+#      SINGLE-VALUE
+#      USAGE directoryOperation )
+#
+#5.3.3  pwdAccountLockedTime
+#
+#   This attribute holds the time that the user's account was locked.  A
+#   locked account means that the password may no longer be used to
+#   authenticate.  A 000001010000Z value means that the account has been
+#   locked permanently, and that only a password administrator can unlock
+#   the account.
+#
+#      ( 1.3.6.1.4.1.42.2.27.8.1.17
+#      NAME 'pwdAccountLockedTime'
+#      DESC 'The time an user account was locked'
+#      EQUALITY generalizedTimeMatch
+#      ORDERING generalizedTimeOrderingMatch
+#      SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+#      SINGLE-VALUE
+#      USAGE directoryOperation )
+#
+#5.3.4  pwdFailureTime
+#
+#   This attribute holds the timestamps of the consecutive authentication
+#   failures.
+#
+#      ( 1.3.6.1.4.1.42.2.27.8.1.19
+#      NAME 'pwdFailureTime'
+#      DESC 'The timestamps of the last consecutive authentication
+#      failures'
+#      EQUALITY generalizedTimeMatch
+#      ORDERING generalizedTimeOrderingMatch
+#      SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+#      USAGE directoryOperation )
+#
+#5.3.5  pwdHistory
+#
+#   This attribute holds a history of previously used passwords.  Values
+#   of this attribute are transmitted in string format as given by the
+#   following ABNF:
+#
+#   pwdHistory = time "#" syntaxOID "#" length "#" data
+#
+#   time       = <generalizedTimeString as specified in 6.14
+#                 of [RFC2252]>
+#
+#   syntaxOID  = numericoid    ; the string representation of the
+#                              ; dotted-decimal OID that defines the
+#                              ; syntax used to store the password.
+#                              ; numericoid is described in 4.1
+#                              ; of [RFC2252].
+#
+#   length     = numericstring ; the number of octets in data.
+#                              ; numericstring is described in 4.1
+#                              ; of [RFC2252].
+#
+#   data       = <octets representing the password in the format
+#                 specified by syntaxOID>.
+#
+#   This format allows the server to store, and transmit a history of
+#   passwords that have been used.  In order for equality matching to
+#   function properly, the time field needs to adhere to a consistent
+#   format.  For this purpose, the time field MUST be in GMT format.
+#
+#      ( 1.3.6.1.4.1.42.2.27.8.1.20
+#      NAME 'pwdHistory'
+#      DESC 'The history of user s passwords'
+#      EQUALITY octetStringMatch
+#      SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+#      USAGE directoryOperation )
+#
+#5.3.6  pwdGraceUseTime
+#
+#   This attribute holds the timestamps of grace authentications after a
+#   password has expired.
+#
+#      ( 1.3.6.1.4.1.42.2.27.8.1.21
+#      NAME 'pwdGraceUseTime'
+#      DESC 'The timestamps of the grace authentication after the
+#      password has expired'
+#      EQUALITY generalizedTimeMatch
+#      SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+#
+#5.3.7  pwdReset
+#
+#   This attribute holds a flag to indicate (when TRUE) that the password
+#   has been updated by the password administrator and must be changed by
+#   the user on first authentication.
+#
+#      ( 1.3.6.1.4.1.42.2.27.8.1.22
+#      NAME 'pwdReset'
+#      DESC 'The indication that the password has been reset'
+#      EQUALITY booleanMatch
+#      SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+#      SINGLE-VALUE
+#      USAGE directoryOperation )
+#
+#5.3.8  pwdPolicySubentry
+#
+#   This attribute points to the pwdPolicy subentry in effect for this
+#   object.
+#
+#      ( 1.3.6.1.4.1.42.2.27.8.1.23
+#      NAME 'pwdPolicySubentry'
+#      DESC 'The pwdPolicy subentry in effect for this object'
+#      EQUALITY distinguishedNameMatch
+#      SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+#      SINGLE-VALUE
+#      USAGE directoryOperation )
+#
+#
+#Disclaimer of Validity
+#
+#   This document and the information contained herein are provided on an
+#   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+#   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+#   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+#   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+#   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+#   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+#
+#
+#Copyright Statement
+#
+#   Copyright (C) The Internet Society (2004).  This document is subject
+#   to the rights, licenses and restrictions contained in BCP 78, and
+#   except as set forth therein, the authors retain all their rights.
+

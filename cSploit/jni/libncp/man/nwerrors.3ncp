@@ -1,0 +1,338 @@
+.TH nwerrors 3NCP 04/13/1999 "libncp (>= 2.2.0.14)" "Netware Calls Library"
+.SH NAME
+nwerrors \- list of error codes returned by libncp calls
+.SH SYNOPSIS
+.B #include <nwcalls.h>
+
+.B "NWE_*"
+
+
+.B #include <nwnet.h>
+
+.B "ERR_*"
+
+.SH DESCRIPTION
+This is list of codes returned by functions in \fBlibncp\fP. Error codes
+are split into several groups:
+
+.B OK
+.RS 3
+When \fIzero\fP is returned, call was processed without problems.
+.RE
+
+.B libc errors
+.RS 3
+These values are same as \fIerrno\fP values and they are listed in
+\fIerrno\fP(3). Return value is \fBlibc error\fP if it is in range 
+\fI1\-511\fP.
+.RE
+
+.B RPC errors (obsolete)
+.RS 3
+These error codes are returned only by \fINWSM*\fP group of functions.
+They are in range \fI512\-524\fP.
+.RE 
+
+.B libncp specific errors
+.RS 3
+These error codes are in range \fI0x8700\-0x87FF\fP and are used
+for reporting non-standard problems in \fBlibncp\fP.
+.RE
+
+.B requester errors
+.RS 3
+These error codes are in range \fI0x8800\-0x88FF\fP and are used
+for reporting standard problems in \fBlibncp\fP.
+.RE
+
+.B server errors
+.RS 3
+These error codes in range \fI0x8900\-0x89FF\fP are error codes
+returned by server when calling \fBNCP\fP functions.
+.RE
+
+.B NDS errors
+.RS 3
+Error codes in range \fI\-1000 ... \-256\fP are returned by NDS server
+system (\fI\-600 ... -799\fP), by local NDS system (\fI\-300 ... -399\fP)
+and by other subsystems (\fIother\fP).
+.RE
+
+.B reserved errors
+.RS 3
+Range \fI\-255 ... \-1\fP is reserved. If some function returns this value,
+it is bug (this is probably forgotten \fBlibc\fP return value (\fI\-1\fP)
+or negative \fIerrno\fP value)). Other ranges, not mentioned in this document,
+are reserved for future expansion.
+.RE
+
+.SH "LIBNCP SPECIFIC ERRORS"
+
+.TP
+.IB "0x8701   " NCPLIB_INVALID_MODE
+~/.nwclient file has not mode 0600 or 0400 \fIor\fP
+.br
+~/.nwclient file is readable or writeable by group or world
+
+.SH "REQUESTER ERRORS"
+
+.TP
+.IB "0x880E   " NWE_BUFFER_OVERFLOW
+Requested information is larger than supplied buffer.
+
+.TP
+.IB "0x880F   " NWE_SERVER_NO_CONN
+You have no connection to server (at this time, if ~/.nwclient is empty,
+this error is returned).
+
+.TP
+.IB "0x8816   " NWE_INVALID_NCP_PACKET_LENGTH
+Reply returned by server fails in some consistency check (reply is shorter
+than expected).
+
+.TP
+.IB "0x8834   " NWE_USER_NO_NAME
+User name not specified (returned by ncp_find_conn_spec if user name was
+not found).
+
+.TP
+.IB "0x8836   " NWE_PARAM_INVALID
+Invalid parameter (\fINULL\fP, out of range...) was passed into some 
+function.
+
+.TP
+.IB "0x8847   " NWE_SERVER_NOT_FOUND
+Specified server was not found (see also \fI0x89FC\fP:\fBNWE_SERVER_UNKNOWN\fP).
+This error is returned, if ANY server was not found on the network
+(no response from SAP resolver).
+
+.TP
+.IB "0x8861   " NWE_SIGNATURE_LEVEL_CONFLICT
+Requested signature level is not compatible with server setting.
+
+.TP
+.IB "0x8870   " NWE_INVALID_LEVEL
+Unknown information type was requested from \fBNWCCGetConnInfo\fP.
+
+.TP
+.IB "0x88FF   " NWE_REQUESTER_FAILURE
+Unspecified \fBlibncp\fP error, \fBncp\fP unavailable and so on.
+
+.SH "SERVER ERRORS"
+
+.TP
+.IB "0x89D3   " NWE_Q_NO_RIGHTS
+You have not rights to specified (print) queue.
+
+.TP
+.IB "0x89DF   " NWE_PASSWORD_EXPIRED
+Your password has expired, this login was `grace' login.
+
+.TP
+.IB "0x89E9   " NWE_BIND_MEMBER_ALREADY_EXISTS
+Object is already in set.
+
+.TP
+.IB "0x89FB   " NWE_NCP_NOT_SUPPORTED
+Attempted function is not available on this version of NetWare.
+
+.TP
+.IB "0x89FC   " NWE_SERVER_UNKNOWN
+Server was not found.
+
+.TP
+.IB "0x89FD   " NWE_CONN_NUM_INVALID
+Operation attempted on invalid connection (\fBNWClearConnection\fP(3ncp),
+\fBNWGetConnInfo\fP(3ncp), ...) or your own connection timed out
+(\fBnds4linux\fP).
+
+.TP
+.IB "0x89FF   " NWE_SERVER_FAILURE
+Unspecified server error (bad parameters passed, LinWare/Mars/Windows on
+other end of wire, bad password, ...).
+
+.SH "NDS/UNICODE ERRORS"
+
+.TP
+.IB "\-301     " ERR_NOT_ENOUGH_MEMORY
+Not enough memory (see also \fBerrno\fP(3):\fIENOMEM\fP).
+
+.TP
+.IB "\-302     " ERR_BAD_KEY
+Invalid key value DCK_* passed to \fBNWDSGetContext\fP or \fBNWDSSetContext\fP.
+
+.TP
+.IB "\-303     " ERR_BAD_CONTEXT
+Invalid \fBNWDSContextHandle\fP was passed to some of \fBNWDS*\fP functions.
+
+.TP
+.IB "\-304     " ERR_BUFFER_FULL
+Information is larger than passed buffer.
+
+.TP
+.IB "\-307     " ERR_BUFFER_EMPTY
+Requested information does not exist in buffer. It can be programmer's error
+or unexpected reply from server.
+
+.TP
+.IB "\-308     " ERR_BAD_VERB
+Operation attempted with buffer prepared for something else or buffer cannot
+contain requested information.
+
+.TP
+.IB "\-309     " ERR_EXPECTED_IDENTIFIER
+Object name fails on some check (multiple dots, two equals or plus signs,
+backslash at the end of name...)
+
+.TP
+.IB "\-311     " ERR_ATTR_TYPE_EXPECTED
+If object has multiple naming attributes, you must specify all with or
+without types, you must not mix it.
+
+.TP
+.IB "\-312     " ERR_ATTR_TYPE_NOT_EXPECTED
+If object has multiple naming attributes, you must specify all without or
+with types, you must not mix it.
+
+.TP
+.IB "\-314     " ERR_INVALID_OBJECT_NAME
+Something is wrong with object name (odd length returned by server, string
+returned from server is not zero terminated, object name is absolute, but
+has dot(s) at the end (\fI.object.tree.\fP)).
+
+.TP
+.IB "\-315     " ERR_EXPECTED_RDN_DELIMITER
+Something is wrong with object name (multiple equal signs without intervening
+dot or plus sign).
+
+.TP
+.IB "\-316     " ERR_TOO_MANY_TOKENS
+Something is wrong with object name (there is more dots at the end of object 
+name than levels in current context name).
+
+.TP
+.IB "\-317     " ERR_INCONSISTENT_MULTIAVA
+You are trying to apply default naming rule on typeless name with multiple
+naming attributes.
+
+.TP
+.IB "\-318     " ERR_COUNTRY_NAME_TOO_LONG
+Country name must not exceed two characters.
+
+.TP
+.IB "\-319     " ERR_SYSTEM_ERROR
+Something went wrong.
+
+.TP
+.IB "\-322     " ERR_INVALID_HANDLE
+Application passed invalid iteration handle to one of NWDS* functions.
+It is bug in application.
+
+.TP
+.IB "\-323     " ERR_BUFFER_ZERO_LENGTH
+Application passed empty request buffer to one of NWDS* functions. It is
+bug in application.
+
+.TP
+.IB "\-328     " ERR_CONTEXT_CREATION
+An error occured in \fBNWDSCreateContext\fP. You should use 
+\fBNWDSCreateContextHandle\fP, which has better error reporting.
+
+.TP
+.IB "\-330     " ERR_INVALID_SERVER_RESPONSE
+Unexpected reply was returned from server.
+
+.TP
+.IB "\-331     " ERR_NULL_POINTER
+NULL pointer was passed to some function. Only (some) output parameters can
+be NULL.
+
+.TP
+.IB "\-333     " ERR_NO_CONNECTION
+You have not any connection for this context handle. At this moment (2.2.0.17),
+call NWDSAddConnection(NWDSContextHandle, NWCONN_HANDLE).
+
+.TP
+.IB "\-335     " ERR_DUPLICATE_TYPE
+If object has multiple naming attributes, they must not have same name.
+
+.TP
+.IB "\-337     " ERR_NOT_LOGGED_IN
+You are trying to authenticate connection before you logged in. You must
+first do \fBNWDSLogin\fP before call to \fBNWDSAuthenticate\fP.
+
+.TP
+.IB "\-338     " ERR_INVALID_PASSWORD_CHARS
+Invalid characters in password.
+
+.TP
+.IB "\-340     " ERR_TRANSPORT
+Transport not supported / referral addresses does not include any supported
+protocol.
+
+.TP
+.IB "\-341     " ERR_NO_SUCH_SYNTAX
+Invalid Syntax ID was passed to NWDSGet/NWDSPut/NWDSCompute function.
+
+.TP
+.IB "\-342     " ERR_INVALID_DS_NAME
+Multiple dots or some other problem (currently only in \fBRemoveAllTypes\fP).
+
+.TP
+.IB "\-348     " ERR_UNICODE_FILE_NOT_FOUND
+Tables required for local<->unicode translation were not found (system
+defaults to \fIISO_8859-1\fP).
+
+.TP
+.IB "\-353     " ERR_DN_TOO_LONG
+Object name is too long.
+
+.TP
+.IB "\-354     " ERR_RENAME_NOT_ALLOWED
+\fBNWDSMoveObject\fP cannot be used to rename object. Use either \fBNWDSModifyRDN\fP
+or \fBNWDSModifyDN\fP function calls.
+
+.TP
+.IB "\-601     " ERR_NO_SUCH_ENTRY
+Specified object does not exist.
+
+.TP
+.IB "\-603     " ERR_NO_SUCH_ATTRIBUTE
+None of requested attributes exists.
+
+.TP
+.IB "\-641     " ERR_INVALID_REQUEST
+Server did not understand your request. Either your program did not fill
+up request buffer properly or server DS is too old.
+
+.TP
+.IB "\-656     " ERR_CRUCIAL_REPLICA
+Replica cannot be removed (or type cannot be changed) because of it is last master 
+replica of an partition.
+
+.TP
+.IB "\-659     " ERR_TIME_NOT_SYNCHRONIZED
+Server time is not synchronized with rest of tree.
+
+.TP
+.IB "\-669     " ERR_FAILED_AUTHENTICATION
+Invalid password or authentication time window exceeded.
+
+.TP
+.IB "\-683     " ERR_INVALID_API_VERSION
+Server does not support this API version - it is too old.
+One of examples is \fBNWDSAddObject\fP if server does
+not support fragmented \fBDSV_ENTRY_ADD\fP, but you asked for it.
+Another example is \fBNWDSListPartitionsExtInfo\fP.
+
+.TP
+.IB "\-700     " ERR_OBSOLETE_API
+Server does not support this API version - this API call is no
+longer supported. One of examples is \fBNWDSRemovePartition\fP if
+server runs NDS8.
+
+.SH BUGS
+This manual page is incomplete and some error descriptions are confusing.
+
+.SH SEE ALSO
+.BR "NWCallsInit" (3ncp), " NWCallsTerm"(3ncp)

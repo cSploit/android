@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>BFILE SQL Objects and Functions</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="bfile-extension.html" title="Appendix A. Using the BFILE Extension" />
+    <link rel="prev" href="bfile-extension.html" title="Appendix A. Using the BFILE Extension" />
+    <link rel="next" href="bfile-c.html" title="BFILE C/C++ Objects and Functions" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">BFILE SQL Objects and Functions</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="bfile-extension.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix A. Using the BFILE Extension</th>
+          <td width="20%" align="right"> <a accesskey="n" href="bfile-c.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="bfile-sql"></a>BFILE SQL Objects and Functions</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-sql.html#bfile_create_directory">BFILE_CREATE_DIRECTORY</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-sql.html#bfile_replace_directory">BFILE_REPLACE_DIRECTORY</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-sql.html#bfile_drop_directory">BFILE_DROP_DIRECTORY</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-sql.html#bfile_name">BFILE_NAME</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-sql.html#bfile_fullpath">BFILE_FULLPATH</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-sql.html#bfile_open">BFILE_OPEN</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-sql.html#bfile_read">BFILE_READ</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-sql.html#bfile_close">BFILE_CLOSE</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="bfile-sql.html#bfile_size">BFILE_SIZE</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+            When the BFILE extension is enabled, you can create a
+            <code class="literal">DIRECTORY</code> object. These objects are required
+            before you can store a pointer to a file in a
+            <code class="literal">BFILE</code> column.
+        </p>
+      <p>
+            <code class="literal">DIRECTORY</code> objects are stored
+            in a special table called <code class="literal">BFILE_DIRECTORY</code>. 
+            This table is automatically created for you when it is needed.
+            You should <span class="emphasis"><em>not</em></span> manually create this table.
+        </p>
+      <p>
+            You manage <code class="literal">DIRECTORY</code> objects using the
+            following SQL functions:
+        </p>
+      <table class="simplelist" border="0" summary="Simple list">
+        <tr>
+          <td>
+            <a class="xref" href="bfile-sql.html#bfile_create_directory" title="BFILE_CREATE_DIRECTORY">BFILE_CREATE_DIRECTORY</a>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a class="xref" href="bfile-sql.html#bfile_replace_directory" title="BFILE_REPLACE_DIRECTORY">BFILE_REPLACE_DIRECTORY</a>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <a class="xref" href="bfile-sql.html#bfile_drop_directory" title="BFILE_DROP_DIRECTORY">BFILE_DROP_DIRECTORY</a>
+          </td>
+        </tr>
+      </table>
+      <p>
+            The following sections describe the SQL functions that you can
+            use when the BFILE extension is enabled.
+        </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bfile_create_directory"></a>BFILE_CREATE_DIRECTORY</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">BFILE_CREATE_DIRECTORY(directory, path)</pre>
+        <p>
+                Creates a <code class="literal">DIRECTORY</code> object as a path.
+                The specified path must not already exist, or
+                <code class="literal">Directory already exists</code>
+                is returned.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bfile_replace_directory"></a>BFILE_REPLACE_DIRECTORY</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">BFILE_REPLACE_DIRECTORY(directory, path)</pre>
+        <p>
+                Replaces the named <code class="literal">DIRECTORY</code> object using the specified path. 
+                If the object does not exist, <code class="literal">Directory does not exist</code>
+                is returned.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bfile_drop_directory"></a>BFILE_DROP_DIRECTORY</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">BFILE_DROP_DIRECTORY(directory)</pre>
+        <p>
+                Drops the named <code class="literal">DIRECTORY</code> object.  If
+                the object does not exist, 
+                <code class="literal">Directory does not exist</code> is returned.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bfile_name"></a>BFILE_NAME</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">BFILE_NAME(directory, filename)</pre>
+        <p>
+                Returns the BFILE locator.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bfile_fullpath"></a>BFILE_FULLPATH</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">BFILE_FULLPATH(column)</pre>
+        <p>
+                Returns the full path.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bfile_open"></a>BFILE_OPEN</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">BFILE_OPEN(column)</pre>
+        <p>
+                Extracts the directory and file names from the BFILE
+                locator, and then opens that file. On success, a BFILE
+                handle is returned. Otherwise, <code class="literal">0</code>
+                is returned.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bfile_read"></a>BFILE_READ</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">BFILE_READ(BFILE handle, amt, offset)</pre>
+        <p>
+                Reads at most <code class="literal">amt</code> data from the BFILE
+                handle, starting at <code class="literal">offset</code>. On success, 
+                <code class="literal">Data</code> is returned. Otherwise,
+                <code class="literal">0</code> is returned to indicate that no more
+                valid data is available.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bfile_close"></a>BFILE_CLOSE</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">BFILE_CLOSE(BFILE handle)</pre>
+        <p>
+                Closes the BFILE handle.
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="bfile_size"></a>BFILE_SIZE</h3>
+            </div>
+          </div>
+        </div>
+        <pre class="programlisting">BFILE_SIZE(column)</pre>
+        <p>
+                Returns the size of the BFILE. On success, the size is
+                returned. Otherwise, -1 is returned.
+            </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="bfile-extension.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="bfile-extension.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="bfile-c.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Appendix A. Using the BFILE Extension </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> BFILE C/C++ Objects and Functions</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

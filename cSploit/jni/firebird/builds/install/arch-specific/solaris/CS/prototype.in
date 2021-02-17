@@ -1,0 +1,259 @@
+#-------------------------------------------------------------------------------
+
+!SRCDIR=@NEW_FIREBIRD_DIR@
+
+
+i pkginfo=Pkginfo
+i preinstall=Preinstall
+i postinstall=Postinstall
+i postremove=Postremove
+i prototype=Prototype
+
+!default 755 firebird firebird
+d none /usr         ? ? ?
+d none /usr/lib     ? ? ?
+d none /opt         ? ? ?
+
+d none @prefix@ 0751 firebird firebird
+
+v CONFIG.prsv @prefix@/security2.fdb=$SRCDIR/security2.fdb  0660 firebird firebird
+v CONFIG.prsv @prefix@/firebird.conf=$SRCDIR/misc/firebird.conf  0444 firebird firebird
+v CONFIG.prsv @prefix@/databases.conf=$SRCDIR/../../builds/install/misc/databases.conf.in  0444 firebird firebird
+v CONFIG.prsv @prefix@/intl/fbintl.conf=$SRCDIR/misc/fbintl.conf 0644 firebird firebird
+f none @prefix@/WhatsNew=$SRCDIR/../../doc/WhatsNew 0644 firebird firebird
+
+d none @prefix@/bin  0751 firebird firebird
+
+#f none @prefix@/bin/CSchangeRunUser.sh=$SRCDIR/bin/CSchangeRunUser.sh  0451 firebird firebird
+#f none @prefix@/bin/CSrestoreRootRunUser.sh=$SRCDIR/bin/CSrestoreRootRunUser.sh  0451 firebird firebird
+#f none @prefix@/bin/changeDBAPassword.sh=$SRCDIR/bin/changeDBAPassword.sh  0451 firebird firebird
+
+#/usr/lib symlinks for compability with external tools
+
+s none /usr/lib/libfbembed.so.2=@prefix@/lib/libfbembed.so.2
+s none /usr/lib/libfbclient.so.2=@prefix@/lib/libfbclient.so.2
+
+# include
+
+d none @prefix@/include 0751 firebird firebird
+f none @prefix@/include/ib_util.h=$SRCDIR/include/ib_util.h 0444 firebird firebird
+f none @prefix@/include/perf.h=$SRCDIR/include/perf.h 0444 firebird firebird
+f none @prefix@/include/iberror.h=$SRCDIR/include/iberror.h 0444 firebird firebird
+f none @prefix@/include/ibase.h=$SRCDIR/include/ibase.h 0444 firebird firebird
+
+# intl
+
+d none @prefix@/intl 0751 firebird firebird
+f none @prefix@/intl/libfbintl.so=$SRCDIR/intl/libfbintl.so 0555 firebird firebird
+s none @prefix@/intl/fbintl=@prefix@/intl/libfbintl.so
+
+# UDF
+
+d none @prefix@/UDF 0751 firebird firebird
+f none @prefix@/UDF/ib_udf.so=$SRCDIR/UDF/ib_udf.so 0755 firebird firebird
+f none @prefix@/UDF/fbudf.so=$SRCDIR/UDF/fbudf.so 0755 firebird firebird
+f none @prefix@/UDF/ib_udf.sql=$SRCDIR/../../src/extlib/ib_udf.sql 0644 firebird firebird
+f none @prefix@/UDF/ib_udf2.sql=$SRCDIR/../../src/extlib/ib_udf2.sql 0644 firebird firebird
+f none @prefix@/UDF/fbudf.sql=$SRCDIR/../../src/extlib/fbudf/fbudf.sql 0644 firebird firebird
+
+# bin
+
+d none @prefix@/bin 0751 firebird firebird
+f none @prefix@/bin/fb_smp_server=$SRCDIR/bin/fb_smp_server 0451 firebird firebird
+f none @prefix@/bin/gfix=$SRCDIR/bin/gfix 0451 firebird firebird
+f none @prefix@/bin/gbak=$SRCDIR/bin/gbak 0451 firebird firebird
+f none @prefix@/bin/gsplit=$SRCDIR/bin/gsplit 0451 firebird firebird
+f none @prefix@/bin/gsec=$SRCDIR/bin/gsec 0451 firebird firebird
+f none @prefix@/bin/isql=$SRCDIR/bin/isql 0555 firebird firebird
+f none @prefix@/bin/gpre=$SRCDIR/bin/gpre 0451 firebird firebird
+f none @prefix@/bin/gstat=$SRCDIR/bin/gstat 0451 firebird firebird
+#f none @prefix@/bin/fbguard=$SRCDIR/bin/fbguard 0451 firebird firebird
+#f none @prefix@/bin/fbmgr.bin=$SRCDIR/bin/fbmgr.bin 0451 firebird firebird
+f none @prefix@/bin/fb_lock_print=$SRCDIR/bin/fb_lock_print 0451 firebird firebird
+f none @prefix@/bin/qli=$SRCDIR/bin/qli 0555 firebird firebird
+# from 2.0
+f none @prefix@/bin/nbackup=$SRCDIR/bin/nbackup 0451 firebird firebird
+
+# upgrade
+
+d none @prefix@/upgrade 0751 firebird firebird
+f none @prefix@/upgrade/ib_udf2_params.txt=$SRCDIR/../../src/misc/upgrade/v2/ib_udf2_params.txt 0644 firebird firebird
+f none @prefix@/upgrade/ib_udf_params.txt=$SRCDIR/../../src/misc/upgrade/v2/ib_udf_params.txt 0644 firebird firebird
+f none @prefix@/upgrade/ib_udf_upgrade.sql=$SRCDIR/../../src/misc/upgrade/v2/ib_udf_upgrade.sql 0644 firebird firebird
+f none @prefix@/upgrade/security_database.sql=$SRCDIR/../../src/misc/upgrade/v2/security_database.sql 0644 firebird firebird
+f none @prefix@/upgrade/security_database.txt=$SRCDIR/../../src/misc/upgrade/v2/security_database.txt 0644 firebird firebird
+
+# examples
+
+d none @prefix@/examples 0751 firebird firebird
+d none @prefix@/examples/api 0555 firebird firebird
+f none @prefix@/examples/api/api1.c=$SRCDIR/examples/api/api1.c 0444 firebird firebird
+f none @prefix@/examples/api/api10.c=$SRCDIR/examples/api/api10.c 0444 firebird firebird
+f none @prefix@/examples/api/api11.c=$SRCDIR/examples/api/api11.c 0444 firebird firebird
+f none @prefix@/examples/api/api12.c=$SRCDIR/examples/api/api12.c 0444 firebird firebird
+f none @prefix@/examples/api/api13.c=$SRCDIR/examples/api/api13.c 0444 firebird firebird
+f none @prefix@/examples/api/api14.e=$SRCDIR/examples/api/api14.e 0444 firebird firebird
+f none @prefix@/examples/api/api15.c=$SRCDIR/examples/api/api15.c 0444 firebird firebird
+f none @prefix@/examples/api/api16.c=$SRCDIR/examples/api/api16.c 0444 firebird firebird
+f none @prefix@/examples/api/api16t.c=$SRCDIR/examples/api/api16t.c 0444 firebird firebird
+f none @prefix@/examples/api/api2.c=$SRCDIR/examples/api/api2.c 0444 firebird firebird
+f none @prefix@/examples/api/api3.c=$SRCDIR/examples/api/api3.c 0444 firebird firebird
+f none @prefix@/examples/api/api4.c=$SRCDIR/examples/api/api4.c 0444 firebird firebird
+f none @prefix@/examples/api/api5.c=$SRCDIR/examples/api/api5.c 0444 firebird firebird
+f none @prefix@/examples/api/api6.c=$SRCDIR/examples/api/api6.c 0444 firebird firebird
+f none @prefix@/examples/api/api7.c=$SRCDIR/examples/api/api7.c 0444 firebird firebird
+f none @prefix@/examples/api/api8.c=$SRCDIR/examples/api/api8.c 0444 firebird firebird
+f none @prefix@/examples/api/api9.c=$SRCDIR/examples/api/api9.c 0444 firebird firebird
+f none @prefix@/examples/api/api9f.c=$SRCDIR/examples/api/api9f.c 0444 firebird firebird
+f none @prefix@/examples/api/api9f.def=$SRCDIR/examples/api/api9f.def 0444 firebird firebird
+f none @prefix@/examples/api/api9f.sql=$SRCDIR/examples/api/api9f.sql 0444 firebird firebird
+f none @prefix@/examples/api/apifull.c=$SRCDIR/examples/api/apifull.c 0444 firebird firebird
+f none @prefix@/examples/api/example.def=$SRCDIR/examples/api/example.def 0444 firebird firebird
+f none @prefix@/examples/api/winevent.c=$SRCDIR/examples/api/winevent.c 0444 firebird firebird
+f none @prefix@/examples/api/winevent.def=$SRCDIR/examples/api/winevent.def 0444 firebird firebird
+f none @prefix@/examples/api/winevent.rc=$SRCDIR/examples/api/winevent.rc 0444 firebird firebird
+
+d none @prefix@/examples/dyn 0555 firebird firebird
+f none @prefix@/examples/dyn/dyn1.e=$SRCDIR/examples/dyn/dyn1.e 0444 firebird firebird
+f none @prefix@/examples/dyn/dyn2.e=$SRCDIR/examples/dyn/dyn2.e 0444 firebird firebird
+f none @prefix@/examples/dyn/dyn3.e=$SRCDIR/examples/dyn/dyn3.e 0444 firebird firebird
+f none @prefix@/examples/dyn/dyn4.e=$SRCDIR/examples/dyn/dyn4.e 0444 firebird firebird
+f none @prefix@/examples/dyn/dyn5.e=$SRCDIR/examples/dyn/dyn5.e 0444 firebird firebird
+f none @prefix@/examples/dyn/dynfull.e=$SRCDIR/examples/dyn/dynfull.e 0444 firebird firebird
+
+d none @prefix@/examples/empbuild 0555 firebird firebird
+f none @prefix@/examples/empbuild/employee.fdb=$SRCDIR/examples/empbuild/employee.fdb 0660 firebird firebird
+#f none @prefix@/examples/empbuild/employe2.sql=$SRCDIR/examples/empbuild/employe2.sql 0444 firebird firebird
+
+d none @prefix@/examples/include 0555 firebird firebird
+f none @prefix@/examples/include/align.h=$SRCDIR/examples/include/align.h 0444 firebird firebird
+f none @prefix@/examples/include/example.h=$SRCDIR/examples/include/example.h 0444 firebird firebird
+
+d none @prefix@/examples/stat 0555 firebird firebird
+f none @prefix@/examples/stat/stat1.e=$SRCDIR/examples/stat/stat1.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat10.e=$SRCDIR/examples/stat/stat10.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat11.e=$SRCDIR/examples/stat/stat11.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat12.e=$SRCDIR/examples/stat/stat12.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat12t.e=$SRCDIR/examples/stat/stat12t.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat2.e=$SRCDIR/examples/stat/stat2.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat3.e=$SRCDIR/examples/stat/stat3.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat4.e=$SRCDIR/examples/stat/stat4.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat5.e=$SRCDIR/examples/stat/stat5.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat6.e=$SRCDIR/examples/stat/stat6.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat7.e=$SRCDIR/examples/stat/stat7.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat8.e=$SRCDIR/examples/stat/stat8.e 0444 firebird firebird
+f none @prefix@/examples/stat/stat9.e=$SRCDIR/examples/stat/stat9.e 0444 firebird firebird
+
+d none @prefix@/examples/udf 0555 firebird firebird
+f none @prefix@/examples/udf/udf.sql=$SRCDIR/examples/udf/udf.sql 0444 firebird firebird
+f none @prefix@/examples/udf/udflib.c=$SRCDIR/examples/udf/udflib.c 0444 firebird firebird
+f none @prefix@/examples/udf/udflib.def=$SRCDIR/examples/udf/udflib.def 0444 firebird firebird
+
+f none @prefix@/examples/README=$SRCDIR/examples/README 0555 firebird firebird
+
+f none @prefix@/examples/functions.c=$SRCDIR/examples/functions.c 0444 firebird firebird
+
+
+# lib
+
+d none @prefix@/lib 0751 firebird firebird
+f none @prefix@/lib/libfbclient.so.@FIREBIRD_VERSION@=$SRCDIR/lib/libfbclient.so.@FIREBIRD_VERSION@  0555 firebird firebird
+s none @prefix@/lib/libfbclient.so.2=@prefix@/lib/libfbclient.so.@FIREBIRD_VERSION@
+s none @prefix@/lib/libfbclient.so=@prefix@/lib/libfbclient.so.2
+
+f none @prefix@/lib/libfbembed.so.@FIREBIRD_VERSION@=$SRCDIR/lib/libfbembed.so.@FIREBIRD_VERSION@ 0555 firebird firebird
+s none @prefix@/lib/libfbembed.so.2=@prefix@/lib/libfbembed.so.@FIREBIRD_VERSION@
+s none @prefix@/lib/libfbembed.so=@prefix@/lib/libfbembed.so.2
+
+f none @prefix@/lib/libib_util.so=$SRCDIR/lib/libib_util.so 0555 firebird firebird
+
+# help
+
+d none @prefix@/help 0751 firebird firebird
+f none @prefix@/help/help.fdb=$SRCDIR/help/help.fdb 0444 firebird firebird
+
+# messages
+
+f none @prefix@/firebird.msg=$SRCDIR/firebird.msg 0444 firebird firebird
+f none @prefix@/fr_FR.msg=$SRCDIR/fr_FR.msg 0444 firebird firebird
+f none @prefix@/de_DE.msg=$SRCDIR/de_DE.msg 0444 firebird firebird
+
+# docs
+
+d none @prefix@/doc 0751 firebird firebird
+d none @prefix@/doc/sql.extensions 0755 firebird firebird
+f none @prefix@/doc/sql.extensions/README.aggregate_tracking=$SRCDIR/../../doc/sql.extensions/README.aggregate_tracking 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.builtin_functions=$SRCDIR/../../doc/sql.extensions/README.builtin_functions.txt 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.case=$SRCDIR/../../doc/sql.extensions/README.case 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.coalesce=$SRCDIR/../../doc/sql.extensions/README.coalesce 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.common_table_expressions=$SRCDIR/../../doc/sql.extensions/README.common_table_expressions 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.context_variables=$SRCDIR/../../doc/sql.extensions/README.context_variables 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.context_variables2=$SRCDIR/../../doc/sql.extensions/README.context_variables2 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.current_time=$SRCDIR/../../doc/sql.extensions/README.current_time 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.cursors=$SRCDIR/../../doc/sql.extensions/README.cursors 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.data_type_results_of_aggregations=$SRCDIR/../../doc/sql.extensions/README.data_type_results_of_aggregations.txt 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.data_types=$SRCDIR/../../doc/sql.extensions/README.data_types 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.db_triggers=$SRCDIR/../../doc/sql.extensions/README.db_triggers.txt 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.ddl=$SRCDIR/../../doc/sql.extensions/README.ddl.txt 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.default_parameters=$SRCDIR/../../doc/sql.extensions/README.default_parameters 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.derived_tables=$SRCDIR/../../doc/sql.extensions/README.derived_tables.txt 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.distinct=$SRCDIR/../../doc/sql.extensions/README.distinct 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.domains_psql=$SRCDIR/../../doc/sql.extensions/README.domains_psql.txt 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.exception_handling=$SRCDIR/../../doc/sql.extensions/README.exception_handling 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.execute_block=$SRCDIR/../../doc/sql.extensions/README.execute_block 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.execute_statement=$SRCDIR/../../doc/sql.extensions/README.execute_statement 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.explicit_locks=$SRCDIR/../../doc/sql.extensions/README.explicit_locks 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.expression_indices=$SRCDIR/../../doc/sql.extensions/README.expression_indices 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.global_temporary_tables=$SRCDIR/../../doc/sql.extensions/README.global_temporary_tables 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.iif=$SRCDIR/../../doc/sql.extensions/README.iif 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.isc_info_xxx=$SRCDIR/../../doc/sql.extensions/README.isc_info_xxx 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.joins=$SRCDIR/../../doc/sql.extensions/README.joins.txt 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.keywords=$SRCDIR/../../doc/sql.extensions/README.keywords 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.leave_labels=$SRCDIR/../../doc/sql.extensions/README.leave_labels 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.length=$SRCDIR/../../doc/sql.extensions/README.length 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.list=$SRCDIR/../../doc/sql.extensions/README.list 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.merge=$SRCDIR/../../doc/sql.extensions/README.merge.txt 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.null_value=$SRCDIR/../../doc/sql.extensions/README.null_value 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.nullif=$SRCDIR/../../doc/sql.extensions/README.nullif 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.order_by_expressions_nulls=$SRCDIR/../../doc/sql.extensions/README.order_by_expressions_nulls 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.plan=$SRCDIR/../../doc/sql.extensions/README.plan 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.PSQL_stack_trace=$SRCDIR/../../doc/sql.extensions/README.PSQL_stack_trace.txt 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.returning=$SRCDIR/../../doc/sql.extensions/README.returning 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.rows=$SRCDIR/../../doc/sql.extensions/README.rows 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.savepoints=$SRCDIR/../../doc/sql.extensions/README.savepoints 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.select_expressions=$SRCDIR/../../doc/sql.extensions/README.select_expressions 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.sequence_generators=$SRCDIR/../../doc/sql.extensions/README.sequence_generators 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.set_transaction=$SRCDIR/../../doc/sql.extensions/README.set_transaction.txt
+f none @prefix@/doc/sql.extensions/README.trim=$SRCDIR/../../doc/sql.extensions/README.trim 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.universal_triggers=$SRCDIR/../../doc/sql.extensions/README.universal_triggers 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.update_or_insert=$SRCDIR/../../doc/sql.extensions/README.update_or_insert 0644 firebird firebird
+f none @prefix@/doc/sql.extensions/README.view_updates=$SRCDIR/../../doc/sql.extensions/README.view_updates 0644 firebird firebird
+f none @prefix@/doc/ReleaseNotes.pdf=$SRCDIR/../../doc/ReleaseNotes.pdf 0644 firebird firebird
+f none @prefix@/doc/ods11-index-structure.html=$SRCDIR/../../doc/ods11-index-structure.html 0644 firebird firebird
+f none @prefix@/doc/README.build.mingw.html=$SRCDIR/../../doc/README.build.mingw.html 0644 firebird firebird
+f none @prefix@/doc/README.build.msvc.html=$SRCDIR/../../doc/README.build.msvc.html 0644 firebird firebird
+f none @prefix@/doc/README.coding_style=$SRCDIR/../../doc/README.coding.style 0644 firebird firebird
+f none @prefix@/doc/README.DiskSpaceAllocation=$SRCDIR/../../doc/README.DiskSpaceAllocation 0644 firebird firebird
+f none @prefix@/doc/README.fbsvcmgr=$SRCDIR/../../doc/README.fbsvcmgr 0644 firebird firebird
+f none @prefix@/doc/README.garbage_collector=$SRCDIR/../../doc/README.garbage_collector 0644 firebird firebird
+f none @prefix@/doc/README.incompatibilities=$SRCDIR/../../doc/README.incompatibilities.txt 0644 firebird firebird
+f none @prefix@/doc/README.instsvc=$SRCDIR/../../doc/README.instsvc 0644 firebird firebird
+f none @prefix@/doc/README.intl=$SRCDIR/../../doc/README.intl 0644 firebird firebird
+f none @prefix@/doc/README.isql_enhancements=$SRCDIR/../../doc/README.isql_enhancements.txt 0644 firebird firebird
+f none @prefix@/doc/README.makefiles=$SRCDIR/../../doc/README.makefiles 0644 firebird firebird
+f none @prefix@/doc/README.monitoring_tables=$SRCDIR/../../doc/README.monitoring_tables 0644 firebird firebird
+f none @prefix@/doc/README.NTSecurity=$SRCDIR/../../doc/README.NTSecurity 0644 firebird firebird
+f none @prefix@/doc/README.optimizer=$SRCDIR/../../doc/README.Optimizer.txt 0644 firebird firebird
+f none @prefix@/doc/README.perforamance_monitoring=$SRCDIR/../../doc/README.performance_monitoring 0644 firebird firebird
+f none @prefix@/doc/README.raw_devices=$SRCDIR/../../doc/README.raw_devices 0644 firebird firebird
+f none @prefix@/doc/README.sha1=$SRCDIR/../../doc/README.sha1 0644 firebird firebird
+f none @prefix@/doc/README.trusted_authentication=$SRCDIR/../../doc/README.trusted_authentication 0644 firebird firebird
+f none @prefix@/doc/README.user=$SRCDIR/../../doc/README.user 0644 firebird firebird
+f none @prefix@/doc/README.user.embedded=$SRCDIR/../../doc/README.user.embedded 0644 firebird firebird
+f none @prefix@/doc/README.user.troubleshooting=$SRCDIR/../../doc/README.user.troubleshooting 0644 firebird firebird
+f none @prefix@/doc/README.Win32LibraryInstallation=$SRCDIR/../../doc/README.Win32LibraryInstallation.txt 0644 firebird firebird
+f none @prefix@/doc/README.xnet=$SRCDIR/../../doc/README.xnet 0644 firebird firebird
+
+# Service
+
+f none /@prefix@/gds_db-tcp.xml=$SRCDIR/../../builds/install/arch-specific/solaris/CS/gds_db-tcp.xml 0644 firebird firebird

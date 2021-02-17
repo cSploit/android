@@ -1,0 +1,80 @@
+This directory contains user application schema definitions for use
+with slapd(8).
+
+File                    Description
+----                    -----------
+collective.schema       Collective attributes (experimental)
+corba.schema            Corba Object
+core.schema             OpenLDAP "core"
+cosine.schema           COSINE Pilot
+duaconf.schema          Client Configuration (work in progress)
+dyngroup.schema			Dynamic Group (experimental)
+inetorgperson.schema    InetOrgPerson
+java.schema             Java Object
+misc.schema             Miscellaneous Schema (experimental)
+nadf.schema             North American Directory Forum (obsolete)
+nis.schema              Network Information Service (experimental)
+openldap.schema         OpenLDAP Project (FYI)
+ppolicy.schema          Password Policy Schema (work in progress)
+
+Additional "generally useful" schema definitions can be submitted
+using the OpenLDAP Issue Tracking System <http://www.openldap.org/its/>.
+Submissions should include a stable reference to a mature, open
+technical specification (e.g., an RFC) for the schema.
+
+The core.ldif and openldap.ldif files are equivalent to their
+corresponding .schema files. They have been provided as examples
+for use with the dynamic configuration backend. These example files
+are not actually necessary since slapd will automatically convert any
+included *.schema files into LDIF when converting a slapd.conf file
+to a configuration database, but they serve as a model of how to
+convert schema files in general.
+
+---
+
+This notice applies to all files in this directory.
+
+Copyright 1998-2014 The OpenLDAP Foundation, Redwood City, California, USA
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.  A copy of this license is available at
+http://www.OpenLDAP.org/license.html or in file LICENSE in the
+top-level directory of the distribution.
+
+---
+
+This notice applies to all schema in this directory which are derived
+from RFCs and other IETF documents.
+
+Portions Copyright 1991-2004, The Internet Society.  All Rights Reserved.
+
+This document and translations of it may be copied and furnished
+to others, and derivative works that comment on or otherwise explain
+it or assist in its implementation may be prepared, copied, published
+and distributed, in whole or in part, without restriction of any
+kind, provided that the above copyright notice and this paragraph  
+are included on all such copies and derivative works.  However,
+this document itself may not be modified in any way, such as by      
+removing the copyright notice or references to the Internet Society
+or other Internet organizations, except as needed for the  purpose
+of developing Internet standards in which case the procedures for
+copyrights defined in the Internet Standards process must be
+followed, or as required to translate it into languages other than
+English.
+
+The limited permissions granted above are perpetual and will not
+be revoked by the Internet Society or its successors or assigns.
+
+This document and the information contained herein is provided on
+an "AS IS" basis and THE AUTHORS, THE INTERNET SOCIETY, AND THE
+INTERNET ENGINEERING TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE
+OF THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY       
+IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR
+PURPOSE.
+
+
+---
+$OpenLDAP$

@@ -1,0 +1,29 @@
+dn: dc=example,dc=com
+objectclass: dcobject
+dc: example
+objectclass: organization
+o: Example, Inc.
+
+dn: cn=md5,dc=example,dc=com
+objectclass: person
+cn: md5
+sn: md5
+userpassword:: e01ENX1YcjRpbE96UTRQQ09xM2FRMHFidWFRPT0=
+
+dn: cn=smd5,dc=example,dc=com
+objectclass: person
+cn: smd5
+sn: smd5
+userpassword: secret
+
+dn: cn=sha,dc=example,dc=com
+objectclass: person
+cn: sha
+sn: sha
+userpassword:: e1NIQX01ZW42RzZNZXpScm9UM1hLcWtkUE9tWS9CZlE9
+
+dn: cn=ssha,dc=example,dc=com
+objectclass: person
+cn: ssha
+sn: ssha
+userpassword: secret

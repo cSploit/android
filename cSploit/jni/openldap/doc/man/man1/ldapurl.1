@@ -1,0 +1,168 @@
+.TH LDAPURL 1 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 2008-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldapurl \- LDAP URL formatting tool
+.SH SYNOPSIS
+.B ldapurl
+[\c
+.BR \-a \ attrs\fR]
+[\c
+.BI \-b \ searchbase\fR]
+[\c
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BI \-f \ filter\fR]
+[\c
+.BI \-H \ ldapuri\fR]
+[\c
+.BI \-h \ ldaphost\fR]
+[\c
+.BI \-p \ ldapport\fR]
+[\c
+.BR \-s \ { base \||\| one \||\| sub \||\| children }]
+[\c
+.BI \-S \ scheme\fR]
+.SH DESCRIPTION
+.I ldapurl
+is a command that allows to either compose or decompose LDAP URIs.
+.LP
+When invoked with the \fB\-H\fP option,
+.B ldapurl
+extracts the components of the \fIldapuri\fP option argument,
+unescaping hex-escaped chars as required.
+It basically acts as a frontend to the
+.BR ldap_url_parse (3)
+call.
+Otherwise, it builds an LDAP URI based on the components
+passed with the appropriate options, performing the inverse operation.
+Option \fB\-H\fP is incompatible with options
+.BR \-a ,
+.BR \-b ,
+.BR \-E ,
+.BR \-f ,
+.BR \-H ,
+.BR \-h ,
+.BR \-p ,
+.BR \-S ,
+and
+.BR \-s .
+.SH OPTIONS
+.TP
+.TP
+.BI \-a \ attrs
+Set a comma-separated list of attribute selectors.
+.TP
+.BI \-b \ searchbase
+Set the \fIsearchbase\fP.
+.TP
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+
+Specify general extensions with \fB\-e\fP
+\'\fB!\fP\' indicates criticality.
+
+General extensions:
+.nf
+  [!]assert=<filter>    (an RFC 4515 Filter)
+  !authzid=<authzid>    ("dn:<dn>" or "u:<user>")
+  [!]bauthzid           (RFC 3829 authzid control)
+  [!]chaining[=<resolve>[/<cont>]]
+  [!]manageDSAit
+  [!]noop
+  ppolicy
+  [!]postread[=<attrs>] (a comma-separated attribute list)
+  [!]preread[=<attrs>]  (a comma-separated attribute list)
+  [!]relax
+  sessiontracking[=<username>]
+  abandon,cancel,ignore (SIGINT sends abandon/cancel,
+  or ignores response; if critical, doesn't wait for SIGINT.
+  not really controls)
+.fi
+
+.TP
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+Set URL extensions; incompatible with
+.BR \-H .
+.TP
+.BI \-f \ filter
+Set the URL filter.  No particular check on conformity with RFC 4515
+LDAP filters is performed, but the value is hex-escaped as required.
+.TP
+.BI \-H \ ldapuri
+Specify URI to be exploded.
+.TP
+.BI \-h \ ldaphost
+Set the host.
+.TP
+.BI \-p \ ldapport
+Set the TCP port.
+.TP
+.BI \-S \ scheme
+Set the URL scheme.  Defaults for other fields, like \fIldapport\fP,
+may depend on the value of \fIscheme\fP.
+.TP
+.BR \-s \ { base \||\| one \||\| sub \||\| children }
+Specify the scope of the search to be one of
+.BR base ,
+.BR one ,
+.BR sub ,
+or
+.B children
+to specify a base object, one-level, subtree, or children search.
+The default is
+.BR sub .
+Note:
+.B children
+scope requires LDAPv3 subordinate feature extension.
+
+.SH OUTPUT FORMAT
+If the \fB\-H\fP option is used, the \fIldapuri\fP supplied
+is exploded in its components, which are printed to standard output
+in an LDIF-like form.
+.LP
+Otherwise, the URI built using the values passed with the other options
+is printed to standard output.
+.SH EXAMPLE
+The following command:
+.LP
+.nf
+    ldapurl \-h ldap.example.com \-b dc=example,dc=com \-s sub \-f "(cn=Some One)"
+.fi
+.LP
+returns
+.LP
+.nf
+    ldap://ldap.example.com:389/dc=example,dc=com??sub?(cn=Some%20One)
+.fi
+.LP
+The command:
+.LP
+.nf
+    ldapurl \-H ldap://ldap.example.com:389/dc=example,dc=com??sub?(cn=Some%20One)
+.fi
+.LP
+returns
+.LP
+.nf
+    scheme: ldap
+    host: ldap.example.com
+    port: 389
+    dn: dc=example,dc=com
+    scope: sub
+    filter: (cn=Some One)
+.fi
+.LP
+.SH DIAGNOSTICS
+Exit status is zero if no errors occur.
+Errors result in a non-zero exit status and
+a diagnostic message being written to standard error.
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR ldap_url_parse (3),
+.SH AUTHOR
+The OpenLDAP Project <http://www.openldap.org/>
+.SH ACKNOWLEDGEMENTS
+.so ../Project

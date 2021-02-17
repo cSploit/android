@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+<TITLE>Build procedure for MinGW compiler</TITLE>
+<META NAME="Generator" CONTENT="EditPlus">
+<META NAME="Author" CONTENT="">
+<META NAME="Keywords" CONTENT="">
+<META NAME="Description" CONTENT="">
+</HEAD>
+
+<BODY>
+<H2>MINGW Notes</H2>
+<hr/>
+First version: Mar 6 2003<br>
+Last Update: Mar 21 2010<br>
+Authors: Blas Rodriguez Somoza (blas at puertareal dot com), Dmitry Sibiryakov (aafemt at mail dot ru)<br>
+
+<h3>0.-Introduction</h3>
+<p>The MSYS/MINGW build was started with 1.5.x<p>
+<p>The only difference between the msvc build and the mingw build, is that the later one does not support the MS SEH exception handling. This means that some exceptions will not be catched and thus FB will abort.The sources using this exception handling are jrd/blob_filter.cpp, jrd/exe.cpp and jrd/fun.epp.</p>
+<p>This port is not maintained anymore.</p>
+
+<h3>1.-TODO</h3>
+<ul>
+<li>Support for ms SEH (superserver).</li>
+<li>Executable size problem. The executables are too great.
+(Partially solved by stripping symbols in production build.)</li>
+</ul>
+
+<h3>2.-INSTALLING MSYS and MINGW</h3>
+
+<p>The following packages from <a href="http://www.mingw.org">http://www.mingw.org</a> are needed</p>
+<p>MinGW
+<ul>
+<li>GCC 4.7.2 or better</li>
+</ul>
+</p>
+<p>MSYS
+<ul>
+<li>MSYS</li>
+<li>msysDTK</li>
+</ul>
+<p>If you intend to build an executable installer you will also need to download InnoSetup from <a href="http://www.jrsoftware.org/isdl.php">http://www.jrsoftware.org</a></p>
+<ul>
+<li>InnoSetup</li>
+<li>InnoSetup QuickStart Pack</li>
+</ul>
+</p>
+<p>STEPS TO INSTALL
+<ol>
+<li>Install MinGW, MSYS and msysDTK using appropriate instructions for each package.</li>
+<li>Optionally install Bison.</li>
+<li>Install InnoSetup and InnoSetup QuickStart Pack if you want to make a executable installer</li>
+</ol>
+</p>
+
+<h3>3.- BUILD PROCESS</h3>
+
+<ol>
+<li>Start msys with the icon.</li>
+<li>Go to the firebird root directory. For instance, if your root is d:\svn\firebird you must do cd /d/svn/firebird.</li>
+<li>Start configure with the switches to get super/classic and production/development build, for instance:<br>
+autogen.sh --enable-superserver<br>
+The valid switches for autogen are<br>
+--enable-superserver    Select superserver build, default classic build.<br>
+--enable-debug          Select debug build, default production build.<br>
+You can run ./configure --help to see full list of switches.
+</li>
+<li>Make the build. For instance if you want to get compiler messages isolated from make log<br> make &gt; make.log 2&gt;comp.log</li>
+<li>After the build finish, the firebird directory with the binaries is created as gen/firebird.</li>
+</ol>
+
+<p>You can use 'make clean' to delete files created during build process when you don't need them anymore. 'make clean_all' will do even more clean. :)</p>
+<p>BUILD NOTE:</p>
+<p>There is a bug in MinGW GCC (&lt;=3.2) related with MSVC format for 64bit integers. When the I64 format is used, the compiler throws warnings of two types:</p>
+<p>warning: [...] format, different type arg (arg 3)<br>
+or<br>
+warning: unknown conversion type character `I' in format<br>
+warning: too many arguments for format</p>
+
+<h3>4.- INSTALL.</h3>
+<p>To create an installable build you need to execute the InnoSetup script.</p>
+<ol>
+<li>Open firebird/builds/install/arch-specific/mingw/super/FirebirdInstall_15.iss with InnoSetup.</li>
+<li>Run the script with F9 or Run-&gt;Run</li>
+<li>Close InnoSetup</li>
+</ol>
+<p>A executable installer will be in firebird/builds/install/arch-specific/mingw/super/</p>
+<p>To install the build, simply run the resulting exe.</p>
+
+<h3>5.- TROUBLESHOOTING</h3>
+
+<p>AUTOGEN<p>
+<p>The autogen script creates an output file in the same directory where it is executed with the name config.out. If the autogen fails look at config.out first.</p>
+
+<p>Some permission problems, most probably related with the svn client, has been reported. If the autogen gives a permission related error, like<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;autom4te: cannot open configure: Permission denied<br><br>
+execute in the same directory:<br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&gt;chmod -R +uw *</p>
+</BODY>
+</HTML>

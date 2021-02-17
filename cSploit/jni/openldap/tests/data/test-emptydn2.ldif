@@ -1,0 +1,39 @@
+# geographical naming contexts
+dn: c=US
+objectClass: country
+c: US
+
+dn: o=Example,c=US
+objectClass: organization
+o: Example
+o: Example, Inc.
+
+dn: c=UK
+objectClass: country
+c: UK
+
+dn: o=Example,c=UK
+objectClass: organization
+o: Example
+o: Example, Ltd.
+
+dn: c=IT
+objectClass: country
+c: IT
+
+dn: o=Esempio,c=IT
+objectClass: organization
+o: Esempio
+o: Esempio S.p.A.
+o: Example
+
+dn: c=DE
+objectClass: country
+c: DE
+
+dn: o=Beispiel,c=DE
+objectClass: organization
+o: Beispiel
+o: Beispiel GmbH
+o: Example
+

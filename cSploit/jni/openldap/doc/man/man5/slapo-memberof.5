@@ -1,0 +1,129 @@
+.TH SLAPO-MEMBEROF 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation, All Rights Reserved.
+.\" Copying restrictions apply.  See the COPYRIGHT file.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-memberof \- Reverse Group Membership overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The
+.B memberof
+overlay to
+.BR slapd (8)
+allows automatic reverse group membership maintenance.
+Any time a group entry is modified, its members are modified as appropriate
+in order to keep a DN-valued "is member of" attribute updated with the DN
+of the group.
+
+.SH CONFIGURATION
+The config directives that are specific to the
+.B memberof
+overlay must be prefixed by
+.BR memberof\- ,
+to avoid potential conflicts with directives specific to the underlying 
+database or to other stacked overlays.
+
+.TP
+.B overlay memberof
+This directive adds the memberof overlay to the current database; see
+.BR slapd.conf (5)
+for details.
+
+.LP
+The following
+.B slapd.conf
+configuration options are defined for the memberof overlay.
+
+.TP
+.BI memberof\-group\-oc \ <group-oc>
+The value 
+.I <group-oc> 
+is the name of the objectClass that triggers the reverse group membership
+update.
+It defaults to \fIgroupOfNames\fP.
+
+.TP
+.BI memberof\-member\-ad \ <member-ad>
+The value 
+.I <member-ad> 
+is the name of the attribute that contains the names of the members
+in the group objects; it must be DN-valued.
+It defaults to \fImember\fP.
+
+.TP
+.BI memberof\-memberof\-ad \ <memberof-ad>
+The value 
+.I <memberof-ad> 
+is the name of the attribute that contains the names of the groups
+an entry is member of; it must be DN-valued.  Its contents are 
+automatically updated by the overlay.
+It defaults to \fImemberOf\fP.
+
+.TP
+.BI memberof\-dn \ <dn>
+The value 
+.I <dn> 
+contains the DN that is used as \fImodifiersName\fP for internal 
+modifications performed to update the reverse group membership.
+It defaults to the \fIrootdn\fP of the underlying database.
+
+.TP
+.BI "memberof\-dangling {" ignore ", " drop ", " error "}"
+This option determines the behavior of the overlay when, during 
+a modification, it encounters dangling references.
+The default is
+.IR ignore ,
+which may leave dangling references.
+Other options are
+.IR drop ,
+which discards those modifications that would result in dangling
+references, and
+.IR error ,
+which causes modifications that would result in dangling references
+to fail.
+
+.TP
+.BI memberof\-dangling\-error \ <error-code>
+If
+.BR memberof\-dangling
+is set to
+.IR error ,
+this configuration parameter can be used to modify the response code
+returned in case of violation.  It defaults to "constraint violation",
+but other implementations are known to return "no such object" instead.
+
+.TP
+.BI "memberof\-refint {" true "|" FALSE "}"
+This option determines whether the overlay will try to preserve
+referential integrity or not.
+If set to
+.IR TRUE ,
+when an entry containing values of the "is member of" attribute is modified,
+the corresponding groups are modified as well.
+
+.LP
+The memberof overlay may be used with any backend that provides full 
+read-write functionality, but it is mainly intended for use 
+with local storage backends. The maintenance operations it performs
+are internal to the server on which the overlay is configured and
+are never replicated. Replica servers should be configured with their
+own instances of the memberOf overlay if it is desired to maintain
+these memberOf attributes on the replicas.
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd (8).
+The
+.BR slapo\-memberof (5)
+overlay supports dynamic configuration via
+.BR back-config .
+.SH ACKNOWLEDGEMENTS
+.P
+This module was written in 2005 by Pierangelo Masarati for SysNet s.n.c.
+

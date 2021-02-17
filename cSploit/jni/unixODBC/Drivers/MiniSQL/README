@@ -1,0 +1,38 @@
+***************************************************************
+* This code is LGPL. You CAN make commercial solutions using  *
+* LGPL software.                                              *
+***************************************************************
+
++-------------------------------------------------------------+
+| unixODBC                                                    |
+| Driver for MiniSQL                                          |
++-------------------------------------------------------------+
+
+This driver is for use with the MiniSQL SQL Server Version 2.x.
+
+To build
+
+1. modify Config.mk as required
+2. make
+
+Compliance
+
+This driver is a work in progress which strives to meet 3.51
+CLI compliance. This driver currently implements a usefull set
+of;
+
+1. catalog functions via SQLColumns, SQLTables, SQLDescribeCol, SQLColAttribute
+2. alloc and free calls for Environment, Connection, and Statement
+3. connect via SQLConnect
+4. SQL execution via SQLPrepare, SQLExecute
+5. data retreival via SQLFetch, SQLBindCol, SQLGetData
+
+If you would like to improve this driver then please send
+me (Peter Harvey) an email.
+
++-------------------------------------------------------------+
+| Please vist;                                                |
+| www.codebydesign.com/unixODBC                               |
+| www.Hughes.com.au                                           |
++-------------------------------------------------------------+
+

@@ -1,0 +1,129 @@
+! FreeTDS - Library of routines accessing Sybase and Microsoft databases
+! Copyright (C) 2003  Craig A. Berry	craigberry@mac.com	05-MAY-2003
+! 
+! This library is free software; you can redistribute it and/or
+! modify it under the terms of the GNU Library General Public
+! License as published by the Free Software Foundation; either
+! version 2 of the License, or (at your option) any later version.
+! 
+! This library is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+! Library General Public License for more details.
+! 
+! You should have received a copy of the GNU Library General Public
+! License along with this library; if not, write to the
+! Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+! Boston, MA 02111-1307, USA.
+! 
+LIBODBCINST/SHAREABLE
+CASE_SENSITIVE=YES
+SYMBOL_VECTOR = (SQLAllocConnect=PROCEDURE,-
+		SQLAllocEnv=PROCEDURE,-
+		SQLAllocHandle=PROCEDURE,-
+		SQLAllocStmt=PROCEDURE,-
+		SQLBindCol=PROCEDURE,-
+		SQLBindParam=PROCEDURE,-
+		SQLBindParameter=PROCEDURE,-
+		SQLCancel=PROCEDURE,-
+		SQLCloseCursor=PROCEDURE,-
+		SQLColAttribute=PROCEDURE,-
+		SQLColAttributes=PROCEDURE,-
+		SQLColumnPrivileges=PROCEDURE,-
+		SQLColumns=PROCEDURE,-
+		SQLConnect=PROCEDURE,-
+		SQLCopyDesc=PROCEDURE,-
+		SQLDescribeCol=PROCEDURE,-
+		SQLDisconnect=PROCEDURE,-
+		SQLDriverConnect=PROCEDURE,-
+		SQLEndTran=PROCEDURE,-
+		SQLError=PROCEDURE,-
+		SQLExecDirect=PROCEDURE,-
+		SQLExecute=PROCEDURE,-
+		SQLExtendedFetch=PROCEDURE,-
+		SQLFetch=PROCEDURE,-
+		SQLFetchScroll=PROCEDURE,-
+		SQLForeignKeys=PROCEDURE,-
+		SQLFreeConnect=PROCEDURE,-
+		SQLFreeEnv=PROCEDURE,-
+		SQLFreeHandle=PROCEDURE,-
+		SQLFreeStmt=PROCEDURE,-
+		SQLGetConnectAttr=PROCEDURE,-
+		SQLGetConnectOption=PROCEDURE,-
+		SQLGetConnectOptionW=PROCEDURE,-
+		SQLGetCursorName=PROCEDURE,-
+		SQLGetData=PROCEDURE,-
+		SQLGetDescField=PROCEDURE,-
+		SQLGetDescRec=PROCEDURE,-
+		SQLGetDiagField=PROCEDURE,-
+		SQLGetDiagRec=PROCEDURE,-
+		SQLGetEnvAttr=PROCEDURE,-
+		SQLGetFunctions=PROCEDURE,-
+		SQLGetInfo=PROCEDURE,-
+		SQLGetStmtAttr=PROCEDURE,-
+		SQLGetStmtAttrW=PROCEDURE,-
+		SQLGetStmtOption=PROCEDURE,-
+		SQLGetTypeInfo=PROCEDURE,-
+		SQLGetTypeInfoW=PROCEDURE,-
+		SQLMoreResults=PROCEDURE,-
+		SQLNativeSql=PROCEDURE,-
+		SQLNumParams=PROCEDURE,-
+		SQLNumResultCols=PROCEDURE,-
+		SQLParamData=PROCEDURE,-
+		SQLParamOptions=PROCEDURE,-
+		SQLPrepare=PROCEDURE,-
+		SQLPrimaryKeys=PROCEDURE,-
+		SQLProcedureColumns=PROCEDURE,-
+		SQLProcedures=PROCEDURE,-
+		SQLPutData=PROCEDURE,-
+		SQLRowCount=PROCEDURE,-
+		SQLSetConnectAttr=PROCEDURE,-
+		SQLSetConnectOption=PROCEDURE,-
+		SQLSetConnectOptionW=PROCEDURE,-
+		SQLSetCursorName=PROCEDURE,-
+		SQLSetDescField=PROCEDURE,-
+		SQLSetDescRec=PROCEDURE,-
+		SQLSetEnvAttr=PROCEDURE,-
+		SQLSetParam=PROCEDURE,-
+		SQLSetPos=PROCEDURE,-
+		SQLSetScrollOptions=PROCEDURE,-
+		SQLSetStmtAttr=PROCEDURE,-
+		SQLSetStmtAttrW=PROCEDURE,-
+		SQLSetStmtOption=PROCEDURE,-
+		SQLSpecialColumns=PROCEDURE,-
+		SQLStatistics=PROCEDURE,-
+		SQLTablePrivileges=PROCEDURE,-
+		SQLTables=PROCEDURE,-
+		SQLTransact=PROCEDURE,-
+		SQLColAttributeW=PROCEDURE,-
+		SQLColumnPrivilegesW=PROCEDURE,-
+		SQLColumnsW=PROCEDURE,-
+		SQLConnectW=PROCEDURE,-
+		SQLDescribeColW=PROCEDURE,-
+		SQLDriverConnectW=PROCEDURE,-
+		SQLErrorW=PROCEDURE,-
+		SQLExecDirectW=PROCEDURE,-
+		SQLForeignKeysW=PROCEDURE,-
+		SQLGetConnectAttrW=PROCEDURE,-
+		SQLGetCursorNameW=PROCEDURE,-
+		SQLGetDescFieldW=PROCEDURE,-
+		SQLGetDescRecW=PROCEDURE,-
+		SQLGetDiagFieldW=PROCEDURE,-
+		SQLGetDiagRecW=PROCEDURE,-
+		SQLGetInfoW=PROCEDURE,-
+		SQLNativeSqlW=PROCEDURE,-
+		SQLPrepareW=PROCEDURE,-
+		SQLPrimaryKeysW=PROCEDURE,-
+		SQLProcedureColumnsW=PROCEDURE,-
+		SQLProceduresW=PROCEDURE,-
+		SQLSetConnectAttrW=PROCEDURE,-
+		SQLSetCursorNameW=PROCEDURE,-
+		SQLSetDescFieldW=PROCEDURE,-
+		SQLSpecialColumnsW=PROCEDURE,-
+		SQLStatisticsW=PROCEDURE,-
+		SQLTablePrivilegesW=PROCEDURE,-
+		SQLTablesW=PROCEDURE)
+)
+!
+!		SQLBrowseConnect=PROCEDURE,-
+!		SQLDescribeParam=PROCEDURE,-

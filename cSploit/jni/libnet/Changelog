@@ -1,0 +1,1 @@
+git --no-pager log --no-merges --pretty=format:' %x20%x20 - %s (%an)' `git tag | grep -v -- -rc | tail -n 1`..HEAD .

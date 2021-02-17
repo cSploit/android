@@ -1,0 +1,55 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+/****************************************************************************
+
+
+window.rh
+
+produced by Borland Resource Workshop
+
+
+*****************************************************************************/
+
+#define IDI_IBSVR_SMALL	1009
+
+/* Thi should be in sync with iscguard.rh */
+#define IDM_SHUTDOWN	5
+#define IDM_CANCEL	6
+#define IDM_OPEN	8
+#define IDM_OPENPOPUP	9
+#define IDM_PROPERTIES	10
+#define IDM_STARTUPCFG	11
+#define IDM_GUARDED	14
+
+/* Defines for String Table */
+#define IDS_PNP1		200
+#define IDS_PNP2		201
+#define IDS_PNP3		202
+#define IDS_QUIT1		203
+#define IDS_MAPERROR		204
+#define IDS_REGERROR		205
+#define IDS_LIC_BADFILE		206
+#define IDS_LIC_NOREMOTE	207
+#define IDS_LIC_NOLOCAL		208
+#define IDS_LIC_NOTHING		209
+#define IDS_PROPERTIES		210
+#define IDS_SHUTDOWN		212
+#define IDS_ALREADYSTARTED	213
+#define IDS_QUIT2		214

@@ -1,0 +1,237 @@
+MySQL Connector/C 6.1 - Release Notes / ChangeLog
+Copyright (c) 2013, Oracle and/or its affiliates. All rights reserved.
+ 
+Full release notes:
+http://dev.mysql.com/doc/relnotes/connector-c/en/
+  
+Changes in MySQL Connector/C 6.1.3 (2013-12-27)
+
+   Security Notes
+
+     * A new MYSQL_OPT_SSL_ENFORCE option is available for the
+       mysql_options() C API function to indicate whether to require
+       the connection to use SSL. If enabled, an encrypted connection
+       is attempted. If an encrypted connection cannot be
+       established, the connection attempt fails.
+       For more information, see mysql_options()
+       (http://dev.mysql.com/doc/refman/5.7/en/mysql-options.html).
+
+   Functionality Added or Changed
+
+     * Some dependencies between client-side plugin header files were
+       removed:
+
+          + The MYSQL_PLUGIN_EXPORT macro required by plugin
+            declarations is now declared directly in
+            mysql/client_plugin.h instead of getting the definition
+            from mysql/plugin.h. That macro was the only thing
+            required by client-side plugins and declared in
+            server-side header mysql/plugin.h, so including
+            mysql/client_plugin.h in an application no longer
+            requires the application to also include mysql/plugin.h.
+
+          + mysql/plugin_trace.h no longer uses C_MODE_START or
+            C_MODE_END. Consequently, including mysql/plugin_trace.h
+            in an application no longer requires the application to
+            also include my_global.h.
+       Applications might require mysql/plugin.h or my_global.h for
+       other reasons, of course. (Bug #17582168)
+
+     * A new mysql_get_option() C API function is available that
+       returns the current value of applicable mysql_options()
+       options. See mysql_get_option()
+       (http://dev.mysql.com/doc/refman/5.7/en/mysql-get-option.html)
+       .
+
+     * When a connection is returned to the thread pool plugin, the
+       connection thread context must be cleaned up. Previously, this
+       was done using COM_CHANGE_USER (which is like the
+       mysql_change_user() C API function). However, that operation
+       reauthenticates, which is unnecessary network roundtrip
+       overhead in this context.
+       Now it is possible for client connection state to be reset in
+       a more lightweight manner without causing reauthentication.
+       The API is exposed publicly through these changes:
+
+          + A new COM_RESET_CONNECTION protocol command (defined in
+            mysql_com.h)
+
+          + A new mysql_reset_connection() C API function
+
+          + A new resetconnection command for the mysql client
+       Resetting a connection has effects similar to
+       mysql_change_user() or an auto-reconnect except that the
+       connection is not closed and reopened, and reauthentication is
+       not done. See mysql_change_user()
+       (http://dev.mysql.com/doc/refman/5.6/en/mysql-change-user.html
+       )) and see Controlling Automatic Reconnection Behavior
+       (http://dev.mysql.com/doc/refman/5.6/en/auto-reconnect.html)).
+       For more information, see mysql_reset_connection()
+       (http://dev.mysql.com/doc/refman/5.7/en/mysql-reset-connection
+       .html) and mysql --- The MySQL Command-Line Tool
+       (http://dev.mysql.com/doc/refman/5.6/en/mysql.html).
+
+     * Connector/C is now included in MySQL Installer (Windows).
+
+     * Because there are new API functions (mysql_get_option(),
+       mysql_reset_connection()), the library ABI version is now
+       18.2. Shared library names now include 18.2 where appropriate.
+
+   Bugs Fixed
+
+     * It was not possible to build client-side plugins using
+       Connector/C because client_plugin.h referenced a macro defined
+       in the plugin.h file, which is not included in Connector/C
+       distributions. (Bug #17582228)
+       References: See also Bug #17582168.
+
+     * After the fix for Bug #16409270, it was not possible to
+       #include <mysql.h> following #include <windows.h>. (Bug
+       #17514554)
+
+     * Upgrading Connector/C using the 64-bit version of the Windows
+       MSI package occurred in the default folder because registry
+       search logic was hardcoded to use the 32-bit registry. (Bug
+       #17515067)
+
+     * A client crash occurred if mysql_set_server_option() or
+       several other C API functions were called before
+       mysql_real_connect(). (Bug #17338958)
+
+Changes in MySQL Connector/C 6.1.2 (2013-09-30)
+=====================================================================
+   Functionality Added or Changed
+
+     * The implementation of condition variables specific to Windows
+       XP and Windows Server 2003 was removed from the source code
+       because MySQL is not supported on those platforms as of MySQL
+       5.6.
+       Note
+       This change has the following implication: Previously,
+       Connector/C 6.1, while not officially supported on Windows XP
+       or Windows Server 2003, could be used on those platforms. This
+       is no longer possible.
+       (Bug #17332056)
+
+     * MySQL now supports the use of client-side plugins that
+       implement a trace of communication between a client and the
+       server that takes place using the client/server protocol.
+       Protocol trace plugins use the client plugin API (see Writing
+       Plugins
+       (http://dev.mysql.com/doc/refman/5.6/en/writing-plugins.html))
+       .
+       In Connector/C source distributions, a test protocol trace
+       plugin is implemented in the test_trace_plugin.cc file in the
+       libmysql directory. This can be examined as a guide to writing
+       other protocol trace plugins.
+
+     * Static libraries built with VS2008, VS2010, VS2012 are now
+       distributed as part of Connector/C packages for Windows: ZIP
+       and MSI. New directories named vs9, vs10, and vs11 located
+       under the lib directory contain static libraries and
+       corresponding pdb files built with VS2008, VS2010, and VS2012,
+       respectively.
+
+   Bugs Fixed
+
+     * The CLIENT_CONNECT_WITH_DB flag was improperly handled in the
+       C client library. This could lead to a malformed packet sent
+       to the server. (Bug #17351732)
+
+     * The mysql_real_connect() C API function could leak memory if
+       it failed. (Bug #17337684)
+
+     * The mysql_options() C API function could leak memory if called
+       more than once with the MYSQL_SET_CLIENT_IP option. (Bug
+       #17297012)
+
+     * The Connector/C MSI package was missing the following files:
+       ChangeLog, README, LICENSE, COPYING, INFO_SRC, INFO_BIN. (Bug
+       #17261526)
+
+     * The Connector/C RPM package was missing the following files:
+       INFO_SRC, INFO_BIN, my_print_defaults, perror. (Bug #17261610)
+
+     * On Windows, a MySQL client program that simply used #include
+       <mysql.h> could not be compiled due to missing Windows
+       declarations in that file. The same program would compile on
+       other platforms. (Bug #16409270)
+
+     * The libmysql.dll library was missing several symbols: my_init,
+       mysql_client_find_plugin, mysql_client_register_plugin,
+       mysql_load_plugin, mysql_load_plugin_v, and
+       mysql_plugin_options. (Bug #69204, Bug #16797982)
+
+Changes in MySQL Connector/C 6.1.1 (2013-08-05)
+=====================================================================
+   Functionality Added or Changed
+ 
+     * The C API libmysqlclient shared-library .so files now
+       have version 18.1.0 (up from version 18.0.0 used in
+       6.1.0). 18.1.0 can be used as a replacement for 18.0.0.
+       (Bug #16809055)
+ 
+   Bugs Fixed
+ 
+     * The mysql_options4 symbol was missing from libmysql.dll. (Bug
+       #69204, Bug #16797982)
+ 
+Changes in MySQL Connector/C 6.1.0 (2013-05-02, General Availability)
+=====================================================================
+   Functionality Added or Changed
+ 
+     * MySQL Connector/C 6.1 provides these features not present in
+       6.0:
+ 
+          + Support for the pluggable authentication framework that
+            enables implementation of authentication methods as
+            plugins. This framework can be used for MySQL native
+            authentication as well as external authentication
+            methods. See Pluggable Authentication
+            (http://dev.mysql.com/doc/refman/5.6/en/pluggable-authent
+            ication.html).
+ 
+          + Client-side support for the SHA-256, PAM, and Windows
+            native authentication plugins. See The SHA-256
+            Authentication Plugin
+            (http://dev.mysql.com/doc/refman/5.6/en/sha256-authentica
+            tion-plugin.html), The PAM Authentication Plugin
+            (http://dev.mysql.com/doc/refman/5.6/en/pam-authenticatio
+            n-plugin.html), and The Windows Native Authentication
+            Plugin
+            (http://dev.mysql.com/doc/refman/5.6/en/windows-authentic
+            ation-plugin.html).
+            The older MySQL Connector/C 6.0 can connect only to
+            accounts that use native MySQL passwords. If a client
+            program attempts to connect to an account that requires a
+            different authentication method, an "Access denied for
+            user" error occurs.
+ 
+          + Support for connecting to accounts that have expired
+            passwords. See Password Expiration and Sandbox Mode
+            (http://dev.mysql.com/doc/refman/5.6/en/password-expirati
+            on.html).
+ 
+          + Support for prepared CALL statements. This enables client
+            programs to handle stored procedures that produce
+            multiple result sets and to obtain the final value of OUT
+            and INOUT procedure parameters. See C API Support for
+            Prepared CALL Statements
+            (http://dev.mysql.com/doc/refman/5.6/en/c-api-prepared-ca
+            ll-statements.html).
+ 
+          + Support for connecting over IPv6. See IPv6 Support
+            (http://dev.mysql.com/doc/refman/5.6/en/ipv6-support.html
+            ).
+ 
+          + Support for binding client programs to a specific IP
+            address at connect time. See mysql_options()
+            (http://dev.mysql.com/doc/refman/5.6/en/mysql-options.htm
+            l).
+ 
+          + Support for specifying connection attributes to pass to
+            the server at connect time. See mysql_options()
+            (http://dev.mysql.com/doc/refman/5.6/en/mysql-options.htm
+            l), and mysql_options4()
+            (http://dev.mysql.com/doc/refman/5.6/en/mysql-options4.ht
+            ml).

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>set_verbose</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="configuration_reference.html" title="Appendix B. DB_CONFIG Parameter Reference" />
+    <link rel="prev" href="set_tx_max_parameter.html" title="set_tx_max" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">set_verbose</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="set_tx_max_parameter.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix B. DB_CONFIG Parameter Reference</th>
+          <td width="20%" align="right"> </td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="set_verbose_parameter"></a>set_verbose</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+            Enables/disables specific additional informational and debugging messages in the Berkeley DB message output.
+            </p>
+      <p>
+                The syntax of the entry in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file is a single
+                line with the string <code class="literal">set_verbose</code>, one or
+                more whitespace characters, the method flag parameter as a
+                string, optionally one or more whitespace characters and
+                the string <code class="literal">on</code> or <code class="literal">off</code>.
+                If the optional string is omitted, the default is
+                <code class="literal">on</code>.
+			</p>
+      <p>
+			For example:
+			</p>
+      <p>
+			</p>
+      <pre class="programlisting">set_verbose DB_VERB_RECOVERY</pre>
+      <p>
+			</p>
+      <p> or
+			</p>
+      <p>
+			 </p>
+      <pre class="programlisting">set_verbose DB_VERB_RECOVERY on</pre>
+      <p>
+			 </p>
+      <p>Enables display of additional information when performing recovery.</p>
+      <p>
+            </p>
+      <p> The method flag parameters are as follows:</p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>DB_VERB_DEADLOCK
+            </li>
+          <li>DB_VERB_FILEOPS
+            </li>
+          <li>DB_VERB_FILEOPS_ALL
+            </li>
+          <li>DB_VERB_RECOVERY
+            </li>
+          <li>DB_VERB_REGISTER
+            </li>
+          <li>DB_VERB_REPLICATION
+            </li>
+          <li>DB_VERB_REP_ELECT
+            </li>
+          <li>DB_VERB_REP_LEASE
+            </li>
+          <li>DB_VERB_REP_MISC
+            </li>
+          <li>DB_VERB_REP_MSGS
+            </li>
+          <li>DB_VERB_REP_SYNC
+            </li>
+          <li>DB_VERB_REP_SYSTEM
+            </li>
+          <li>DB_VERB_REPMGR_CONNFAIL
+            </li>
+          <li>DB_VERB_REPMGR_MISC
+            </li>
+          <li>DB_VERB_WAITSFOR
+            </li>
+        </ul>
+      </div>
+      <p>For more information, see <a class="xref" href="envset_verbose.html" title="DbEnv::set_verbose()">DbEnv::set_verbose()</a>. </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="set_tx_max_parameter.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="configuration_reference.html">Up</a>
+          </td>
+          <td width="40%" align="right"> </td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">set_tx_max </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

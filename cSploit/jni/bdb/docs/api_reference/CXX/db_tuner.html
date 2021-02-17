@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>db_tuner</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="utilities.html" title="Appendix A.  Berkeley DB Command Line Utilities" />
+    <link rel="prev" href="db_stat.html" title="db_stat" />
+    <link rel="next" href="db_upgrade.html" title="db_upgrade" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">db_tuner</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="db_stat.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix A. 
+                Berkeley DB Command Line Utilities
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="db_upgrade.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="db_tuner"></a>db_tuner</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">db_tuner [-c cachesize] -d file [-h home] [-s database] [-v]  </pre>
+      <p>
+   The <span class="command"><strong>db_tuner</strong></span> utility analyzes the data in a btree database, and suggests a page size that is likely to deliver optimal operation.
+ </p>
+      <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+        <h3 class="title">Note</h3>
+        <p>
+ The <span class="command"><strong>db_tuner</strong></span> utility assumes that databases are compacted when analysing the data. The analysis is based on a static view of the data and the data access and update patterns are not take into account. 
+ </p>
+      </div>
+      <p>
+   The options are as follows:
+ </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+       <span class="bold"><strong>-c</strong></span>
+     </p>
+            <p>
+    Specify a value of the cachesize, otherwise, the default value will
+        be set.
+     </p>
+          </li>
+          <li>
+            <p>
+       <span class="bold"><strong>-d</strong></span> 
+     </p>
+            <p>
+    Display database statistics for the specified file. If the database contains multiple databases and the -s flag is not specified, the statistics are for the internal database that describes the other databases the file contains, and not for the file as a whole. 
+     </p>
+          </li>
+          <li>
+            <p>
+       <span class="bold"><strong>-h</strong></span> 
+     </p>
+            <p>
+    Specify a home directory for the database environment. 
+     </p>
+          </li>
+          <li>
+            <p>
+       <span class="bold"><strong>-s</strong></span> 
+     </p>
+            <p>
+    Display page size recommendation for the specified database contained in the file specified with the -d flag.
+     </p>
+          </li>
+          <li>
+            <p>
+       <span class="bold"><strong>-v</strong></span>
+     </p>
+            <p>
+    Display verbose information. 
+     </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="db_stat.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="utilities.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="db_upgrade.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">db_stat </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> db_upgrade</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

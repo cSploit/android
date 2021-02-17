@@ -1,0 +1,41 @@
+#!/bin/sh
+#
+# ipx       Bring up/down IPX networking
+#
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+. /etc/sysconfig/network
+. /etc/sysconfig/ipx
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+
+# See how we were called.
+case "$1" in
+  start)
+	if [ ${IPX_CONFIGURED} = "yes" ]; then
+		if [ ${IPX_INTERNAL_NET} = "yes" ]; then
+			/sbin/ipx_internal_net add ${IPX_NETNUM}
+		else
+			/sbin/ipx_interface add -p ${IPX_DEVICE} \
+				${IPX_FRAME} ${IPX_NETNUM}
+		fi
+	fi
+	ipx_configure \
+		--auto_primary=${IPX_AUTO_PRIMARY} \
+		--auto_interface=${IPX_AUTO_INTERFACE}
+        touch /var/lock/subsys/ipx
+        ;;
+  stop)
+	ipx_configure --auto_primary=off --auto_interface=off
+	ipx_interface delall
+        rm -f /var/lock/subsys/ipx
+        ;;
+  *)
+        echo "Usage: network {start|stop}"
+        exit 1
+esac
+
+exit 0

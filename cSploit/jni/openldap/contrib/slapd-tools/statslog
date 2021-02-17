@@ -1,0 +1,171 @@
+#!/usr/bin/perl -w
+# statslog - Rearrange and output selected parts of slapd's statslog output.
+# $OpenLDAP$
+# This work is part of OpenLDAP Software <http://www.openldap.org/>.
+#
+# Copyright 1998-2014 The OpenLDAP Foundation.
+# Portions Copyright 2004 Hallvard B. Furuseth.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted only as authorized by the OpenLDAP
+# Public License.
+#
+# A copy of this license is available in the file LICENSE in the
+# top-level directory of the distribution or, alternatively, at
+# <http://www.OpenLDAP.org/license.html>.
+
+sub usage {
+    die join("", @_, <<'EOM');
+Usage: statslog [options] [logfiles; may be .gz or .bz2 files]
+
+  Output selected parts of slapd's statslog output (LDAP request/response
+  log to syslog or stderr; loglevel 256), grouping log lines by LDAP
+  connection.  Lines with no connection are excluded by default.
+
+Options:
+  --brief       -b      Brief output (omit time, host/process name/ID).
+  --exclude=RE  -e RE   Exclude connections whose output matches REgexp.
+  --include=RE  -i RE   Only include connections matching REgexp.
+  --EXCLUDE=RE  -E RE   Case-sensitive '--exclude'.
+  --INCLUDE=RE  -I RE   Case-sensitive '--include'.
+  --loose       -l      Include "loose" lines (lines with no connection).
+  --no-loose    -L RE   Only exclude the "loose" lines that match RE.
+  --join        -j      Join the inputs as if they were one big log file.
+                        Each file must start where the previous left off.
+  --no-join     -J      Do not --join.  (Can be useful with --sort.)
+  --sort        -s      Sort input files by age.     Implies --join.
+  --trace       -t      Print file names when read.  Implies --no-join.
+All --exclude/include options are applied.  Note: --exclude/include are
+unreliable without --join/sort for connections spanning several log files.
+EOM
+}
+
+########################################################################
+
+use bytes;
+use strict;
+use Getopt::Long;
+
+# Globals
+my %conns;			# Hash (connection number -> output)
+my @loose;			# Collected output with no connection number
+
+# Command line options
+my($brief, @filters, @conditions, $no_loose);
+my($join_files, $sort_files, $trace, $getopt_ok);
+
+# Handle --include/INCLUDE/exclude/EXCLUDE options
+sub filter_opt {
+    my($opt, $regexp) = @_;
+    push(@conditions, sprintf('$lines %s /$filters[%d]/om%s',
+			      (lc($opt) eq 'include' ? "=~" : "!~"),
+			      scalar(@filters),
+			      ($opt eq lc($opt) ? "i" : "")));
+    push(@filters, $regexp);
+}
+
+# Parse options at compile time so some can become constants to optimize away
+BEGIN {
+    &Getopt::Long::Configure(qw(bundling no_ignore_case));
+    $getopt_ok = GetOptions("brief|b"		=> \$brief,
+			    "include|i=s"	=> \&filter_opt,
+			    "exclude|e=s"	=> \&filter_opt,
+			    "INCLUDE|I=s"	=> \&filter_opt,
+			    "EXCLUDE|E=s"	=> \&filter_opt,
+			    "join|j"		=> \$join_files,
+			    "no-join|J"		=> sub { $join_files = 0; },
+			    "sort|s"		=> \$sort_files,
+			    "loose|l"		=> sub { $no_loose = ".^"; },
+			    "no-loose|L=s"	=> \$no_loose,
+			    "trace|t"		=> \$trace);
+}
+usage() unless $getopt_ok;
+usage("--trace is incompatible with --join.\n") if $trace && $join_files;
+
+$join_files = 1 if !defined($join_files) && $sort_files && !$trace;
+use constant BRIEF => !!$brief;
+use constant LOOSE => defined($no_loose) && ($no_loose eq ".^" ? 2 : 1);
+
+# Build sub out(header, connection number) to output one connection's data
+my $out_body = (LOOSE
+		? ' if (@loose) { print "\n", @loose; @loose = (); } '
+		: '');
+$out_body .= ' print "\n", $_[0], $lines; ';
+$out_body = " if (" . join("\n && ", @conditions) . ") {\n$out_body\n}"
+    if @conditions;
+eval <<EOM;
+sub out {
+    my \$lines = delete(\$conns{\$_[1]});
+    $out_body
+}
+1;
+EOM
+die $@ if $@;
+
+# Read and output log lines from one file
+sub do_file {
+    local(@ARGV) = @_;
+    my($conn, $line, $act);
+    while (<>) {
+	if (BRIEF
+	    ? (($conn, $line, $act) = /\bconn=(\d+) (\S+ (\S+).*\n)/)
+	    : (($conn,        $act) = /\bconn=(\d+) \S+ (\S+)/      )) {
+	    $conns{$conn} .= (BRIEF ? $line : $_);
+	    out("", $conn) if $act eq 'closed';
+	} elsif (LOOSE && (LOOSE > 1 || !/$no_loose/omi)) {
+	    s/^\w{3} [ \d]+:\d\d:\d\d [^:]*: // if BRIEF;
+	    push(@loose, $_);
+	}
+    }
+    final() unless $join_files;
+}
+
+# Output log lines for unfinished connections
+sub final {
+    if (%conns) {
+	for my $conn (sort keys %conns) {
+	    out("UNFINISHED:\n", $conn);
+	}
+	die if %conns;
+    }
+    if (LOOSE && @loose) { print "\n", @loose; @loose = (); }
+}
+
+# Main program
+if (!@ARGV) {
+    # Read from stdin
+    do_file();
+} else {
+    if ($sort_files && @ARGV > 1) {
+	# Sort files by last modified time; oldest first
+	my @fileinfo;
+	for my $file (@ARGV) {
+	    my $age = -M $file;
+	    if (defined($age)) {
+		push(@fileinfo, [$age, $file]);
+	    } else {
+		print STDERR "File not found: $file\n";
+	    }
+	}
+	exit(1) unless @fileinfo;
+	@ARGV = map { $_->[1] } sort { $b->[0] <=> $a->[0] } @fileinfo;
+    }
+
+    # Prepare to pipe .gz, .bz2 and .bz files through gunzip or bunzip2
+    my %type2prog = ("gz" => "gunzip", "bz2" => "bunzip2", "bz" => "bunzip2");
+    for (@ARGV) {
+	if (/\.(gz|bz2?)$/) {
+	    my $type = $1;
+	    die "Bad filename: $_\n" if /^[+-]|[^\w\/.,:%=+-]|^$/;
+	    $_ = "$type2prog{$type} -c $_ |";
+	}
+    }
+
+    # Process the files
+    for my $file (@ARGV) {
+	print "\n$file:\n" if $trace;
+	do_file($file);
+    }
+}
+final();

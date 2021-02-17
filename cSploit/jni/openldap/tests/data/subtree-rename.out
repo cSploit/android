@@ -1,0 +1,97 @@
+# Searching all database (after add)...
+dn: ou=Another parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Another parent
+
+dn: ou=Child,ou=Parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Child
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Grandchild,ou=Child,ou=Parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Grandchild
+
+dn: ou=Parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Parent
+
+# Searching all database (after PASS1)...
+dn: ou=Another parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Another parent
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Grandchild,ou=Renamed child,ou=Parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Grandchild
+
+dn: ou=Parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Parent
+
+dn: ou=Renamed child,ou=Parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Child
+ou: Renamed child
+
+# Searching all database (after PASS2)...
+dn: ou=Another parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Another parent
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Grandchild,ou=Renamed child,ou=Renamed parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Grandchild
+
+dn: ou=Renamed child,ou=Renamed parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Child
+ou: Renamed child
+
+dn: ou=Renamed parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Parent
+ou: Renamed parent
+
+# Searching all database (after PASS3)...
+dn: ou=Another parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Another parent
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Grandchild,ou=Renamed child,ou=Another parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Grandchild
+
+dn: ou=Renamed child,ou=Another parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Child
+ou: Renamed child
+
+dn: ou=Renamed parent,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Parent
+ou: Renamed parent
+

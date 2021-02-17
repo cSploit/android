@@ -1,0 +1,45 @@
+This is a VERY stupid packet sniffer for IPX ethernet packets.
+
+ =============================================
+ ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+ ! ! !  S E C U R I T Y   W A R N I N G  ! ! !
+ ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !
+ =============================================
+
+If you are using unencrypted passwords, and use this tool to send a
+dump to somebody else or store it on a computer, you might very well
+store passwords there. So, be VERY careful! This is exactly the kind
+of tools Novell designed the encrypted passwords for (or against).
+
+
+
+I hacked it together to be able to help people with problems with
+ncpfs. The socket handling was taken from Statnet-2.0.
+
+You can use it to watch commercial NetWare clients when they talk to
+servers. I divided the program into 2 parts, ipxdump and ipxparse.
+
+ipxdump simply pumps all the IPX frames it receives to stdout.
+
+If you use ipxdump to watch a workstation, you can use the simple
+filter function ipxdump provides. You can call ipxdump with the node
+address of the workstation you want to watch. This way only the
+packets this workstation sends and receives are monitored. As an
+example, I call ipxdump as
+
+  ./ipxdump 00001B038B11
+
+to look at my 286/10MHz test 'workstation'. ipxdump still generates
+huge amounts of data, so you should be very careful to start it just
+before you perform the operation (such as file creation for OS/2
+clients with NW4.1 as a server, or a 'dir' on a directory with long
+and short file names, or an encrypted password change ;-)) and stop it
+directly after that. And, please gzip -9 and uuencode it before you
+send it to anybody.
+
+ipxparse will eventually take apart the dump that ipxdump
+generates. They can as well be used in a pipe. Currently ipxparse does
+not do anything sensible, but that will definitely change.
+
+Volker Lendecke
+<lendecke@namu01.gwdg.de>

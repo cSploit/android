@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_ENV-&gt;txn_applied()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 10.  Replication Methods" />
+    <link rel="prev" href="dbsite_close.html" title="DB_SITE-&gt;close()" />
+    <link rel="next" href="txnset_commit_token.html" title="DB_TXN-&gt;set_commit_token()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_ENV-&gt;txn_applied()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbsite_close.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 10. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="txnset_commit_token.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envtxn_applied"></a>DB_ENV-&gt;txn_applied()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB_ENV-&gt;txn_applied(DB_ENV *env, DB_TXN_TOKEN *token, 
+                    db_timeout_t timeout, u_int32_t flags);  </pre>
+      <p>
+        The <code class="methodname">DB_ENV-&gt;txn_applied()</code> method checks to
+        see if a specified transaction has been replicated from the master
+        of a replication group. It may be called by applications using
+        either the Base API or the Replication Manager.
+    </p>
+      <p>
+        If the transaction has not yet arrived, this method will block for
+        the amount of time specified on the <code class="literal">timeout</code>
+        parameter while it waits for the result to be determined.  For more
+        information, please refer to the
+        <a href="../../programmer_reference/rep_ryw.html" class="olink">Read your writes consistency</a>
+        section in the <em class="citetitle">Berkeley DB Programmer's Reference Guide</em>.
+    </p>
+      <p>
+        The <code class="methodname">DB_ENV-&gt;txn_applied()</code> method may not be
+        called before the <a class="xref" href="envopen.html" title="DB_ENV-&gt;open()">DB_ENV-&gt;open()</a>
+        method.
+    </p>
+      <p>
+        The <code class="methodname">DB_ENV-&gt;txn_applied()</code> method returns a
+        non-zero error on failure and 0 to indicate that the specified
+        transaction has been applied at the local site. It may also return
+        one of the following non-zero return codes:
+    </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                <code class="literal">DB_TIMEOUT</code>
+            </p>
+            <p>
+                 Returned if the specified transaction has not yet arrived
+                 at the calling site, but can be expected to arrive soon.
+                 If a non-zero timeout parameter is given, the this method
+                 always waits for the specified amount of time before
+                 returning <code class="literal">DB_TIMEOUT</code>.
+            </p>
+          </li>
+          <li>
+            <p>
+                <code class="literal">DB_NOTFOUND</code>
+            </p>
+            <p>
+                Returned if the transaction is expected to never arrive.
+                This occurs if the transaction has not been applied at the
+                local site because the transaction has been rolled back due
+                to a change of master.
+            </p>
+          </li>
+        </ul>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp54605384"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp54602640"></a>token</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 A pointer to a buffer containing a copy of a commit token
+                 previously generated at the replication group's master 
+                 environment. Commit tokens are created using the 
+                 <a class="xref" href="txnset_commit_token.html" title="DB_TXN-&gt;set_commit_token()">DB_TXN-&gt;set_commit_token()</a>
+                 method.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp54610648"></a>timeout</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 Specifies the maximum time to wait for the transaction to
+                 arrive by replication, expressed in microseconds.  
+                 To check the status of the transaction
+                 without waiting, provide a timeout value of 0.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp54617816"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 The <span class="bold"><strong>flags</strong></span> parameter is
+                 currently unused, and must be set to 0.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp54611856"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DB_ENV-&gt;txn_applied()</code> <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp54601512"></a>DB_KEYEMPTY</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The specified token was generated by a transaction that did
+                not modify the database environment (for example, a read-only
+                transaction).
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp54598752"></a> DB_LOCK_DEADLOCK</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                While waiting for the result to be determined, the API
+                became locked out due to replication role change and/or
+                master/client synchronization.  The application should
+                abort in-flight transactions, pause briefly, and then
+                retry.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp54621480"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If the database environment was not already opened; or if
+                the specified token was generated from a non-replicated
+                database environment.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp54614016"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                 <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a> 
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp54600864"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    <a class="xref" href="txn.html#txnlist" title="Transaction Subsystem and Related Methods">Transaction Subsystem and Related Methods</a>,
+                    <a class="xref" href="rep.html#replist" title="Replication and Related Methods">Replication and Related Methods</a>
+                </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbsite_close.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="txnset_commit_token.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_SITE-&gt;close() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_TXN-&gt;set_commit_token()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

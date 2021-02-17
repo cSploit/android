@@ -1,0 +1,65 @@
+.TH NWGETOBJECTCONNECTIONNUMBERS 3NCP 04/13/1999 "libncp (>= 2.2.0.14)"
+.\" Netware Calls Library
+.SH NAME
+NWGetObjectConnectionNumbers \- Retrieve connection list of specified object
+.SH SYNOPSIS
+.B #include <nwcalls.h>
+
+.BI "NWCCODE NWGetObjectConnectionNumbers(NWCONN_HANDLE " conn ", const char* " name ","
+.BI "nuint16 " type ", size_t* " noOfReturnedConns ","
+.BI "NWCONN_NUM* " connList ", size_t " maxConns ");"
+
+.SH DESCRIPTION
+This function retrieves connection list of specified object from server.
+
+.B conn
+.RS 3
+\fBconn\fP contains connection handle obtained from \fIncp_open\fP(3ncp) or
+\fINWParsePath\fP(3ncp).
+.RE
+
+.B name
+.RS 3
+\fBname\fP contains bindery object name. Wildcards are not supported.
+Must not be \fINULL\fP.
+.RE
+
+.B type
+.RS 3
+\fBtype\fP contains bindery object type. \fINCP_BINDERY_USER\fP should
+be specified in most cases.
+.RE
+
+.B noOfReturnedConns
+.RS 3
+\fBnoOfReturnedConns\fP contains number of returned connections. It may
+be \fINULL\fP, there is no reason for pass \fINULL\fP into this function.
+.RE
+
+.B connList
+.RS 3
+\fBconnList\fP is array for returned connection numbers. It may be
+\fINULL\fP, in this case, only \fInoOfReturnedConns\fP is returned.
+.RE
+
+.B maxConns
+.RS 3
+\fBmaxConns\fP holds maximum number of returned connections. \fBconnList\fP
+must be \fINULL\fP or large enough for 
+.BI maxConns " * sizeof(" NWCONN_NUM ")"
+bytes.
+.RE
+
+.SH "RETURN VALUE"
+Function returns \fBzero\fP on success and \fBnon-zero\fP on failure.
+If specified object does not exist, success is returned and 
+\fInoOfReturnedConns\fP is set to \fBzero\fP.
+
+See \fInwerrors\fP(3ncp) for complete list of  error codes.
+
+
+.SH BUGS
+None known.
+
+.SH SEE ALSO
+.BR "nwerrors" (3ncp) ", NWGetConnListFromObject" (3ncp)

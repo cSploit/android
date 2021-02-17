@@ -1,0 +1,27 @@
+***************************************************************
+* This code is LGPL. You CAN make commercial solutions using  *
+* LGPL software. This software is a LinuxODBC component and   *
+* may NOT be distributed seperately.                          *
+*                                                             *
+* Peter Harvey 21.FEB.99 pharvey@codebydesign.com             *
+***************************************************************
+
++-------------------------------------------------------------+
+| LinuxODBC                                                   |
+| Driver Config template                                      |
++-------------------------------------------------------------+
+
+A Driver Config is too simple. So simple in fact
+that it would be pointless to create a real template.
+
+So go to a working Driver Config and check it out. I
+recommend starting with;
+
+1. drvcfg1 - basics for an SQL Server type data source
+2. drvcfg2 - basics for a File type data source
+
+Enjoy...
+
+Peter Harvey
+pharvey@codebydesign.com
+25.FEB.99

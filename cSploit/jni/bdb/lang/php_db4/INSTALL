@@ -1,0 +1,94 @@
+Build and installation instructions for Berkeley DB PHP support
+on Linux or *nix machines.  Note that while it is still called "db4" these
+instructions apply to Berkeley DB 5.x as well.
+
+Prerequisites
+-------------
+
+1. This module and instructions require that Berkeley DB be configured and 
+built using --enable-cxx to enable C++. It is assumed that this has been
+done.
+
+2. PHP must be installed on the machine along with the PHP development
+environment which includes header files and tools such as "phpize."
+
+Basic build
+-----------
+
+To install this php module execute the following steps:
+
+$ phpize
+$ ./configure --with-db4=<path-to-BDB-installation-directory>
+  (e.g. ./configure --with-db4=/usr/local/BerkeleyDB.5.1)
+$ make
+$ su -
+$ make install
+
+If you are using the Apache PHP module, see instructions below.
+If you are using the CLI (command line interface) to PHP, add this to
+the php.ini file you use:
+
+extension=db4.so
+
+See examples in the "samples" directory.  The samples create their data in
+/var/tmp by default and the transaction_counter.php example requires 
+that /var/tmp/dbhome exist. The samples can be edited to change these 
+requirements.
+
+Apache 2 Configuration
+----------------------
+
+Most users will use PHP in a web server module, typically Apache.  These
+are the steps you'll need to use to allow Berkeley DB PHP scripts to run
+inside the PHP module for Apache 2.  Because installation among
+machines varies your specific commands will likely be different.  This 
+is an example of how it can work.
+
+1. Install and get running Apache 2 with a working PHP module.
+
+This can be done by building PHP from source or by using prebuilt modules 
+available for most *nix machines (easier).  These instructions tell you 
+how to do this from source:
+      http://php.net/manual/en/install.php
+
+Here's how you might use installation packages (e.g. on Ubuntu).  This 
+approach is simpler than building from scratch.  The packages
+may already be installed on your system.  Other Linux distributions use
+different package tools (e.g. rpm, yum, etc) for installation.  
+Permission to do these operations is assumed:
+
+$ apt-get install apache2  (the web server)
+$ apt-get install libapache2-mod-php5  (the PHP module)
+$ apt-get install php5-dev  (this is needed for the Berkeley DB build)
+
+At this point you need to verify that (1) your web server is working and
+(2) you can run PHP (*.php) scripts.  Do that before attempting to use
+Berkeley DB.  This can be done by copying a simple php script to your
+web site and running it.
+
+2. Build Berkeley DB support for PHP (see instructions above).  Be
+sure to "make install" as well.  The php.ini file portion can be ignored 
+for this configuration.
+
+3. Determine the locations of:
+   a.  the php.ini file for the PHP module.  For example it may be in
+   /etc/php5/apache2 if you installed binaries on Ubuntu.
+   b.  the root of your web site.  This may be /var/www or wherever it
+   was configured for your server.
+
+4. Add this line to the php.ini file:
+extension=db4.so
+
+5. Restart the web server (e.g. apache2ctl restart)
+
+6. Try out a simple Berkeley DB script.
+   a.  copy <db-x.y.z>/lang/php_db4/samples/simple_counter.php to your web
+   site.
+   b.  run it.  For example, if it's in the root directory:
+       http://<path-to-server>/simple_counter.php
+   Refresh your page to see the counter increment.
+
+   This example creates a database in /var/tmp.  It can be modified to 
+   change the location of the database.
+
+

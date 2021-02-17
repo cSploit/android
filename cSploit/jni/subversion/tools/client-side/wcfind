@@ -1,0 +1,81 @@
+#!/bin/sh
+
+# ------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+# ------------------------------------------------------------
+
+# Copyright 2007 Max Bowsher
+# Licensed under the terms Subversion ships under
+
+# Runs the 'find' program, with arguments munged such that '.svn' or 'CVS'
+# working copy administrative directories and their contents are ignored.
+
+optspaths=
+expropts=
+exproptarg=
+exprmain=
+depth=
+somethingseen=
+phase=optspaths
+print=-print
+for option in "$@"; do
+    if [ "$phase" = "optspaths" ]; then
+        case $option in
+            -H|-L|-P) ;;
+            -*|"("*|")"*|,*|!*) phase=exprmain ;;
+            *) ;;
+        esac
+    fi
+    if [ "$exproptarg" = "yes" ]; then
+        exproptarg=
+        phase=expropts
+    fi
+    if [ "$phase" = "exprmain" ]; then
+        case $option in
+            -depth|-d) depth=yes ;;
+            -delete|-exec|-exec|-execdir|-execdir|-fls|-fprint|-fprint0 \
+            |-fprintf|-ok|-print|-okdir|-print0|-printf|-quit|-ls) print= ;;
+        esac
+        case $option in
+            -depth|-d|-noleaf|-mount|-xdev|-warn|-nowarn \
+            |-ignore_readdir_race|-noignore_readdir_race) phase=expropts ;;
+            -maxdepth|-mindepth|-regextype) phase=expropts; exproptarg=yes ;;
+            -follow|-daystart) ;;
+            *) somethingseen=yes
+        esac
+    fi
+    eval "$phase=\"\$$phase \\\"$option\\\"\""
+    if [ "$phase" = "expropts" ]; then
+        phase=exprmain
+    fi
+done
+
+if [ -z "$somethingseen" ]; then
+    exprmain="$exprmain -print"
+    print=
+fi
+
+if [ "$depth" = "yes" ]; then
+    eval find $optspaths $expropts \
+    -regex \''.*/\.svn'\' -o -regex \''.*/\.svn/.*'\' \
+    -o -regex \''.*/CVS'\' -o -regex \''.*/CVS/.*'\' \
+    -o '\(' $exprmain '\)' $print
+else
+    eval find $optspaths $expropts '\(' -name .svn -o -name CVS '\)' -prune \
+    -o '\(' $exprmain '\)' $print
+fi

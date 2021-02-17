@@ -1,0 +1,38 @@
+# $OpenLDAP$
+# $Id: ldapns.schema,v 1.3 2009-10-01 19:17:20 tedcheng Exp $
+# LDAP Name Service Additional Schema
+# http://www.iana.org/assignments/gssapi-service-names
+
+#
+# Not part of the distribution: this is a workaround!
+#
+
+attributetype ( 1.3.6.1.4.1.5322.17.2.1 NAME 'authorizedService'
+          DESC 'IANA GSS-API authorized service name'
+          EQUALITY caseIgnoreMatch
+          SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+attributetype ( 1.3.6.1.4.1.5322.17.2.2 NAME 'loginStatus'
+          DESC 'Currently logged in sessions for a user'
+          EQUALITY caseIgnoreMatch
+          SUBSTR caseIgnoreSubstringsMatch
+          ORDERING caseIgnoreOrderingMatch
+          SYNTAX OMsDirectoryString )
+
+objectclass ( 1.3.6.1.4.1.5322.17.1.1 NAME 'authorizedServiceObject'
+          DESC 'Auxiliary object class for adding authorizedService attribute'
+          SUP top
+          AUXILIARY
+          MAY authorizedService )
+
+objectclass ( 1.3.6.1.4.1.5322.17.1.2 NAME 'hostObject'
+          DESC 'Auxiliary object class for adding host attribute'
+          SUP top
+          AUXILIARY
+          MAY host )
+
+objectclass ( 1.3.6.1.4.1.5322.17.1.3 NAME 'loginStatusObject'
+          DESC 'Auxiliary object class for login status attribute'
+          SUP top
+          AUXILIARY
+          MAY loginStatus )

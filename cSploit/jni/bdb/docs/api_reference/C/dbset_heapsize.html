@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB-&gt;set_heapsize()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="db.html" title="Chapter 2.  The DB Handle" />
+    <link rel="prev" href="dbset_h_nelem.html" title="DB-&gt;set_h_nelem()" />
+    <link rel="next" href="dbset_heap_regionsize.html" title="DB-&gt;set_heap_regionsize()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB-&gt;set_heapsize()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbset_h_nelem.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 2. 
+                The DB Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbset_heap_regionsize.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbset_heapsize"></a>DB-&gt;set_heapsize()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB-&gt;set_heapsize(DB *db,
+    u_int32_t gbytes, u_int32_t bytes, u_int32_t flags);  </pre>
+      <p>
+        Sets the maximum on-disk database file size used by a database
+        configured to use the Heap access method. If this method is never
+        called, the database's file size can grow without bound. If this
+        method is called, then the heap file can never grow larger than the
+        limit defined by this method. In that case, attempts to update or
+        create records in a Heap database that has reached its maximum size
+        will result in a <code class="literal">DB_HEAP_FULL</code> error return.
+    </p>
+      <p>
+        The size specified to this method must be at least three times the
+        database page size. That is, a Heap database must contain at least
+        three database pages. You can set the database page size using the 
+        <a class="xref" href="dbset_pagesize.html" title="DB-&gt;set_pagesize()">DB-&gt;set_pagesize()</a>
+        method.
+    </p>
+      <p>
+         The <code class="methodname">DB-&gt;set_heapsize()</code> method may not be
+         called after the <a class="xref" href="dbopen.html" title="DB-&gt;open()">DB-&gt;open()</a>
+         method is called. Further, if this method is called on an existing
+         Heap database, the size specified here must match the size used to
+         create the database. Note, however, that specifying an incorrect
+         size to this method will not result in an error return 
+         (<code class="literal">EINVAL</code>) until the database is opened.
+    </p>
+      <p>
+         The <code class="methodname">DB-&gt;set_heapsize()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50417592"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50427128"></a>gbytes</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The size of the heap is set to <span class="bold"><strong>gbytes</strong></span> gigabytes plus <span class="bold"><strong>bytes</strong></span>.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50416120"></a>bytes</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The size of the heap is set to <span class="bold"><strong>gbytes</strong></span> gigabytes plus <span class="bold"><strong>bytes</strong></span>.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50421176"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The <span class="bold"><strong>flags</strong></span> parameter is currently
+                unused, and must be set to 0.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50430528"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DB-&gt;set_heapsize()</code> <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50435336"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  If the specified heap size was too small; the method was
+                  called after <a class="xref" href="dbopen.html" title="DB-&gt;open()">DB-&gt;open()</a> 
+                  was called; or if an invalid flag value or parameter was specified.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50436672"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="db.html" title="Chapter 2.  The DB Handle">DB</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50431208"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="db.html#dblist" title="Database and Related Methods">Database and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbset_h_nelem.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="db.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbset_heap_regionsize.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB-&gt;set_h_nelem() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB-&gt;set_heap_regionsize()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

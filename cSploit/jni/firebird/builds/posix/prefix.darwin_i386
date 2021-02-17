@@ -1,0 +1,40 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+#
+# Copyright (C) 2000 Inprise Corporation
+# All Rights Reserved.
+# Contributor(s): ______________________________________.
+# Start of file prefix.darwin:	$(VERSION)	@PLATFORM@
+# 2 Oct 2002, Nickolay Samofatov - Major Cleanup
+# Use this file to create a 32bit version of Firebird for intel
+# Instructions if running MacOSX 10.6
+# 1. edit configure.in so that MAKEFILE_PREFIX=darwin_i386
+# 2. dnl the CPU_TYPE
+# 3. edit extern/icu/source/config and set the right 32bit flags (-arch i386)
+# 4. for  CFLAGS, CXXFLAGS, LDFLAGS export '-m32 -arch i386'
+# 5. export MACOSX_DEPLOYMENT_TARGET=10.6 
+
+DYLD_LIBRARY_PATH=$(FIREBIRD)/lib
+export DYLD_LIBRARY_PATH
+
+MACOSX_DEPLOYMENT_TARGET=10.6
+export MACOSX_DEPLOYMENT_TARGET
+
+PROD_FLAGS=-O1 -DDARWIN -pipe -p -MMD -fPIC -fno-common -arch i386 -mmacosx-version-min=10.6
+DEV_FLAGS=-ggdb -DDARWIN -pipe -p -MMD -fPIC -fno-common -Wall -arch i386 -mmacosx-version-min=10.6 -Wno-non-virtual-dtor
+CXXFLAGS:=$(CXXFLAGS) -fvisibility-inlines-hidden -fvisibility=hidden -fno-weak
+
+EXE_LINK_OPTIONS:=-m32
+LD_FLAGS+=-m32 -arch i386
+
+include $(ROOT)/gen/darwin.defaults

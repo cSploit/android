@@ -1,0 +1,22 @@
+SCREENNAME	"none"
+VERSION		1 0 1
+COPYRIGHT	"(c) 2001 Petr Vandrovec"
+DESCRIPTION	"NCPs for 64bit file access"
+OS_DOMAIN
+PSEUDOPREEMPTION
+IMPORT		memset,printf,signal
+IMPORT		_SetupArgv,_StartNLM,_TerminateNLM
+IMPORT		AllocateResourceTag,ExitThread,GetNLMHandle,CYieldIfNeeded
+IMPORT		HookNCPVerb,ReleaseNCPVerb
+IMPORT		COMN_Write,COMN_SetDataSize,COMN_DoReleaseFileHandleIDP,COMN_Release
+IMPORT		COMN_IsSharedByteRange,COMN_DoResolveFileHandle,COMN_ReadSnapOrDontCopyToSnap
+IMPORT		asyncReadAhead,asyncReadFileBlk,fastReadCache,mailInterrupt
+IMPORT		cacheUnpinned,cacheRelease
+IMPORT		LB_getAsyncio,LB_freeAsyncio
+IMPORT		LBL_sSignal,LBL_sWait,LBL_cntSignal,LBL_cntWait,LBL_xSignal,LBL_xWait
+IMPORT		SetErrno
+IMPORT		ReserveResource,NW_connectionTable,PeriodicYieldCount
+#MODULE		CLIB,MBNWSA
+INPUT		prelude.o
+INPUT		ncphook.o
+OUTPUT		ncphook.nlm

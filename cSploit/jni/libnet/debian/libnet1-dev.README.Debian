@@ -1,0 +1,31 @@
+Message received at 224674@bugs.debian.org:
+
+Date: Tue, 6 Jan 2004 17:13:04 +0100
+From: Enrico Zini <zinie@cs.unibo.it>
+
+...
+
+ From what I've seen in the libnet mailing list, the current libnet
+package still has documentation and function export issues:
+
+ - if that function is only used internally, it should not be exported
+   in the header file
+ - the HTML documentation seems to refer to the old API of libnet
+ - I've later found out that the manpage suggests to create many libnet
+   contexts if one wants to create many packets at a time; although I
+   don't really like that idea, there is a documented way of doing it
+   and many packets can be created without using libnet_pblock_coalesce
+ - In the mailing list, sandr8 suggests to use libnet_adv_cull_packet(),
+   however that function is not documented in the manpage, but only as a
+   short comment in the header file, which doesn't tell how and if the
+   resulting packet should be deallocated
+ - In the mailing list, sandr8 and Mike Schiffman suggest using the
+   context queue interface, for which I haven't found any documented
+   overview on what its concepts are, but only the single functions
+   briefly documented in the header file
+ - Mike Schiffman also talks about initializing libnet with the ADVANCED
+   interface, but again I only found the LIBNET_????_ADV constants
+   briefly documented, with no overview on what the advanced mode is and
+   does
+
+...

@@ -1,0 +1,128 @@
+.TH NWPJMV 1 03/15/2003 nwpjmv nwpjmv
+.SH NAME
+nwpjvm \- Move print job to Unix queue
+.SH SYNOPSIS
+.B nwpjmv
+[
+.B -S
+.I server
+] [
+.B -h
+] [
+.B -U
+.I user name
+] [
+.B -P
+.I password
+|
+.B -n
+] [
+.B -C
+] [
+.B -q
+.I queue name
+] [
+.B -c
+.I command
+] [
+.B -j
+.I job number
+] [
+.B -d
+]
+
+.SH DESCRIPTION
+.B nwpjmv
+is a program that connects to print queues on NetWare servers and
+moves a designated print job to a Unix queue.
+
+.SH OPTIONS
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user
+.RS 3
+.B user
+is the print server name at the server.
+.RE
+
+.B -P
+.I password
+.RS 3
+.B password
+is the password to use for the print server at the server. If neither
+.B -n
+nor
+.B -P
+are given, and the user has no open connection to the server, pserver
+prompts for a password.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given if the print server does not require a password.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.B -q
+.I queue name
+.RS 3
+.B queue name 
+is the name of the print queue you want to service.
+.RE
+
+.B -c
+.I command
+.RS 3
+nwpjmv removes the designated job from the Novell queue and feeds the job file to stdin.
+.I command
+is the printing command that is executed for each job. The default
+command is 'lpr'.
+
+You can insert several flags into the command, preceded by %. These
+are replaced with values retrieved from the queue structure for the
+print job.
+
+%u: This field will be replaced by the name of the user who posted
+this print job.
+
+%d: This field will be replaced by the job description field of 
+this print job.
+.RE
+
+.B -j
+.I job number
+.RS 3
+This designates the ID number of the print job to be moved.
+.RE
+
+.B -d
+causes extra error messages to be logged.
+.RE
+
+
+.SH SEE ALSO
+.B nwclient(5), slist(1), pqlist(1), ncpmount(8), ncpumount(8), pserver(1)
+
+.SH CREDITS
+nwpjmv was written by Bruno Browning (bruno@lss.wisc.edu) based on 
+pserver by Volker Lendecke (lendecke@math.uni-goettingen.de)

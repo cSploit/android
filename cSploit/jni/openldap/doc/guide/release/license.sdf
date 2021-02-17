@@ -1,0 +1,15 @@
+# $OpenLDAP$
+# Copyright 2000-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: OpenLDAP Public License
+
+#!block inline
+#<FONT FACE="Courier">
+#!endblock
+
+!include "../../../LICENSE" ; verbatim
+
+#!block inline
+#</FONT>
+#!endblock

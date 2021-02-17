@@ -1,0 +1,30 @@
+SVN-fs-dump-format-version: 3
+
+UUID: 95f5730d-843b-4fe3-8879-f46da52f2123
+
+Revision-number: 0
+Prop-content-length: 258
+Content-length: 258
+
+K 8
+svn:date
+V 27
+2003-01-08T10:33:40.549533Z
+K 26
+svn:sync-currently-copying
+V 2
+15
+K 17
+svn:sync-from-url
+V 31
+http://svn.apache.org/repos/asf
+K 18
+svn:sync-from-uuid
+V 36
+13f79535-47bb-0310-9956-ffa450edef68
+K 24
+svn:sync-last-merged-rev
+V 2
+14
+PROPS-END
+

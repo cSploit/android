@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Data Migration</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="admin.html" title="Chapter 5. Administrating Berkeley DB SQL Databases" />
+    <link rel="prev" href="sync.html" title="Syncing with Oracle Databases" />
+    <link rel="next" href="recoverysql.html" title="Catastrophic Recovery" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Data Migration</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="sync.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. Administrating Berkeley DB SQL Databases</th>
+          <td width="20%" align="right"> <a accesskey="n" href="recoverysql.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="datamigration"></a>Data Migration</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="datamigration.html#shellmigrate">Migration Using the Shells</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+                If you have a database created by SQLite, you can migrate
+                it to a Berkeley DB database for use with the BDB SQL interface. For
+                production applications, you should do this only when your
+                application is shutdown. 
+            </p>
+      <p>
+                All data and schema supported by SQLite can be migrated to a
+                Berkeley DB database.
+            </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="shellmigrate"></a>Migration Using the Shells</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    To migrate your data from SQLite to a Berkeley DB database:
+                </p>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p>
+                            Make sure your application is shutdown.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            Open the SQLite database within the
+                            <span class="command"><strong>sqlite3</strong></span> shell.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            Execute the <code class="literal">.output</code> command to
+                            specify the location where you want to dump data.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            Dump the database using the SQLite
+                            <code class="literal">.dump</code> command.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            Close the <span class="command"><strong>sqlite3</strong></span> shell and open
+                            the Berkeley DB 
+                            <span>
+                                <a href="../api_reference/C/dbsql.html" class="olink">dbsql</a> shell.
+                            </span>
+                            
+                        </p>
+            </li>
+            <li>
+              <p>
+                            Load the dumped data using the
+                            <code class="literal">.read</code> command.
+                        </p>
+            </li>
+          </ol>
+        </div>
+        <p>
+                    Note that you can migrate in the reverse direction as well.
+                    Dump the Berkeley DB database by calling <code class="literal">.dump</code>
+                    from within the Berkeley DB 
+                    <span>
+                        <a href="../api_reference/C/dbsql.html" class="olink">dbsql</a> shell,
+                    </span>
+                    
+                    and load it into SQLite by <code class="literal">.read</code> from within
+                    SQLite's <span class="command"><strong>sqlite3</strong></span> shell.
+                </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="sync.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="admin.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="recoverysql.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Syncing with Oracle Databases </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Catastrophic Recovery</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

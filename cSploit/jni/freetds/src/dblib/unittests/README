@@ -1,0 +1,17 @@
+The programs in this directory test the db-lib routines.  Tests
+that db-lib passes print "dblib okay for t000X.c" as the last line
+of output and exit with a status of 0.  If the test does not print
+that message for the last line of output it means that db-lib failed
+that test.  
+
+Some of the tests are designed to dump core if an error is detected.
+This is to assist with post-mortem debugging of the dblib routines.
+
+Run all tests with 'make check'.  The test programs read the 
+'PWD' file in the root of the source tree to determine which
+server to run the tests on and which account to login as.  
+
+You will want to modify PWD accordingly.  
+
+All unit tests are expected to pass on all servers and all 
+operating systems.  

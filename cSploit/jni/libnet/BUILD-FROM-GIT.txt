@@ -1,0 +1,14 @@
+I build from git using some top-level scripts. General procedure is
+
+    git clone .../libnet.git
+    cd libnet/libnet
+    ../Prepare
+    ../Build
+
+and then, one of the following, depending on how you like to install
+local packages:
+
+    sudo make install
+    ../Stow
+    ../Package
+

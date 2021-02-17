@@ -1,0 +1,5 @@
+cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com
+cn=ITD Staff,ou=Groups,dc=example,dc=com
+ou=Groups, dc=example,dc=com
+ou=Alumni Association, ou=People, dc=example,dc=com
+cn=James A Jones 1, ou=Alumni Association, ou=People, dc=example,dc=com

@@ -1,0 +1,86 @@
+PLEASE READ THIS WHOLE FILE AND CONCEPT, BECAUSE THEY COVER SEVERAL STICKY
+ISSUES THAT YOU WILL PROBABLY STUMBLE ACROSS ANYWAY
+
+1. Build
+To build slapd with back-sql under Unix you need to build and install
+iODBC 2.50.3 (later versions should probably work, but not earlier),
+or unixODBC (you will have to change -liodbc to -lodbc then).
+Then, at top of OpenLDAP source tree, run
+"configure <other options you need> --enable-sql", then "make" -
+this should build back-sql-enabled slapd, provided that you have iODBC/unixODBC
+libraries and include files in include/library paths, "make install"...
+In other words, follow installation procedure described in OpenLDAP 
+Administrators Guide, adding --enable-sql option to configure, and
+having iODBC/unixODBC libraries installed an accessible by compiler.
+
+Under Win32/MSVC++, I modified the workspace so that back-sql is built into
+slapd automatically, since MS ODBC manager, odbc32.dll, is included in
+standard library pack, and it does no bad even if you don't plan to use it.
+I also could provide precompiled executables for those who don't have MSVC.
+Note that Win32 port of OpenLDAP itself is experimental, and thus doesn't
+provide very convenient build environment (yet).
+
+2. Tune datasources and slapd.conf
+Next, you need to define ODBC datasource with data you want to publish
+with help of back-sql. Assuming that you have your data in some SQL-compliant
+RDBMS, and have installed proper ODBC driver for this RDBMS, this is as simple
+as adding a record into odbc.ini (for iODBC/unixODBC), or using ODBC wizard in
+Control Panel (for odbc32).
+Next, you need to add appropriate "database" record to your slapd.conf.
+See samples provided in "back-sql/RDBMS_DEPENDENT/" subdirectory. 
+
+Several things worth noting about ODBC:
+- "dbname" directive stands for ODBC datasource name (DSN),
+  not the name of your database in RDBMS context
+- ODBC under Unix is not so common as under Windows, so you could have
+  problems with Unix drivers for your RDBMS. Visit http://www.openlinksw.com,
+  they provide a multitier solution which allows connecting to DBMSes on
+  different platforms, proxying and other connectivity and integration issues.
+  They also support iODBC, and have good free customer service through
+  newsserver (at news.openlinksw.com).
+  Also worth noting are: ODBC-ODBC bridge by EasySoft (which was claimed
+   by several people to be far more effective and stable than OpenLink),
+   OpenRDA package etc.
+- be careful defining RDBMS connection parameters, you'll probably need only
+  "dbname" directive - all the rest can be defined in datasource. Every other
+  directive is used to override value stored in datasource definition.
+  Maybe you will want to use dbuser/dbpasswd to override credentials defined in datasource
+- full list of configuration directives supported is available in file "guide",
+  you may also analyze output of 'slapd -d 5' to find out some useful 
+  directives for redefining default queries 
+
+3. Creating and using back-sql metatables
+Read the file "concept" to understand, what metainformation you need to add,
+and what for... ;)
+See SQL scripts and slapd.conf files in samples directory.
+Find subdirectory in "rdbms_depend/" corresponding to your RDBMS (Oracle,
+MS SQL Server and mySQL are listed there currently), or copy and edit
+any of these to conform to SQL dialect of your RDBMS (please be sure to send
+me scripts and notes for new RDBMSes ;).
+
+Execute "backsql_create.sql" from that subdirectory (or edited one),
+so that the tables it creates appear in the same
+context with the data you want to export through LDAP (under same DB/user, 
+or whatever is needed in RDBMS you use). You can use something like
+"mysql < xxx.sql" for mySQL, Query Analyzer+Open query file for MS SQL,
+sqlplus and "@xxx.sql" for Oracle.
+
+You may well want to try it with test data first, and see how metatables
+are used. Create test data and metadata by running testdb_create.sql,
+testdb_data.sql, and testdb_metadata.sql scripts (again, adopted for your
+RDBMS, and in the same context as metatables you created before), and
+tune slapd.conf to use your test DB.
+
+4. Testing
+To diagnose back-sql, run slapd with debug level TRACE ("slapd -d 5" will go).
+Then, use some LDAP client to query corresponding subtree (for test database,
+you could for instance search one level from "o=sql,c=RU"). I personally used
+saucer, which is included in OpenLDAP package (it builds automatically under
+Unix/GNU configure and for MSVC I added appropriate project to workspace).
+And also Java LDAP browser-editor (see link somewhere on OpenLDAP site) to
+test ADD/DELETE/MODIFY operations on Oracle and MS SQL.
+
+See file "platforms" if you encounter connection problems - you may find
+a hint for your RDBMS or OS there. If you are stuck - please contact me at
+mit@openldap.org, or (better) post an issue through OpenLDAP's Issue Tracking
+System (see http:/www.openldap.org/its).

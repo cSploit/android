@@ -1,0 +1,95 @@
+Firebird 2 architecture
+
+
+Engine uses following objects in memory that are a subject
+to threading contention.
+
+1. Buffer cache
+Protection: single mutex on buffer cache object.
+All modification to buffers should be performed in this module only
+and under mutex. Only costant pointers should be given out 
+(it should be working this way now - make interface declaration appropriate)
+
+2. Metadata cache. Compiled requests + request cache
+Idea of implementation: only constant objects should be stored in cache.
+Use single cache-level mutex to protect addition to cache and removal from 
+cache. Modify objects only when they are outside of cache. Derive all cached
+objects (including requests and relations) from unified cacheable object
+which will allow to track object usage.
+
+3. Lock manager data
+single subsystem mutex. works well now.
+
+4. Cached database header data (DBB) and other cached pieces of data.
+Protect it with a single dbb-level mutex to avoid deadlocks.
+Use temporary structures when needed to cache snapshots of this data.
+
+Targets we are going to support under Firebird 2 architecture
+1. Multi-threaded engine. Just like SuperServer, but SMP-friendly.
+2. Embeeded server. The same as multi-threaded but is packaged in a single
+.dll/.so module. Other differences:
+- no security 
+- no configuration file (set params via special API call)
+- built-in INTL
+- internal UDF handler
+3. Clustered server
+Run multi-process engine on each cluster node. Direct page latches and
+other locks to a distributed lock manager. Processes may share the same
+buffer and metadata cache via shared memory. This target should be kept 
+in mind, but may not be finalized in 2.0 release. Making Firebird run
+in such configuration is quite an easy thing (at least without shared 
+cache), but it requires expensive equipment and time for testing.
+
+Another important thing. Engine AS IS already _is_ already suited for parallel 
+operation by initial design. Versioning is a great thing !
+We NEED:
+- just a few simple Java-like object-level mutexes and a few
+  rw-locks
+- make it run just like CS, but using several shared subsystems
+- we should use constant objects with usage tracking 
+We do NOT NEED:
+- big amount of mutexes and mutex arrays
+- relation-level mutexes and other shit like this
+Mutexes should be aquired only for a very short periods of time.
+Linked lists usage should be discouraged. All classes touched
+by thread-safety cleanup (bdb, att, dbb) should be fixed to avoid
+LLS usage as it is usually thread-unsafe.
+
+TODO:
+1. Implement locking objects.
+2. Implement thread-safe, SMP-friendly memory manager.
+3. Review every source module inside the engine regarding its MT-safety.
+  TODO-list might extend after this point, but not too much because we
+  already have SMP-friendly CS builds.
+4. Fix up buffer cache to make it thread-safe,
+  and solve its performance problems.
+5. Re-write metadata cache
+6. Make JRD requests use new metadata cache
+7. Make DSQL compilation thread-safe (via porting it to BISON correctly)
+8. Make DSQL requests use new metadata cache
+9. Implement cache of compiled requests (should be easy at this point)
+10. Thread context should be converted to a class and removed from
+parameters from all functions (and SET_TDBB should be eliminated too).
+tdbb_default memory pool usage should be eradicated. Functions should 
+normally derive their context from parameters, not from thread context.
+Final goal is to minimize or even eliminate TLS usage at all (because
+its usage is simular to local variables usage in terms of maintainability).
+11. Warp dbb/att access with thread-safe accessor methods using dbb-level mutex.
+  Review all places where it is used.
+12. Kill manual thread shcheduling (sch.cpp, THREAD_ENTER/THREAD_EXIT 
+  and company)
+13. Engine should be thread-safe at this point. TEST IT !
+  Perform stress testing and add needed logging where required.
+  We need to unify debug logging across the engine.
+
+Other tasks:
+
+1. NOMEM cleanup + EH cleanup. Use auto_ptr-like templates for resource management
+2. system_call_failed exception must have call name, parameters and error code
+
+Assignments
+
+Nickolay Samofatov:
+Points 1 and 2 are almost finished in my tree. Locking objects need some more 
+comparative testing. Hardware memory pages manager (1.5 uses malloc for this 
+purpose) is neary finished and needs testing.

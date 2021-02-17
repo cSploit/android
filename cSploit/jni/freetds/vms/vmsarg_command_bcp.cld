@@ -1,0 +1,92 @@
+! FreeTDS - Library of routines accessing Sybase and Microsoft databases
+! Copyright (C) 2010  Craig A. Berry	craigberry@mac.com
+!
+! This library is free software; you can redistribute it and/or
+! modify it under the terms of the GNU Library General Public
+! License as published by the Free Software Foundation; either
+! version 2 of the License, or (at your option) any later version.
+!
+! This library is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+! Library General Public License for more details.
+!
+! You should have received a copy of the GNU Library General Public
+! License along with this library; if not, write to the
+! Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+! Boston, MA 02111-1307, USA.
+
+! Command definitions for the BCP command.
+
+
+Module VARG_CLD
+
+Define Verb VARG
+   parameter P1, label=TABLE_NAME
+      value (required)
+   parameter P2, label=DIRECTION
+      value (required,type=DIR_KEYS)
+   parameter P3, label=DATA_FILE
+      value (required,type=$file)
+   qualifier MAX_ERRORS
+      value (required,type=$number)
+   qualifier FORMAT_FILE
+      value (required,type=$file)
+   qualifier ERRORFILE
+      value (required,type=$file)
+   qualifier FIRST_ROW
+      value (required,type=$number)
+   qualifier LAST_ROW
+      value (required,type=$number)
+   qualifier BATCH_SIZE
+      value (required,type=$number)
+   qualifier NATIVE_DEFAULT
+   qualifier CHARACTER_DEFAULT
+   qualifier COLUMN_TERMINATOR
+      value (required)
+   qualifier ROW_TERMINATOR
+      value (required)
+   qualifier USERNAME
+      value
+   qualifier PASSWORD
+      value (default="")
+   qualifier SERVER_NAME
+      value (required)
+   qualifier INPUT
+      value (required,type=$file)
+   qualifier OUTPUT
+      value (required,type=$file)
+   qualifier SERVCHARSET
+      value
+   qualifier CLIENTCHARSET
+      value
+   qualifier DISPCHARSET
+      value
+   qualifier FILECHARSET
+      value
+   qualifier LANGUAGE
+      value
+   qualifier FILECHARSET
+      value
+   qualifier TDSPACKETSIZE
+      value (type=$number)
+   qualifier TEXTSIZE
+      value (type=$number)
+   qualifier VERSION, syntax=NOPARAM
+   qualifier HOMEDIR
+      value
+   qualifier ENCRYPT
+   qualifier IDENTITY
+   disallow (NATIVE_DEFAULT and CHARACTER_DEFAULT)
+
+define type DIR_KEYS
+   keyword IN
+   keyword OUT
+
+define syntax NOPARAM
+   parameter P1, label=TABLE_NAME
+   parameter P2, label=DIRECTION
+      value (type=DIR_KEYS)
+   parameter P3, label=DATA_FILE
+      value (type=$file)
+

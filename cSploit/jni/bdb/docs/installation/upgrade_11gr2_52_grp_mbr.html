@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Group Membership in Repmgr</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_52_toc.html" title="Chapter 11.  Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2" />
+    <link rel="prev" href="upgrade_11gr2_52_excl_txn_sql.html" title="Exclusive Transactions in the SQL Layer" />
+    <link rel="next" href="upgrade_11gr2_52_heap.html" title="Heap Access Method" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Group Membership in Repmgr</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="upgrade_11gr2_52_excl_txn_sql.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 11. 
+        Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="upgrade_11gr2_52_heap.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="upgrade_11gr2_52_grp_mbr"></a>Group Membership in Repmgr</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="upgrade_11gr2_52_grp_mbr.html#idp51175504">Upgrading</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="upgrade_11gr2_52_grp_mbr.html#idp51155936">New Functions</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="upgrade_11gr2_52_grp_mbr.html#idp51153712">Modified Functions</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="upgrade_11gr2_52_grp_mbr.html#idp51113480">New Events</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="upgrade_11gr2_52_grp_mbr.html#idp51183712">Removed Functions</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="upgrade_11gr2_52_grp_mbr.html#idp51147592">New Parameters</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="upgrade_11gr2_52_grp_mbr.html#idp51170408">New Structure</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        Replication Manager now manages group membership much more closely,
+        making it much easier for applications to add and remove sites from
+        a replication group without risk of transaction loss.  In order to
+        accomplish this, the API for configuring group membership has
+        changed significantly.  The
+        <code class="literal">repmgr_set_local_site()</code> and
+        <code class="literal">repmgr_add_remote_site()</code> methods no longer
+        exist; they are replaced by a new handle type,
+        <code class="literal">DB_SITE</code>.  The
+        <code class="literal">repmgr_get_local_site()</code> method has been replaced
+        by <a href="../api_reference/C/repmgr_site.html" class="olink">DB_ENV-&gt;repmgr_site()</a>, which now returns a
+        <code class="literal">DB_SITE</code> handle instead of a raw host/port
+        network address.
+    </p>
+      <p>
+        Replication Manager applications may no longer call the <a href="../api_reference/C/repnsites.html" class="olink">DB_ENV-&gt;rep_set_nsites()</a>
+        method, because the Replication Manager now tracks the number of
+        sites in the replication group for you.  Replication Manager
+        applications may still call <a href="../api_reference/C/repget_nsites.html" class="olink">DB_ENV-&gt;rep_get_nsites()</a>, but only after a
+        successful call to <a href="../api_reference/C/repmgrstart.html" class="olink">DB_ENV-&gt;repmgr_start()</a>.
+    </p>
+      <p>
+        For applications using the replication Base API there is no change,
+        except that they may now call <a href="../api_reference/C/repnsites.html" class="olink">DB_ENV-&gt;rep_set_nsites()</a> to change the group size
+        even when Master Leases are in use.
+    </p>
+      <p>
+        The new Replication Manager group membership functionality is
+        described in the <a href="../programmer_reference/group_membership.html" class="olink">Managing Replication Manager Group Membership</a> chapter in the 
+        <em class="citetitle">Berkeley DB Programmer's Reference Guide</em>.
+    </p>
+      <p>
+        Replication Manager no longer prints an error message on a
+        connection failure.  Instead it generates an event with the
+        equivalent information (invoking the application's
+        event-handling call-back function).
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51175504"></a>Upgrading</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            An existing application running a previous version of BDB can do a
+            "live upgrade" so that only one site at a time has to be shut down.
+            To do this, restart each site in the group, with the old master
+            being shutdown last.  When each site is restarted, use
+            <code class="literal">DB_SITE</code> to configure the local site with the
+            flag <code class="literal">DB_LEGACY</code>, and create a
+            <code class="literal">DB_SITE</code> handle with a full specification of  all
+            the remote site addresses for all other sites currently in the
+            group, and configure each handle with the
+            <code class="literal">DB_LEGACY</code> flag.  When the old master is
+            restarted and a new master has been established, the new master is
+            ready to manage membership changes, and new sites can be added as
+            usual. But the application must not try to add new sites, or remove
+            existing sites, during the mixed-version transitional phase.
+        </p>
+        <p>
+            To do a non-live upgrade shutdown the entire replication group.
+            Then restart the group with each site configured with the
+            <code class="literal">DB_LEGACY</code> flag, and in
+            <code class="literal">DB_REP_ELECTION</code> mode.
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51155936"></a>New Functions</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <a href="../api_reference/C/repmgr_site.html" class="olink">DB_ENV-&gt;repmgr_site()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/repmgr_site_by_eid.html" class="olink">DB_ENV-&gt;repmgr_site_by_eid()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/dbsite_set_config.html" class="olink">DB_SITE-&gt;set_config()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/dbsite_get_config.html" class="olink">DB_SITE-&gt;get_config()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/dbsite_remove.html" class="olink">DB_SITE-&gt;remove()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/dbsite_get_eid.html" class="olink">DB_SITE-&gt;get_eid()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/dbsite_get_address.html" class="olink">DB_SITE-&gt;get_address()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/dbsite_close.html" class="olink">DB_SITE-&gt;close()</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51153712"></a>Modified Functions</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li><a href="../api_reference/C/repnsites.html" class="olink">DB_ENV-&gt;rep_set_nsites()</a> is no longer used by the Replication Manager,
+                but is still used by the Base API.  It can now be used to
+                change the number of sites dynamically, even when master
+                leases are in use.
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51113480"></a>New Events</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <code class="literal">DB_EVENT_REP_SITE_ADDED</code>
+            </li>
+            <li>
+              <code class="literal">DB_EVENT_REP_SITE_REMOVED</code>
+            </li>
+            <li>
+              <code class="literal">DB_EVENT_REP_LOCAL_SITE_REMOVED</code>
+            </li>
+            <li>
+              <code class="literal">DB_EVENT_REP_CONNECT_BROKEN</code>
+            </li>
+            <li>
+              <code class="literal">DB_EVENT_REP_CONNECT_ESTD</code>
+            </li>
+            <li>
+              <code class="literal">DB_EVENT_REP_CONNECT_TRY_FAILED</code>
+            </li>
+            <li>
+              <code class="literal">DB_EVENT_REP_INIT_DONE</code>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51183712"></a>Removed Functions</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <code class="methodname">DB_ENV-&gt;repmgr_set_local_site()</code>
+            </li>
+            <li>
+              <code class="methodname">DB_ENV-&gt;repmgr_add_local_site()</code>
+            </li>
+            <li>
+              <code class="methodname">DB_ENV-&gt;repmgr_add_remote_site()</code>
+            </li>
+            <li>
+              <code class="methodname">DB_ENV-&gt;repmgr_get_local_site()</code>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51147592"></a>New Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            The following new parameters are passed to 
+            <a href="../api_reference/C/dbsite_set_config.html" class="olink">DB_SITE-&gt;set_config()</a>.
+        </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <code class="literal">DB_BOOTSTRAP_HELPER</code>
+            </li>
+            <li>
+              <code class="literal">DB_GROUP_CREATOR</code>
+            </li>
+            <li>
+              <code class="literal">DB_LEGACY</code>
+            </li>
+            <li>
+              <code class="literal">DB_LOCAL_SITE</code>
+            </li>
+            <li>
+              <code class="literal">DB_REPMGR_PEER</code>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51170408"></a>New Structure</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li><code class="literal">DB_REPMGR_CONN_ERR</code> encapsulates an EID
+                and an integer system error code.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="upgrade_11gr2_52_excl_txn_sql.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_52_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="upgrade_11gr2_52_heap.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Exclusive Transactions in the SQL Layer </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Heap Access Method</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

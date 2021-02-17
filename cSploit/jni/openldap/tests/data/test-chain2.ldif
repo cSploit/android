@@ -1,0 +1,88 @@
+#LEAD COMMENT
+dn: dc=example,dc=com
+#EMBEDDED COMMENT
+objectclass: top
+objectclass: organization
+objectclass: domainRelatedObject
+objectclass: dcobject
+dc: example
+l: Anytown, Michigan
+st: Michigan
+o: Example, Inc.
+o: EX
+o: Ex.
+description: The Example, Inc. at Anytown
+postaladdress: Example, Inc. $ 535 W. William St. $ Anytown, MI 48109 $ US
+telephonenumber: +1 313 555 1817
+associateddomain: example.com
+
+dn: ou=People,dc=example,dc=com
+objectClass: referral
+objectclass: extensibleObject
+ou: People
+ref: @URI1@ou=People,dc=example,dc=com
+
+dn: ou=Groups,dc=example,dc=com
+objectclass: organizationalUnit
+ou: Groups
+
+dn: cn=All Staff,ou=Groups,dc=example,dc=com
+member: cn=Manager,dc=example,dc=com
+member: cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=exam
+ ple,dc=com
+member: cn=Jane Doe,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=John Doe,ou=Information Technology Division,ou=People,dc=example,dc
+ =com
+member: cn=Mark Elliot,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 2,ou=Information Technology Division,ou=People,dc=exa
+ mple,dc=com
+member: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Dorothy Stevens,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=exampl
+ e,dc=com
+owner: cn=Manager,dc=example,dc=com
+cn: All Staff
+description: Everyone in the sample data
+objectclass: groupofnames
+
+dn: cn=Alumni Assoc Staff,ou=Groups,dc=example,dc=com
+member: cn=Manager,dc=example,dc=com
+member: cn=Dorothy Stevens,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Jane Doe,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Mark Elliot,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+owner: cn=Manager,dc=example,dc=com
+description: All Alumni Assoc Staff
+cn: Alumni Assoc Staff
+objectclass: groupofnames
+
+dn: cn=ITD Staff,ou=Groups,dc=example,dc=com
+owner: cn=Manager,dc=example,dc=com
+description: All ITD Staff
+cn: ITD Staff
+objectclass: groupofuniquenames
+uniquemember: cn=Manager,dc=example,dc=com
+uniquemember: cn=Bjorn Jensen,OU=Information Technology Division,ou=People,dc=
+ example,dc=com
+uniquemember: cn=James A Jones 2,ou=Information Technology Division,ou=People,
+ dc=example,dc=com
+uniquemember: cn=John Doe,ou=Information Technology Division,ou=People,dc=exam
+ ple,dc=com
+
+dn: cn=Manager,dc=example,dc=com
+objectclass: person
+cn: Manager
+cn: Directory Manager
+cn: Dir Man
+sn: Manager
+description: Manager of the directory
+userpassword:: c2VjcmV0
+
+dn: ou=Other,dc=example,dc=com
+objectclass: organizationalUnit
+ou: Other
+

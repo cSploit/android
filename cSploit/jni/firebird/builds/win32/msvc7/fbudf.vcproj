@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="fbudf" ProjectGUID="{9DC67B05-AC3E-49A3-B0CC-83B25D757445}">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Release|Win32" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" PreprocessorDefinitions="NDEBUG" MkTypLibCompatible="true" TargetEnvironment="1" />
+      <Tool Name="VCCLCompilerTool" Optimization="2" InlineFunctionExpansion="1" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SUPERCLIENT;FBUDF_EXPORTS" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="NDEBUG" Culture="13322" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\udf\$(ProjectName).dll" LinkIncremental="1" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" GenerateManifest="false" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+    <Configuration Name="Debug|Win32" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" PreprocessorDefinitions="_DEBUG" MkTypLibCompatible="true" TargetEnvironment="1" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SUPERCLIENT;FBUDF_EXPORTS;DEV_BUILD" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="13322" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\udf\$(ProjectName).dll" LinkIncremental="2" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" GenerateManifest="false" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="Source Files" Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+      <File RelativePath="..\..\..\src\extlib\fbudf\fbudf.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\extlib\fbudf\stdafx.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\timestamp.cpp">
+      </File>
+    </Filter>
+    <Filter Name="Header Files" Filter="h;hpp;hxx;hm;inl">
+      <File RelativePath="..\..\..\src\extlib\fbudf\fbudf.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ibase.h">
+      </File>
+      <File RelativePath="..\..\..\src\extlib\fbudf\stdafx.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\timestamp.h">
+      </File>
+    </Filter>
+    <Filter Name="Resource Files" Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+    </Filter>
+    <File RelativePath="..\..\..\src\extlib\fbudf\fbudf.sql">
+    </File>
+    <File RelativePath="..\..\..\src\extlib\fbudf\fbudf.txt">
+    </File>
+    <File RelativePath="..\..\..\src\extlib\fbudf\MSReadMe.txt">
+    </File>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

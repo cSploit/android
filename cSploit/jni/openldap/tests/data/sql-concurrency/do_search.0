@@ -1,0 +1,12 @@
+dc=example,dc=com
+cn=Mitya Kovalev
+cn=Akakiy Zinberstein,dc=example,dc=com
+sn=Zinberstein
+dc=example,dc=com
+cn=James*
+dc=example,dc=com
+sn=*
+dc=example,dc=com
+cn=*
+dc=example,dc=com
+cn=James*

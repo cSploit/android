@@ -1,0 +1,108 @@
+<!DOCTYPE style-sheet PUBLIC "-//James Clark//DTD DSSSL Style Sheet//EN" [
+<!ENTITY dbstyle SYSTEM "docbook.dsl" CDATA DSSSL>
+]>
+
+<style-sheet>
+<style-specification use="docbook">
+<style-specification-body>
+
+;; Instructions can be found in 
+;; 	The Modular DocBook Stylesheets
+;;	by Norman Walsh
+;; See Chapter 3, "Customizing the Stylesheets"
+;; http://docbook.sourceforge.net/release/dsssl/current/doc/custom.html
+
+;; $Id: userguide.dsl.in,v 1.4 2008-12-20 06:01:31 jklowden Exp $
+
+;; For note, tip, and warning: include little
+;; gifs of a hand pointing a finger, or a yield sign, and so on.  
+;; Much prettier to look at than text.  
+
+(define %admon-graphics% #t) 
+;;(define %admon-graphics-path% "../images/")
+
+;; In generating names of HTML pages, use the
+;; section's "id" attribute, if present, to form the name.  
+
+(define %use-id-as-filename% #t)
+
+;; The filename of the root HTML document (excluding the extension).  
+(define %root-filename% "index")
+  
+(define %graphic-extensions%
+  ;; graphic extensions allowed
+  '("gif" "png" "jpg" "jpeg" "tif" "tiff" "eps" "epsf" ))
+
+(define %graphic-default-extension% 
+  "gif")
+  
+;; Indent "screen" sections. 
+;; http://docbook.sourceforge.net/release/dsssl/current/doc/html/indent-screen-lines.html
+(define %indent-screen-lines%
+  ;; Indent lines in a 'Screen'?
+  #f)
+
+;; If %html40% is true then the output more closely resembles HTML
+;; 4.0. In particular, the HTML table module includes COL, THEAD,
+;; TBODY, and TFOOT elements, and the output documents have a proper
+;; doctype declaration.
+
+(define %html40%
+  ;; Generate HTML 4.0
+  #t)
+
+(define %html-pubid%
+  ;; REFENTRY html-pubid
+  ;; PURP What public ID are you declaring your HTML compliant with?
+  ;; DESC
+  ;; The public ID used in output HTML files.  If '#f', then no public ID
+  ;; is produced.  If both this and %html-sysid% are '#f', then no
+  ;; doctype declaration is produced.
+  ;; /DESC
+  ;; AUTHOR N/A
+  ;; /REFENTRY
+  (if %html40%
+	;; "-//W3C//DTD HTML 4.01 Transitional//EN"
+	   "-//W3C//DTD HTML 4.01//EN"
+      #f))
+
+(define %html-sysid%
+  ;; REFENTRY html-sysid
+  ;; PURP What system ID are you declaring your HTML compliant with?
+  ;; DESC
+  ;; The system ID used in output HTML files.  If '#f', then no system ID
+  ;; is produced.  If both this and %html-pubid% are '#f', then no
+  ;; doctype declaration is produced.
+  ;; /DESC
+  ;; AUTHOR N/A
+  ;; /REFENTRY
+  (if %html40%
+      	;; "http://www.w3.org/TR/html4/loose.dtd"
+	   "http://www.w3.org/TR/html4/strict.dtd"
+      #f))
+
+
+;; Insert meta tag with encoding information into each generated HTML file.
+;; cf. http://www.dpawson.co.uk/docbook/dsssl/dssslgeneral.html 
+
+(define %html-header-tags% 
+  '(("META" ("HTTP-EQUIV" "Content-Type") ("CONTENT" "text/html; charset=utf-8"))))
+
+;; Should the role attribute of emphasis be propagated to HTML as a
+;; class attribute value? Source Code
+
+(define %emphasis-propagates-style%
+  ;; Support propagating emphasis role attributes to HTML
+  #t)
+
+;; Generate links to the FreeTDS HTML stylesheet to control the 
+;; browswer's rendering of certain classes of elements e.g. < userinput >.
+;; The stylesheets (version 1.57) wrapped userinput in < b >< /b >, but 
+;; version 1.79 doesn't.  
+
+(define %stylesheet% "userguide.css")
+  
+</style-specification-body>
+</style-specification>
+<external-specification id="docbook" document="dbstyle">
+</style-sheet>

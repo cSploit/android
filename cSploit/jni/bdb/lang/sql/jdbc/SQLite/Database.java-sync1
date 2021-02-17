@@ -1,0 +1,473 @@
+package SQLite;
+
+/**
+ * Main class wrapping an SQLite database.
+ */
+
+public class Database {
+
+    /**
+     * Internal handle for the native SQLite API.
+     */
+
+    protected long handle = 0;
+
+    /**
+     * Internal last error code for exec() methods.
+     */
+
+    protected int error_code = 0;
+
+    /**
+     * Open an SQLite database file.
+     *
+     * @param filename the name of the database file
+     * @param mode open mode, currently ignored
+     */
+
+    public synchronized void open(String filename, int mode) 
+	throws SQLite.Exception {
+	_open(filename, mode);
+    }
+
+    private native void _open(String filename, int mode)
+	throws SQLite.Exception;
+
+    /**
+     * Open SQLite auxiliary database file for temporary
+     * tables.
+     *
+     * @param filename the name of the auxiliary file or null
+     */
+
+    public synchronized void open_aux_file(String filename)
+	throws SQLite.Exception {
+	_open_aux_file(filename);
+    }
+
+    private native void _open_aux_file(String filename)
+	throws SQLite.Exception;
+
+    /**
+     * Destructor for object.
+     */
+
+    protected synchronized void finalize() {
+	_finalize();
+    }
+
+    private native void _finalize();
+
+    /**
+     * Close the underlying SQLite database file.
+     */
+
+    public synchronized void close()
+	throws SQLite.Exception {
+	_close();
+    }
+
+    private native void _close()
+	throws SQLite.Exception;
+
+    /**
+     * Execute an SQL statement and invoke callback methods
+     * for each row of the result set.<P>
+     *
+     * It the method fails, an SQLite.Exception is thrown and
+     * an error code is set, which later can be retrieved by
+     * the last_error() method.
+     *
+     * @param sql the SQL statement to be executed
+     * @param cb the object implementing the callback methods
+     */
+
+    public synchronized void exec(String sql, SQLite.Callback cb)
+	throws SQLite.Exception {
+	_exec(sql, cb);
+    }
+
+    private native void _exec(String sql, SQLite.Callback cb)
+	throws SQLite.Exception;
+
+    /**
+     * Execute an SQL statement and invoke callback methods
+     * for each row of the result set. Each '%q' or %Q in the
+     * statement string is substituted by its corresponding
+     * element in the argument vector.
+     * <BR><BR>
+     * Example:<BR>
+     * <PRE>
+     *   String args[] = new String[1];
+     *   args[0] = "tab%";
+     *   db.exec("select * from sqlite_master where type like '%q'",
+     *           null, args);
+     * </PRE>
+     *
+     * It the method fails, an SQLite.Exception is thrown and
+     * an error code is set, which later can be retrieved by
+     * the last_error() method.
+     *
+     * @param sql the SQL statement to be executed
+     * @param cb the object implementing the callback methods
+     * @param args arguments for the SQL statement, '%q' substitution
+     */
+
+    public synchronized void exec(String sql, SQLite.Callback cb,
+				  String args[]) throws SQLite.Exception {
+	_exec(sql, cb, args);
+    }
+
+    private native void _exec(String sql, SQLite.Callback cb, String args[])
+	throws SQLite.Exception;
+
+    /**
+     * Return the row identifier of the last inserted
+     * row.
+     */
+
+    public synchronized long last_insert_rowid() {
+	return _last_insert_rowid();
+    }
+
+    private native long _last_insert_rowid();
+
+    /**
+     * Abort the current SQLite operation.
+     */
+
+    public synchronized void interrupt() {
+	_interrupt();
+    }
+
+    private native void _interrupt();
+
+    /**
+     * Return the number of changed rows for the last statement.
+     */
+
+    public synchronized long changes() {
+	return _changes();
+    }
+
+    private native long _changes();
+
+    /**
+     * Establish a busy callback method which gets called when
+     * an SQLite table is locked.
+     *
+     * @param bh the object implementing the busy callback method
+     */
+
+    public synchronized void busy_handler(SQLite.BusyHandler bh) {
+	_busy_handler(bh);
+    }
+
+    private native void _busy_handler(SQLite.BusyHandler bh);
+
+    /**
+     * Set the timeout for waiting for an SQLite table to become
+     * unlocked.
+     *
+     * @param ms number of millisecond to wait
+     */
+
+    public synchronized void busy_timeout(int ms) {
+	_busy_timeout(ms);
+    }
+
+    private native void _busy_timeout(int ms);
+
+    /**
+     * Convenience method to retrieve an entire result
+     * set into memory.
+     *
+     * @param sql the SQL statement to be executed
+     * @return result set
+     */
+
+    public TableResult get_table(String sql) throws SQLite.Exception {
+	TableResult ret = new TableResult();
+	if (!is3()) {
+	    exec(sql, ret);
+	} else {
+	    /* only one statement !!! */
+	    Vm vm = compile(sql);
+	    set_last_error(vm.error_code);
+	    while (vm.step(ret)) {
+		set_last_error(vm.error_code);
+	    }
+	    vm.finalize();
+	}
+	return ret;
+    }
+
+    /**
+     * Convenience method to retrieve an entire result
+     * set into memory.
+     *
+     * @param sql the SQL statement to be executed
+     * @param args arguments for the SQL statement, '%q' substitution
+     * @return result set
+     */
+
+    public TableResult get_table(String sql, String args[])
+	throws SQLite.Exception {
+	TableResult ret = new TableResult();
+	if (!is3()) {
+	    exec(sql, ret, args);
+	} else {
+	    /* only one statement !!! */
+	    Vm vm = compile(sql, args);
+	    set_last_error(vm.error_code);
+	    while (vm.step(ret)) {
+		set_last_error(vm.error_code);
+	    }
+	    vm.finalize();
+	}
+	return ret;
+    }
+
+    /**
+     * Convenience method to retrieve an entire result
+     * set into memory.
+     *
+     * @param sql the SQL statement to be executed
+     * @param args arguments for the SQL statement, '%q' substitution
+     * @param tbl TableResult to receive result set
+     * @return result set
+     */
+
+    public void get_table(String sql, String args[], TableResult tbl)
+	throws SQLite.Exception {
+	tbl.clear();
+	if (!is3()) {
+	    exec(sql, tbl, args);
+	} else {
+	    /* only one statement !!! */
+	    Vm vm = compile(sql, args);
+	    while (vm.step(tbl)) {
+	    }
+	    vm.finalize();
+	}
+    }
+
+    /**
+     * See if an SQL statement is complete.
+     * Returns true if the input string comprises
+     * one or more complete SQL statements.
+     *
+     * @param sql the SQL statement to be checked
+     */
+
+    public synchronized static boolean complete(String sql) {
+	return _complete(sql);
+    }
+
+    private native static boolean _complete(String sql);
+
+    /**
+     * Return SQLite version number as string.
+     * Don't rely on this when both SQLite 2 and 3 are compiled
+     * into the native part. Use the class method in this case.
+     */
+
+    public native static String version();
+
+    /**
+     * Return SQLite version number as string.
+     * If the database is not open, <tt>unknown</tt> is returned.
+     */
+
+    public native String dbversion();
+
+    /**
+     * Create regular function.
+     *
+     * @param name the name of the new function
+     * @param nargs number of arguments to function
+     * @param f interface of function
+     */
+
+    public native void create_function(String name, int nargs, Function f);
+
+    /**
+     * Create aggregate function.
+     *
+     * @param name the name of the new function
+     * @param nargs number of arguments to function
+     * @param f interface of function
+     */
+
+    public native void create_aggregate(String name, int nargs, Function f);
+
+    /**
+     * Set function return type. Only available in SQLite 2.6.0 and
+     * above, otherwise a no-op.
+     *
+     * @param name the name of the function whose return type is to be set
+     * @param type return type code, e.g. SQLite.Constants.SQLITE_NUMERIC
+     */
+
+    public native void function_type(String name, int type);
+
+    /**
+     * Return the code of the last error occured in
+     * any of the exec() methods. The value is valid
+     * after an Exception has been reported by one of
+     * these methods. See the <A HREF="Constants.html">Constants</A>
+     * class for possible values.
+     *
+     * @return SQLite error code
+     */
+
+    public int last_error() {
+	return error_code;
+    }
+
+    /**
+     * Internal: set error code.
+     * @param error_code new error code
+     */
+
+    protected void set_last_error(int error_code) {
+	this.error_code = error_code;
+    }
+
+    /**
+     * Return error string given SQLite error code.
+     *
+     * @param error_code the error code
+     * @return error string
+     */
+
+    public static native String error_string(int error_code);
+
+    /**
+     * Set character encoding.
+     * @param enc name of encoding
+     */
+
+    public synchronized void set_encoding(String enc) throws SQLite.Exception {
+	_set_encoding(enc);
+    }
+
+    private native void _set_encoding(String enc)
+	throws SQLite.Exception;
+
+    /**
+     * Set authorizer function. Only available in SQLite 2.7.6 and
+     * above, otherwise a no-op.
+     *
+     * @param auth the authorizer function
+     */
+
+    public synchronized void set_authorizer(Authorizer auth) {
+	_set_authorizer(auth);
+    }
+
+    private native void _set_authorizer(Authorizer auth);
+
+    /**
+     * Set trace function. Only available in SQLite 2.7.6 and above,
+     * otherwise a no-op.
+     *
+     * @param tr the trace function
+     */
+
+    public synchronized void trace(Trace tr) {
+	_trace(tr);
+    }
+
+    private native void _trace(Trace tr);
+
+    /**
+     * Compile and return SQLite VM for SQL statement. Only available
+     * in SQLite 2.8.0 and above, otherwise a no-op.
+     *
+     * @param sql SQL statement to be compiled
+     * @return a Vm object
+     */
+
+    public synchronized Vm compile(String sql) throws SQLite.Exception {
+	Vm vm = new Vm();
+	vm_compile(sql, vm);
+	return vm;
+    }
+
+    /**
+     * Compile and return SQLite VM for SQL statement. Only available
+     * in SQLite 3.0 and above, otherwise a no-op.
+     *
+     * @param sql SQL statement to be compiled
+     * @param args arguments for the SQL statement, '%q' substitution
+     * @return a Vm object
+     */
+
+    public synchronized Vm compile(String sql, String args[])
+	throws SQLite.Exception {
+	Vm vm = new Vm();
+	vm_compile_args(sql, vm, args);
+	return vm;
+    }
+
+    /**
+     * Check type of open database.
+     * @return true if SQLite3 database
+     */
+
+    public native boolean is3();
+
+    /**
+     * Internal compile method.
+     * @param sql SQL statement
+     * @param vm Vm object
+     */
+
+    private native void vm_compile(String sql, Vm vm)
+	throws SQLite.Exception;
+
+    /**
+     * Internal compile method, SQLite 3.0 only.
+     * @param sql SQL statement
+     * @param args arguments for the SQL statement, '%q' substitution
+     * @param vm Vm object
+     */
+
+    private native void vm_compile_args(String sql, Vm vm, String args[])
+	throws SQLite.Exception;
+
+    /**
+     * Establish a progress callback method which gets called after
+     * N SQLite VM opcodes.
+     *
+     * @param n number of SQLite VM opcodes until callback is invoked
+     * @param p the object implementing the progress callback method
+     */
+
+    public synchronized void progress_handler(int n,
+					      SQLite.ProgressHandler p) {
+	_progress_handler(n, p);
+    }
+
+    private native void _progress_handler(int n, SQLite.ProgressHandler p);
+
+    /**
+     * Internal native initializer.
+     */
+
+    private static native void internal_init();
+
+    /**
+     * Static initializer to load the native part.
+     */
+
+    static {
+	try {
+	    System.loadLibrary("sqlite_jni");
+	    internal_init();
+	} catch (Throwable t) {
+	    System.err.println("Unable to load sqlite: " + t);
+	}
+    }
+}

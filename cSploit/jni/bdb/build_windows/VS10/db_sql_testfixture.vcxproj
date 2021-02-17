@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="4.0">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+  <ProjectGuid>{5D79B660-0667-11DF-8A39-0800200C9A66}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+    </ImportGroup>
+  <ImportGroup>
+    <Import Project="application.props"/>
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <TargetName>testfixture</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../lang/sql/generated;../../lang/sql/adapter;../../lang/sql/sqlite/src;../../lang/sql/sqlite/ext/fts3;../../lang/sql/sqlite/ext/rtree;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CONSOL;STATIC_BUILD;SQLITE_TEST;TCLSH;SQLITE_NO_SYNC;SQLITE_CRASH_TEST;SQLITE_SERVER;SQLITE_PRIVATE;SQLITE_CORE;SQLITE_THREADSAFE=1;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE_UNICODE;UNICODE;SQLITE_MEMDEBUG;;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>tcl85.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../lang/sql/generated;../../lang/sql/adapter;../../lang/sql/sqlite/src;../../lang/sql/sqlite/ext/fts3;../../lang/sql/sqlite/ext/rtree;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CONSOL;STATIC_BUILD;SQLITE_TEST;TCLSH;SQLITE_NO_SYNC;SQLITE_CRASH_TEST;SQLITE_SERVER;SQLITE_PRIVATE;SQLITE_CORE;SQLITE_THREADSAFE=1;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>tcl85.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../lang/sql/generated;../../lang/sql/adapter;../../lang/sql/sqlite/src;../../lang/sql/sqlite/ext/fts3;../../lang/sql/sqlite/ext/rtree;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CONSOL;STATIC_BUILD;SQLITE_TEST;TCLSH;SQLITE_NO_SYNC;SQLITE_CRASH_TEST;SQLITE_SERVER;SQLITE_PRIVATE;SQLITE_CORE;SQLITE_THREADSAFE=1;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE_UNICODE;UNICODE;SQLITE_MEMDEBUG;;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>tcl85.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../lang/sql/generated;../../lang/sql/adapter;../../lang/sql/sqlite/src;../../lang/sql/sqlite/ext/fts3;../../lang/sql/sqlite/ext/rtree;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_CONSOL;STATIC_BUILD;SQLITE_TEST;TCLSH;SQLITE_NO_SYNC;SQLITE_CRASH_TEST;SQLITE_SERVER;SQLITE_PRIVATE;SQLITE_CORE;SQLITE_THREADSAFE=1;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>tcl85.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\alter.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\analyze.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\attach.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\auth.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\backup.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\bitvec.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\btmutex.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\btree.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\build.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\callback.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\ctime.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\complete.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\date.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\db_pragma.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\db_sequence.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\delete.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\db_encrypt.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\expr.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\fault.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\fkey.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_aux.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_expr.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_hash.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_icu.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_porter.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_snippet.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_term.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_test.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_tokenizer1.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_tokenizer.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\fts3\fts3_write.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\func.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\global.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\hash.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\insert.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\journal.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\legacy.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\loadext.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\main.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\malloc.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\mem0.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\mem1.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\mem2.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\mem3.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\mem5.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\memjournal.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\mutex.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\mutex_noop.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\mutex_w32.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\notify.c"/>
+    <ClCompile Include="..\..\lang\sql\generated\opcodes.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\os.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\os_win.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\pager.c"/>
+    <ClCompile Include="..\..\lang\sql\generated\parse.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\pcache.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\pcache1.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\pragma.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\prepare.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\printf.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\random.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\resolve.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\rowset.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\ext\rtree\rtree.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\select.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\status.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\table.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\tokenize.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\trigger.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\update.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\utf.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\util.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\vacuum.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\vdbe.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\vdbeapi.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\vdbeaux.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\vdbeblob.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\vdbemem.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\vdbesort.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\vdbetrace.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\vtab.c"/>
+    <ClCompile Include="..\..\lang\sql\adapter\wal.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\walker.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\where.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\tclsqlite.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_init.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test1.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test2.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test3.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test4.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test5.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test6.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test7.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test8.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test9.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_async.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_autoext.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_backup.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_btree.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_config.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_demovfs.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_devsym.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_fs.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_func.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_fuzzer.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_hexio.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_intarray.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_journal.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_loadext.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_malloc.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_multiplex.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_mutex.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_onefile.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_osinst.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_pcache.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_quota.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_regexp.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_rtree.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_schema.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_server.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_syscall.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_superlock.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_stat.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_tclvar.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_thread.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_vfs.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_vfstrace.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_wholenumber.c"/>
+    <ClCompile Include="..\..\lang\sql\sqlite\src\test_wsd.c"/>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ItemGroup>
+    <ProjectReference Condition="exists('db.vcxproj')" Include="db.vcxproj">
+      <Project>{fd045d60-abad-4a6c-9794-9bfb085fc3e7}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

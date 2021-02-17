@@ -1,0 +1,48 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+/****************************************************************************
+
+
+window.rc
+
+produced by Borland Resource Workshop
+
+
+*****************************************************************************/
+
+#include <windows.h>
+#include "window.rh"
+#include "../../../../jrd/version.rc"
+#include "property.rc"
+
+STRINGTABLE 
+{
+ IDS_PNP1, "A device which is in use by Firebird is going to be removed.  The Firebird server will have to be shutdown before the device can be removed."
+ IDS_PNP2, "Any uncommitted data will be lost.  Choose OK when you are ready to shutdown the server, or Cancel to abort the removal of the device."
+ IDS_PNP3, "Note: The removal of this device may not be cancelable in which case another warning will follow."
+ IDS_QUIT1, "%u connection(s) active.  Are you sure you want to exit?"
+ IDS_QUIT2, "%u service(s) active.  Are you sure you want to exit?"
+ IDS_REGERROR, "Error registering main window class"
+ IDS_ALREADYSTARTED "The Firebird Server failed to startup\r\nbecause another instance of the server\r\nis already running." 
+ IDS_MAPERROR, "The Firebird server failed to startup\r\nbecause a needed resource is in use.\r\nInsure that all previously connected\r\nFirebird client applications have\r\nterminated and try again."
+ IDS_PROPERTIES, "P&roperties"
+ IDS_SHUTDOWN, "&Shutdown"
+}
+
+IDI_IBSVR_SMALL ICON DISCARDABLE "server.ico"

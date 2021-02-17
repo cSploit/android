@@ -1,0 +1,124 @@
+This is ncpfs, a free NetWare client filesystem for Linux. Besides
+some little utilities it also contains nprint, which enables you to
+print on NetWare print queues. The opposite side, pserver, is also
+provided.
+
+ncpfs works with NetWare versions 3.x and following. It does NOT work
+with NetWare version 2.x. Some of the NetWare look-alikes, such as
+CD-ROM servers WinNT 3.51 Server are also NOT supported. This
+restriction comes from the fact that ncpfs relies heavily on the name
+space facilities NetWare supports since version 3. When you want to
+mount volumes that have been exported by mars_nwe, you have to
+activate the name space calls in mars_nwe's config.h file, although
+probably it's more clever to use nfs between two Linux machines.
+
+The user-space utilities such as nprint and the bindery utils should
+work with all versions of NetWare.
+
+
+INSTALLATION
+
+Before you start the installation, make sure that your kernel has IPX
+support compiled in. When 'make config' asks you for
+
+The IPX protocol (CONFIG_IPX) [N/y/m/?]
+
+simply answer 'y' or 'm'. Probably you do not need the full internal net 
+that you are asked for next.
+
+Run 'configure', 'make' and, as root, 'make install'. That's all.
+
+Before installing new version of ncpfs, you should stop all users of
+old version, to release libncp.so from memory. Run as root:
+	umount -v -a -tncpfs
+Command above unmounts all your ncpfs mounted volumes. Of course,
+it is not necessary if you agree that disk space occupied by old
+libncp.so will be released after reboot and that currently mounted
+shares will continue using old libncp.so until unmount.	
+	
+See shell script file "contrib/scripts/rc.ipxnet" for other details.
+
+
+HELP
+
+In the meantime my mail volume has grown considerably, so the response
+time might be better at the LinWare mailing list than at my personal
+email address. You can mail to and/or subscribe to the LinWare mailing
+list:
+
+Topics for the list:
+- discussing LinWare server, its features, installation problems and bugs
+- using IPX protocol under Linux
+- IPX routing and router daemons under Linux
+- mars_nwe
+- ncpfs
+
+You can subscribe to the list by sending the command "add linware" in
+the mail message body to address: "listserv@sh.cvut.cz".  Your
+postings should be sent to: "linware@sh.cvut.cz".
+
+
+USING NCPFS
+
+Please note that your IPX system has to be configured correctly. If
+you want to take the 'Plug-and-Play' route, you can simply say
+'ipx_configure --auto_interface=on --auto_primary=on'. If ncpmount
+does not work immediately, you should wait for about 1 minute and try
+again. In that period, an IPX packet should have passed by and your
+network interface should have configured itself automatically.
+
+If all that does not work and you want to do the configuration by
+hand, note that there has to be a route to the internal network of
+your server. Please see the file util/start_ipx for an example.
+
+I use tools written by Greg Page, Caldera. I hope I did not do too
+much harm to their business. For your convenience I included the
+contents of the file ipx.tar made available by Caldera.
+
+My main source of information is a book written in german by Manfred
+Hill and Ralf Zessin, "Netzwerkprogrammierung in C", IWT Verlag GmbH,
+1995, ISBN 3-88322-491-X. It contains quite a lot of typographical and
+other errors, but I find it very valuable as an introduction to NCP
+programming. If you know about the concepts and possibilities of NCP,
+Ralph Brown's interrupt list becomes much more readable. It's much
+easier to find undocumented information if you know what to look for!
+
+For the curious: the files ncplib.[ch] are a library that makes it
+possible to send NCP requests to the server over a mounted
+directory. I use it to keep the encryption stuff out of the kernel by
+logging in from user space. Look at the file ncptest.c for other
+possible uses. I use ncptest to check my assumptions about the widely
+undocumented NetWare Core Protocol.  Maybe this is the beginning of a
+free NetWare API for Linux! I would be happy to receive your comments
+on this.
+
+
+THANKS
+
+I do not want to leave those unmentioned, who have helped me with
+ncpfs. 
+
+The most enthusiastic user and tester is certainly Uwe Bonnes
+<bon@elektron.ikp.physik.th-darmstadt.de>. So far he's the only one
+who has contributed something, namely manpages and corrections to
+existing manpages.
+
+Ales Dyrak has written lwared, which was the initial start for ncpfs.
+
+Alan Cox has found some bugs I would probably never have found.
+
+Look at the file Changes for others.
+
+
+LIMITATIONS (compare these with smbfs :-)
+
+The limitations ncpfs has are the natural limitations of the NCP
+protocol, which was designed with MS-DOS based PCs in mind. The first
+limitation is the lack of uid, gid and permission information per
+file. You have to assign those values once for a complete mounted
+directory.
+
+Have fun with ncpfs!
+
+Volker, lendecke@namu01.gwdg.de (original author)
+Petr Vandrovec, vandrove@vc.cvut.cz (current maintainer)

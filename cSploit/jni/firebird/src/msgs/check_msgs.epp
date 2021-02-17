@@ -1,0 +1,208 @@
+/*
+ *	PROGRAM:		Firebird Message Facility
+ *	MODULE:			check_messages.epp
+ *	DESCRIPTION:	Check whether any messages have been updated
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+#include "firebird.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#ifdef TIME_WITH_SYS_TIME
+# include <sys/time.h>
+# include <time.h>
+#else
+# ifdef HAVE_SYS_TIME_H
+#  include <sys/time.h>
+# else
+#  include <time.h>
+# endif
+#endif
+
+#include "../jrd/ibase.h"
+#include "../yvalve/gds_proto.h"
+
+DATABASE DB = "msg.fdb";
+
+
+const char* INCLUDE_INDICATOR	= "indicator.incl";
+const char* MESSAGE_INDICATOR	= "indicator.msg";
+const char* LOCALE_INDICATOR	= "indicator.loc";
+
+
+int CLIB_ROUTINE main( int argc, char *argv[])
+{
+/**************************************
+ *
+ *	m a i n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Top level routine.
+ *
+ **************************************/
+	TEXT *p, **end_args, db_file[256];
+	bool flag_jrd;
+	bool flag_msg;
+	bool flag_loc;
+	bool do_locales = false;
+	bool sw_bad;
+	FILE *ind_jrd, *ind_msg, *ind_loc;
+	ISC_TIMESTAMP date_jrd, date_msg, date_loc;
+	struct stat file_stat;
+
+	strcpy(db_file, "msg.fdb");
+
+	end_args = argv + argc;
+
+	for (++argv; argv < end_args;)
+	{
+		p = *argv++;
+		sw_bad = false;
+		if (*p != '-')
+			sw_bad = true;
+		else
+		{
+			switch (UPPER(p[1]))
+			{
+			case 'D':
+				strcpy(db_file, *argv++);
+				break;
+
+			case 'L':
+				do_locales = true;
+				break;
+
+			default:
+				sw_bad = true;
+			}
+		}
+		if (sw_bad)
+		{
+			printf("Invalid option \"%s\".  Valid options are:\n", p);
+			printf("\t-D\tDatabase name\n");
+			printf("\t-L\tCheck all locales\n");
+			exit(FINI_ERROR);
+		}
+	}
+
+	flag_jrd = flag_msg = true;
+
+	if (ind_jrd = fopen(INCLUDE_INDICATOR, "r"))
+	{
+		if (!fstat(fileno(ind_jrd), &file_stat))
+		{
+			isc_encode_date(localtime(&file_stat.st_mtime), (ISC_QUAD*) &date_jrd);
+			flag_jrd = false;
+		}
+		fclose(ind_jrd);
+	}
+
+	if (ind_msg = fopen(MESSAGE_INDICATOR, "r"))
+	{
+		if (!fstat(fileno(ind_msg), &file_stat))
+		{
+			isc_encode_date(localtime(&file_stat.st_mtime), (ISC_QUAD*) &date_msg);
+			flag_msg = false;
+		}
+		fclose(ind_msg);
+	}
+
+	if (do_locales)
+	{
+		flag_loc = true;
+		if (ind_loc = fopen(LOCALE_INDICATOR, "r"))
+		{
+			if (!fstat(fileno(ind_loc), &file_stat))
+			{
+				isc_encode_date(localtime(&file_stat.st_mtime), (ISC_QUAD*) &date_loc);
+				flag_loc = false;
+			}
+			// Earlier the following fclose was closing ind_msg again, due to which
+			// check_messages was crashing with SEGV signal -
+			fclose(ind_loc);	// A bug in check_messages is fixed
+		}
+	}
+
+	READY db_file AS DB;
+	START_TRANSACTION;
+
+	if (!flag_jrd)
+	{
+		FOR FIRST 1 X IN FACILITIES WITH
+			X.FACILITY EQ 'JRD' AND X.LAST_CHANGE GE date_jrd
+
+            flag_jrd = true;
+		END_FOR;
+	}
+
+	if (!flag_msg)
+	{
+		FOR FIRST 1 X IN FACILITIES WITH
+			X.LAST_CHANGE GE date_msg
+
+            flag_msg = true;
+		END_FOR;
+	}
+
+	if (!flag_loc)
+	{
+		FOR FIRST 1 T IN TRANSMSGS WITH
+			T.TRANS_DATE GE date_loc
+
+            flag_loc = true;
+		END_FOR;
+	}
+
+	COMMIT;
+	FINISH;
+
+	if (flag_jrd)
+	{
+		if (ind_jrd = fopen(INCLUDE_INDICATOR, "w"))
+		{
+			fputc(' ', ind_jrd);
+			fclose(ind_jrd);
+		}
+	}
+
+	if (flag_msg)
+	{
+		if (ind_msg = fopen(MESSAGE_INDICATOR, "w"))
+		{
+			fputc(' ', ind_msg);
+			fclose(ind_msg);
+		}
+	}
+
+	if (flag_loc)
+	{
+		if (ind_loc = fopen(LOCALE_INDICATOR, "w"))
+		{
+			fputc(' ', ind_loc);
+			fclose(ind_loc);
+		}
+	}
+
+	exit(FINI_OK);
+}

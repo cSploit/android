@@ -1,0 +1,170 @@
+#!/bin/bash
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+# Checks that the "_svn" function defined in the specified "bash_completion"
+# script produces appropriate lists of completions for various incomplete svn
+# command lines.
+
+if [ ! -f "$1" ] || [ "$2" ]; then
+  echo "Usage: bash_completion_test BASH_COMPLETION_PATHNAME"
+  echo "Tests the specified \"bash_completion\" script,"
+  echo "including checking it against the \"svn\" program found in the current PATH."
+  exit 1
+fi
+
+set -e  # Exit on error
+shopt -s extglob
+export LC_ALL=C
+
+# Execute the script which is to be tested.
+. "$1"
+
+# From the given incomplete svn command, print a space-separated list of
+# possible completions of the last argument (or of an empty first argument
+# if no subcommand is given).
+# Usage: get_svn_completions [SVN-SUBCOMMAND [SVN-OPTION...]]
+get_svn_completions() {
+  COMP_WORDS=(svn "$@")
+  if [ $# == 0 ]; then
+    COMP_CWORD=1
+  else
+    COMP_CWORD=$#
+  fi
+  _svn
+  echo -n "${COMPREPLY[*]}"
+}
+
+# Print a failure message, record the failure, and return "false".
+# Usage: fail MESSAGE
+fail() {
+  PREFIX="FAIL: "
+  for LINE in "$@"; do
+    echo "$PREFIX$LINE"
+    PREFIX="      "
+  done
+  TESTS_FAILED=1
+  false
+}
+
+# Check that EXPECTED-WORD is among the completions of the last word in
+# SVN-COMMAND.  SVN-COMMAND is a single argument to this function, split
+# into multiple arguments when passed to "get_svn_completions()".
+# Usage: includes SVN-COMMAND EXPECTED-WORD
+includes() {
+  COMPLETIONS=`get_svn_completions $1`
+  if [[ "$2" != @(${COMPLETIONS// /|}) ]]; then
+    fail "completions of \"svn $1\" should include \"$2\"" \
+      "(completions: $COMPLETIONS)"
+  fi
+}
+
+excludes() {
+  COMPLETIONS=`get_svn_completions $1`
+  if [[ "$2" == @(${COMPLETIONS// /|}) ]]; then
+    fail "completions of \"svn $1\" should exclude \"$2\"" \
+      "(completions: $COMPLETIONS)"
+  fi
+}
+
+# Print the valid subcommands for "svn", one per line, sorted.
+# Exclude any synonym that is just a truncation of its full name.
+# Usage: get_svn_subcommands
+get_svn_subcommands() {
+  svn help |
+    # Find the relevant lines.
+    sed -n -e '1,/^Available subcommands:$/d;/^$/q;p' |
+    # Remove brackets and commas
+    tr -d ' )' | tr '(,' ' ' |
+    # Remove simple abbreviations
+    ( while read SYNONYMS; do
+        for CMD in $SYNONYMS; do
+          if [ "$CMD" != "?" ]; then
+            for SYNONYM in $SYNONYMS; do
+              case $SYNONYM in
+              $CMD) ;;
+              $CMD*) CMD= ; break ;;
+              esac
+            done
+            if [ $CMD ]; then
+              echo $CMD
+            fi
+          fi
+        done
+      done
+    ) |
+    sort
+}
+
+# Print the valid option switches for "svn SUBCMD", one per line, sorted.
+# Usage: get_svn_options SUBCMD
+get_svn_options() {
+  { svn help "$1" |
+      # Find the relevant lines; remove "arg" and description.
+      sed -n -e '1,/^Valid options:$/d;/^  -/!d' \
+             -e 's/\( ARG\)* * : .*//;p' |
+      # Remove brackets; put each word on its own line.
+      tr -d '] ' | tr '[' '\n'
+    # The following options are always accepted but not listed in the help
+    echo "-h"
+    echo "--help"
+  } | sort
+  
+}
+
+
+# The tests.
+set +e  # Do not exit on error
+TESTS_FAILED=
+
+echo "Checking general completion"
+includes "he" "help"
+includes "" "help"
+includes "" "--version"
+
+echo "Checking list of subcommands"
+HELP_SUBCMDS=`get_svn_subcommands | tr "\n" " "`
+COMPLETION_SUBCMDS=`get_svn_completions | tr " " "\n" | grep -v "^-" | sort | tr "\n" " "`
+if [ "$HELP_SUBCMDS" != "$COMPLETION_SUBCMDS" ]; then
+  fail "non-option completions for \"svn \" != subcommands accepted" \
+       "    (non-o. cmpl.: $COMPLETION_SUBCMDS)" \
+       "    (svn accepts:  $HELP_SUBCMDS)"
+fi
+
+echo "Checking list of options for each subcommand"
+for SUBCMD in $HELP_SUBCMDS; do
+  HELP_OPTIONS=`get_svn_options $SUBCMD | tr "\n" " "`
+  COMPLETION_OPTIONS=`get_svn_completions $SUBCMD - | tr " " "\n" | sort | tr "\n" " "`
+  if [ "$HELP_OPTIONS" != "$COMPLETION_OPTIONS" ]; then
+    fail "completions for \"svn $SUBCMD -\" != options accepted" \
+	 "    (completions: $COMPLETION_OPTIONS)" \
+         "    (svn accepts: $HELP_OPTIONS)"
+  fi
+done
+
+echo "Checking rejection of synonyms"
+excludes "diff -x -u -" "-x"
+excludes "diff -x -u --e" "--extensions"
+excludes "diff --extensions -u -" "--extensions"
+excludes "diff --extensions -u -" "-x"
+excludes "diff --extensions=-u -" "-x"
+
+if [ $TESTS_FAILED ]; then
+  echo "FAILURE: at least one bash_completion test failed."
+else
+  echo "All bash_completion tests passed."
+fi

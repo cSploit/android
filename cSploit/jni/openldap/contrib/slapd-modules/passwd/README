@@ -1,0 +1,69 @@
+This directory contains native slapd plugins for password mechanisms that
+are not actively supported by the project. Currently this includes the
+Kerberos, Netscape MTA-MD5 and RADIUS password mechanisms. The Apache
+APR1 MD5 and BSD/Paul Henning Kamp MD5 mechanisms are also included.
+
+To use the Kerberos plugin, add:
+
+moduleload pw-kerberos.so
+
+to your slapd configuration file.
+
+To use the Netscape plugin, add:
+
+moduleload pw-netscape.so
+
+to your slapd configuration file.
+
+To use the APR1/BSD/MD5 plugin, add:
+
+moduleload pw-apr1.so
+
+to your slapd configuration file.
+
+To use the RADIUS plugin, add:
+
+moduleload pw-radius.so
+
+to your slapd configuration file; optionally, the path to a configuration
+file can be appended in the form
+
+moduleload pw-radius.so config="/etc/radius.conf"
+
+Use Makefile to compile this plugin or use a command line similar to:
+
+gcc -shared -I../../../include -Wall -g -DHAVE_KRB5 -o pw-kerberos.so kerberos.c
+
+Replace HAVE_KRB5 with HAVE_KRB4 if you want to use Kerberos IV.
+If your Kerberos header files are not in the C compiler's
+default path, you will need to add a "-I" directive for that as well.
+
+The corresponding command for the Netscape plugin would be:
+
+gcc -shared -I../../../include -Wall -g -o pw-netscape.so netscape.c
+
+The corresponding command for the RADIUS plugin would be:
+
+gcc -shared -I../../../include -Wall -g -o pw-radius.so radius.c -lradius
+
+(Actually, you might want to statically link the RADIUS client library
+libradius.a into the module).
+
+The corresponding command for the APR1 plugin would be:
+
+gcc -shared -I../../../include -Wall -g -o pw-apr1.so apr1.c
+
+---
+This work is part of OpenLDAP Software <http://www.openldap.org/>.
+
+Copyright 2004-2014 The OpenLDAP Foundation.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in the file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+<http://www.OpenLDAP.org/license.html>.
+

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+AUTOTOOLS_DIR=/usr/share/misc
+if [ -f "${AUTOTOOLS_DIR}/config.guess" ]; then
+  cp -p "${AUTOTOOLS_DIR}/config.guess" config.guess
+fi
+if [ -f "${AUTOTOOLS_DIR}/config.sub" ]; then
+  cp -p "${AUTOTOOLS_DIR}/config.sub" config.sub
+fi
+aclocal
+
+# Do not use space between -W and all, otherwise Debian's auto*-wrapper
+# brokes...
+autoconf -Wall
+autoheader -Wall
+
+rm -f config.cache config.status config.log

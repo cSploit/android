@@ -1,0 +1,47 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 51ec0b24-bd07-11db-97f6-8dc527e3df93
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2007-02-15T15:16:13.268177Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 143
+Content-length: 143
+
+K 7
+svn:log
+V 41
+Commit a special file with a unknown type
+K 10
+svn:author
+V 7
+malcolm
+K 8
+svn:date
+V 27
+2007-02-15T15:18:08.532835Z
+PROPS-END
+
+Node-path: special
+Node-kind: file
+Node-action: add
+Prop-content-length: 33
+Text-content-length: 11
+Text-content-md5: 12dfeb21c0626cc041b5de87de30c661
+Content-length: 44
+
+K 11
+svn:special
+V 1
+*
+PROPS-END
+gimble wabe
+

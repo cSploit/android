@@ -1,0 +1,78 @@
+#!/bin/bash
+# This is the cronjob as run on our ASF box aka svn-qavm.
+# It uses neels' mad bash script magic called 'pat' to update and
+# build the latest trunk, invokes a benchmark and sends as mail.
+
+#EMAILS=your@email.addresses
+EMAILS=""
+
+if [ "$USER" = "neels" ]; then
+  # I don't want to keep editing files after every update. ~Neels
+  EMAILS=dev@subversion.apache.org
+fi
+
+
+echo
+echo "--------------------------------------------------------------------"
+date
+echo
+
+results="$(tempfile)"
+
+
+# first update trunk to HEAD and rebuild.
+# update/build is logged to the cronjob log (via stdout)
+
+cd /home/neels/pat/trunk
+/home/neels/bin/pat update
+
+if [ "$?" -ne "0" ]; then
+  subject="Failed to update to HEAD."
+  echo "$subject" > "$results"
+  echo "$subject"
+else
+
+  rev="$(svn info /home/neels/pat/trunk/src | grep Revision)"
+  if [ -z "$rev" ]; then
+    subject="Working copy problem."
+    echo "$subject" > "$results"
+    echo "$subject"
+  else
+
+    /home/neels/bin/pat remake
+    if [ "$?" -ne "0" ]; then
+      subject="Failed to build $rev."
+      echo "$subject" > "$results"
+      echo "$subject"
+    else
+
+      
+      # updating and building succeeded!
+      # run the benchmark:
+
+      compiled="$(/home/neels/pat/trunk/prefix/bin/svn --version | grep "compiled")"
+      subject="$rev$compiled"
+
+      cd /home/neels/svnbench/
+
+      # make more or less sure that runs don't leak into each other via
+      # I/O caching.
+      sync
+
+      # basically, just run it. But also, I want to
+      # - append output to stdout, for cronjob logging.
+      # - send output as mail, but only this run's output less update&build
+      "$(which time)" -p ./run 2>&1 | tee "$results"
+
+    fi
+  fi
+fi
+
+if [ -n "$EMAILS" ]; then
+  cat "$results" | mail -s "[svnbench] $subject" $EMAILS
+else
+  echo "No email addresses configured."
+fi
+
+rm "$results"
+

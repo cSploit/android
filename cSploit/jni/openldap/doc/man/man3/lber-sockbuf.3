@@ -1,0 +1,199 @@
+.TH LBER_SOCKBUF 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ber_sockbuf_alloc, ber_sockbuf_free, ber_sockbuf_ctrl, ber_sockbuf_add_io, ber_sockbuf_remove_io, Sockbuf_IO \- OpenLDAP LBER I/O infrastructure
+.SH LIBRARY
+OpenLDAP LBER (liblber, \-llber)
+.SH SYNOPSIS
+.B #include <lber.h>
+.LP
+.B Sockbuf *ber_sockbuf_alloc( void );
+.LP
+.BI "void ber_sockbuf_free(Sockbuf *" sb ");"
+.LP
+.BI "int ber_sockbuf_ctrl(Sockbuf *" sb ", int " opt ", void *" arg ");"
+.LP
+.BI "int ber_sockbuf_add_io(Sockbuf *" sb ", Sockbuf_IO *" sbio ", int " layer ", void *" arg ");"
+.LP
+.BI "int ber_sockbuf_remove_io(Sockbuf *" sb ", Sockbuf_IO *" sbio ", int " layer ");"
+.LP
+.nf
+.B typedef struct sockbuf_io_desc {
+.BI "int " sbiod_level ";"
+.BI "Sockbuf *" sbiod_sb ";"
+.BI "Sockbuf_IO *" sbiod_io ";"
+.BI "void *" sbiod_pvt ";"
+.BI "struct sockbuf_io_desc *" sbiod_next ";"
+.B } Sockbuf_IO_Desc;
+.LP
+.B typedef struct sockbuf_io {
+.BI "int (*" sbi_setup ")(Sockbuf_IO_Desc *" sbiod ", void *" arg ");"
+.BI "int (*" sbi_remove ")(Sockbuf_IO_Desc *" sbiod ");"
+.BI "int (*" sbi_ctrl ")(Sockbuf_IO_Desc *" sbiod ", int " opt ", void *" arg ");"
+.BI "ber_slen_t (*" sbi_read ")(Sockbuf_IO_Desc *" sbiod ", void *" buf ", ber_len_t " len ");"
+.BI "ber_slen_t (*" sbi_write ")(Sockbuf_IO_Desc *" sbiod ", void *" buf ", ber_len_t " len ");"
+.BI "int (*" sbi_close ")(Sockbuf_IO_Desc *" sbiod ");"
+.B } Sockbuf_IO;
+
+.SH DESCRIPTION
+.LP
+These routines are used to manage the low level I/O operations performed
+by the Lightweight BER library. They are called implicitly by the other
+libraries and usually do not need to be called directly from applications.
+The I/O framework is modularized and new transport layers can be supported
+by appropriately defining a
+.B Sockbuf_IO
+structure and installing it onto an existing
+.BR Sockbuf .
+.B Sockbuf
+structures are allocated and freed by
+.BR ber_sockbuf_alloc ()
+and
+.BR ber_sockbuf_free (),
+respectively. The
+.BR ber_sockbuf_ctrl ()
+function is used to get and set options related to a
+.B Sockbuf
+or to a specific I/O layer of the
+.BR Sockbuf .
+The
+.BR ber_sockbuf_add_io ()
+and
+.BR ber_sockbuf_remove_io ()
+functions are used to add and remove specific I/O layers on a
+.BR Sockbuf .
+
+Options for
+.BR ber_sockbuf_ctrl ()
+include:
+.TP
+.B LBER_SB_OPT_HAS_IO
+Takes a
+.B Sockbuf_IO *
+argument and returns 1 if the given handler is installed
+on the
+.BR Sockbuf ,
+otherwise returns 0.
+.TP
+.B LBER_SB_OPT_GET_FD
+Retrieves the file descriptor associated to the
+.BR Sockbuf ;
+.B arg
+must be a
+.BR "ber_socket_t *" .
+The return value will be 1 if a valid descriptor was present, \-1 otherwise.
+.TP
+.B LBER_SB_OPT_SET_FD
+Sets the file descriptor of the
+.B Sockbuf
+to the descriptor pointed to by
+.BR arg ;
+.B arg
+must be a
+.BR "ber_socket_t *" .
+The return value will always be 1.
+.TP
+.B LBER_SB_OPT_SET_NONBLOCK
+Toggles the non-blocking state of the file descriptor associated to
+the
+.BR Sockbuf .
+.B arg
+should be NULL to disable and non-NULL to enable the non-blocking state.
+The return value will be 1 for success, \-1 otherwise.
+.TP
+.B LBER_SB_OPT_DRAIN
+Flush (read and discard) all available input on the
+.BR Sockbuf .
+The return value will be 1.
+.TP
+.B LBER_SB_OPT_NEEDS_READ
+Returns non-zero if input is waiting to be read.
+.TP
+.B LBER_SB_OPT_NEEDS_WRITE
+Returns non-zero if the
+.B Sockbuf
+is ready to be written.
+.TP
+.B LBER_SB_OPT_GET_MAX_INCOMING
+Returns the maximum allowed size of an incoming message;
+.B arg
+must be a
+.BR "ber_len_t *" .
+The return value will be 1.
+.TP
+.B LBER_SB_OPT_SET_MAX_INCOMING
+Sets the maximum allowed size of an incoming message;
+.B arg
+must be a
+.BR "ber_len_t *" .
+The return value will be 1.
+
+.LP
+Options not in this list will be passed down to each
+.B Sockbuf_IO
+handler in turn until one of them processes it. If the option is not handled
+.BR ber_sockbuf_ctrl ()
+will return 0.
+
+.LP
+Multiple
+.B Sockbuf_IO
+handlers can be stacked in multiple layers to provide various functionality.
+Currently defined layers include
+.TP
+.B LBER_SBIOD_LEVEL_PROVIDER
+the lowest layer, talking directly to a network 
+.TP
+.B LBER_SBIOD_LEVEL_TRANSPORT
+an intermediate layer
+.TP
+.B LBER_SBIOD_LEVEL_APPLICATION
+a higher layer
+.LP
+Currently defined
+.B Sockbuf_IO
+handlers in liblber include
+.TP
+.B ber_sockbuf_io_tcp
+The default stream-oriented provider
+.TP
+.B ber_sockbuf_io_fd
+A stream-oriented provider for local IPC sockets
+.TP
+.B ber_sockbuf_io_dgram
+A datagram-oriented provider. This handler is only present if the liblber
+library was built with LDAP_CONNECTIONLESS defined.
+.TP
+.B ber_sockbuf_io_readahead
+A buffering layer, usually used with a datagram provider to hide the
+datagram semantics from upper layers.
+.TP
+.B ber_sockbuf_io_debug
+A generic handler that outputs hex dumps of all traffic. This handler
+may be inserted multiple times at arbitrary layers to show the flow
+of data between other handlers.
+.LP
+Additional handlers may be present in libldap if support for them was
+enabled:
+.TP
+.B ldap_pvt_sockbuf_io_sasl
+An application layer handler for SASL encoding/decoding.
+.TP
+.B sb_tls_sbio
+A transport layer handler for SSL/TLS encoding/decoding. Note that this
+handler is private to the library and is not exposed in the API.
+.LP
+The provided handlers are all instantiated implicitly by libldap, and
+applications generally will not need to directly manipulate them.
+
+.SH SEE ALSO
+.BR lber-decode (3),
+.BR lber-encode (3),
+.BR lber-types (3),
+.BR ldap_get_option (3)
+
+.LP
+.SH ACKNOWLEDGEMENTS
+.so ../Project

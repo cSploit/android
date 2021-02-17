@@ -1,0 +1,350 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>libtommath</ProjectName>
+    <ProjectGuid>{42109FEE-B0B9-4FCD-9E56-2863BF8C55D2}</ProjectGuid>
+    <RootNamespace>libtommath</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC60.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">lib\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">temp\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">temp\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">lib\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">lib\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">temp\$(Platform)\$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">temp\$(Platform)\$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">tommath</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">tommath</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">tommath</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">tommath</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetFileName)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug/libtommath.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetFileName)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Debug/libtommath.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetFileName)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release/libtommath.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeaderOutputFile>
+      </PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>$(IntDir)</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PrecompiledHeaderFile>
+      </PrecompiledHeaderFile>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Lib>
+      <OutputFile>$(OutDir)\$(TargetFileName)</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+    </Lib>
+    <Bscmake>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <OutputFile>.\Release/libtommath.bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="bn_error.c" />
+    <ClCompile Include="bn_fast_mp_invmod.c" />
+    <ClCompile Include="bn_fast_mp_montgomery_reduce.c" />
+    <ClCompile Include="bn_fast_s_mp_mul_digs.c" />
+    <ClCompile Include="bn_fast_s_mp_mul_high_digs.c" />
+    <ClCompile Include="bn_fast_s_mp_sqr.c" />
+    <ClCompile Include="bn_mp_2expt.c" />
+    <ClCompile Include="bn_mp_abs.c" />
+    <ClCompile Include="bn_mp_add.c" />
+    <ClCompile Include="bn_mp_add_d.c" />
+    <ClCompile Include="bn_mp_addmod.c" />
+    <ClCompile Include="bn_mp_and.c" />
+    <ClCompile Include="bn_mp_clamp.c" />
+    <ClCompile Include="bn_mp_clear.c" />
+    <ClCompile Include="bn_mp_clear_multi.c" />
+    <ClCompile Include="bn_mp_cmp.c" />
+    <ClCompile Include="bn_mp_cmp_d.c" />
+    <ClCompile Include="bn_mp_cmp_mag.c" />
+    <ClCompile Include="bn_mp_cnt_lsb.c" />
+    <ClCompile Include="bn_mp_copy.c" />
+    <ClCompile Include="bn_mp_count_bits.c" />
+    <ClCompile Include="bn_mp_div.c" />
+    <ClCompile Include="bn_mp_div_2.c" />
+    <ClCompile Include="bn_mp_div_2d.c" />
+    <ClCompile Include="bn_mp_div_3.c" />
+    <ClCompile Include="bn_mp_div_d.c" />
+    <ClCompile Include="bn_mp_dr_is_modulus.c" />
+    <ClCompile Include="bn_mp_dr_reduce.c" />
+    <ClCompile Include="bn_mp_dr_setup.c" />
+    <ClCompile Include="bn_mp_exch.c" />
+    <ClCompile Include="bn_mp_expt_d.c" />
+    <ClCompile Include="bn_mp_exptmod.c" />
+    <ClCompile Include="bn_mp_exptmod_fast.c" />
+    <ClCompile Include="bn_mp_exteuclid.c" />
+    <ClCompile Include="bn_mp_fread.c" />
+    <ClCompile Include="bn_mp_fwrite.c" />
+    <ClCompile Include="bn_mp_gcd.c" />
+    <ClCompile Include="bn_mp_get_int.c" />
+    <ClCompile Include="bn_mp_grow.c" />
+    <ClCompile Include="bn_mp_init.c" />
+    <ClCompile Include="bn_mp_init_copy.c" />
+    <ClCompile Include="bn_mp_init_multi.c" />
+    <ClCompile Include="bn_mp_init_set.c" />
+    <ClCompile Include="bn_mp_init_set_int.c" />
+    <ClCompile Include="bn_mp_init_size.c" />
+    <ClCompile Include="bn_mp_invmod.c" />
+    <ClCompile Include="bn_mp_invmod_slow.c" />
+    <ClCompile Include="bn_mp_is_square.c" />
+    <ClCompile Include="bn_mp_jacobi.c" />
+    <ClCompile Include="bn_mp_karatsuba_mul.c" />
+    <ClCompile Include="bn_mp_karatsuba_sqr.c" />
+    <ClCompile Include="bn_mp_lcm.c" />
+    <ClCompile Include="bn_mp_lshd.c" />
+    <ClCompile Include="bn_mp_mod.c" />
+    <ClCompile Include="bn_mp_mod_2d.c" />
+    <ClCompile Include="bn_mp_mod_d.c" />
+    <ClCompile Include="bn_mp_montgomery_calc_normalization.c" />
+    <ClCompile Include="bn_mp_montgomery_reduce.c" />
+    <ClCompile Include="bn_mp_montgomery_setup.c" />
+    <ClCompile Include="bn_mp_mul.c" />
+    <ClCompile Include="bn_mp_mul_2.c" />
+    <ClCompile Include="bn_mp_mul_2d.c" />
+    <ClCompile Include="bn_mp_mul_d.c" />
+    <ClCompile Include="bn_mp_mulmod.c" />
+    <ClCompile Include="bn_mp_n_root.c" />
+    <ClCompile Include="bn_mp_neg.c" />
+    <ClCompile Include="bn_mp_or.c" />
+    <ClCompile Include="bn_mp_prime_fermat.c" />
+    <ClCompile Include="bn_mp_prime_is_divisible.c" />
+    <ClCompile Include="bn_mp_prime_is_prime.c" />
+    <ClCompile Include="bn_mp_prime_miller_rabin.c" />
+    <ClCompile Include="bn_mp_prime_next_prime.c" />
+    <ClCompile Include="bn_mp_prime_rabin_miller_trials.c" />
+    <ClCompile Include="bn_mp_prime_random_ex.c" />
+    <ClCompile Include="bn_mp_radix_size.c" />
+    <ClCompile Include="bn_mp_radix_smap.c" />
+    <ClCompile Include="bn_mp_rand.c" />
+    <ClCompile Include="bn_mp_read_radix.c" />
+    <ClCompile Include="bn_mp_read_signed_bin.c" />
+    <ClCompile Include="bn_mp_read_unsigned_bin.c" />
+    <ClCompile Include="bn_mp_reduce.c" />
+    <ClCompile Include="bn_mp_reduce_2k.c" />
+    <ClCompile Include="bn_mp_reduce_2k_l.c" />
+    <ClCompile Include="bn_mp_reduce_2k_setup.c" />
+    <ClCompile Include="bn_mp_reduce_2k_setup_l.c" />
+    <ClCompile Include="bn_mp_reduce_is_2k.c" />
+    <ClCompile Include="bn_mp_reduce_is_2k_l.c" />
+    <ClCompile Include="bn_mp_reduce_setup.c" />
+    <ClCompile Include="bn_mp_rshd.c" />
+    <ClCompile Include="bn_mp_set.c" />
+    <ClCompile Include="bn_mp_set_int.c" />
+    <ClCompile Include="bn_mp_shrink.c" />
+    <ClCompile Include="bn_mp_signed_bin_size.c" />
+    <ClCompile Include="bn_mp_sqr.c" />
+    <ClCompile Include="bn_mp_sqrmod.c" />
+    <ClCompile Include="bn_mp_sqrt.c" />
+    <ClCompile Include="bn_mp_sub.c" />
+    <ClCompile Include="bn_mp_sub_d.c" />
+    <ClCompile Include="bn_mp_submod.c" />
+    <ClCompile Include="bn_mp_to_signed_bin.c" />
+    <ClCompile Include="bn_mp_to_signed_bin_n.c" />
+    <ClCompile Include="bn_mp_to_unsigned_bin.c" />
+    <ClCompile Include="bn_mp_to_unsigned_bin_n.c" />
+    <ClCompile Include="bn_mp_toom_mul.c" />
+    <ClCompile Include="bn_mp_toom_sqr.c" />
+    <ClCompile Include="bn_mp_toradix.c" />
+    <ClCompile Include="bn_mp_toradix_n.c" />
+    <ClCompile Include="bn_mp_unsigned_bin_size.c" />
+    <ClCompile Include="bn_mp_xor.c" />
+    <ClCompile Include="bn_mp_zero.c" />
+    <ClCompile Include="bn_prime_tab.c" />
+    <ClCompile Include="bn_reverse.c" />
+    <ClCompile Include="bn_s_mp_add.c" />
+    <ClCompile Include="bn_s_mp_exptmod.c" />
+    <ClCompile Include="bn_s_mp_mul_digs.c" />
+    <ClCompile Include="bn_s_mp_mul_high_digs.c" />
+    <ClCompile Include="bn_s_mp_sqr.c" />
+    <ClCompile Include="bn_s_mp_sub.c" />
+    <ClCompile Include="bncore.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="tommath.h" />
+    <ClInclude Include="tommath_class.h" />
+    <ClInclude Include="tommath_superclass.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

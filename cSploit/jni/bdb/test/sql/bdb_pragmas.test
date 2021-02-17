@@ -1,0 +1,663 @@
+#
+#    May you do good and not evil.
+#    May you find forgiveness for yourself and forgive others.
+#    May you share freely, never taking more than you give.
+#
+#***********************************************************************
+# This file implements regression tests for some simple Berkeley DB specific
+# pragmas.
+#
+
+
+set testdir [file dirname $argv0]/../../lang/sql/sqlite/test
+source $testdir/tester.tcl
+reset_db
+
+# Test that pragma trickle works as expected.
+#
+
+do_test bdb_pragmas-1.1 {
+  execsql {
+    PRAGMA trickle;
+  }
+} {0}
+
+# Test that it's just ignored before an open happens
+do_test bdb_pragmas-1.2 {
+  execsql {
+    PRAGMA trickle=123;
+  }
+} {0}
+
+do_test bdb_pragmas-1.3 {
+  execsql {
+    CREATE TABLE t1(n int, log int);
+    PRAGMA trickle;
+  }
+} {0}
+
+do_test bdb_pragmas-1.4 {
+  execsql {
+    PRAGMA trickle=10;
+  }
+} {10}
+
+# populate so there will be something to trickle
+do_test bdb_pragmas-1.5 {
+  for {set i 1} {$i<=2000} {incr i} {
+    for {set j 0} {(1<<$j)<$i} {incr j} {}
+    execsql "INSERT INTO t1 VALUES($i,$j)"
+  }
+} {}
+
+do_test bdb_pragmas-1.6 {
+  execsql {
+    PRAGMA trickle=50;
+  }
+} {50}
+
+# TODO: Verify that something actually trickled?
+
+do_test bdb_pragmas-1.7 {
+  set v [catch { execsql {
+    PRAGMA trickle=weoin;
+  }} msg]
+  lappend v $msg
+} {1 {Invalid trickle value weoin, must be a percentage.}}
+
+do_test bdb_pragmas-1.8 {
+  set v [catch { execsql {
+    PRAGMA trickle=12039;
+  }} msg]
+  lappend v $msg
+} {1 {Invalid trickle value 12039, must be a percentage.}}
+
+integrity_check bdb_pragmas-1.99
+
+reset_db
+
+
+# Test bdbsql_system_memory pragma
+do_test bdb_pragmas-2.1 {
+  execsql {
+    PRAGMA bdbsql_system_memory;
+  }
+} {0}
+
+do_test bdb_pragmas-2.2 {
+  execsql {
+    PRAGMA bdbsql_system_memory=-1;
+  }
+} {-1}
+
+do_test bdb_pragmas-2.3 {
+  set v [catch { execsql {
+    PRAGMA bdbsql_system_memory=asdub;
+  }} msg]
+  lappend v $msg
+} {1 {Invalid value bdbsql_system_memory asdub needs to be a base segment id, see DB_ENV->set_shm_key documentation for more information.}}
+
+do_test bdb_pragmas-2.4 {
+  execsql {
+    PRAGMA bdbsql_system_memory=123;
+  }
+} {123}
+
+# Verify that turning system mem off actually works.
+do_test bdb_pragmas-2.5 {
+  execsql {
+    PRAGMA bdbsql_system_memory=-1;
+  }
+} {-1}
+
+do_test bdb_pragmas-2.6 {
+  execsql {
+    PRAGMA bdbsql_system_memory;
+  }
+} {0}
+
+do_test bdb_pragmas-2.7 {
+  execsql {
+    PRAGMA bdbsql_system_memory=123;
+  }
+} {123}
+
+# Trigger the database create.
+do_test bdb_pragmas-2.8 {
+  execsql { CREATE TABLE t1(x int, log int); }
+  for {set i 1} {$i<=20} {incr i} {
+    for {set j 0} {(1<<$j)<$i} {incr j} {}
+    execsql "INSERT INTO t1 VALUES($i,$j)"
+  }
+} {}
+
+# Check to see if the region files were created (if so, it's not working).
+do_test bdb_pragmas-2.9 {
+  set ::regionfile [lindex [glob test.db-journal/__db.*] 0]
+  llength $::regionfile
+} {1}
+
+do_test bdb_pragmas-2.10 {
+  execsql {
+    PRAGMA bdbsql_system_memory;
+  }
+} {1}
+
+do_test bdb_pragmas-2.11 {
+  set v [catch { execsql {
+    PRAGMA bdbsql_system_memory=124;
+  }} msg]
+  lappend v $msg
+} {1 {Cannot set bdbsql_system_memory after accessing the database}}
+
+integrity_check bdb_pragmas-2.99
+
+reset_db
+# Test bdbsql_error_file pragma
+do_test bdb_pragma-3.1 {
+    set v [execsql {
+    PRAGMA bdbsql_error_file;
+  }]
+    set v1 [file normalize [regsub -all "\[{}]" $v ""]]
+    set v "[pwd]/test.db-journal/sql-errors.txt"
+    set v2 [file normalize $v]   
+    expr {$v1 == $v2}
+} {1}
+
+# Create a sqequence to generate error.
+do_test bdb_pragma-3.2 {
+    execsql {
+    PRAGMA bdbsql_error_file = "a.txt";
+    select create_sequence("b", "maxvalue", 3, "cache", 2);
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+    select nextval("b");
+  }
+} {a.txt 0 0 1 2 3}
+
+# Trigger a DB sequence error and save the internal error message to a.txt
+do_test bdb_pragma-3.3 {
+  set v [catch { execsql {
+    select nextval("b");
+  }} msg]
+  lappend v $msg
+} {1 {Sequence value out of bounds.}}
+
+# Test set bdbql_error_file pragma after opening env.
+do_test bdb_pragma-3.4 {
+    execsql {
+    PRAGMA bdbsql_error_file = "b.txt";
+  }
+} {b.txt}
+
+# Trigger a DB sequence error and save the internal error message to b.txt
+do_test bdb_pragma-3.5 {
+  set v [catch { execsql {
+    select nextval("b");
+  }} msg]
+  lappend v $msg
+} {1 {Sequence value out of bounds.}}
+
+#Ensure the error message has been saved to error file as expected. 
+do_test bdb_pragma-3.6 {
+  set fd [open "./a.txt" r]
+  set res [read $fd]
+  close $fd
+  file delete -force ./a.txt
+  set pat {BDB4011 Sequence overflow}
+  regexp $pat $res
+} {1}
+
+do_test bdb_pragma-3.7 {
+  set fd [open "./b.txt" r]
+  set res [read $fd]
+  close $fd
+  db close
+  file delete -force ./b.txt
+  set pat {BDB4011 Sequence overflow}
+  regexp $pat $res
+} {1}
+
+# Test the WAL pragma works as expected. #20620.
+reset_db
+do_test bdb_pragma-4.0 {
+  execsql {
+    create table t1(x);
+    create temporary table t2(x);
+    PRAGMA journal_mode=delete;
+  }
+} {delete}
+
+# Test that pragma bdbsql_lock_tablesize
+#
+reset_db
+
+# If the handle is not opened, the value is zero
+do_test bdb_pragma-5.1 {
+  execsql {
+    PRAGMA bdbsql_shared_resources;
+  }
+} {16777216}
+
+# Open db handle and set_shared_resources
+do_test bdb_pragma-5.2 {
+  db close
+  sqlite3 db test.db
+  execsql {
+    PRAGMA bdbsql_shared_resources=100;
+  }
+} {100}
+
+# Test get_shared_resources
+do_test bdb_pragma-5.3 {
+  execsql {
+    PRAGMA bdbsql_shared_resources;
+  }
+} {100}
+
+# Test invalid value
+if {$tcl_platform(pointerSize) == 4} { 
+  # On 32-bits platform, the max memory size is (4GB - 1),
+  # Too-large size will be truncated.
+  do_test bdb_pragma-5.4 {
+    execsql {
+      PRAGMA bdbsql_shared_resources=4294967296;
+    }
+  } {4294967295}
+} else {
+  # On 64-bits platform, the max acceptable value is
+  # 4611686018427387903 (1G * (UINT32_MAX + 1) - 1)
+  do_test bdb_pragma-5.4 {
+   catchsql {
+      PRAGMA bdbsql_shared_resources=4611686018427387904;
+    }
+  } {1 {Invalid value bdbsql_shared_resources 4611686018427387904}}
+}
+
+# Test negative
+do_test bdb_pragma-5.5 {
+  catchsql {
+    PRAGMA bdbsql_shared_resources=-1;
+  }
+} {1 {Invalid value bdbsql_shared_resources -1}}
+
+# Test invalid value
+if {$tcl_platform(pointerSize) == 4} { 
+  # On 32-bits platform, the max memory size is (4GB - 1)
+  do_test bdb_pragma-5.6 {
+    execsql {
+      PRAGMA bdbsql_shared_resources=4294967295;
+    }
+  } {4294967295}
+} else {
+  # On 64-bits platform, the max acceptable value is
+  # 4611686018427387903 (1G * (UINT32_MAX + 1) - 1)
+  do_test bdb_pragma-5.6 {
+    execsql {
+      PRAGMA bdbsql_shared_resources=4611686018427387903;
+    }
+  } {4611686018427387903}
+}
+
+# Create the table and environment
+do_test bdb_pragma-5.7 {
+  db close
+  sqlite3 db test.db
+  execsql {
+    CREATE TABLE t3(x TEXT);
+    INSERT INTO t3 VALUES(randstr(10,400));
+    INSERT INTO t3 VALUES(randstr(10,400));
+    SELECT count(*) FROM t3;
+  }
+} {2}
+
+# Ensure that can not set shared_resources after accessing the database
+do_test bdb_pragma-5.8 {
+  catchsql {
+    PRAGMA bdbsql_shared_resources=100;
+  }
+} {1 {Cannot set bdbsql_shared_resources after accessing the database}}
+
+# Close and reopen the exisiting environment again
+do_test bdb_pragma-5.9 {
+  db close
+  sqlite3 db test.db
+  catchsql {
+    PRAGMA bdbsql_shared_resources=100000;
+  }
+} {1 {Can't set shared_resources for an open or existing environment}}
+
+
+# Test that pragma bdbsql_shared_resources
+#
+reset_db
+
+#If the handle is not opened, the value is zero
+do_test bdb_pragma-6.1 {
+  execsql {
+    PRAGMA bdbsql_lock_tablesize;
+  }
+} {20000}
+
+#Open db handle and set lock_tablesize
+do_test bdb_pragma-6.2 {
+  db close
+  sqlite3 db test.db
+  execsql {
+    PRAGMA bdbsql_lock_tablesize=100;
+  }
+} {100}
+
+#Test get lock_tablesize
+do_test bdb_pragma-6.3 {
+  execsql {
+    PRAGMA bdbsql_lock_tablesize;
+  }
+} {100}
+
+# Return error if the size is too big:
+# The max acceptable value is 2147483647 (INT32_MAX)
+do_test bdb_pragma-6.4 {
+ catchsql {
+    PRAGMA bdbsql_lock_tablesize=2147483648;
+  }
+} {1 {Invalid value bdbsql_lock_tablesize 2147483648}}
+
+# Test negative
+do_test bdb_pragma-6.5 {
+ catchsql {
+    PRAGMA bdbsql_lock_tablesize=-1;
+  }
+} {1 {Invalid value bdbsql_lock_tablesize -1}}
+
+# The max acceptable value is 2147483647(INT32_MAX)
+do_test bdb_pragma-6.6 {
+  execsql {
+    PRAGMA bdbsql_lock_tablesize=2147483647;
+  }
+} {2147483647}
+
+# Create the table and environment
+do_test bdb_pragma-6.7 {
+  db close
+  sqlite3 db test.db
+  execsql {
+    CREATE TABLE t3(x TEXT);
+    INSERT INTO t3 VALUES(randstr(10,400));
+    INSERT INTO t3 VALUES(randstr(10,400));
+    SELECT count(*) FROM t3;
+  }
+} {2}
+
+# Ensure that can not set lk_tablesize after accessing the database
+do_test bdb_pragma-6.8 {
+  catchsql {
+    PRAGMA bdbsql_lock_tablesize=100;
+  }
+} {1 {Cannot set bdbsql_lock_tablesize after accessing the database}}
+
+# Close and reopen the exisiting environment again
+do_test bdb_pragma-6.9 {
+  db close
+  sqlite3 db test.db
+  catchsql {
+    PRAGMA bdbsql_lock_tablesize=100000;
+  }
+} {1 {Can't set lk_tablesize for open or existing environment}}
+
+
+# Test that pragma bdbsql_single_process
+#
+reset_db
+
+# Check the initial value
+do_test bdb_pragma-7.1 {
+  execsql {
+    PRAGMA bdbsql_single_process;
+  }
+} {0}
+
+# Open db handle and set single_process
+do_test bdb_pragma-7.2 {
+  db close
+  sqlite3 db test.db
+  execsql {
+    PRAGMA bdbsql_single_process = 1;
+  }
+} {1}
+
+# Set again with different format
+do_test bdb_pragma-7.3 {
+  execsql {
+    PRAGMA bdbsql_single_process = on;
+  }
+} {1}
+
+# Check result
+do_test bdb_pragma-7.4 {
+ execsql {
+    PRAGMA bdbsql_single_process;
+  }
+} {1}
+
+# Create the table and environment
+do_test bdb_pragma-7.5 {
+  db close
+  sqlite3 db test.db
+  execsql {
+    PRAGMA bdbsql_single_process = 1;
+    CREATE TABLE t3(x TEXT);
+    INSERT INTO t3 VALUES(randstr(10,400));
+    INSERT INTO t3 VALUES(randstr(10,400));
+    SELECT count(*) FROM t3;
+  }
+} {1 2}
+
+# Check if setting take effect
+do_test bdb_pragma-7.6 {
+ execsql {
+    PRAGMA bdbsql_single_process;
+  }
+} {1}
+
+# Ensure that can not set single_process after accessing the database
+do_test bdb_pragma-7.7 {
+  catchsql {
+    PRAGMA bdbsql_single_process = 0;
+  }
+} {1 {Cannot set bdbsql_single_process after accessing the database}}
+
+# Close and reopen the exisiting environment again
+do_test bdb_pragma-7.8 {
+  db close
+  sqlite3 db test.db
+  execsql {
+    PRAGMA bdbsql_single_process = 1;
+  }
+} {1}
+
+
+# Do some actual operations to open db handle
+do_test bdb_pragma-7.9 {
+  db close
+  sqlite3 db test.db
+  execsql {
+    SELECT count(*) FROM t3;
+  }
+} {2}
+
+# Ensure that can not set single_process after accessing the database
+do_test bdb_pragma-7.10 {
+  catchsql {
+    PRAGMA bdbsql_single_process = 1;
+  }
+} {1 {Cannot set bdbsql_single_process after accessing the database}}
+
+# Test that pragma bdbsql_log_buffer
+#
+reset_db
+
+# Check the initial value
+do_test bdb_pragma-8.1 {
+  execsql {
+    PRAGMA bdbsql_log_buffer;
+  }
+} {0}
+
+do_test bdb_pragma-8.2 {
+  execsql {
+    CREATE TABLE t1(x);
+    PRAGMA bdbsql_log_buffer;
+  }
+} {32000}
+
+reset_db
+
+# Set the value and confirm it sticks.
+do_test bdb_pragma-8.3 {
+  execsql {
+    PRAGMA bdbsql_log_buffer=1048576;
+  }
+} {}
+
+do_test bdb_pragma-8.4 {
+  execsql {
+    PRAGMA bdbsql_log_buffer;
+  }
+} {1048576}
+
+do_test bdb_pragma-8.5 {
+  execsql {
+    CREATE TABLE t1(x);
+    PRAGMA bdbsql_log_buffer;
+  }
+} {1048576}
+
+# Check for reasonable error after open
+do_test bdb_pragma-8.6 {
+  catchsql {
+    PRAGMA bdbsql_log_buffer=64000;
+  }
+} {1 {Cannot set bdbsql_log_buffer after accessing the database}}
+
+# Test the pragma large_record_opt, which enables blob files
+#
+reset_db
+
+set ::blob_dir "test.db-journal/__db_bl"
+
+# Note, the subdirectory structure may change in the future.
+set ::blob_file_dir "$::blob_dir/__db1"
+set ::blob_sub1_dir "$::blob_file_dir/__db5"
+set ::blob_sub2_dir "$::blob_file_dir/__db8"
+set ::blob_sub3_dir "$::blob_file_dir/__db10"
+set ::blob_file "$::blob_sub1_dir/__db.bl002"
+
+# Check the initial value
+do_test bdb_pragma-9.1 {
+  execsql {
+    PRAGMA large_record_opt;
+  }
+} {0}
+
+# Set to 100 bytes
+do_test bdb_pragma-9.2 {
+  execsql {
+    PRAGMA large_record_opt=100;
+  }
+} {100}
+
+# Enable multiversion, which is illegal with blobs
+do_test bdb_pragma-9.3 {
+  set v [catch { execsql {
+    PRAGMA multiversion=ON;
+  }} msg]
+  lappend v $msg
+} {1 {Cannot enable both multiversion and large record optimization.}}
+
+# Create a table and add a record < 100 bytes, which is too
+# small to be a blob file
+do_test bdb_pragma-9.4 {
+  execsql {
+    create table t1(blob a);
+    insert into t1 values(zeroblob(10));
+  }
+} {}
+
+# Check that the blob directory exists
+do_test bdb_pragma-9.5 {
+  file exists $::blob_dir
+} {1}
+
+# Check that the blob file directory does not exist
+do_test bdb_pragma-9.6 {
+  file exists $::blob_file_dir
+} {0}
+
+# Add a record > 100 bytes, which will create a blob
+# file.
+do_test bdb_pragma-9.7 {
+  execsql {
+    insert into t1 values(zeroblob(1000));
+  }
+} {}
+
+# Check that the blob subdirectory exists
+do_test bdb_pragma-9.8 {
+  file exists $::blob_sub1_dir
+} {1}
+
+# Disable blobs by setting the value to 0
+do_test bdb_pragma-9.9 {
+  execsql {
+    PRAGMA large_record_opt=0;
+  }
+} {0}
+
+# Create a table and add a record > 100 bytes
+do_test bdb_pragma-9.10 {
+  execsql {
+    create table t2(blob a);
+    insert into t2 values(zeroblob(10000));
+  }
+} {}
+
+# Check that the blob subdirectory does not exist
+do_test bdb_pragma-9.11 {
+  file exists $::blob_sub2_dir
+} {0}
+
+# Close and reopen, the large_record_opt value will be
+# reset to 0, which will cause all new tables to be
+# created without blob support, while existing tables
+# with blob support will still support blobs.
+do_test bdb_pragma-9.12 {
+  db close
+  sqlite3 db test.db
+  execsql {
+    insert into t1 values (zeroblob(10000));
+  }
+} {}
+
+# Check that a blob file was created
+do_test bdb_pragma-9.13 {
+  file exists $::blob_file
+} {1}
+
+# Create a new table and add a record > 100 bytes,
+# since large_record_opt == 0, this table will not
+# support blobs.
+do_test bdb_pragma-9.14 {
+  execsql {
+    create table t3(blob a);
+    insert into t3 values(zeroblob(10000));
+  }
+} {}
+
+# Check that a blob directory does not exist for this database
+do_test bdb_pragma-9.15 {
+  file exists $::blob_sub3_dir
+} {0}
+
+finish_test

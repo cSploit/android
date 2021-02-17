@@ -1,0 +1,9 @@
+Handle closed connections by the dataserver (done)
+Timeout open member connections. (done)
+Open member connections on the fly. (done)
+Add TDS_SRV_WAIT state when all members are in use. (done)
+Handle SIGTERM (partial...add timeout to select() call)
+Error checking is weak in several places.
+Need to handle larger packet sizes
+Add blob support
+Add TDS 5/7 support

@@ -1,0 +1,177 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Fetching Data</TITLE>
+<LINK REL="StyleSheet" Href="odbc.css">
+</HEAD>
+<BODY bgcolor="white">
+<table width="90%" cols="3" border="0">
+<TR>
+   <TD colspan="3" class="big">Fetching data from a result set</TD>
+</TR>
+<TR>
+  <TD colspan="3"><P>If the execution of the statement went fine you are now able to fetch
+  the data <A Href="gloss.html#col">column</A> by column. May be you would first like to know
+  how many columns there are in the result set (if you use a <CODE> SELECT * FROM tkeyuser</CODE>
+  you wouldn't know in your program). A call to <a href="gloss.html#ccol"><CODE>SQLNumResultCols</CODE></A>.
+  This function takes the statement handle and a pointer to an integer variable which will yield the
+  number of columns after the call.</P>
+  Knowing that much we can add this to our program:
+  <CODE><PRE>
+<FONT COLOR="green">// At the beginning add:</FONT>
+SQLSMALLINT      V_OD_colanz;    <FONT COLOR="green">// Num of columns</FONT>
+
+<FONT COLOR="green">// At the end add:</FONT>
+   V_OD_erg=SQLNumResultCols(V_OD_hstmt,&V_OD_colanz);
+   if ((V_OD_erg != SQL_SUCCESS) && 
+       (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+      {
+       printf("Fehler im ResultCols %d\n",V_OD_erg);
+       SQLFreeHandle(SQL_HANDLE_STMT,V_OD_hstmt);
+       SQLFreeHandle(SQL_HANDLE_DBC,V_OD_hdbc);
+       SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+       exit(0);
+      }
+   printf("Number of Columns %d\n",V_OD_colanz);
+
+  </PRE></CODE>
+  <P>
+  The next thing you need to know is how many <A href="gloss.html#row">rows</A> have
+  been returned by the query. A call to <A HREF="gloss.html#crow"><CODE>SQLRowCount</CODE></A> should
+  quench your thirst for knowledge. 
+  </P>
+  <P>
+  The last thing to do is to fetch the data itself from the result set. You should call <A HREF="gloss.html#fetc"><CODE>SQLFetch</CODE></A>
+  with a statement handle (which has been allocated and <CODE>SQLBind</CODE> has been called for all columns).
+  <CODE>SQLFetch</CODE> returns <CODE>SQL_NO_DATA</CODE> if there is no more data in the result set.
+  </P>
+  <P>So here is the complete source code. Real C-programmers will moan in disgust
+  how inefficient the program is coded, but I prefer it that way (doesn't it look a little bit like PASCAL?). 
+  Take it as a starting point for your own endeavors with ODBC.</P>
+  <CODE class="list"><PRE>
+/* odbc.c
+
+    testing unixODBC
+*/
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;odbc/sql.h&gt;
+#include &lt;odbc/sqlext.h&gt;
+#include &lt;odbc/sqltypes.h&gt;
+
+SQLHENV			 V_OD_Env;			<FONT COLOR="green">// Handle ODBC environment</FONT>
+long			 V_OD_erg;			<FONT COLOR="green">// result of functions</FONT>
+SQLHDBC			 V_OD_hdbc;			<FONT COLOR="green">// Handle connection</FONT>
+
+char			 V_OD_stat[10];		<FONT COLOR="green">// Status SQL</FONT>
+SQLINTEGER		 V_OD_err,V_OD_rowanz,V_OD_id;
+SQLSMALLINT		 V_OD_mlen,V_OD_colanz;
+char             V_OD_msg[200],V_OD_buffer[200];
+
+
+int main(int argc,char *argv[])
+{
+	<FONT COLOR="green">// 1. allocate Environment handle and register version </FONT>
+	V_OD_erg=SQLAllocHandle(SQL_HANDLE_ENV,SQL_NULL_HANDLE,&V_OD_Env);
+	if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+	{
+		printf("Error AllocHandle\n");
+		exit(0);
+	}
+	V_OD_erg=SQLSetEnvAttr(V_OD_Env, SQL_ATTR_ODBC_VERSION, (void*)SQL_OV_ODBC3, 0); 
+	if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+	{
+		printf("Error SetEnv\n");
+		SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+		exit(0);
+	}
+	<FONT COLOR="green">// 2. allocate connection handle, set timeout</FONT>
+	V_OD_erg = SQLAllocHandle(SQL_HANDLE_DBC, V_OD_Env, &V_OD_hdbc); 
+	if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+	{
+		printf("Error AllocHDB %d\n",V_OD_erg);
+		SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+		exit(0);
+	}
+	SQLSetConnectAttr(V_OD_hdbc, SQL_LOGIN_TIMEOUT, (SQLPOINTER *)5, 0);
+	<FONT COLOR="green">// 3. Connect to the datasource "web" </FONT>
+	V_OD_erg = SQLConnect(V_OD_hdbc, (SQLCHAR*) "web", SQL_NTS,
+                                     (SQLCHAR*) "christa", SQL_NTS,
+                                     (SQLCHAR*) "", SQL_NTS);
+	if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+	{
+		printf("Error SQLConnect %d\n",V_OD_erg);
+		SQLGetDiagRec(SQL_HANDLE_DBC, V_OD_hdbc,1, 
+		              V_OD_stat, &V_OD_err,V_OD_msg,100,&V_OD_mlen);
+		printf("%s (%d)\n",V_OD_msg,V_OD_err);
+		SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+		exit(0);
+	}
+	printf("Connected !\n");
+	V_OD_erg=SQLAllocHandle(SQL_HANDLE_STMT, V_OD_hdbc, &V_OD_hstmt);
+	if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+	{
+		printf("Fehler im AllocStatement %d\n",V_OD_erg);
+		SQLGetDiagRec(SQL_HANDLE_DBC, V_OD_hdbc,1, V_OD_stat,&V_OD_err,V_OD_msg,100,&V_OD_mlen);
+		printf("%s (%d)\n",V_OD_msg,V_OD_err);
+		SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+		exit(0);
+	}
+    SQLBindCol(V_OD_hstmt,1,SQL_C_CHAR, &V_OD_buffer,150,&V_OD_err);
+    SQLBindCol(V_OD_hstmt,2,SQL_C_ULONG,&V_OD_id,150,&V_OD_err);
+	
+    V_OD_erg=SQLExecDirect(V_OD_hstmt,"SELECT dtname,iduser FROM tkeyuser order by iduser",SQL_NTS);   
+    if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+    {
+       printf("Error in Select %d\n",V_OD_erg);
+       SQLGetDiagRec(SQL_HANDLE_DBC, V_OD_hdbc,1, V_OD_stat,&V_OD_err,V_OD_msg,100,&V_OD_mlen);
+       printf("%s (%d)\n",V_OD_msg,V_OD_err);
+       SQLFreeHandle(SQL_HANDLE_STMT,V_OD_hstmt);
+       SQLFreeHandle(SQL_HANDLE_DBC,V_OD_hdbc);
+       SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+       exit(0);
+    }
+    V_OD_erg=SQLNumResultCols(V_OD_hstmt,&V_OD_colanz);
+    if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+    {
+        SQLFreeHandle(SQL_HANDLE_STMT,V_OD_hstmt);
+        SQLDisconnect(V_OD_hdbc);
+        SQLFreeHandle(SQL_HANDLE_DBC,V_OD_hdbc);
+        SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+        exit(0);
+    }
+    printf("Number of Columns %d\n",V_OD_colanz);
+    V_OD_erg=SQLRowCount(V_OD_hstmt,&V_OD_rowanz);
+    if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+    {
+      printf("Number ofRowCount %d\n",V_OD_erg);
+      SQLFreeHandle(SQL_HANDLE_STMT,V_OD_hstmt);
+      SQLDisconnect(V_OD_hdbc);
+      SQLFreeHandle(SQL_HANDLE_DBC,V_OD_hdbc);
+      SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+      exit(0);
+    }
+    printf("Number of Rows %d\n",V_OD_rowanz);
+    V_OD_erg=SQLFetch(V_OD_hstmt);  
+    while(V_OD_erg != SQL_NO_DATA)
+    {
+     printf("Result: %d %s\n",V_OD_id,V_OD_buffer);
+     V_OD_erg=SQLFetch(V_OD_hstmt);  
+    }  ;
+    SQLFreeHandle(SQL_HANDLE_STMT,V_OD_hstmt);
+    SQLDisconnect(V_OD_hdbc);
+    SQLFreeHandle(SQL_HANDLE_DBC,V_OD_hdbc);
+    SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+    return(0);
+}
+  </PRE>
+  </CODE>
+  If I find some more time I will add something about diagnostics, cursor positioning updating and and and...
+
+  </TD>
+</TR>
+</TABLE>
+  
+
+</BODY>
+</HTML>

@@ -1,0 +1,22 @@
+***************************************************************
+* This code is LGPL. You CAN make commercial solutions using  *
+* LGPL software.                                              *
+***************************************************************
+
++-------------------------------------------------------------+
+| unixODBC                                                    |
+| Driver Config for the Text File Driver                      |
++-------------------------------------------------------------+
+
+This is a driver setup which can be called
+by ODBC Config to allow the driver specific options to
+be set for the Text File Driver.
+
+This will allow ODBCConfig to prompt for Data Source
+options.
+
++-------------------------------------------------------------+
+| Peter Harvey pharvey@codebydesign.com                       |
+| http://www.unixodbc.org                                     |
++-------------------------------------------------------------+
+

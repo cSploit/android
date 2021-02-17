@@ -1,0 +1,11 @@
+Contributing to c-ares
+======================
+
+The c-ares developers prefer patches to be sent to the c-ares mailing list
+rather than receiving pull requests via GitHub.  So for suggested changes
+please:
+
+ - Subscribe to the mailing list at:
+     http://cool.haxx.se/mailman/listinfo/c-ares
+ - Use 'git format-patch' to generate patch files.
+ - Send the patches to the mailing list at c-ares@cool.haxx.se

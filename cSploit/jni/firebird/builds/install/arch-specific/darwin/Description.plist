@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IFPkgDescriptionDeleteWarning</key>
+	<string></string>
+	<key>IFPkgDescriptionDescription</key>
+	<string>_FB_BUILD_SUFFIX_</string>
+	<key>IFPkgDescriptionTitle</key>
+	<string>Firebird Database</string>
+	<key>IFPkgDescriptionVersion</key>
+	<string>_SMFB_BUILD_SUFFIX_</string>
+</dict>
+</plist>

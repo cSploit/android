@@ -1,0 +1,94 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Peter Harvey">
+   <meta name="GENERATOR" content="Mozilla/4.77C-CCK-MCD Caldera Systems OpenLinux [en] (X11; U; Linux 2.4.2 i686) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<img SRC="unixODBC.gif" height=32 width=32><font face="Arial,Helvetica"><font size=+4>unixODBC</font></font>
+<br>
+<hr WIDTH="100%">
+<center><b><font face="Arial,Helvetica"><font size=+3>PROGRAMMER MANUAL</font></font></b>
+<br><b><font face="Arial,Helvetica">Peter Harvey</font></b>
+<br><b><font face="Arial,Helvetica">19.DEC.01</font></b></center>
+
+<p><b><font face="Arial,Helvetica">Introduction</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Welcome to the unixODBC&nbsp;Programmer
+Manual. This manual is a starting point for a programmer who is interested
+in developing an application which *uses* ODBC. This manual does not address
+Driver development or any other development which is internal to the ODBC&nbsp;sub-system.</font><font face="Arial,Helvetica"></font>
+<p><b><font face="Arial,Helvetica">Why Use ODBC?</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">ODBC&nbsp;provides a portable Application
+Programmers Interface (API) with which to access data. This means that
+your data access code will recompile without changes on all popular platforms.
+In practice; portability is sometimes hampered by incomplete drivers. However;
+the core ODBC functionality (the most used functionality) is always supported
+any working driver. Other advantages to developing with ODBC&nbsp;include;</font>
+<ul>
+<li>
+<font face="Arial,Helvetica">most popular API of its kind</font></li>
+
+<li>
+<font face="Arial,Helvetica">most mature API of its kind</font></li>
+
+<li>
+<font face="Arial,Helvetica">skills more reusable/easily found</font></li>
+
+<li>
+<font face="Arial,Helvetica">hundreds, if not thousands, of applications
+use it</font></li>
+
+<li>
+<font face="Arial,Helvetica">availible on all majour platforms</font></li>
+
+<li>
+<font face="Arial,Helvetica">easy to change data storage solution/vendor
+(ah; freedom)</font></li>
+
+<li>
+<font face="Arial,Helvetica">easy to upscale data storage (developer and
+end-user)</font></li>
+
+<li>
+<font face="Arial,Helvetica">arguably the most complete API of its kind</font></li>
+
+<li>
+<font face="Arial,Helvetica">many books on the subject</font></li>
+
+<li>
+<font face="Arial,Helvetica">greater support base</font></li>
+</ul>
+<b><font face="Arial,Helvetica">Languages Supported</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">ODBC&nbsp;is based upon a C API. C++ programmers
+will find a number of C++ class libraries for using the ODBC&nbsp;API.
+These are wrappers - using the C&nbsp;API&nbsp;internally but can provide
+a much nicer way to use ODBC for C++ programmers.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Any language which can call a C API should
+be able to use the ODBC&nbsp;API and most languages, such as PHP and Perl,
+provide an interface to work with ODBC but these are not covered in this
+manual.</font><font face="Arial,Helvetica"></font>
+<p><b><font face="Arial,Helvetica">Architecture</font></b><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Client Libraries</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">These are client libraries which are specific
+to the particular database being used. These, often, provide a C API of
+their own which is used by Driver developers. In some cases these exist
+inside of the Driver itself or are staticly linked into the Driver. Any
+Client Libraries required by a Driver will be a part of the installation
+of your Driver or will simply be a requirement for the installation of
+your Driver. Sometimes Client Libraries must be configured before any ODBC&nbsp;configuration.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Driver</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">Driver Manager</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">The Driver Manager acts as a gateway to
+the ODBC&nbsp;drivers. The main advantage to having a Driver Manager is
+that the end-user can configure the Driver Manager to use a different Driver
+than the one original conceived of by the programmer.</font><font face="Arial,Helvetica"></font>
+<p><font face="Arial,Helvetica">It as virtualy identical functions declarations
+as a Driver which means that one *could* create an application</font>
+<br><font face="Arial,Helvetica"></font>&nbsp;
+<p>
+<hr WIDTH="100%">
+<br>&nbsp;
+<br>&nbsp;
+</body>
+</html>

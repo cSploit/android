@@ -1,0 +1,189 @@
+Author: Pierangelo Masarati <ando@OpenLDAP.org>
+
+Back-sql can be tested with sql-test000-read; it requires a bit of work 
+to get everything up and running appropriately.
+
+This document briefly describes the steps that are required to prepare
+a quick'n'dirty installation of back-sql and of the related RDBMS
+and ODBC; Examples are provided, but by no means they pretent
+to represent an exaustive source of info about how to setup the ODBC;
+refer to the docs for any problem or detail.
+
+Currently, the system has been tested with IBM db2, PostgreSQL and MySQL;
+basic support and test data for other RDBMSes is in place, but as of
+today (November 2004) it's totally untested.  If you succeed in running
+any of the other RDBMSes, please provide feedback about any required
+change either in the code or in the test scripts by means of OpenLDAP's
+Issue Tracking System (http://www.openldap.org/its/).
+
+1) slapd must be compiled with back-sql support, i.e. configure 
+with --enable-sql switch.  This requires an implementation of the ODBC
+to be installed.
+
+2) The ODBC must be set up appropriately, by editing the odbc.ini file
+in /etc/ (or wherever your installation puts it) and, if appropriate,
+the odbcinst.ini file.  Note: you can also use custom odbc.ini and
+odbcinst.ini files, provided you export in ODBCINI the full path to the
+odbc.ini file, and in ODBCSYSINI the directory where the odbcinst.ini
+file resides.
+Relevant info for our test setup is highlighted with '<===' on the right.
+
+2.1) PostgreSQL
+
+2.1.1) Add to the odbc.ini file a block of the form
+
+[example]                        <===
+Description         = Example for OpenLDAP's back-sql
+Driver              = PostgreSQL
+Trace               = No
+Database            = example    <===
+Servername          = localhost
+UserName            = manager    <===
+Password            = secret     <===
+Port                = 5432
+;Protocol            = 6.4
+ReadOnly            = No
+RowVersioning       = No
+ShowSystemTables    = No
+ShowOidColumn       = No
+FakeOidIndex        = No
+ConnSettings        =
+
+2.1.2) Add to the odbcinst.ini file a block of the form
+
+[PostgreSQL]
+Description     = ODBC for PostgreSQL
+Driver          = /usr/lib/libodbcpsql.so
+Setup           = /usr/lib/libodbcpsqlS.so
+FileUsage       = 1
+
+2.2) MySQL
+
+2.2.1) Add to the odbc.ini file a block of the form
+
+[example]                        <===
+Description         = Example for OpenLDAP's back-sql
+Driver              = MySQL
+Trace               = No
+Database            = example    <===
+Servername          = localhost
+UserName            = manager    <===
+Password            = secret     <===
+ReadOnly            = No
+RowVersioning       = No
+ShowSystemTables    = No
+ShowOidColumn       = No
+FakeOidIndex        = No
+ConnSettings        =
+SOCKET              = /var/lib/mysql/mysql.sock
+
+2.2.2) Add to the odbcinst.ini file a block of the form
+
+[MySQL]
+Description     = ODBC for MySQL
+Driver          = /usr/lib/libmyodbc.so
+FileUsage       = 1
+
+2.3) IBM db2
+[n.a.]
+
+3) The RDBMS must be setup; examples are provided for my installations 
+of PostgreSQL and MySQL, but details may change; other RDBMSes should
+be configured in a similar manner, you need to find out the details by
+reading their documentation.
+
+3.1) PostgreSQL
+
+3.1.1) Start the server
+on RedHat:
+[root@localhost]# service postgresql start
+on other systems: read the docs...
+
+3.1.2) Create the database:
+[root@localhost]# su - postgres
+[postgres@localhost]$ createdb example
+
+3.1.3) Create the user:
+[root@localhost]# su - postgres
+[postgres@localhost]$ psql example
+example=> create user manager with password 'secret';
+example=> <control-D>
+
+3.1.4) Populate the database:
+[root@localhost]# cd $SOURCES/servers/slapd/back-sql/rdbms_depend/pgsql/
+[root@localhost]# psql -U manager -W example
+example=> <control-D>
+[root@localhost]# psql -U manager example < backsql_create.sql
+[root@localhost]# psql -U manager example < testdb_create.sql
+[root@localhost]# psql -U manager example < testdb_data.sql
+[root@localhost]# psql -U manager example < testdb_metadata.sql
+
+3.1.5) Run the test:
+[root@localhost]# cd $SOURCES/tests
+[root@localhost]# SLAPD_USE_SQL=pgsql ./run sql-test000
+
+3.2) MySQL
+
+3.2.1) Start the server
+on RedHat:
+[root@localhost]# service mysqld start
+on other systems: read the docs...
+
+3.2.2) Create the database:
+[root@localhost]# mysqladmin -u root -p create example
+(hit <return> for the empty password).
+
+3.2.3) Create the user:
+[root@localhost]# mysql -u root -p example
+(hit <return> for the empty password)
+mysql> grant all privileges on *.* \
+  to 'manager'@'localhost' identified by 'secret' with grant option;
+mysql> exit;
+
+3.2.4) Populate the database:
+[root@localhost]# cd $SOURCES/servers/slapd/back-sql/rdbms_depend/mysql/
+[root@localhost]# mysql -u manager -p example < backsql_create.sql
+[root@localhost]# mysql -u manager -p example < testdb_create.sql
+[root@localhost]# mysql -u manager -p example < testdb_data.sql
+[root@localhost]# mysql -u manager -p example < testdb_metadata.sql
+
+3.2.5) Run the test:
+[root@localhost]# cd $SOURCES/tests
+[root@localhost]# SLAPD_USE_SQL=mysql ./run sql-test000
+
+3.3) IBM db2
+[n.a.]
+
+3.3.1) Start the server:
+
+3.3.2) Create the database:
+
+3.3.3) Create the user:
+
+3.3.4) Populate the database:
+connect to the database as user manager, and execute the test files
+in auto-commit mode (-c)
+[root@localhost]# su - manager
+[manager@localhost]$ db2 "connect to example user manager using secret"
+[manager@localhost]$ db2 -ctvf backsql_create.sql
+[manager@localhost]$ db2 -ctvf testdb_create.sql
+[manager@localhost]$ db2 -ctvf testdb_data.sql
+[manager@localhost]$ db2 -ctvf testdb_metadata.sql
+[manager@localhost]$ db2 "connect reset"
+
+3.3.5) Run the test:
+[root@localhost]# cd $SOURCES/tests
+[root@localhost]# SLAPD_USE_SQL=ibmdb2 ./run sql-test000
+
+4) Cleanup:
+The test is basically readonly; this can be performed by all RDBMSes 
+(listed above).
+
+There is another test, sql-test900-write, which is currently enabled
+only for PostgreSQL and IBM db2.  Note that after a successful run 
+of the write test, the database is no longer in the correct state 
+to restart either of the tests, and step 3.X.4 needs to be re-run first.
+
+More tests are to come; PostgreSQL is known to allow a full reload 
+of the test database starting from an empty database.
+

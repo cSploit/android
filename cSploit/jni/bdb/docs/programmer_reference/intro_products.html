@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>The Berkeley DB products</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="intro.html" title="Chapter 1.  Introduction" />
+    <link rel="prev" href="intro_where.html" title="Where does Berkeley DB run?" />
+    <link rel="next" href="am_conf.html" title="Chapter 2.  Access Method Configuration" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">The Berkeley DB products</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="intro_where.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 1. 
+		Introduction
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="am_conf.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="intro_products"></a>The Berkeley DB products</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="intro_products.html#idp220240">Berkeley DB Data Store</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="intro_products.html#idp219832">Berkeley DB Concurrent Data Store</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="intro_products.html#idp112064">Berkeley DB Transactional Data Store</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="intro_products.html#idp126120">Berkeley DB High Availability</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        Oracle provides four Berkeley DB products, each differing by the
+        level of database support that they offer.
+    </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            Berkeley DB Data Store
+        </li>
+          <li>
+            Berkeley DB Concurrent Data Store
+        </li>
+          <li>
+            Berkeley DB Transactional Data Store
+        </li>
+          <li>
+            Berkeley DB High Availability
+        </li>
+        </ul>
+      </div>
+      <p>
+        Each product provides additional functionality to the product that
+        precedes it in the list.  As a result, you can download Berkeley DB
+        and build an application that provides read-only database access
+        for a single-user, and later add support for more complex database
+        access patterns for multiple users.
+   </p>
+      <p>
+       The single Open Source distribution of Berkeley DB from Oracle
+       includes the four products and building the distribution
+       automatically builds all four products. However, you must use the
+       same Berkeley DB product throughout an application or group of
+       applications.
+    </p>
+      <p>
+        To redistribute Berkeley DB software, you must have a license for
+        the Berkeley DB product you use.  For further details, refer to the
+        licensing informaion at:  
+        <a class="ulink" href="http://www.oracle.com/technetwork/database/berkeleydb/downloads/index.html" target="_top">http://www.oracle.com/technetwork/database/berkeleydb/downloads/index.html</a>
+    </p>
+      <p>
+        A comparison of the four Berkeley DB product features is provided
+        in the following table.
+    </p>
+      <div class="informaltable">
+        <table border="1" width="80%">
+          <colgroup>
+            <col align="left" />
+            <col align="left" />
+            <col align="left" />
+            <col align="left" />
+            <col align="left" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th align="center"> </th>
+              <th align="center">Berkeley DB Data Store</th>
+              <th align="center">Berkeley DB Concurrent Data Store</th>
+              <th align="center">Berkeley DB Transactional Data Store</th>
+              <th align="center">Berkeley DB High Availability</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td align="left">
+                        <p>
+                            What is this product?
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Provides indexed, single-reader/single-writer embedded data storage
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                           Adds simple locking with multiple-reader/single-writer capabilities
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Adds complete ACID transaction support, as well as recovery
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Adds single-master data replication across multiple physical machines
+                        </p>
+                    </td>
+            </tr>
+            <tr>
+              <td align="left">
+                        <p>
+                            Ensures recovery operation
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+            </tr>
+            <tr>
+              <td align="left">
+                        <p>
+                            Provides Locking feature
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+            </tr>
+            <tr>
+              <td align="left">
+                        <p>
+                            Provides concurrent read-write access
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+            </tr>
+            <tr>
+              <td align="left">
+                        <p>
+                            Provides transactional support
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+            </tr>
+            <tr>
+              <td align="left">
+                        <p>
+                            Supports the SQL API
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+            </tr>
+            <tr>
+              <td align="left">
+                        <p>
+                            Provides replication support
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            No
+                        </p>
+                    </td>
+              <td align="left">
+                        <p>
+                            Yes
+                        </p>
+                    </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp220240"></a>Berkeley DB Data Store</h3>
+            </div>
+          </div>
+        </div>
+        <p>The Berkeley DB Data Store product is an embeddable, high-performance data store.  This product
+	supports multiple concurrent threads of control, including multiple
+	processes and multiple threads of control within a process.  
+	However, Berkeley DB Data Store does not support locking,
+	and hence does not guarantee correct behavior if more than one
+	thread of control is updating the database at a time.  The Berkeley DB Data Store is
+	intended for use in read-only applications or applications which can
+	guarantee no more than one thread of control updates the
+	database at a time.</p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp219832"></a>Berkeley DB Concurrent Data Store</h3>
+            </div>
+          </div>
+        </div>
+        <p>The Berkeley DB Concurrent Data Store product adds multiple-reader, single writer capabilities to
+	the Berkeley DB Data Store product. This product provides built-in concurrency and locking feature. 
+	Berkeley DB Concurrent Data Store is
+	intended for applications that need support for concurrent updates to a
+	database that is largely used for reading.</p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp112064"></a>Berkeley DB Transactional Data Store</h3>
+            </div>
+          </div>
+        </div>
+        <p>The Berkeley DB Transactional Data Store product adds support for transactions and database recovery. 
+	Berkeley DB Transactional Data Store is intended for applications that require
+	industrial-strength database services, including excellent performance
+	under high-concurrency workloads of read and write operations,
+	the ability to commit or roll back multiple changes to the database at
+	a single instant, and the guarantee that in the event of a
+	catastrophic system or hardware failure, all committed database changes
+	are preserved.</p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp126120"></a>Berkeley DB High Availability</h3>
+            </div>
+          </div>
+        </div>
+        <p>The Berkeley DB High Availability product adds support for data replication. A single master system
+	handles all updates, and distributes these updates to multiple replicas. The number of replicas depends on the application requirements. All replicas can handle read requests during
+	normal processing. If the master system fails for any reason, one of
+	the replicas takes over as the new master system, and distributes
+	updates to the remaining replicas.</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="intro_where.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="intro.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="am_conf.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Where does Berkeley DB run? </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 2. 
+		Access Method Configuration
+        </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,115 @@
+# base
+
+dn: o=refint
+objectClass: top
+objectClass: organization
+o: refint
+description: referential integrity test database
+
+# container
+
+dn: ou=users,o=refint
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+description: container for test users
+
+# secretary
+dn: uid=alice,ou=users,o=refint
+objectClass: inetOrgPerson
+uid: alice
+sn: typist
+cn: alice
+businessCategory: test
+carLicense: ZOOM
+departmentNumber: 5151
+displayName: George
+employeeNumber: 6363
+employeeType: contractor
+givenName: Alice the Typist
+
+# manager
+dn: uid=george,ou=users,o=refint
+objectClass: inetOrgPerson
+uid: george
+sn: jungle
+cn: george
+businessCategory: test
+carLicense: SAMPLE
+departmentNumber: 6969
+displayName: George
+employeeNumber: 5150
+employeeType: contractor
+givenName: Big G
+
+dn: uid=dave,ou=users,o=refint
+objectClass: inetOrgPerson
+uid: dave
+sn: nothere
+cn: dave
+secretary: uid=george,ou=users,o=refint
+businessCategory: otest
+carLicense: ALGAE
+departmentNumber: 42
+displayName: Dave
+employeeNumber: 73
+employeeType: contractor
+givenName: Dave
+
+dn: uid=bob,ou=users,o=refint
+objectClass: inetOrgPerson
+uid: bob
+sn: bitchen
+cn: bob
+manager: uid=george,ou=users,o=refint
+businessCategory: rtest
+carLicense: SL49152
+departmentNumber: 42
+displayName: Bob
+employeeNumber: 38
+employeeType: contractor
+givenName: Bob
+
+dn: uid=bill,ou=users,o=refint
+objectClass: inetOrgPerson
+uid: bill
+sn: problem
+cn: bill
+businessCategory: otest
+manager: uid=george,ou=users,o=refint
+secretary: uid=alice,ou=users,o=refint
+carLicense: DRV818
+departmentNumber: 42
+displayName: Bill
+employeeNumber: 69
+employeeType: contractor
+givenName: Bill
+
+dn: uid=jorge,ou=users,o=refint
+objectClass: inetOrgPerson
+uid: jorge
+sn: burrito
+cn: jorge
+manager: uid=theman,ou=users,o=refint
+secretary: uid=alice,ou=users,o=refint
+businessCategory: rtest
+carLicense: CLA511
+departmentNumber: 42
+displayName: Jorge
+employeeNumber: 93
+employeeType: contractor
+givenName: Jorge
+
+dn: uid=richard,ou=users,o=refint
+objectClass: inetOrgPerson
+uid: richard
+sn: cranium
+cn: richard
+manager: uid=theman,ou=users,o=refint
+businessCategory: rtest
+carLicense: DHD722
+departmentNumber: 42
+displayName: Richard
+employeeNumber: 114
+employeeType: contractor
+givenName: Richard

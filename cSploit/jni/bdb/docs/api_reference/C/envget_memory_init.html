@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_ENV-&gt;get_memory_init()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="env.html" title="Chapter 5.  The DB_ENV Handle" />
+    <link rel="prev" href="envget_intermediate_dir_mode.html" title="DB_ENV-&gt;get_intermediate_dir_mode()" />
+    <link rel="next" href="envget_memory_max.html" title="DB_ENV-&gt;get_memory_max()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_ENV-&gt;get_memory_init()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envget_intermediate_dir_mode.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. 
+                The DB_ENV Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envget_memory_max.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envget_memory_init"></a>DB_ENV-&gt;get_memory_init()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB_ENV-&gt;get_memory_init(DB_ENV *dbenv, DB_MEM_CONFIG type, 
+                        u_int32_t *countp);  </pre>
+      <p>
+        The <code class="methodname">DB_ENV-&gt;get_memory_init()</code> method returns
+        the number of objects to allocate and initialize when an
+        environment is created. The count is returned for a specific named
+        structure. The count for each structure is set using the
+        <a class="xref" href="envset_memory_init.html" title="DB_ENV-&gt;set_memory_init()">DB_ENV-&gt;set_memory_init()</a>
+        method.
+     </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;get_memory_init()</code> method may be
+         called at any time during the life of the application.
+     </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;get_memory_init()</code>  <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+         
+     </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51558248"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51557600"></a>type</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>struct</strong></span> parameter
+                  identifies the structure for which you want 
+                  an object count returned. It must be one of the following
+                  values:
+             </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                        <code class="literal">DB_MEM_LOCK</code>
+                    </p>
+                <p>
+                        Initialize locks.  A thread uses this structure
+                        to lock a page (or record for the QUEUE access
+                        method) and hold it to the end of a transactions.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">DB_MEM_LOCKOBJECT</code>
+                    </p>
+                <p>
+                        Initialize lock objects.  For each page (or record) which
+                        is locked in the system, a lock object will be allocated.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">DB_MEM_LOCKER</code>
+                    </p>
+                <p>
+                        Initialize lockers. Each thread which is active in a
+                        transactional environment will use a locker structure
+                        either for each transaction which is active, or for each
+                        non-transactional cursor that is active.
+                    </p>
+              </li>
+              <li>
+                <p>
+                          <code class="literal">DB_MEM_LOGID</code>
+                    </p>
+                <p>
+                        Initialize the log fileid structures.  For each database handle
+                        which is opened for writing in a transactional environment,
+                        a log fileid structure is used.
+                    </p>
+              </li>
+              <li>
+                <p>
+                          <code class="literal">DB_MEM_TRANSACTION</code>
+                    </p>
+                <p>
+                        Initialize transaction structures.  Each active
+                        transaction uses a transaction structure until it
+                        either commits or aborts.
+                    </p>
+              </li>
+              <li>
+                <p>
+                          <code class="literal">DB_MEM_THREAD</code> 
+                    </p>
+                <p>
+                        Initialize thread identification structures.  If thread
+                        tracking is enabled then each active thread will use a
+                        structure.  Note that since a thread does not signal the
+                        BDB library that it will no longer be making calls, unused
+                        structures may accumulate until a cleanup is triggered either
+                        using a high water mark or by running 
+                        <a class="xref" href="envfailchk.html" title="DB_ENV-&gt;failchk()">DB_ENV-&gt;failchk()</a>.
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51571560"></a>countp</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>countp</strong></span> parameter references
+                  memory into which the object count for the specified
+                  structure is copied.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51561808"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51573848"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="env.html#envlist" title="Database Environments and Related Methods">Database Environments and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envget_intermediate_dir_mode.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="env.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envget_memory_max.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_ENV-&gt;get_intermediate_dir_mode() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_ENV-&gt;get_memory_max()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,11 @@
+--- libnet-1.1.2.1.orig/include/libnet.h.in
++++ libnet-1.1.2.1/include/libnet.h.in
+@@ -90,7 +90,7 @@
+ #include <winsock2.h>
+ #include <win32/in_systm.h>
+ #endif /* __WIN32__ */
+-#if !(__linux__) && !(__WIN32__) && !(__APPLE__) && !(__CYGWIN__)
++#if !(__linux__) && !(__WIN32__) && !(__APPLE__) && !(__CYGWIN__) && !(__GNU__)
+ #include <netinet/ip_var.h>
+ #else   /* __linux__ */
+ #if (HAVE_NET_ETHERNET_H)

@@ -1,0 +1,70 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+H1: The Big Picture - Configuration Choices
+
+This section gives a brief overview of various {{TERM:LDAP}} directory
+configurations, and how your Standalone LDAP Daemon {{slapd}}(8)
+fits in with the rest of the world.
+
+
+H2: Local Directory Service
+
+In this configuration, you run a {{slapd}}(8) instance which provides
+directory service for your local domain only. It does not interact
+with other directory servers in any way. This configuration is shown
+in Figure 3.1.
+
+!import "config_local.png"; align="center"; title="Local service via slapd(8) configuration"
+FT[align="Center"] Figure 3.1: Local service configuration.
+
+Use this configuration if you are just starting out (it's the one the
+quick-start guide makes for you) or if you want to provide a local
+service and are not interested in connecting to the rest of the world.
+It's easy to upgrade to another configuration later if you want.
+
+
+H2: Local Directory Service with Referrals
+
+In this configuration, you run a {{slapd}}(8) instance which provides
+directory service for your local domain and configure it to return
+referrals to other servers capable of handling requests.  You may
+run this service (or services) yourself or use one provided to you.
+This configuration is shown in Figure 3.2.
+
+!import "config_ref.png"; align="center"; title="Local service with referrals"
+FT[align="Center"] Figure 3.2: Local service with referrals 
+
+Use this configuration if you want to provide local service and
+participate in the Global Directory,  or you want to delegate
+responsibility for {{subordinate}} entries to another server.
+
+
+H2: Replicated Directory Service
+
+slapd(8) includes support for {{LDAP Sync}}-based replication, called
+{{syncrepl}}, which may be used to maintain shadow copies of directory
+information on multiple directory servers.   In its most basic
+configuration, the {{master}} is a syncrepl provider and one or more
+{{slave}} (or {{shadow}}) are syncrepl consumers.  An example
+master-slave configuration is shown in figure 3.3. Multi-Master 
+configurations are also supported.
+
+!import "config_repl.png"; align="center"; title="Replicated Directory Services"
+FT[align="Center"] Figure 3.3: Replicated Directory Services
+
+This configuration can be used in conjunction with either of the
+first two configurations in situations where a single {{slapd}}(8)
+instance does not provide the required reliability or availability.
+
+H2: Distributed Local Directory Service
+
+In this configuration, the local service is partitioned into smaller
+services, each of which may be replicated, and {{glued}} together with
+{{superior}} and {{subordinate}} referrals.
+!if 0
+An example of this configuration is shown in Figure 3.4.
+
+!import "config_dist.gif"; align="center"; title="Distributed Local Directory Services"
+FT[align="Center"] Figure 3.4: Distributed Local Directory Services
+!endif

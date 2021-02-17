@@ -1,0 +1,26 @@
+WR,NAME,DOMAINS,COUNTRY,REGION,SIZE,VISIBILITY,RICH,SCHOLAR
+1,Massachusetts Institute of Technology,mit.edu,us,North America,2,1,1,7
+2,Harvard University,harvard.edu,us,North America,7,2,12,1
+3,Stanford University,stanford.edu,us,North America,4,4,2,24
+4,University of California Berkeley,berkeley.edu,us,North America,8,3,5,32
+5,Cornell University,cornell.edu,us,North America,1,5,9,37
+6,University of Wisconsin Madison,wisc.edu,us,North America,3,10,6,71
+7,University of Minnesota,umn.edu,us,North America,6,15,7,22
+8,California Institute of Technology,caltech.edu,us,North America,18,6,20,30
+9,University of Illinois Urbana Champaign,uiuc.edu,us,North America,17,7,13,51
+10,University of Michigan,umich.edu,us,North America,10,8,18,55
+11,University of Texas Austin,utexas.edu,us,North America,12,11,8,44
+12,University of Washington,washington.edu,us,North America,22,9,4,94
+13,University of Chicago,uchicago.edu,us,North America,42,16,44,2
+14,Carnegie Mellon University,cmu.edu,us,North America,5,24,3,93
+15,University of Pennsylvania,upenn.edu,us,North America,16,14,33,26
+16,Columbia University New York,columbia.edu,us,North America,19,12,21,95
+17,Texas A&M University,tamu.edu,us,North America,31,31,11,17
+18,University of Maryland,umd.edu,us,North America,37,22,17,52
+19,University of California Los Angeles,ucla.edu,us,North America,13,17,26,110
+20,Purdue University,purdue.edu,us,North America,14,34,14,46
+21,Johns Hopkins University,jhu.edu,us,North America,59,27,49,3
+22,University of Cambridge,cam.ac.uk,uk,Europe,26,13,70,86
+23,Pennsylvania State University,psu.edu,us,North America,27,29,16,102
+24,University of Tokyo,u-tokyo.ac.jp,jp,Asia,32,26,65,31
+25,University of Arizona,arizona.edu,us,North America,20,36,19,134

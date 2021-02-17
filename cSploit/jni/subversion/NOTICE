@@ -1,0 +1,16 @@
+Subversion
+Copyright 2010 The Apache Software Foundation
+
+This product includes software developed by many people, and distributed
+under Contributor License Agreements to The Apache Software Foundation
+(http://www.apache.org/).  See the accompanying COMMITTERS file and the
+revision logs for an exact contribution history.
+
+Portions of the test suite for Subversion's Python bindings are copyrighted
+by Edgewall Software, Jonas Borgström and Christopher Lenz.
+For more information, see LICENSE.
+
+This product includes software developed under the X Consortium License
+see: build/install-sh
+
+

@@ -1,0 +1,68 @@
+# Searching "dc=example,dc=com" (should fail)...
+# Searching "dc=example,dc=com" (should succeed with no results)...
+# Searching "dc=example,dc=com" as "cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com" (should succeed)...
+dn: dc=example,dc=com
+objectClass: top
+objectClass: organization
+objectClass: domainRelatedObject
+objectClass: dcObject
+dc: example
+l: Anytown, Michigan
+st: Michigan
+o: Example, Inc.
+o: EX
+o: Ex.
+description: The Example, Inc. at Anytown
+postalAddress: Example, Inc. $ 535 W. William St. $ Anytown, MI 48109 $ US
+telephoneNumber: +1 313 555 1817
+associatedDomain: example.com
+
+# Searching "ou=Groups,dc=example,dc=com" as "cn=John Doe,ou=Information Technology Division,ou=People,dc=example,dc=com" (should succeed)...
+dn: cn=All Staff,ou=Groups,dc=example,dc=com
+member: cn=Manager,dc=example,dc=com
+member: cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=exam
+ ple,dc=com
+member: cn=Jane Doe,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=John Doe,ou=Information Technology Division,ou=People,dc=example,dc
+ =com
+member: cn=Mark Elliot,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 2,ou=Information Technology Division,ou=People,dc=exa
+ mple,dc=com
+member: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Dorothy Stevens,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=exampl
+ e,dc=com
+owner: cn=Manager,dc=example,dc=com
+cn: All Staff
+description: Everyone in the sample data
+objectClass: groupOfNames
+
+dn: cn=Alumni Assoc Staff,ou=Groups,dc=example,dc=com
+member: cn=Manager,dc=example,dc=com
+member: cn=Dorothy Stevens,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Jane Doe,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Mark Elliot,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+owner: cn=Manager,dc=example,dc=com
+description: All Alumni Assoc Staff
+cn: Alumni Assoc Staff
+objectClass: groupOfNames
+
+dn: cn=ITD Staff,ou=Groups,dc=example,dc=com
+owner: cn=Manager,dc=example,dc=com
+description: All ITD Staff
+cn: ITD Staff
+objectClass: groupOfUniqueNames
+uniqueMember: cn=Manager,dc=example,dc=com
+uniqueMember: cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=
+ example,dc=com
+uniqueMember: cn=James A Jones 2,ou=Information Technology Division,ou=People,
+ dc=example,dc=com
+uniqueMember: cn=John Doe,ou=Information Technology Division,ou=People,dc=exam
+ ple,dc=com
+
+# Searching "ou=Groups,dc=example,dc=com" as "cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com" (should succeed with no results)...

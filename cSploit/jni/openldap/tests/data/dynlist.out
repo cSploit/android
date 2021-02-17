@@ -1,0 +1,271 @@
+# Testing list search of all attrs...
+dn: cn=Dynamic List,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+cn: Dynamic List
+cn: Barbara Jensen
+cn: Babs Jensen
+cn: Bjorn Jensen
+cn: Biiff Jensen
+cn: Dorothy Stevens
+cn: Dot Stevens
+cn: James A Jones 1
+cn: James Jones
+cn: Jim Jones
+cn: James A Jones 2
+cn: Jane Doe
+cn: Jane Alverson
+cn: Jennifer Smith
+cn: Jen Smith
+cn: John Doe
+cn: Jonathon Doe
+cn: Mark Elliot
+cn: Mark A Elliot
+cn: Ursula Hampster
+memberURL: ldap:///ou=People,dc=example,dc=com?cn,mail?sub?(objectClass=person
+ )
+mail: bjensen@mailgw.example.com
+mail: bjorn@mailgw.example.com
+mail: dots@mail.alumni.example.com
+mail: jaj@mail.alumni.example.com
+mail: jjones@mailgw.example.com
+mail: jdoe@woof.net
+mail: jen@mail.alumni.example.com
+mail: johnd@mailgw.example.com
+mail: melliot@mail.alumni.example.com
+mail: uham@mail.alumni.example.com
+
+# Testing list search of a listed attr...
+dn: cn=Dynamic List,ou=Dynamic Lists,dc=example,dc=com
+mail: bjensen@mailgw.example.com
+mail: bjorn@mailgw.example.com
+mail: dots@mail.alumni.example.com
+mail: jaj@mail.alumni.example.com
+mail: jjones@mailgw.example.com
+mail: jdoe@woof.net
+mail: jen@mail.alumni.example.com
+mail: johnd@mailgw.example.com
+mail: melliot@mail.alumni.example.com
+mail: uham@mail.alumni.example.com
+
+# Testing list search of a non-listed attr...
+dn: cn=Dynamic List,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+
+# Testing list search with (critical) manageDSAit...
+dn: cn=Dynamic List,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+cn: Dynamic List
+memberURL: ldap:///ou=People,dc=example,dc=com?cn,mail?sub?(objectClass=person
+ )
+
+# Testing list compare...
+TRUE
+
+# Testing list compare (should return FALSE)...
+FALSE
+
+# Testing list compare (should return UNDEFINED)...
+Compare Result: No such attribute (16)
+UNDEFINED
+
+# Testing list compare with manageDSAit...
+FALSE
+
+# Testing list search of all (mapped) attrs...
+dn: cn=Dynamic List,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+cn: Dynamic List
+memberURL: ldap:///ou=People,dc=example,dc=com?cn,mail?sub?(objectClass=person
+ )
+sn: Barbara Jensen
+sn: Babs Jensen
+sn: Bjorn Jensen
+sn: Biiff Jensen
+sn: Dorothy Stevens
+sn: Dot Stevens
+sn: James A Jones 1
+sn: James Jones
+sn: Jim Jones
+sn: James A Jones 2
+sn: Jane Doe
+sn: Jane Alverson
+sn: Jennifer Smith
+sn: Jen Smith
+sn: John Doe
+sn: Jonathon Doe
+sn: Mark Elliot
+sn: Mark A Elliot
+sn: Ursula Hampster
+mail: bjensen@mailgw.example.com
+mail: bjorn@mailgw.example.com
+mail: dots@mail.alumni.example.com
+mail: jaj@mail.alumni.example.com
+mail: jjones@mailgw.example.com
+mail: jdoe@woof.net
+mail: jen@mail.alumni.example.com
+mail: johnd@mailgw.example.com
+mail: melliot@mail.alumni.example.com
+mail: uham@mail.alumni.example.com
+
+# Testing list search of a (mapped) listed attr...
+dn: cn=Dynamic List,ou=Dynamic Lists,dc=example,dc=com
+sn: Barbara Jensen
+sn: Babs Jensen
+sn: Bjorn Jensen
+sn: Biiff Jensen
+sn: Dorothy Stevens
+sn: Dot Stevens
+sn: James A Jones 1
+sn: James Jones
+sn: Jim Jones
+sn: James A Jones 2
+sn: Jane Doe
+sn: Jane Alverson
+sn: Jennifer Smith
+sn: Jen Smith
+sn: John Doe
+sn: Jonathon Doe
+sn: Mark Elliot
+sn: Mark A Elliot
+sn: Ursula Hampster
+
+# Testing list search of a (n unmapped) listed attr...
+dn: cn=Dynamic List,ou=Dynamic Lists,dc=example,dc=com
+mail: bjensen@mailgw.example.com
+mail: bjorn@mailgw.example.com
+mail: dots@mail.alumni.example.com
+mail: jaj@mail.alumni.example.com
+mail: jjones@mailgw.example.com
+mail: jdoe@woof.net
+mail: jen@mail.alumni.example.com
+mail: johnd@mailgw.example.com
+mail: melliot@mail.alumni.example.com
+mail: uham@mail.alumni.example.com
+
+# Testing list compare (mapped attrs) ...
+TRUE
+
+# Testing list compare (mapped attrs; should return FALSE)...
+FALSE
+
+# Testing list search of all attrs...
+dn: cn=Dynamic List of Members,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+cn: Dynamic List of Members
+memberURL: ldap:///ou=People,dc=example,dc=com??sub?(objectClass=person)
+member: cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=exam
+ ple,dc=com
+member: cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=exampl
+ e,dc=com
+member: cn=Dorothy Stevens,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 2,ou=Information Technology Division,ou=People,dc=exa
+ mple,dc=com
+member: cn=Jane Doe,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=John Doe,ou=Information Technology Division,ou=People,dc=example,dc
+ =com
+member: cn=Mark Elliot,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+
+# Testing list search of a listed attr...
+dn: cn=Dynamic List of Members,ou=Dynamic Lists,dc=example,dc=com
+member: cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=exam
+ ple,dc=com
+member: cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=exampl
+ e,dc=com
+member: cn=Dorothy Stevens,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 2,ou=Information Technology Division,ou=People,dc=exa
+ mple,dc=com
+member: cn=Jane Doe,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=John Doe,ou=Information Technology Division,ou=People,dc=example,dc
+ =com
+member: cn=Mark Elliot,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+
+# Testing list search of a non-listed attr...
+dn: cn=Dynamic List of Members,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+
+# Testing list search with (critical) manageDSAit...
+dn: cn=Dynamic List of Members,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+cn: Dynamic List of Members
+memberURL: ldap:///ou=People,dc=example,dc=com??sub?(objectClass=person)
+
+# Testing list compare...
+TRUE
+
+# Testing list compare (should return FALSE)...
+FALSE
+
+# Testing list compare with manageDSAit...
+FALSE
+
+# Testing list search without dgIdentity...
+dn: cn=Dynamic List of Members,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+cn: Dynamic List of Members
+memberURL: ldap:///ou=People,dc=example,dc=com??sub?(objectClass=person)
+
+# Testing list search with dgIdentity...
+dn: cn=Dynamic List of Members,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+objectClass: dgIdentityAux
+cn: Dynamic List of Members
+memberURL: ldap:///ou=People,dc=example,dc=com??sub?(objectClass=person)
+dgIdentity: cn=Bjorn Jensen,ou=Information Technology DivisioN,ou=People,dc=ex
+ ample,dc=com
+member: cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=exam
+ ple,dc=com
+member: cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=exampl
+ e,dc=com
+member: cn=Dorothy Stevens,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 2,ou=Information Technology Division,ou=People,dc=exa
+ mple,dc=com
+member: cn=Jane Doe,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=John Doe,ou=Information Technology Division,ou=People,dc=example,dc
+ =com
+member: cn=Mark Elliot,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+
+# Testing list search with dgIdentity and dgAuthz anonymously...
+dn: cn=Dynamic List of Members,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+objectClass: dgIdentityAux
+cn: Dynamic List of Members
+memberURL: ldap:///ou=People,dc=example,dc=com??sub?(objectClass=person)
+dgIdentity: cn=Bjorn Jensen,ou=Information Technology DivisioN,ou=People,dc=ex
+ ample,dc=com
+dgAuthz: {0}dn:cn=Barbara Jensen,ou=Information Technology DivisioN,ou=People,
+ dc=example,dc=com
+
+# Testing list search with dgIdentity and dgAuthz as the authorized identity...
+dn: cn=Dynamic List of Members,ou=Dynamic Lists,dc=example,dc=com
+objectClass: groupOfURLs
+objectClass: dgIdentityAux
+cn: Dynamic List of Members
+memberURL: ldap:///ou=People,dc=example,dc=com??sub?(objectClass=person)
+dgIdentity: cn=Bjorn Jensen,ou=Information Technology DivisioN,ou=People,dc=ex
+ ample,dc=com
+dgAuthz: {0}dn:cn=Barbara Jensen,ou=Information Technology DivisioN,ou=People,
+ dc=example,dc=com
+member: cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=exam
+ ple,dc=com
+member: cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=exampl
+ e,dc=com
+member: cn=Dorothy Stevens,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 1,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=James A Jones 2,ou=Information Technology Division,ou=People,dc=exa
+ mple,dc=com
+member: cn=Jane Doe,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Jennifer Smith,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=John Doe,ou=Information Technology Division,ou=People,dc=example,dc
+ =com
+member: cn=Mark Elliot,ou=Alumni Association,ou=People,dc=example,dc=com
+member: cn=Ursula Hampster,ou=Alumni Association,ou=People,dc=example,dc=com
+

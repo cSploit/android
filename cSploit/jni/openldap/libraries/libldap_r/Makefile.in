@@ -1,0 +1,88 @@
+# Makefile.in for LDAP -lldap
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+LIBRARY = libldap_r.la
+
+PROGRAMS = apitest ltest
+
+XXDIR = $(srcdir)/../libldap
+XXSRCS    = apitest.c test.c \
+	bind.c open.c result.c error.c compare.c search.c \
+	controls.c messages.c references.c extended.c cyrus.c \
+	modify.c add.c modrdn.c delete.c abandon.c \
+	sasl.c gssapi.c sbind.c unbind.c cancel.c \
+	filter.c free.c sort.c passwd.c whoami.c vc.c \
+	getdn.c getentry.c getattr.c getvalues.c addentry.c \
+	request.c os-ip.c url.c pagectrl.c sortctrl.c vlvctrl.c \
+	init.c options.c print.c string.c util-int.c schema.c \
+	charray.c os-local.c dnssrv.c utf-8.c utf-8-conv.c \
+	tls2.c tls_o.c tls_g.c tls_m.c \
+	turn.c ppolicy.c dds.c txn.c ldap_sync.c stctrl.c \
+	assertion.c deref.c ldifutil.c ldif.c fetch.c
+SRCS	= threads.c rdwr.c rmutex.c tpool.c rq.c \
+	thr_posix.c thr_cthreads.c thr_thr.c thr_nt.c \
+	thr_pth.c thr_stub.c thr_debug.c
+OBJS	= threads.lo rdwr.lo rmutex.lo tpool.lo  rq.lo \
+	thr_posix.lo thr_cthreads.lo thr_thr.lo thr_nt.lo \
+	thr_pth.lo thr_stub.lo thr_debug.lo \
+	bind.lo open.lo result.lo error.lo compare.lo search.lo \
+	controls.lo messages.lo references.lo extended.lo cyrus.lo \
+	modify.lo add.lo modrdn.lo delete.lo abandon.lo \
+	sasl.lo gssapi.lo sbind.lo unbind.lo cancel.lo \
+	filter.lo free.lo sort.lo passwd.lo whoami.lo vc.lo \
+	getdn.lo getentry.lo getattr.lo getvalues.lo addentry.lo \
+	request.lo os-ip.lo url.lo pagectrl.lo sortctrl.lo vlvctrl.lo \
+	init.lo options.lo print.lo string.lo util-int.lo schema.lo \
+	charray.lo os-local.lo dnssrv.lo utf-8.lo utf-8-conv.lo \
+	tls2.lo tls_o.lo tls_g.lo tls_m.lo \
+	turn.lo ppolicy.lo dds.lo txn.lo ldap_sync.lo stctrl.lo \
+	assertion.lo deref.lo ldifutil.lo ldif.lo fetch.lo
+
+LDAP_INCDIR= ../../include       
+LDAP_LIBDIR= ../../libraries
+
+LIB_DEFS = -DLDAP_LIBRARY
+
+XDEFS = -DLDAP_R_COMPILE -I$(XXDIR)
+XLIBS = $(LIBRARY) $(LDAP_LIBLBER_LA) $(LDAP_LIBLUTIL_A)
+XXLIBS = $(SECURITY_LIBS) $(LUTIL_LIBS)
+XXXLIBS = $(LTHREAD_LIBS)
+NT_LINK_LIBS = $(LDAP_LIBLBER_LA) $(AC_LIBS) $(SECURITY_LIBS)
+UNIX_LINK_LIBS = $(LDAP_LIBLBER_LA) $(AC_LIBS) $(SECURITY_LIBS) $(LTHREAD_LIBS)
+
+.links : Makefile
+	@for i in $(XXSRCS); do \
+		$(RM) $$i ; \
+		$(LN_S) $(XXDIR)/$$i . ; \
+	done
+	touch .links
+
+$(XXSRCS) : .links
+
+clean-local: FORCE
+	@$(RM) .links
+
+depend-common: .links
+
+apitest:	$(XLIBS) apitest.o
+	$(LTLINK) -o $@ apitest.o $(LIBS)
+ltest:	$(XLIBS) test.o
+	$(LTLINK) -o $@ test.o $(LIBS)
+
+install-local: $(CFFILES) FORCE
+	-$(MKDIR) $(DESTDIR)$(libdir)
+	$(LTINSTALL) $(INSTALLFLAGS) -m 644 $(LIBRARY) $(DESTDIR)$(libdir)
+	$(LTFINISH) $(DESTDIR)$(libdir)
+

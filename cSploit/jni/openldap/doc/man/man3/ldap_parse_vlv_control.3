@@ -1,0 +1,49 @@
+.TH LDAP_PARSE_VLV_CONTROL 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_parse_vlv_control \- Decode the information returned from a search operation that used a VLV (virtual list view) control
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_parse_vlv_control( ld, ctrlp, target_posp, list_countp, contextp, errcodep )
+.ft
+LDAP *ld;
+LDAPControl **ctrlp;
+unsigned long *target_posp, *list_countp;
+struct berval **contextp;
+int *errcodep;
+.SH DESCRIPTION
+The
+.B ldap_parse_vlv_control
+is used to decode the information returned from a search operation that used a
+VLV (virtual list view)control. It takes a null terminated array of LDAPControl
+structures, usually obtained by a call to the 
+.BR ldap_parse_result function,
+a \fItarget_pos\fP which points to the list index of the target entry. If
+this parameter is NULL, the target position is not returned. The index returned 
+is an approximation of the position of the target entry. It is
+not guaranteed to be exact. The parameter \fIlist_countp\fP points to 
+the server's estimate of the size of the list. If this parameter is NULL, the
+size is not returned. \fIcontextp\fP is a pointer to the address of a berval
+structure that contains a server-generated context identifier if server returns
+one. If server does not return a context identifier, the server returns a NULL
+in this parameter. If this parameter is set to NULL, the context identifier is
+not returned. You should use this returned context in the next call to
+create a VLV control. When the berval structure is no longer needed, you should
+free the memory by calling the \fIber_bvfree function.e\fP
+\fIerrcodep\fP is an output parameter, which points to the result code returned
+by the server. If this parameter is NULL, the result code is not returned.
+.LP 
+See
+ldap.h for a list of possible return codes.
+.SH SEE ALSO
+.BR ldap_search (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

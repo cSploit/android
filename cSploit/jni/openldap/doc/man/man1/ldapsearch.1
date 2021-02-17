@@ -1,0 +1,505 @@
+.TH LDAPSEARCH 1 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldapsearch \- LDAP search tool
+.SH SYNOPSIS
+.B ldapsearch
+[\c
+.BR \-V [ V ]]
+[\c
+.BI \-d \ debuglevel\fR]
+[\c
+.BR \-n ]
+[\c
+.BR \-v ]
+[\c
+.BR \-c ]
+[\c
+.BR \-u ]
+[\c
+.BR \-t [ t ]]
+[\c
+.BI \-T \ path\fR]
+[\c
+.BI \-F \ prefix\fR]
+[\c
+.BR \-A ]
+[\c
+.BR \-L [ L [ L ]]]
+[\c
+.BI \-S \ attribute\fR]
+[\c
+.BI \-b \ searchbase\fR]
+[\c
+.BR \-s \ { base \||\| one \||\| sub \||\| children }]
+[\c
+.BR \-a \ { never \||\| always \||\| search \||\| find }]
+[\c
+.BI \-l \ timelimit\fR]
+[\c
+.BI \-z \ sizelimit\fR]
+[\c
+.BI \-f \ file\fR]
+[\c
+.BR \-M [ M ]]
+[\c
+.BR \-x ]
+[\c
+.BI \-D \ binddn\fR]
+[\c
+.BR \-W ]
+[\c
+.BI \-w \ passwd\fR]
+[\c
+.BI \-y \ passwdfile\fR]
+[\c
+.BI \-H \ ldapuri\fR]
+[\c
+.BI \-h \ ldaphost\fR]
+[\c
+.BI \-p \ ldapport\fR]
+[\c
+.BR \-P \ { 2 \||\| 3 }]
+[\c
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BI \-o \ opt \fR[= optparam \fR]]
+[\c
+.BI \-O \ security-properties\fR]
+[\c
+.BR \-I ]
+[\c
+.BR \-Q ]
+[\c
+.BR \-N ]
+[\c
+.BI \-U \ authcid\fR]
+[\c
+.BI \-R \ realm\fR]
+[\c
+.BI \-X \ authzid\fR]
+[\c
+.BI \-Y \ mech\fR]
+[\c
+.BR \-Z [ Z ]]
+.I filter
+[\c
+.IR attrs... ]
+.SH DESCRIPTION
+.I ldapsearch
+is a shell-accessible interface to the
+.BR ldap_search_ext (3)
+library call.
+.LP
+.B ldapsearch
+opens a connection to an LDAP server, binds, and performs a search
+using specified parameters.   The \fIfilter\fP should conform to
+the string representation for search filters as defined in RFC 4515.
+If not provided, the default filter, \fB(objectClass=*)\fP, is used.
+.LP
+If
+.B ldapsearch
+finds one or more entries, the attributes specified by
+\fIattrs\fP are returned.  If \fB*\fP is listed, all user attributes are
+returned.  If \fB+\fP is listed, all operational attributes are returned.
+If no \fIattrs\fP are listed, all user attributes are returned.  If only
+1.1 is listed, no attributes will be returned.
+.LP
+The search results are displayed using an extended version of LDIF.
+Option \fI\-L\fP controls the format of the output.
+.SH OPTIONS
+.TP
+.BR \-V [ V ]
+Print version info.
+If \fB\-VV\fP is given, only the version information is printed.
+.TP
+.BI \-d \ debuglevel
+Set the LDAP debugging level to \fIdebuglevel\fP.
+.B ldapsearch
+must be compiled with LDAP_DEBUG defined for this option to have any effect.
+.TP
+.B \-n
+Show what would be done, but don't actually perform the search.  Useful for
+debugging in conjunction with \fB\-v\fP.
+.TP
+.B \-v
+Run in verbose mode, with many diagnostics written to standard output.
+.TP
+.B \-c
+Continuous operation mode. Errors are reported, but ldapsearch will continue
+with searches. The default is to exit after reporting an error.  Only useful
+in conjunction with \fB\-f\fP.
+.TP
+.B \-u
+Include the User Friendly Name form of the Distinguished Name (DN)
+in the output.
+.TP
+.BR \-t [ t ]
+A single \fB\-t\fP writes retrieved non-printable values to a set of temporary
+files.  This is useful for dealing with values containing non-character
+data such as jpegPhoto or audio. A second \fB\-t\fP writes all retrieved values to
+files.
+.TP
+.BI \-T \ path
+Write temporary files to directory specified by \fIpath\fP (default:
+\fB/var/tmp/\fP)
+.TP
+.BI \-F \ prefix
+URL prefix for temporary files.  Default is \fBfile://\fIpath\fP where
+\fIpath\fP is \fB/var/tmp/\fP or specified with \fB\-T\fP.
+.TP
+.B \-A
+Retrieve attributes only (no values).  This is useful when you just want to
+see if an attribute is present in an entry and are not interested in the
+specific values.
+.TP
+.B \-L
+Search results are display in LDAP Data Interchange Format detailed in
+.BR ldif (5).
+A single \fB\-L\fP restricts the output to LDIFv1.
+ A second \fB\-L\fP disables comments.
+A third \fB\-L\fP disables printing of the LDIF version.
+The default is to use an extended version of LDIF.
+.TP
+.BI \-S \ attribute
+Sort the entries returned based on \fIattribute\fP. The default is not
+to sort entries returned.  If \fIattribute\fP is a zero-length string (""),
+the entries are sorted by the components of their Distinguished Name.  See
+.BR ldap_sort (3)
+for more details. Note that
+.B ldapsearch
+normally prints out entries as it receives them. The use of the \fB\-S\fP
+option defeats this behavior, causing all entries to be retrieved,
+then sorted, then printed.
+.TP
+.BI \-b \ searchbase
+Use \fIsearchbase\fP as the starting point for the search instead of
+the default.
+.TP
+.BR \-s \ { base \||\| one \||\| sub \||\| children }
+Specify the scope of the search to be one of
+.BR base ,
+.BR one ,
+.BR sub ,
+or
+.B children
+to specify a base object, one-level, subtree, or children search.
+The default is
+.BR sub .
+Note:
+.I children
+scope requires LDAPv3 subordinate feature extension.
+.TP
+.BR \-a \ { never \||\| always \||\| search \||\| find }
+Specify how aliases dereferencing is done.  Should be one of
+.BR never ,
+.BR always ,
+.BR search ,
+or
+.B find
+to specify that aliases are never dereferenced, always dereferenced,
+dereferenced when searching, or dereferenced only when locating the
+base object for the search.  The default is to never dereference aliases.
+.TP
+.BI \-l \ timelimit
+wait at most \fItimelimit\fP seconds for a search to complete.
+A timelimit of
+.I 0
+(zero) or
+.I none
+means no limit.
+A timelimit of
+.I max
+means the maximum integer allowable by the protocol.
+A server may impose a maximal timelimit which only
+the root user may override.
+.TP
+.BI \-z \ sizelimit
+retrieve at most \fIsizelimit\fP entries for a search.
+A sizelimit of
+.I 0
+(zero) or
+.I none
+means no limit.
+A sizelimit of
+.I max
+means the maximum integer allowable by the protocol.
+A server may impose a maximal sizelimit which only
+the root user may override.
+.TP
+.BI \-f \ file
+Read a series of lines from \fIfile\fP, performing one LDAP search for
+each line.  In this case, the \fIfilter\fP given on the command line
+is treated as a pattern where the first and only occurrence of \fB%s\fP
+is replaced with a line from \fIfile\fP.  Any other occurrence of the
+the \fB%\fP character in the pattern will be regarded as an error.
+Where it is desired that the search filter include a \fB%\fP character,
+the character should be encoded as \fB\\25\fP (see RFC 4515).
+If \fIfile\fP is a single
+\fB\-\fP character, then the lines are read from standard input.
+.B ldapsearch
+will exit when the first non-successful search result is returned,
+unless \fB\-c\fP is used.
+.TP
+.BR \-M [ M ]
+Enable manage DSA IT control.
+.B \-MM
+makes control critical.
+.TP
+.B \-x 
+Use simple authentication instead of SASL.
+.TP
+.BI \-D \ binddn
+Use the Distinguished Name \fIbinddn\fP to bind to the LDAP directory.
+For SASL binds, the server is expected to ignore this value.
+.TP
+.B \-W
+Prompt for simple authentication.
+This is used instead of specifying the password on the command line.
+.TP
+.BI \-w \ passwd
+Use \fIpasswd\fP as the password for simple authentication.
+.TP
+.BI \-y \ passwdfile
+Use complete contents of \fIpasswdfile\fP as the password for
+simple authentication.
+.TP
+.BI \-H \ ldapuri
+Specify URI(s) referring to the ldap server(s);
+a list of URI, separated by whitespace or commas is expected;
+only the protocol/host/port fields are allowed.
+As an exception, if no host/port is specified, but a DN is,
+the DN is used to look up the corresponding host(s) using the
+DNS SRV records, according to RFC 2782.  The DN must be a non-empty
+sequence of AVAs whose attribute type is "dc" (domain component),
+and must be escaped according to RFC 2396.
+.TP
+.BI \-h \ ldaphost
+Specify an alternate host on which the ldap server is running.
+Deprecated in favor of \fB\-H\fP.
+.TP
+.BI \-p \ ldapport
+Specify an alternate TCP port where the ldap server is listening.
+Deprecated in favor of \fB\-H\fP.
+.TP
+.BR \-P \ { 2 \||\| 3 }
+Specify the LDAP protocol version to use.
+.TP
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+.TP
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+
+Specify general extensions with \fB\-e\fP and search extensions with \fB\-E\fP.
+\'\fB!\fP\' indicates criticality.
+
+General extensions:
+.nf
+  [!]assert=<filter>    (an RFC 4515 Filter)
+  !authzid=<authzid>    ("dn:<dn>" or "u:<user>")
+  [!]bauthzid           (RFC 3829 authzid control)
+  [!]chaining[=<resolve>[/<cont>]]
+  [!]manageDSAit
+  [!]noop
+  ppolicy
+  [!]postread[=<attrs>] (a comma-separated attribute list)
+  [!]preread[=<attrs>]  (a comma-separated attribute list)
+  [!]relax
+  sessiontracking[=<username>]
+  abandon,cancel,ignore (SIGINT sends abandon/cancel,
+  or ignores response; if critical, doesn't wait for SIGINT.
+  not really controls)
+.fi
+
+Search extensions:
+.nf
+  !dontUseCopy
+  [!]domainScope                       (domain scope)
+  [!]mv=<filter>                       (matched values filter)
+  [!]pr=<size>[/prompt|noprompt]       (paged results/prompt)
+  [!]sss=[\-]<attr[:OID]>[/[\-]<attr[:OID]>...]  (server side sorting)
+  [!]subentries[=true|false]           (subentries)
+  [!]sync=ro[/<cookie>]                (LDAP Sync refreshOnly)
+          rp[/<cookie>][/<slimit>]     (LDAP Sync refreshAndPersist)
+  [!]vlv=<before>/<after>(/<offset>/<count>|:<value>)  (virtual list view)
+  [!]deref=derefAttr:attr[,attr[...]][;derefAttr:attr[,attr[...]]]
+  [!]<oid>[=<value>]
+.fi
+.TP
+.BI \-o \ opt \fR[= optparam \fR]
+
+Specify general options.
+
+General options:
+.nf
+  nettimeout=<timeout>  (in seconds, or "none" or "max")
+  ldif-wrap=<width>     (in columns, or "no" for no wrapping)
+.fi
+.TP
+.BI \-O \ security-properties
+Specify SASL security properties.
+.TP
+.B \-I
+Enable SASL Interactive mode.  Always prompt.  Default is to prompt
+only as needed.
+.TP
+.B \-Q
+Enable SASL Quiet mode.  Never prompt.
+.TP
+.B \-N
+Do not use reverse DNS to canonicalize SASL host name.
+.TP
+.BI \-U \ authcid
+Specify the authentication ID for SASL bind. The form of the ID
+depends on the actual SASL mechanism used.
+.TP
+.BI \-R \ realm
+Specify the realm of authentication ID for SASL bind. The form of the realm
+depends on the actual SASL mechanism used.
+.TP
+.BI \-X \ authzid
+Specify the requested authorization ID for SASL bind.
+.I authzid
+must be one of the following formats:
+.BI dn: "<distinguished name>"
+or
+.BI u: <username>
+.TP
+.BI \-Y \ mech
+Specify the SASL mechanism to be used for authentication. If it's not
+specified, the program will choose the best mechanism the server knows.
+.TP
+.BR \-Z [ Z ]
+Issue StartTLS (Transport Layer Security) extended operation. If you use
+\fB\-ZZ\fP, the command will require the operation to be successful.
+.SH OUTPUT FORMAT
+If one or more entries are found, each entry is written to standard
+output in LDAP Data Interchange Format or
+.BR ldif (5):
+.LP
+.nf
+    version: 1
+
+    # bjensen, example, net
+    dn: uid=bjensen,dc=example,dc=net
+    objectClass: person
+    objectClass: dcObject
+    uid: bjensen
+    cn: Barbara Jensen
+    sn: Jensen
+    ...
+.fi
+.LP
+If the \fB\-t\fP option is used, the URI of a temporary file
+is used in place of the actual value.  If the \fB\-A\fP option
+is given, only the "attributename" part is written.
+.SH EXAMPLE
+The following command:
+.LP
+.nf
+    ldapsearch \-LLL "(sn=smith)" cn sn telephoneNumber
+.fi
+.LP
+will perform a subtree search (using the default search base and
+other parameters defined in
+.BR ldap.conf (5))
+for entries with a surname (sn) of smith.  The common name (cn), surname
+(sn) and telephoneNumber values will be retrieved and printed to
+standard output.
+The output might look something like this if two entries are found:
+.LP
+.nf
+    dn: uid=jts,dc=example,dc=com
+    cn: John Smith
+    cn: John T. Smith
+    sn: Smith
+    sn;lang\-en: Smith
+    sn;lang\-de: Schmidt
+    telephoneNumber: 1 555 123\-4567
+
+    dn: uid=sss,dc=example,dc=com
+    cn: Steve Smith
+    cn: Steve S. Smith
+    sn: Smith
+    sn;lang\-en: Smith
+    sn;lang\-de: Schmidt
+    telephoneNumber: 1 555 765\-4321
+.fi
+.LP
+The command:
+.LP
+.nf
+    ldapsearch \-LLL \-u \-t "(uid=xyz)" jpegPhoto audio
+.fi
+.LP
+will perform a subtree search using the default search base for entries
+with user id of "xyz".  The user friendly form of the entry's DN will be
+output after the line that contains the DN itself, and the jpegPhoto
+and audio values will be retrieved and written to temporary files.  The
+output might look like this if one entry with one value for each of the
+requested attributes is found:
+.LP
+.nf
+    dn: uid=xyz,dc=example,dc=com
+    ufn: xyz, example, com
+    audio:< file:///tmp/ldapsearch\-audio\-a19924
+    jpegPhoto:< file:///tmp/ldapsearch\-jpegPhoto\-a19924
+.fi
+.LP
+This command:
+.LP
+.nf
+    ldapsearch \-LLL \-s one \-b "c=US" "(o=University*)" o description
+.fi
+.LP
+will perform a one-level search at the c=US level for all entries
+whose organization name (o) begins with \fBUniversity\fP.
+The organization name and description attribute values will be retrieved
+and printed to standard output, resulting in output similar to this:
+.LP
+.nf
+    dn: o=University of Alaska Fairbanks,c=US
+    o: University of Alaska Fairbanks
+    description: Preparing Alaska for a brave new yesterday
+    description: leaf node only
+
+    dn: o=University of Colorado at Boulder,c=US
+    o: University of Colorado at Boulder
+    description: No personnel information
+    description: Institution of education and research
+
+    dn: o=University of Colorado at Denver,c=US
+    o: University of Colorado at Denver
+    o: UCD
+    o: CU/Denver
+    o: CU\-Denver
+    description: Institute for Higher Learning and Research
+
+    dn: o=University of Florida,c=US
+    o: University of Florida
+    o: UFl
+    description: Warper of young minds
+
+    ...
+.fi
+.SH DIAGNOSTICS
+Exit status is zero if no errors occur.
+Errors result in a non-zero exit status and
+a diagnostic message being written to standard error.
+.SH "SEE ALSO"
+.BR ldapadd (1),
+.BR ldapdelete (1),
+.BR ldapmodify (1),
+.BR ldapmodrdn (1),
+.BR ldap.conf (5),
+.BR ldif (5),
+.BR ldap (3),
+.BR ldap_search_ext (3),
+.BR ldap_sort (3)
+.SH AUTHOR
+The OpenLDAP Project <http://www.openldap.org/>
+.SH ACKNOWLEDGEMENTS
+.so ../Project

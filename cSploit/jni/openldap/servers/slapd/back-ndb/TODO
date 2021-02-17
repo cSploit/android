@@ -1,0 +1,6 @@
+LDAP features not currently supported:
+
+tagged attributes
+aliases
+substring indexing
+subtree rename

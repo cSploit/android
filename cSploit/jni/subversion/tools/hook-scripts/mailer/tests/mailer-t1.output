@@ -1,0 +1,751 @@
+Group: file plus other areas
+Subject: r1 -  dir1 dir2
+
+Author: mailer test
+Date: Sun Sep  9 01:46:40 2001
+New Revision: 1
+
+Log:
+initial load
+
+Added:
+   file1
+   file2
+
+Changes in other areas also in this revision:
+Added:
+   dir1/
+   dir1/file3
+   dir1/file4
+   dir2/
+   dir2/file5
+   dir2/file6
+
+Added: file1
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file1	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file1
+
+Added: file2
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file2	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file2
+
+Diffs of changes in other areas also in this revision:
+
+Added: dir1/file3
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir1/file3	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file3
+
+Added: dir1/file4
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir1/file4	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file4
+
+Added: dir2/file5
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir2/file5	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file5
+
+Added: dir2/file6
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir2/file6	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file6
+Group: All
+Subject: r1 -  dir1 dir2
+
+Author: mailer test
+Date: Sun Sep  9 01:46:40 2001
+New Revision: 1
+
+Log:
+initial load
+
+Added:
+   dir1/
+   dir1/file3
+   dir1/file4
+   dir2/
+   dir2/file5
+   dir2/file6
+   file1
+   file2
+
+Added: dir1/file3
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir1/file3	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file3
+
+Added: dir1/file4
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir1/file4	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file4
+
+Added: dir2/file5
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir2/file5	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file5
+
+Added: dir2/file6
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir2/file6	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file6
+
+Added: file1
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file1	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file1
+
+Added: file2
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file2	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file2
+Group: file
+Subject: r1 -  dir1 dir2
+
+Author: mailer test
+Date: Sun Sep  9 01:46:40 2001
+New Revision: 1
+
+Log:
+initial load
+
+Added:
+   file1
+   file2
+
+Added: file1
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file1	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file1
+
+Added: file2
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file2	Sun Sep  9 01:46:40 2001	(r1)
+@@ -0,0 +1 @@
++file2
+Group: bugtracker
+Subject: Fix for Blah#123: r2 -  dir1 dir2
+
+Author: mailer test
+Date: Sun Sep  9 04:33:20 2001
+New Revision: 2
+
+Log:
+two file changes.  Fixes Blah#123
+
+Modified:
+   dir1/   (props changed)
+   dir2/file5
+   file1   (props changed)
+   file2   (contents, props changed)
+
+Modified: dir2/file5
+==============================================================================
+--- dir2/file5	Sun Sep  9 01:46:40 2001	(r1)
++++ dir2/file5	Sun Sep  9 04:33:20 2001	(r2)
+@@ -1 +1,2 @@
+ file5
++change C2
+
+Modified: file2
+==============================================================================
+--- file2	Sun Sep  9 01:46:40 2001	(r1)
++++ file2	Sun Sep  9 04:33:20 2001	(r2)
+@@ -1 +1,2 @@
+ file2
++change C1
+Group: All
+Subject: r2 -  dir1 dir2
+
+Author: mailer test
+Date: Sun Sep  9 04:33:20 2001
+New Revision: 2
+
+Log:
+two file changes.  Fixes Blah#123
+
+Modified:
+   dir1/   (props changed)
+   dir2/file5
+   file1   (props changed)
+   file2   (contents, props changed)
+
+Modified: dir2/file5
+==============================================================================
+--- dir2/file5	Sun Sep  9 01:46:40 2001	(r1)
++++ dir2/file5	Sun Sep  9 04:33:20 2001	(r2)
+@@ -1 +1,2 @@
+ file5
++change C2
+
+Modified: file2
+==============================================================================
+--- file2	Sun Sep  9 01:46:40 2001	(r1)
++++ file2	Sun Sep  9 04:33:20 2001	(r2)
+@@ -1 +1,2 @@
+ file2
++change C1
+Group: file plus other areas
+Subject: r2 -  dir1 dir2
+
+Author: mailer test
+Date: Sun Sep  9 04:33:20 2001
+New Revision: 2
+
+Log:
+two file changes.  Fixes Blah#123
+
+Modified:
+   file1   (props changed)
+   file2   (contents, props changed)
+
+Changes in other areas also in this revision:
+Modified:
+   dir1/   (props changed)
+   dir2/file5
+
+Modified: file2
+==============================================================================
+--- file2	Sun Sep  9 01:46:40 2001	(r1)
++++ file2	Sun Sep  9 04:33:20 2001	(r2)
+@@ -1 +1,2 @@
+ file2
++change C1
+
+Diffs of changes in other areas also in this revision:
+
+Modified: dir2/file5
+==============================================================================
+--- dir2/file5	Sun Sep  9 01:46:40 2001	(r1)
++++ dir2/file5	Sun Sep  9 04:33:20 2001	(r2)
+@@ -1 +1,2 @@
+ file5
++change C2
+Group: file
+Subject: r2 -  dir1 dir2
+
+Author: mailer test
+Date: Sun Sep  9 04:33:20 2001
+New Revision: 2
+
+Log:
+two file changes.  Fixes Blah#123
+
+Modified:
+   file1   (props changed)
+   file2   (contents, props changed)
+
+Modified: file2
+==============================================================================
+--- file2	Sun Sep  9 01:46:40 2001	(r1)
++++ file2	Sun Sep  9 04:33:20 2001	(r2)
+@@ -1 +1,2 @@
+ file2
++change C1
+Group: All
+Subject: r3 - dir2 dir3
+
+Author: mailer test
+Date: Sun Sep  9 07:20:00 2001
+New Revision: 3
+
+Log:
+two copies
+
+Added:
+   dir2/file7
+      - copied unchanged from r2, file1
+   dir3/   (props changed)
+      - copied from r2, dir1/
+
+Copied: dir2/file7 (from r2, file1)
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir2/file7	Sun Sep  9 07:20:00 2001	(r3, copy of r2, file1)
+@@ -0,0 +1 @@
++file1
+Group: All
+Subject: r4 - dir3
+
+Author: mailer test
+Date: Sun Sep  9 10:06:40 2001
+New Revision: 4
+
+Log:
+copied and changed
+
+Added:
+   dir3/file8
+      - copied, changed from r2, file1
+
+Copied and modified: dir3/file8 (from r2, file1)
+==============================================================================
+--- file1	Sun Sep  9 04:33:20 2001	(r2, copy source)
++++ dir3/file8	Sun Sep  9 10:06:40 2001	(r4)
+@@ -1 +1,2 @@
+ file1
++change C3
+Group: file plus other areas
+Subject: r5 -  dir1 dir3
+
+Author: mailer test
+Date: Sun Sep  9 12:53:20 2001
+New Revision: 5
+
+Log:
+changes and deletes of properties
+
+Modified:
+   file2   (props changed)
+
+Changes in other areas also in this revision:
+Modified:
+   dir1/   (props changed)
+   dir3/   (props changed)
+Group: All
+Subject: r5 -  dir1 dir3
+
+Author: mailer test
+Date: Sun Sep  9 12:53:20 2001
+New Revision: 5
+
+Log:
+changes and deletes of properties
+
+Modified:
+   dir1/   (props changed)
+   dir3/   (props changed)
+   file2   (props changed)
+Group: file
+Subject: r5 -  dir1 dir3
+
+Author: mailer test
+Date: Sun Sep  9 12:53:20 2001
+New Revision: 5
+
+Log:
+changes and deletes of properties
+
+Modified:
+   file2   (props changed)
+Group: file
+Subject: r6 -  dir1 dir4
+
+Author: mailer test
+Date: Sun Sep  9 15:40:00 2001
+New Revision: 6
+
+Log:
+mixed addition and change.  Fixes Blaz#456 Blah#987
+
+Added:
+   file9
+
+Added: file9
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file9	Sun Sep  9 15:40:00 2001	(r6)
+@@ -0,0 +1 @@
++file9
+Group: file plus other areas
+Subject: r6 -  dir1 dir4
+
+Author: mailer test
+Date: Sun Sep  9 15:40:00 2001
+New Revision: 6
+
+Log:
+mixed addition and change.  Fixes Blaz#456 Blah#987
+
+Added:
+   file9
+
+Changes in other areas also in this revision:
+Added:
+   dir4/
+Modified:
+   dir1/file3
+
+Added: file9
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file9	Sun Sep  9 15:40:00 2001	(r6)
+@@ -0,0 +1 @@
++file9
+
+Diffs of changes in other areas also in this revision:
+
+Modified: dir1/file3
+==============================================================================
+--- dir1/file3	Sun Sep  9 12:53:20 2001	(r5)
++++ dir1/file3	Sun Sep  9 15:40:00 2001	(r6)
+@@ -1 +1,2 @@
+ file3
++change C4
+Group: All
+Subject: r6 -  dir1 dir4
+
+Author: mailer test
+Date: Sun Sep  9 15:40:00 2001
+New Revision: 6
+
+Log:
+mixed addition and change.  Fixes Blaz#456 Blah#987
+
+Added:
+   dir4/
+   file9
+Modified:
+   dir1/file3
+
+Modified: dir1/file3
+==============================================================================
+--- dir1/file3	Sun Sep  9 12:53:20 2001	(r5)
++++ dir1/file3	Sun Sep  9 15:40:00 2001	(r6)
+@@ -1 +1,2 @@
+ file3
++change C4
+
+Added: file9
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file9	Sun Sep  9 15:40:00 2001	(r6)
+@@ -0,0 +1 @@
++file9
+Group: bugtracker
+Subject: Fix for Blah#987: r6 -  dir1 dir4
+
+Author: mailer test
+Date: Sun Sep  9 15:40:00 2001
+New Revision: 6
+
+Log:
+mixed addition and change.  Fixes Blaz#456 Blah#987
+
+Added:
+   dir4/
+   file9
+Modified:
+   dir1/file3
+
+Modified: dir1/file3
+==============================================================================
+--- dir1/file3	Sun Sep  9 12:53:20 2001	(r5)
++++ dir1/file3	Sun Sep  9 15:40:00 2001	(r6)
+@@ -1 +1,2 @@
+ file3
++change C4
+
+Added: file9
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file9	Sun Sep  9 15:40:00 2001	(r6)
+@@ -0,0 +1 @@
++file9
+Group: bugtracker
+Subject: Fix for Blaz#456: r6 -  dir1 dir4
+
+Author: mailer test
+Date: Sun Sep  9 15:40:00 2001
+New Revision: 6
+
+Log:
+mixed addition and change.  Fixes Blaz#456 Blah#987
+
+Added:
+   dir4/
+   file9
+Modified:
+   dir1/file3
+
+Modified: dir1/file3
+==============================================================================
+--- dir1/file3	Sun Sep  9 12:53:20 2001	(r5)
++++ dir1/file3	Sun Sep  9 15:40:00 2001	(r6)
+@@ -1 +1,2 @@
+ file3
++change C4
+
+Added: file9
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ file9	Sun Sep  9 15:40:00 2001	(r6)
+@@ -0,0 +1 @@
++file9
+Group: file plus other areas
+Subject: r7 -  dir1 dir2 dir3 dir3/dir5
+
+Author: mailer test
+Date: Sun Sep  9 18:26:40 2001
+New Revision: 7
+
+Log:
+adds, deletes, and a change
+
+Deleted:
+   file2
+
+Changes in other areas also in this revision:
+Added:
+   dir1/file10
+   dir3/dir5/
+Deleted:
+   dir2/
+Modified:
+   dir3/file3
+
+Deleted: file2
+==============================================================================
+--- file2	Sun Sep  9 18:26:40 2001	(r6)
++++ /dev/null	00:00:00 1970	(deleted)
+@@ -1,2 +0,0 @@
+-file2
+-change C1
+
+Diffs of changes in other areas also in this revision:
+
+Added: dir1/file10
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir1/file10	Sun Sep  9 18:26:40 2001	(r7)
+@@ -0,0 +1 @@
++file10
+
+Modified: dir3/file3
+==============================================================================
+--- dir3/file3	Sun Sep  9 15:40:00 2001	(r6)
++++ dir3/file3	Sun Sep  9 18:26:40 2001	(r7)
+@@ -1 +1,2 @@
+ file3
++change C5
+Group: All
+Subject: r7 -  dir1 dir2 dir3 dir3/dir5
+
+Author: mailer test
+Date: Sun Sep  9 18:26:40 2001
+New Revision: 7
+
+Log:
+adds, deletes, and a change
+
+Added:
+   dir1/file10
+   dir3/dir5/
+Deleted:
+   dir2/
+   file2
+Modified:
+   dir3/file3
+
+Added: dir1/file10
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir1/file10	Sun Sep  9 18:26:40 2001	(r7)
+@@ -0,0 +1 @@
++file10
+
+Modified: dir3/file3
+==============================================================================
+--- dir3/file3	Sun Sep  9 15:40:00 2001	(r6)
++++ dir3/file3	Sun Sep  9 18:26:40 2001	(r7)
+@@ -1 +1,2 @@
+ file3
++change C5
+
+Deleted: file2
+==============================================================================
+--- file2	Sun Sep  9 18:26:40 2001	(r6)
++++ /dev/null	00:00:00 1970	(deleted)
+@@ -1,2 +0,0 @@
+-file2
+-change C1
+Group: file
+Subject: r7 -  dir1 dir2 dir3 dir3/dir5
+
+Author: mailer test
+Date: Sun Sep  9 18:26:40 2001
+New Revision: 7
+
+Log:
+adds, deletes, and a change
+
+Deleted:
+   file2
+
+Deleted: file2
+==============================================================================
+--- file2	Sun Sep  9 18:26:40 2001	(r6)
++++ /dev/null	00:00:00 1970	(deleted)
+@@ -1,2 +0,0 @@
+-file2
+-change C1
+Group: All
+Subject: r8 - in dir6: . dir5
+
+Author: mailer test
+Date: Sun Sep  9 21:13:20 2001
+New Revision: 8
+
+Log:
+copy dir, then make a change
+
+Added:
+   dir6/
+      - copied from r6, dir3/
+   dir6/dir5/
+      - copied from r7, dir3/dir5/
+Replaced:
+   dir6/file3
+      - copied unchanged from r7, dir3/file3
+Modified:
+   dir6/file4
+
+Copied: dir6/file3 (from r7, dir3/file3)
+==============================================================================
+--- /dev/null	00:00:00 1970	(empty, because file is newly added)
++++ dir6/file3	Sun Sep  9 21:13:20 2001	(r8, copy of r7, dir3/file3)
+@@ -0,0 +1,2 @@
++file3
++change C5
+
+Modified: dir6/file4
+==============================================================================
+--- dir3/file4	Sun Sep  9 15:40:00 2001	(r6)
++++ dir6/file4	Sun Sep  9 21:13:20 2001	(r8)
+@@ -1 +1,2 @@
+ file4
++change C6
+Group: file plus other areas
+Subject: r9 - 
+
+Author: mailer test
+Date: Mon Sep 10 00:00:00 2001
+New Revision: 9
+
+Log:
+add binary file
+
+Added:
+   file11   (contents, props changed)
+Modified:
+   file9   (props changed)
+
+Added: file11
+==============================================================================
+Binary file. No diff available.
+Group: All
+Subject: r9 - 
+
+Author: mailer test
+Date: Mon Sep 10 00:00:00 2001
+New Revision: 9
+
+Log:
+add binary file
+
+Added:
+   file11   (contents, props changed)
+Modified:
+   file9   (props changed)
+
+Added: file11
+==============================================================================
+Binary file. No diff available.
+Group: file
+Subject: r9 - 
+
+Author: mailer test
+Date: Mon Sep 10 00:00:00 2001
+New Revision: 9
+
+Log:
+add binary file
+
+Added:
+   file11   (contents, props changed)
+Modified:
+   file9   (props changed)
+
+Added: file11
+==============================================================================
+Binary file. No diff available.
+Group: file plus other areas
+Subject: r10 - 
+
+Author: mailer test
+Date: Mon Sep 10 02:46:40 2001
+New Revision: 10
+
+Log:
+change binary file
+
+Modified:
+   file11
+   file9   (props changed)
+
+Modified: file11
+==============================================================================
+Binary file (source and/or target). No diff available.
+Group: All
+Subject: r10 - 
+
+Author: mailer test
+Date: Mon Sep 10 02:46:40 2001
+New Revision: 10
+
+Log:
+change binary file
+
+Modified:
+   file11
+   file9   (props changed)
+
+Modified: file11
+==============================================================================
+Binary file (source and/or target). No diff available.
+Group: file
+Subject: r10 - 
+
+Author: mailer test
+Date: Mon Sep 10 02:46:40 2001
+New Revision: 10
+
+Log:
+change binary file
+
+Modified:
+   file11
+   file9   (props changed)
+
+Modified: file11
+==============================================================================
+Binary file (source and/or target). No diff available.

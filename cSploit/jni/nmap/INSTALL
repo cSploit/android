@@ -1,0 +1,10 @@
+Ideally, you should be able to just type:
+
+./configure
+make
+make install
+
+For far more in-depth compilation, installation, and removal notes,
+read the Nmap Install Guide at http://nmap.org/install/ .
+
+

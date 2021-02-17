@@ -1,0 +1,65 @@
+#!/bin/sh
+#
+# $Header: /home/job/firebird/cvs-backup/firebird2/src/install/arch-specific/solx86gcc/CS/postinstall.in,v 1.2 2004-08-19 13:50:59 kkuznetsov Exp $
+#------------------------------------------------------------------------------
+# $Copyright: 
+# Copyright (C) Siemens Nixdorf Informationssysteme AG 1994 - 1998
+# Copyright (C) Siemens AG 1998 1999
+# Copyright (C) Fujitsu Siemens Computers GmbH 1999 - 2002
+# All rights reserved
+# $
+#------------------------------------------------------------------------------
+
+FIREBIRD=@prefix@
+cd $FIREBIRD
+
+# Create lock files
+HOSTNAME=`uname -n`
+for i in isc_init1 isc_lock1 isc_event1
+do
+    file=${i}.${HOSTNAME}
+    touch ${file}
+    chmod 666 ${file}
+done
+
+# Create log
+touch firebird.log
+chmod 666 firebird.log
+
+#
+# If TCP is installed, update both services and servers databases
+#
+if [ -f /etc/inet/services ]; then
+    grep -s @FB_SERVICE_NAME@ /etc/inet/services >/dev/null 2>&1
+    if [ $? -ne 0 ] ; then
+        echo "Patching /etc/inet/services..."
+	echo "@FB_SERVICE_NAME@ @FB_SERVICE_PORT@/tcp # Firebird2 Database Remote Protocol" >>/etc/inet/services
+    fi
+fi
+if [ -f /etc/inet/inetd.conf ]; then
+    grep -s @FB_SERVICE_NAME@ /etc/inet/inetd.conf >/dev/null 2>&1
+    if [ $? -ne 0 ] ; then
+        echo "Patching /etc/inet/inetd.conf..."
+	echo ""                                                                                  >> /etc/inet/inetd.conf
+	echo "# Firebird2 Database Remote Server"                                                >> /etc/inet/inetd.conf
+        echo "@FB_SERVICE_NAME@ stream tcp nowait.30000 root $FIREBIRD/bin/fb_inet_server fb_inet_server" >>/etc/inet/inetd.conf
+	echo "Restarting inetd..."
+	kill -HUP `ps -e | grep inetd | awk '{print $1}'`
+    fi
+fi
+
+if [ -f /etc/profile ]; then
+    grep -s "# Enhance PATH for Firebird2" /etc/profile >/dev/null 2>&1
+    if [ $? -ne 0 ] ; then
+        echo "Patching /etc/profile..."
+        echo "# Enhance PATH for Firebird2"                    >>/etc/profile 
+        echo "PATH=\$PATH:$FIREBIRD/bin"                       >>/etc/profile
+        echo "export PATH"                                     >>/etc/profile
+        echo "LD_LIBRARY_PATH=\$LD_LIBRARY_PATH:$FIREBIRD/lib:$FIREBIRD/intl" >>/etc/profile
+        echo "export LD_LIBRARY_PATH"                          >>/etc/profile
+        echo "INTERBASE=$FIREBIRD"                             >>/etc/profile
+        echo "export INTERBASE"                                >>/etc/profile
+    fi
+fi
+
+# EOF

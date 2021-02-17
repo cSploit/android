@@ -1,0 +1,65 @@
+/*
+ * this file tests all sorts of connecting to one single database.
+ */
+
+#include <stdlib.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+/* do not include regression.h */
+
+int
+main(void)
+{
+exec sql begin declare section;
+	char db[200];
+	char pw[200];
+exec sql end declare section;
+
+	ECPGdebug(1, stderr);
+
+	exec sql connect to connectdb as main;
+	exec sql alter user connectuser ENCRYPTED PASSWORD 'connectpw';
+	exec sql disconnect;  /* <-- "main" not specified */
+
+	exec sql connect to connectdb@localhost as main;
+	exec sql disconnect main;
+
+	exec sql connect to @localhost as main user connectdb;
+	exec sql disconnect main;
+
+	/* exec sql connect to :@TEMP_PORT@ as main user connectdb;
+	exec sql disconnect main; */
+
+	exec sql connect to tcp:postgresql://localhost/connectdb user connectuser identified by connectpw;
+	exec sql disconnect;
+
+	exec sql connect to tcp:postgresql://localhost/ user connectdb;
+	exec sql disconnect;
+
+	strcpy(pw, "connectpw");
+	strcpy(db, "tcp:postgresql://localhost/connectdb");
+	exec sql connect to :db user connectuser using :pw;
+	exec sql disconnect;
+
+	exec sql connect to unix:postgresql://localhost/connectdb user connectuser using "connectpw";
+	exec sql disconnect;
+
+	exec sql connect to unix:postgresql://localhost/connectdb?connect_timeout=14 user connectuser;
+	exec sql disconnect;
+
+	/* wrong db */
+	exec sql connect to tcp:postgresql://localhost/nonexistant user connectuser identified by connectpw;
+	exec sql disconnect;
+
+	/* wrong port */
+	exec sql connect to tcp:postgresql://localhost:20/connectdb user connectuser identified by connectpw;
+	/* no disconnect necessary */
+
+	/* wrong password */
+	exec sql connect to unix:postgresql://localhost/connectdb user connectuser identified by "wrongpw";
+	/* no disconnect necessary */
+
+	return (0);
+}

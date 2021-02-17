@@ -1,0 +1,120 @@
+autogroup overlay Readme
+
+DESCRIPTION
+    The autogroup overlay allows automated updates of group memberships which
+    meet the requirements of any filter contained in the group definition.
+    The filters are built from LDAP URI-valued attributes. Any time an object
+    is added/deleted/updated, it is tested for compliance with the filters,
+    and its membership is accordingly updated. For searches and compares
+    it behaves like a static group.
+    If the attribute part of the URI is filled, the group entry is populated
+    by the values of this attribute in the entries resulting from the search.
+
+BUILDING
+    A Makefile is included.
+
+CONFIGURATION
+    # dyngroup.schema:
+        The dyngroup schema must be modified, adding the 'member' attribute
+        to the MAY clause of the groupOfURLs object class, i.e.:
+
+        objectClass ( NetscapeLDAPobjectClass:33
+        NAME 'groupOfURLs'
+        SUP top STRUCTURAL
+        MUST cn
+        MAY ( memberURL $ businessCategory $ description $ o $ ou $
+                owner $ seeAlso $ member) )
+
+
+    # slapd.conf:
+
+    moduleload /path/to/autogroup.so
+        Loads the overlay (OpenLDAP must be built with --enable-modules).
+
+    overlay autogroup
+        This directive adds the autogroup overlay to the current database.
+
+    autogroup-attrset <group-oc> <URL-ad> <member-ad>
+        This configuration option is defined for the autogroup overlay.
+        It may have multiple occurrences, and it must appear after the
+        overlay directive.
+
+        The value <group-oc> is the name of the objectClass that represents 
+        the group.
+
+        The value <URL-ad> is the name of the attributeDescription that 
+        contains the URI that is converted to the filters. If no URI is 
+        present, there will be no members in that group. It must be a subtype
+        of labeledURI.
+
+        The value <member-ad> is the name of the attributeDescription that
+        specifies the member attribute. User modification of this attribute 
+        is disabled for consistency.
+
+    autogroup-memberof-ad <memberof-ad>
+        This configuration option is defined for the autogroup overlay.
+
+        It defines the attribute that is used by the memberOf overlay
+        to store the names of groups that an entry is member of; it must be
+        DN-valued. It should be set to the same value as
+        memberof-memberof-ad. It defaults to 'memberOf'.
+
+
+EXAMPLE
+    ### slapd.conf
+    include /path/to/dyngroup.schema
+    # ...
+    moduleload /path/to/autogroup.so
+    # ...
+
+    database <database>
+    # ...
+
+    overlay autogroup
+    autogroup-attrset groupOfURLs memberURL member
+    ### end slapd.conf
+
+    ### slapd.conf
+    include /path/to/dyngroup.schema
+    # ...
+    moduleload /path/to/autogroup.so
+    moduleload /path/to/memberof.so
+    # ...
+
+    database <database>
+    #...
+
+    overlay memberof
+    memberof-memberof-ad foo
+
+    overlay autogroup
+    autogroup-attrset groupOfURLs memberURL member
+    autogroup-memberof-ad foo
+    ### end slapd.conf
+
+CAVEATS
+    As with static groups, update operations on groups with a large number
+    of members may be slow.
+    If the attribute part of the URI is specified, modify and delete operations
+    are more difficult to handle. In these cases the overlay will try to detect
+    if groups have been modified and then simply refresh them. This can cause
+    performance hits if the search specified by the URI deals with a significant
+    number of entries.
+
+ACKNOWLEDGEMENTS
+    This module was originally written in 2007 by Michał Szulczyński. Further
+	enhancements were contributed by Howard Chu, Raphael Ouazana,
+	Norbert Pueschel, and Christian Manal.
+
+---
+Copyright 1998-2014 The OpenLDAP Foundation.
+Portions Copyright (C) 2007 Michał Szulczyński.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+http://www.OpenLDAP.org/license.html.

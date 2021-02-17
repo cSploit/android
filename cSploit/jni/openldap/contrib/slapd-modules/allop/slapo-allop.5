@@ -1,0 +1,63 @@
+.TH SLAPO-ALLOP 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2005-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapo-allop \- All Operational Attributes overlay
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The All Operational Attributes overlay is designed to allow slapd to
+interoperate with dumb clients that expect all attributes, including
+operational ones, to be returned when "*" or an empty attribute list
+is requested, as opposed to RFC2251 and RFC3673.
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the All Operational overlay.
+They should appear after the
+.B overlay
+directive and before any subsequent
+.B database
+directive.
+.TP
+.B allop-URI <ldapURI>
+Specify the base and the scope of search operations that trigger the overlay.
+By default, it is "ldap:///??base", i.e. it only applies to the rootDSE.
+This requires the overlay to be instantited as global.
+
+.SH EXAMPLES
+.LP
+default behavior: only affects requests to the rootDSE
+.nf
+        # global
+        overlay         allop
+.fi
+.LP
+affects all requests
+.nf
+        # global
+        overlay         allop
+        allop-URI       "ldap:///??sub"
+.fi
+.LP
+affects only requests directed to the suffix of a database
+.nf
+        # per database
+        database        mdb
+        suffix          "dc=example,dc=com"
+        # database specific directives ...
+        overlay         allop
+        allop-URI       "ldap:///dc=example,dc=com??base"
+.fi
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5).
+
+.SH ACKNOWLEDGEMENTS
+.P
+This module was written in 2005 by Pierangelo Masarati for SysNet s.n.c.

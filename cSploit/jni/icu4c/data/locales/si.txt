@@ -1,0 +1,173 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/si.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/si.xml
+ */
+si{
+    AuxExemplarCharacters{"[\u200B \u200C \u200D ඎ ඏ ඐ ඦ ෳ]"}
+    ExemplarCharacters{
+        "[අ ආ ඇ ඈ ඉ ඊ උ ඌ ඍ එ ඒ ඓ ඔ ඕ ඖ ං ඃ ක ඛ ග ඝ ඞ ඟ ච ඡ ජ ඣ ඥ ඤ ට ඨ ඩ ඪ ණ ඬ ත ථ ද"
+        " ධ න ඳ ප ඵ බ භ ම ඹ ය ර ල ව ශ ෂ ස හ ළ ෆ ා ැ ෑ \u0DD2 \u0DD3 \u0DD4 \u0DD6 ෘ ෲ"
+        " ෟ \u0DCA ෙ ේ ෛ ො ෝ ෞ]"
+    }
+    ExemplarCharactersCurrency{"[a b c d e f g h i j k l m n o p q r s t u v w x y z]"}
+    ExemplarCharactersIndex{
+        "[අ ආ ඇ ඈ ඉ ඊ උ ඌ ඍ එ ඒ ඓ ඔ ඕ ඖ ක ඛ ග ඝ ඞ ඟ ච ඡ ජ ඣ ඥ ඤ ට ඨ ඩ ඪ ණ ඬ ත ථ ද ධ න"
+        " ඳ ප ඵ බ භ ම ඹ ය ර ල ව ශ ෂ ස හ ළ ෆ]"
+    }
+    LocaleScript{
+        "Sinh",
+    }
+    NumberPatterns{
+        "#,##,##0.###",
+        "¤#,##,##0.00;(¤#,##,##0.00)",
+        "#,##,##0%",
+        "#E0",
+    }
+    Version{"2.0.47.63"}
+    calendar{
+        gregorian{
+            AmPmMarkers{
+                "පෙ.ව.",
+                "ප.ව.",
+            }
+            DateTimePatterns{
+                "h:mm:ss a zzzz",
+                "h:mm:ss a z",
+                "h:mm:ss a",
+                "h:mm a",
+                "EEEE, y MMMM d",
+                "y MMMM d",
+                "y MMM d",
+                "yyyy/MM/dd",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            dayNames{
+                format{
+                    abbreviated{
+                        "ඉරි",
+                        "සඳු",
+                        "අඟ",
+                        "බදා",
+                        "බ්‍රහ",
+                        "සිකු",
+                        "සෙන",
+                    }
+                    wide{
+                        "ඉරිදා",
+                        "සඳුදා",
+                        "අඟහරුවාදා",
+                        "බදාදා",
+                        "බ්‍රහස්පතින්දා",
+                        "සිකුරාදා",
+                        "සෙනසුරාදා",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "ඉ",
+                        "ස",
+                        "අ",
+                        "බ",
+                        "බ්‍ර",
+                        "සි",
+                        "සෙ",
+                    }
+                }
+            }
+            eras{
+                abbreviated{
+                    "ක්‍රි.පූ.",
+                    "ක්‍රි.ව.",
+                }
+                wide{
+                    "ක්‍රිස්තු පූර්‍ව",
+                    "ක්‍රිස්තු වර්‍ෂ",
+                }
+            }
+            fields{
+                day{
+                    relative{
+                        "-1"{"ඊයෙ"}
+                        "0"{"අද"}
+                        "1"{"හෙට"}
+                    }
+                }
+            }
+            monthNames{
+                format{
+                    abbreviated{
+                        "ජන",
+                        "පෙබ",
+                        "මාර්ත",
+                        "අප්‍රේල",
+                        "මැය",
+                        "ජූන",
+                        "ජූල",
+                        "අගෝ",
+                        "සැප",
+                        "ඔක",
+                        "නොවැ",
+                        "දෙසැ",
+                    }
+                    wide{
+                        "ජනවාර",
+                        "පෙබරවාර",
+                        "මාර්ත",
+                        "අප්‍රේල්",
+                        "මැයි",
+                        "ජූන",
+                        "ජූලි",
+                        "අගෝස්තු",
+                        "සැප්තැම්බර්",
+                        "ඔක්තෝබර්",
+                        "නොවැම්බර්",
+                        "දෙසැම්බර්",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "ජ",
+                        "පෙ",
+                        "මා",
+                        "අ",
+                        "මැ",
+                        "ජූ",
+                        "ජූ",
+                        "අ",
+                        "සැ",
+                        "ඔ",
+                        "නො",
+                        "දෙ",
+                    }
+                }
+            }
+            quarters{
+                format{
+                    abbreviated{
+                        "කාර්:1",
+                        "කාර්:2",
+                        "කාර්:3",
+                        "කාර්:4",
+                    }
+                    wide{
+                        "1 වන කාර්තුව",
+                        "2 වන කාර්තුව",
+                        "3 වන කාර්තුව",
+                        "4 වන කාර්තුව",
+                    }
+                }
+            }
+        }
+    }
+}

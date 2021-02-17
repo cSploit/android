@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="fb_inet_server" ProjectGUID="{664D4A04-36E0-48EF-8BCA-D5C331EFAA24}">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Release|Win32" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" PreprocessorDefinitions="_DEBUG" MkTypLibCompatible="true" TargetEnvironment="1" />
+      <Tool Name="VCCLCompilerTool" Optimization="2" InlineFunctionExpansion="1" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" PreprocessorDefinitions="NDEBUG,_WINDOWS,WIN32" BrowseInformation="1" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" AdditionalDependencies="comctl32.lib ws2_32.lib mpr.lib version.lib" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\bin\$(ProjectName).exe" LinkIncremental="1" AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/$(ConfigurationName)/lib" SubSystem="2" StackReserveSize="2097152" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+    <Configuration Name="Debug|Win32" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" PreprocessorDefinitions="_DEBUG" MkTypLibCompatible="true" TargetEnvironment="1" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" PreprocessorDefinitions="_DEBUG,_WINDOWS,WIN32,DEV_BUILD" BrowseInformation="1" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" AdditionalDependencies="comctl32.lib ws2_32.lib mpr.lib version.lib" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\bin\$(ProjectName).exe" LinkIncremental="1" AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/release/lib" SubSystem="2" StackReserveSize="2097152" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="UTILITIES files">
+      <File RelativePath="..\..\..\gen\$(PlatformName)\utilities\gstat\dba.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\nbackup.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\nbackup\nbkMain.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\gstat\ppg.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceCmdLine.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceService.cpp">
+      </File>
+    </Filter>
+    <Filter Name="Resource files" Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+      <File RelativePath="..\..\..\src\remote\os\win32\caution.ico">
+      </File>
+      <File RelativePath="..\..\..\src\remote\os\win32\server.ico">
+      </File>
+      <File RelativePath="..\..\..\src\remote\os\win32\window.rc">
+        <FileConfiguration Name="Release|Win32">
+          <Tool Name="VCResourceCompilerTool" AdditionalIncludeDirectories="..\..\..\src\remote;$(NoInherit)" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|Win32">
+          <Tool Name="VCResourceCompilerTool" AdditionalIncludeDirectories="..\..\..\src\remote;$(NoInherit)" />
+        </FileConfiguration>
+      </File>
+    </Filter>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

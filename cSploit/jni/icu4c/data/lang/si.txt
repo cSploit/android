@@ -1,0 +1,47 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/si.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/si.xml
+ */
+si{
+    Keys{
+        calendar{"දිනදසුන"}
+        currency{"මුදල්"}
+    }
+    Languages{
+        si{"සිංහල"}
+    }
+    Scripts{
+        Arab{"අරාබි"}
+        Armn{"ආර්මේනියානු"}
+        Deva{"දේවනාගරී"}
+        Grek{"ග්‍රීක"}
+        Gujr{"ගුජරාටි"}
+        Hebr{"හීබෲ"}
+        Hira{"හිරඟනා"}
+        Jpan{"ජපන්"}
+        Knda{"කණ්ණඩ"}
+        Kore{"කොරියානු"}
+        Latn{"ලතින්"}
+        Mlym{"මලයාලම්"}
+        Mong{"මොන්ගෝලියානු"}
+        Sinh{"සිංහල"}
+        Taml{"දෙමල"}
+        Telu{"තෙළිඟු"}
+        Thai{"තායි"}
+        Tibt{"ටි‍බෙට්"}
+    }
+    Types{
+        calendar{
+            buddhist{"බුද්‍ධ දිනදසුන"}
+            gregorian{"දිනදසුන"}
+        }
+    }
+    Version{"2.0.47.63"}
+}

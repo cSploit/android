@@ -1,0 +1,30 @@
+Package rersion 2.0:
+- Detects OpenLDAP 2.0 and builds correctly with it.
+- Increment major version to 2, library file to libldaptcl2.0.so.
+- Can now perform add/delete/replace modifications in a single command.
+- Replaced calls to TclX_WrongArgs with core Tcl_WrongNumArgs to reduce
+  dependency on Extended Tcl.
+- Wrap dereference search control with #ifdef LDAP_OPT_DEREF.
+- Deref during search should work.
+- Add protocol_version option to ldap init command.
+- Add LDAPTCL_PROTOCOL_VERSION_DEFAULT to allow specifying the default
+  protocol version used.
+- Add controlArray(timeout) to control timeouts during searches.
+- Add controlArray(cache) to control caching current search results.
+  (Experience has shown this to be not very useful or not working correctly.
+  Caching search results should probably be done in Ldaptcl rather than
+  letting the LDAP API do it.)
+- Add "compare" subcommand
+- Add experimental trap subcommand (undocumented -- use at your own risk).
+
+Package version 1.2:
+
+- Filter no longer a required controlArray member, defaults to objectclass=*.
+- Sets errorCode with LDAP macro string value (better to test than the more
+  human readable values).
+- Shorten minimum required characters for search scope definitions: now allows
+  "base", "one", and "sub".  For the latter two, additional characters are
+  ignored.
+- Now compiles successfully with -devel branch.
+- Client cache management code enabled for OpenLDAP versions <= 1.2.4.  (This
+  code is relatively untested and feedback is welcome.)

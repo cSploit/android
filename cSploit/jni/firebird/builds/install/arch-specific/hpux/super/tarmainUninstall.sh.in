@@ -1,0 +1,166 @@
+#!/bin/sh
+
+#
+#  This library is part of the FirebirdSQL project
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU Lesser General Public
+#  License as published by the Free Software Foundation; either
+#  version 2.1 of the License, or (at your option) any later version.
+#  You may obtain a copy of the Licence at
+#  http://www.gnu.org/licences/lgpl.html
+#  
+#  As a special exception this file can also be included in modules
+#  with other source code as long as that source code has been 
+#  released under an Open Source Initiative certificed licence.  
+#  More information about OSI certification can be found at: 
+#  http://www.opensource.org 
+#  
+#  This module is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU Lesser General Public Licence for more details.
+#  
+#  This module was created by members of the firebird development 
+#  team.  All individual contributions remain the Copyright (C) of 
+#  those individuals and all rights are reserved.  Contributors to 
+#  this file are either listed below or can be obtained from a CVS 
+#  history command.
+# 
+#   Created by:  Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+# 
+#   Contributor(s):
+#  
+# 
+
+#  Install script for Firebird database engine
+#  http://www.firebirdsql.org
+
+# This is the new file !!!
+
+
+#------------------------------------------------------------------------
+# Prompt for response, store result in Answer
+
+Answer=""
+
+AskQuestion() {
+    Test=$1
+    DefaultAns=$2
+    echo -n "${1}"
+    Answer="$DefaultAns"
+    read Answer
+}
+
+#------------------------------------------------------------------------
+# Prompt for yes or no answer - returns non-zero for no
+
+AskYNQuestion() {
+    while echo -n "${*} (y/n): "
+    do
+        read answer rest
+        case $answer in
+        [yY]*)
+            return 0
+            ;;
+        [nN]*)
+            return 1
+            ;;
+        *)
+            echo "Please answer y or n"
+            ;;
+        esac
+    done
+}
+
+
+#------------------------------------------------------------------------
+# Run process and check status
+
+
+runAndCheckExit() {
+    Cmd=$*
+
+#    echo $Cmd
+    $Cmd
+
+    ExitCode=$?
+
+    if [ $ExitCode -ne 0 ]
+      then
+        echo "Uninstall aborted: The command $Cmd "
+        echo "                 failed with error code $ExitCode"
+        exit
+    fi
+}
+
+#------------------------------------------------------------------------
+# Check for a previous install 
+
+
+checkInstallUser() {
+
+    if [ "`whoami`" != "root" ];
+      then
+        echo ""
+        echo "--- Warning ----------------------------------------------"
+        echo ""
+        echo "    You need to be 'root' user to run uninstall"
+        echo ""
+        exit
+    fi
+}
+
+
+
+#== Main Program ==========================================================
+
+
+InteractiveInstall=1
+export InteractiveInstall
+
+
+checkInstallUser
+
+BuildVersion=@FIREBIRD_VERSION@.@FB_BUILD_NUM@
+PackageVersion=@FIREBIRD_PACKAGE_VERSION@
+CpuType=@CPU_TYPE@
+
+FBRootDir=@prefix@
+
+Version="$BuildVersion-$PackageVersion.$CpuType"
+
+
+cat <<EOF
+
+Firebird SuperServer $Version Uninstall program
+
+Are you sure you want to proceed?
+
+EOF
+
+
+
+AskQuestion "Press Enter to start uninstall or ^C to abort"
+
+
+# Here we are uninstalling from a install tar file
+
+scriptsDir=$FBRootDir/misc/scripts
+
+
+if [ -e $scriptsDir ]
+  then
+    echo "Extracting install data"
+
+    runAndCheckExit "$scriptsDir/preUninstall.sh"
+    runAndCheckExit "$scriptsDir/postUninstall.sh"
+
+    # This one is done last since it deletes the script files
+    # as well.
+    runAndCheckExit "$scriptsDir/tarUninstall.sh"
+
+fi
+
+echo "Uninstall completed"
+

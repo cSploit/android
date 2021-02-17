@@ -1,0 +1,6 @@
+libnet (VERSION) unstable; urgency=low
+
+  * libnet package built from git source
+
+ -- Sam Roberts <vieuxtech@gmail.com>  DATE
+

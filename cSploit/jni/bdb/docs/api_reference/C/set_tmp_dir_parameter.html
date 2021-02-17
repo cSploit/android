@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>set_tmp_dir</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="configuration_reference.html" title="Appendix D. DB_CONFIG Parameter Reference" />
+    <link rel="prev" href="set_timeout_parameter.html" title="set_timeout" />
+    <link rel="next" href="set_tx_max_parameter.html" title="set_tx_max" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">set_tmp_dir</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="set_timeout_parameter.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix D. DB_CONFIG Parameter Reference</th>
+          <td width="20%" align="right"> <a accesskey="n" href="set_tx_max_parameter.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="set_tmp_dir_parameter"></a>set_tmp_dir</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+            Specifies the path of a directory to be used as the location of temporary files. The files created
+			to back in-memory access method databases will be created relative to this path. These
+			temporary files can be quite large, depending on the size of the database.
+            </p>
+      <p>
+                The syntax of the entry in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file with the
+                string <code class="literal">set_tmp_dir</code>, one or more
+                whitespace characters, and the directory name.
+            </p>
+      <p>For more information, see <a class="xref" href="envset_tmp_dir.html" title="DB_ENV-&gt;set_tmp_dir()">DB_ENV-&gt;set_tmp_dir()</a>. </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="set_timeout_parameter.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="configuration_reference.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="set_tx_max_parameter.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">set_timeout </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> set_tx_max</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

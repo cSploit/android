@@ -1,0 +1,51 @@
+#!/usr/bin/stap
+/*
+ * Copyright (c) 2012, 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * apicalls - Summarize DB API call count grouped by thread.
+ *
+ * This summarizes the count of DB apicalls grouped by thread or process.
+ *
+ * The path to the DB library is required to be the first argument.
+ *
+ * To limit tracing to a particular process use one of the stap options:
+ *	-x <pid> or
+ *	-c "<program> [<program arguments>..]"
+ *
+ */
+
+global calls
+
+probe begin
+{
+	printf("DB API call counts of ");
+	if (target() == 0)
+		printf("processes using \"%s\"", @1)
+	else
+		printf("process %d", target());
+	printf("; interrupt to display summary\n")
+}
+
+probe process(@1).function("db_*create").call,
+      process(@1).function("__*pp").call
+{
+	calls[(target() == 0 ? pid() : tid()), probefunc()] <<< 1;
+}
+
+probe end
+{
+	any_seen = 0;
+	/* Display counts grouped by process, or by thread. */
+	if (target() == 0)
+		printf("%-20s %7s %9s\n",
+		    "Function", "process", "callcount")
+	else
+		printf("%-20s %7s %9s for process %d\n",
+		    "Function", "thread", "callcount", target());
+	foreach ([a,b] in calls+) {
+		printf("%-20s %7d %9d\n", b, a, @count(calls[a,b]));
+		any_seen = 1;
+	}
+	if (!any_seen)
+		printf("No probes were triggered in %s; it might not be the correct library\n", @1);
+}

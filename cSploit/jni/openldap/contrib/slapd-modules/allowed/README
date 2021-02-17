@@ -1,0 +1,73 @@
+This directory contains a slapd overlay, "allowed".
+
+    --- o --- o --- o ---
+
+It adds to entries returned by search operations the value of attributes
+
+"allowedAttributes"
+	<http://msdn.microsoft.com/en-us/library/ms675217(VS.85).aspx>
+
+"allowedAttributesEffective"
+	<http://msdn.microsoft.com/en-us/library/ms675218(VS.85).aspx>
+
+"allowedChildClasses"
+	<http://msdn.microsoft.com/en-us/library/ms675219(VS.85).aspx>
+
+"allowedChildClassesEffective"
+	<http://msdn.microsoft.com/en-us/library/ms675220(VS.85).aspx>
+
+No other use is made of those attributes: they cannot be compared,
+they cannot be used in search filters, they cannot be used in ACLs, ...
+
+    --- o --- o --- o ---
+
+Usage: add to slapd.conf(5)
+
+
+moduleload	path/to/allowed.so
+overlay		allowed
+
+or add
+
+dn: olcOverlay={0}allowed,olcDatabase={1}bdb,cn=config
+objectClass: olcOverlayConfig
+olcOverlay: {0}allowed
+
+as a child of the database that's intended to support this feature
+(replace "olcDatabase={1}bdb,cn=config" with the appropriate parent);
+or use
+
+dn: olcOverlay={0}allowed,olcDatabase={-1}frontend,cn=config
+objectClass: olcOverlayConfig
+olcOverlay: {0}allowed
+
+if it's supposed to be global.
+
+    --- o --- o --- o ---
+
+Use Makefile to compile this plugin or use a command line similar to:
+
+gcc -shared -I../../../include -I../../../servers/slapd -Wall -g \
+	-o allowed.so allowed.c
+
+---
+This work is part of OpenLDAP Software <http://www.openldap.org/>.
+
+Copyright 2006-2014 The OpenLDAP Foundation. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in the file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+<http://www.OpenLDAP.org/license.html>.
+
+ACKNOWLEDGEMENTS:
+This work was initially developed by Pierangelo Masarati for inclusion in
+OpenLDAP Software.
+

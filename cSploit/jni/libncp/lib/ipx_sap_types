@@ -1,0 +1,35 @@
+0001 User
+0002 User Group
+0003 Print Queue
+0004 File Server
+0005 Job Server
+0006 Gateway
+0007 Print Server
+0008 Archive Server
+0009 Archive Server
+000A Job Queue
+000B Administration
+0021 NAS SNA Gateway
+0024 Remote Bridge
+0026 Bridge Server
+0027 TCP/IP Gateway
+002D Time Synchronization VAP
+002E Archive Server Dynamic SAP
+0047 Advertising Print Server
+004B Btrieve VAP 5.0
+0050 Btrieve VAP
+0053 Print Queue User
+007A TES NetWare for VMS
+0098 NetWare Access Server
+009A Named Pipe Server
+009E Portable NetWare Unix
+0103 Listener
+0107 NetWare 386
+0111 Test Server
+0133 NetWare Name Service
+0166 NetWare Management
+026A NetWare Management
+026B Time Server (NetWare 4.0)
+0278 NetWare Directory Server (NetWare 4.0)
+0640 NT Server
+8202 Broker

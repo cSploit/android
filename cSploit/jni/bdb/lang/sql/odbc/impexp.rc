@@ -1,0 +1,48 @@
+#include <winresrc.h>
+#include <winver.h>
+#include "resource3.h"
+#include "sqlite3.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION VERSION_C,0,0
+ PRODUCTVERSION VERSION_C,0,0
+ FILEFLAGSMASK (3)
+ FILEFLAGS (0)
+ FILEOS VOS__WINDOWS32
+ FILETYPE VFT_DLL
+ FILESUBTYPE (0)
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Christian Werner Software & Consulting\0"
+            VALUE "FileDescription", "SQLite3 Extension SQL Import/Export\0"
+            VALUE "FileVersion", VERSION "\0"
+            VALUE "InternalName", "IMPEXP\0"
+            VALUE "LegalCopyright", "Public Domain\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "SQLITE3_MOD_IMPEXP.DLL\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "ODBC Driver for SQLite3 " SQLITE_VERSION "\0"
+            VALUE "ProductVersion", VERSION "\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+ico1 ICON "sqliteodbc.ico"

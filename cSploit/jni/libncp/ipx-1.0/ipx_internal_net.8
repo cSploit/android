@@ -1,0 +1,32 @@
+.TH IPX_INTERNAL_NET 8 "IPX Utilities" "Caldera, Inc." 
+.SH NAME
+ipx_internal_net \- add or delete the IPX internal network
+.SH SYNOPSIS
+.B ipx_internal_net
+add network_number node_number
+.LP
+.B ipx_internal_net
+del 
+.SH DESCRIPTION
+.B ipx_internal_net
+adds or deletes the IPX internal network.
+An IPX internal network is a special kind of IPX interface that does
+not have a physical device or frame type.  It is used to provide
+a route-independent address for service providers.   Internal networks
+are optional; however, when one is present it is also the
+Primary Interface.  There can only be one internal network per host.
+.SS OPTIONS
+.TP
+.I add
+This option is used to create the IPX internal network. 
+.TP
+.I del
+This option is used to delete the IPX internal network.
+.SH FILES
+.I /proc/net/ipx_interface /proc/net/ipx_route
+.SH BUGS
+This functionality really belongs in
+.B
+ifconfig(8).
+.SH AUTHOR
+Greg Page <greg.page@caldera.com>

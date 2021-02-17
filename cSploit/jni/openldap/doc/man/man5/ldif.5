@@ -1,0 +1,277 @@
+.TH LDIF 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldif \- LDAP Data Interchange Format
+.SH DESCRIPTION
+The LDAP Data Interchange Format (LDIF) is used to represent LDAP
+entries and change records in text form. LDAP tools, such as
+.BR ldapadd (1)
+and
+.BR ldapsearch (1),
+read and write LDIF entry
+records.
+.BR ldapmodify (1)
+reads LDIF change records.
+.LP
+This manual page provides a basic description of LDIF.  A
+formal specification of LDIF is published in RFC 2849.
+.SH ENTRY RECORDS
+.LP
+LDIF entry records are used to represent directory entries.  The basic
+form of an entry record is:
+.LP
+.nf
+.ft tt
+	dn: <distinguished name>
+	<attrdesc>: <attrvalue>
+	<attrdesc>: <attrvalue>
+	<attrdesc>:: <base64-encoded-value>
+	<attrdesc>:< <URL>
+	...
+.ft
+.fi
+.LP
+The value may be specified as UTF-8 text or as base64 encoded data,
+or a URI may be provided to the location of the attribute value.
+.LP
+A line may be continued by starting the next line with a single space
+or tab, e.g.,
+.LP
+.nf
+.ft tt
+	dn: cn=Barbara J Jensen,dc=exam
+	 ple,dc=com
+.ft
+.fi
+.LP
+Lines beginning with a sharp sign ('#') are ignored.
+.LP
+Multiple attribute values are specified on separate lines, e.g.,
+.LP
+.nf
+.ft tt
+	cn: Barbara J Jensen
+	cn: Babs Jensen
+.ft
+.fi
+.LP
+If an value contains a non-printing character, or begins
+with a space or a colon ':', the <attrtype> is followed by a
+double colon and the value is encoded in base 64 notation. e.g.,
+the value " begins with a space" would be encoded like this:
+.LP
+.nf
+.ft tt
+	cn:: IGJlZ2lucyB3aXRoIGEgc3BhY2U=
+.ft
+.fi
+.LP
+If the attribute value is located in a file, the <attrtype> is
+followed by a ':<' and a file: URI.  e.g., the value contained
+in the file /tmp/value would be listed like this:
+.LP
+.nf
+.ft tt
+	cn:< file:///tmp/value
+.ft
+.fi
+Other URI schemes (ftp,http) may be supported as well.
+.LP
+Multiple entries within the same LDIF file are separated by blank
+lines.
+.SH ENTRY RECORD EXAMPLE
+Here is an example of an LDIF file containing three entries.
+.LP
+.nf
+.ft tt
+	dn: cn=Barbara J Jensen,dc=example,dc=com
+	cn: Barbara J Jensen
+	cn: Babs Jensen
+	objectclass: person
+	description:< file:///tmp/babs
+	sn: Jensen
+
+	dn: cn=Bjorn J Jensen,dc=example,dc=com
+	cn: Bjorn J Jensen
+	cn: Bjorn Jensen
+	objectclass: person
+	sn: Jensen
+
+	dn: cn=Jennifer J Jensen,dc=example,dc=com
+	cn: Jennifer J Jensen
+	cn: Jennifer Jensen
+	objectclass: person
+	sn: Jensen
+	jpegPhoto:: /9j/4AAQSkZJRgABAAAAAQABAAD/2wBDABALD
+	 A4MChAODQ4SERATGCgaGBYWGDEjJR0oOjM9PDkzODdASFxOQ
+	 ERXRTc4UG1RV19iZ2hnPk1xeXBkeFxlZ2P/2wBDARESEhgVG
+	...
+.ft
+.fi
+.LP
+Note that the description in Barbara Jensen's entry is
+read from file:///tmp/babs and the jpegPhoto in Jennifer
+Jensen's entry is encoded using base 64.
+.SH CHANGE RECORDS
+LDIF change records are used to represent directory change requests.
+Each change record starts with line indicating the distinguished
+name of the entry being changed:
+.LP
+.nf
+	dn: <distinguishedname>
+.fi
+.LP
+.nf
+	changetype: <[modify|add|delete|modrdn]>
+.fi
+.LP
+Finally, the change information itself is given, the format of which
+depends on what kind of change was specified above.  For a \fIchangetype\fP
+of \fImodify\fP, the format is one or more of the following:
+.LP
+.nf
+	add: <attributetype>
+	<attrdesc>: <value1>
+	<attrdesc>: <value2>
+	...
+	\-
+.fi
+.LP
+Or, for a replace modification:
+.LP
+.nf
+	replace: <attributetype>
+	<attrdesc>: <value1>
+	<attrdesc>: <value2>
+	...
+	\-
+.fi
+.LP
+If no \fIattributetype\fP lines are given to replace,
+the entire attribute is to be deleted (if present).
+.LP
+Or, for a delete modification:
+.LP
+.nf
+	delete: <attributetype>
+	<attrdesc>: <value1>
+	<attrdesc>: <value2>
+	...
+	\-
+.fi
+.LP
+If no \fIattributetype\fP lines are given to delete,
+the entire attribute is to be deleted.
+.LP
+For a \fIchangetype\fP of \fIadd\fP, the format is:
+.LP
+.nf
+	<attrdesc1>: <value1>
+	<attrdesc1>: <value2>
+	...
+	<attrdescN>: <value1>
+	<attrdescN>: <value2>
+.fi
+.LP
+For a \fIchangetype\fP of \fImodrdn\fP or \fImoddn\fP,
+the format is:
+.LP
+.nf
+	newrdn: <newrdn>
+	deleteoldrdn: 0 | 1
+	newsuperior: <DN>
+.fi
+.LP
+where a value of 1 for deleteoldrdn means to delete the values
+forming the old rdn from the entry, and a value of 0 means to
+leave the values as non-distinguished attributes in the entry.
+The newsuperior line is optional and, if present, specifies the
+new superior to move the entry to.
+.LP
+For a \fIchangetype\fP of \fIdelete\fP, no additional information
+is needed in the record.
+.LP
+Note that attribute values may be presented using base64 or in
+files as described for entry records.  Lines in change records
+may be continued in the manner described for entry records as
+well. 
+.SH CHANGE RECORD EXAMPLE
+The following sample LDIF file contains a change record
+of each type of change.
+.LP
+.nf
+	dn: cn=Babs Jensen,dc=example,dc=com
+	changetype: add
+	objectclass: person
+	objectclass: extensibleObject
+	cn: babs
+	cn: babs jensen
+	sn: jensen
+
+	dn: cn=Babs Jensen,dc=example,dc=com
+	changetype: modify
+	add: givenName
+	givenName: Barbara
+	givenName: babs
+	\-
+	replace: description
+	description: the fabulous babs
+	\-
+	delete: sn
+	sn: jensen
+	\-
+
+	dn: cn=Babs Jensen,dc=example,dc=com
+	changetype: modrdn
+	newrdn: cn=Barbara J Jensen
+	deleteoldrdn: 0
+	newsuperior: ou=People,dc=example,dc=com
+
+	dn: cn=Barbara J Jensen,ou=People,dc=example,dc=com
+	changetype: delete
+.fi
+
+.SH INCLUDE STATEMENT
+The LDIF parser has been extended to support an
+.B include
+statement for referencing other LDIF files.  The
+.B include
+statement must be separated from other records by a blank line.
+The referenced file is specified using a file: URI and all of its
+contents are incorporated as if they were part of the original
+LDIF file. As above, other URI schemes may be supported. For example:
+.LP
+.nf
+	dn: dc=example,dc=com
+	objectclass: domain
+	dc: example
+
+	include: file:///tmp/example.com.ldif
+
+	dn: dc=example,dc=org
+	objectclass: domain
+	dc: example
+.fi
+This feature is not part of the LDIF specification in RFC 2849 but
+is expected to appear in a future revision of this spec. It is supported
+by the
+.BR ldapadd (1),
+.BR ldapmodify (1),
+and
+.BR slapadd (8)
+commands.
+
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldapsearch (1),
+.BR ldapadd (1),
+.BR ldapmodify (1),
+.BR slapadd (8),
+.BR slapcat (8),
+.BR slapd\-ldif (5).
+.LP
+"LDAP Data Interchange Format," Good, G., RFC 2849.
+.SH ACKNOWLEDGEMENTS
+.so ../Project

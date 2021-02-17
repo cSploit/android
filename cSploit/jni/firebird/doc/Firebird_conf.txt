@@ -1,0 +1,167 @@
+firebird.conf
+=============
+
+Firebird configuration can be changed by entries in the firebird.conf.
+
+Depending on operating system this file is found in a little
+bit of different ways.
+
+
+Windows
+-------
+On Windows this file is located by first looking inside the registry
+for a string value specifying the directory of firebird.conf:
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Firebird Project\Firebird Server\Instances\DefaultInstance
+
+If this value is not present, it assumes firebird.conf is placed in the
+directory directly above the fbserver.exe. If fbserver.exe is placed as
+
+	 C:\Program Files\Firebird\bin\fbserver.exe
+
+then the firebird.conf file is
+
+	C:\Program Files\Firebird\firebird.conf
+
+
+POSIX (excluding Darwin/Mac OS X)
+---------------------------------
+For POSIX systems it first tries the "directory above" approach,
+described above. If that fails (note: how could this be???) it
+then tries to find the directory from the environment variable
+FIREBIRD.
+If that fails, it tries to find it inside "/usr/local/firebird".
+
+Darwin
+------
+Darwin on the other hand first checks the environment variable
+FIREBIRD. If not found, it [... John, please describe the "bundle"
+stuff here].
+As a last resort it too falls back to "/usr/local/firebird".
+
+
+Syntax of firebird.conf
+=======================
+
+Comments
+--------
+The # character is used for comments and can be placed anywhere on a line.
+Anything following the # character on a line is considered a comment.
+Examples:
+
+# This is a comment
+DefaultDbCachePages = 2048   # This is an end-of-line comment
+
+
+Configuration settings
+----------------------
+
+Configuration settings are placed one at each line, followed by zero or
+more whitespace (tab or space) characters, a '=' character, followed by
+again any number of whitespace, followed by the configuration value.
+
+Example:
+
+DefaultDbCachePages=2048
+CpuAffinityMask    =  2  # only run on second CPU
+
+Configuration settings can also be indented on a line by any number of
+tabs or spaces. Example:
+
+    DefaultDbCachePages = 2048  # This is also a legal config setting
+
+
+
+There are as of this writing, 28 Feb. 2003, 35 user settings. Not all
+settings apply to all operating systems.
+
+
+There are three types of configuration values: integer, boolean and string.
+
+
+Integers
+--------
+Integers is what they sound like, an integral value. Examples:
+  1
+  42
+  4711
+
+Boolean
+-------
+Boolean is expressed as integer values with 0 being "false" and
+anything != 0 is taken to mean "true". For consistency we recommend
+you only use 0/1
+
+String
+------
+Strings are also what they sound like, strings. Examples:
+RootDirectory  = /opt/firebird
+RemotePipeName = "pipe47"
+
+
+Configuration options
+---------------------
+
+RootDirectory              string
+
+SortMemBlockSize           integer  default 1048576 (1 MB)
+
+SortMemUpperLimit          integer
+Defaults: Superserver (SS), 67108864 (64 MB). Classic server (CS), 0.
+
+RemoteFileOpenAbility      boolean  default false.
+(experimental?) Allow DB files used over NFS mounts.
+
+GuardianOption             integer  default 1
+Affects the operation of the guardian:
+0 - only start the Firebird service once.
+1 - restart the Firebird service if it should terminate.
+
+CpuAffinityMask            integer  default 1
+A bit-field defining what CPU's the process should be allowed to run on.
+Only meaningful for Windows SS on SMP systems.
+
+OldParameterOrdering       boolean  default false
+TcpRemoteBufferSize        integer  default 8192 (bytes)
+TcpNoNagle                 boolean  default false
+IpcMapSize                 integer  default 4096 (bytes)
+DefaultDbCachePages        integer  default SS: 2048. CS: 75
+ConnectionTimeout          integer  default 180 (seconds)
+DummyPacketInterval        integer  default  60 (seconds)
+LockMemSize                integer  default 262144 (256 KB)
+LockSemCount               integer  default SINIX-Z: 25. All others: 32
+LockSignal                 integer  default 16 (signal # - (only used on POSIX CS?))
+LockGrantOrder             boolean  default true
+LockHashSlots              integer  default 101
+LockRequireSpins           boolean  default false
+EventMemSize               integer  default 65536
+DeadlockTimeout            integer  default 10 (seconds)
+SolarisStallValue          integer  default 60 (seconds)
+TraceMemoryPools           boolean  default false
+PrioritySwitchDelay        integer  default 100 (milliseconds)
+DeadThreadsCollection      integer  default 50
+PriorityBoost              integer  default 5
+RemoteServiceName          string   default gds_db
+RemoteServicePort          integer  default 3050 (TCP port number)
+RemotePipeName             string   default "interbas" (Windows only?)
+IpcName                    string   default "FirebirdIPI" (Windows only)
+
+MaxUnflushedWrites         integer
+# of writes before file writes are forcibly synched.
+Windows default: 100. All else -1 (i.e. don't forcibly synch)
+
+MaxUnflushedWriteTime      integer
+Windows default:   5. All else -1 (i.e. don't forcibly synch)
+
+ProcessPriorityLevel       integer  default 0 - meaning depends on system.
+CreateInternalWindow       boolean  default true
+Windows only. Tells if the Firebird server should create a (hidden) window
+(used for IPC?) or not.
+
+CompleteBooleanEvaluation  boolean  default off
+
+Controls whether full evaluation of OR and AND statements is performed.
+If your SQL code depends on side-effects of full evaluation of
+right-hand-side terms, even if the expressions final result could
+be determined by just examining the value of the first term, you
+might need to turn this on.

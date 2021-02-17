@@ -1,0 +1,25 @@
+dn: dc=example,dc=com
+objectclass: dcObject
+objectclass: organization
+dc: example
+o: My Domain corp.
+
+dn: ou=users,dc=example,dc=com
+ou: users
+objectclass: organizationalUnit
+
+dn: ou=groups,dc=example,dc=com
+ou: groups
+objectclass: organizationalUnit
+
+dn: uid=1,ou=groups,dc=example,dc=com
+objectclass: inetOrgPerson
+cn: test 1
+sn: test1
+uid: 1
+
+dn: uid=2,ou=groups,dc=example,dc=com
+objectclass: inetOrgPerson
+cn: test 2
+sn: test2
+uid: 2

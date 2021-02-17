@@ -1,0 +1,43 @@
+# typical user
+dn: uid=danger,ou=users,o=translucent
+objectClass: inetOrgPerson
+uid: danger
+sn: warning
+cn: danger
+businessCategory: backend-opaque
+initials: dw
+carLicense: BACK
+departmentNumber: 7341
+displayName: Warning
+employeeNumber: 5150
+employeeType: contractor
+givenName: Danger Warning
+
+# another example
+dn: uid=example,ou=users,o=translucent
+objectClass: inetOrgPerson
+uid: example
+sn: user
+cn: example
+businessCategory: backend-opaque
+carLicense: SAMPLE
+departmentNumber: 7341
+displayName: Example
+employeeNumber: 5150
+employeeType: fulltime
+givenName: Example User
+
+#
+dn: uid=fred,ou=users,o=translucent
+objectClass: inetOrgPerson
+uid: fred
+sn: said
+cn: said
+businessCategory: backend-opaque
+carLicense: RIGHT
+departmentNumber: 9919
+displayName: Right Said Fred
+employeeNumber: 44199
+employeeType: fulltime
+givenName: Right Said
+

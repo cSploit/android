@@ -1,0 +1,773 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- $Id: faq.html,v 1.34 2011-09-21 16:21:32 jklowden Exp $ -->
+
+<head>
+	<title>FreeTDS Frequently Asked Questions</title>
+
+	<link href="freetds.css" type="text/css" rel="stylesheet" />
+	<meta name="generator" content="Bluefish 1.0.7"/>
+</head>
+
+<body>
+  <!-- generic header -->
+
+	<div id="Navigation">
+	<table>
+		<tr valign="bottom">
+			<td> <a href="index.html">
+				<img src="freetdslogo3.gif" alt="FreeTDS.org" /> </a></td>
+			<td><ul>
+					<li> <a href="index.html">Home</a> </li>
+					<li> <a href="news.html">News</a> </li>
+					<li> <a href="software.html">Software</a> </li>
+					<li> <a href="docs.html">Documentation</a> </li>
+					<li> <a href="support.html">Support</a> </li>
+					<li> <a href="contrib.html">Contribute</a> </li>	
+					</ul>
+				</td></tr>
+		</table>
+				</div>
+  <hr size="1" noshade="noshade" />
+  
+  <!-- page specific content -->
+
+  <h1>FAQ</h1>
+
+  <p><font size="-1">The <a href="userguide/">FreeTDS User Guide</a>,
+  included in each release, is the appropriate place for new users
+  to start.</font></p>
+
+  <p>This list of frequently asked questions and answers about
+  FreeTDS is updated between releases to cover problems since the
+  last release, and to answer perennial questions (there are
+  some).</p>
+
+  <ol>
+    <li>General Questions
+
+      <ul>
+        <li><a href="#What.is.FreeTDS">What is FreeTDS?</a></li>
+
+        <li><a href="#Where.do.I.get.FreeTDS">Where do I get
+        FreeTDS?</a></li>
+
+        <li><a href="#Does.FreeTDS.support.Microsoft.servers">Does
+        FreeTDS support Microsoft servers?</a></li>
+
+         <li><a href="#Does.FreeTDS.support.my.server">
+	 Does version <i>X</i> of FreeTDS connect to version <i>Y</i> of 
+	 my Microsoft or Sybase server? </a></li>
+
+       <li><a href="#How.can.I.get.help">How can I get help (or
+        support)?</a></li>
+
+        <li><a href="#Who.is.responsible.for.FreeTDS">Who is
+        responsible for FreeTDS?</a></li>
+
+        <li><a href="#license">Why LGPL license?</a></li>
+      </ul>
+    </li>
+
+    <li>Documentation
+
+      <ul>
+        <li><a href="#documentation">What sort of documentation is
+        available?</a></li>
+
+        <li><a href="#refman">What about a Programmer's Reference
+        Manual?</a></li>
+
+        <li><a href="#protocol">Is there any documentation for the
+        TDS protocol?</a></li>
+      </ul>
+    </li>
+
+    <li>Implementation
+
+      <ul>
+        <li><a href="#SYBASE">What's this SYBASE environment
+        variable for?</a></li>
+
+        <li><a href="#RPM">How do I install the RPM?</a></li>
+      </ul>
+    </li>
+
+    <li>Programming: C++, Sybperl, SQSH, &amp; PHP
+
+      <ul>
+        <li><a href="#compiling">How do
+        I compile Sybperl with FreeTDS?</a></li>
+
+        <li><a href="#compiling">How do I
+        compile SQSH with FreeTDS?</a></li>
+
+        <li><a href="#compiling">How do I
+        compile PHP 3 with FreeTDS?</a></li>
+
+        <li><a href="#Which.API">How should I choose among
+        <tt>DB-Library</tt>, <tt>CT-Library</tt>, and
+        <tt>ODBC</tt>?</a></li>
+
+        <li><a href="#where.is.libtds.so">Where is <kbd>libtds.so</kbd>?</a></li>
+
+        <li><a href="#Which.Perl.library.should.I.use">Which Perl
+        library should I use?</a></li>
+
+        <li><a href="#Are.there.any.known.issues">Are there any
+        known issues?</a></li>
+
+        <li><a href="#What.features.are.missing">What features are missing</a> compared to the vendors' implementations?</li>
+
+        <li><a href="#pending">Why does each connection support
+        only one query at a time?</a></li>
+
+        <li><a href="#thread.safe">Is FreeTDS be thread
+        safe?</a></li>
+
+        <li><a href=
+        "#Are.there.plans.to.implement.the.OpenServer.protocol.library">
+        Are there plans to implement the OpenServer
+        protocol/library?</a></li>
+        
+        <li><a href="mars.html">What's wrong with MARS?</a></li>
+      </ul>
+    </li>
+
+    <li>Problems Running <ul>	
+	<li><a href="#ms.output.parameters">
+        I'm not getting my output parameters returned</a>, but I seem
+        to be doing everything right!</li>
+
+	<li><a href="#unknownmarker">What does this <tt>unknown
+        marker</tt> message mean?</a></li>
+
+        <li><a href="#connectionrefused">What if I get a
+        'connection refused' message?</a></li>
+
+         <li><a href="#encrypted">Do encrypted connections work?</a></li>
+
+       <li><a href="#integratedsecurity">The server is listening,
+        but logins fail? (MS SQL only)</a></li>
+
+        <li><a href="#textdata">My <tt>text</tt> data are being
+        truncated or are causing my client to break.</a></li>
+
+        <li><a href="#dateformat">My dates aren't formatted
+        right!</a></li>
+        <li>My PHP script works from the command line but 
+		<a href="#php">fails in the browser!</a></li>
+		
+		<li>How do I debug my <a href="#oracle">Oracle Heterogeneous Services</a> error?</li>
+      </ul>
+    </li>
+  </ol>
+  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+  <hr size="1" />
+
+  <h2>General Questions</h2>
+
+  <h3 id="What.is.FreeTDS">What is FreeTDS?</h3>
+
+  <p>FreeTDS is a free implementation of the TDS (Tabular Data
+  Stream) protocol that is used by Sybase and Microsoft for their
+  database products. It can communicate with any Sybase or Microsoft SQL
+  Server.  It includes three client libraries: DB-Library, CT-Library, 
+  and ODBC.  All libraries use the same protocol and can communicate with 
+  servers from both vendors.  </p>
+
+  <h3 id="Where.do.I.get.FreeTDS">Where do I get FreeTDS?</h3>
+
+  <p>You can get the latest FreeTDS from <a href=
+  "ftp://ftp.freetds.org/pub/freetds/stable/freetds-stable.tgz">
+  ftp.freetds.org</a>. See "Quick Links" on the <a href=
+  "/">FreeTDS</a> home page. See the 
+  <a href="userguide/">User Guide</a> for details.</p>
+
+  <p>Your favorite operating system may have a package of some kind
+  available. You might want to check there. Occasionally someone
+  contributes a package here, which we keep around. Post a message
+  to the list if you're looking for one and don't find one in the
+  usual places.</p>
+
+  <h3 id="Does.FreeTDS.support.Microsoft.servers">Does FreeTDS support Microsoft servers?</h3>
+
+  <p>Yes. Microsoft servers don't usually accept TDS 5.0
+  connections. Use one of versions 4.2, 7.0 or 8.0 of the protocol.
+  See the <a href=
+  "userguide/choosingtdsprotocol.htm">User
+  Guide</a> for details.</p>
+
+  <h3 id="Does.FreeTDS.support.my.server">
+  	Does version <i>X</i> of FreeTDS connect to version <i>Y</i> of 
+	 my Microsoft or Sybase server?</h3>
+
+  <p>For the last several years, every version of FreeTDS has been 
+  able to communicate with every kind of TDS server.  New servers 
+  sometimes introduce new protocol features, but the changes are small, 
+  and they're always compatible with old clients.  
+  Generally, you should use the latest version of the TDS protocol 
+  for your server.    See the <a href=
+  "userguide/choosingtdsprotocol.htm">User
+  Guide</a> for details.</p>
+
+  <h3 id="How.can.I.get.help">How can I get help (or support)?</h3>
+	
+  <p>After reading this FAQ and the User Guide, you might want to
+  look at the mailing list <a href=
+  "http://lists.ibiblio.org/pipermail/freetds/">archives</a>. If
+  you don't see your question answered there (or, if you'd just
+  like to learn more about what's going on with FreeTDS), please
+  subscribe to the <a href=
+  "contact.html">mailing list</a>. Questions
+  new and old are cheerfully answered there. Traffic is not high,
+  normally around 10 messages a day.</p>
+
+  <p><i>Netiquette note</i>: It's considered poor form to mail
+  "help me" questions directly to the developers of <i>any</i> free
+  software project, this one included. Please direct your question
+  to the list, where someone with the available time and expertise
+  can help you.</p>
+
+  <h3 id="Who.is.responsible.for.FreeTDS">Who is responsible for FreeTDS?</h3>
+
+	<h4>Current contributors</h4>
+	<dl>
+	<dt><a href="mailto:brian@nospam.bruns.org">Brian
+      Bruns</a></dt>
+		<dd>Started this crazy thing</dd>
+	<dt><a href="mailto:jklowden@nospam.freetds.org">James K. Lowden</a></dt>
+		<dd>Project maintainer since 2003</dd>
+	<dt><a href="mailto:freddy77_A_gmail_D_com">Frediano Ziglio</a></dt>
+		<dd>Wrote great swaths of the ODBC driver and keeps the TDS
+		library up to date with protocol changes.  Also contributed
+		most of the current encryption logic. </dd>
+	</dl>
+      <p>For a more complete history, see AUTHORS in the distribution.  
+      Thanks also go to the folks at A2i, Inc. <a href=
+      "http://www.a2i.com">http://www.a2i.com</a> for funding the original
+      development of DB-Library host file bulk copy and writetext
+      support, and to Dave Poyourow there for helping with the
+      debugging.</p>
+
+  <p>(To send
+  email to anyone listed above, delete the "nospam." part of the
+  address.)</p>
+
+  <h3 id="license">Why LGPL license?</h3>
+
+  <p>Brian Bruns started the project, and that's the choice he
+  made. LGPL was chosen because if you want a commercial client,
+  you can buy them from Sybase, Microsoft or others. &ldquo;I do believe
+  BSDish licenses are better in some cases, but not for something
+  like this,&rdquo; he said.</p>
+  <hr />
+  <!-- documentation -->
+
+  <h2 id="documentation">Documentation</h2>
+
+  <h3>What sort of documentation is available?</h3>
+
+  <ul>
+    <li>The FreeTDS <a href="userguide/">User Guide</a> 
+    	is the best place to start.</li>
+
+    <li>FreeTDS , on <a href=
+    "reference/">Reference Manual</a> is a
+    beginning at an independent description of the client APIs and
+    the TDS layer.</li>
+  </ul>
+
+  <h3 id="refman">What about a Programmer's Reference Manual?</h3>
+
+  <p>The best information is available from the vendors. FreeTDS
+  means to conform to the documented (and, in some cases,
+  undocumented) behavior of the vendors' offerings.</p>
+
+  <ul>
+    <li><a href=
+    "http://www.microsoft.com/sql/productdoc/">Microsoft's Books
+    Online</a>.</li>
+    <!-- goes to http://www.microsoft.com/sql/techinfo/productdoc/2000/default.asp -->
+    <!-- valid as at 12th november 2001 -->
+
+    <li><a href="http://www.sybase.com/support/manuals">Sybase's
+    Product Manuals</a>.</li>
+    <!-- valid as at 12th november 2001 -->
+  </ul>
+
+  <h3 id="protocol">Is there any documentation on the TDS protocol?</h3>
+
+  <p>There is <a href="tds.html">preliminary
+  documentation</a> available. The most up to date version is in
+  the User Guide.</p>
+
+  <p>Sybase publishes its <a href="http://www.sybase.com/content/1040983/Sybase-tds38-102306.pdf" >TDS 5.0 Functional Specification</a>.</p>
+  
+  <p>Microsoft published its specification, too.  
+  It can currently be found on <a href="http://msdn2.microsoft.com/en-us/library/cc448436.aspx"
+  	>MSDN</a> or search the web for 
+	&ldquo;MS-TDS tabular data stream site:microsoft.com&rdquo;.</p>
+  
+  <hr/>
+  <!-- Implementation -->
+
+  <h2>Implementation</h2>
+  	<a name="SYBASE" id="SYBASE"></a>
+
+
+  <p>Many programs look for the <var>SYBASE</var> environment
+  variable in order to find the library's home. You will want to
+  set this to the main FreeTDS directory. For example, if
+  <code>FreeTDS</code> is installed in <tt>/usr/local/freetds</tt>
+  (meaning the libraries were installed in
+  <tt>/usr/local/freetds/lib</tt>), then your <var>SYBASE</var>
+  variable would be set to <tt>/usr/local/freetds</tt>.</p>
+
+  <h3 id="RPM">How do I install the RPM?</h3>
+
+  <p><tt>rpm -ivh freetds-0.52-1.i386.rpm</tt> (as root) will
+  install the libraries.</p>
+
+  <p><tt>rpm -ivh freetds-devel-0.52-1.i386.rpm</tt> (as root) will
+  install the headers and other stuff needed to build other
+  stuff.</p>
+  <hr />
+  
+  <!-- Programming -->
+
+  <h2 id="compiling">Programming: C++, Sybperl, SQSH, &amp; PHP</h2>
+
+  <h3>How do I compile Sybperl with FreeTDS?</h3>
+  <h3>How do I compile SQSH with FreeTDS?</h3>
+  <h3>How do I compile PHP 3 with FreeTDS?</h3>
+
+  <p>Please refer to the <a href="userguide/">User Guide</a>.</p>
+
+  <p>One small PHP hint, mailed to the FAQ master in May 2001:</p>
+
+  <p>In the mailing list archives I noticed a few people discussing
+  a problem I just had.</p>
+
+  <blockquote>
+    <p>An attempt to make a connection to a MS SQL server from PHP
+    would fail, leaving a message in the Apache error log:</p>
+    <pre>
+        connect: Network is unreachable
+        DB-Library: Login incorrect</pre>
+
+    <p>The problem turned out to be a very simple one to fix. In
+    the php.ini file under the sybase section, there is a directive
+    that sets the path to the sybase interfaces file
+    "sybase.interface_file = "</p>
+
+    <p>After uncommenting this and setting it to a reasonable value
+    (ie. /usr/local/freetds/interfaces), things started
+    working.</p>
+  </blockquote>
+
+  <h3 id="Which.API">How should I choose among <tt>DB-Library</tt>, <tt>CT-Library</tt>,
+  and <tt>ODBC</tt>?</h3>
+
+  <p><tt>FreeTDS</tt> offers three client libraries and one
+  internal one (<tt>libtds</tt>). We generally encourage people to
+  use one of the client libraries, and discourage writing to
+  <tt>libtds</tt>, because the latter is evolving, more subject to
+  change, less well documented, and harder to use. In choosing
+  which client API to write to, you might want to peruse our
+  <a href="which_api.html">brief discussion</a>. </p>
+
+  <h3 id="where.is.libtds.so">
+  	Where is <kbd>libtds.so</kbd>?</h3>
+
+  <p><kbd>libtds.so</kbd> doesn't exist and isn't needed.  Any reference to
+  it in your linker commands can be safely removed.  Any test for its existence 
+  should be modified to test instead for the appropriate client library.  
+	
+  <p>As of version 0.82, the TDS utility library is not built 
+  as a shared object.  The static library <kbd>libtds.a</kbd>, 
+  is not installed by <kbd class="input">make install</kbd> and is not needed by 
+  an applications that uses a client 
+  library (<kbd>CT-Library</kbd>, <kbd>DB-Library</kbd>, or <kbd>ODBC</kbd>).  
+  Because <kbd>libtds</kbd> is statically linked to the client libraries, 
+  they each now contain all the TDS functionality they need.  </p>
+  
+  <p>In the past, <kbd>libtds</kbd> was distrbuted as a shared object.  
+  We found that did more harm than good.  
+  Proper versioning and support was a burden on the 
+  developers, and it was just one more thing for a client application
+  to link in.  Only programs that used more than
+  one client library benefited. Such programs are rare, and the benefit small. </p>
+  
+  <p>Of course, it's still free software, and you're free to build a 
+  shared object of it if you want to.  It's just not done "out of the box"
+  by the distributed makefiles.  </p>
+
+  <h3 id="Which.Perl.library.should.I.use">Which Perl library should I use?</h3>
+
+  <p>There are four options for using TDS and Perl to connect to a
+  Sybase or Microsoft database, <tt>DBD::Sybase</tt>, <tt>DBD::ODBC</tt>,
+  <tt>DBD::FreeTDS,</tt>
+  and <tt>Sybperl</tt>. As of 2010, <tt>DBD::Sybase</tt> and <tt>DBD::ODBC</tt> are your best choices.  If
+  you need paramaterized queries on a Microsoft server, use <tt>DBD::ODBC</tt></p>
+
+
+  <h3 id="Are.there.any.known.issues">Are there any known issues?</h3>
+  <ul>
+    <li>ODBC can be confusing to set up. See the <tt>samples</tt>
+    directory for example <tt>.ini</tt> files, and follow the User
+    Guide's instructions carefully.</li>
+
+    <li>BCP does not support TDS 4.2. You must use a more modern
+    protocol version.</li>
+
+    <li>DBD::Sybase dynamic SQL placeholders don't work, pending a client-side SQL parser.  (The ODBC ones do.)</li>
+
+    <li>There are no plans to implement DB-Library browse mode.</li>
+  </ul>
+
+  <p>Errors can sometimes be confusing. When an application uses
+  the library incorrectly, or when there are problems in a data
+  file being uploaded with BCP, the message returned by FreeTDS can
+  sometimes be misleading. In the latter case, it's often necessary
+  to examine the log file to understand what went wrong. </p>
+
+ <h3 id="What.features.are.missing"> What features are missing compared to the vendors' implementations?</h3>
+ 
+ 	<p>In no particular order: </p>
+	<ul>
+		<li>MARS</li>
+		<li>DB-Library browse API</li>
+		<li>Parameterized queries in CT-Library with TDS 7.0+ (i.e. Microsoft servers)</li>
+		<li>CT-Library money functions</li>
+	</ul>
+	
+	<p>For specific functions, consult <code>doc/api_status.txt</code> in your distribution. </p>
+	
+	<p>Very few programs actually need the missing functionality.  Parameterized CT-Library queries would benefit Perl DBD::Sybase users, but the functionality would require departing from Sybase's documented API.  MARS comes up because there must be thousands of people whom Microsoft has convinced they need it, but the benefits are meager compared to the complexity.  </p>
+	
+  <h3 id="pending">Why does each connection support only one query at a time?</h3>
+
+  <p>If you are accustomed to programming with other database
+  servers, you may be surprised when you first encounter this
+  aspect of the TDS protocol. When a TDS server&mdash;be it by
+  Microsoft or Sybase&mdash;responds to a query, it may send a result
+  set to the client. The server sends the rows as they're
+  selected/formed, in real time (if you will). The client
+  libraries make the rows available to the client application 
+  as they arrive.</p>
+
+  <p>The client library is tightly coupled to the server; they are
+  synchronized, share state information. The server requires the
+  client either to read all the results from a query, or to
+  indicate that no further rows are desired i.e., to issue a
+  cancellation. Until one of those two things happens, the server
+  will not accept new queries on that connection. It will complain
+  about "pending results".</p>
+
+  <p>How do mortal programmers cope with this strict
+  one-query-at-a-time limitation? For one thing, they become better
+  programmers.</p>
+
+  <ul>
+    <li>The solution often involves doing more SQL work, which
+    often results in less interaction with the server, which is
+    almost always faster.</li>
+
+    <li>Even when that's not true, there's nothing to prevent the
+    application from caching the whole results set in its own
+    collection object.</li>
+
+    <li>Sometimes, the best answer is to open a new connection.
+    That's not as bad as it sounds, and it certainly not unheard of
+    to have 4 or more simultaneous connections supporting an
+    application.</li>
+  </ul>
+  
+  <p>It's important to realize that the selection of rows and
+  their accumulation into a container of some sort are two
+  different functions. A TDS server issues its results a row at a
+  time, which the client library dutifully makes available to the
+  application on arrival. It's up to the application&mdash;or a
+  higher-level library&mdash;to form a "rowset" of some kind if
+  desired.</p>
+  
+  <p><i>But what about MARS&reg;</i> you ask?  <i>Doesn't that solve the problem?</i>  Well, no.  MARS <i>does</i> make a TDS server more similar to other vendors' servers, and Microsoft benefits from one more just-like-the-others feature for its ODBC driver.  But Microsoft claims a patent on MARS, the documentation is incomplete, and supporting it would introduce significant complexity.</p>
+  
+  <p>MARS might get implemented one day; more surprising things have happened.  But the technical advantages it provides to the programmer are over server-side cursors or simply using another connection are vanishingly small.  </p>
+
+  <h4>PHP note</h4>If you use PHP, you will still run into this
+  problem even if you create a new connection. The reason is that
+  PHP is so nice that it will re-use the first connection if you
+  connect again with the same parameters. You my wish to refer to
+  <a href=
+  "http://lists.ibiblio.org/pipermail/freetds/2003q3/013915.html">this
+  post</a> by Daniel Fazekas in the mailing list archives. 
+
+  <h3 id="thread.safe">Is FreeTDS thread safe?</h3>
+
+  <p>Different threads may all use separate connections without
+  interfering with each other. Threads may not share a DBPROCESS or
+  CS_CONNECTION without controlling access via a mutex.</p>
+
+  <h3 id="Are.there.plans.to.implement.the.OpenServer.protocol.library">Are there plans to implement the OpenServer protocol/library?</h3>
+
+  <p>Not at this point, there is still much work to do on the
+  client protocol. But, <tt>libtdssrv</tt> will do the trick for
+  some applications.</p>
+  <hr />
+  <!-- RUNNING -->
+
+  <h2>Problems Running</h2>
+
+  <h3 id="ms.output.parameters">Output Parameters</h3>
+	
+  <p><i>I'm not getting my output parameters returned, but I seem
+         to be doing everything right!</i> </p> 
+  <p>That's not a question!</p>
+  <p>Microsoft SQL Server 7 with SP3, and later versions, quietly changed (which is to say, broke) how they respond to queries that execute stored procedures with output parameters.  Earlier servers let you send a query like <font size="-1"><code>EXECUTE A @P OUTPUT</code></font> and fetch the output parameter as a special result row (technique varying by library).  Newer servers simply don't send back that data.  To elicit output parameters from them, you have to use the RPC functions such as the DB-Library <a href="reference/a00336.html#a129">dbrpcparam</a>.  
+  </p>
+         
+  <h3 id="unknownmarker">What does this <tt>unknown marker</tt> message mean?</h3>
+
+  <p>Most of the time, it means you're not using the right protocol
+  version. That <i>can</i> happen even if your <tt>./configure</tt>
+  was done correctly. Try setting the <tt>TDSVER</tt> variable to a
+  value appropriate for your server: normally <code>5.0</code> for
+  Sybase and <code>7.0</code> for Microsoft. If that works, double
+  check your work. If your <kbd>freetds.conf</kbd> file and
+  <kbd><strong>configure</strong></kbd> options were right, but you
+  needed the environment variable anyway, please post a message to
+  the list and help us track it down.</p>
+
+  <h3 id="connectionrefused">
+	  What if I get a 
+  	<tt><font size="+1">connection refused</font></tt> message?</h3>
+
+  <p>You want to make sure:</p>
+
+  <ul>
+    <li>your server is running,</li>
+
+    <li>you can connect to it,</li>
+
+    <li>your account has permissions in the database to execute
+    your query.</li>
+  </ul>
+
+  <p>Steps:</p>
+
+  <ol>
+    <li>Try <kbd class="input">telnet <i>hostmachine port</i></kbd> and
+    see if it's listening. You should get some form of response
+    from the server (actual text varies by vendor &amp;
+    version).<br /></li>
+
+    <li>
+      <p>Try <kbd class="input">tsql -H <i>hostmachine</i> -p <i>port</i> -U
+      <i>username</i> -P <i>password</i></kbd></p>
+
+      <p>That will connect to the server, bypassing the
+      <kbd>freetds.conf</kbd> file. If it doesn't work, the problem lies
+      upstream.</p></li>
+
+    <li>
+      <p>Try <kbd class="input">tsql -S <i>servername</i> -p <i>port</i> -U
+      <i>username</i> -P <i>password</i></kbd></p>
+
+      <p>That will connect to the server using <kbd>freetds.conf</kbd>. This
+      allows you to isolate <kbd>freetds.conf</kbd> mistakes. 
+	<kbd class="input">man tsql</kbd> for more.</p></li>
+
+    <li>Check your ./configure and environment variables. The
+    <tt>--with-tdsver</tt> determines what flavor of the TDS
+    protocol your runs by default; the $TDSVER variable overrides
+    that default. The following combinations are reasonable; see
+    the <a href="userguide/">User Guide</a>
+    for details:</li>
+
+    <li style="list-style: none">
+      <table summary="TDS Protocol Versions">
+        <tr>
+          <td><b>Vendor</b></td>
+
+          <td><b>Version</b></td>
+
+          <td><b>TDS Version</b></td>
+        </tr>
+
+        <tr>
+          <td>Sybase</td>
+
+          <td>4.92+&nbsp;</td>
+
+          <td>5.0</td>
+        </tr>
+
+        <tr>
+          <td>Microsoft</td>
+
+          <td>6.0, 6.5</td>
+
+          <td>4.2</td>
+        </tr>
+
+        <tr>
+          <td>Microsoft</td>
+
+          <td>7.0/2000</td>
+
+          <td>7.0</td>
+        </tr>
+      </table>
+    </li>
+
+    <li>
+      <p>Edit the <b><tt>PWD</tt></b> file and try <kbd class="input">make
+      check</kbd>. It will call unittests for libtds, ctlib, dblib
+      and odbc in that order</p>
+    </li>
+
+    <li>
+      <p>Compile <font size="+1"><tt><a href=
+      "http://www.sqsh.org">sqsh</a></tt></font> and try that
+      before the more complicated stuff (PHP/Perl). If you can
+      connect with <tt>sqsh</tt>, you don't have a FreeTDS
+      problem.</p>
+    </li>
+  </ol>
+
+  <h3 id="integratedsecurity">The Microsoft SQL Server is listening, 
+  	my configuration and
+	environment are set up per question 6.1, but logins still
+	fail.</h3>
+
+  <p>Microsoft supports two security models in three
+  permutations:</p>
+
+  <ol>
+    <li>Windows NT Authentication Mode (Windows NT
+    Authentication)</li>
+
+    <li>Standard Mode (SQL Server Authentication)</li>
+
+    <li>Mixed Mode (Windows NT Authentication and SQL Server
+    Authentication)</li>
+  </ol>
+
+  <p>"Windows NT Authentication", often called "integrated
+  security", relies on Microsoft's domain logins, which establish a
+  user's network security attributes at network login time. When
+  connecting to the database server, SQL Server accepts an
+  encrypted password in the login packet, and uses Windows NT
+  facilities authenticate it, usually via the Primary Domain
+  Controller (PDC). The server then permits or denies login access
+  based on the response.</p>
+
+  <p>With traditional "Standard Mode" authentication, usernames and
+  passwords are stored within SQL Server. They are passed in the
+  login packet as plaintext, and connection requests are
+  authenticated without consulting the operating system.</p>
+
+  <p>FreeTDS supports both security models. Domain logins are
+  recognized by the presence of a backslash (\) character in the
+  username. See the <a href=
+  "userguide/domains.htm">User Guide</a> for
+  details. </p>
+
+  <h3 id="encrypted">Do encrypted connections work?</h3>
+  
+  <p>Yes.  Sometimes it's tricky, though.  </p>
+
+  <h3 id="textdata">My <tt>text</tt> data are being truncated or are causing my
+  client to break.</h3>
+
+  <p>The <tt>text</tt> data type is different from <tt>char</tt>
+  and <tt>varchar</tt> types. The maximum data length of a
+  <tt>text</tt> column is governed by the <tt>textsize</tt>
+  connection option. Microsoft <i>claims</i> in their
+  documentation to use a default <tt>textsize</tt> of 4000
+  characters, but in fact their implementation is inconsistent.
+  Sometimes <tt>text</tt> columns are returned with a size of 4
+  GB!</p>
+
+  <p>The best solution is to make sure you set the <tt>textsize</tt> option to
+  a reasonable value when establishing a connection. For
+  example:</p>
+  <pre class="screen">
+<tt class="userinput">
+1&gt; <b>set <tt class="envar">textsize</tt> 10000</b></tt>
+2&gt; <b>go</b></pre>
+
+  See also the <tt>text size</tt> option in <tt>freetds.conf</tt>.
+
+  <h3 id="dateformat">My dates aren't formatted right!</h3>
+
+  <p>Some dates turn out better than others.</p>
+
+  <p>If you think your dates should look like <em>2001-12-13
+  17:58:55.000</em>, but you're seeing something like <em>Dec 13
+  2001 05:58PM</em> instead (or vice versa), you've bumped into
+  driver behavior. There's no standard governing the default
+  character string representation of a <code>datetime</code>
+  datatype. Different drivers make different choices, and your
+  driver has chosen a representation for you.</p>Microsoft's ODBC
+  driver (which is used by among other things the Query Analyzer
+  tool) converts <tt>datetime</tt> to an ISO format. That format
+  has the advantages of being all numeric: sortable, unambiguous,
+  and locale-independent. The vendors' <code>DB-Library</code> and
+  <code>CT-Library</code>, in contrast, use the <code>MMM DD YYYY
+  hh:mm</code> format.
+
+  <p>If you want to be sure your queries always return dates in a
+  particular format, don't leave the formatting up to the driver!
+  Use the <code>convert</code> function. For example:</p>
+  <!-- example convert  -->
+  <pre class="screen">
+<tt class="userinput">
+1&gt; <b>select convert( varchar(30), getdate(), 120 ) as Now</b>
+2&gt; <b>go</b>
+ Now
+ ------------------------------
+ 2002-07-02 12:36:31
+</tt>
+</pre>
+
+  <p>As of version 0.60, the default datetime-&gt;string conversion
+  is controlled by the <code>locale.conf</code> file. See the User
+  Guide for details.</p>
+  
+
+  <h3 id="php">My PHP script fails in the browser!</h3>
+  
+  <p> This is usually a webserver configuration issue, typically
+  permissions reading <kbd>freetds.conf</kbd> or similar.  
+  Remember that the account running the e.g. Apache server is 
+  normally not the one you use to log in, or to test your script
+  with on the command line.  </p>
+
+	<h3 id="oracle">How do I debug my Oracle Heterogeneous Services error?</h3>
+	
+	<p>The message produced by the Oracle server is seldom detailed enough to understand what's wrong.  
+		Really, the only way to debug these errors reliably is with a TDSDUMP log of the session. 
+		The log will contain any error messages from the server and/or from the library.  Often that's
+		all the information needed.  If not, post the log to the mailing list. </p>
+  
+  <!-- footer -->
+  <hr size="1" />
+  <font size="-1">Updates and comments <a href=
+  "mailto:jklowden@freetds.org">FreeTDS FAQ Master</a> 
+  <br/>
+    <i>$Id: faq.html,v 1.34 2011-09-21 16:21:32 jklowden Exp $</i>
+	</font>
+<hr/>
+  <p>
+    <a href="http://validator.w3.org/check?uri=referer"><img
+        src="http://www.w3.org/Icons/valid-xhtml10"
+        alt="Valid XHTML 1.0 Transitional" height="31" width="88" /></a>
+  </p>
+</body>
+</html>

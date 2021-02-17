@@ -1,0 +1,634 @@
+<HTML>
+<HEAD>
+<META NAME="GENERATOR" Content="Microsoft Developer Studio">
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Glossary </TITLE>
+<LINK REL="StyleSheet" Href="odbc.css">
+</HEAD>
+<BODY bgcolor="white">
+
+<table width="90%" cols="3" border="0" cellspacing="0">
+<TR>
+   <TD colspan="3" class="big">Index / Glossary</TD>
+</TR>
+<TR>
+  <TD colspan="3">
+   <TABLE Cols="13" width=90% bgcolor="black">
+   <TR>
+      <TH class="head"><a href="#A">A</A></TH>
+      <TH CLASS="head"><a href="#B">B</A></TH>
+      <TH CLASS="head"><a href="#C">C</A></TH>
+      <TH CLASS="head"><a href="#D">D</A></TH>
+      <TH CLASS="head"><a href="#E">E</A></TH>
+      <TH CLASS="head"><a href="#F">F</A></TH>
+      <TH CLASS="head"><a href="#G">G</A></TH>
+      <TH CLASS="head"><a href="#H">H</A></TH>
+      <TH CLASS="head"><a href="#I">I</A></TH>
+      <TH CLASS="head"><a href="#J">J</A></TH>
+      <TH CLASS="head"><a href="#K">K</A></TH>
+      <TH CLASS="head"><a href="#L">L</A></TH>
+      <TH CLASS="head"><a href="#M">M</A></TH>
+   </TR>
+   <TR>
+      <TH CLASS="head"><a href="#N">N</A></TH>
+      <TH CLASS="head"><a href="#O">O</A></TH>
+      <TH CLASS="head"><a href="#P">P</A></TH>
+      <TH CLASS="head"><a href="#Q">Q</A></TH>
+      <TH CLASS="head"><a href="#R">R</A></TH>
+      <TH CLASS="head"><a href="#S">S</A></TH>
+      <TH CLASS="head"><a href="#T">T</A></TH>
+      <TH CLASS="head"><a href="#U">U</A></TH>
+      <TH CLASS="head"><a href="#V">V</A></TH>
+      <TH CLASS="head"><a href="#W">W</A></TH>
+      <TH CLASS="head"><a href="#X">X</A></TH>
+      <TH CLASS="head"><a href="#Y">Y</A></TH>
+      <TH CLASS="head"><a href="#Z">Z</A></TH>
+   </TR>
+   </TABLE>
+  </TD>
+</TR>
+</TABLE>
+<table width="90%" cols="3" border="0" cellspacing="0">
+
+<TR>
+  <TD class="head" width="60"><a name="C"><B>C</B></A></TD>
+  <TD width="20" class="head">&nbsp</TD>
+  <TD class="head"><A Name="col">Column</A></TD>
+</TR>
+<TR><TD Colspan="2">&nbsp;</TD>
+    <TD><P>A column is another name for field in a SQL table.
+	It has a data type (Integer, Char, Money etc) and a name by which it is 
+	addressed.</P>
+	<P>You specify the name of a column in a query (either DELETE, UPDATE, SELECT or
+	INSERT)</P>
+	</TD>
+</TR>
+<TR>
+  <TD class="head" width="60"><a name="D"><B>D</B></A></TD>
+  <TD width="20" class="head">&nbsp</TD>
+  <TD class="head"><A Name="dsrc">data source</A></TD>
+</TR>
+<TR><TD Colspan="2">&nbsp;</TD>
+    <TD>A data source defines all informationen needed by ODBC to connect to a
+	database. This includes the name of the driver to use (Postgres, mySQL etc.),
+	the name of the user, his password, the server name on which the database resides 
+	and of course the name of the database. There are a lot more options available.
+	</TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD class="head"><A NAME="dtyp">Data Types</A></TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp;</TD>
+  <TD><P>
+  The following table show some ODBC data types and how the relate
+  to standard C data types:</P>
+  <TABLE COLS="3" border="0" cellspacing="1">
+  <TR>
+    <TH CLASS="head">Type identifier</TH>
+    <TH CLASS="head">ODBC typedef</TH>
+    <TH CLASS="head">C typedef</TH>
+  </TR>
+  <TR>
+    <TD class="small">SQL_C_CHAR</TD>
+    <TD class="small">SQLCHAR * </TD>
+	<TD class="small">unsigned char * </TD>
+  </TR>
+  <TR>
+    <TD class="small">SQL_C_SSHORT</TD>
+    <TD class="small">SQLSMALLINT</TD>
+	<TD class="small">short int </TD>
+  </TR>
+  <TR>
+    <TD class="small">SQL_C_USHORT  </TD>
+    <TD class="small">SQLUSMALLINT </TD>
+    <TD class="small">unsigned short int </TD>
+  </TR>
+  <TR>
+    <TD class="small">SQL_C_SLONG </TD>
+    <TD class="small">SQLINTEGER</TD>
+    <TD class="small">long int</TD>
+  </TR>
+  <TR>
+    <TD class="small">SQL_C_FLOAT</TD>
+    <TD class="small">SQLREAL</TD>
+    <TD class="small">float </TD>
+  </TR>
+  <TR>
+    <TD class="small">SQL_C_DOUBLE</TD>
+    <TD class="small">SQLDOUBLE, SQLFLOAT</TD>
+	<TD class="small">double </TD>
+  </TR>
+  <TR>
+    <TD class="small">SQL_C_BINARY </TD>
+    <TD class="small">SQLCHAR *</TD>
+	<TD class="small">unsigned char </TD>
+  </TR>
+  <TR>
+    <TD class="small">SQL_C_TYPE_DATE</TD>
+    <TD class="small">SQL_DATE_STRUCT</TD>
+	<TD class="small"> struct <BR>tagDATE_STRUCT {<BR>
+     SQLSMALLINT year; <BR>
+     SQLUSMALLINT month; <BR>
+     SQLUSMALLINT day; <BR>
+     } DATE_STRUCT; 
+     </TD>
+  </TR>
+  <TR>
+    <TD class="small">SQL_C_TYPE_TIME </TD>
+    <TD class="small">SQL_TIME_STRUCT </TD>
+	<TD class="small">struct<BR>tagTIME_STRUCT {<BR>
+     SQLUSMALLINT hour; <BR>
+     SQLUSMALLINT minute; <BR>
+     SQLUSMALLINT second; <BR>
+    } TIME_STRUCT;  
+	</TD>
+   </TR>
+   </TABLE>
+   <P>You will need the type identifier in calls to <A HREF="#bind">SQLBindCol</A>.
+   </TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD >
+  </TD>
+</TR>
+<TR>
+  <TD class="head" width="60"><a name="O"><B>O</B></A></TD>
+  <TD width="20" class="head">&nbsp</TD>
+  <TD class="head"><A Name="oini">odbc.ini</A></TD>
+</TR>
+<TR><TD Colspan="2">&nbsp;</TD>
+    <TD><CODE>/etc/odbc.ini</CODE> is the configuration file for system
+	    <A HREF="#dsrc">data sources</A>. It contains information which will be needed when
+		connecting to a database. It is modified by a graphical utility
+		ODBCConfig.
+	</TD>
+</TR>
+<TR>
+  <TD class="head" width="60"><a name="R"><B>R</B></A></TD>
+  <TD width="20" class="head">&nbsp</TD>
+  <TD class="head"><A Name="row">Row</A></TD>
+</TR>
+<TR><TD Colspan="2">&nbsp;</TD>
+    <TD>A row is a set of <A HREF="#col">columns</A> in a query. For example in our
+	<A HREF="intro.html#tab">table</A> there are two users. Each user makes up a row
+	in the table or in the result of our query.
+	</TD>
+</TR>
+<TR>
+  <TD class="head" width="60"><a name="S"><B>S</B></A></TD>
+  <TD width="20" class="head">&nbsp</TD>
+  <TD class="head"><A Name="alloc">SQLAllocHandle</A></TD>
+</TR>
+<TR><TD Colspan="2">&nbsp;</TD>
+    <TD>allocates needed handles.
+      <CODE><PRE>
+SQLRETURN 
+SQLAllocHandle(SQLSMALLINT  HandleType,     
+               SQLHANDLE    InputHandle, 
+               SQLHANDLE   *OutputHandlePtr); 
+
+	  </PRE></CODE>
+	  <H4>Arguments</H4>
+
+	  <h5>HandleType</h5>
+	  <P>
+      Defines the type of handle to be allocated by <CODE>SQLAllocHandle</CODE>. There are four
+	  possible values:</P>
+      <CODE>
+	  SQL_HANDLE_ENV<BR>
+	  SQL_HANDLE_DBC<BR>
+      SQL_HANDLE_STMT<BR>
+      SQL_HANDLE_DESC
+      </CODE>
+	  <H5>InputHandle</H5>
+      This is the input handle in whose context the new handle will be allocated. 
+	  If <CODE>HandleType</CODE> is <CODE>SQL_HANDLE_ENV</CODE>, this is <CODE>SQL_NULL_HANDLE</CODE>. For
+	  a handle of type <CODE>SQL_HANDLE_DBC</CODE>, this has to be an environment handle, and 
+	  if it is <CODE>SQL_HANDLE_STMT</CODE> or <CODE>SQL_HANDLE_DESC</CODE>, it must be a connection 
+	  handle.
+
+      <H5>OutputHandlePtr</H5>
+      Pointer to a buffer in which to return the allocated handle.
+
+      <H4>Returns</H4>
+
+	  <CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_INVALID_HANDLE,</CODE> or <CODE>SQL_ERROR</CODE>.
+		<HR width="20%" align="center">
+  </TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD class="head"><A NAME="bind">SQLBindCol</A></TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD >
+   binds a variable to a column in the result.
+<CODE><PRE>
+SQLRETURN 
+SQLBindCol(SQLHSTMT      StatementHandle, 
+           SQLUSMALLINT  ColumnNumber, 
+           SQLSMALLINT   TargetType,  
+           SQLPOINTER    TargetValuePtr, 
+           SQLINTEGER    BufferLength, 
+           SQLINTEGER   *StrLen_or_IndPtr); 
+</PRE></CODE>
+
+   <H4>Arguments</H4>
+   <H5>StatementHandle</H5>
+   <CODE>StatementHandle</CODE> must have been allocated by <CODE>SQLAllocHandle</CODE>
+   and will hold all information and the result set of the statement.
+
+   <H5>ColumnNumber</H5>
+   Number of the column in the result set. Starts with 1.
+   
+   <H5>TargetType</H5>
+   Type identifier of the <A href="#dtyp">data type</A>
+
+   <H5>TargetValuePtr</H5>
+   The pointer to the variable in which the data will be stored.
+
+   <H5>BufferLength</H5>
+   The size of the buffer <CODE>TargetValuePtr</CODE> points at in bytes.
+
+   <H5>StrLen_or_IndPtr</H5>
+   When data is fetched, returns either
+   <UL>
+   <LI>The length of the data available to return
+   <LI>SQL_NO_TOTAL
+   <LI>SQL_NULL_DATA 
+   </UL>
+
+   <H4>Returns</H4>
+
+   <CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_ERROR</CODE> or <CODE>SQL_INVALID_HANDLE</CODE>.
+	<HR align="center" width="20%">
+</TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD class="head"><A NAME="conn">SQLConnect</A></TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD >
+   connects to a datasource
+<CODE><PRE>
+SQLRETURN SQLConnect(SQLHDBC     ConnectionHandle, 
+                     SQLCHAR    *ServerName, 
+                     SQLSMALLINT NameLength1, 
+                     SQLCHAR    *UserName, 
+                     SQLSMALLINT NameLength2, 
+                     SQLCHAR    *Authentication, 
+                     SQLSMALLINT NameLength3); 
+</PRE></CODE>
+
+   <H4>Arguments</H4>
+   <H5>ConnectionHandle</H5>
+   <CODE>ConnectionHandle</CODE> must have been allocated by <CODE>SQLAllocHandle</CODE>
+   and will hold all information about the connection.
+
+   <H5>ServerName</H5>
+   Name of the database server
+   
+   <H5>NameLength1</H5>
+   The length of <CODE>ServerName</CODE> or <CODE>SQL_NTS</CODE>
+
+   <H5>UserName</H5>
+   The name of the user who connects to the database.
+
+   <H5>NameLength2</H5>
+   The length of <CODE>UserName</CODE> or <CODE>SQL_NTS</CODE>
+   <H5>Authentication</H5>
+   Password of the user
+
+   <H5>NameLength3</H5>
+   The length of <CODE>Authentication</CODE> or <CODE>SQL_NTS</CODE>
+
+   <H4>Returns</H4>
+
+   <CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_ERROR</CODE> or <CODE>SQL_INVALID_HANDLE</CODE>.
+	<HR align="center" width="20%">
+</TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD class="head"><A NAME="dsn">SQLDataSources</A></TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD >
+   fetches avaible datasource names either user, system or both.
+<CODE><PRE>
+SQLRETURN 
+SQLDataSources(SQLHENV      EnvironmentHandle, 
+               SQLUSMALLINT Direction, 
+               SQLCHAR     *ServerName, 
+               SQLSMALLINT  BufferLength1, 
+               SQLSMALLINT *NameLength1Ptr, 
+               SQLCHAR     *Description, 
+               SQLSMALLINT  BufferLength2, 
+               SQLSMALLINT *NameLength2Ptr); 
+</PRE></CODE>
+
+   <H4>Arguments</H4>
+   <H5>EnvironmentHandle</H5>
+   <CODE>EnvironmentHandle</CODE> must have been allocated by       <CODE>SQLAllocHandle</CODE>.
+
+   <H5>Direction</H5>
+   Which DSN we are looking for. May be on of:
+     <TABLE COLS="2" border="0">
+     <TR>
+       <TD valign="top"><CODE>SQL_FETCH_FIRST</CODE></TD>
+       <TD>Sets up <CODE>SQLDataSources()</CODE> to lookup the first of all
+           available datasources (either user or systemwide).
+     </TR>
+     <TR>
+       <TD valign="top"><CODE>SQL_FETCH_FIRST_USER</CODE></TD>
+       <TD>Sets up <CODE>SQLDataSources()</CODE> to lookup the first of the
+           available user datasources.
+     </TR>
+     <TR>
+       <TD valign="top"><CODE>SQL_FETCH_FIRST_SYSTEM</CODE></TD>
+       <TD>Sets up <CODE>SQLDataSources()</CODE> to lookup the first of the
+           available system datasources.
+     </TR>
+     <TR>
+       <TD valign="top"><CODE>SQL_FETCH_NEXT</CODE></TD>
+       <TD>Fetches the next datasource.
+           Depending on <CODE>SQL_FETCH_FIRST_USER</CODE>, <CODE>SQL_FETCH_FIRST_SYSTEM</CODE>
+           or <CODE>SQL_FETCH_FIRST</CODE> this may only be a user datasource, 
+           only a system datasource or one of either.
+     </TR>
+     </TABLE>
+
+   <H5>ServerName</H5>
+   The name of the datasource is returned herein.
+
+   <H5>BufferLength1</H5>
+   Defines how many chars <I>Servername</I> may contain at most.
+
+   <H5>NameLength1Ptr</H5>
+   The pointer to the variable in which the actual length of the datasource name
+   is stored. If <I>NameLength1Ptr</I> is greater than <I>BufferLength1</I>, then
+   the DSN in <I>ServerName</I> is truncated to fit.
+
+   <H5>BufferLength</H5>
+   The size of the buffer <CODE>TargetValuePtr</CODE> points at in bytes.
+
+   <H5>Description</H5>
+   The description supplied with the datasource, giving more information on the
+   datasource in human readable form.
+
+   <H5>BufferLength2</H5>
+   Defines how many chars <I>Description</I> may contain at most.
+
+   <H5>NameLength2Ptr</H5>
+   The pointer to the variable in which the actual length of the description
+   is stored. If <I>NameLength2Ptr</I> is greater than <I>BufferLength2</I>, then
+   the description in <I>Description</I> is truncated to fit.
+ 
+   <H4>Returns</H4>
+
+   <CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_ERROR</CODE>,    <CODE>SQL_NO_DATA></CODE> or <CODE>SQL_INVALID_HANDLE</CODE>.
+	<HR align="center" width="20%">
+</TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD class="head"><A NAME="exec">SQLExecDirect</A></TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD >
+   Executes a SQL statement
+<CODE><PRE>
+SQLRETURN SQLExecDirect(SQLHSTMT    StatementHandle, 
+                        SQLCHAR    *StatementText, 
+                        SQLINTEGER  TextLength); 
+</PRE></CODE>
+   <H4>Arguments</H4>
+   <H5>StatementHandle</H5>
+   <CODE>StatementHandle</CODE> must have been allocated by <CODE>SQLAllocHandle</CODE>
+   and will hold all information and the result set of the statement.
+
+   <H5>StatementText</H5>
+   The SQL statement to be executed
+   
+   <H5>TextLength</H5>
+   The length of <CODE>StatementText</CODE> or <CODE>SQL_NTS</CODE>
+
+   <H4>Returns</H4>
+
+   <CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_ERROR</CODE> or <CODE>SQL_INVALID_HANDLE</CODE>.
+	<HR align="center" width="20%">
+</TD>
+</TR>
+<TR>
+  <TD width="20" colspan="2">&nbsp</TD>
+  <TD class="head"><A Name="clos">SQLDisconnect</A></TD>
+</TR>
+<TR><TD Colspan="2">&nbsp;</TD>
+    <TD>disconnects the specified connection
+      <CODE><PRE>
+SQLRETURN SQLDisconnect(SQLHDBC     ConnectionHandle);
+
+	  </PRE></CODE>
+	  <H4>Arguments</H4>
+
+	  <H5>ConnectionHandle</H5>
+      The handle of the connection to be closed.
+
+
+      <H4>Returns</H4>
+
+	  <CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_INVALID_HANDLE,</CODE> or <CODE>SQL_ERROR</CODE>.
+		<HR width="20%" align="center">
+  </TD>
+</TR>
+<TR>
+  <TD width="20" colspan="2">&nbsp</TD>
+  <TD class="head"><A Name="fetc">SQLFetch</A></TD>
+</TR>
+<TR><TD Colspan="2">&nbsp;</TD>
+    <TD>Fetches the next row of the result set.
+      <CODE><PRE>
+SQLRETURN SQLFetch(SQLHDBC     StatementHandle);
+
+	  </PRE></CODE>
+	  <H4>Arguments</H4>
+
+	  <H5>StatementHandle</H5>
+      The handle of the statement to be closed fromwhich the data should 
+	  be fetched.
+
+      <H4>Returns</H4>
+
+	  <P><CODE>SQL_SUCCESS, SQL_NO_DATA, SQL_STILL_EXECUTING, SQL_SUCCESS_WITH_INFO, SQL_INVALID_HANDLE,</CODE> or <CODE>SQL_ERROR</CODE>.</P>
+		<HR width="20%" align="center">
+  </TD>
+</TR>
+<TR>
+  <TD width="20" colspan="2">&nbsp</TD>
+  <TD class="head"><A Name="free">SQLFreeHandle</A></TD>
+</TR>
+<TR><TD Colspan="2">&nbsp;</TD>
+    <TD> frees allocated handles.
+      <CODE><PRE>
+SQLRETURN SQLFreeHandle(SQLSMALLINT  HandleType,     
+                        SQLHANDLE    InputHandle);
+
+	  </PRE></CODE>
+	  <H4>Arguments</H4>
+
+	  <h5>HandleType</h5>
+	  <P>
+      Defines the type of handle to be freed. There are four
+	  possible values:</P>
+      <CODE>
+	  SQL_HANDLE_ENV<BR>
+	  SQL_HANDLE_DBC<BR>
+      SQL_HANDLE_STMT<BR>
+      SQL_HANDLE_DESC
+      </CODE>
+	  <H5>InputHandle</H5>
+      The handle to be freed. Should match the type stated by <CODE>HandleType</CODE>
+
+
+      <H4>Returns</H4>
+
+	  <CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_INVALID_HANDLE,</CODE> or <CODE>SQL_ERROR</CODE>.
+		<HR width="20%" align="center">
+  </TD>
+</TR>
+<TR>
+  <TD width="20" colspan="2">&nbsp</TD>
+  <TD class="head"><A Name="ccol">SQLNumResultCols</A></TD>
+</TR>
+<TR><TD Colspan="2">&nbsp;</TD>
+    <TD>returns the number of columns in the result set.
+      <CODE><PRE>
+SQLRETURN SQLNumResultCols(SQLHSTMT     StatementHandle, 
+                           SQLSMALLINT *ColumnCountPtr); 
+	  </PRE></CODE>
+	  <H4>Arguments</H4>
+
+      <H5>StatementHandle</H5>
+      <CODE>StatementHandle</CODE> must have been allocated by <CODE>SQLAllocHandle</CODE>
+      and holds all information and the result set of the statement.
+	  <h5>ColumnCountPtr</H5>
+	  A pointer to a variable to hold the result value.
+      <H4>Returns</H4>
+
+	  <P><CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_STILL_EXECUTING, SQL_INVALID_HANDLE,</CODE> or <CODE>SQL_ERROR</CODE>.</P>
+		<HR width="20%" align="center">
+  </TD>
+</TR>
+<TR>
+  <TD width="20" colspan="2">&nbsp</TD>
+  <TD class="head"><A Name="crow">SQLRowCount</A></TD>
+</TR>
+<TR><TD Colspan="2">&nbsp;</TD>
+    <TD>returns the number of rows affected by INSERT, UPDATE or DELETE. 
+	    Many drivers (but not all) return the number of rows returned by the
+		last executed SELECT statement too.
+      <CODE><PRE>
+SQLRETURN SQLSQLRowCount(SQLHSTMT     StatementHandle, 
+                         SQLSMALLINT *RowCountPtr); 
+	  </PRE></CODE>
+	  <H4>Arguments</H4>
+
+      <H5>StatementHandle</H5>
+      <CODE>StatementHandle</CODE> must have been allocated by <CODE>SQLAllocHandle</CODE>
+      and holds all information and the result set of the statement.
+	  <h5>RowCountPtr</H5>
+	  A pointer to a variable to hold the result value.
+      <H4>Returns</H4>
+
+	  <P><CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_STILL_EXECUTING, SQL_INVALID_HANDLE,</CODE> or <CODE>SQL_ERROR</CODE>.</P>
+		<HR width="20%" align="center">
+  </TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD class="head"><A NAME="conattr">SQLSetConnectAttr</A></TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD >
+   modifies attributes of connections.
+<CODE><PRE>
+SQLRETURN SQLSetConnectAttr(SQLHDBC    ConnectionHandle, 
+                            SQLINTEGER Attribute, 
+                            SQLPOINTER ValuePtr, 
+                            SQLINTEGER StringLength); 
+</PRE></CODE>
+
+   <H4>Arguments</H4>
+   <H5>ConnectionHandle</H5>
+   <CODE>ConnectionHandle</CODE> must have been allocated by <CODE>SQLAllocHandle</CODE>
+   and defines the connection which will be modified.
+
+   <H5>Attribute</H5>
+   which attribute to set
+
+   <H5>ValuePtr</H5>
+   Pointer to the value for <CODE>Attribute</CODE>. Depending on 
+   <CODE>Attribute</CODE>, <CODE>ValuePtr</CODE> will be a 32-bit integer 
+   value or a pointer to a null-terminated string.
+
+   <H5>StringLength</H5>
+   If <CODE>ValuePtr</CODE> points to a character string or a binary buffer, this 
+   argument should be the length of <CODE>*ValuePtr</CODE>.
+   Otherwise, for <CODE>ValuePtr</CODE> of type integer <CODE>StringLength</CODE> is ignored.
+
+   <H4>Returns</H4>
+
+   <P><CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_ERROR</CODE> or <CODE>SQL_INVALID_HANDLE</CODE>.</P>
+	<HR align="center" width="20%">
+</TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD class="head"><A NAME="envattr">SQLSetEnvAttr</A></TD>
+</TR>
+<TR>
+  <TD colspan="2">&nbsp</TD>
+  <TD >
+   sets attributes of environments.
+<CODE><PRE>
+SQLRETURN  SQLSetEnvAttr(SQLHENV    EnvironmentHandle, 
+                         SQLINTEGER Attribute, 
+                         SQLPOINTER ValuePtr, 
+                         SQLINTEGER StringLength); 
+</PRE></CODE>
+
+   <H4>Arguments</H4>
+   <H5>EnvironmentHandle</H5>
+   <CODE>EnvironmentHandle</CODE> must have been allocated by <CODE>SQLAllocHandle</CODE>
+
+   <H5>Attribute</H5>
+   which attribute to set
+
+   <H5>ValuePtr</H5>
+   Pointer to the value for <CODE>Attribute</CODE>. Depending on 
+   <CODE>Attribute</CODE>, <CODE>ValuePtr</CODE> will be a 32-bit integer 
+   value or a pointer to a null-terminated string.
+
+   <H5>StringLength</H5>
+   If <CODE>ValuePtr</CODE> points to a character string or a binary buffer, this 
+   argument should be the length of <CODE>*ValuePtr</CODE>.
+   Otherwise, for <CODE>ValuePtr</CODE> of type integer <CODE>StringLength</CODE> is ignored.
+
+   <H4>Returns</H4>
+
+   <CODE>SQL_SUCCESS, SQL_SUCCESS_WITH_INFO, SQL_ERROR</CODE> or <CODE>SQL_INVALID_HANDLE</CODE>.
+   <HR width="20%" align="center">
+</TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>

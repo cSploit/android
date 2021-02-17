@@ -1,0 +1,75 @@
+.TH LDAP_EXTENDED_OPERATION 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_extended_operation, ldap_extended_operation_s \- Extends the LDAP operations to the LDAP server.
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_extended_operation(
+.RS
+.ft B
+LDAP *\fIld\fB,
+const char *\fIrequestoid\fB,
+const struct berval *\fIrequestdata\fB,
+LDAPControl **\fIsctrls\fB,
+LDAPControl **\fIcctrls\fB,
+int *\fImsgidp\fB );
+.RE
+.LP
+.ft B
+int ldap_extended_operation_s(
+.RS
+.ft B
+LDAP *\fIld\fB,
+const char *\fIrequestoid\fB,
+const struct berval *\fIrequestdata\fB,
+LDAPControl **\fIsctrls\fB,
+LDAPControl **\fIcctrls\fB,
+char **\fIretoidp\fB,
+struct berval **\fIretdatap\fB );
+.RE
+.SH DESCRIPTION
+The
+.B ldap_extended_operation_s()
+routine is used to synchronously perform an LDAP extended operation.
+It takes \fIrequestoid\fP, which points to a dotted-decimal OID string
+identifying the extended operation to perform. \fIrequestdata\fP is the
+data required for the request, \fIsctrls\fP is an array of LDAPControl
+structures to use with this extended operation, \fIcctrls\fP is an array
+of LDAPControl structures that list the client controls to use with
+this extended operation.
+.LP
+The output parameter \fIretoidp\fP points to a dotted-decimal OID
+string returned by the LDAP server.  The memory used by the string
+should be freed with the
+.BR ldap_memfree (3)
+function.
+The output parameter \fIretdatap\fP points to a pointer to a berval
+structure that contains the returned data.  If no data is returned
+by the server, the pointer is set this to NULL.  The memory used by
+this structure should be freed with the
+.BR ber_bvfree (3)
+function.
+.LP
+The
+.B ldap_extended_operation()
+works just like
+.BR ldap_extended_operation_s() ,
+but the operation is asynchronous.  It provides the message id of
+the request it initiated in the integer pointed to be \fImsgidp\fP.
+The result of this operation can be obtained by calling
+.BR ldap_result(3).
+.SH SEE ALSO
+.BR ber_bvfree (3),
+.BR ldap_memfree (3),
+.BR ldap_parse_extended_result (3),
+.BR ldap_result (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

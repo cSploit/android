@@ -1,0 +1,350 @@
+/*
+ *	PROGRAM:	JRD Command Oriented Query Language
+ *	MODULE:		help.epp
+ *	DESCRIPTION:	Help module.
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ *
+ * 2002.10.30 Sean Leyne - Removed support for obsolete "PC_PLATFORM" define
+ *
+ */
+
+#include "firebird.h"
+#include <stdio.h>
+#include <string.h>
+#include "../jrd/ibase.h"
+#include "../qli/dtr.h"
+#include "../qli/compile.h"
+#include "../qli/parse.h"
+#include "../qli/err_proto.h"
+#include "../qli/help_proto.h"
+#include "../qli/lex_proto.h"
+#include "../yvalve/gds_proto.h"
+#include "../common/utils_proto.h"
+#include "../common/classes/fb_string.h"
+
+using MsgFormat::SafeArg;
+
+
+const char* INDENT	= "  ";
+const int COLUMN_WIDTH	= 20;
+const int RIGHT_MARGIN	= 70;
+
+const char* const TARGET = "help.fdb";
+
+DATABASE HELP_DB = STATIC "help.fdb" RUNTIME target;
+
+static int additional_topics(const TEXT*, const TEXT*, const TEXT*);
+static void print_more(USHORT, USHORT, const TEXT**, USHORT*, const TEXT*); //, bool);
+static void print_topic(USHORT, USHORT, const TEXT**, USHORT*, const TEXT*, bool);
+static const TEXT* strip(const TEXT*);
+
+
+void HELP_fini()
+{
+/**************************************
+ *
+ *	H E L P _ f i n i
+ *
+ **************************************
+ *
+ * Functional description
+ *
+ **************************************/
+
+	if (HELP_DB)
+	{
+		COMMIT;
+		FINISH;
+	}
+}
+
+
+void HELP_help( qli_syntax* node)
+{
+/**************************************
+ *
+ *	H E L P _ h e l p
+ *
+ **************************************
+ *
+ * Functional description
+ *	Give the poor sucker help.
+ *
+ **************************************/
+	if (!HELP_DB)
+	{
+		Firebird::PathName name = fb_utils::getPrefix(Firebird::DirType::FB_DIR_HELP, TARGET);
+		TEXT target[MAXPATHLEN];
+		name.copyTo(target, sizeof target);
+		READY
+		ON_ERROR
+			ERRQ_database_error(NULL, gds_status);
+		END_ERROR;
+		START_TRANSACTION;
+	}
+
+	USHORT max_level = 0;
+	const TEXT* topics[16];
+	const TEXT** topic = topics;
+	*topic++ = "QLI";
+
+	qli_name** ptr;
+	qli_name** end;
+	for (ptr = (qli_name**) node->syn_arg, end = ptr + node->syn_count; ptr < end; ptr++)
+	{
+		*topic++ = (*ptr)->nam_string;
+	}
+
+	print_topic(0, node->syn_count, topics, &max_level, "", false);
+
+	if (max_level < node->syn_count)
+		print_topic(0, node->syn_count, topics, &max_level, "", true);
+}
+
+
+static int additional_topics( const TEXT* parent, const TEXT* banner, const TEXT* string)
+{
+/**************************************
+ *
+ *	a d d i t i o n a l _ t o p i c s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Print a list of other known topics.
+ *
+ **************************************/
+	TEXT line[256];
+
+	// Print list of know topics.  When we find the first, print the banner, if any
+
+	TEXT* ptr = line;
+	USHORT topics = 0;
+	USHORT l = strlen(parent);
+
+	FOR X IN TOPICS
+		WITH X.PARENT EQ parent SORTED BY X.TOPIC
+		if (QLI_abort)
+			return 0;
+		const TEXT* p = X.TOPIC;
+		while (*p && *p != ' ')
+			p++;
+		if (!(l = p - X.TOPIC))
+			continue;
+		if (++topics == 1 && banner)
+			printf("%s%s%s\n", banner, string, parent);
+		p =
+			line +
+			((ptr - line + COLUMN_WIDTH - 1) / COLUMN_WIDTH) * COLUMN_WIDTH;
+		if (p + l > line + RIGHT_MARGIN)
+		{
+			*ptr = 0;
+			printf("%s%s\n", INDENT, line);
+			p = ptr = line;
+		}
+		while (ptr < p)
+			*ptr++ = ' ';
+		p = X.TOPIC;
+		do {
+			*ptr++ = *p++;
+		} while (--l);
+		*ptr++ = ' ';
+	END_FOR;
+
+	if (ptr != line)
+	{
+		*ptr = 0;
+		printf("%s%s\n", INDENT, line);
+	}
+
+	return topics;
+}
+
+
+static void print_more(USHORT level,
+					   USHORT depth,
+					   const TEXT** topics,
+					   USHORT* max_level,
+					   const TEXT* parent)
+					   //bool error_flag) // unused
+{
+/**************************************
+ *
+ *	p r i n t _ m o r e
+ *
+ **************************************
+ *
+ * Functional description
+ *	We have printed a topic with additional sub-topics.  Ask the user if he
+ *	wants more.
+ *
+ **************************************/
+	TEXT buffer[256], topic[80], prompt[80];
+
+	ERRQ_msg_get(502, prompt, sizeof(prompt));	// Msg502 "Subtopic? "
+
+	// Prompt the user for a line
+
+	if (!LEX_get_line(prompt, buffer, sizeof(buffer)))
+		return;
+
+	// Upcase the response and zap the blanks
+	TEXT* p = topic;
+	topics[1] = p;
+
+	for (const TEXT* q = buffer; *q && *q != '\n'; q++)
+		if (*q != ' ')
+			*p++ = UPPER(*q);
+	*p = 0;
+
+	// If we got anything, print the new topic
+
+	if (p != topic)
+	{
+		print_topic(level + 1, depth + 1, topics + 1, max_level, parent, false);
+		// strange, it doesn't use error_flag
+	}
+}
+
+
+static void print_topic(USHORT level,
+						USHORT depth,
+						const TEXT** topics,
+						USHORT* max_level, const TEXT* parent, bool error_flag)
+{
+/**************************************
+ *
+ *	p r i n t _ t o p i c
+ *
+ **************************************
+ *
+ * Functional description
+ *	Lookup topic in path.  If we find a topic, and are not level
+ *	zero, recurse.  Otherwise print out the topic.  In any case,
+ *	remember the lowest level on which a topic was found.  If the
+ *	error flag is set, print out a list of sub-topics.
+ *
+ **************************************/
+	TEXT string[128], banner[128], buffer[128], prompt[80];
+
+	// Copy the parent string inserting a blank at the end
+
+	TEXT* p = string;
+
+	if (*parent)
+	{
+		const TEXT* q = parent;
+		while (*q)
+			*p++ = *q++;
+		*p++ = ' ';
+	}
+
+	TEXT* const next = p;
+	USHORT count = 0;
+
+	FOR X IN TOPICS
+		WITH X.FACILITY EQ "QLI" AND
+		(X.TOPIC STARTING WITH * topics AND X.PARENT EQ parent) OR
+         (X.TOPIC = X.FACILITY AND X.TOPIC = *topics AND X.TOPIC = X.PARENT)
+        count++;
+	END_FOR;
+
+	if (count > 1)
+		ERRQ_msg_put(80, SafeArg() << count << *topics);	// Msg80 [%d topics matched %s]
+
+	count = 0;
+
+	FOR(LEVEL level) X IN TOPICS
+		WITH X.FACILITY EQ "QLI" AND
+		(X.TOPIC STARTING WITH * topics AND X.PARENT EQ parent) OR
+        (X.TOPIC = X.FACILITY AND X.TOPIC = *topics AND X.TOPIC = X.PARENT)
+		SORTED BY X.TOPIC
+
+        if (QLI_abort)
+			  return;
+
+		if (count)
+		{
+			ERRQ_msg_get(503, prompt, sizeof(prompt));
+			// Msg503 "\ntype <cr> for next topic or <EOF> to stop: "
+			if (!LEX_get_line(prompt, buffer, sizeof(buffer)))
+				return;
+		}
+		++count;
+		if (level > *max_level)
+			*max_level = level;
+		p = next;
+		const TEXT* q = X.TOPIC;
+		while (*q && *q != ' ')
+			*p++ = *q++;
+		*p = 0;
+		if (level < depth)
+			print_topic(level + 1, depth, topics + 1, max_level, string, error_flag);
+		else
+		{
+			printf("\n%s\n\n", strip(string));
+			QLI_skip_line = true;
+			FOR B IN X.TEXT
+				if (QLI_abort)
+					return;
+				B.SEGMENT[B.LENGTH] = 0;
+				printf("%s%s", INDENT, B.SEGMENT);
+			END_FOR;
+			ERRQ_msg_format(81, sizeof(banner), banner, SafeArg() << INDENT);
+			// Msg81 %sSub-topics available:
+			if (additional_topics(string, banner, INDENT))
+				print_more(level, depth, topics, max_level, string); //, error_flag);
+		}
+	END_FOR;
+
+	if (!count && error_flag && level > *max_level)
+	{
+		const TEXT* path = strip(parent);
+		ERRQ_msg_put(82, SafeArg() << path << *topics);	// Msg82 No help is available for %s %s
+		ERRQ_msg_format(83, sizeof(banner), banner, SafeArg() << path);
+		// Msg83 Sub-topics available for %s are:
+		additional_topics(parent, banner, path);
+	}
+}
+
+
+static const TEXT* strip( const TEXT* string)
+{
+/**************************************
+ *
+ *	s t r i p
+ *
+ **************************************
+ *
+ * Functional description
+ *	Strip off the first topic in the path.
+ *
+ **************************************/
+	const TEXT* p = string;
+
+	while (*p != ' ')
+		if (!*p++)
+			return string;
+
+	while (*p == ' ')
+		if (!*p++)
+			return string;
+
+	return p;
+}

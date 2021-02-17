@@ -1,0 +1,57 @@
+<VisualStudioProject ProjectType="Visual C++" Version="8.00" Name="db_sql_jdbc" ProjectGUID="{433EAC30-1CEA-11DF-8A39-0800200C9A66}">
+  <Platforms>
+    <Platform Name="Win32"/>
+    <Platform Name="x64"/>
+  </Platforms>
+  <Configurations>
+    <Configuration Name="Debug|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_sql_jdbc" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../lang/sql/generated,../../lang/sql/adapter,../../lang/sql/sqlite/src,../../lang/sql/sqlite/ext/fts3,../../lang/sql/sqlite/ext/rtree,../../lang/sql/jdbc/native" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;DB_CREATE_DLL;_UNICODE;UNICODE;HAVE_SQLITE3;HAVE_SQLITE3_MALLOC=1;HAVE_SQLITE3_PREPARE_V2=1;HAVE_SQLITE3_PREPARE16_V2=1;HAVE_SQLITE3_BIND_ZEROBLOB=1;HAVE_SQLITE3_CLEAR_BINDINGS=1;HAVE_SQLITE3_BIND_PARAMETER_COUNT=1;HAVE_SQLITE3_BIND_PARAMETER_NAME=1;HAVE_SQLITE3_BIND_PARAMETER_INDEX=1;HAVE_SQLITE3_RESULT_ZEROBLOB=1;HAVE_SQLITE3_INCRBLOBIO=1;HAVE_SQLITE3_SHARED_CACHE=1;_USRDLL" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_jdbc.pch" AssemblerListingLocation="$(OutDir)/sqlite_jni/" ObjectFile="$(OutDir)/sqlite_jni/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="libdb_sql60d.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/sqlite_jni.dll" ProgramDatabaseFile="$(OutDir)/sqlite_jni.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/sqlite_jni.lib" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool" CommandLine="&#xA;mkdir &quot;./$(OutDir)/jdbc_classes/&quot; &#xA;echo compiling JDBC classes&#xA;javac -g -target 1.5 -d &quot;$(OutDir)\jdbc_classes&quot; -classpath &quot;$(OutDir)\jdbc_classes&quot; ..\..\lang\sql\jdbc\SQLite\*java ..\..\lang\sql\jdbc\SQLite\JDBC2x\*java&#xA;echo Building JNI header files&#xA;javah -o ..\..\lang\sql\jdbc\native\sqlite_jni.h -classpath &quot;$(OutDir)\jdbc_classes&quot; SQLite.Database SQLite.Vm SQLite.FunctionContext SQLite.Stmt SQLite.Blob&#xA;echo creating jar file&#xA;jar cf &quot;$(OutDir)\jdbc.jar&quot; -C &quot;$(OutDir)\jdbc_classes&quot; .&#xA;echo JDBC build finished" Description=""/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_sql_jdbc" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../lang/sql/generated,../../lang/sql/adapter,../../lang/sql/sqlite/src,../../lang/sql/sqlite/ext/fts3,../../lang/sql/sqlite/ext/rtree,../../lang/sql/jdbc/native" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;DB_CREATE_DLL;_UNICODE;UNICODE;HAVE_SQLITE3;HAVE_SQLITE3_MALLOC=1;HAVE_SQLITE3_PREPARE_V2=1;HAVE_SQLITE3_PREPARE16_V2=1;HAVE_SQLITE3_BIND_ZEROBLOB=1;HAVE_SQLITE3_CLEAR_BINDINGS=1;HAVE_SQLITE3_BIND_PARAMETER_COUNT=1;HAVE_SQLITE3_BIND_PARAMETER_NAME=1;HAVE_SQLITE3_BIND_PARAMETER_INDEX=1;HAVE_SQLITE3_RESULT_ZEROBLOB=1;HAVE_SQLITE3_INCRBLOBIO=1;HAVE_SQLITE3_SHARED_CACHE=1;_USRDLL" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_jdbc.pch" AssemblerListingLocation="$(OutDir)/sqlite_jni/" ObjectFile="$(OutDir)/sqlite_jni/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="libdb_sql60.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/sqlite_jni.dll" ProgramDatabaseFile="$(OutDir)/sqlite_jni.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/sqlite_jni.lib" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool" CommandLine="&#xA;mkdir &quot;./$(OutDir)/jdbc_classes/&quot; &#xA;echo compiling JDBC classes&#xA;javac -g -target 1.5 -d &quot;$(OutDir)\jdbc_classes&quot; -classpath &quot;$(OutDir)\jdbc_classes&quot; ..\..\lang\sql\jdbc\SQLite\*java ..\..\lang\sql\jdbc\SQLite\JDBC2x\*java&#xA;echo Building JNI header files&#xA;javah -o ..\..\lang\sql\jdbc\native\sqlite_jni.h -classpath &quot;$(OutDir)\jdbc_classes&quot; SQLite.Database SQLite.Vm SQLite.FunctionContext SQLite.Stmt SQLite.Blob&#xA;echo creating jar file&#xA;jar cf &quot;$(OutDir)\jdbc.jar&quot; -C &quot;$(OutDir)\jdbc_classes&quot; .&#xA;echo JDBC build finished" Description=""/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Debug|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_sql_jdbc" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../lang/sql/generated,../../lang/sql/adapter,../../lang/sql/sqlite/src,../../lang/sql/sqlite/ext/fts3,../../lang/sql/sqlite/ext/rtree,../../lang/sql/jdbc/native" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;DB_CREATE_DLL;_UNICODE;UNICODE;HAVE_SQLITE3;HAVE_SQLITE3_MALLOC=1;HAVE_SQLITE3_PREPARE_V2=1;HAVE_SQLITE3_PREPARE16_V2=1;HAVE_SQLITE3_BIND_ZEROBLOB=1;HAVE_SQLITE3_CLEAR_BINDINGS=1;HAVE_SQLITE3_BIND_PARAMETER_COUNT=1;HAVE_SQLITE3_BIND_PARAMETER_NAME=1;HAVE_SQLITE3_BIND_PARAMETER_INDEX=1;HAVE_SQLITE3_RESULT_ZEROBLOB=1;HAVE_SQLITE3_INCRBLOBIO=1;HAVE_SQLITE3_SHARED_CACHE=1;_USRDLL" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_jdbc.pch" AssemblerListingLocation="$(OutDir)/sqlite_jni/" ObjectFile="$(OutDir)/sqlite_jni/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="libdb_sql60d.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/sqlite_jni.dll" ProgramDatabaseFile="$(OutDir)/sqlite_jni.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/sqlite_jni.lib" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool" CommandLine="&#xA;mkdir &quot;./$(OutDir)/jdbc_classes/&quot; &#xA;echo compiling JDBC classes&#xA;javac -g -target 1.5 -d &quot;$(OutDir)\jdbc_classes&quot; -classpath &quot;$(OutDir)\jdbc_classes&quot; ..\..\lang\sql\jdbc\SQLite\*java ..\..\lang\sql\jdbc\SQLite\JDBC2x\*java&#xA;echo Building JNI header files&#xA;javah -o ..\..\lang\sql\jdbc\native\sqlite_jni.h -classpath &quot;$(OutDir)\jdbc_classes&quot; SQLite.Database SQLite.Vm SQLite.FunctionContext SQLite.Stmt SQLite.Blob&#xA;echo creating jar file&#xA;jar cf &quot;$(OutDir)\jdbc.jar&quot; -C &quot;$(OutDir)\jdbc_classes&quot; .&#xA;echo JDBC build finished" Description=""/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_sql_jdbc" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../lang/sql/generated,../../lang/sql/adapter,../../lang/sql/sqlite/src,../../lang/sql/sqlite/ext/fts3,../../lang/sql/sqlite/ext/rtree,../../lang/sql/jdbc/native" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;DB_CREATE_DLL;_UNICODE;UNICODE;HAVE_SQLITE3;HAVE_SQLITE3_MALLOC=1;HAVE_SQLITE3_PREPARE_V2=1;HAVE_SQLITE3_PREPARE16_V2=1;HAVE_SQLITE3_BIND_ZEROBLOB=1;HAVE_SQLITE3_CLEAR_BINDINGS=1;HAVE_SQLITE3_BIND_PARAMETER_COUNT=1;HAVE_SQLITE3_BIND_PARAMETER_NAME=1;HAVE_SQLITE3_BIND_PARAMETER_INDEX=1;HAVE_SQLITE3_RESULT_ZEROBLOB=1;HAVE_SQLITE3_INCRBLOBIO=1;HAVE_SQLITE3_SHARED_CACHE=1;_USRDLL" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_jdbc.pch" AssemblerListingLocation="$(OutDir)/sqlite_jni/" ObjectFile="$(OutDir)/sqlite_jni/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="libdb_sql60.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/sqlite_jni.dll" ProgramDatabaseFile="$(OutDir)/sqlite_jni.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/sqlite_jni.lib" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool" CommandLine="&#xA;mkdir &quot;./$(OutDir)/jdbc_classes/&quot; &#xA;echo compiling JDBC classes&#xA;javac -g -target 1.5 -d &quot;$(OutDir)\jdbc_classes&quot; -classpath &quot;$(OutDir)\jdbc_classes&quot; ..\..\lang\sql\jdbc\SQLite\*java ..\..\lang\sql\jdbc\SQLite\JDBC2x\*java&#xA;echo Building JNI header files&#xA;javah -o ..\..\lang\sql\jdbc\native\sqlite_jni.h -classpath &quot;$(OutDir)\jdbc_classes&quot; SQLite.Database SQLite.Vm SQLite.FunctionContext SQLite.Stmt SQLite.Blob&#xA;echo creating jar file&#xA;jar cf &quot;$(OutDir)\jdbc.jar&quot; -C &quot;$(OutDir)\jdbc_classes&quot; .&#xA;echo JDBC build finished" Description=""/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+  </Configurations>
+  <References/>
+  <Files>
+    <File RelativePath="..\..\lang\sql\jdbc\native\sqlite_jni.c"/>
+  </Files>
+  <Globals/>
+</VisualStudioProject>

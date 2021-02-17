@@ -1,0 +1,288 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 3f6eb9ce-fbb3-4b51-a522-daa270b3ac27
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2008-01-02T20:33:03.966127Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 115
+Content-length: 115
+
+K 10
+svn:author
+V 3
+lgo
+K 8
+svn:date
+V 27
+2008-01-02T20:33:05.279494Z
+K 7
+svn:log
+V 17
+Add base folders.
+PROPS-END
+
+Node-path: project1
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project1/branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project1/tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project1/trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 110
+Content-length: 110
+
+K 10
+svn:author
+V 3
+lgo
+K 8
+svn:date
+V 27
+2008-01-02T20:33:06.265712Z
+K 7
+svn:log
+V 12
+Add folders.
+PROPS-END
+
+Node-path: project1/trunk/A
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project1/trunk/A/B
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: project1/trunk/A/B/C
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 3
+Prop-content-length: 106
+Content-length: 106
+
+K 10
+svn:author
+V 3
+lgo
+K 8
+svn:date
+V 27
+2008-01-02T20:33:07.283685Z
+K 7
+svn:log
+V 9
+Add file.
+PROPS-END
+
+Node-path: project1/trunk/A/B/C/file.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 22
+Text-content-md5: fe0e7568a5195cc8a2d60ebf93d93c5b
+Text-content-sha1: 07788068d2ea1f14b0e77ffcd1fac64a6049ab2e
+Content-length: 32
+
+PROPS-END
+content for file.txt
+
+
+
+Revision-number: 4
+Prop-content-length: 117
+Content-length: 117
+
+K 10
+svn:author
+V 3
+lgo
+K 8
+svn:date
+V 27
+2008-01-02T20:33:08.278330Z
+K 7
+svn:log
+V 19
+Add file file2.txt.
+PROPS-END
+
+Node-path: project1/trunk/A/B/C/file2.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 23
+Text-content-md5: f3659a1913324affa5d9ddc7451ce7a8
+Text-content-sha1: f27493e177fceaf3b7d25a5f28dcc194aebca0a9
+Content-length: 33
+
+PROPS-END
+content for file2.txt
+
+
+
+Revision-number: 5
+Prop-content-length: 127
+Content-length: 127
+
+K 10
+svn:author
+V 3
+lgo
+K 8
+svn:date
+V 27
+2008-01-02T20:33:12.238116Z
+K 7
+svn:log
+V 29
+move project and modify file.
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 4
+Node-copyfrom-path: project1/branches
+Prop-content-length: 34
+Content-length: 34
+
+K 13
+svn:mergeinfo
+V 0
+
+PROPS-END
+
+
+Node-path: project1/tags
+Node-action: delete
+
+
+Node-path: project1/trunk
+Node-action: delete
+
+
+Node-path: project1/branches
+Node-action: delete
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 4
+Node-copyfrom-path: project1/tags
+Prop-content-length: 34
+Content-length: 34
+
+K 13
+svn:mergeinfo
+V 0
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 4
+Node-copyfrom-path: project1/trunk
+Prop-content-length: 34
+Content-length: 34
+
+K 13
+svn:mergeinfo
+V 0
+
+PROPS-END
+
+
+Node-path: trunk/A/B/C/file.txt
+Node-kind: file
+Node-action: change
+Text-content-length: 42
+Text-content-md5: c69eb9f5054332e29a5e46a80bd3980d
+Text-content-sha1: 910ccaa860667c5216776f8aa479c1177d02df6d
+Content-length: 42
+
+content for file.txt
+
+extra line of test
+
+
+
+Revision-number: 6
+Prop-content-length: 115
+Content-length: 115
+
+K 10
+svn:author
+V 3
+lgo
+K 8
+svn:date
+V 27
+2008-01-02T20:33:14.261412Z
+K 7
+svn:log
+V 17
+removed project1.
+PROPS-END
+
+Node-path: project1
+Node-action: delete
+
+

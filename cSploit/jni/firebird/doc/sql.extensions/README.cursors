@@ -1,0 +1,70 @@
+------------
+PSQL cursors
+------------
+
+  Function:
+    Allows explicit cursor operations.
+
+  Author:
+    Dmitry Yemanov <dimitr@users.sf.net>
+
+  Syntax rules:
+    DECLARE [VARIABLE] <cursor_name> [SCROLL | NO SCROLL] CURSOR FOR ( <select_statement> );
+    OPEN <cursor_name>;
+    FETCH <cursor_name> INTO <var_name> [, <var_name> ...];
+    FETCH {NEXT | PRIOR | FIRST | LAST | ABSOLUTE <n> | RELATIVE <n>} FROM <cursor_name> INTO <var_name> [, <var_name> ...];
+    CLOSE <cursor_name>;
+    
+  Example(s):
+    1. DECLARE RNAME CHAR(31);
+       DECLARE C CURSOR FOR ( SELECT RDB$RELATION_NAME
+                              FROM RDB$RELATIONS );
+       BEGIN
+         OPEN C;
+         WHILE (1 = 1) DO
+         BEGIN
+           FETCH C INTO :RNAME;
+           IF (ROW_COUNT = 0) THEN
+             LEAVE;
+           SUSPEND;
+         END
+         CLOSE C;
+       END
+
+    2. DECLARE RNAME CHAR(31);
+       DECLARE FNAME CHAR(31);
+       DECLARE C CURSOR FOR ( SELECT RDB$FIELD_NAME
+                              FROM RDB$RELATION_FIELDS
+                              WHERE RDB$RELATION_NAME = :RNAME
+                              ORDER BY RDB$FIELD_POSITION );
+       BEGIN
+         FOR
+           SELECT RDB$RELATION_NAME
+           FROM RDB$RELATIONS
+           INTO :RNAME
+         DO
+         BEGIN
+           OPEN C;
+           FETCH C INTO :FNAME;
+           CLOSE C;
+           SUSPEND;
+         END
+       END
+
+  Note(s):
+    1. Cursor declaration is allowed only in the beginning of a PSQL block/procedure/trigger
+       (like a regular local variable declaration).
+    2. Cursor names are required to be unique in the given context. They cannot interfere
+       with FOR SELECT cursor (declared via the AS CURSOR clause) names. But a cursor can
+       share its name with any variable in this context, as possible operations are different.
+    3. Positioned updates and deletes with cursors using the WHERE CURRENT OF clause are allowed.
+    4. Attempts to fetch from or close a FOR SELECT cursor are prohibited.
+    5. Attempts to open cursor which is already open, as well as to fetch from or close cursor
+       which is already closed, will fail.
+    6. All cursors which were not explicitly closed will be closed automatically on exit of
+       the current PSQL block/procedure/trigger.
+    7. ROW_COUNT system variable can be used to check whether the last FETCH statement returned
+       any row.
+
+  See also:
+    README.context_variables

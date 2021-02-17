@@ -1,0 +1,73 @@
+OpenLDAP Software To Do List
+----------------------------
+
+This is a list of projects that need getting done.  They are defined
+by scale of the effort as opposed to priority.  Contribute to
+projects based upon your personal priorities.
+
+If you would like to work on any of these projects, please coordinate
+by posting to OpenLDAP-devel mailing list:
+  http://www.OpenLDAP.org/lists
+
+If you have a project you'd like added to the list, talk it up on
+Developer's list or just do it.
+
+Please read:
+	http://www.OpenLDAP.org/devel/programming.html
+	http://www.OpenLDAP.org/devel/contributing.html
+
+
+OpenLDAP 2.x Projects
+---------------------
+	SLAPD
+		Complete Unicode Support (ACLs, etc.)
+	client C API update
+		Implement per referral/continuation callback
+	clients (e.g. ldapsearch(1))
+		Implement referral chasing options w/ referral callback
+	Update manual pages
+
+
+Large projects
+--------------
+Implement character string localization 
+Implement X.500 administrative models (e.g. subentries (RFC 3672), etc.)
+Implement LDAP sorted search results control (RFC 2891)
+
+
+Medium projects
+---------------
+Add syncrepl turn
+Implement DIT Structure Rules and Name Forms
+Implement LDAPprep
+Implement native support for simple SASL mechanisms
+	(e.g. EXTERNAL and PLAIN)
+Redesign slapd memory allocation fault handling
+Localize tools
+
+
+Small projects
+--------------
+Add BSD kqueue(2) support to slapd(8)
+Add DSML capabilities to command line tools
+Add LDIFv2 (XML) support to command line tools
+Implement authPassword (RFC 3112)
+Implement SASLprep (RFC 4013) for LDAP (draft-ietf-ldapbis-*)
+Implement additional matching rules (RFC 3698)
+Add dumpasn1 logging support
+Add tests to test suite
+Recode linked-list structs to use <ldap_queue.h> macros
+Convert utfconv.txt into man page(s).
+Update manual pages as needed.
+
+
+For additional TODO items, see:
+  http://www.openldap.org/its/index.cgi/Software%20Enhancements
+  http://www.openldap.org/its/index.cgi/Software%20Bugs
+
+
+JLDAP TODO items, see:
+  http://www.openldap.org/devel/gitweb.cgi?p=openldap-jldap.git;a=blob_plain;f=design/todo.txt
+
+---
+$OpenLDAP$

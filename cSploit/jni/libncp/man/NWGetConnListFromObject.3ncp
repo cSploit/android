@@ -1,0 +1,63 @@
+.TH NWGETCONNLISTFROMOBJECT 3NCP 04/13/1999 "libncp (>= 2.2.0.14)"
+.\" Netware Calls Library
+.SH NAME
+NWGetConnListFromObject \- Retrieve connection list of specified object
+.SH SYNOPSIS
+.B #include <nwcalls.h>
+
+.BI "NWCCODE NWGetConnListFromObject(NWCONN_HANDLE " conn ", nuint32 " objID ","
+.BI "NWCONN_NUM " firstConn ", size_t* " noOfReturnedConns ","
+.BI "NWCONN_NUM* " connList ");"
+
+.SH DESCRIPTION
+This function retrieves connection list of specified object from server.
+
+.B conn
+.RS 3
+\fBconn\fP contains connection handle obtained from \fIncp_open\fP(3ncp) or
+\fINWParsePath\fP(3ncp).
+.RE
+
+.B objID
+.RS 3
+\fBobjID\fP contains server specific object ID. For bindery, it is object
+ID, for NDS objects it is local entry number.
+.RE
+
+.B firstConn
+.RS 3
+\fBfirstConn\fP specifies, from which connection start search. Use \fI0\fP
+on first call and highest returned value on subsequent.
+.RE
+
+.B noOfReturnedConns
+.RS 3
+\fBnoOfReturnedConns\fP contains number of returned connections. It may
+be \fINULL\fP, there is no reason for pass \fINULL\fP into this function.
+At most 125 connections are returned at once.
+.RE
+
+.B connList
+.RS 3
+\fBconnList\fP is array for returned connection numbers. It may be
+\fINULL\fP, in this case, only \fInoOfReturnedConns\fP is returned.
+\fBconnList\fP array must be able to hold 125 entries.
+.RE
+
+.SH "RETURN VALUE"
+Function returns \fBzero\fP on success and \fBnon-zero\fP on failure.
+If specified object does not exist, success is returned and 
+\fInoOfReturnedConns\fP is set to \fBzero\fP.
+.br
+If \fBnoOfReturnedConns\fP is 125, it is possible that list is incomplete
+and \fBNWGetConnListFromObject\fP should be invoked again for another
+set of connections.
+
+See \fInwerrors\fP(3ncp) for complete list of  error codes.
+
+
+.SH BUGS
+None known.
+
+.SH SEE ALSO
+.BR "nwerrors" (3ncp) ", NWGetObjectConnectionNumbers" (3ncp)

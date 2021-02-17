@@ -1,0 +1,41 @@
+.TH LDAP_TLS 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_start_tls, ldap_start_tls_s, ldap_tls_inplace, ldap_install_tls \- LDAP TLS initialization routines
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.B #include <ldap.h>
+.LP
+.BI "int ldap_start_tls(LDAP *" ld ");"
+.LP
+.BI "int ldap_start_tls_s(LDAP *" ld ", LDAPControl **" serverctrls ", LDAPControl **" clientctrls ");"
+.LP
+.BI "int ldap_tls_inplace(LDAP *" ld ");"
+.LP
+.BI "int ldap_install_tls(LDAP *" ld ");"
+.SH DESCRIPTION
+These routines are used to initiate TLS processing on an LDAP session.
+.BR ldap_start_tls_s ()
+sends a StartTLS request to a server, waits for the reply, and then installs
+TLS handlers on the session if the request succeeded. The routine returns
+.B LDAP_SUCCESS
+if everything succeeded, otherwise it returns an LDAP error code.
+.BR ldap_start_tls ()
+sends a StartTLS request to a server and does nothing else. It returns
+.B LDAP_SUCCESS
+if the request was sent successfully.
+.BR ldap_tls_inplace ()
+returns 1 if TLS handlers have been installed on the specified session, 0
+otherwise.
+.BR ldap_install_tls ()
+installs the TLS handlers on the given session. It returns
+.B LDAP_LOCAL_ERROR
+if TLS is already installed.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_error (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

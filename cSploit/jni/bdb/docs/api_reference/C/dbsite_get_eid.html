@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_SITE-&gt;get_eid()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 10.  Replication Methods" />
+    <link rel="prev" href="dbsite_get_address.html" title="DB_SITE-&gt;get_address()" />
+    <link rel="next" href="dbsite_remove.html" title="DB_SITE-&gt;remove()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_SITE-&gt;get_eid()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbsite_get_address.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 10. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbsite_remove.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbsite_get_eid"></a>DB_SITE-&gt;get_eid()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB_SITE-&gt;get_eid(DB_SITE *site, int *eidp); </pre>
+      <p>
+         The <code class="methodname">DB_SITE-&gt;get_eid()</code> method returns a
+         replication site's environment ID (EID). This method may not be
+         called before opening the database environment.
+    </p>
+      <p>
+         The <code class="methodname">DB_SITE-&gt;get_eid()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53959408"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp53959208"></a>eidp</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  References memory into which the EID will be copied.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53960488"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DB_SITE-&gt;get_eid()</code> <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp53952328"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If the database environment was not already opened; or if
+                an invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53957520"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                <a class="link" href="db_site.html" title="The DB_SITE Handle">DB_SITE</a>  
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53954096"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    <a class="xref" href="rep.html#replist" title="Replication and Related Methods">Replication and Related Methods</a>
+                </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbsite_get_address.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbsite_remove.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_SITE-&gt;get_address() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_SITE-&gt;remove()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,145 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+// Borland C++ - (C) Copyright 1994 by Borland International
+
+// isql.rh
+
+// Cursor definition
+#define ISQLCURSOR              1
+
+// String table definitions
+#define IDS_NAME                1
+#define IDS_MENUNAME            2
+#define IDS_ICONNAME            3
+#define IDS_TEMP_IN_FILE	4
+#define IDS_TEMP_OUT_FILE	5
+#define IDS_DEF_IN_FILE		6
+#define IDS_DEF_OUT_FILE	7
+#define IDS_DEF_HIST_FILE	8
+#define IDS_DEF_SESS_FILE	9
+#define	IDS_ERROR		10
+
+// EXEC menu defines
+#define IDM_QUIT                101
+#define IDM_EXEC_SQL            103
+#define IDM_HOME                104
+#define IDM_EXEC_SCRIPT         105
+#define IDM_EXTRACT_DB          106
+#define IDM_CONNECT_DB          107
+#define IDM_SAVE_SESSION        108
+#define IDM_SAVE_OUTPUT         109
+#define	IDM_CREATE_DB		138
+#define	IDM_DROP_DB		139
+
+// OPTIONS menu defines
+#define IDM_BLOB_TYPE           110
+#define IDM_STATISTICS          111
+#define IDM_COUNT               112
+#define IDM_AUTOCOMMIT          113
+#define IDM_LIST                114
+#define IDM_PLAN                115
+#define IDM_TRANSACTION         116
+#define IDM_AUTODDL             117
+#define IDM_APPEND              118
+#define IDM_CHAR_SET            119
+#define IDM_TERMINATOR          120
+
+// SHOW menu defines
+
+#define IDM_SHOW_VERSION        121
+#define IDM_SHOW_SYSTEM         122
+#define IDM_SHOW_DATABASE       123
+#define IDM_SHOW_CHECK          124
+#define IDM_SHOW_TRIGGER        125
+#define IDM_SHOW_PROCEDURE      126
+#define IDM_SHOW_GENERATOR      127
+#define IDM_SHOW_GRANT          128
+#define IDM_SHOW_FUNCTION       129
+#define IDM_SHOW_FILTER         130
+#define IDM_SHOW_EXCEPTS        131
+#define IDM_SHOW_DOMAIN         132
+#define IDM_SHOW_INDEX          133
+#define IDM_SHOW_VIEW           134
+#define IDM_SHOW_TABLE          135
+#define IDM_SHOW_SETTINGS       136
+
+// HELP menu defines
+#define IDM_HELP                137
+#define IDM_ABOUT               102
+
+// EXEC menu components
+// Exec SQL dialog box components
+#define IDD_SQL_COMMAND         16
+#define IDD_SQL_HISTORY         17
+
+// Connect DB dialog box components
+#define IDD_DB_DBNAME           18
+#define IDD_DB_USERNAME         19
+#define IDD_DB_PASSWORD         20
+
+// Extract DB dialog box components
+#define IDD_EXTRACT_OUTPUT      21
+#define IDD_EXTRACT_DBNAME      22
+#define IDD_EXTRACT_TARGET      23
+
+// Exec Script dialog box components
+#define IDD_SCRIPT_INPUT        24
+#define IDD_SCRIPT_OUTPUT       25
+
+// Save session/output dialog box components
+#define IDD_SAVE_SESSION_FILE   26
+#define IDD_SAVE_OUTPUT_FILE    27
+
+// Create DB dialog box components
+#define IDD_CREATE_DBNAME       28
+#define IDD_CREATE_USERNAME     29
+#define IDD_CREATE_PASSWORD     30
+
+// OPTIONS menu components
+
+#define IDD_BLOB_TYPE           28
+#define IDD_ALL_BLOBS           29
+#define IDD_TERMINATOR          30
+#define IDD_CHAR_SET            31
+#define IDD_TRANS_STRING        32
+
+// SHOW menu components
+#define IDD_ALL_OBJECTS         33
+#define IDD_OBJECT              34
+
+// Common Help button
+#define IDD_HELP_BUTTON         35
+
+// Dialog box resource id'S
+#define EXEC_SQL                 1
+#define ABOUT                    2
+#define EXTRACT_DB               3
+#define CONNECT_DB               4
+#define EXEC_SCRIPT              5
+#define DB_OBJECT                6
+#define BLOB_TYPE                7
+#define TERMINATOR               8
+#define CHAR_SET                 9
+#define TRANS_STRING            10
+#define SAVE_OUTPUT             11
+#define SAVE_SESSION            12
+#define	CREATE_DB		13
+#define	DROP_DB			14
+
+// end isql.rh

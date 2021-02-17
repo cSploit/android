@@ -1,0 +1,589 @@
+# $OpenLDAP$
+# Copyright 2007-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Backends
+
+Backends do the actual work of storing or retrieving data in response
+to LDAP requests. Backends may be compiled statically into {{slapd}},
+or when module support is enabled, they may be dynamically loaded.
+
+If your installation uses dynamic modules, you may need to add the
+relevant {{moduleload}} directives to the examples that follow. The
+name of the module for a backend is usually of the form:
+
+>	back_<backend name>.la
+
+So for example, if you need to load the {{hdb}} backend, you would configure
+
+>	moduleload back_hdb.la
+
+H2: Berkeley DB Backends
+
+
+H3: Overview
+
+The {{hdb}} backend to {{slapd}}(8) is the recommended primary backend for a 
+normal {{slapd}} database.  It uses the Oracle Berkeley DB ({{TERM:BDB}}) 
+package to store data. It makes extensive use of indexing and caching 
+(see the {{SECT:Tuning}} section) to speed data access.
+
+{{hdb}} is a variant of the original {{bdb}} backend which was first written for use with BDB.
+{{hdb}} uses a hierarchical database layout which supports subtree renames.
+It is otherwise identical to the {{bdb}}
+behavior, and all the same configuration options apply.
+
+Note: An {{hdb}} database needs a large {{idlcachesize}} for good search performance, 
+typically three times the {{cachesize}} (entry cache size) or larger.
+
+Note: The {{hdb}} backend has superseded the {{bdb}} backend, and both will
+are deprecated in favor of the new {{mdb}} backend. See below.
+
+H3: back-bdb/back-hdb Configuration
+
+MORE LATER
+
+H3: Further Information
+
+{{slapd-bdb}}(5)
+
+H2: LDAP
+
+
+H3: Overview
+
+The LDAP backend to {{slapd}}(8) is not an actual database; instead it acts 
+as a proxy to forward incoming requests to another LDAP server. While 
+processing requests it will also chase referrals, so that referrals are fully
+processed instead of being returned to the {{slapd}} client.
+
+Sessions that explicitly {{Bind}} to the {{back-ldap}} database always create 
+their own private connection to the remote LDAP server. Anonymous sessions 
+will share a single anonymous connection to the remote server. For sessions 
+bound through other mechanisms, all sessions with the same DN will share the 
+same connection. This connection pooling strategy can enhance the proxy's 
+efficiency by reducing the overhead of repeatedly making/breaking multiple 
+connections.
+
+The ldap database can also act as an information service, i.e. the identity 
+of locally authenticated clients is asserted to the remote server, possibly 
+in some modified form. For this purpose, the proxy binds to the remote server 
+with some administrative identity, and, if required, authorizes the asserted 
+identity. 
+
+It is heavily used by a lot of other {{SECT: Backends}} and {{SECT: Overlays}}.
+
+H3: back-ldap Configuration
+
+As previously mentioned, {{slapd-ldap(5)}} is used behind the scenes by many 
+other {{SECT: Backends}} and {{SECT: Overlays}}. Some of them merely provide a 
+few configuration directive themselves, but have available to the administrator
+the whole of the {{slapd-ldap(5)}} options. 
+
+For example, the {{SECT: Translucent Proxy}}, which retrieves entries from a 
+remote LDAP server that can be partially overridden by the defined database, has
+only four specific {{translucent-}} directives, but can be configured using any 
+of the normal {{slapd-ldap(5)}} options. See {[slapo-translucent(5)}} for details.
+
+Other {{SECT: Overlays}} allow you to tag directives in front of a normal 
+{{slapd-ldap(5)}} directive. For example, the {{slapo-chain(5)}} overlay does 
+this:
+
+{{"There are very few chain overlay specific directives; however, directives 
+related to the instances of the ldap backend that may be implicitly instantiated 
+by the overlay may assume a special meaning when used in conjunction with this 
+overlay.  They are described in slapd-ldap(5), and they also need to be prefixed 
+by chain-."}}
+
+You may have also seen the {{slapd-ldap(5)}} backend used and described in the
+{{SECT: Push Based}} {{SECT: Replication}} section of the guide.
+
+It should therefore be obvious that the {{slapd-ldap(5)}} backend is extremely
+flexible and heavily used throughout the OpenLDAP Suite.
+
+The following is a very simple example, but already the power of the {{slapd-ldap(5)}}
+backend is seen by use of a {{uri list}}:
+
+>	database        ldap
+>	suffix          "dc=suretecsystems,dc=com"
+>	rootdn          "cn=slapd-ldap"
+>	uri             ldap://localhost/ ldap://remotehost ldap://remotehost2
+
+The URI list is space or comma-separated. Whenever the server that responds 
+is not the first one in the list, the list is rearranged and the responsive 
+server is moved to the head, so that it will be first contacted the next time 
+a connection needs be created.
+
+This feature can be used to provide a form of load balancing when using 
+{{SECT: MirrorMode replication}}.
+
+H3: Further Information
+
+{{slapd-ldap}}(5)
+
+H2: LDIF
+
+
+H3: Overview
+
+The LDIF backend to {{slapd}}(8) is a basic storage backend that stores 
+entries in text files in LDIF format, and exploits the filesystem to create 
+the tree structure of the database. It is intended as a cheap, low performance 
+easy to use backend.
+
+When using the {{cn=config}} dynamic configuration database with persistent
+storage, the configuration data is stored using this backend. See {{slapd-config}}(5)
+for more information
+
+H3: back-ldif Configuration
+
+Like many other backends, the LDIF backend can be instantiated with very few
+configuration lines:
+
+>	include ./schema/core.schema
+>	
+>	database  ldif
+>	directory ./ldif
+>	suffix    "dc=suretecsystems,dc=com"
+>	rootdn    "cn=LDIF,dc=suretecsystems,dc=com"
+>	rootpw    LDIF
+
+If we add the {{dcObject}} for {{dc=suretecsystems,dc=com}}, you can see how this
+is added behind the scenes on the file system:
+
+>   dn: dc=suretecsystems,dc=com
+>   objectClass: dcObject
+>   objectClass: organization
+>   dc: suretecsystems
+>   o: Suretec Systems Ltd
+
+Now we add it to the directory:
+
+>   ldapadd -x -H ldap://localhost:9011 -f suretec.ldif -D "cn=LDIF,dc=suretecsystems,dc=com" -w LDIF
+>   adding new entry "dc=suretecsystems,dc=com"
+
+And inside {{F: ./ldif}} we have:
+
+>   ls ./ldif
+>   dc=suretecsystems,dc=com.ldif
+
+which again contains:
+
+>   cat ldif/dc\=suretecsystems\,dc\=com.ldif 
+>   
+>   dn: dc=suretecsystems
+>   objectClass: dcObject
+>   objectClass: organization
+>   dc: suretecsystems
+>   o: Suretec Systems Ltd.
+>   structuralObjectClass: organization
+>   entryUUID: 2134b714-e3a1-102c-9a15-f96ee263886d
+>   creatorsName: cn=LDIF,dc=suretecsystems,dc=com
+>   createTimestamp: 20080711142643Z
+>   entryCSN: 20080711142643.661124Z#000000#000#000000
+>   modifiersName: cn=LDIF,dc=suretecsystems,dc=com
+>   modifyTimestamp: 20080711142643Z
+
+This is the complete format you would get when exporting your directory using
+{{F: slapcat}} etc.
+
+H3: Further Information
+
+{{slapd-ldif}}(5)
+
+H2: LMDB
+
+
+H3: Overview
+
+The {{mdb}} backend to {{slapd}}(8) is the upcoming primary backend for a
+normal {{slapd}} database.  It uses OpenLDAP's own
+Lightning Memory-Mapped Database ({{TERM:LMDB}})
+library to store data and is intended to replace the Berkeley DB backends.
+
+It supports indexing like the BDB backends, but it uses no caching and requires
+no tuning to deliver maximum search performance.  Like {{hdb}}, it is also
+fully hierarchical and supports subtree renames in constant time.
+
+H3: back-mdb Configuration
+
+Unlike the BDB backends, the {{mdb}} backend can be instantiated with very few
+configuration lines:
+
+>	include ./schema/core.schema
+>
+>	database  mdb
+>	directory ./mdb
+>	suffix    "dc=suretecsystems,dc=com"
+>	rootdn    "cn=mdb,dc=suretecsystems,dc=com"
+>	rootpw    mdb
+>	maxsize   1073741824
+
+In addition to the usual parameters that a minimal configuration requires, the {{mdb}}
+backend requires a maximum size to be set. This should be the largest that
+the database is ever anticipated to grow (in bytes). The filesystem must also
+provide enough free space to accommodate this size.
+
+H3: Further Information
+
+{{slapd-mdb}}(5)
+
+H2: Metadirectory
+
+
+H3: Overview
+
+The meta backend to {{slapd}}(8) performs basic LDAP proxying with respect 
+to a set of remote LDAP servers, called "targets". The information contained 
+in these servers can be presented as belonging to a single Directory Information 
+Tree ({{TERM:DIT}}).
+
+A basic knowledge of the functionality of the {{slapd-ldap}}(5) backend is 
+recommended. This backend has been designed as an enhancement of the ldap 
+backend. The two backends share many features (actually they also share portions
+ of code). While the ldap backend is intended to proxy operations directed 
+ to a single server, the meta backend is mainly intended for proxying of 
+ multiple servers and possibly naming context  masquerading.
+
+These features, although useful in many scenarios, may result in excessive 
+overhead for some applications, so its use should be carefully considered.
+
+
+H3: back-meta Configuration
+
+LATER
+
+H3: Further Information
+
+{{slapd-meta}}(5)
+
+H2: Monitor
+
+
+H3: Overview
+
+The monitor backend to {{slapd}}(8) is not an actual database; if enabled, 
+it is automatically generated and dynamically maintained by slapd with 
+information about the running status of the daemon.
+
+To inspect all monitor information, issue a subtree search with base {{cn=Monitor}}, 
+requesting that attributes "+" and "*" are returned. The monitor backend produces 
+mostly operational attributes, and LDAP only returns operational attributes 
+that are explicitly requested.  Requesting attribute "+" is an extension which 
+requests all operational attributes.
+
+See the {{SECT:Monitoring}} section.
+
+H3: back-monitor Configuration
+
+The monitor database can be instantiated only once, i.e. only one occurrence 
+of "database monitor" can occur in the {{slapd.conf(5)}} file.  Also the suffix 
+is automatically set to {{"cn=Monitor"}}.
+
+You can however set a {{rootdn}} and {{rootpw}}. The following is all that is
+needed to instantiate a monitor backend:
+
+>	include ./schema/core.schema
+>	
+>	database monitor
+>	rootdn "cn=monitoring,cn=Monitor"
+>	rootpw monitoring
+
+You can also apply Access Control to this database like any other database, for 
+example:
+
+>	access to dn.subtree="cn=Monitor"
+>	     by dn.exact="uid=Admin,dc=my,dc=org" write
+>	     by users read
+>	     by * none
+
+Note: The {{F: core.schema}} must be loaded for the monitor database to work. 
+
+A small example of the data returned via {{ldapsearch}} would be:
+
+>	ldapsearch -x -H ldap://localhost:9011 -b 'cn=Monitor'
+>	# extended LDIF
+>	#
+>	# LDAPv3
+>	# base <cn=Monitor> with scope subtree
+>	# filter: (objectclass=*)
+>	# requesting: ALL
+>	#
+>	
+>	# Monitor
+>	dn: cn=Monitor
+>	objectClass: monitorServer
+>	cn: Monitor
+>	description: This subtree contains monitoring/managing objects.
+>	description: This object contains information about this server.
+>	description: Most of the information is held in operational attributes, which 
+>	 must be explicitly requested.
+>	
+>	# Backends, Monitor
+>	dn: cn=Backends,cn=Monitor
+>	objectClass: monitorContainer
+>	cn: Backends
+>	description: This subsystem contains information about available backends.
+
+Please see the {{SECT: Monitoring}} section for complete examples of information
+available via this backend.
+
+H3: Further Information
+
+{{slapd-monitor}}(5)
+
+H2: Null
+
+
+H3: Overview
+
+The Null backend to {{slapd}}(8) is surely the most useful part of slapd:
+
+* Searches return success but no entries.
+* Compares return compareFalse.
+* Updates return success (unless readonly is on) but do nothing.
+* Binds other than as the rootdn fail unless the database option "bind on" is given.
+* The slapadd(8) and slapcat(8) tools are equally exciting.
+
+Inspired by the {{F:/dev/null}} device.
+
+H3: back-null Configuration
+
+This has to be one of the shortest configurations you'll ever do. In order to 
+test this, your {{F: slapd.conf}} file would look like:
+
+>	database null
+>	suffix "cn=Nothing"
+>	bind on
+
+{{bind on}} means:
+
+{{"Allow binds as any DN in this backend's suffix, with any password. The default is "off"."}}
+
+To test this backend with {{ldapsearch}}:
+
+>	ldapsearch -x -H ldap://localhost:9011 -D "uid=none,cn=Nothing" -w testing -b 'cn=Nothing'
+>	# extended LDIF
+>	#
+>	# LDAPv3
+>	# base <cn=Nothing> with scope subtree
+>	# filter: (objectclass=*)
+>	# requesting: ALL
+>	#
+>	
+>	# search result
+>	search: 2
+>	result: 0 Success
+>	
+>	# numResponses: 1
+
+
+H3: Further Information
+
+{{slapd-null}}(5)
+
+H2: Passwd
+
+
+H3: Overview
+
+The PASSWD backend to {{slapd}}(8) serves up the user account information 
+listed in the system {{passwd}}(5) file (defaulting to {{F: /etc/passwd}}).
+
+This backend is provided for demonstration purposes only. The DN of each entry 
+is "uid=<username>,<suffix>".
+
+H3: back-passwd Configuration
+
+The configuration using {{F: slapd.conf}} a slightly longer, but not much. For 
+example:
+
+>	include ./schema/core.schema
+>	
+>	database passwd
+>	suffix "cn=passwd"
+
+Again, testing this with {{ldapsearch}} would result in something like:
+
+>	ldapsearch -x -H ldap://localhost:9011 -b 'cn=passwd'
+>	# extended LDIF
+>	#
+>	# LDAPv3
+>	# base <cn=passwd> with scope subtree
+>	# filter: (objectclass=*)
+>	# requesting: ALL
+>	#
+>	
+>	# passwd
+>	dn: cn=passwd
+>	cn: passwd
+>	objectClass: organizationalUnit
+>	
+>	# root, passwd
+>	dn: uid=root,cn=passwd
+>	objectClass: person
+>	objectClass: uidObject
+>	uid: root
+>	cn: root
+>	sn: root
+>	description: root
+
+
+H3: Further Information
+
+{{slapd-passwd}}(5)
+
+H2: Perl/Shell
+
+H3: Overview
+
+The Perl backend to {{slapd}}(8) works by embedding a {{perl}}(1) interpreter 
+into {{slapd}}(8). Any perl database section of the configuration file 
+{{slapd.conf}}(5) must then specify what Perl module to use. Slapd then creates 
+a new Perl object that handles all the requests for that particular instance of the backend.
+
+The Shell backend to {{slapd}}(8) executes external programs to implement 
+operations, and is designed to make it easy to tie an existing database to the 
+slapd front-end. This backend is is primarily intended to be used in prototypes.
+
+H3: back-perl/back-shell Configuration
+
+LATER
+
+H3: Further Information
+
+{{slapd-shell}}(5) and {{slapd-perl}}(5)
+
+H2: Relay
+
+
+H3: Overview
+
+The primary purpose of this {{slapd}}(8) backend is to map a naming context 
+defined in a database running in the same {{slapd}}(8) instance into a 
+virtual naming context, with attributeType and objectClass manipulation, if
+required. It requires the rwm overlay.
+
+This backend and the above mentioned overlay are experimental.
+
+H3: back-relay Configuration
+
+LATER
+
+H3: Further Information
+
+{{slapd-relay}}(5)
+
+H2: SQL
+
+
+H3: Overview
+
+The primary purpose of this {{slapd}}(8) backend is to PRESENT information 
+stored in some RDBMS as an LDAP subtree without any programming (some SQL and 
+maybe stored procedures can't be considered programming, anyway ;).
+
+That is, for example, when you (some ISP) have account information you use in 
+an RDBMS, and want to use modern solutions that expect such information in LDAP 
+(to authenticate users, make email lookups etc.). Or you want to synchronize or 
+distribute information between different sites/applications that use RDBMSes 
+and/or LDAP. Or whatever else...
+
+It is {{B:NOT}} designed as a general-purpose backend that uses RDBMS instead of 
+BerkeleyDB (as the standard BDB backend does), though it can be used as such with 
+several limitations. Please see {{SECT: LDAP vs RDBMS}} for discussion.
+
+The idea is to use some meta-information to translate LDAP queries to SQL queries, 
+leaving relational schema untouched, so that old applications can continue using 
+it without any modifications. This allows SQL and LDAP applications to interoperate 
+without replication, and exchange data as needed.
+
+The SQL backend is designed to be tunable to virtually any relational schema without 
+having to change source (through that meta-information mentioned). Also, it uses 
+ODBC to connect to RDBMSes, and is highly configurable for SQL dialects RDBMSes 
+may use, so it may be used for integration and distribution of data on different 
+RDBMSes, OSes, hosts etc., in other words, in highly heterogeneous environments.
+
+This backend is experimental.
+
+H3: back-sql Configuration
+
+This backend has to be one of the most abused and complex backends there is. 
+Therefore, we will go through a simple, small example that comes with the 
+OpenLDAP source and can be found in {{F: servers/slapd/back-sql/rdbms_depend/README}}
+
+For this example we will be using PostgreSQL.
+
+First, we add to {{F: /etc/odbc.ini}} a block of the form:
+
+>	[example]                        <===
+>	Description         = Example for OpenLDAP's back-sql
+>	Driver              = PostgreSQL
+>	Trace               = No
+>	Database            = example    <===
+>	Servername          = localhost
+>	UserName            = manager    <===
+>	Password            = secret     <===
+>	Port                = 5432
+>	;Protocol            = 6.4
+>	ReadOnly            = No
+>	RowVersioning       = No
+>	ShowSystemTables    = No
+>	ShowOidColumn       = No
+>	FakeOidIndex        = No
+>	ConnSettings        =
+
+The relevant information for our test setup is highlighted with '<===' on the 
+right above.
+
+Next, we add to {{F: /etc/odbcinst.ini}} a block of the form:
+
+>	[PostgreSQL]
+>	Description     = ODBC for PostgreSQL
+>	Driver          = /usr/lib/libodbcpsql.so
+>	Setup           = /usr/lib/libodbcpsqlS.so
+>	FileUsage       = 1
+
+
+We will presume you know how to create a database and user in PostgreSQL and 
+how to set a password. Also, we'll presume you can populate the 'example'
+database you've just created with the following files, as found in {{F: servers/slapd/back-sql/rdbms_depend/pgsql }} 
+
+>	backsql_create.sql, testdb_create.sql, testdb_data.sql, testdb_metadata.sql
+
+Lastly, run the test:
+
+>	[root@localhost]# cd $SOURCES/tests
+>	[root@localhost]# SLAPD_USE_SQL=pgsql ./run sql-test000
+
+Briefly, you should see something like (cut short for space):
+
+>	Cleaning up test run directory leftover from previous run.
+>	Running ./scripts/sql-test000-read...
+>	running defines.sh
+>	Starting slapd on TCP/IP port 9011...
+>	Testing SQL backend read operations...
+>	Waiting 5 seconds for slapd to start...
+>	Testing correct bind... dn:cn=Mitya Kovalev,dc=example,dc=com
+>	Testing incorrect bind (should fail)... ldap_bind: Invalid credentials (49)
+>	
+>	......
+>	
+>	Filtering original ldif...
+>	Comparing filter output...
+>	>>>>> Test succeeded
+
+The test is basically readonly; this can be performed by all RDBMSes 
+(listed above). 
+
+There is another test, sql-test900-write, which is currently enabled
+only for PostgreSQL and IBM db2.
+
+Using {{F: sql-test000}}, files in {{F: servers/slapd/back-sql/rdbms_depend/pgsql/}}
+and the man page, you should be set.
+
+Note: This backend is experimental.
+
+H3: Further Information
+
+{{slapd-sql}}(5) and {{F: servers/slapd/back-sql/rdbms_depend/README}}

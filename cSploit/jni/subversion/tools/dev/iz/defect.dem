@@ -1,0 +1,6 @@
+set title "Subversion DEFECT Activity"
+set boxwidth 0.5
+set data style lines
+set key 10, 60
+plot "/tmp/points.found.DEFECT" title "found" with boxes, "/tmp/points.fixed.DEFECT" title "fixed" with boxes, "/tmp/points.avg.DEFECT" title "moving avg", "/tmp/points.open.DEFECT" title "open"
+pause -1 "Hit return to continue"

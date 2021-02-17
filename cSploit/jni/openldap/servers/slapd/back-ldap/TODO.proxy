@@ -1,0 +1,101 @@
+back-proxy
+
+A proxy that handles a pool of URI associated to a unique suffix.
+Each request is spread over the different URIs and results are
+masqueraded to appear as coming from a unique server.
+
+Suppose a company has two branches, whose existing DS have URIs
+
+"ldap://ldap.branch1.com/o=Branch 1, c=US"
+"ldap://ldap.branch2.it/o=Branch 2, c=IT"
+
+and it wants to propose to the outer world as a unique URI
+
+"ldap://ldap.company.net/dc=company, dc=net"
+
+It could do some rewriting to map everything that comes in with a base DN
+of "o=Branch 1, dc=company, dc=net" as the URI of the Branch 1, and
+everything that comes in with a base DN of "o=Branch 2, dc=company, dc=net"
+as the URI of Branch 2, and by rewriting all the DNs back to the new, uniform 
+base. Everything that comes in with a base DN of "dc=company, dc=net" should 
+be handled locally and propagated to the two branch URIs if a subtree 
+(or at least onelevel) search is required.
+
+Operations:
+
+- bind
+- unbind
+- search
+- compare
+- add
+- modify
+- modrdn
+- delete
+- abandon
+
+The input of each operation may be related to:
+
+		exact DN	exact parent	ancestor
+-------------------------------------------------------------
+bind		x
+unbind
+search		x		x		x
+compare		x
+add				x
+modify		x
+modrdn		x
+delete		x
+abandon
+
+The backend must rely on a DN fetching mechanism. Each operation requires
+to determine as early as possible which URI will be able to satisfy it.
+Apart from searches, which by definition are usually allowed to return
+multiple results, and apart from unbind and abandon, which do not return any
+result, all the remaining operations require the related entry to be unique.
+
+A major problem isposed by the uniqueness of the DNs. As far as the suffixes
+are masqueraded by a common suffix, the DNs are no longer guaranteed to be
+unique. This backend relies on the assumption that the uniqueness of the
+DNs is guaranteed.
+
+Two layers of depth in DN fetching are envisaged.
+The first layer is provided by a backend-side cache made of previously
+retrieved entries. The cache relates each RDN (i.e. the DN apart from the
+common suffix) to the pool of URIs that are expected to contain a subset
+of its children.
+
+The second layer is provided by a fetching function that spawns a search for
+each URI in the pool determined by the cache if the correct URI has not been 
+directly determined.
+
+Note that, as the remote servers may have been updated by some direct
+operation, this mechanism does not guarantee the uniqueness of the result.
+So write operations will require to skip the cache search and to perform
+the exaustive search of all the URIs unless some hint mechanism is provided
+to the backend (e.g. a server is read-only).
+
+Again, the lag between the fetching of the required DN and the actual
+read/write may result in a failure; however, this applies to any LDAP 
+operation AFAIK.
+
+- bind
+if updates are to be strictly honored, a bind operation is performed against
+each URI; otherwise, it is performed against the URIs resulting from a
+cache-level DN fetch.
+
+- unbind
+nothing to say; all the open handles related to the connection are reset.
+
+- search
+if updates are to be strictly honored, a search operation is performed agaist
+each URI. Note that this needs be performed also when the backend suffix
+is used as base. In case the base is stricter, the URI pool may be restricted 
+by performing a cache DN fetch of the base first.
+
+- compare
+the same applies to the compare DN.
+
+- add
+this operation is delicate. Unless the DN up to the top-level part excluded
+can be uniquely associated to a URI, and unless its uniqueness can be trusted,
+no add operation should be allowed.

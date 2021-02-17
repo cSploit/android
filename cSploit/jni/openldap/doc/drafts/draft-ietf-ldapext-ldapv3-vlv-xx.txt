@@ -1,0 +1,739 @@
+
+Internet-Draft                                 D. Boreham, Bozeman Pass 
+LDAPext Working Group                            J. Sermersheim, Novell 
+Intended Category: Standards Track                  A. Kashi, Microsoft 
+<draft-ietf-ldapext-ldapv3-vlv-09.txt>                                  
+Expires: Jun 2003                                              Nov 2002 
+    
+    
+       LDAP Extensions for Scrolling View Browsing of Search Results 
+    
+    
+1. Status of this Memo 
+    
+   This document is an Internet-Draft and is in full conformance with 
+   all provisions of Section 10 of RFC2026. 
+    
+   Internet-Drafts are working documents of the Internet Engineering 
+   Task Force (IETF), its areas, and its working groups. Note that other 
+   groups may also distribute working documents as Internet-Drafts. 
+    
+   Internet-Drafts are draft documents valid for a maximum of six months 
+   and may be updated, replaced, or obsoleted by other documents at any 
+   time. It is inappropriate to use Internet-Drafts as reference 
+   material or to cite them other than as "work in progress." 
+    
+   The list of current Internet-Drafts can be accessed at 
+   http://www.ietf.org/ietf/1id-abstracts.txt 
+    
+   The list of Internet-Draft Shadow Directories can be accessed at 
+   http://www.ietf.org/shadow.html. 
+    
+   This document is intended to be submitted, after review and revision, 
+   as a Standards Track document. Distribution of this memo is 
+   unlimited. 
+   Please send comments to the authors. 
+    
+    
+2. Abstract 
+    
+   This document describes a Virtual List View extension for the 
+   Lightweight Directory Access Protocol (LDAP) Search operation. This 
+   extension is designed to allow the "virtual list box" feature, common 
+   in existing commercial e-mail address book applications, to be 
+   supported efficiently by LDAP servers. LDAP servers' inability to 
+   support this client feature is a significant impediment to LDAP 
+   replacing proprietary protocols in commercial e-mail systems. 
+    
+   The extension allows a client to specify that the server return, for 
+   a given LDAP search with associated sort keys, a contiguous subset of 
+   the search result set. This subset is specified in terms of offsets 
+   into the ordered list, or in terms of a greater than or equal 
+   comparison value. 
+    
+    
+   Boreham et al           Internet-Draft                             1 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+3. Conventions used in this document 
+   The key words "MUST", "SHALL", "SHOULD", "SHOULD NOT", and "MAY" in 
+   this document are to be interpreted as described in RFC 2119 
+   [Bradner97]. 
+    
+   Protocol elements are described using ASN.1 [X.680].  The term "BER-
+   encoded" means the element is to be encoded using the Basic Encoding 
+   Rules [X.690] under the restrictions detailed in Section 5.1 of 
+   [LDAPPROT]. 
+    
+   The phrase "subsequent virtual list request" is used in this document 
+   to describe a search request accompanied by a VirtualListViewRequest 
+   control, where the search base, scope, and filter are the same as a 
+   previous search request also accompanied by a VirtualListViewRequest 
+   control, and where the contextID of the subsequent 
+   VirtualListViewRequest control, is set to that of the contextID in 
+   the VirtualListViewResponse control that accompanied the previous 
+   search response. 
+    
+   The phrase "contiguous virtual list request" is used to describe a 
+   subsequent virtual list request which is requesting search results 
+   adjoining or overlapping the result returned from the prior virtual 
+   list request.  
+    
+    
+4. Background 
+    
+   A Virtual List is a graphical user interface technique employed where 
+   ordered lists containing a large number of entries need to be 
+   displayed. A window containing a small number of visible list entries 
+   is drawn. The visible portion of the list may be relocated to 
+   different points within the list by means of user input. This input 
+   can be to a scroll bar slider; from cursor keys; from page up/down 
+   keys; from alphanumeric keys for "typedown". The user is given the 
+   impression that they may browse the complete list at will, even 
+   though it may contain millions of entries. It is the fact that the 
+   complete list contents are never required at any one time that 
+   characterizes Virtual List View. Rather than fetch the complete list 
+   from wherever it is stored (typically from disk or a remote server), 
+   only that information which is required to display the part of the 
+   list currently in view is fetched. The subject of this document is 
+   the interaction between client and server required to implement this 
+   functionality in the context of the results from an ordered [SSS] 
+   Lightweight Directory Access Protocol (LDAP) search operation 
+   [LDAPPROT]. 
+    
+   For example, suppose an e-mail address book application displays a 
+   list view onto the list containing the names of all the holders of e-
+   mail accounts at a large university. The list is ordered 
+   alphabetically. While there may be tens of thousands of entries in 
+   this list, the address book list view displays only 20 such accounts 
+    
+   Boreham et al           Internet-Draft                             2 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+   at any one time. The list has an accompanying scroll bar and text 
+   input window for type-down. When first displayed, the list view shows 
+   the first 20 entries in the list, and the scroll bar slider is 
+   positioned at the top of its range. Should the user drag the slider 
+   to the bottom of its range, the displayed contents of the list view 
+   should be updated to show the last 20 entries in the list. Similarly, 
+   if the slider is positioned somewhere in the middle of its travel, 
+   the displayed contents of the list view should be updated to contain 
+   the 20 entries located at that relative position within the complete 
+   list. Starting from any display point, if the user uses the cursor 
+   keys or clicks on the scroll bar to request that the list be scrolled 
+   up or down by one entry, the displayed contents should be updated to 
+   reflect this. Similarly the list should be displayed correctly when 
+   the user requests a page scroll up or down. Finally, when the user 
+   types characters in the type-down window, the displayed contents of 
+   the list should "jump" or "seek" to the appropriate point within the 
+   list. For example, if the user types "B", the displayed list could 
+   center around the first user with a name beginning with the letter 
+   "B". When this happens, the scroll bar slider should also be updated 
+   to reflect the new relative location within the list. 
+    
+   This document defines a request control which extends the LDAP search 
+   operation. Always used in conjunction with the server side sorting 
+   control [SSS], this allows a client to retrieve selected portions of 
+   large search result set in a fashion suitable for the implementation 
+   of a virtual list view. 
+    
+    
+5. Client-Server Interaction 
+    
+   The Virtual List View control extends a regular LDAP Search operation 
+   which MUST also include a server-side sorting control [SSS]. Rather 
+   than returning the complete set of appropriate SearchResultEntry 
+   messages, the server is instructed to return a contiguous subset of 
+   those entries, taken from the ordered result set, centered around a 
+   particular target entry. Henceforth, in the interests of brevity, the 
+   ordered search result set will be referred to as "the list". 
+    
+   The sort control may contain any sort specification valid for the 
+   server. The attributeType field in the first SortKeyList sequence 
+   element has special significance for "typedown". The Virtual List 
+   View control acts upon a set of ordered entries and this order must 
+   be repeatable for all subsequent virtual list requests. The server-
+   side sorting control is intended to aid in this ordering, but other 
+   mechanisms may need to be employed to produce a repeatable order--
+   especially for entries that don't have a value of the sort key. 
+    
+   The desired target entry and the number of entries to be returned, 
+   both before and after that target entry in the list, are determined 
+   by the client's VirtualListViewRequest control. 
+    
+    
+   Boreham et al           Internet-Draft                             3 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+   When the server returns the set of entries to the client, it attaches 
+   a VirtualListViewResponse control to the SearchResultDone message. 
+   The server returns in this control: its current estimate for the list 
+   content count, the location within the list corresponding to the 
+   target entry, any error codes, and optionally a context identifier. 
+    
+   The target entry is specified in the VirtualListViewRequest control 
+   by one of two methods. The first method is for the client to indicate 
+   the target entry's offset within the list. The second way is for the 
+   client to supply an attribute assertion value. The value is compared 
+   against the values of the attribute specified as the primary sort key 
+   in the sort control attached to the search operation. The first sort 
+   key in the SortKeyList is the primary sort key. The target entry is 
+   the first entry in the list with value greater than or equal to (in 
+   the primary sort order), the presented value. The order is determined 
+   by rules defined in [SSS]. Selection of the target entry by this 
+   means is designed to implement "typedown". Note that it is possible 
+   that no entry satisfies these conditions, in which case there is no 
+   target entry. This condition is indicated by the server returning the 
+   special value contentCount + 1 in the target position field.  
+    
+   Because the server may not have an accurate estimate of the number of 
+   entries in the list, and to take account of cases where the list size 
+   is changing during the time the user browses the list, and because 
+   the client needs a way to indicate specific list targets "beginning" 
+   and "end", offsets within the list are transmitted between client and 
+   server as ratios---offset to content count. The server sends its 
+   latest estimate as to the number of entries in the list (content 
+   count) to the client in every response control. The client sends its 
+   assumed value for the content count in every request control. The 
+   server examines the content count and offsets presented by the client 
+   and computes the corresponding offsets within the list, based on its 
+   own idea of the content count. 
+    
+        Si = Sc * (Ci / Cc) 
+    
+        Where: 
+        Si is the actual list offset used by the server 
+        Sc is the server's estimate for content count 
+        Ci is the client's submitted offset 
+        Cc is the client's submitted content count 
+        The result is rounded to the nearest integer. 
+    
+   If the content count is stable, and the client returns to the server 
+   the content count most recently received, Cc = Sc and the offsets 
+   transmitted become the actual server list offsets. 
+    
+   The following special cases exist when the client is specifying the 
+   offset and content count:  
+   - an offset of one and a content count of non-one (Ci = 1, Cc != 1) 
+     indicates that the target is the first entry in the list. 
+    
+   Boreham et al           Internet-Draft                             4 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+   - equivalent values (Ci = Cc) indicate that the target is the last 
+     entry in the list. 
+   - a content count of zero (Cc = 0, Ci != 0) means the client has no 
+     idea what the content count is, the server MUST use its own 
+     content count estimate in place of the client's. 
+    
+   Because the server always returns contentCount and targetPosition, 
+   the client can always determine which of the returned entries is the 
+   target entry. Where the number of entries returned is the same as the 
+   number requested, the client is able to identify the target by simple 
+   arithmetic. Where the number of entries returned is not the same as 
+   the number requested (because the requested range crosses the 
+   beginning or end of the list, or both), the client MUST use the 
+   target position and content count values returned by the server to 
+   identify the target entry. For example, suppose that 10 entries 
+   before and 10 after the target were requested, but the server returns 
+   13 entries, a content count of 100 and a target position of 3. The 
+   client can determine that the first entry must be entry number 1 in 
+   the list, therefore the 13 entries returned are the first 13 entries 
+   in the list, and the target is the third one. 
+    
+   A server-generated contextID MAY be returned to clients. A client 
+   receiving a contextID MUST return it unchanged or not return it at 
+   all, in a subsequent request which relates to the same list. The 
+   purpose of this interaction is to maintain state information between 
+   the client and server. 
+    
+    
+6. The Controls 
+    
+   Support for the virtual list view control extension is indicated by 
+   the presence of the OID "2.16.840.1.113730.3.4.9" in the 
+   supportedControl attribute of a server's root DSE. 
+    
+6.1. Request Control 
+    
+   This control is included in the SearchRequest message as part of the 
+   controls field of the LDAPMessage, as defined in Section 4.1.12 of 
+   [LDAPPROT]. The controlType is set to "2.16.840.1.113730.3.4.9". If 
+   this control is included in a SearchRequest message, a Server Side 
+   Sorting request control [SSS] MUST also be present in the message. 
+   The controlValue, an OCTET STRING, is the BER-encoding of the 
+   following SEQUENCE: 
+    
+   VirtualListViewRequest ::= SEQUENCE { 
+          beforeCount    INTEGER (0..maxInt), 
+          afterCount     INTEGER (0..maxInt), 
+          target       CHOICE { 
+                         byOffset        [0] SEQUENCE {                           
+                              offset          INTEGER (1 .. maxInt), 
+                              contentCount    INTEGER (0 .. maxInt) }, 
+    
+   Boreham et al           Internet-Draft                             5 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+                         greaterThanOrEqual [1] AssertionValue }, 
+          contextID     OCTET STRING OPTIONAL } 
+    
+   beforeCount indicates how many entries before the target entry the 
+   client wants the server to send.  
+    
+   afterCount indicates the number of entries after the target entry the 
+   client wants the server to send.  
+    
+   offset and contentCount identify the target entry as detailed in 
+   section 5.  
+    
+   greaterThanOrEqual is a matching rule assertion value defined in 
+   [LDAPPROT]. The assertion value is encoded according to the ORDERING 
+   matching rule for the attributeDescription in the sort control [SSS]. 
+   If present, the value supplied in greaterThanOrEqual is used to 
+   determine the target entry by comparison with the values of the 
+   attribute specified as the primary sort key. The first list entry 
+   who's value is no less than (less than or equal to when the sort 
+   order is reversed) the supplied value is the target entry.  
+    
+   If present, the contextID field contains the value of the most 
+   recently received contextID field from a VirtualListViewResponse 
+   control for the same list view. If the contextID is not known because 
+   no contextID has been sent by the server in a VirtualListViewResponse 
+   control, it SHALL be omitted. If the server receives a contextID that 
+   is invalid, it SHALL fail the search operation and indicate the 
+   failure with a protocolError (3) value in the virtualListViewResult 
+   field of the VirtualListViewResponse. The contextID provides state 
+   information between the client and server. This state information is 
+   used by the server to ensure continuity contiguous virtual list 
+   requests. When a server receives a VirtualListViewRequest control 
+   that includes a contextID, it SHALL determine whether the client has 
+   sent a contiguous virtual list request and SHALL provide contiguous 
+   entries if possible. If a valid contextID is sent, and the server is 
+   unable to determine whether contiguous data is requested, or is 
+   unable to provide requested contiguous data, it SHALL fail the search 
+   operation and indicate the failure with an unwillingToPerform (53) 
+   value in the virtualListViewResult field of the 
+   VirtualListViewResponse. contextID values have no validity outside 
+   the connection and query with which they were received. A client MUST 
+   NOT submit a contextID which it received from a different connection, 
+   a different query, or a different server. 
+    
+   The type AssertionValue and value maxInt are defined in [LDAPPROT]. 
+    
+    
+6.2. Response Control 
+    
+
+
+    
+   Boreham et al           Internet-Draft                             6 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+   If the request control is serviced, this response control is included 
+   in the SearchResultDone message as part of the controls field of the 
+   LDAPMessage, as defined in Section 4.1.12 of [LDAPPROT]. 
+    
+   The controlType is set to "2.16.840.1.113730.3.4.10". The 
+   controlValue, an OCTET STRING, is the BER-encoding of the following 
+   SEQUENCE: 
+    
+   VirtualListViewResponse ::= SEQUENCE { 
+          targetPosition    INTEGER (0 .. maxInt), 
+          contentCount     INTEGER (0 .. maxInt), 
+          virtualListViewResult ENUMERATED { 
+               success (0), 
+               operationsError (1), 
+               protocolError (3), 
+               unwillingToPerform (53), 
+               insufficientAccessRights (50), 
+               timeLimitExceeded (3), 
+               adminLimitExceeded (11), 
+               innapropriateMatching (18), 
+               sortControlMissing (60), 
+               offsetRangeError (61), 
+               other(80), 
+               ... }, 
+          contextID     OCTET STRING OPTIONAL } 
+    
+   targetPosition gives the list offset for the target entry.  
+    
+   contentCount gives the server's estimate of the current number of 
+   entries in the list. Together these give sufficient information for 
+   the client to update a list box slider position to match the newly 
+   retrieved entries and identify the target entry. The contentCount 
+   value returned SHOULD be used in a subsequent VirtualListViewRequest 
+   control.  
+    
+   contextID is a server-defined octet string. If present, the contents 
+   of the contextID field SHOULD be returned to the server by a client 
+   in a subsequent virtual list request. The presence of a contextID 
+   here indicates that the server is willing to return contiguous data 
+   from a subsequent search request which uses the same search criteria, 
+   accompanied by a VirtualListViewRequest which indicates that the 
+   client wishes to receive an adjoining page of data. 
+    
+   The virtualListViewResult codes which are common to the LDAP 
+   searchResultDone (adminLimitExceeded, timeLimitExceeded, 
+   operationsError, unwillingToPerform, insufficientAccessRights, 
+   success, other) have the same meanings as defined in [LDAPPROT], but 
+   they pertain specifically to the VLV operation. For example, the 
+   server could exceed a VLV-specific administrative limit while 
+   processing a SearchRequest with a VirtualListViewRequest control. 
+   Obviously, the same administrative limit would not be exceeded should 
+    
+   Boreham et al           Internet-Draft                             7 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+   the same SearchRequest be submitted by the client without the 
+   VirtualListViewRequest control. In this case, the client can 
+   determine that the administrative limit has been exceeded in 
+   servicing the VLV request, and can if it chooses resubmit the 
+   SearchRequest without the VirtualListViewRequest control, or with 
+   different parameters. 
+    
+   insufficientAccessRights means that the server denied the client 
+   permission to perform the VLV operation. 
+    
+   If the server determines that the results of the search presented 
+   exceed the range specified in INTEGER values, or if the client 
+   specifies an invalid offset or contentCount, the server MUST set the 
+   virtualListViewResult value to offsetRangeError. 
+    
+6.2.1 virtualListViewError 
+ 
+   A new LDAP error is introduced called virtualListViewError. Its value 
+   is 76. This error indicates that the search operation failed due to 
+   the inclusion of the VirtualListViewRequest control. 
+    
+   If the resultCode in the SearchResultDone message is set to 
+   virtualListViewError (76), then the virtualListViewResult value MUST 
+   NOT be success (as virtualListViewResult indicates the specific error 
+   condition). If resultCode in the SearchResultDone message is not set 
+   to virtualListViewError (76), then the virtualListViewResult value 
+   SHOULD be success (0) and its value MUST be ignored. 
+    
+7. Protocol Example 
+    
+   Here we walk through the client-server interaction for a specific 
+   virtual list view example: The task is to display a list of all 78564 
+   persons in the US company "Ace Industry". This will be done by 
+   creating a graphical user interface object to display the list 
+   contents, and by repeatedly sending different versions of the same 
+   virtual list view search request to the server. The list view 
+   displays 20 entries on the screen at a time. 
+    
+   We form a search with baseObject of "o=Ace Industry,c=us"; scope of 
+   wholeSubtree; and filter of "(objectClass=person)". We attach a 
+   server-side sort control [SSS] to the search request, specifying 
+   ascending sort on attribute "cn". To this search request, we attach a 
+   virtual list view request control with contents determined by the 
+   user activity and send the search request to the server. We display 
+   the results from each search result entry in the list window and 
+   update the slider position. 
+    
+   When the list view is first displayed, we want to initialize the 
+   contents showing the beginning of the list. Therefore, we set 
+   beforeCount to 0, afterCount to 19, contentCount to 0, offset to 1 
+   and send the request to the server. The server duly returns the first 
+    
+   Boreham et al           Internet-Draft                             8 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+   20 entries in the list, plus a content count of 78564 and 
+   targetPosition of 1. We therefore leave the scroll bar slider at its 
+   current location (the top of its range). 
+    
+   Say that next the user drags the scroll bar slider down to the bottom 
+   of its range. We now wish to display the last 20 entries in the list, 
+   so we set beforeCount to 19, afterCount to 0, contentCount to 78564, 
+   offset to 78564 and send the request to the server. The server 
+   returns the last 20 entries in the list, plus a content count of 
+   78564 and a targetPosition of 78564. 
+    
+   Next the user presses a page up key. Our page size is 20, so we set 
+   beforeCount to 0, afterCount to 19, contentCount to 78564, offset to 
+   78564-19-20 and send the request to the server. The server returns 
+   the preceding 20 entries in the list, plus a content count of 78564 
+   and a targetPosition of 78525. 
+    
+   Now the user grabs the scroll bar slider and drags it to 68% of the 
+   way down its travel. 68% of 78564 is 53424 so we set beforeCount to 
+   9, afterCount to 10, contentCount to 78564, offset to 53424 and send 
+   the request to the server. The server returns the preceding 20 
+   entries in the list, plus a content count of 78564 and a 
+   targetPosition of 53424. 
+    
+   Lastly, the user types the letter "B". We set beforeCount to 9, 
+   afterCount to 10 and greaterThanOrEqual to "B". The server finds the 
+   first entry in the list not less than "B", let's say "Babs Jensen", 
+   and returns the nine preceding entries, the target entry, and the 
+   proceeding 10 entries. The server returns a content count of 78564 
+   and a targetPosition of 5234 and so the client updates its scroll bar 
+   slider to 6.7% of full scale. 
+    
+    
+8. Notes for Implementers 
+    
+   While the feature is expected to be generally useful for arbitrary 
+   search and sort specifications, it is specifically designed for those 
+   cases where the result set is very large. The intention is that this 
+   feature be implemented efficiently by means of pre-computed indices 
+   pertaining to a set of specific cases. For example, an offset 
+   relating to "all the employees in the local organization, sorted by 
+   surname" would be a common case. 
+    
+   The intention for client software is that the feature should fit 
+   easily with the host platform's graphical user interface facilities 
+   for the display of scrolling lists. Thus the task of the client 
+   implementers should be one of reformatting up the requests for 
+   information received from the list view code to match the format of 
+   the virtual list view request and response controls. 
+    
+
+    
+   Boreham et al           Internet-Draft                             9 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+   Client implementers MUST be aware that any offset value returned by 
+   the server might be approximate. Do not design clients that only 
+   operate correctly when offsets are exact. However, if contextIDs are 
+   used, and adjoining pages of information are requested, the server 
+   will return contiguous data. 
+    
+   Server implementers using indexing technology which features 
+   approximate positioning should consider returning contextIDs to 
+   clients. The use of a contextID will allow the server to distinguish 
+   between client requests which relate to different displayed lists on 
+   the client. Consequently the server can decide more intelligently 
+   whether to reposition an existing database cursor accurately to 
+   within a short distance of its current position, or to reposition to 
+   an approximate position. Thus the client will see precise offsets for 
+   "short" repositioning (e.g. paging up or down), but approximate 
+   offsets for a "long" reposition (e.g. a slider movement). 
+    
+   Server implementers are free to return an LDAP result code of 
+   virtualListViewError and a virtualListViewResult of 
+   unwillingToPerform should their server be unable to service any 
+   particular VLV search. This might be because the resolution of the 
+   search is computationally infeasible, or because excessive server 
+   resources would be required to service the search. 
+    
+   Client implementers should note that this control is only defined on 
+   a client interaction with a single server. If a search scope spans 
+   multiple naming contexts that are not held locally, search result 
+   references will be returned, and may occur at any point in the search 
+   operation. The client is responsible for deciding when and how to 
+   apply this control to the referred-to servers, and how to collate the 
+   results from multiple servers. 
+    
+    
+9. Relationship to "Simple Paged Results" 
+    
+   These controls are designed to support the virtual list view, which 
+   has proved hard to implement with the Simple Paged Results mechanism 
+   [SPaged]. However, the controls described here support any operation 
+   possible with the Simple Paged Results mechanism. The two mechanisms 
+   are not complementary; rather one has a superset of the other's 
+   features. One area where the mechanism presented here is not a strict 
+   superset of the Simple Paged Results scheme is that here we require a 
+   sort order to be specified. No such requirement is made for paged 
+   results. 
+    
+    
+10. Security Considerations 
+    
+   Server implementers may wish to consider whether clients are able to 
+   consume excessive server resources in requesting virtual list 
+   operations. Access control to the feature itself; configuration 
+    
+   Boreham et al           Internet-Draft                            10 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+   options limiting the feature's use to certain predetermined search 
+   base DNs and filters; throttling mechanisms designed to limit the 
+   ability for one client to soak up server resources, may be 
+   appropriate. 
+    
+   Consideration should be given as to whether a client will be able to 
+   retrieve the complete contents, or a significant subset of the 
+   complete contents of the directory using this feature. This may be 
+   undesirable in some circumstances and consequently it may be 
+   necessary to enforce some access control or administrative limit. 
+    
+   Clients can, using this control, determine how many entries match a 
+   particular filter, before the entries are returned to the client. 
+   This may require special processing in servers which perform access 
+   control checks on entries to determine whether the existence of the 
+   entry can be disclosed to the client. 
+    
+   Server implementers should exercise caution concerning the content of 
+   the contextID. Should the contextID contain internal server state, it 
+   may be possible for a malicious client to use that information to 
+   gain unauthorized access to information. 
+    
+11. IANA Considerations 
+    
+11.1 Request for LDAP Result Code 
+    
+   In accordance with section 3.6 of [LDAPIANA], it is requested that 
+   IANA register the LDAP result code virtualListViewError (76) upon 
+   Standards Action by the IESG. The value 76 has been suggested by 
+   experts, had expert review, and is currently being used by some 
+   implementations. If 76 is unavailable on not chosen, the value in the 
+   paragraphs in Section 6.2.1 will need to be updated. The following 
+   registration template is suggested: 
+    
+   Subject: LDAP Result Code Registration 
+   Person & email address to contact for further information: Jim 
+   Sermersheim  
+   Result Code Name: virtualListViewError 
+   Specification: RFCXXXX 
+   Author/Change Controller: IESG 
+   Comments:  request LDAP result codes be assigned 
+    
+    
+    
+12. Acknowledgements 
+    
+   Chris Weider, Anoop Anantha, and Michael Armijo of Microsoft co-
+   authored previous versions of this document. 
+    
+    
+
+    
+   Boreham et al           Internet-Draft                            11 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+13. Normative References 
+    
+    
+   [X.680]    ITU-T Rec. X.680, "Abstract Syntax Notation One (ASN.1) - 
+              Specification of Basic Notation", 1994. 
+    
+   [X.690]    ITU-T Rec. X.690, "Specification of ASN.1 encoding rules: 
+              Basic, Canonical, and Distinguished Encoding Rules", 
+              1994. 
+    
+   [LDAPPROT]  Wahl, M., Kille, S. and T. Howes, "Lightweight Directory 
+               Access Protocol (v3)", Internet Standard, RFC 2251, 
+               December, 1997. 
+    
+   [SSS]       Wahl, M., Herron, A. and T. Howes, "LDAP Control 
+               Extension for Server Side Sorting of Search Results", 
+               RFC 2891, August, 2000. 
+                
+   [Bradner97] Bradner, S., "Key Words for use in RFCs to Indicate 
+               Requirement Levels", BCP 14, RFC 2119, March 1997. 
+                
+   [LDAPIANA] Zeilenga, K., "Internet Assigned Numbers Authority (IANA) 
+              Considerations for the Lightweight Directory Access 
+              Protocol (LDAP)", RFC 3383, September 2002. 
+                
+14. Informative References 
+    
+   [SPaged]    Weider, C., Herron, A., Anantha, A. and T. Howes, "LDAP 
+               Control Extension for Simple Paged Results Manipulation", 
+               RFC2696, September 1999. 
+    
+    
+15. Authors' Addresses 
+    
+        David Boreham 
+        Bozeman Pass, Inc 
+        +1 406 222 7093 
+        david@bozemanpass.com 
+         
+        Jim Sermersheim 
+        Novell 
+        1800 South Novell Place 
+        Provo, Utah 84606, USA 
+        jimse@novell.com 
+         
+        Asaf Kashi 
+        Microsoft Corporation 
+        1 Microsoft Way 
+        Redmond, WA 98052, USA 
+        +1 425 882-8080 
+        asafk@microsoft.com 
+    
+   Boreham et al           Internet-Draft                            12 
+    
+                 LDAP Extensions for Scrolling View            Nov 2002 
+                     Browsing of Search Results 
+    
+         
+    
+16. Full Copyright Statement 
+    
+   Copyright (C) The Internet Society (2002). All Rights Reserved. 
+   This document and translations of it may be copied and furnished to 
+   others, and derivative works that comment on or otherwise explain it 
+   or assist in its implementation may be prepared, copied, published 
+   and distributed, in whole or in part, without restriction of any 
+   kind, provided that the above copyright notice and this paragraph are 
+   included on all such copies and derivative works. However, this 
+   document itself may not be modified in any way, such as by removing 
+   the copyright notice or references to the Internet Society or other 
+   Internet organizations, except as needed for the purpose of 
+   developing Internet standards in which case the procedures for 
+   copyrights defined in the Internet Standards process must be 
+   followed, or as required to translate it into languages other than 
+   English. The limited permissions granted above are perpetual and will 
+   not be revoked by the Internet Society or its successors or assigns. 
+   This document and the information contained herein is provided on an 
+   "AS IS" basis and THE INTERNET SOCIETY AND THE 
+   INTERNET ENGINEERING TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR 
+   IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF 
+   THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED 
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE." 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+   Boreham et al           Internet-Draft                            13 

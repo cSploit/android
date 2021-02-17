@@ -1,0 +1,133 @@
+\" vim:language en_US.UTF-8:
+.TH isql 1 "Tue 25 Jun 2013" "version 2.3.2" "UnixODBC manual pages"
+
+.SH NAME
+isql - unixODBC command-line interactive SQL tool
+
+.SH SYNOPSIS
+\fBisql\fR \fIDSN\fR [\fIUSER\fR [\fIPASSWORD\fR]] [\fIoptions\fR] 
+
+.SH DESCRIPTION
+.B isql
+is a command line tool which allows the user to execute SQL in batch
+or interactively. It has some interesting options such as an option to generate
+output wrapped in an HTML table.
+
+.SH ARGUMENTS
+
+.IP \fBDSN\fR
+The Data Source Name, which should be used to make connection to the database.
+The data source is looked for in the /etc/odbc.ini and $HOME/.odbc.ini files in
+that order, with the latter overwriting the former.
+
+.IP \fBUSER\fR
+Specifies the database user/role under which the connection should be made.
+
+.IP \fBPASSWORD\fR
+Password for the specified \fBUSER\fR.
+
+.SH OPTIONS
+
+.IP \fB-b\fR
+Run isql in non-interactive batch mode. In this mode, the isql processes its
+standard input, expecting one SQL command per line.
+
+.IP \fB-d\fIDELIMITER\fR
+Delimits columns with \fIdelimiter\fR.
+
+.IP \fB-x\fIHEX\fR
+Delimits columns with \fIHEX\fR, which is a hexadecimal code of the delimiting
+character in the format 0xNN - i.e. 0x09 for the TAB character.
+
+.IP \fB-w\fR
+Format the result as HTML table.
+
+.IP \fB-c\fR
+Output the names of the columns on the first row. Has any effect only with the
+\fB-d\fR or \fB-x\fR options.
+
+.IP \fB-m\fINUM\fR
+Limit the column display width to \fINUM\fR characters.
+
+.IP \fB-l\fILOCALE\fR
+Sets locale to \fILOCALE\fR.
+
+.IP \fB-q\fR
+Wrap the character fields in double quotes.
+
+.IP \fB-3\fR
+Use the ODBC 3 calls.
+
+.IP \fB-n\fR
+Use the newline processing.
+
+.IP \fB-e\fR
+Use the SQLExecDirect instead of Prepare.
+
+.IP \fB-k\fR
+Use SQLDriverConnect.
+
+.IP \fB-v\fR
+Turn on the verbose mode, where the errors are fully described. Useful for debugging.
+
+.IP \fB--version\fR
+Prints the program version and exits.
+
+.SH COMMANDS
+This section briefly describes some isql runtime commands.
+
+.B help
+.RS
+List all tables in the database.
+.RE
+
+.B help \fItable\fR
+.RS
+List all columns in the \fItable\fR.
+.RE
+
+.B help help
+.RS
+List all help options.
+.RE
+
+.SH EXAMPLES
+.nf
+$ isql WebDB MyID MyPWD -w -b < My.sql
+.fi
+
+Connects to the WebDB as user MyID with password MyPWD, then execute the
+commands in the My.sql file and returns the results wrapped in HTML table.
+Each line in My.sql must contain exactly 1 SQL command, except for the last
+line, which must be blank (unless the \fB-n\fR option is specified).
+
+.SH FILES
+
+.I /etc/odbc.ini
+.RS
+System-wide DSN definitions. See
+.BR odbc.ini (5)
+for details.
+.RE
+
+.I $HOME/.odbc.ini
+.RS
+User-specific DSN definitions. See
+.BR odbc.ini (5)
+for details.
+.RE
+
+.SH SEE ALSO
+.BR odbcinst (1),
+.BR odbc.ini (5)
+
+.SH AUTHORS
+
+The authors of unixODBC are Peter Harvey <\fIpharvey@codebydesign.com\fR> and
+Nick Gorham <\fInick@lurcher.org\fR>. For the full list of contributors see the
+AUTHORS file.
+
+.SH COPYRIGHT
+
+unixODBC is licensed under the GNU Lesser General Public License. For details
+about the license, see the COPYING file.

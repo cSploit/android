@@ -1,0 +1,9 @@
+PKG="Firebird2"
+NAME="Firebird2 Relational Database Server"
+ARCH="@CPU_TYPE@"
+VERSION="@FIREBIRD_VERSION@"
+LOAD="@FIREBIRD_PACKAGE_VERSION@"
+CATEGORY="application"
+VENDOR="www.firebirdsql.org"
+BASEDIR=/opt/firebird
+EMAIL=pbeach at ibphoenix.com

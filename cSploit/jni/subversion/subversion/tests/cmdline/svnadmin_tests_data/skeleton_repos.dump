@@ -1,0 +1,207 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 45cfc32e-e360-9043-8e66-614bff171639
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2010-03-24T16:31:48.968750Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 118
+Content-length: 118
+
+K 7
+svn:log
+V 17
+Initial setup...
+
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-24T16:35:09.828125Z
+PROPS-END
+
+Node-path: Projects
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 118
+Content-length: 118
+
+K 7
+svn:log
+V 17
+Initial setup...
+
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-24T16:36:28.781250Z
+PROPS-END
+
+Node-path: README
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 48
+Text-content-md5: 02d086e41b03058c5f1af6282c1f483f
+Text-content-sha1: cc67e4dd7cd8ca83095c8b95f65b6698b39cb263
+Content-length: 88
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+Valuable information will go here...
+...someday.
+
+Revision-number: 3
+Prop-content-length: 118
+Content-length: 118
+
+K 7
+svn:log
+V 17
+Initial setup...
+
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-24T16:37:10.937500Z
+PROPS-END
+
+Node-path: Projects/Project-X
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 4
+Prop-content-length: 118
+Content-length: 118
+
+K 7
+svn:log
+V 17
+Initial setup...
+
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-24T16:37:38.156250Z
+PROPS-END
+
+Node-path: Projects/Project-Y
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 5
+Prop-content-length: 118
+Content-length: 118
+
+K 7
+svn:log
+V 17
+Initial setup...
+
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-24T16:38:11.046875Z
+PROPS-END
+
+Node-path: Projects/Project-Z
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 6
+Prop-content-length: 118
+Content-length: 118
+
+K 7
+svn:log
+V 17
+Initial setup...
+
+K 10
+svn:author
+V 6
+pburba
+K 8
+svn:date
+V 27
+2010-03-24T16:39:04.062500Z
+PROPS-END
+
+Node-path: Projects/docs
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: Projects/docs/README
+Node-kind: file
+Node-action: add
+Prop-content-length: 40
+Text-content-length: 48
+Text-content-md5: 02d086e41b03058c5f1af6282c1f483f
+Text-content-sha1: cc67e4dd7cd8ca83095c8b95f65b6698b39cb263
+Content-length: 88
+
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+Valuable information will go here...
+...someday.
+

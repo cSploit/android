@@ -1,0 +1,73 @@
+This patch can be used to generate a report showing what C source
+lines are executed when the testsuite is run.  gcc is required.  After
+applying this patch do:
+
+$ ./configure --enable-gcov
+$ make check
+$ make gcov
+
+Now look at gcov-report.html and the annotated source files it links
+to.
+
+See also gcov(1), gcc(1).
+
+Index: Makefile.in
+===================================================================
+--- Makefile.in	(revision 32484)
++++ Makefile.in	(working copy)
+@@ -443,6 +443,36 @@
+ 	@$(MAKE) check \
+ 	  BASE_URL=svn+ssh://localhost`pwd`/subversion/tests/cmdline
+ 
++gcov:
++	@echo -n "Collecting source files ..." ;                         \
++	FILES=`find subversion/ -path '*/tests/*' -prune -o              \
++	    -name '*.c' -print`;                                         \
++	echo "Done." ;                                                   \
++	echo "Coverage report Subversion r`svnversion .`<br>"            \
++	echo "`date`<br>"                                                \
++	    > gcov-report.html;                                          \
++	echo `uname -o -r -m`  "<br>"                                    \
++	    >> gcov-report.html;                                         \
++	(for file in $$FILES; do                                         \
++	    echo $$file 1>&2 ;                                           \
++	    base=`echo $$file | sed -e 's/.c$$//' `;                     \
++	    if [ -f "$$base.da" ] ; then                                 \
++	        obj=$$base.o;                                            \
++	    else                                                         \
++	        obj=`dirname $$base`/.libs/`basename $$base`.o;          \
++	    fi;                                                          \
++	    stats=`gcov --preserve-paths                                 \
++	        --object-directory=$$obj                                 \
++	        $$file | sed -e "s/Creating.*//"  |                      \
++                sed -s "s|$$PWD/||"`                                     \
++	    mangled=`echo $$base | tr '/' '#'`;                          \
++	    fixed=`echo $$base | tr '/' '_'`;                            \
++	    mv *$$mangled.c.gcov $$fixed.c.gcov;                         \
++	    echo -n $$stats |                                            \
++	        sed -e "s/in file/in file <a href=\"$$fixed.c.gcov\">/"; \
++	    echo "</a><br>";                                             \
++	done) | sort -g >> gcov-report.html
++
+ bdbcheck:
+ 	@$(MAKE) check FS_TYPE=bdb
+ 
+Index: configure.ac
+===================================================================
+--- configure.ac	(revision 32484)
++++ configure.ac	(working copy)
+@@ -684,6 +684,14 @@
+ #   # do nothing
+ fi
+ 
++AC_ARG_ENABLE(gcov,
++AC_HELP_STRING([--enable-gcov],
++         [Turn on coverage testing (GCC only).]),
++[
++    if test "$enableval" = "yes" ; then
++      CFLAGS="$CFLAGS -fprofile-arcs -ftest-coverage"
++    fi
++])
+ 
+ AC_ARG_WITH(editor,
+ AS_HELP_STRING([--with-editor=PATH],

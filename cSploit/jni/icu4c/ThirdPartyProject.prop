@@ -1,0 +1,9 @@
+# Copyright 2010 Google Inc. All Rights Reserved.
+#Fri Jul 16 10:03:09 PDT 2010
+currentVersion=4.2.1. 3.8.1 is latest 3.8.
+version=3.8.1
+isNative=true
+name=icu4c
+keywords=icu4c
+onDevice=true
+homepage=http\://www.icu-project.org/apiref/icu4c/

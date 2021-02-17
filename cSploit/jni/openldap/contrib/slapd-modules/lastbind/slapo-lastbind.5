@@ -1,0 +1,97 @@
+.TH SLAPO-LASTBIND 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2009 Jonathan Clarke, All Rights Reserved.
+.\" $OpenLDAP$
+.SH NAME
+slapo-lastbind \- lastbind overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The
+.B lastbind
+overlay to
+.BR slapd (8)
+allows recording the timestamp of the last successful bind to entries
+in the directory, in the
+.B authTimestamp
+attribute.
+The overlay can be configured to update this timestamp only if it is
+older than a given value, thus avoiding large numbers of write
+operations penalizing performance.
+One sample use for this overlay would be to detect unused accounts.
+
+.SH CONFIGURATION
+The config directives that are specific to the
+.B lastbind
+overlay must be prefixed by
+.BR lastbind\- ,
+to avoid potential conflicts with directives specific to the underlying 
+database or to other stacked overlays.
+
+.TP
+.B overlay lastbind
+This directive adds the
+.B lastbind
+overlay to the current database, see
+.BR slapd.conf (5)
+for details.
+
+.LP
+This
+.B slapd.conf
+configuration option is defined for the lastbind overlay. It must
+appear after the
+.B overlay
+directive:
+.TP
+.B lastbind-precision <seconds>
+The value 
+.B <seconds>
+is the number of seconds after which to update the
+.B authTimestamp
+attribute in an entry. If the existing value of
+.B authTimestamp
+is less than 
+.B <seconds>
+old, it will not be changed. 
+If this configuration option is omitted, the
+.B authTimestamp
+attribute is updated on each successful bind operation.
+
+.SH EXAMPLE
+This example configures the
+.B lastbind
+overlay to store
+.B authTimestamp
+in all entries in a database, with a 1 week precision.
+Add the following to
+.BR slapd.conf (5):
+
+.LP
+.nf
+    database <database>
+    # ...
+
+    overlay lastbind
+    lastbind-precision 604800
+.fi
+.LP
+.B slapd
+must also load
+.B lastbind.la,
+if compiled as a run-time module;
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd (8).
+The
+.BR slapo-lastbind (5)
+overlay supports dynamic configuration via
+.BR back-config.
+.SH ACKNOWLEDGEMENTS
+.P
+This module was written in 2009 by Jonathan Clarke. It is loosely
+derived from the password policy overlay.

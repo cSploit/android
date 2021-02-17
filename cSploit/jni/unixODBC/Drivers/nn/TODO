@@ -1,0 +1,15 @@
+TODO
+----
+
+0. standardize makefile(s)
+1. modularize to the function level
+2. get all sources to reside in one dir
+3. replace redundent code with unixODBC libs such as odbcinst
+4. update function declares to ODBC 3.5.1 standard
+5. implement catalog functions ( SQLTables, SQLColumns... )
+
+
+
+- Peter Harvey
+
+

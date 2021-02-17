@@ -1,0 +1,723 @@
+##########
+# Setup
+#
+AC_INIT(sqliteodbc.h)
+AM_PROG_LIBTOOL
+AC_PROG_INSTALL
+CC=${CC:-cc}
+AC_SUBST(CC)
+AC_SUBST(CFLAGS)
+VER_INFO=`cat VERSION`
+
+##########
+# Find SQLite header file and library
+#
+AC_ARG_WITH(sqlite, [  --with-sqlite=DIR       use SQLite header/lib from DIR],
+   SQLITE_DIR=$withval)
+if test -n "$SQLITE_DIR" ; then
+   if test ! -d "$SQLITE_DIR" ; then
+      AC_MSG_ERROR(SQLite directory $SQLITE_DIR does not exist)
+   fi
+fi
+
+SQLITE_INC=UNKNOWN
+SQLITE_LIB=UNKNOWN
+
+if test -z "$SQLITE_DIR" ; then
+   if test -r "$includedir/sqlite.h" -a -r "$libdir/libsqlite.la" ; then
+      SQLITE_INC="$includedir"
+      SQLITE_LIB="$libdir/libsqlite.la"
+      SQLITE_LIBDIR="$libdir"
+      SQLITE_DIR=""
+   else
+      SQLITE_DIR="../sqlite /usr /usr/local /opt"
+   fi
+fi
+
+AC_MSG_CHECKING([for SQLite header and library])
+for i in $SQLITE_DIR ; do
+   if test -r "$i/sqlite.h" ; then
+      if test -r "$i/libsqlite.la" ; then
+         SQLITE_INC="$i"
+         SQLITE_LIB="$i/libsqlite.la"
+         SQLITE_LIBDIR=$i
+         break
+      fi
+   elif test -r "$i/include/sqlite.h" ; then
+      SQLITE_INC="$i/include"
+      if test -r "$i/lib/libsqlite.la" ; then
+         SQLITE_LIB="$i/lib/libsqlite.la"
+         SQLITE_LIBDIR="$i/lib"
+         break
+      elif test -d "$i/lib" ; then
+         SQLITE_LIB="-lsqlite"
+         SQLITE_LIBDIR="$i/lib"
+	 break
+      fi
+   fi
+done
+if test "$SQLITE_INC" = "UNKNOWN" -o "$SQLITE_LIB" = "UNKNOWN" ; then
+   AC_MSG_RESULT(no)
+   AC_MSG_WARN([SQLite header files and/or library not found])
+else
+   AC_MSG_RESULT(yes)
+fi
+
+AC_SUBST(SQLITE_INC)
+AC_SUBST(SQLITE_LIB)
+
+# test for availability of sqlite_libversion() et.al.
+
+if test -n "$SQLITE_LIBDIR" ; then
+   SQLITE_LIBDIR="-L$SQLITE_LIBDIR"
+fi
+
+saved_CFLAGS=$CFLAGS
+CFLAGS="$CFLAGS -I$SQLITE_INC"
+saved_LIBS=$LIBS
+LIBS="$LIBS $SQLITE_LIBDIR"
+AC_CHECK_LIB(sqlite,sqlite_libversion,SQLITE_LIBVERSION=1,SQLITE_LIBVERSION=0)
+AC_CHECK_LIB(sqlite,sqlite_compile,SQLITE_COMPILE=1,SQLITE_COMPILE=0)
+AC_CHECK_LIB(sqlite,sqlite_encode_binary,SQLITE_ENCDEC=1,SQLITE_ENCDEC=0)
+AC_CHECK_LIB(sqlite,sqliteAtoF,SQLITE_ATOF=1,SQLITE_ATOF=0)
+AC_CHECK_LIB(sqlite,sqlite_mprintf,SQLITE_MPRINTF=1,SQLITE_MPRINTF=0)
+AC_CHECK_LIB(sqlite,sqlite_trace,SQLITE_TRACE=1,SQLITE_TRACE=0)
+LIBS=$saved_LIBS
+CFLAGS=$saved_CFLAGS
+AC_SUBST(SQLITE_LIBVERSION)
+AC_SUBST(SQLITE_ENCDEC)
+AC_SUBST(SQLITE_ATOF)
+AC_SUBST(SQLITE_MPRINTF)
+AC_SUBST(SQLITE_TRACE)
+if test "$SQLITE_COMPILE" = "0" ; then
+   AC_MSG_WARN([SQLite library too old, need 2.8.0 or later])
+else
+   LIB_TARGETS="$LIB_TARGETS libsqliteodbc.la"
+   INST_TARGETS="$INST_TARGETS install-2"
+   UNINST_TARGETS="$UNINST_TARGETS uninstall-2"
+   DRVINST_TARGETS="$DRVINST_TARGETS drvinst-2"
+   DRVUNINST_TARGETS="$DRVUNINST_TARGETS drvuninst-2"
+fi
+
+##########
+# Find SQLite3 header file and library
+#
+AC_ARG_WITH(sqlite3,[  --with-sqlite3=DIR      use SQLite3 hdr/lib from DIR],
+   SQLITE3_DIR=$withval)
+if test -n "$SQLITE3_DIR" ; then
+   if test ! -d "$SQLITE3_DIR" ; then
+      AC_MSG_WARN([SQLite3 directory $SQLITE3_DIR does not exist])
+   fi
+fi
+
+SQLITE3_INC=UNKNOWN
+SQLITE3_LIB=UNKNOWN
+
+if test -z "$SQLITE3_DIR" ; then
+   if test -r "$includedir/sqlite3.h" -a -r "$libdir/libsqlite3.la" ; then
+      SQLITE3_INC="$includedir"
+      SQLITE3_LIB="$libdir/libsqlite3.la"
+      SQLITE3_LIBDIR="$libdir"
+      SQLITE3_DIR=""
+   else
+      SQLITE3_DIR="../sqlite /usr /usr/local /opt"
+   fi
+fi
+
+AC_MSG_CHECKING([for SQLite3 header and library])
+for i in $SQLITE3_DIR ; do
+   if test -r "$i/sqlite3.h" ; then
+      if test -r "$i/sqlite3.c" ; then
+         SQLITE3_INC="$i"
+         SQLITE3_LIB="unknown"
+         SQLITE3_LIBDIR=""
+         SQLITE3_A10N_C="$i/sqlite3.c"
+         SQLITE3_A10N_O="sqlite3.lo"
+         break
+      elif test -r "$i/libsqlite3.la" ; then
+         SQLITE3_INC="$i"
+         SQLITE3_LIB="$i/libsqlite3.la"
+         SQLITE3_LIBDIR=$i
+         break
+      fi
+   elif test -r "$i/include/sqlite3.h" ; then
+      SQLITE3_INC="$i/include"
+      if test -r "$i/lib/libsqlite3.la" ; then
+         SQLITE3_LIB="$i/lib/libsqlite3.la"
+         SQLITE3_LIBDIR="$i/lib"
+         break
+      elif test -d "$i/lib" ; then
+         SQLITE3_LIB="-lsqlite3"
+         SQLITE3_LIBDIR="$i/lib"
+         break
+      fi
+   fi
+done
+if test "$SQLITE3_INC" = "UNKNOWN" -o "$SQLITE3_LIB" = "UNKNOWN" ; then
+   AC_MSG_RESULT(no)
+   AC_MSG_WARN([SQLite3 header files and/or library not found])
+else
+   AC_MSG_RESULT(yes)
+   LIB_TARGETS="$LIB_TARGETS libsqlite3odbc.la"
+   INST_TARGETS="$INST_TARGETS install-3"
+   UNINST_TARGETS="$UNINST_TARGETS uninstall-3"
+   DRVINST_TARGETS="$DRVINST_TARGETS drvinst-3"
+   DRVUNINST_TARGETS="$DRVUNINST_TARGETS drvuninst-3"
+   if test -n "$SQLITE3_A10N_C" ; then
+      SQLITE3_LIB=""
+      SQLITE3_A10N_FLAGS="$SQLITE3_A10N_FLAGS -DSQLITE_ENABLE_COLUMN_METADATA=1"
+      SQLITE3_A10N_FLAGS="$SQLITE3_A10N_FLAGS -DSQLITE_DLL=1 -DSQLITE_SOUNDEX=1"
+      SQLITE3_A10N_FLAGS="$SQLITE3_A10N_FLAGS -DSQLITE_THREADSAFE=1"
+   fi
+fi
+AC_SUBST(SQLITE3_INC)
+AC_SUBST(SQLITE3_A10N_C)
+AC_SUBST(SQLITE3_A10N_FLAGS)
+
+# test for availability of some sqlite3_*() funcs
+
+if test -n "$SQLITE3_LIBDIR" ; then
+   SQLITE3_LIBDIR="-L$SQLITE3_LIBDIR"
+fi
+
+if test -n "$SQLITE3_A10N_C" ; then
+   SQLITE3_LOADEXTENSION=1
+   SQLITE3_COLUMNTABLENAME=1
+   SQLITE3_OVERLOADFUNCTION=1
+   SQLITE3_PREPARE_V2=1
+   SQLITE3_CLEARBINDINGS=1
+   SQLITE3_CREATEMODULE_V2=1
+   SQLITE3_VFS=1
+   SQLITE3_TABLECOLUMNMETADATA=1
+   SQLITE3_PROFILE=1
+   SQLITE3_STRNICMP=1
+else
+   saved_CFLAGS=$CFLAGS
+   CFLAGS="$CFLAGS -I$SQLITE3_INC"
+   saved_LIBS=$LIBS
+   LIBS="$LIBS $SQLITE3_LIBDIR"
+   AC_CHECK_LIB(sqlite3,sqlite3_load_extension,
+		SQLITE3_LOADEXTENSION=1,
+		SQLITE3_LOADEXTENSION=0)
+   if test "$SQLITE3_LOADEXTENSION" = "0" ; then
+      unset ac_cv_lib_sqlite3_sqlite3_load_extension
+      # try again with -ldl
+      LIBS="$LIBS -ldl $SQLITE3_LIBDIR"
+      AC_CHECK_LIB(sqlite3,sqlite3_load_extension,
+		   SQLITE3_LOADEXTENSION=1,
+		   SQLITE3_LOADEXTENSION=0)
+      if test "$SQLITE3_LOADEXTENSION" = "1" ; then
+         SQLITE3_LIB="$SQLITE3_LIB -ldl"
+      fi
+   fi
+   AC_CHECK_LIB(sqlite3,sqlite3_column_table_name,
+		SQLITE3_COLUMNTABLENAME=1,
+		SQLITE3_COLUMNTABLENAME=0)
+   AC_CHECK_LIB(sqlite3,sqlite3_overload_function,
+		SQLITE3_OVERLOADFUNCTION=1,
+		SQLITE3_OVERLOADFUNCTION=0)
+   AC_CHECK_LIB(sqlite3,sqlite3_prepare_v2,
+		SQLITE3_PREPARE_V2=1,
+		SQLITE3_PREPARE_V2=0)
+   AC_CHECK_LIB(sqlite3,sqlite3_clear_bindings,
+		SQLITE3_CLEARBINDINGS=1,
+		SQLITE3_CLEARBINDINGS=0)
+   AC_CHECK_LIB(sqlite3,sqlite3_create_module_v2,
+		SQLITE3_CREATEMODULE_V2=1,
+		SQLITE3_CREATEMODULE_V2=0)
+   AC_CHECK_LIB(sqlite3,sqlite3_vfs_register,
+		SQLITE3_VFS=1,
+		SQLITE3_VFS=0)
+   AC_CHECK_LIB(sqlite3,sqlite3_table_column_metadata,
+		SQLITE3_TABLECOLUMNMETADATA=1,
+		SQLITE3_TABLECOLUMNMETADATA=0)
+   AC_CHECK_LIB(sqlite3,sqlite3_profile,
+		SQLITE3_PROFILE=1,
+		SQLITE3_PROFILE=0)
+   AC_CHECK_LIB(sqlite3,sqlite3_strnicmp,
+		SQLITE3_STRNICMP=1,
+		SQLITE3_STRNICMP=0)
+   LIBS=$saved_LIBS
+   CFLAGS=$saved_CFLAGS
+fi
+
+#########
+# Find zlib for zipfile module
+#
+LIBZ_OK=no
+if test "$SQLITE3_LOADEXTENSION" = "1" ; then
+   AC_SEARCH_LIBS(zlibVersion,z,[ AC_CHECK_HEADERS(zlib.h,[LIBZ_OK=yes]) ])
+fi
+
+#########
+# Add extensions to build
+#
+if test "$SQLITE3_LOADEXTENSION" = "1" ; then
+   EXT_BLOBTOXY=libsqlite3_mod_blobtoxy.la
+   EXT_IMPEXP=libsqlite3_mod_impexp.la
+   EXT_CSVTABLE=libsqlite3_mod_csvtable.la
+   EXT_ZIPFILE=""
+   LIB_TARGETS="$LIB_TARGETS $EXT_BLOBTOXY $EXT_IMPEXP $EXT_CSVTABLE"
+   if test "$LIBZ_OK" = "yes" ; then
+      EXT_ZIPFILE=libsqlite3_mod_zipfile.la
+      LIB_TARGETS="$LIB_TARGETS $EXT_ZIPFILE"
+   fi
+else
+   EXT_BLOBTOXY=""
+   EXT_IMPEXP=""
+   EXT_CSVTABLE=""
+   EXT_ZIPFILE=""
+fi
+
+AC_SUBST(SQLITE3_COLUMNTABLENAME)
+AC_SUBST(SQLITE3_OVERLOADFUNCTION)
+AC_SUBST(SQLITE3_PREPARE_V2)
+AC_SUBST(SQLITE3_CLEARBINDINGS)
+AC_SUBST(SQLITE3_CREATEMODULE_V2)
+AC_SUBST(SQLITE3_LOADEXTENSION)
+AC_SUBST(SQLITE3_TABLECOLUMNMETADATA)
+AC_SUBST(SQLITE3_VFS)
+AC_SUBST(SQLITE3_PROFILE)
+AC_SUBST(SQLITE3_STRNICMP)
+AC_SUBST(EXT_BLOBTOXY)
+AC_SUBST(EXT_IMPEXP)
+AC_SUBST(EXT_CSVTABLE)
+AC_SUBST(EXT_ZIPFILE)
+
+##########
+# Find SQLite4 header file and library
+#
+AC_ARG_WITH(sqlite4,[  --with-sqlite4=DIR      use SQLite4 hdr/src from DIR],
+   SQLITE4_DIR=$withval)
+if test -n "$SQLITE4_DIR" ; then
+   if test ! -d "$SQLITE4_DIR" ; then
+      AC_MSG_WARN([SQLite4 directory $SQLITE4_DIR does not exist])
+   fi
+fi
+
+SQLITE4_INC=UNKNOWN
+
+if test -n "$SQLITE4_DIR" ; then
+   AC_MSG_CHECKING([for SQLite4 header and library])
+   for i in $SQLITE4_DIR ; do
+      if test -r "$i/sqlite4.h" ; then
+         if test -r "$i/sqlite4.c" ; then
+            SQLITE4_INC="$i"
+            SQLITE4_A10N_C="$i/sqlite4.c"
+            SQLITE4_A10N_O="sqlite4.lo"
+            break
+         fi
+      fi
+   done
+fi
+if test "$SQLITE4_INC" = "UNKNOWN" ; then
+   AC_MSG_RESULT(no)
+   AC_MSG_WARN([SQLite4 header file and source not found])
+else
+   AC_MSG_RESULT(yes)
+   LIB_TARGETS="$LIB_TARGETS libsqlite4odbc.la"
+   INST_TARGETS="$INST_TARGETS install-4"
+   UNINST_TARGETS="$UNINST_TARGETS uninstall-4"
+   DRVINST_TARGETS="$DRVINST_TARGETS drvinst-4"
+   DRVUNINST_TARGETS="$DRVUNINST_TARGETS drvuninst-4"
+   SQLITE4_A10N_FLAGS="$SQLITE4_A10N_FLAGS -DSQLITE4_ENABLE_COLUMN_METADATA=1"
+   SQLITE4_A10N_FLAGS="$SQLITE4_A10N_FLAGS -DSQLITE4_SOUNDEX=1"
+   SQLITE4_A10N_FLAGS="$SQLITE4_A10N_FLAGS -DSQLITE4_THREADSAFE=1"
+fi
+AC_SUBST(SQLITE4_INC)
+AC_SUBST(SQLITE4_A10N_C)
+AC_SUBST(SQLITE4_A10N_FLAGS)
+
+#########
+# libxml2 support for XPath virtual table module
+XML2_FLAGS=""
+XML2_LIBS=""
+EXT_XPATH=""
+if test "$SQLITE3_LOADEXTENSION" = "1" ; then
+   AC_MSG_CHECKING([for libxml2 header and library])
+   XML2_CONFIG="`which xml2-config 2>/dev/null`"
+   if test -n "$XML2_CONFIG" ; then
+      XML2_FLAGS="`xml2-config --cflags`"
+      XML2_LIBS="`xml2-config --libs`"
+      EXT_XPATH=libsqlite3_mod_xpath.la
+      LIB_TARGETS="$LIB_TARGETS $EXT_XPATH"
+      AC_MSG_RESULT(yes)
+   else
+      AC_MSG_RESULT(no)
+   fi
+fi
+AC_SUBST(XML2_FLAGS)
+AC_SUBST(XML2_LIBS)
+AC_SUBST(EXT_XPATH)
+
+#########
+# Any SQLite to be done ?
+
+if test "X$LIB_TARGETS" = "X" ; then
+   AC_MSG_ERROR([No usable SQLite header/library on this system])
+fi
+AC_SUBST(LIB_TARGETS)
+AC_SUBST(INST_TARGETS)
+AC_SUBST(UNINST_TARGETS)
+AC_SUBST(DRVINST_TARGETS)
+AC_SUBST(DRVUNINST_TARGETS)
+
+#########
+# Find ODBC headers and libraries
+#
+AC_ARG_WITH(odbc, [  --with-odbc=DIR         use ODBC header/libs from DIR],
+   ODBC_DIR=$withval)
+if test -n "$ODBC_DIR" ; then
+   if test ! -d "$ODBC_DIR" ; then
+      AC_MSG_ERROR([ODBC directory $ODBC_DIR does not exist])
+   fi
+fi
+
+ODBC_FLAGS=UNKNOWN
+ODBC_LIB=UNKNOWN
+
+if test -z "$ODBC_DIR" ; then
+   if test -r "$includedir/sql.h" -a -r "$includedir/iodbcinst.h" -a -r "$libdir/libiodbcinst.la" ; then
+      ODBC_FLAGS="-DHAVE_IODBC=1 -I$includedir"
+      ODBC_LIB="$libdir/libiodbcinst.la"
+      ODBC_DIR=""
+   elif test -r "$includedir/iodbc/sql.h" -a -r "$includedir/iodbc/iodbcinst.h" -a -r "$libdir/libiodbcinst.la" ; then
+      ODBC_FLAGS="-DHAVE_IODBC=1 -I$includedir/iodbc"
+      ODBC_LIB="$libdir/libiodbcinst.la"
+      ODBC_DIR=""
+   elif test -r "$includedir/sql.h" -a -r "$includedir/odbcinst.h" -a -r "$libdir/libodbcinst.la" ; then
+      ODBC_FLAGS="-DHAVE_UNIXODBC=1 -I$includedir"
+      ODBC_LIB="$libdir/libodbcinst.la"
+      if test -r "$includedir/odbcinstext.h" ; then
+         ODBC_FLAGS="$ODBC_FLAGS -DHAVE_ODBCINSTEXT_H=1 -Imissing"
+      fi
+   else
+      ODBC_DIR="/usr /usr/local /opt"
+   fi
+fi
+
+AC_MSG_CHECKING([for ODBC headers and libraries])
+for i in $ODBC_DIR ; do
+   if test -r "$i/include/iodbc/sql.h" -o -r "$i/include/sql.h" ; then
+      if test -r "$i/include/iodbc/iodbcinst.h" ; then
+         ODBC_FLAGS="-DHAVE_IODBC=1 -I$i/include/iodbc"
+         if test -r "$i/lib/libiodbcinst.la" ; then
+            ODBC_LIB="$i/lib/libiodbcinst.la"
+         else
+            ODBC_LIB=-liodbcinst
+         fi
+         break
+      elif test -r "$i/include/iodbcinst.h" ; then
+         ODBC_FLAGS="-DHAVE_IODBC=1 -I$i/include"
+         if test -r "$i/lib/libiodbcinst.la" ; then
+            ODBC_LIB="$i/lib/libiodbcinst.la"
+         else
+            ODBC_LIB=-liodbcinst
+         fi
+         break
+      elif test -r "$i/include/odbcinst.h" ; then
+         ODBC_FLAGS="-DHAVE_UNIXODBC=1 -I$i/include"
+         if test -r "$i/lib/libodbcinst.la" ; then
+            ODBC_LIB="$i/lib/libodbcinst.la"
+         else
+            ODBC_LIB=-lodbcinst
+         fi
+         if test -r "$i/include/odbcinstext.h" ; then
+	    ODBC_FLAGS="$ODBC_FLAGS -DHAVE_ODBCINSTEXT_H=1"
+	    if test -r "$i/include/log.h" -a -r "$i/include/ini.h" ; then
+	       : no need for replacements
+	    else
+	       ODBC_FLAGS="$ODBC_FLAGS -Imissing"
+	    fi
+         fi
+         break
+      fi
+   fi
+done
+if test "$ODBC_FLAGS" = "UNKNOWN" -o "$ODBC_LIB" = "UNKNOWN" ; then
+   AC_MSG_RESULT(no)
+   AC_MSG_ERROR([ODBC header files and/or libraries not found])
+else
+   AC_MSG_RESULT(yes)
+fi
+
+##########
+# Test ODBC features.
+#
+
+SAVED_CFLAGS="$CFLAGS"
+CFLAGS="$CFLAGS $ODBC_FLAGS"
+
+AC_MSG_CHECKING([for SQLLEN availability])
+AC_TRY_COMPILE([
+#include <sql.h>
+#include <sqltypes.h>
+],[SQLLEN len = 1;],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DHAVE_SQLLEN=1"
+],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for SQLULEN availability])
+AC_TRY_COMPILE([
+#include <sql.h>
+#include <sqltypes.h>
+],[SQLULEN len = 1;],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DHAVE_SQLULEN=1"
+],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for SQLROWCOUNT availability])
+AC_TRY_COMPILE([
+#include <sql.h>
+#include <sqltypes.h>
+],[SQLROWCOUNT rc = 1;],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DHAVE_SQLROWCOUNT=1"
+],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for SQLSETPOSIROW availability])
+AC_TRY_COMPILE([
+#include <sql.h>
+#include <sqltypes.h>
+],[SQLSETPOSIROW rc = 1;],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DHAVE_SQLSETPOSIROW=1"
+],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for SQLROWOFFSET availability])
+AC_TRY_COMPILE([
+#include <sql.h>
+#include <sqltypes.h>
+],[SQLROWOFFSET rc = 1;],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DHAVE_SQLROWOFFSET=1"
+],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for SQLROWSETSIZE availability])
+AC_TRY_COMPILE([
+#include <sql.h>
+#include <sqltypes.h>
+],[SQLROWSETSIZE rc = 1;],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DHAVE_SQLROWSETSIZE=1"
+],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for SQLColAttribute signature has SQLLEN])
+AC_TRY_COMPILE([
+#include <stdio.h>
+#define ODBCVER 0x0300
+#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+],[
+SQLHSTMT stmt = SQL_NULL_HSTMT;
+SQLSMALLINT valLen;
+SQLLEN val2;
+extern SQLRETURN SQLColAttribute(SQLHSTMT hstmt,
+                                 SQLUSMALLINT col,
+                                 SQLUSMALLINT id,
+                                 SQLPOINTER charattr,
+                                 SQLSMALLINT buflen,
+                                 SQLSMALLINT *slen,
+                                 SQLLEN *numattr);
+SQLColAttribute(stmt, 1, 0, NULL, 0, &valLen, &val2);
+],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DCOLATTRIBUTE_LAST_ARG_TYPE=SQLLEN_PTR"
+],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for SQLSetStmtOption signature has SQLULEN])
+AC_TRY_COMPILE([
+#include <stdio.h>
+#define ODBCVER 0x0300
+#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
+],[
+SQLHSTMT stmt = SQL_NULL_HSTMT;
+extern SQLRETURN SQLSetStmtOption(SQLHSTMT hstmt,
+                                  SQLUSMALLINT option,
+                                  SQLULEN value);
+SQLSetStmtOption(stmt, 1, 2);
+],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DSETSTMTOPTION_LAST_ARG_TYPE=SQLULEN"
+],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for SQLWCHAR availability])
+AC_TRY_COMPILE([
+#include <sql.h>
+#include <sqltypes.h>
+],[SQLWCHAR thisiswchar;],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DHAVE_SQLWCHAR=1"
+],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for SQLBIGINT availability])
+AC_TRY_COMPILE([
+#include <sql.h>
+#include <sqltypes.h>
+],[SQLBIGINT thisisbig;],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DHAVE_LONG_LONG=1"
+],[AC_MSG_RESULT(no)])
+
+AC_MSG_CHECKING([for ptrdiff_t availability])
+AC_TRY_COMPILE([
+#include <stddef.h>
+#include <stdlib.h>
+],[ptrdiff_t apdt = 0;],[
+AC_MSG_RESULT(yes)
+ODBC_FLAGS="$ODBC_FLAGS -DPTRDIFF_T=ptrdiff_t"
+],[
+AC_MSG_RESULT(no)
+ODBC_FLAGS="$ODBC_FLAGS -DPTRDIFF_T=int"
+])
+
+CFLAGS="$SAVED_CFLAGS"
+
+##########
+# Experimental: dlopen for resolving SQLGetPrivateProfileString dynamically
+#
+AC_CHECK_LIB(dl,dlopen,DLOPENFORGPPS=1,DLOPENFORGPPS=0)
+if test "$DLOPENFORGPPS" = "1" ; then
+   AC_MSG_CHECKING([for SQLGetPrivateProfileString via dlopen])
+   saved_LIBS=$LIBS
+   LIBS="$LIBS -ldl"
+   AC_TRY_RUN([
+#include <dlfcn.h>
+
+int
+main(int argc, char **argv)
+{
+   void *lib;
+   int (*gpps)();
+
+   lib = dlopen("libodbcinst.so", RTLD_LAZY);
+   if (!lib) {
+      lib = dlopen("libiodbcinst.so", RTLD_LAZY);
+   }
+   if (lib) {
+      gpps = (int (*)()) dlsym(lib, "SQLGetPrivateProfileString");
+      exit(0);
+   }
+   exit(1);
+}
+],[
+   ODBC_FLAGS="$ODBC_FLAGS -DUSE_DLOPEN_FOR_GPPS"
+   ODBC_LIB="-ldl"
+   AC_MSG_RESULT(yes)
+],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(no)])
+   LIBS=$saved_LIBS
+fi
+
+AC_SUBST(ODBC_FLAGS)
+AC_SUBST(ODBC_LIB)
+AC_SUBST(VER_INFO)
+
+##########
+# Find out if char ptr array can be passed in place of
+# a va_list (needed for sqlite_exec_vprintf() and
+# sqlite_vmprintf())
+#
+AC_MSG_CHECKING([va_list usage])
+AC_TRY_RUN([
+#include <stdarg.h>
+#include <stdio.h>
+
+static int
+vatest(char **x, ...)
+{
+   va_list ap;
+   char *y;
+   int ret;
+
+   va_start(ap, x);
+   y = va_arg(ap, char *);
+   x = (char **) &x + 1;
+   ret = (y != *x);
+   va_end(ap);
+   return ret;
+}
+
+int
+main(int argc, char **argv)
+{
+   exit(vatest(NULL, vatest, 0.0, 0, NULL));
+}
+],[USE_VFUNCS=1],[USE_VFUNCS=0],[USE_VFUNCS=0])
+
+if test "$USE_VFUNCS" = "1" ; then
+   AC_MSG_RESULT(using sqlite_exec_vprintf/sqlite_vmprintf)
+else
+   AC_MSG_RESULT(NOT using sqlite_exec_vprintf/sqlite_vmprintf)
+   ODBC_FLAGS="$ODBC_FLAGS -DCANT_PASS_VALIST_AS_CHARPTR=1"
+fi
+
+##########
+# Check for usleep() and nanosleep()
+#
+AC_CHECK_FUNC(usleep, [ODBC_FLAGS="$ODBC_FLAGS -DHAVE_USLEEP=1"])
+AC_CHECK_FUNC(nanosleep, [ODBC_FLAGS="$ODBC_FLAGS -DHAVE_NANOSLEEP=1"])
+
+##########
+# Check for localeconv()
+#
+AC_CHECK_FUNC(localeconv, [ODBC_FLAGS="$ODBC_FLAGS -DHAVE_LOCALECONV=1"])
+
+##########
+# Check for localtime_r()
+#
+AC_CHECK_FUNC(localtime_r, [ODBC_FLAGS="$ODBC_FLAGS -DHAVE_LOCALTIME_R=1"])
+
+##########
+# Check for gmtime_r()
+#
+AC_CHECK_FUNC(gmtime_r, [ODBC_FLAGS="$ODBC_FLAGS -DHAVE_GMTIME_R=1"])
+
+##########
+# Allow omission of SQL*W() functions for SQLITE_UTF8 encoding
+#
+AC_ARG_ENABLE(winterface,
+   [  --enable-winterface     make SQL*W() functions],
+   [ test $enable_winterface = "no" &&
+     ODBC_FLAGS="$ODBC_FLAGS -DWITHOUT_WINTERFACE=1" ],
+   [ ODBC_FLAGS="$ODBC_FLAGS -DWITHOUT_WINTERFACE=1" ])
+
+#########
+# Install directory (on Debian $libdir/odbc)
+if test -r /etc/debian_version ; then
+  DRVDIR="/odbc"
+else
+  DRVDIR=""
+fi
+AC_SUBST(DRVDIR)
+
+##########
+# Experimental: dlopen for resolving SQLite3/SQLite4 symbols
+#
+AC_ARG_WITH(dls,[  --with-dls              dlopen SQLite3/SQLite4 lib],
+   WITH_DLS=1,WITH_DLS=0)
+if test "$DLOPENFORGPPS" = "1" ; then
+   if test "$WITH_DLS" = "1" ; then
+      DL_OPTS="-DSQLITE_DYNLOAD=1"
+      SQLITE3_LIB=""
+      SQLITE3_A10N_O=""
+      SQLITE4_A10N_O=""
+      DL_INITFINI="-Wl,-init,dls_init -Wl,-fini,dls_fini"
+   fi
+fi
+AC_SUBST(DL_OPTS)
+AC_SUBST(DL_INITFINI)
+AC_SUBST(SQLITE3_LIB)
+AC_SUBST(SQLITE3_A10N_O)
+AC_SUBST(SQLITE4_A10N_O)
+
+#########
+# Generate the output files.
+#
+SPEC_CHANGELOG_TS=`LANG=C date -u "+%a %b %d %Y"`
+DEB_CHANGELOG_TS=`LANG=C date "+%a, %d %b %Y %X %z"`
+AC_SUBST(SPEC_CHANGELOG_TS)
+AC_SUBST(DEB_CHANGELOG_TS)
+AC_OUTPUT(Makefile sqliteodbc.spec debian/changelog)

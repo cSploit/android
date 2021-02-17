@@ -1,0 +1,94 @@
+.TH NWUSERLIST 1 7/22/1996 nwuserlist nwuserlist
+.SH NAME
+nwuserlist \- List Users logged in at a NetWare server
+.SH SYNOPSIS
+.B nwuserlist
+[ \fB-h\fP ] [ \fB-S\fP \fIserver\fP ] [ \fB-U\fP \fIuser name\fP ]
+[ \fB-P\fP \fIpassword\fP | \fB-n\fP ] [ \fB-C\fP ] [ \fB-a\fP ]
+[ \fB-q\fP ] [ \fB-f\fP [ \fB-d\fP ] [ \fB-D\fP ] [ \fB-t\fP ]]
+
+.SH DESCRIPTION
+.B nwuserlist
+lists the users logged in at a NetWare server, together with their
+connection number and their login time.
+
+.B nwuserlist
+looks up the file \fI$HOME/.nwclient\fP to find a file server, 
+a user name and possibly a password. See \fBnwclient\fP(5) for 
+more information. Please note that the access permissions of 
+\fI$HOME/.nwclient\fP MUST be 600 for security reasons.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+\fB-h\fP is used to print out a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+\fBserver\fP is the name of the server you want to use.
+.RE
+
+.B -U
+.I user
+.RS 3
+\fBuser\fP is the user name to use for login.
+.RE
+
+.B -P
+.I password
+.RS 3
+\fBpassword\fP is the password to use for login. If neither
+\fB-n\fP nor \fB-P\fP are given, and the user has no open 
+connection to the server, nwuserlist prompts for a password.
+.RE
+
+.B -n
+.RS 3
+\fB-n\fP should be given if no password is required for the login.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.B -a
+.RS 3
+With option \fB-a\fP the IPX address of the station the user is logged in
+from is printed as well.
+.RE
+
+.B -q
+.RS 3
+With option \fB-q\fP object ID is printed in addition to user name.
+.RE
+
+.B -f
+.RS 3
+List also files opened by each connection.
+.RE
+
+.B -d
+.RS 3
+List detailed informations about each file.
+.RE
+
+.B -D
+.RS 3
+List DOS filename instead of filename which was used for opening.
+.RE
+
+.B -t
+.RS 3
+Show raw hexadecimal values in addition to human readable conversions.
+.RE
+
+.SH AUTHORS
+nwuserlist was written by Volker Lendecke. See the Changes file of ncpfs
+for other contributors.

@@ -1,0 +1,157 @@
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# You may obtain a copy of the Licence at
+# http://www.gnu.org/licences/lgpl.html
+# 
+# As a special exception this file can also be included in modules
+# with other source code as long as that source code has been 
+# released under an Open Source Initiative certificed licence.  
+# More information about OSI certification can be found at: 
+# http://www.opensource.org 
+# 
+# This module is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public Licence for more details.
+# 
+# This module was created by members of the firebird development 
+# team.  All individual contributions remain the Copyright (C) of 
+# those individuals and all rights are reserved.  Contributors to 
+# this file are either listed below or can be obtained from a CVS 
+# history command.
+#
+#  Created by:  Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#
+#  Contributor(s):
+#
+ROOT=..
+
+include     $(ROOT)/gen/make.defaults
+include     $(ROOT)/gen/make.platform
+include     $(ROOT)/gen/make.rules
+include     $(ROOT)/gen/make.shared.variables
+
+
+FirebirdInstallPrefix=@prefix@
+
+ @SET_MAKE@
+
+FIREBIRD=$(FirebirdInstallPrefix)
+
+export -n FIREBIRD
+export -n INTERBASE
+
+.PHONY: install install-embedded dist packages depotfile tarfile 
+.PHONY: buildDepot buildTarDir buildImageDir buildRoot buildDebugInfo
+
+# Some of these targets are run from the root tree of the build.
+# those need to know where the install subdirectory is kept.
+# Others are run locally these need to know the path back to the
+# root of the build tree.
+
+BuildRoot=$(GEN_ROOT)
+InstallRoot=.
+FirebirdBuildPrefix=$(GEN_ROOT)
+
+#export FirebirdBuildPrefix
+#export FirebirdInstallPrefix
+#export PackageVersion
+
+BuildVersion=$(FirebirdVersion).$(BuildNum)
+Version=$(BuildVersion)-$(PackageVersion)
+
+# This means something like: FirebirdCS-2.0.0-1.i386.tar
+TarDir= Firebird-$(Version).$(CpuType)
+TarFile=Firebird-$(Version).$(CpuType).tar
+DepotFile=Firebird-$(Version).$(CpuType).depot
+RPMFile=Firebird-$(Version).$(CpuType).rpm
+DebugDir=Firebird-debuginfo-$(Version).$(CpuType)
+DebugFile=Firebird-debuginfo-$(Version).$(CpuType).tar
+
+PkgSrcDir=$(InstallRoot)/$(ArchType)
+ScriptDir=$(GEN_ROOT)/install/scripts/
+RPMSrcDir=$(GEN_ROOT)/install/scripts
+
+TarInstallDir=$(GEN_ROOT)/install
+
+dist : packages
+
+packages: depotfile tarfile debugfile
+depotfile: $(DepotFile)
+
+tarfile:  $(TarFile)
+
+$(TarFile) :  buildTarDir
+	(cd $(GEN_ROOT); tar -cvf $(TarFile) $(TarDir))
+
+debugfile:  $(DebugFile)
+
+$(DebugFile) :  buildImageDir
+	(cd $(GEN_ROOT)/$(DebugDir); tar -cvf ../$(DebugFile) *)
+
+# objcopy --add-gnu-debuglink fails with binutils 2.14 or older
+# its failure affects only GDB ability to pick up external debug 
+# symbols automatically. We may use eu-strip command from elfutils 
+# instead, but it doesn't work or compile with such distros 
+# as Mandrake 9.0 not saying about older ones. New binutils
+# seem to compile and work everywhere I tried, but we try to 
+# use eu-strip first since it is a part of default Red Hat 9 
+# install and is available in binary form for Mandrake 9.1 and newer.
+#
+#     28-Dec-2003. Nickolay Samofatov
+#
+# Do not use eu-strip any longer because version 0.89/AMD64 shipped with 
+# Mandrake 9.2 produces broken debuginfo packages and there is no easy way to 
+# detect the breakage. Binutils seem to be more reliable alternative to me.
+#
+#     05-Apr-2004. Nickolay Samofatov
+#
+
+buildRoot:
+	(cd $(GEN_ROOT); ./install/makeInstallImage.aix.sh $(MAKECMDGOALS))
+
+buildDebugInfo: buildRoot
+	mkdir -p $(GEN_ROOT)/$(DebugDir)
+	for x in `(cd $(GEN_ROOT)/buildroot; find)`; do \
+        FIL=$(GEN_ROOT)/buildroot/$$x; \
+        D_FIL=$(GEN_ROOT)/$(DebugDir)/`dirname $${x}`/.debug/`basename $${x}`.debug; \
+        if [ ! -h $$FIL ] && readelf -h $$FIL > /dev/null 2> /dev/null; then \
+            mkdir -p $(GEN_ROOT)/$(DebugDir)/`dirname $$x`/.debug; \
+            echo Generating external debug info for $$x; \
+            cp $${FIL} $${D_FIL}; \
+            if objcopy --add-gnu-debuglink $${D_FIL} $${FIL}; > /dev/null 2> /dev/null; then \
+                echo Succeeded using objcopy from binutils; \
+            else \
+                echo Failed to set debug link for $${x}; \
+            fi; \
+            echo Stripping unneeded symbols from $${x}; \
+            objcopy --strip-debug --strip-unneeded $${FIL}; \
+        fi; \
+    done
+# Work around GDB 6.0 bug
+	mkdir -p $(GEN_ROOT)/$(DebugDir)@libdir@/.debug
+	for x in `ls $(GEN_ROOT)/$(DebugDir)@prefix@/lib/.debug`; do \
+        ln -f -s @prefix@/lib/.debug/`basename $$x` $(GEN_ROOT)/$(DebugDir)@libdir@/.debug; \
+    done
+
+# Use this line if you don't want to use separate debug info
+buildImageDir: buildRoot
+#buildImageDir: buildDebugInfo
+
+
+buildTarDir: buildImageDir
+	mkdir -p $(GEN_ROOT)/$(TarDir)
+	cp -r $(GEN_ROOT)/install/scripts $(GEN_ROOT)/$(TarDir)
+	cp -r $(GEN_ROOT)/install/scripts/tarmaininstall.aix.sh $(GEN_ROOT)/$(TarDir)/install.sh
+	chmod a+x $(GEN_ROOT)/$(TarDir)/install.sh $(GEN_ROOT)/$(TarDir)/scripts/*sh
+	(cd $(GEN_ROOT)/buildroot; rm -f buildroot.tar; tar -cvf buildroot.tar * )
+	(cd $(GEN_ROOT)/buildroot; tar -tvf buildroot.tar > manifest.txt )
+	(cd $(GEN_ROOT)/buildroot; cp buildroot.tar ../$(TarDir)/buildroot.tar )
+	(cd $(GEN_ROOT)/buildroot; cp manifest.txt ../$(TarDir)/manifest.txt )
+
+install install-embedded: buildTarDir
+# pass command-line goal, e.g. "install-embedded", to shell process
+# "install-embedded" installs without a server process, i.e. embedded mode
+	(cd $(GEN_ROOT)/$(TarDir); ./install.sh $(MAKECMDGOALS))

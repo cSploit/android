@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Differences for Users of other SQL Engines</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="dbsqlbasics.html" title="Chapter 1. Berkeley DB SQL: The Absolute Basics" />
+    <link rel="prev" href="sequencesupport.html" title="Using Sequences" />
+    <link rel="next" href="lockingnotes.html" title="Chapter 2. Locking Notes" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Differences for Users of other SQL Engines</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="sequencesupport.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 1. Berkeley DB SQL: The Absolute Basics</th>
+          <td width="20%" align="right"> <a accesskey="n" href="lockingnotes.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="normal-sql"></a>Differences for Users of other SQL Engines</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                If you are used to a SQL implementation from other SQL
+                engine (such as Oracle's RDBMS), the SQL used by the BDB SQL interface
+                (which is the same as used by SQLite) may hold some surprises for
+                you. 
+            </p>
+      <p>
+                Some things in particular to take note of:
+            </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                        Datatyping is weaker in SQLite than it is with
+                        standard SQL. For example, SQLite does not
+                        enforce the length of a <code class="literal">VARCHAR</code>.
+                        While standard SQL will truncate a
+                        <code class="literal">VARCHAR</code> that is too long, you
+                        could (for example) declare a
+                        <code class="literal">VARCHAR(10)</code> then put 500
+                        characters in it without any truncation, ever.
+                    </p>
+            <p>
+                        SQLite datatyping is described in detail on the 
+                        <a class="ulink" href="http://sqlite.org/datatype3.html" target="_top">
+                            Datatypes in SQLite Version 3
+                        </a> page.
+                    </p>
+          </li>
+          <li>
+            <p>
+                        Do not use autocommit with SQLite. Instead, use
+                        <code class="literal">begin exclusive</code>
+                        and then <code class="literal">commit</code>.
+                    </p>
+          </li>
+          <li>
+            <p>
+                        How NULLs are handled in SQLite may be different from what
+                        you are used to. See
+                        <a class="ulink" href="http://www.sqlite.org/nulls.html" target="_top">
+                            NULL Handling in SQLite Versus Other Database Engines
+                        </a>
+                        for details.
+                    </p>
+          </li>
+          <li>
+            <p>
+                        There are some features of SQL that SQLite does
+                        not support. For more information, see
+                        <a class="ulink" href="http://www.sqlite.org/omitted.html" target="_top">
+                            SQL Features That SQLite Does Not Implement.
+                        </a>
+                    </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="sequencesupport.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="dbsqlbasics.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="lockingnotes.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Using Sequences </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 2. Locking Notes</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

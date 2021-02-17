@@ -1,0 +1,16 @@
+Title Firebird Database
+Version 2.5.0
+Description Firebird 2.5.0
+DefaultLocation /tmp/install
+DeleteWarning 
+
+### Package Flags
+
+NeedsAuthorization YES
+Required YES
+Relocatable YES
+RequiresReboot NO
+UseUserMask YES
+OverwritePermissions NO
+InstallFat NO
+RootVolumeOnly NO

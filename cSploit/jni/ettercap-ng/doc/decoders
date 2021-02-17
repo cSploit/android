@@ -1,0 +1,56 @@
+===============================================================================
+
+TOPIC:      decoder
+
+ABSTRACT:   this file describes how to write a protocol decoder and how to fill
+            the structures in order to ettercap understand them
+
+NOTE:       decoders refers to functions analyzing protocols such as TCP or
+            UDP. functions that handle the application level of the TCP/IP 
+            stack are called dissectors and they are stored in the
+            src/dissectors directory.
+
+===============================================================================
+
+The decoders are organized as in a protocol stack as for the TCP/IP stack. The
+captured packet is passed to the decoder of the lowest level (link layer) which
+decodes its header, fills the struct in the packet object and pass the packet
+to the decoder of the upper level. Each decoder call the next one according to 
+the type of packet carried by the current header. For example the ethernet
+decoder call the next one looking at the eth->proto field (0x0800 for IP). 
+You can imagine the process as a stack of layers. The packet goes up while gets
+decoded and down when each decoder returns. In the descending phase you can 
+adjust the packet if a modification in the upper layer has been performed.
+
+Each decoder must register itself with the add_decoder() function. The decoder
+must provide a level (as for the ISO/OSI stack) and a type (for the specific
+protocol).
+
+
+A decoder must use the macro provided in the ec_decode.h file. The main
+function must be declared as:
+
+   FUNC_DECODER(new_dissector) 
+   {
+      ...
+   }
+
+within the function code, some macro are provided to properly handle the structures.
+
+DECODED_LEN       (int) is the len of the data the decoder can parse 
+
+PACKET            (struct packet_object) the PO structure associated with data 
+
+FUNC_DECODER_PTR() can be used to declare a pointer to a decoder.
+
+get_decoder(level, type)  this fuction is used to retrieve a decoder for a give
+                          level. the decoder are registered in the list of
+                          decoder on startup. every decoder registers itself in
+                          the proper level (2 for eth, 3 for ip, etc) in the
+                          __init function.
+
+EXECUTE_DECODER() this macro is used to execute the next decoder in the stack.
+
+
+EOF
+

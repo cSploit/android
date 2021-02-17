@@ -1,0 +1,5 @@
+# This invokes the benchmarking cronjob as run on our ASF box aka svn-qavm
+# (ask danielsh about the VM).
+# m h  dom mon dow   command
+21 0 * * Mon /home/neels/svnbench/cronjob >>/home/neels/cronjob.log 2>&1
+

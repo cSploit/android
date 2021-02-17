@@ -1,0 +1,94 @@
+This directory contains a slapd overlay, smbk5pwd, that extends the
+PasswordModify Extended Operation to update Kerberos keys and Samba
+password hashes for an LDAP user.
+
+The Kerberos support is written for Heimdal using its hdb-ldap backend.
+If a PasswordModify is performed on an entry that has the krb5KDCEntry
+objectclass, then the krb5Key and krb5KeyVersionNumber will be updated
+using the new password in the PasswordModify request. Additionally, a
+new "{K5KEY}" password hash mechanism is provided. For krb5KDCEntries that
+have this hash specifier in their userPassword attribute, Simple Binds
+will be checked against the Kerberos keys of the Entry. No data is
+needed after the "{K5KEY}" hash specifier in the userPassword, it is
+looked up from the Entry directly.
+
+The Samba support is written using the Samba 3.0 LDAP schema. If a
+PasswordModify is performed on an entry that has the sambaSamAccount
+objectclass, then the sambaLMPassword, sambaNTPassword, and sambaPwdLastSet
+attributes will be updated accordingly.
+
+To use the overlay, add:
+
+	include <path to>/krb5-kdc.schema
+	include <path to>/samba.schema
+
+	moduleload <path to>smbk5pwd.so
+	...
+
+	database mdb
+	...
+	overlay smbk5pwd
+
+to your slapd configuration file. (You should obtain the necessary schema
+files from the Heimdal and/or Samba distributions. At this time, there
+are several known errors in these schema files that you will have to
+correct before they will load in slapd.  As of Samba 3.0 the schema looks
+fine as shipped.)
+
+All modules compiled in (i.e. krb5 and samba) are enabled; the statement
+
+	smbk5pwd-enable		<module>
+
+can be used to enable only the desired one(s); legal values for <module>
+are "krb5", "samba" and "shadow", if they are respectively enabled by defining
+DO_KRB5, DO_SAMBA and DO_SHADOW.
+
+The samba module also supports the
+
+	smbk5pwd-must-change	<seconds>
+
+which sets the "sambaPwdMustChange" attribute accordingly to force passwd
+expiry.  A value of 0 disables this feature.
+
+The overlay now supports table-driven configuration, and thus can be run-time
+loaded and configured via back-config.  The layout of the entry is
+
+	# {0}smbk5pwd, {1}bdb, config
+	dn: olcOverlay={0}smbk5pwd,olcDatabase={1}bdb,cn=config
+	objectClass: olcOverlayConfig
+	objectClass: olcSmbK5PwdConfig
+	olcOverlay: {0}smbk5pwd
+	olcSmbK5PwdEnable: krb5
+	olcSmbK5PwdEnable: samba
+	olcSmbK5PwdMustChange: 2592000
+
+which enables both krb5 and samba modules with a password expiry time
+of 30 days.
+
+The provided Makefile builds both Kerberos and Samba support by default.
+You must edit the Makefile to insure that the correct include and library
+paths are used. You can change the DEFS macro if you only want one or the
+other of Kerberos or Samba support.
+
+This overlay is only set up to be built as a dynamically loaded module.
+On most platforms, in order for the module to be usable, all of the 
+library dependencies must also be available as shared libraries.
+
+If you need to build the overlay statically, you will have to move it into the
+slapd/overlays directory and edit the Makefile and overlays.c to reference
+it. You will also have to define SLAPD_OVER_SMBK5PWD to SLAPD_MOD_STATIC,
+and add the relevant libraries to the main slapd link command.
+
+---
+This work is part of OpenLDAP Software <http://www.openldap.org/>.
+Copyright 2004-2014 The OpenLDAP Foundation.
+Portions Copyright 2004-2005 Howard Chu, Symas Corp. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in the file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+<http://www.OpenLDAP.org/license.html>.
+

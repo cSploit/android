@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Getting and Installing BDB SQL</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="dbsqlbasics.html" title="Chapter 1. Berkeley DB SQL: The Absolute Basics" />
+    <link rel="prev" href="dbsqlbasics.html" title="Chapter 1. Berkeley DB SQL: The Absolute Basics" />
+    <link rel="next" href="accessing_bdb_sql_databases.title.html" title="Accessing BDB SQL Databases" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Getting and Installing BDB SQL</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbsqlbasics.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 1. Berkeley DB SQL: The Absolute Basics</th>
+          <td width="20%" align="right"> <a accesskey="n" href="accessing_bdb_sql_databases.title.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="buildinstall"></a>Getting and Installing BDB SQL</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="buildinstall.html#onwin">On Windows Systems</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="buildinstall.html#onunix">On Unix</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="buildinstall.html#ado_net">The BDB SQL ADO.NET Interface</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+                The BDB SQL interface comes as a part of the Oracle Berkeley DB
+                download. This can be downloaded from the 
+                <a class="ulink" href="http://www.oracle.com/technetwork/database/berkeleydb/downloads/index.html" target="_top">Oracle Berkeley DB download page</a>.
+            </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="onwin"></a>On Windows Systems</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    The BDB SQL interface is automatically built and installed
+                    whenever you build or install Berkeley DB for a Windows
+                    system. The BDB SQL interface <code class="literal">dll</code>s and the
+                    command line interpreter have names that differ from a
+                    standard SQLite distribution as follows:
+                </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                            <code class="literal">dbsql.exe</code>
+                        </p>
+              <p>
+                            This is the command line shell. It operates
+                            identically to the SQLite
+                            <span class="command"><strong>sqlite3.exe</strong></span> shell.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <code class="literal">libdb_sql60.dll</code>
+                        </p>
+              <p>
+                            This is the library that provides the BDB SQL interface.
+                            It is the equivalent of the SQLite
+                            <code class="literal">sqlite3.dll</code> library.
+                        </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="onunix"></a>On Unix</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    In order to build the BDB SQL interface, you download and build
+                    Berkeley DB, configuring it so that the BDB SQL interface is also built.
+                    Be aware that it is not built by default. Instead, you
+                    need to tell the Berkeley DB <code class="literal">configure</code>
+                    script to also build the BDB SQL interface.  For instructions on
+                    building the BDB SQL interface, see <a href="../installation/build_unix.html#build_unix_sqlinter" class="olink">Building the DB SQL Interface</a> in the
+                    <em class="citetitle">Berkeley DB Installation and Build Guide</em>.
+                </p>
+        <p>
+                    The library and application names used when building
+                    the BDB SQL interface are different than those used by SQLite.
+                    If you want library and command shell names that are
+                    consistent with the names used by SQLite, configure
+                    the BDB SQL interface build using the compatibility
+                    (<code class="literal">--enable-sql_compat</code>) option.
+                </p>
+        <div class="warning" style="margin-left: 0.5in; margin-right: 0.5in;">
+          <h3 class="title">Warning</h3>
+          <p>
+                        The compatibility option can break other
+                        applications on your platform that rely on standard
+                        SQLite. This is especially true of Mac OS X, which
+                        uses standard SQLite for a number of default
+                        applications.
+                    </p>
+          <p>
+                        <span class="emphasis"><em>
+                            Use the compatibility option only if you know
+                            exactly what you are doing.
+                        </em></span>
+                    </p>
+        </div>
+        <p>
+                    Unless you built the BDB SQL interface with the compatibility
+                    option, libraries and a command line shell
+                    are built with the following names:
+                </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                            <a href="../api_reference/C/dbsql.html" class="olink">dbsql</a>
+                        </p>
+              <p>
+                            This is the command line shell. It operates
+                            identically to the SQLite
+                            <span class="command"><strong>sqlite3</strong></span> shell.
+                        </p>
+            </li>
+            <li>
+              <p>
+                            <code class="literal">libdb_sql</code>
+                        </p>
+              <p>
+                            This is the library that provides the BDB SQL interface.
+                            It is the equivalent of the SQLite
+                            <code class="literal">libsqlite3</code> library.
+                        </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="ado_net"></a>The BDB SQL ADO.NET Interface</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                Download the ADO.NET package from the
+                <a class="ulink" href="http://www.oracle.com/technetwork/database/berkeleydb/downloads/index.html" target="_top">Oracle Berkeley DB download page</a>.
+                </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="ado_prereqs"></a>Prerequisites For Building The ADO.NET Package</h4>
+              </div>
+            </div>
+          </div>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                        To build the Linq package, you will need to install
+                        <code class="literal">Microsoft .NET Framework 3.5 SP1</code>.
+                    </li>
+              <li>
+                        To build SQLite.Designer, you will need to install the
+                        <code class="literal">Microsoft Visual Studio SDK</code>.
+                    </li>
+              <li>
+                        To build on Windows Mobile you will need to install the
+                        <code class="literal">Microsoft Windows Mobile 6.5.3 Developer Tool Kit (DTK)</code>.
+                    </li>
+              <li>
+                        To build on Windows Mobile you will need to use Visual
+                        Studio 2008.
+                    </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="ado_build_steps"></a>Building BDB SQL ADO.NET Interface For Windows</h4>
+              </div>
+            </div>
+          </div>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                                The package contains Visual Studio solution files:
+                            </p>
+                <div class="itemizedlist">
+                  <ul type="circle">
+                    <li>
+                      <p>
+                                        <code class="literal">SQLite.NET.2008.sln</code>
+                                        and
+                                        <code class="literal">SQLite.NET.2010.sln</code>
+                                    </p>
+                      <p>
+                                        For use by with Visual Studio 2008
+                                        or 2010.  Note that these solution
+                                        files do not build support for Linq
+                                        or SQLite Designer.
+                                    </p>
+                    </li>
+                    <li>
+                      <p>
+                                        <code class="literal">SQLite.NET.2008.MSBuild.sln</code>
+                                        and 
+                                        <code class="literal">SQLite.NET.2010.MSBuild.sln</code>
+                                    </p>
+                      <p>
+                                        For use with MSBuild (Microsoft
+                                        Build Engine). These can also be
+                                        used with Visual Studio. These
+                                        solutions exclude SQLite Designer
+                                        and CompactFramework. By default,
+                                        these do not build support for
+                                        Linq.
+                                    </p>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li>
+                            Change the current platform target to
+                            <code class="literal">ReleaseNativeOnly</code> choose either
+                            <code class="literal">Win32</code> or <code class="literal">x64</code>
+                            depending on your target platform.
+                        </li>
+              <li>
+                            Build the solution.
+                        </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="ado_build_steps_ce"></a>
+                        Building BDB SQL ADO.NET Interface For Windows Mobile
+                    </h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                        Building BDB SQL ADO.NET for Windows Mobile
+                        requires Windows Mobile 6.5.3 Professional DTK.
+                        Typical requirements for installing this toolkit
+                        are:
+                    </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                                Visual Studio 2005 SP1 or Later
+                            </p>
+              </li>
+              <li>
+                <p>
+                                ActiveSync 4.5
+                            </p>
+              </li>
+              <li>
+                <p>
+                                .NET CompactFramework 2.0 SP1
+                            </p>
+              </li>
+              <li>
+                <p>
+                                Windows Mobile 6 SDK
+                            </p>
+              </li>
+            </ul>
+          </div>
+          <p>
+                        To build BDB SQL ADO.NET for Windows Mobile, do
+                        the following:
+                    </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                            Open the <code class="literal">SQLite.NET.2008.WinCE.sln</code>
+                            solution file in Visual Studio 2008.
+                        </li>
+              <li>
+                            Select <code class="literal">Load Project Normally</code></li>
+              <li>
+                            Change the current platform to <code class="literal">ReleaseNativeOnly</code>.
+                        </li>
+              <li>
+                            Select <code class="literal">Configuration Manager</code>-&gt;<code class="literal">new</code>,
+                            then type or select the platform
+                            <code class="literal">Windows Mobile 6.5.3 Professional DTK (ARMV4I)</code>. 
+                            Choose to copy settings from
+                            <code class="literal">Pocket PC 2003 (ARMV4I)</code></li>
+              <li>
+                            Build the solution.
+                        </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbsqlbasics.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="dbsqlbasics.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="accessing_bdb_sql_databases.title.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 1. Berkeley DB SQL: The Absolute Basics </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Accessing BDB SQL Databases</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

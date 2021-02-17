@@ -1,0 +1,100 @@
+#
+#    May you do good and not evil.
+#    May you find forgiveness for yourself and forgive others.
+#    May you share freely, never taking more than you give.
+#
+#***********************************************************************
+# This file implements tests for some Berkeley DB specific
+# vacuum pragmas.
+#
+
+
+set testdir [file dirname $argv0]/../../lang/sql/sqlite/test
+source $testdir/tester.tcl
+reset_db
+
+# Test that bdbsql_vacuum_pragmas pragma works as expected.
+#
+
+# Test that bdbsql_vacuum_fillpercent pragma works as expected.
+#
+do_test bdb_vacuum_pragmas-1.1 {
+  execsql {
+    PRAGMA bdbsql_vacuum_fillpercent;
+  }
+} {90}
+
+do_test bdb_vacuum_pragmas-1.2 {
+  execsql {
+    PRAGMA bdbsql_vacuum_fillpercent=80;
+  }
+} {80}
+
+# Test boundary
+do_test bdb_vacuum_pragmas-1.3 {
+  catchsql {
+    PRAGMA bdbsql_vacuum_fillpercent=0;
+  }
+} {1 {Invalid value bdbsql_vacuum_fillpercent 0}}
+
+# Test boundary
+do_test bdb_vacuum_pragmas-1.4 {
+  execsql {
+    PRAGMA bdbsql_vacuum_fillpercent=100;
+  }
+} {100}
+
+# Test invalid values
+do_test bdb_vacuum_pragmas-1.5 {
+  catchsql {
+    PRAGMA bdbsql_vacuum_fillpercent=-1;
+  }
+} {1 {Invalid value bdbsql_vacuum_fillpercent -1}}
+
+do_test bdb_vacuum_pragmas-1.6 {
+  execsql {
+    PRAGMA bdbsql_vacuum_fillpercent;
+  }
+} {100}
+
+do_test bdb_vacuum_pragmas-1.7 {
+  execsql {
+    PRAGMA bdbsql_vacuum_fillpercent=90;
+  }
+} {90}
+
+# Test that pragma bdb_vacuum_pages works as expected.
+#
+do_test bdb_vacuum_pragmas-2.1 {
+  execsql {
+    PRAGMA bdbsql_vacuum_pages;
+  }
+} {128}
+
+do_test bdb_vacuum_pragmas-2.2 {
+  execsql {
+    PRAGMA bdbsql_vacuum_pages=256;
+  }
+} {256}
+
+# Test invalid values
+do_test bdb_vacuum_pragmas-2.3 {
+  catchsql {
+    PRAGMA bdbsql_vacuum_pages=0;
+  }
+} {1 {Invalid value bdbsql_vacuum_pages 0}}
+
+# Test invalid values
+do_test bdb_vacuum_pragmas-2.3 {
+  catchsql {
+    PRAGMA bdbsql_vacuum_pages=-1;
+  }
+} {1 {Invalid value bdbsql_vacuum_pages -1}}
+
+do_test bdb_vacuum_pragmas-2.4 {
+  execsql {
+    PRAGMA bdbsql_vacuum_pages;
+  }
+} {256}
+
+finish_test

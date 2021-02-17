@@ -1,0 +1,72 @@
+;  The contents of this file are subject to the Interbase Public
+;  License Version 1.0 (the "License"); you may not use this file
+;  except in compliance with the License. You may obtain a copy
+;  of the License at http://www.Inprise.com/IPL.html
+; 
+;  Software distributed under the License is distributed on an
+;  "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+;  or implied. See the License for the specific language governing
+;  rights and limitations under the License.
+; 
+;  The Original Code was created by Inprise Corporation
+;  and its predecessors. Portions created by Inprise Corporation are
+;  Copyright (C) Inprise Corporation.
+; 
+;  All Rights Reserved.
+;  Contributor(s): ______________________________________.
+;------------------------------------------------------------
+;  UTLS DLL MODULE DEFINITION FILE
+;------------------------------------------------------------
+
+LIBRARY     UTLS
+
+DESCRIPTION 'EXTERNAL UTILITIES INTERBASE MODULE'
+CODE MOVEABLE DISCARDABLE
+DATA MOVEABLE SINGLE
+EXPORTS
+
+; ../DSQL/BLOB.C
+	_ISC_BLOB_DEFAULT_DESC         @2
+	_ISC_BLOB_GEN_BPB              @3
+	_ISC_BLOB_LOOKUP_DESC          @4
+	_ISC_BLOB_SET_DESC             @5
+
+; PERF.C
+	_PERF_FORMAT                   @6
+	_PERF_GET_INFO                 @7
+	_PERF_REPORT                   @8
+
+; UTL.C
+	_BLOB_CLOSE                    @9
+	_BLOB_GET                      @10
+	_BLOB__DISPLAY                 @11
+	_BLOB_DISPLAY                  @12
+	_BLOB_DUMP                     @13
+	_BLOB__DUMP                    @14
+	_BLOB_EDIT                     @15
+	_BLOB__EDIT                    @16
+	_BLOB_LOAD                     @17
+	_BLOB__LOAD                    @18
+	_BLOB_OPEN                     @19
+	_BLOB_PUT                      @20
+	_BOPEN                         @21
+
+	_GDS__BLOB_SIZE                @22
+	_GDS__EDIT                     @23
+	_GDS__EVENT_BLOCK              @24
+	_GDS__EVENT_BLOCK_A            @25
+	_GDS__EVENT_BLOCK_S            @26
+	_GDS__EVENT_COUNTS             @27
+	_GDS__VERSION                  @28
+
+	_ISC_BADDRESS                  @29
+	_ISC_BADDRESS_S                @30
+	_ISC_EXPAND_DPB                @31
+	_ISC_FORMAT_IMPLEMENTATION     @32
+	_ISC_SET_LOGIN                 @33
+	_ISC_SET_SINGLE_USER           @35
+
+
+;-------------------------------------------
+		WEP                            	@1
+

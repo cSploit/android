@@ -1,0 +1,134 @@
+This directory contains a slapd overlay, nssov, that handles
+NSS lookup requests through a local Unix Domain socket. It uses the
+same IPC protocol as Arthur de Jong's nss-ldapd, and a complete
+copy of the nss-ldapd source is included here. It also handles
+PAM requests.
+
+To use this code, you will need the client-side stuf library from
+nss-pam-ldapd.  You can get it from:
+http://arthurdejong.org/nss-pam-ldapd
+You will not need the nslcd daemon; this overlay replaces that part.
+To disable building of the nslcd daemon in nss-pam-ldapd, add the
+--disable-nslcd option to the nss-pam-ldapd configure script. You
+should already be familiar with the RFC2307 and RFC2307bis schema
+to use this overlay.  See the nss-pam-ldapd README for more information
+on the schema and which features are supported.
+
+To use the overlay, add:
+
+	include <path to>nis.schema
+
+	moduleload <path to>nssov.so
+	...
+
+	database hdb
+	...
+	overlay nssov
+
+to your slapd configuration file. (The nis.schema file contains
+the original RFC2307 schema. Some modifications will be needed to
+use RFC2307bis.)
+
+The overlay may be configured with Service Search Descriptors (SSDs)
+for each NSS service that will be used. SSDs are configured using
+
+	nssov-ssd <service> <url>
+
+where the <service> may be one of
+	aliases
+	ethers
+	group
+	hosts
+	netgroup
+	networks
+	passwd
+	protocols
+	rpc
+	services
+	shadow
+
+and the <url> must be of the form
+	ldap:///[<basedn>][??[<scope>][?<filter>]]
+
+The <basedn> will default to the first suffix of the current database.
+The <scope> defaults to "subtree". The default <filter> depends on which
+service is being used.
+
+If the local database is actually a proxy to a foreign LDAP server, some
+mapping of schema may be needed. Some simple attribute substitutions may
+be performed using
+
+	nssov-map <service> <orig> <new>
+
+See the nss-ldapd/README for the original attribute names used in this code.
+
+The overlay also supports dynamic configuration in cn=config. The layout
+of the config entry is
+
+	dn: olcOverlay={0}nssov,ocDatabase={1}hdb,cn=config
+	objectClass: olcOverlayConfig
+	objectClass: olcNssOvConfig
+	olcOverlay: {0}nssov
+	olcNssSsd: passwd ldap:///ou=users,dc=example,dc=com??one
+	olcNssMap: passwd uid accountName
+
+which enables the passwd service, and uses the accountName attribute to
+fetch what is usually retrieved from the uid attribute.
+
+PAM authentication, account management, session management, and password
+management are supported.
+
+Authentication is performed using Simple Binds. Since all operations occur
+inside the slapd overlay, "fake" connections are used and they are
+inherently secure. Two methods of mapping the PAM username to an LDAP DN
+are provided:
+  the mapping can be accomplished using slapd's authz-regexp facility. In
+this case, a DN of the form
+	cn=<service>+uid=<user>,cn=<hostname>,cn=pam,cn=auth
+is fed into the regexp matcher. If a match is produced, the resulting DN
+is used.
+  otherwise, the NSS passwd map is invoked (which means it must already
+be configured).
+
+If no DN is found, the overlay returns PAM_USER_UNKNOWN. If the DN is
+found, and Password Policy is supported, then the Bind will use the
+Password Policy control and return expiration information to PAM.
+
+Account management also uses two methods. These methods depend on the
+ldapns.schema included with the nssov source.
+  The first is identical to the method used in PADL's pam_ldap module:
+host and authorizedService attributes may be looked up in the user's entry,
+and checked to determine access. Also a check may be performed to see if
+the user is a member of a particular group. This method is pretty
+inflexible and doesn't scale well to large networks of users, hosts,
+and services.
+  The second uses slapd's ACL engine to check if the user has "compare"
+privilege on an ipHost object whose name matches the current hostname, and
+whose authorizedService attribute matches the current service name. This
+method is preferred, since it allows authorization to be centralized in
+the ipHost entries instead of scattered across the entire user population.
+The ipHost entries must have an authorizedService attribute (e.g. by way
+of the authorizedServiceObject auxiliary class) to use this method.
+
+Session management: the overlay may optionally add a "logged in" attribute
+to a user's entry for successful logins, and delete the corresponding
+value upon logout. The attribute value is of the form
+	<generalizedTime> <host> <service> <tty> (<ruser@rhost>)
+
+Password management: the overlay will perform a PasswordModify exop
+in the server for the given user.
+
+---
+This work is part of OpenLDAP Software <http://www.openldap.org/>.
+
+Copyright 1998-2014 The OpenLDAP Foundation.
+Portions Copyright 2008-2009 Howard Chu, Symas Corp. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in the file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+<http://www.OpenLDAP.org/license.html>.
+

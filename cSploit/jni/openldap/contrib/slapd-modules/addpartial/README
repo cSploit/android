@@ -1,0 +1,72 @@
+addpartial Overlay README
+
+DESCRIPTION
+    This package contains an OpenLDAP overlay called "addpartial" that 
+    intercepts add requests, determines if the entry exists, determines what 
+    attributes, if any, have changed, and modifies those attributes.  If the
+    entry does not exist, the add request falls through and proceeds normally.
+    If the entry exists but no changes have been detected, the client receives
+    LDAP_SUCCESS (I suppose it is debatable what to do in this case, but this is
+    the most clean for my use.  The LDAP_SUCCESS lets me know that the entry I
+    sent slapd == the entry already in my slapd DB.  Perhaps this behavior
+    should be configurable in the future).
+
+    When a change is found, the addpartial overlay will replace all values for
+    the attribute (if an attribute does not exist in the new entry but exists
+    in the entry in the slapd DB, a replace will be done with an empty list of
+    values).
+
+    Once a modify takes place, the syncprov overlay will properly process the
+    change, provided that addpartial is the first overlay to run.  Please see
+    the CAVEATS for more specifics about this.
+
+    The addpartial overlay makes it easy to replicate full entries to a slapd 
+    instance without worrying about the differences between entries or even if
+    the entry exists.  Using ldapadd to add entries, the addpartial overlay can
+    compare about 500 records per second.  The intent of the addpartial overlay
+    is to make it easy to replicate records from a source that is not an LDAP
+    instance, such as a database.  The overlay is also useful in places where it
+    is easier to create full entries rather than comparing an entry with an
+    entry that must be retrieved (with ldapsearch or similar) from an existing
+    slapd DB to find changes. 
+
+    The addpartial overlay has been used in production since August 2004 and has
+    processed millions of records without incident.
+
+BUILDING
+    A Makefile is included, please set your LDAP_SRC directory properly.
+
+INSTALLATION
+    After compiling the addpartial overlay, add the following to your 
+    slapd.conf:
+
+    ### slapd.conf
+    ...
+    moduleload addpartial.so
+    ...
+    # after database directive...
+    # this overlay should be the last overlay in the config file to ensure that
+    # it properly intercepts the add request
+    overlay addpartial
+    ...
+    ### end slapd.conf
+
+CAVEATS
+    - In order to ensure that addpartial does what it needs to do, it should be
+      the last overlay configured so it will run before the other overlays.
+      This is especially important if you are using syncrepl, as the modify that
+      addpartial does will muck with the locking that takes place in the
+      syncprov overlay.
+
+---
+Copyright 2004-2014 The OpenLDAP Foundation.
+Portions Copyright (C) Virginia Tech, David Hawes.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+http://www.OpenLDAP.org/license.html.

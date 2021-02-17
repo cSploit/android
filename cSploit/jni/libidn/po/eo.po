@@ -1,0 +1,357 @@
+# Esperanto translations for GNU libidn.
+# Copyright (C) 2012 Free Software Foundation, Inc.
+# This file is distributed under the same license as the libidn package.
+#
+# Tradukoj kiuj komencas per "##" estas mesaĝoj por erarspurado;
+# ili devus malesti en ĉi tiu dosiero.
+#
+# Edmund GRIMLEY EVANS <edmundo@rano.org>, 2004, 2005, 2007, 2008.
+# Benno Schulenberg <benno@vertaalt.nl>, 2012.
+msgid ""
+msgstr ""
+"Project-Id-Version: libidn 1.25\n"
+"Report-Msgid-Bugs-To: bug-libidn@gnu.org\n"
+"POT-Creation-Date: 2013-07-10 13:54+0200\n"
+"PO-Revision-Date: 2012-12-17 16:42+0100\n"
+"Last-Translator: Benno Schulenberg <benno@vertaalt.nl>\n"
+"Language-Team: Esperanto <translation-team-eo@lists.sourceforge.net>\n"
+"Language: eo\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Lokalize 1.0\n"
+
+#: lib/strerror-idna.c:82 lib/strerror-pr29.c:66 lib/strerror-punycode.c:66
+#: lib/strerror-stringprep.c:86 lib/strerror-tld.c:68
+msgid "Success"
+msgstr "Sukceso"
+
+#: lib/strerror-idna.c:86 lib/strerror-pr29.c:74
+msgid "String preparation failed"
+msgstr "Malsukcesis pretigo de signoĉeno"
+
+#: lib/strerror-idna.c:90
+msgid "Punycode failed"
+msgstr "Malsukcesis 'Punycode'"
+
+#: lib/strerror-idna.c:94
+msgid "Non-digit/letter/hyphen in input"
+msgstr "Litero/necifero/streketo en enigo"
+
+#: lib/strerror-idna.c:98
+msgid "Forbidden leading or trailing minus sign (`-')"
+msgstr "Malpermesita minuso ('-') ĉe komenco aŭ fino"
+
+#: lib/strerror-idna.c:102
+msgid "Output would be too large or too small"
+msgstr "Eligo estus tro granda aŭ tro malgranda"
+
+#: lib/strerror-idna.c:106
+msgid "Input does not start with ACE prefix (`xn--')"
+msgstr "Enigo ne komenciĝas per ACE-prefikso ('xn--')"
+
+#: lib/strerror-idna.c:110
+msgid "String not idempotent under ToASCII"
+msgstr "Ĉeno ŝanĝiĝas ĉe dua apliko de 'ToASCII'"
+
+#: lib/strerror-idna.c:114
+msgid "Input already contain ACE prefix (`xn--')"
+msgstr "Enigo jam havas ACE-prefikson ('xn--')"
+
+#: lib/strerror-idna.c:118 lib/strerror-tld.c:84
+msgid "System iconv failed"
+msgstr "Malsukcesis sistemfunkcio 'iconv()'"
+
+#: lib/strerror-idna.c:122 lib/strerror-stringprep.c:130 lib/strerror-tld.c:80
+msgid "Cannot allocate memory"
+msgstr "Mankas sufiĉa memoro"
+
+#: lib/strerror-idna.c:126
+msgid "System dlopen failed"
+msgstr "Malsukcesis sistemfunkcio 'dlopen()'"
+
+#: lib/strerror-idna.c:130 lib/strerror-pr29.c:78 lib/strerror-punycode.c:82
+#: lib/strerror-stringprep.c:134 lib/strerror-tld.c:92
+msgid "Unknown error"
+msgstr "Nekonata eraro"
+
+#: lib/strerror-pr29.c:70
+msgid "String not idempotent under Unicode NFKC normalization"
+msgstr "Ĉeno ŝanĝiĝas ĉe dua apliko de Unikoda NFKC-normigo"
+
+#: lib/strerror-punycode.c:70
+msgid "Invalid input"
+msgstr "Nevalida enigo"
+
+#: lib/strerror-punycode.c:74 lib/strerror-stringprep.c:110
+msgid "Output would exceed the buffer space provided"
+msgstr "Eligo estus tro granda por donita bufro"
+
+#: lib/strerror-punycode.c:78
+msgid "String size limit exceeded"
+msgstr "Limo de signoĉena grando transpasiĝis"
+
+#: lib/strerror-stringprep.c:90
+msgid "Forbidden unassigned code points in input"
+msgstr "Malpermesita neatribuita kodero en enigo"
+
+#: lib/strerror-stringprep.c:94
+msgid "Prohibited code points in input"
+msgstr "Malpermesita kodero en enigo"
+
+#: lib/strerror-stringprep.c:98
+msgid "Conflicting bidirectional properties in input"
+msgstr "Malkongruaj dudirektaj trajtoj en enigo"
+
+#: lib/strerror-stringprep.c:102
+msgid "Malformed bidirectional string"
+msgstr "Misformita dudirekta ĉeno"
+
+#: lib/strerror-stringprep.c:106
+msgid "Prohibited bidirectional code points in input"
+msgstr "Malpermesita dudirekta kodero en enigo"
+
+#: lib/strerror-stringprep.c:114
+msgid "Error in stringprep profile definition"
+msgstr "Eraro en difino de ĉenopretig-profilo"
+
+#: lib/strerror-stringprep.c:118
+msgid "Flag conflict with profile"
+msgstr "Flaga malkongruo kun profilo"
+
+#: lib/strerror-stringprep.c:122
+msgid "Unknown profile"
+msgstr "Nekonata profilo"
+
+#: lib/strerror-stringprep.c:126
+msgid "Unicode normalization failed (internal error)"
+msgstr "Malsukcesis Unikoda normigo (**interna programeraro**)"
+
+#: lib/strerror-tld.c:72
+msgid "Code points prohibited by top-level domain"
+msgstr "Koderoj kiuj malpermesiĝas de supera retregiono"
+
+#: lib/strerror-tld.c:76
+msgid "Missing input"
+msgstr "Mankanta enigo"
+
+#: lib/strerror-tld.c:88
+msgid "No top-level domain found in input"
+msgstr "Neniu supera retregiono troviĝis en enigo"
+
+#: src/idn.c:65
+#, c-format
+msgid "Try `%s --help' for more information.\n"
+msgstr "Tajpu '%s --help' por pli da informoj.\n"
+
+#: src/idn.c:69
+#, c-format
+msgid "Usage: %s [OPTION]... [STRINGS]...\n"
+msgstr "Uzmaniero:  %s [OPCIO...] [ĈENO...]\n"
+
+#: src/idn.c:72
+msgid ""
+"Internationalized Domain Name (IDN) convert STRINGS, or standard input.\n"
+"\n"
+msgstr ""
+"Konvertas ĈENO(j)n (aŭ ĉefenigujon) laŭ la internaciigitaj retnomaj "
+"reguloj.\n"
+"\n"
+
+#: src/idn.c:76
+msgid ""
+"Command line interface to the internationalized domain name library.\n"
+"\n"
+"All strings are expected to be encoded in the preferred charset used\n"
+"by your locale.  Use `--debug' to find out what this charset is.  You\n"
+"can override the charset used by setting environment variable CHARSET.\n"
+"\n"
+"To process a string that starts with `-', for example `-foo', use `--'\n"
+"to signal the end of parameters, as in `idn --quiet -a -- -foo'.\n"
+"\n"
+"Mandatory arguments to long options are mandatory for short options too.\n"
+msgstr ""
+"Komandlinia interfaco al la biblioteko por internaciigitaj retnomoj.\n"
+"\n"
+"Ĉiuj ĉenoj estu koditaj per la preferata signaro de via lokaĵaro.\n"
+"Uzu '--debug' por eltrovi kiu ĝi estas.  Vi povas indiki alian\n"
+"signaron per la media variablo CHARSET.\n"
+"\n"
+"Por trakti ĉenon kiu komenciĝas per '-' (ekzemple '-foo'), uzu '--' por\n"
+"indiki la finon de la parametroj, kiel en «idn --quiet -a -- -foo».\n"
+"\n"
+"(Endaj argumentoj por longaj opcioj ankaŭ endas por la mallongaj.)\n"
+
+#: src/idn.c:88
+msgid ""
+"  -h, --help               Print help and exit\n"
+"  -V, --version            Print version and exit\n"
+msgstr ""
+"  -h, --help               montri ĉi tiun helpon kaj eliri\n"
+"  -V, --version            montri programversion kaj eliri\n"
+
+#: src/idn.c:92
+msgid ""
+"  -s, --stringprep         Prepare string according to nameprep profile\n"
+"  -d, --punycode-decode    Decode Punycode\n"
+"  -e, --punycode-encode    Encode Punycode\n"
+"  -a, --idna-to-ascii      Convert to ACE according to IDNA (default mode)\n"
+"  -u, --idna-to-unicode    Convert from ACE according to IDNA\n"
+msgstr ""
+"  -s, --stringprep         pretigi ĉenon laŭ la profilo 'Nameprep'\n"
+"  -d, --punycode-decode    malkodi 'Punycode'\n"
+"  -e, --punycode-encode    kodi 'Punycode'\n"
+"  -a, --idna-to-ascii      konverti al ACE laŭ IDNA (la implicita reĝimo)\n"
+"  -u, --idna-to-unicode    konverti de ACE laŭ IDNA\n"
+
+#: src/idn.c:99
+msgid ""
+"      --allow-unassigned   Toggle IDNA AllowUnassigned flag (default off)\n"
+"      --usestd3asciirules  Toggle IDNA UseSTD3ASCIIRules flag (default off)\n"
+msgstr ""
+"      --allow-unassigned   enŝalti la IDNA-flagon 'AllowUnassigned'\n"
+"      --usestd3asciirules  enŝalti la IDNA-flagon 'UseSTD3ASCIIRules'\n"
+
+#: src/idn.c:103
+msgid ""
+"      --no-tld             Don't check string for TLD specific rules\n"
+"                             Only for --idna-to-ascii and --idna-to-unicode\n"
+msgstr ""
+"      --no-tld             ne kontroli ĉenon pri TLD-specifaj reguloj;\n"
+"                             nur por '--idna-to-ascii' kaj '--idna-to-"
+"unicode'\n"
+
+#: src/idn.c:107
+msgid ""
+"  -n, --nfkc               Normalize string according to Unicode v3.2 NFKC\n"
+msgstr "  -n, --nfkc               normigi signoĉenon laŭ Unikodo v3.2 NFKC\n"
+
+#: src/idn.c:110
+msgid ""
+"  -p, --profile=STRING     Use specified stringprep profile instead\n"
+"                             Valid stringprep profiles: `Nameprep',\n"
+"                             `iSCSI', `Nodeprep', `Resourceprep', \n"
+"                             `trace', `SASLprep'\n"
+msgstr ""
+"  -p, --profile=NOMO       uzi ĉi tiun ĉenopretig-profilon anstataŭe;\n"
+"                             validaj ĉenopretig-profiloj estas:\n"
+"                             'Nameprep', 'iSCSI', 'Nodeprep',\n"
+"                             'Resourceprep', 'trace', 'SASLprep'\n"
+
+#: src/idn.c:116
+msgid ""
+"      --debug              Print debugging information\n"
+"      --quiet              Silent operation\n"
+msgstr ""
+"      --debug              montri informojn por helpi al erarspurado\n"
+"      --quiet              funkcii silente\n"
+
+#: src/idn.c:172
+#, c-format
+msgid "only one of -s, -e, -d, -a, -u or -n can be specified"
+msgstr ""
+"nur unu el la opcioj '-s', '-e', '-d', '-a', '-u' aŭ '-n' povas esti indikata"
+
+#: src/idn.c:182
+#, c-format
+msgid "Charset `%s'.\n"
+msgstr "Signaro '%s'.\n"
+
+#: src/idn.c:187
+#, c-format
+msgid ""
+"Type each input string on a line by itself, terminated by a newline "
+"character.\n"
+msgstr ""
+"Tajpu ĉiun enigan ĉenon en propra linio, kun linifina signo ĉe la fino.\n"
+
+#: src/idn.c:202
+#, c-format
+msgid "input error"
+msgstr "enig-eraro"
+
+#: src/idn.c:212 src/idn.c:274 src/idn.c:357 src/idn.c:434 src/idn.c:515
+#, c-format
+msgid "could not convert from %s to UTF-8"
+msgstr "malsukcesis konverti de %s al UTF-8"
+
+#: src/idn.c:220 src/idn.c:245 src/idn.c:281 src/idn.c:498 src/idn.c:527
+#: src/idn.c:551
+#, c-format
+msgid "could not convert from UTF-8 to UCS-4"
+msgstr "malsukcesis konverti de UTF-8 al UCS-4"
+
+#: src/idn.c:237
+#, c-format
+msgid "stringprep_profile: %s"
+msgstr "## stringprep_profile(): %s"
+
+#: src/idn.c:260 src/idn.c:302 src/idn.c:345 src/idn.c:503 src/idn.c:564
+#, c-format
+msgid "could not convert from UTF-8 to %s"
+msgstr "malsukcesis konverti de UTF-8 al %s"
+
+#: src/idn.c:295
+#, c-format
+msgid "punycode_encode: %s"
+msgstr "## punycode_encode(): %s"
+
+#: src/idn.c:317
+#, c-format
+msgid "malloc"
+msgstr "mankas sufiĉa memoro"
+
+#: src/idn.c:323
+#, c-format
+msgid "punycode_decode: %s"
+msgstr "## punycode_decode(): %s"
+
+#: src/idn.c:340 src/idn.c:364 src/idn.c:442
+#, c-format
+msgid "could not convert from UCS-4 to UTF-8"
+msgstr "malsukcesis konverti de UCS-4 al UTF-8"
+
+#: src/idn.c:381
+#, c-format
+msgid "idna_to_ascii_4z: %s"
+msgstr "## idna_to_ascii_4z(): %s"
+
+#: src/idn.c:395
+#, c-format
+msgid "idna_to_unicode_8z4z (TLD): %s"
+msgstr "## idna_to_unicode_8z4z (TLD): %s"
+
+#: src/idn.c:409 src/idn.c:482
+#, c-format
+msgid "tld_check_4z (position %lu): %s"
+msgstr "## tld_check_4z (pozicio %lu): %s"
+
+#: src/idn.c:412 src/idn.c:488
+#, c-format
+msgid "tld_check_4z: %s"
+msgstr "## tld_check_4z(): %s"
+
+#: src/idn.c:461
+#, c-format
+msgid "idna_to_unicode_8z4z: %s"
+msgstr "## idna_to_unicode_8z4z(): %s"
+
+#: src/idn.c:540
+#, c-format
+msgid "could not do NFKC normalization"
+msgstr "malsukcesis fari NFKC-normigon"
+
+#~ msgid ""
+#~ "\n"
+#~ "Report bugs to <%s>.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Raportu programmisojn al <%s>.\n"
+#~ "Raportu tradukerarojn al <translation-team-eo@lists.sourceforge.net>.\n"
+
+#~ msgid "input[%lu] = U+%04x\n"
+#~ msgstr "enigo[%lu] = U+%04x\n"
+
+#~ msgid "output[%lu] = U+%04x\n"
+#~ msgstr "eligo[%lu] = U+%04x\n"

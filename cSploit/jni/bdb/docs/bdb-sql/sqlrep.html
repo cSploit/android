@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 4. Using Replication with the SQL API</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="prev" href="selectpage_size.html" title="Selecting the Page Size" />
+    <link rel="next" href="reppragma.html" title="Replication PRAGMAs" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 4. Using Replication with the SQL API</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="selectpage_size.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="reppragma.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="sqlrep"></a>Chapter 4. Using Replication with the SQL API</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="sqlrep.html#repoverview">Replication Overview</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="sqlrep.html#repmasters">Replication Masters</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="sqlrep.html#repelect">Elections</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="sqlrep.html#repdurability">Durability Guarantees</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="sqlrep.html#permmessage">Permanent Message Handling</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="sqlrep.html#twositerep">Two-Site Replication Groups</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="reppragma.html">Replication PRAGMAs</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication">PRAGMA replication</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_ack_policy">PRAGMA replication_ack_policy</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_ack_timeout">PRAGMA replication_ack_timeout</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_get_master">PRAGMA replication_get_master</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_initial_master">PRAGMA replication_initial_master</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_local_site">PRAGMA replication_local_site</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_num_sites">PRAGMA replication_num_sites</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_perm_failed">PRAGMA replication_perm_failed</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_priority">PRAGMA replication_priority</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_remote_site">PRAGMA replication_remote_site</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_remove_site">PRAGMA replication_remove_site</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_site_status">PRAGMA replication_site_status</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_verbose_output">PRAGMA replication_verbose_output</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="reppragma.html#pragma_replication_verbose_file">PRAGMA replication_verbose_file</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="repstatistics.html">Displaying Replication Statistics</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="rep_usageexamples.html">Replication Usage Examples</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="rep_usageexamples.html#rep_ex1">Example 1: Distributed Read at 3 Sites</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="rep_usageexamples.html#rep_ex2">Example 2: 2-Site Failover</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+        </dl>
+      </div>
+      <p>
+            The Berkeley DB SQL interface allows you to use Berkeley DB's
+            replication feature. You configure and start replication using
+            PRAGMAs that are specific to the task.
+        </p>
+      <p>
+            This chapter provides a high-level introduction of 
+            Berkeley DB replication. It then shows how to configure and use
+            replication with the SQL API.
+        </p>
+      <p>
+            For a more detailed description of Berkeley DB replication,
+            see:
+        </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                    <em class="citetitle">Berkeley DB Getting Started with Replicated Applications</em>
+                </p>
+          </li>
+          <li>
+            <p>
+                    <em class="citetitle">Berkeley DB Programmer's Reference Guide</em>
+                </p>
+          </li>
+        </ul>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="repoverview"></a>Replication Overview</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <dl>
+            <dt>
+              <span class="sect2">
+                <a href="sqlrep.html#repmasters">Replication Masters</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="sqlrep.html#repelect">Elections</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="sqlrep.html#repdurability">Durability Guarantees</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="sqlrep.html#permmessage">Permanent Message Handling</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="sqlrep.html#twositerep">Two-Site Replication Groups</a>
+              </span>
+            </dt>
+          </dl>
+        </div>
+        <p>
+                Berkeley DB's replication feature allows you to automatically
+                distribute your database write operations to one or more
+                read-only <span class="emphasis"><em>replicas</em></span>. For this reason, BDB's
+                replication implementation is said to be a <span class="emphasis"><em>single
+                    master, multiple replica</em></span> replication strategy.
+            </p>
+        <p>
+                A single replication master and all of its replicas are
+                referred to as a <span class="emphasis"><em>replication group</em></span>. 
+                Each replication group can have one and only one master
+                site.
+            </p>
+        <p>
+                When discussing Berkeley DB replication, we sometimes refer
+                to <span class="emphasis"><em>replication sites</em></span>. This is because
+                most production applications place each of their replication
+                participants on separate physical machines. In fact, each
+                replication participant must be assigned a hostname/port
+                pair that is unique within the replication group.
+            </p>
+        <p>
+                Note that under the hood, the unit of replication is the
+                environment. That is, data is replicated from one Berkeley
+                DB environment to one or more other Berkeley DB
+                environments. However, when used with the BDB SQL interface,
+                you can think of this as replicating between Berkeley DB
+                databases, because the BDB SQL interface results in a single
+                database file for each environment.
+            </p>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="repmasters"></a>Replication Masters</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+                    Every replication group has one and only one master.
+                    The master site is where you perform write operations.
+                    These operations are then automatically replicated to
+                    the other sites in the replication group. Because 
+                    the other replica sites in the replication group are
+                    read-only, it is an error for you to attempt to perform
+                    write operatons on them.
+                </p>
+          <p>
+                    The replication master is usually automatically
+                    selected by the replication group using elections.
+                    Replication elections simply determine which
+                    replication site has the most up-to-date copy of the
+                    data, and so is in the best position to serve as the
+                    master site.
+                </p>
+          <p>
+                    Note that when you initially start up your BDB SQL
+                    replicated application, you must explicitly designate a
+                    specific site as the master. Over time, the master site
+                    can move from one environment to the next. For example,
+                    if the master site is shut down, becomes unavailable,
+                    or a network partition causes it to lose contact with
+                    the rest of the replication group, then the replication
+                    group will elect a new master if it can successfully
+                    hold an election. When the old master comes back
+                    online, it rejoins the replication group as a read-only
+                    replica site.
+                </p>
+          <p>
+                    Also, if you are enabling replication for an existing
+                    database, then that database must be designated as the
+                    master. Doing this is required; otherwise the entire
+                    contents of the existing database might be deleted
+                    during the replication startup process.
+                </p>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="repelect"></a>Elections</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+                    A replication group selects the master site by holding
+                    an election. In simplistic terms, each participant in
+                    the replication group votes on who it believes has the
+                    most up-to-date version of the data that the
+                    replication group is managing. The site that receives
+                    the most number of votes becomes the master site, and
+                    all data write activity must occur there.
+                </p>
+          <p>
+                    In order to hold an election, the replication group
+                    must have a quorum. In order to achieve a quorum, a
+                    simple majority of the sites must be available to
+                    select the master. That is, 
+                    <span class="emphasis"><em>n/2 + 1</em></span> sites must be available, where
+                    <span class="emphasis"><em>n</em></span> is the total number of replication
+                    group participants. By requiring a simple majority, the
+                    replication group avoids the possibility of
+                    simultaneously running with two master sites due to a
+                    network partition.
+                </p>
+          <p>
+                    If a replication group cannot select a master, then it
+                    can only be used in read-only mode.
+                </p>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="repdurability"></a>Durability Guarantees</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+                    Durability is a term that means data modifications have
+                    met some pre-defined set of guarantees that the
+                    modifications will remain persistent across application
+                    run times. Usually, this means that there is some
+                    assurance that the data modification has been written
+                    to stable storage (that is, written to a hard drive). 
+                </p>
+          <p>
+                    For replicated BDB SQL applications, the durability
+                    guarantee is enhanced because data modifications are
+                    also replicated to those environments that are
+                    participating in the replication group. This ensures
+                    higher data durability than non-replicated applications
+                    by placing data in multiple environments that usually
+                    reside on separate physical machines.
+                </p>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="permmessage"></a>Permanent Message Handling</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+                    Permanent messages are created by replication masters
+                    as a part of a transactional commit operation. When a
+                    replica receives a message that is marked as permanent,
+                    it knows that the message affects transactional
+                    integrity.  Receipt of a permanent message means that
+                    the replica must send a message acknowledgment back to
+                    the master server because the master 
+                    <span class="emphasis"><em>might be</em></span> waiting for the
+                    acknowledgment before it considers the transaction
+                    commit to be complete.
+                </p>
+          <p>
+                    Whether the master is actually waiting for message
+                    acknowledgement depends on the acknowledgement policy
+                    in effect for the replication group. Policies can range
+                    from <code class="literal">NONE</code> (the master will not wait
+                    for any acknowledgements before completing the
+                    transaction) to <code class="literal">ALL</code> (the master will
+                    wait for acknowledgements from all replicas before
+                    completing the transaction).
+                </p>
+          <p>
+                    Acknowledgements are only sent back to the master once
+                    the replica has completed applying the message to its
+                    local environment. Therefore, the stronger your
+                    acknowledgement policy, the stronger you durability
+                    guarantee. On the other hand, the stronger your
+                    acknowledgement policy, the slower your application's
+                    write throughput will be.
+                </p>
+          <p>
+                    In addition to setting an acknowledgement policy, you
+                    can also set an acknowledgment timeout. This time limit
+                    is set in microseconds and it represents the length of
+                    time the master will wait to satisfy its
+                    acknowledgement policy for each transaction commit.  If
+                    this timeout value is not met, the transaction is still
+                    committed locally to the master, but is not yet
+                    considered durable across the replication group. Your
+                    code should take whatever actions are appropriate for
+                    that transaction. If enough other sites are available
+                    to meet the acknowledgement policy, the transaction
+                    will become durable after more time has passed.
+                </p>
+          <p>
+                    You set acknowledgement policies and acknowledgement timeouts
+                    using PRAGMAs. See
+                    <a class="xref" href="reppragma.html#pragma_replication_ack_policy" title="PRAGMA replication_ack_policy">PRAGMA replication_ack_policy</a>
+                    and
+                    <a class="xref" href="reppragma.html#pragma_replication_ack_timeout" title="PRAGMA replication_ack_timeout">PRAGMA replication_ack_timeout</a>.
+                    In addition, you can examine how frequently your
+                    transactions do not achieve durability within the
+                    acknowledgement timeout by using
+                    <a class="xref" href="reppragma.html#pragma_replication_perm_failed" title="PRAGMA replication_perm_failed">PRAGMA replication_perm_failed</a>.
+                </p>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="twositerep"></a>Two-Site Replication Groups</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+                    In a replication group that consists of exactly two
+                    sites, both sites must be available in order to achieve
+                    a quorum. Without a quorum, a new master site cannot
+                    be elected. This means that if the master site is
+                    unable to participate in the replication group, then
+                    the remaining read-only replica cannot become the
+                    master site.
+                </p>
+          <p>
+                    In other words, if you have a group that consists of
+                    exactly two sites, if you lose your master site then
+                    the replication group must exist in read-only mode until
+                    the master site becomes available again.
+                </p>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="selectpage_size.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="reppragma.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Selecting the Page Size </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Replication PRAGMAs</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+cn=Barbara Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com
+bjensen
+cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=example,dc=com
+bjorn
+ou=People,dc=example,dc=com
++userPassword:(userPassword=*)

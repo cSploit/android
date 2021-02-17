@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+<key>Disabled</key>
+<false/>
+<key>Label</key>
+<string>org.firebird.gds</string>
+<key>ProgramArguments</key>
+<array>
+<string>/Library/Frameworks/Firebird.framework/Resources/bin/fb_smp_server</string>
+</array>
+<key>InetdCompatibility</key>
+<dict>
+<key>Wait</key>
+<false/>
+</dict>
+<key>InitGroups</key>
+<true/>
+<key>Sockets</key>
+<dict>
+<key>Listeners</key>
+<dict>
+<key>SockServiceName</key>
+<string>gds_db</string>
+<key>SockType</key>
+<string>stream</string>
+<key>SockFamily</key>
+<string>IPv4</string>
+</dict>
+</dict>
+<key>OnDemand</key>
+<true/>
+<key>UserName</key>
+<string>firebird</string>
+</dict>
+</plist>

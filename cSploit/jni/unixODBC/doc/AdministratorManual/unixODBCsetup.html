@@ -1,0 +1,238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="StarOffice/5.1 (Linux)">
+	<META NAME="AUTHOR" CONTENT="Charles Morrison">
+	<META NAME="CREATED" CONTENT="19990831;225400">
+	<META NAME="CHANGEDBY" CONTENT="Charles Morrison">
+	<META NAME="CHANGED" CONTENT="19990914;11232600">
+</HEAD>
+<BODY>
+<H3 ALIGN=CENTER>A neophyte's guide <BR>to getting unixODBC and
+Mysql/MyODBC working<BR><BR><BR>
+</H3>
+<H4>Introduction</H4>
+<P STYLE="margin-left: 0.79in">UnixODBC is an idea whose time has
+come. It holds many promises for those of us who use databases in our
+daily work and would like to do more of that work on Linux or one of
+the UNIX variants. Those coming from a windows background will
+rapidly discover that it can be much more involved setting up a
+working Unix based database than they are used to. They will also
+discover a world of great advantages too; stability, scalability and
+freely available source code are values not easily dismissed.</P>
+<P STYLE="margin-left: 0.79in">This document is designed to help
+people set up and use unixODBC. My database of choice is MySQL, which
+I have used with great success for several years, and it is the
+database I will discuss setting up</P>
+<P STYLE="margin-left: 0.79in">ODBC is an interface by which programs
+and programmers can communicate with any database which has an ODBC
+driver. While most databases have one or more APIs in various
+programming languages, ODBC allows the same programming code to talk
+with numerous types of databases. (ODBC is not the only interface to
+do this, but it is very widely used and supported)</P>
+<H4>Getting Started</H4>
+<P STYLE="margin-left: 0.79in">UnixODBC is available in source code
+only. This means that you download a tar file from
+<A HREF="http://www.unixODBC.org/">http://www.unixODBC.org</A> ,
+extract it, compile it, and install it. Before you do so though you
+need some other things.</P>
+<H4>Prerequisets: 
+</H4>
+<OL>
+	<LI><P>The Qt toolkit version 2.x sources from <A HREF="http://www.troll.no/">http://www.troll.no</A>
+	. Make sure it is version 2 or higher !</P>
+	<OL>
+		<LI><P>Download the Qt v2 sources.</P>
+		<LI><P>Extract the sources to somewhere, usually this is done by
+		placing the tar file in a directory like /usr/local or /opt and
+		using the command.<BR><B>tar zxvf qt-2.0.1.tar.gz </B><BR>to
+		extract the files. This will create a subdirectory qt-2.0.1 .
+		Remember that only root can normally write to /usr/local or /opt.
+		This is an exaple, use the name of the file you have.</P>
+		<LI><P>Compile the sources. Assuming you have a relatively recent
+		version of Linux with all the appropriate stuff (libg++, gcc or
+		egcs etc) You issue 3 commands from the qt-2.0.1
+		directory.<BR><B>./configure</B><BR><B>make</B><BR><B>make install</B></P>
+		<LI><P>This last command is scary since it will install the new
+		libqt into places where any old v1.4x libqt may exist. Rest assured
+		that the full name of the library is different and it will not
+		overwrite your existing libqt. It should choke on rewriting the
+		symlink to libqt.so and thus not mess up your existing Qt / KDE
+		apps. If it does rewrite this link, you will need to set it back to
+		its original link.</P>
+		<LI><P>For more information, see <A HREF="http://www.troll.no/">http://www.troll.no</A>
+		. Please don't bother the unixODBC people for instructions on
+		setting up Qt.</P>
+	</OL>
+</OL>
+<OL START=2>
+	<LI><P>A Database - in this case MySQL from <A HREF="http://www.mysql.com/">http://www.mysql.com</A></P>
+	<OL>
+		<LI><P>Again, I strongly suggest you get the sources and compile
+		them yourself. The process is similar if not identical to that for
+		Qt described above. By default MySQL installs it's executable files
+		in<B><I> /usr/local/bin</I></B>, it's include files (source
+		headers) in <B><I>/usr/local/include/mysql</I></B> and it's
+		libraries in <B><I>/usr/local/lib/mysql</I></B>. The actual
+		database files are in <B><I>/usr/local/var</I>.</B></P>
+		<LI><P>Before you can use MySQL, you need to run
+		<BR><B>/usr/local/bin/mysql_install_db</B> <BR>as root to set up
+		the system tables. To actually start the database, run
+		<BR><B>/usr/local/bin/safe_mysqld &amp;</B></P>
+		<LI><P>MySQL comes with very extensive documentation. Refer to it
+		for questions on compiling, installing and using MySQL. This is
+		expecially true for permissions. If the permissions aren't correct,
+		no interface will work.</P>
+	</OL>
+</OL>
+<H4>Installing unixODBC</H4>
+<OL>
+	<LI><P>As mentioned before, get the source tar file from
+	<A HREF="http://www.unixodbc.org/">http://www.unixodbc.org</A> . As
+	root, move the tar file to /op or /usr/local or where ever you want
+	the source to reside. Untar the file and run the following commands
+	from the command line in the unixODBC source
+	directories:<BR><B>./configure</B><BR><B>./make</B><BR><B>./make
+	install</B></P>
+	<LI><P>Assuming that you have all the libraries and tools that it
+	needs, you should be breezing through this compile. Certainly after
+	all that practice with Qt and MySQL this should be old hat. UnixODBC
+	takes quite a while to compile, actually all of these packages do.
+	Relax and enjoy it. 
+	</P>
+</OL>
+<H4>Installing a Driver</H4>
+<P STYLE="margin-left: 0.79in">UnixODBC by itself isn't a whole lot
+of good without a driver. MySQL has an ODBC driver named MyODBC but
+it isn't included with the current edition of unixODBC, so you have
+to get it and compile it yourself. I'll be referring to version
+2.50.24, the latest as of this writing. The installation is much the
+same as the other packages, but you need to give configure some
+options. It will prompt you for the path to the MySQL sources if you
+don't specify the path, but you also have to supply the
+<I>--with-unixODBC=</I>&lt;your unixODBC directory here&gt; flag. The
+following is from the MyODBC INSTALL file: 
+</P>
+<P STYLE="margin-left: 0.79in"><I>     To make configure look for
+unixODBC instead of iODBC, use</I></P>
+<P STYLE="margin-left: 0.79in"><I>          --with-unixODBC=DIR</I></P>
+<P STYLE="margin-left: 0.79in"><I>      Where DIR is where unixODBC
+is installed.</I></P>
+<P STYLE="margin-left: 0.79in"><I>      And (as usual), if the
+unixODBC headers and libraries aren't located</I></P>
+<P STYLE="margin-left: 0.79in"><I>      in DIR/include and DIR/lib,
+use</I></P>
+<P STYLE="margin-left: 0.79in"><I>          
+--with-unixODBC-libs=LIBDIR  --with-unixODBC-includes=INCDIR</I></P>
+<P STYLE="margin-left: 0.79in"><I>   You might want to specify a
+prefix other than /usr/local for installation,<BR>   I, for example
+keep my ODBC drivers in /usr/local/odbc/lib, so I add</I></P>
+<P STYLE="margin-left: 0.79in"><I>       --prefix=/usr/local/odbc</I></P>
+<P STYLE="margin-left: 0.79in">So here is my configure line:</P>
+<P STYLE="margin-left: 0.79in"><B>./configure
+<I>--with-unixodbc=/usr/local --with-mysql-sources=/usr/local/mysql</I></B></P>
+<P STYLE="margin-left: 0.79in">Running <B>make</B> and then <B>make
+install</B> puts the resulting library: <B>libmyodbc-2.50.23.so</B>
+into /usr/local/lib. WAIT A MINUTE ! Didn't I say it was version
+2.50.24 ? Yes, I did. However, unless you want to go in and change
+the version info in the source code, it will create the library with
+that name. I don't consider this a big deal and so I didn't mess with
+it.</P>
+<P STYLE="margin-left: 0.79in">If you omit the <I>--with-mysql-sources</I>
+flag, configure will fail. If you omit the <SPAN STYLE="font-weight: medium"><I>--with-unixodbc</I></SPAN>
+flag, configure will complete and MyODBC will compile. However, it
+will not work correctly when using it with unixODBC. The problems
+described below occurred when I omitted this flag: <BR><BR>1) If the
+DSN (Data Source Name) you create is also the name of a database, the
+driver points to that database no matter what you specify the
+database to be.<BR>2) If the DSN is not the name of an existing
+database, it will fail, not allowing you to login to the database.
+The trace log file will tell you that it couldn't find a database
+with the name of the DSN. This is confusing if you specified a valid
+database name in the .odbc.ini file . 
+</P>
+<P STYLE="margin-left: 0.79in">When using the <I>--with-unixodbc</I>
+flag, These problems dissappear and it works the way it should. 
+</P>
+<P STYLE="margin-left: 0.79in">A note: MyODBC does not support ODBC
+version 3 as of version 2.50.24 . When writing programs that utilize
+this driver, I have had success with specifying V_OD_ODBC2 when
+calling SQLSetEnvAttr(...) .</P>
+<H4>Setting up unixODBC</H4>
+<P STYLE="margin-left: 0.79in">At long last we come to actually
+setting up unixODBC and using it. While most of this information
+exists on the unixODBC web pages and user's guide, I found it
+difficult to find and follow, so I repeat it here in hopes that it
+will be made clearer.</P>
+<P STYLE="margin-left: 0.79in">UnixODBC consists of a lot of
+libraries, installed in <B>/usr/local/lib</B>, and a few executable
+files (binaries) installed into <B>/usr/local/bin</B>. These
+executable files are <I>ODBCConfig</I>, <I>DataManager</I>, and
+<SPAN STYLE="font-weight: medium"><I>odbcinst</I></SPAN>. 
+</P>
+<P><B>In order to get unixODBC running, do these things in this
+order:</B></P>
+<P><B>Do this as root...</B></P>
+<P STYLE="margin-left: 0.79in">In an xterm, type ODBCConfig . This is
+a GUI program and must be run in an X session. At the very least you
+need to set up a driver to use. The drivers will be specific to one
+database application, like MyODBC is specific to MySQL. In addition
+to this, you need to specify a setup file to use for this drive. The
+setup files are the <B>/usr/local/lib/libodbc*S.so</B> libraries
+where * signifies the database application, so
+<B>/usr/local/lib/libodbcmyS.so</B> is the &quot;setup file&quot; for
+MyODBC. The driver (not the setup file) is
+<B>/usr/local/lib/libmyodbc-2.50.23.so. </B>
+</P>
+<P STYLE="margin-left: 0.79in; font-weight: medium">To set up the
+driver, run ODBCConfig as root, go to the drivers tab and click on
+&quot;New&quot;. The following are the settings I use...</P>
+<P STYLE="margin-left: 0.79in"><B>Name: myodbc<BR>Description: MySQL
+driver.<BR>Driver: /usr/local/lib/libmyodbc-2.50.23.so<BR>Setup:
+/usr/local/lib/libodbcmyS.so</B><BR><B>FileUsage: 1</B></P>
+<P STYLE="margin-left: 0.79in; font-weight: medium">You should have a
+driver set up before setting up a DSN. After having done so, you may
+want to set up a system DSN. You do this by selecting the &quot;System
+DSN&quot; tab, clicking on 'New', specifying the driver to use and
+filling in the required information. You will want to select the
+driver name you just defined as the Driver in the first screen that
+displays, and click OK.</P>
+<P STYLE="margin-left: 0.79in; font-weight: medium">Doing this as
+root will create and edit the <B>/usr/local/etc/odbcinst.ini</B> (for
+the driver info) and <B>/usr/local/etc/odbc.ini</B> (for the system
+DSN) files. Early versions of unixODBC would put these files in /etc,
+and you can still use a configure option : <I>--sysconfdir=/etc</I>
+to put those files in that location.</P>
+<P STYLE="font-weight: medium"><B>Do this as a normal user:</B> 
+</P>
+<P STYLE="margin-left: 0.79in">The process for setting up a user DSN
+is identical to setting up a system DSN. You simply select the &quot;User
+DSN&quot; tab in ODBCConfig and fill out the required fields. The
+following is how I filled out a User DSN.</P>
+<P STYLE="margin-left: 0.79in"><B>Name: mysqltest<BR>Description:
+myodbc<BR>Driver: myodbc<BR>Trace: Yes<BR>TraceFile: mysql.log<BR>Host:
+localhost<BR>Port: 3306<BR>Socket:<BR>Database: test</B></P>
+<P STYLE="margin-left: 0.79in">This will create and edit a file named
+~/.odbc.ini . Since the test database comes without any tables, you
+may want to specify mysql as the database instead, so you can see the
+tables when running DataManager.</P>
+<P><B>Run DataManager</B></P>
+<P STYLE="margin-left: 0.79in">Now you should be able to run
+DataManager and see your drivers, DSNs and tables for each DSN. See
+the unixODBC web site for screen shots of what it should look like. 
+</P>
+<P><B>OK, Now What ?</B></P>
+<P STYLE="margin-left: 0.79in">UnixODBC is not so much an end user
+program, but rather an intermediary between a program and one or more
+databases. There is information in the unixODBC documentation for
+example, about setting up StarOffice to use an ODBC connection. I am
+in the process of writing a <A HREF="http://www.info2000.net/~cmorrison/databuilder.html">program</A>
+that makes use of unixODBC and numerous others are as well. It may
+well be that in time unixODBC will be included in numerous Linux
+distributions and installed by default. Until that time I hope that
+this document helps you get this sofware up and running.</P>
+<P ALIGN=RIGHT STYLE="margin-left: 0.79in">Charles
+Morrison<BR>cmorrison@info2000.net</P>
+</BODY>
+</HTML>

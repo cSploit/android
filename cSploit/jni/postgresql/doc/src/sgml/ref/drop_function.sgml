@@ -1,0 +1,156 @@
+<!--
+doc/src/sgml/ref/drop_function.sgml
+PostgreSQL documentation
+-->
+
+<refentry id="SQL-DROPFUNCTION">
+ <refmeta>
+  <refentrytitle>DROP FUNCTION</refentrytitle>
+  <manvolnum>7</manvolnum>
+  <refmiscinfo>SQL - Language Statements</refmiscinfo>
+ </refmeta>
+
+ <refnamediv>
+  <refname>DROP FUNCTION</refname>
+  <refpurpose>remove a function</refpurpose>
+ </refnamediv>
+
+ <indexterm zone="sql-dropfunction">
+  <primary>DROP FUNCTION</primary>
+ </indexterm>
+
+ <refsynopsisdiv>
+<synopsis>
+DROP FUNCTION [ IF EXISTS ] <replaceable class="parameter">name</replaceable> ( [ [ <replaceable class="parameter">argmode</replaceable> ] [ <replaceable class="parameter">argname</replaceable> ] <replaceable class="parameter">argtype</replaceable> [, ...] ] )
+    [ CASCADE | RESTRICT ]
+</synopsis>
+ </refsynopsisdiv>
+
+ <refsect1>
+  <title>Description</title>
+
+  <para>
+   <command>DROP FUNCTION</command> removes the definition of an existing
+   function. To execute this command the user must be the
+   owner of the function. The argument types to the
+   function must be specified, since several different functions
+   can exist with the same name and different argument lists.
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>Parameters</title>
+
+  <variablelist>
+    <varlistentry>
+    <term><literal>IF EXISTS</literal></term>
+    <listitem>
+     <para>
+      Do not throw an error if the function does not exist. A notice is issued
+      in this case.
+     </para>
+    </listitem>
+   </varlistentry>
+
+  <varlistentry>
+    <term><replaceable class="parameter">name</replaceable></term>
+    <listitem>
+     <para>
+      The name (optionally schema-qualified) of an existing function.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="parameter">argmode</replaceable></term>
+
+    <listitem>
+     <para>
+      The mode of an argument: <literal>IN</>, <literal>OUT</>,
+      <literal>INOUT</>, or <literal>VARIADIC</>.
+      If omitted, the default is <literal>IN</>.
+      Note that <command>DROP FUNCTION</command> does not actually pay
+      any attention to <literal>OUT</> arguments, since only the input
+      arguments are needed to determine the function's identity.
+      So it is sufficient to list the <literal>IN</>, <literal>INOUT</>,
+      and <literal>VARIADIC</> arguments.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="parameter">argname</replaceable></term>
+
+    <listitem>
+     <para>
+      The name of an argument.
+      Note that <command>DROP FUNCTION</command> does not actually pay
+      any attention to argument names, since only the argument data
+      types are needed to determine the function's identity.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><replaceable class="parameter">argtype</replaceable></term>
+
+    <listitem>
+     <para>
+      The data type(s) of the function's arguments (optionally
+      schema-qualified), if any.
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>CASCADE</literal></term>
+    <listitem>
+     <para>
+      Automatically drop objects that depend on the function (such as
+      operators or triggers).
+     </para>
+    </listitem>
+   </varlistentry>
+
+   <varlistentry>
+    <term><literal>RESTRICT</literal></term>
+    <listitem>
+     <para>
+      Refuse to drop the function if any objects depend on it.  This
+      is the default.
+     </para>
+    </listitem>
+   </varlistentry>
+  </variablelist>
+ </refsect1>
+
+ <refsect1 id="SQL-DROPFUNCTION-examples">
+  <title>Examples</title>
+
+  <para>
+   This command removes the square root function:
+
+<programlisting>
+DROP FUNCTION sqrt(integer);
+</programlisting></para>
+ </refsect1>
+
+ <refsect1 id="SQL-DROPFUNCTION-compatibility">
+  <title>Compatibility</title>
+
+  <para>
+   A <command>DROP FUNCTION</command> statement is defined in the SQL
+   standard, but it is not compatible with this command.
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>See Also</title>
+
+  <simplelist type="inline">
+   <member><xref linkend="sql-createfunction"></member>
+   <member><xref linkend="sql-alterfunction"></member>
+  </simplelist>
+ </refsect1>
+
+</refentry>

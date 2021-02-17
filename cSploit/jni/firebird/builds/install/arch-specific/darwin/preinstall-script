@@ -1,0 +1,9 @@
+#!/bin/sh
+#
+# Script args:
+# $0: full path to script
+# $1: full path to top level package dir, no trailing slash
+# $2: full path to installed location
+# $3:  ????? Path to install Volume????
+# $4:  ?????
+exit 0

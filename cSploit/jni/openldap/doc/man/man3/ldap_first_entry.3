@@ -1,0 +1,80 @@
+.TH LDAP_FIRST_ENTRY 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_first_entry, ldap_next_entry, ldap_count_entries \- LDAP result entry parsing and counting routines
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_count_entries( LDAP *ld, LDAPMessage *result )
+.LP
+.ft B
+LDAPMessage *ldap_first_entry( LDAP *ld, LDAPMessage *result )
+.LP
+.ft B
+LDAPMessage *ldap_next_entry( LDAP *ld, LDAPMessage *entry )
+.SH DESCRIPTION
+.LP
+These routines are used to parse results received from
+.BR ldap_result (3)
+or the synchronous LDAP search operation routines
+.BR ldap_search_s (3)
+and
+.BR ldap_search_st (3).
+.LP
+The
+.B ldap_first_entry()
+routine is used to retrieve the first entry in a chain
+of search results.  It takes the \fIresult\fP as returned by a call to
+.BR ldap_result (3)
+or
+.BR ldap_search_s (3)
+or
+.BR ldap_search_st (3)
+and returns a pointer to the first entry in the result.
+.LP
+This pointer should be supplied on a subsequent call to
+.B ldap_next_entry()
+to get the next entry, the result of which should be
+supplied to the next call to
+.BR ldap_next_entry() ,
+etc.
+.B ldap_next_entry()
+will return NULL when there are no more entries.  The entries returned
+from these calls are used in calls to the routines described in
+.BR ldap_get_dn (3),
+.BR ldap_first_attribute (3),
+.BR ldap_get_values (3),
+etc.
+.LP
+A count of the number of entries in the search result can be obtained
+by calling
+.BR ldap_count_entries() .
+.SH ERRORS
+If an error occurs in
+.B ldap_first_entry()
+or
+.BR ldap_next_entry() ,
+NULL is returned and the ld_errno field in the \fIld\fP parameter
+is set to indicate the error.  If an error occurs in
+.BR ldap_count_entries() ,
+-1 is returned, and
+.B ld_errno
+is set appropriately.  See
+.BR ldap_error (3)
+for a description of possible error codes.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_result (3),
+.BR ldap_search (3),
+.BR ldap_first_attribute (3),
+.BR ldap_get_values (3),
+.BR ldap_get_dn (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

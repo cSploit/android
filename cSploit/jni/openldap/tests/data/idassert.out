@@ -1,0 +1,59 @@
+dn: o=Example,c=US
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=People,o=Example,c=US
+objectClass: organizationalUnit
+ou: People
+
+dn: uid=bjorn,ou=People,o=Example,c=US
+objectClass: inetOrgPerson
+cn: Bjorn Jensen
+sn: Jensen
+uid: bjorn
+mail: bjorn@example.com
+description: ***
+
+dn: uid=bjensen,ou=People,o=Example,c=US
+objectClass: inetOrgPerson
+cn: Barbara Jensen
+sn: Jensen
+uid: bjensen
+mail: bjensen@example.com
+description: ***
+
+dn: ou=Groups,o=Example,c=US
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=All,ou=Groups,o=Example,c=US
+objectClass: groupOfNames
+cn: All
+member: uid=bjorn,ou=People,o=Example,c=US
+member: uid=bjensen,ou=People,o=Example,c=US
+
+dn: cn=Authorizable,ou=Groups,o=Example,c=US
+objectClass: groupOfNames
+cn: Authorizable
+member: uid=bjorn,ou=People,o=Example,c=US
+
+dn: ou=Admin,o=Example,c=US
+objectClass: organizationalUnit
+ou: Admin
+
+dn: cn=Proxy US,ou=Admin,o=Example,c=US
+objectClass: applicationProcess
+objectClass: simpleSecurityObject
+cn: Proxy US
+
+dn: cn=Proxy IT,ou=Admin,o=Example,c=US
+objectClass: applicationProcess
+objectClass: simpleSecurityObject
+cn: Proxy IT
+
+dn: cn=Sandbox,ou=Admin,o=Example,c=US
+objectClass: applicationProcess
+cn: Sandbox
+

@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Replication Views</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_60_toc.html" title="Chapter 9.  Upgrading Berkeley DB 11.2.5.3 applications to Berkeley DB 12.1.6.0" />
+    <link rel="prev" href="blob-support.html" title="Binary Large Object Support" />
+    <link rel="next" href="bdbsql_ha_more_options.html" title="Enhanced BDB SQL Replication Options" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Replication Views</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="blob-support.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 9. 
+        Upgrading Berkeley DB 11.2.5.3 applications to Berkeley DB 12.1.6.0
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="bdbsql_ha_more_options.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="rep_views"></a>Replication Views</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="rep_views.html#idp50953392">New Function</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="rep_views.html#idp50964680">New Flag</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        A replication site can now be created as a replication view by
+        using the <a href="../api_reference/C/repset_view.html" class="olink">DB_ENV-&gt;rep_set_view()</a> method. A replication view is a read-only
+        copy of some or all of the replicated databases that cannot become
+        master, participate in elections, or contribute to transaction
+        durability.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50953392"></a>New Function</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <a href="../api_reference/C/repset_view.html" class="olink">DB_ENV-&gt;rep_set_view()</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50964680"></a>New Flag</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li><code class="literal">DB_REPMGR_ISVIEW</code> - A new value for the flags
+            field of the <code class="literal">DB_REPMGR_SITE</code> structures returned
+            by the <a href="../api_reference/C/repmgrsite_list.html" class="olink">DB_ENV-&gt;repmgr_site_list()</a> method to indicate that a site is a
+            replication view.
+        </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="blob-support.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_60_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="bdbsql_ha_more_options.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Binary Large Object Support </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Enhanced BDB SQL Replication Options</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

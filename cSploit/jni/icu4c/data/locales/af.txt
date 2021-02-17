@@ -1,0 +1,252 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/af.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/af.xml
+ */
+af{
+    ExemplarCharacters{"[a á â b c d e é è ê ë f g h i î ï j k l m n o ô ö p q r s t u û v w x y z]"}
+    ExemplarCharactersCurrency{"[a b c d e f g h i j k l m n o p q r s t u v w x y z]"}
+    ExemplarCharactersIndex{"[A B C D E F G H I J K L M N O P Q R S T U V W X Y Z]"}
+    LocaleScript{
+        "Latn",
+    }
+    NumberElements{
+        ",",
+        " ",
+        ";",
+        "%",
+        "0",
+        "#",
+        "-",
+        "E",
+        "‰",
+        "∞",
+        "NaN",
+        "+",
+    }
+    NumberPatterns{
+        "#,##0.###",
+        "¤#,##0.00",
+        "#,##0%",
+        "#E0",
+    }
+    Version{"2.0.47.68"}
+    calendar{
+        gregorian{
+            AmPmMarkers{
+                "vm.",
+                "nm.",
+            }
+            DateTimePatterns{
+                "h:mm:ss a zzzz",
+                "h:mm:ss a z",
+                "h:mm:ss a",
+                "h:mm a",
+                "EEEE dd MMMM y",
+                "dd MMMM y",
+                "dd MMM y",
+                "yyyy-MM-dd",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            availableFormats{
+                Hm{"HH:mm"}
+                Hms{"HH:mm:ss"}
+                M{"L"}
+                MEd{"E, M/d"}
+                MMM{"LLL"}
+                MMMEd{"E, MMM d"}
+                MMMMEd{"E, MMMM d"}
+                MMMMd{"MMMM d"}
+                MMMd{"MMM d"}
+                Md{"M/d"}
+                d{"d"}
+                hm{"h:mm a"}
+                ms{"mm:ss"}
+                y{"y"}
+                yM{"M/y"}
+                yMEd{"EEE, y-M-d"}
+                yMMM{"MMM y"}
+                yMMMEd{"EEE, MMM d, y"}
+                yMMMM{"MMMM y"}
+                yQ{"Q y"}
+                yQQQ{"QQQ y"}
+            }
+            dayNames{
+                format{
+                    abbreviated{
+                        "So",
+                        "Ma",
+                        "Di",
+                        "Wo",
+                        "Do",
+                        "Vr",
+                        "Sa",
+                    }
+                    wide{
+                        "Sondag",
+                        "Maandag",
+                        "Dinsdag",
+                        "Woensdag",
+                        "Donderdag",
+                        "Vrydag",
+                        "Saterdag",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "S",
+                        "M",
+                        "D",
+                        "W",
+                        "D",
+                        "V",
+                        "S",
+                    }
+                }
+            }
+            eras{
+                abbreviated{
+                    "v.C.",
+                    "n.C.",
+                }
+                wide{
+                    "voor Christus",
+                    "na Christus",
+                }
+            }
+            fields{
+                day{
+                    dn{"Dag"}
+                    relative{
+                        "-1"{"Gister"}
+                        "0"{"Vandag"}
+                        "1"{"Môre"}
+                    }
+                }
+                dayperiod{
+                    dn{"AM/PM"}
+                }
+                hour{
+                    dn{"Uur"}
+                }
+                minute{
+                    dn{"Minuut"}
+                }
+                month{
+                    dn{"Maand"}
+                }
+                second{
+                    dn{"Sekonde"}
+                }
+                week{
+                    dn{"Week"}
+                }
+                weekday{
+                    dn{"Weeksdag"}
+                }
+                year{
+                    dn{"Jaar"}
+                }
+                zone{
+                    dn{"Tydsone"}
+                }
+            }
+            monthNames{
+                format{
+                    abbreviated{
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "Mei",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Okt",
+                        "Nov",
+                        "Des",
+                    }
+                    wide{
+                        "Januarie",
+                        "Februarie",
+                        "Maart",
+                        "April",
+                        "Mei",
+                        "Junie",
+                        "Julie",
+                        "Augustus",
+                        "September",
+                        "Oktober",
+                        "November",
+                        "Desember",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "J",
+                        "F",
+                        "M",
+                        "A",
+                        "M",
+                        "J",
+                        "J",
+                        "A",
+                        "S",
+                        "O",
+                        "N",
+                        "D",
+                    }
+                }
+            }
+            quarters{
+                format{
+                    abbreviated{
+                        "K1",
+                        "K2",
+                        "K3",
+                        "K4",
+                    }
+                    wide{
+                        "1ste kwartaal",
+                        "2de kwartaal",
+                        "3de kwartaal",
+                        "4de kwartaal",
+                    }
+                }
+            }
+        }
+    }
+    delimiters{
+        alternateQuotationEnd{"”"}
+        alternateQuotationStart{"“"}
+        quotationEnd{"’"}
+        quotationStart{"‘"}
+    }
+    listPattern{
+        standard{
+            2{"{0} en {1}"}
+            end{"{0} en {1}"}
+        }
+    }
+    measurementSystemNames{
+        US{"VSA"}
+        metric{"Metriek"}
+    }
+    units{
+        day{
+            one{"{0} dag"}
+            other{"{0} dae"}
+        }
+    }
+}

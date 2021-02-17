@@ -1,0 +1,154 @@
+#include <winresrc.h>
+#include <winver.h>
+#include "resource3.h"
+#include "../../lang/sql/generated/sqlite3.h"
+
+#ifndef SQLITE_VERSION
+#define SQLITE_VERSION "?.?.?"
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+DRIVERCONNECT DIALOG DISCARDABLE  65, 43, 277, 175
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION |
+    WS_SYSMENU
+CAPTION "SQLite3 ODBC Driver Connect"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_DSNAME,82,20,140,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_DBNAME,82,36,140,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,225,35,40,14
+    EDITTEXT        IDC_TONAME,82,51,53,12,ES_AUTOHSCROLL
+    CONTROL         "No TXN",IDC_NOTXN,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,170,50,52,15
+    CONTROL         "Step API",IDC_STEPAPI,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,225,50,52,15
+    COMBOBOX        IDC_SYNCP,82,67,69,52,CBS_DROPDOWN | CBS_HASSTRINGS |
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Short Column Names",IDC_SHORTNAM,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,170,65,95,15
+    CONTROL         "Foreign Keys",IDC_FKSUPPORT,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,85,80,75,15
+    CONTROL         "Long Column Names",IDC_LONGNAM,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,170,80,95,15
+    CONTROL         "OEMCP Translation",IDC_OEMCP,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,85,95,75,15
+    CONTROL         "Don't Create Database",IDC_NOCREAT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,170,95,95,15
+    CONTROL         "Always BIGINT",IDC_BIGINT,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,85,110,75,15
+    CONTROL         "No WCHAR",IDC_NOWCHAR,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,170,110,52,15
+    EDITTEXT        IDC_LOADEXT,82,130,185,12,ES_AUTOHSCROLL | WS_GROUP
+    DEFPUSHBUTTON   "OK",IDOK,175,150,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,225,150,40,14
+    CTEXT           "Enter options for connect",1003,95,6,80,8
+    RTEXT           "Data Source Name:",IDC_DSNAMETEXT,6,22,73,9,NOT WS_GROUP
+    RTEXT           "Database Name:",IDC_DBNAMETEXT,7,38,71,9,NOT WS_GROUP
+    RTEXT           "Lock Timeout [ms]:",IDC_TONAMETEXT,6,53,73,9,NOT WS_GROUP
+    RTEXT           "Sync.Mode:",IDC_SYNCPTEXT,6,69,72,9,NOT WS_GROUP
+    RTEXT           "Load Extensions:",IDC_LOADEXTTEXT,6,132,73,9,NOT WS_GROUP
+END
+
+CONFIGDSN DIALOG DISCARDABLE  65, 43, 277, 175
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION |
+    WS_SYSMENU
+CAPTION "SQLite3 ODBC DSN Configuration"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_DSNAME,82,20,140,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_DBNAME,82,36,140,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,225,35,40,14
+    EDITTEXT        IDC_TONAME,82,51,53,12,ES_AUTOHSCROLL
+    CONTROL         "No TXN",IDC_NOTXN,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,170,50,52,15
+    CONTROL         "Step API",IDC_STEPAPI,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,225,50,52,15
+    COMBOBOX        IDC_SYNCP,82,67,69,52,CBS_DROPDOWN | CBS_HASSTRINGS |
+                    WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Short Column Names",IDC_SHORTNAM,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,170,65,95,15
+    CONTROL         "Foreign Keys",IDC_FKSUPPORT,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,85,80,75,15
+    CONTROL         "Long Column Names",IDC_LONGNAM,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,170,80,95,15
+    CONTROL         "OEMCP Translation",IDC_OEMCP,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,85,95,75,15
+    CONTROL         "Don't Create Database",IDC_NOCREAT,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,170,95,95,15
+    CONTROL         "Always BIGINT",IDC_BIGINT,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,85,110,75,15
+    CONTROL         "No WCHAR",IDC_NOWCHAR,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,170,110,52,15
+    EDITTEXT        IDC_LOADEXT,82,130,185,12,ES_AUTOHSCROLL | WS_GROUP
+    DEFPUSHBUTTON   "OK",IDOK,175,150,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,225,150,40,14
+    CTEXT           "Enter options for connect",1003,95,6,80,8
+    RTEXT           "Data Source Name:",IDC_DSNAMETEXT,6,22,73,9,NOT WS_GROUP
+    RTEXT           "Database Name:",IDC_DBNAMETEXT,7,38,71,9,NOT WS_GROUP
+    RTEXT           "Lock Timeout [ms]:",IDC_TONAMETEXT,6,53,73,9,NOT WS_GROUP
+    RTEXT           "Sync.Mode:",IDC_SYNCPTEXT,6,69,72,9,NOT WS_GROUP
+    RTEXT           "Load Extensions:",IDC_LOADEXTTEXT,6,132,73,9,NOT WS_GROUP
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION VERSION_C,0,0
+ PRODUCTVERSION VERSION_C,0,0
+ FILEFLAGSMASK (3)
+ FILEFLAGS (0)
+ FILEOS VOS__WINDOWS32
+ FILETYPE VFT_DLL
+ FILESUBTYPE (0)
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Christian Werner Software & Consulting\0"
+            VALUE "FileDescription", "SQLite3 ODBC Driver\0"
+            VALUE "FileVersion", VERSION "\0"
+            VALUE "InternalName", "SQLITE3ODBC\0"
+            VALUE "LegalCopyright", "Copyright © 2004-2013 <chw@ch-werner.de>\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "SQLITE3ODBC.DLL\0"
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "ODBC Driver for SQLite3 " SQLITE_VERSION "\0"
+            VALUE "ProductVersion", VERSION "\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_MSGTITLE            "SQLite3 ODBC Setup"
+    IDS_BADDSN              "%s cannot be used as a data source name."
+    IDS_EXTTITLE            "SQLite3 ODBC Extension"
+    IDS_EXTERR              "Extension '%s' did not load:\n%s"
+    IDS_DRVTITLE            "SQLite3 ODBC Driver"
+    IDS_DLLERR              "No usable SQLite3 DLL found."
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+ico1 ICON "sqliteodbc.ico"

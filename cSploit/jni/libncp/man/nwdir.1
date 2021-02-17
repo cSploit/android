@@ -1,0 +1,67 @@
+.TH NWDIR 1 4/2/1998 nwdir nwdir
+.SH NAME
+nwdir \- Lists files in directory
+.SH SYNOPSIS
+.BR nwdir " [" -h "] [" -v "] [" -l "] [" -t "] [" -d "] [" -e "] [" -f "] [" directory ]
+
+.SH DESCRIPTION
+.B nwdir
+lists files, directories and their attributes from the specified NetWare 
+directory.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+\fB-h\fP is used to print out a short help text.
+.RE
+
+.B -d
+.RS 3
+List directories like other files, rather than listing their contents.
+.RE
+
+.B -l
+.RS 3
+Show filename in all available namespaces.
+.RE
+
+.B -v
+.RS 3
+Verbose listing, display everything possible.
+.RE
+
+.B -e
+.RS 3
+Display \fIOS/2\fP Extended Attributes.
+.RE
+
+.B -f
+.RS 3
+List connections using each file.
+.RE
+
+.B -t
+.RS 3
+Show all informations (rights, attributes, file inodes) also as hexadecimal 
+numbers.
+.RE
+
+.B directory
+.RS 3
+You can specify the directory to list. Current working directory is used by 
+default. You have to specify path in Linux format, not in NetWare format.
+
+.SH EXAMPLES
+
+nwdir -t -v /NetWare/server/sys
+
+With this example, all files from directory /NetWare/server/sys are displayed.
+
+.SH AUTHORS
+nwdir was written by Milan Vandrovec. See the Changes file of ncpfs for other 
+contributors.
+
+.SH BUGS
+Directory quotas are not displayed. User names are not taken from NDS, but 
+only from bindery.

@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 11.  Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="prev" href="changelog_5_3.html" title="Berkeley DB Library Version 11.2.5.3 Change Log" />
+    <link rel="next" href="upgrade_11gr2_52_sqlite_ver.html" title="SQLite Interface Upgrade" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 11. 
+        Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2
+    </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="changelog_5_3.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="upgrade_11gr2_52_sqlite_ver.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="upgrade_52_toc"></a>Chapter 11. 
+        Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2
+    </h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_52_toc.html#upgrade_52_intro">Introduction</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_sqlite_ver.html">SQLite Interface Upgrade</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_bit_cmp_win.html">32bit/64bit Compatibility on Windows</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_rep_dbt_readonly.html">Read Only flag for DBT</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_rep_dbt_readonly.html#idp51152880">New Flag</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_dyn_env.html">Dynamic Environment Configuration </a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_dyn_env.html#idp51148640">New Functions</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_dyn_env.html#idp51157880">Deprecated Functions</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_excl_txn_sql.html">Exclusive Transactions in the SQL Layer</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_grp_mbr.html">Group Membership in Repmgr</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_grp_mbr.html#idp51175504">Upgrading</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_grp_mbr.html#idp51155936">New Functions</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_grp_mbr.html#idp51153712">Modified Functions</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_grp_mbr.html#idp51113480">New Events</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_grp_mbr.html#idp51183712">Removed Functions</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_grp_mbr.html#idp51147592">New Parameters</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_grp_mbr.html#idp51170408">New Structure</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_heap.html">Heap Access Method</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_heap.html#idp51182632">New Functions</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_heap.html#idp51176208">Modified Functions</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_heap.html#idp51177560">New Definition</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_mvcc_sql.html">Enabling Transaction Snapshots in the SQL Layer</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_mvcc_sql.html#idp51197240">New Pragmas</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_rep_2site_strict.html">2SITE_STRICT Enabled by Default in Replication</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_rep_sql.html">Enabling Replication in the SQL Layer </a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_rep_sql.html#idp51208472">New Pragmas</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_repmgr_channels.html">Repmgr Message Channels </a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_repmgr_channels.html#idp51165040">New Functions</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_seq_sql.html">Sequence Support in the SQL Layer</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_seq_sql.html#idp51209256">New Functions</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_xa.html">Berkeley DB X/Open Compliant XA Resource Manager </a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_xa.html#idp51219040">Constraints</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_xa.html#idp51223976">New Flag</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="upgrade_11gr2_52_xa.html#idp51228032">Modified Function</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_11gr2_52_hot_backup.html">Hot Backup Changes </a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="changelog_5_2.html">Berkeley DB Library Version 11.2.5.2 Change Log</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51218232">Database or Log File On-Disk Format Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51224496">New Features</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51230584">Database Environment Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51241728">Concurrent Data Store Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51235024">Access Method Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51235408">SQL API Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51217688">C API Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51242504">Tcl-specific API Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51217776">C#-specific API Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51240432">Replication Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51242888">Locking Subsystem Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51256616">Logging Subsystem Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51238704">Memory Pool Subsystem Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51264848">Mutex Subsystem Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51257032">Transaction Subsystem Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51249400">Test Suite Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51275728">Utility Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51277344">Configuration, Documentation, Sample Apps, Portability and Build Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51249176">Example Changes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51280256">Miscellaneous Bug Fixes</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51281792">Deprecated Features</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_5_2.html#idp51283712">Known Bugs</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+        </dl>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="upgrade_52_intro"></a>Introduction</h2>
+            </div>
+          </div>
+        </div>
+        <p>
+        The following pages describe how to upgrade applications coded against
+        the Berkeley DB 11.2.5.1 library to the Berkeley DB
+        11.2.5.2 library (both of which belong to Berkeley DB
+        11<span class="emphasis"><em>g</em></span> Release 2).
+        This information does not describe how to upgrade Berkeley DB 1.85
+        release applications.
+    </p>
+        <p>
+        For information on the general process of upgrading Berkeley DB
+        installations and upgrade instructions related to historical releases, see the
+        
+        
+        <a class="ulink" href="http://docs.oracle.com/cd/E17076_02/html/upgrading/index.html" target="_top">
+            Berkeley DB Upgrade Guide.
+        </a>
+    </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="changelog_5_3.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="upgrade_11gr2_52_sqlite_ver.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Berkeley DB Library Version 11.2.5.3 Change Log </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> SQLite Interface Upgrade</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

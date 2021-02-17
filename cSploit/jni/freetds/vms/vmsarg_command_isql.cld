@@ -1,0 +1,79 @@
+! FreeTDS - Library of routines accessing Sybase and Microsoft databases
+! Copyright (C) 2010  Craig A. Berry	craigberry@mac.com
+!
+! This library is free software; you can redistribute it and/or
+! modify it under the terms of the GNU Library General Public
+! License as published by the Free Software Foundation; either
+! version 2 of the License, or (at your option) any later version.
+!
+! This library is distributed in the hope that it will be useful,
+! but WITHOUT ANY WARRANTY; without even the implied warranty of
+! MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+! Library General Public License for more details.
+!
+! You should have received a copy of the GNU Library General Public
+! License along with this library; if not, write to the
+! Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+! Boston, MA 02111-1307, USA.
+
+! Command definitions for the ISQL command.
+
+Module VARG_CLD
+
+Define Verb VARG
+   qualifier ECHO
+   qualifier STATISTICS
+   qualifier NOPROMPT
+   qualifier TERMINATOR
+      value
+   qualifier WIDTH
+      value (type=$number)
+   qualifier COLSEPARATOR
+      value
+   qualifier ROWSINPAGE
+      value (type=$number)
+   qualifier TIMEOUT
+      value
+   qualifier ERRORLEVEL
+      value (type=$number)
+   qualifier USERNAME
+      value
+   qualifier PASSWORD
+      value
+   qualifier SERVER_NAME
+      value
+   qualifier INTERFACE
+      value (type=$file)
+   qualifier HOSTNAME
+      value
+   qualifier CLIENTCHARSET
+      value
+   qualifier DISPCHARSET
+      value
+   qualifier INPUT
+      value (type=$file)
+   qualifier OUTPUT
+      value (type=$file)
+   qualifier LANGUAGE
+      value
+   qualifier HOMEDIR
+      value
+   qualifier VERSION
+   qualifier DEBUG
+   qualifier BROWSE
+   qualifier RECORD_FRONT_TO_SERVER
+      value
+   qualifier LOGINTIME
+      value
+   qualifier EDITOR
+      value
+   qualifier TDSPACKETSIZE
+      value (type=$number)
+   qualifier TRACE
+      value
+   qualifier ADDID
+   qualifier LOOK3
+   qualifier ENCRYPT
+   qualifier CHAIN_XACT
+   qualifier FIPS
+define syntax NOPARAM

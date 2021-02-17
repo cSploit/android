@@ -1,0 +1,110 @@
+Well.. I don't know how to put these information so I'll put here
+Probably I'm the only person who can fully understand these notes...
+
+Fixes
+-----
+IMPORTANT fix done_handling
+ODBC RPC check (+chained rpcs?? see below)
+
+Cursor and dynamic
+------------------
+libTDS should handle real cursor/dynamic memory deallocation
+search for tds_alloc_cursor, tds_free_cursor and similar for dynamic
+cursor too complicate... reduce all states, handle more in libTDS
+Tests:
+ - multiple RPCs check returns (possible??)
+   (see odbc_set_return_status, odbc_set_return_params and odbc_get_param_len
+   calls)
+   add multiple chained RPCs for odbc and mssql7+...
+ - cursor update and multiple tables (using view)
+ODBC cursor check (cfr "Progress on CVS")
+  search "TODO read results, set row count, check type and scroll returned"
+http://support.microsoft.com/kb/246265/en-us
+http://support.microsoft.com/kb/290413/en-us
+http://support.microsoft.com/kb/238336/en-us
+ODBC: fix prepare_warn test (similar DBD::ODBC test ??)
+
+Row handling
+------------
+Upper layer should be able to read data from network and handle rows
+Possibility to stop sending/receiving data for SQLPutData and similar
+Allow upper layer to get if libTDS is sending a request (add new state??)
+tds_process_tokens should "return" any row/done/other informations,
+not only done_flags
+libTDS should handle multiple reply from server (cursors and so on)
+
+Token handling
+--------------
+Split token.c to one base token handling and another with higher
+level (callbacks, state and so on)
+See James propos about tds_read_results
+
+Done handling
+-------------
+Callback when state goes to IDLE
+Free unused cursors and dynamic and/or reuse them
+ check if ref_count == 1 and in connection list
+
+ODBC SQL_C_CHAR with wide
+-------------------------
+Check iso8859-1 for single ??
+Is it possible to support direct binding for parameters using different
+encodings? For instance client <-> server iso8859-1 <-> ucs2. It should be
+possible changing TDSCOLUMN->char_conv.
+Merge putdata and blob1 tests.
+Check blob1 dialog, seems to prepare twice during insert.
+Do merge a bit continue_parse_prepared_query and odbc_sql2tds ??
+
+Other
+-----
+Implement some sort of fast write to network writing directly to 
+wire buffer. It would be helpful to have "lock" length size, write to
+wire, write length, "unlock". Also a function to get current position (to
+compute lengths).
+
+build an array of "flags" to translate type -> flag like SYBCHAR ->
+char, variable and so on
+
+Possibility to lock TDSSOCKET (see odbc, multiple RPCs)
+
+If application rebind with compatible types do not prepare twice.
+Compatible (tds_match_dynamic ??) if:
+- same query
+- same # of parameters
+- for every param
+  - same server type
+    (tds_get_conversion_type(curcol->on_server.column_type, curcol->on_server.column_size))
+  - same len (tds_fix_column_size(tds, curcol)) or len < previous
+    (for decimal/precision check curcol->column_prec and curcol->column_scale)
+
+
+Tests
+-----
+Rebuild all test support (virtual machines, chroot, msde+mssql2005)
+Add a test for rpm (redhat, suse?)
+disabling thread safety don't check for thread-safe functions
+check cross compiled odbc driver, exports, resource version (test-dist)
+bcp
+  tests colfmt after init
+  test encodings loading data
+  extract to file and import again (t0016 test)
+  table with id
+
+
+Full thread
+- odbc done in 0.92
+
+MARS
+- handle timeout
+- see error result from write turned into EOF (see network loop)
+  hang test should success
+- reduce packet copy (just an optimization)
+- support MARS under CTlib ??
+  
+reprepare in libTDS so to fix ctlib (see ML)
+sql parser to support SQLDescribeParam using mssql (100% DBD::ODBC)
+new date types
+
+see problems using DBD::ODBC
+- SQLFreeStmt return error if pending queries return so ??
+  check 

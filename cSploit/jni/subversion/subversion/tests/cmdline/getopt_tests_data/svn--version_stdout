@@ -1,0 +1,18 @@
+svn, version 0.16.0 (r3987)
+   compiled Dec  5 2002, 00:02:51
+
+Copyright (C) 2010 The Apache Software Foundation.
+This software consists of contributions made by many people; see the NOTICE
+file for more information.
+Subversion is open source software, see http://subversion.apache.org/
+
+The following repository access (RA) modules are available:
+
+* ra_neon : Module for accessing a repository via WebDAV protocol using Neon.
+  - handles 'http' scheme
+  - handles 'https' scheme
+* ra_local : Module for accessing a repository on local disk.
+  - handles 'file' scheme
+* ra_svn : Module for accessing a repository using the svn network protocol.
+  - handles 'svn' scheme
+

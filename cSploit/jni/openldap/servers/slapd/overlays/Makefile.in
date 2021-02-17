@@ -1,0 +1,156 @@
+# Makefile.in for overlays
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 2003-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+SRCS = overlays.c \
+	accesslog.c \
+	auditlog.c \
+	constraint.c \
+	dds.c \
+	deref.c \
+	dyngroup.c \
+	dynlist.c \
+	memberof.c \
+	pcache.c \
+	collect.c \
+	ppolicy.c \
+	refint.c \
+	retcode.c \
+	rwm.c rwmconf.c rwmdn.c rwmmap.c \
+	seqmod.c \
+	sssvlv.c \
+	syncprov.c \
+	translucent.c \
+	unique.c \
+	valsort.c
+OBJS = statover.o \
+	@SLAPD_STATIC_OVERLAYS@ \
+	overlays.o
+
+# Add here the objs that are needed by overlays, but do not make it
+# into SLAPD_STATIC_OVERLAYS...
+OBJDEP=rwm.o rwmconf.o rwmdn.o rwmmap.o
+
+LTONLY_MOD = $(LTONLY_mod)
+LDAP_INCDIR= ../../../include       
+LDAP_LIBDIR= ../../../libraries
+
+MOD_DEFS = -DSLAPD_IMPORT
+
+shared_LDAP_LIBS = $(LDAP_LIBLDAP_R_LA) $(LDAP_LIBLBER_LA)
+NT_LINK_LIBS = -L.. -lslapd $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+UNIX_LINK_LIBS = $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+
+LIBRARY = ../liboverlays.a
+PROGRAMS = @SLAPD_DYNAMIC_OVERLAYS@
+
+XINCPATH = -I.. -I$(srcdir)/..
+XDEFS = $(MODULES_CPPFLAGS)
+
+static:	$(LIBRARY)
+
+dynamic: $(PROGRAMS)
+
+accesslog.la : accesslog.lo
+	$(LTLINK_MOD) -module -o $@ accesslog.lo version.lo $(LINK_LIBS)
+
+auditlog.la : auditlog.lo
+	$(LTLINK_MOD) -module -o $@ auditlog.lo version.lo $(LINK_LIBS)
+
+constraint.la : constraint.lo
+	$(LTLINK_MOD) -module -o $@ constraint.lo version.lo $(LINK_LIBS)
+
+dds.la : dds.lo
+	$(LTLINK_MOD) -module -o $@ dds.lo version.lo $(LINK_LIBS)
+
+deref.la : deref.lo
+	$(LTLINK_MOD) -module -o $@ deref.lo version.lo $(LINK_LIBS)
+
+dyngroup.la : dyngroup.lo
+	$(LTLINK_MOD) -module -o $@ dyngroup.lo version.lo $(LINK_LIBS)
+
+dynlist.la : dynlist.lo
+	$(LTLINK_MOD) -module -o $@ dynlist.lo version.lo $(LINK_LIBS)
+
+memberof.la : memberof.lo
+	$(LTLINK_MOD) -module -o $@ memberof.lo version.lo $(LINK_LIBS)
+
+pcache.la : pcache.lo
+	$(LTLINK_MOD) -module -o $@ pcache.lo version.lo $(LINK_LIBS)
+
+collect.la : collect.lo
+	$(LTLINK_MOD) -module -o $@ collect.lo version.lo $(LINK_LIBS)
+
+ppolicy.la : ppolicy.lo
+	$(LTLINK_MOD) -module -o $@ ppolicy.lo version.lo $(LINK_LIBS) $(MODULES_LIBS)
+
+refint.la : refint.lo
+	$(LTLINK_MOD) -module -o $@ refint.lo version.lo $(LINK_LIBS)
+
+retcode.la : retcode.lo
+	$(LTLINK_MOD) -module -o $@ retcode.lo version.lo $(LINK_LIBS)
+
+rwm_x.o: rwm.o rwmconf.o rwmdn.o rwmmap.o
+	$(LD) -r -o $@ rwm.o rwmconf.o rwmdn.o rwmmap.o
+
+rwm.la : rwm.lo rwmconf.lo rwmdn.lo rwmmap.lo
+	$(LTLINK_MOD) -module -o $@ rwm.lo rwmconf.lo rwmdn.lo rwmmap.lo version.lo $(LINK_LIBS)
+
+seqmod.la : seqmod.lo
+	$(LTLINK_MOD) -module -o $@ seqmod.lo version.lo $(LINK_LIBS)
+
+sssvlv.la : sssvlv.lo
+	$(LTLINK_MOD) -module -o $@ sssvlv.lo version.lo $(LINK_LIBS)
+
+syncprov.la : syncprov.lo
+	$(LTLINK_MOD) -module -o $@ syncprov.lo version.lo $(LINK_LIBS)
+
+translucent.la : translucent.lo
+	$(LTLINK_MOD) -module -o $@ translucent.lo version.lo $(LINK_LIBS)
+
+unique.la : unique.lo
+	$(LTLINK_MOD) -module -o $@ unique.lo version.lo $(LINK_LIBS)
+
+valsort.la : valsort.lo
+	$(LTLINK_MOD) -module -o $@ valsort.lo version.lo $(LINK_LIBS)
+
+install-local:	$(PROGRAMS)
+	@if test -n "$?" ; then \
+		$(MKDIR) $(DESTDIR)$(moduledir); \
+		$(LTINSTALL) $(INSTALLFLAGS) -m 755 $? $(DESTDIR)$(moduledir);\
+	fi
+
+MKDEPFLAG = -l
+
+.SUFFIXES: .c .o .lo
+
+.c.lo:
+	$(LTCOMPILE_MOD) $<
+
+statover.o: statover.c $(srcdir)/../slap.h
+
+$(LIBRARY): $(OBJS) version.lo
+	$(AR) rs $@ $(OBJS)
+
+# Must fixup depends for non-libtool objects
+depend-local: depend-common
+	@if test -n "$(OBJS)"; then \
+	OBJ2=`echo $(OBJS) $(OBJDEP) | $(SED) -e 's/\.o//g'`; \
+	SCR=''; for i in $$OBJ2; do SCR="$$SCR -e s/^$$i.lo:/$$i.o:/"; done; \
+	mv Makefile Makefile.bak; $(SED) $$SCR Makefile.bak > Makefile && \
+	$(RM) Makefile.bak; fi
+
+veryclean-local:
+	$(RM) statover.c
+

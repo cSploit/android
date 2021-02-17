@@ -1,0 +1,1587 @@
+Fri Dec 30 13:30:28 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/htdoc/faq.html HTML cleanup
+
+Thu Dec 29 11:23:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* vms/config_h.vms vms/configure.com vms/descrip_mms.template:
+	* vms/getpass.c:
+	- applied Craig A. Berry patch for VMS
+
+Fri Dec 23 15:15:40 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/token.c: prevent possible core with bad reply
+
+Wed Dec 21 15:01:29 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/Makefile.am src/replacements/Makefile.am:
+	- fix distribution of replacement.h
+	* src/tds/util.c: fix problem for some old compiler
+
+Wed Dec 21 09:13:40 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/locale.c: parse LANG environment
+
+Wed Dec 21 09:11:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/ctlib.h src/ctlib/ct.c:
+	- use scale/precision informations from CS_DATAFMT
+
+Wed Dec 21 09:05:30 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/replacements/readpassphrase.h(added):
+	* src/replacements/readpassphrase.h(removed):
+	* src/replacements/readpassphrase.c include/replacements.h:
+	- moved readpassphrase.h in include/replacements
+
+Wed Dec 14 11:04:43 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/ct.c: fix core and CS_NULLTERM
+
+Mon Dec 12 17:09:25 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/ct.c: more verbose
+	* src/tds/mem.c: additional check for params
+
+Sun Dec 11 10:58:03 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/apps/tsql.c: small fixes
+
+Sat Dec 10 18:13:13 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* doc/tds_ssl.html: small update
+
+Fri Dec 09 19:02:28 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/tds/token.c:
+	- add TDS_TOKEN_RES_MSG results to tds_process_tokens
+
+Fri Dec  9 12:05:37 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* src/apps/bsqldb.c accept -d as database option
+	* src/apps/tsql.c require 'go' to appear at start of command line
+
+Fri Dec 09 17:57:59 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* acinclude.m4: document --with-openssl
+
+Fri Dec 09 15:21:25 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c: remove warning using gcc4
+
+Fri Dec 09 15:04:23 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* acinclude.m4: fix OpenSSL detection
+
+Wed Dec 07 17:12:11 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/raiserror.c: more strong tests
+
+Wed Dec 07 13:54:54 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* samples/odbc_rpc.pl: remove some warnings
+	* src/odbc/unittests/raiserror.c: updated with odbc 3 check
+
+Tue Dec 06 21:24:58 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* configure.in src/dblib/bcp.c: support for large file in bcp
+
+Tue Dec 06 14:09:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* doc/tds.html doc/tds_ssl.html: now valid html pages
+
+Tue Dec 06 11:47:33 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/config.c: TDSPORT can be a services port
+
+Mon Dec 05 22:34:07 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* freetds.conf: do not suggest deprecated settings
+
+Mon Dec 05 22:10:17 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/util.c: fix possible core
+
+Mon Dec 05 14:28:29 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/util.c: optimize logging speed
+
+Sun Dec 04 17:53:43 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/net.c: more verbose errors
+
+Sun Dec 04 12:15:53 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c: fix print test
+	* src/odbc/unittests/print.c: small indent adjustment
+
+Fri Dec 02 11:31:55 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/print.c: improve test
+
+Thu Dec 01 13:21:27 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* misc/test-auto.sh:
+	- do not take into account suppressed leaks, cleanup
+	* src/dblib/unittests/thread.c:
+	- more consistent messages
+
+Wed Nov 30 13:11:44 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/prepare_query.c:
+	* src/odbc/unittests/const_params.c:
+	- fix rpc calls if not dynamic parameters available
+
+Mon Nov 28 13:24:56 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* configure.in: optimize configure size
+
+Thu Nov 24 10:11:54 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/net.c: detect correctly connection close
+
+Mon Nov 21 23:21:25 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/unittests/rpc.c made output easier to read
+
+Tue Nov 15 18:45:52 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* TODO added some ideas out connecting and connecting reporting
+
+Sun Nov  6 20:59:22 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c: fix for SQLProcedures
+
+Fri Nov  4 10:53:29 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/odbc_util.c src/odbc/unittests/tables.c:
+	- fix problem with Jdbc using SQLTables
+
+Thu Nov  3 10:53:29 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/tables.c: remove warning
+
+Wed Nov  2 13:56:45 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/unittests/tables.c:
+	- fix problem with wildcards in catalog using SQLTables (do not
+	  still works using Sybase)
+
+Wed Oct 26 13:56:23 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/apps/tsql.c now pressing ^D exits cleanly
+
+Tue Oct 25 17:42:26 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/apps/bsqldb.c print only msgtext for msgno = 0
+
+Tue Oct 25 17:26:40 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/dblib.c applied Frediano's nocount patch (cf. ML)
+
+Wed Oct 12 09:02:53 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/apps/defncopy.c: use more const and static
+
+Tue Oct 11 11:20:22 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/apps/defncopy.c fix CREATE INDEX for Microsoft servers
+
+Tue Oct 11 14:43:16 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/numeric.c: optimize for Watcom compiler
+
+Tue Oct 11 13:50:16 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* acinclude.m4: fix typo
+
+Tue Oct 11 10:52:15 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tdsiconv.h: continue dos32x merge
+
+Fri Oct  7 14:34:43 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/defncopy.txt src/apps/defncopy.c generate CREATE TABLE ddl
+
+Fri Oct  7 17:06:18 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/sybdb.h: continue merging dos32 patch
+	* src/dblib/rpc.c: silly bug freeing rpc name
+	* src/tds/net.c: removed warning compiling under dos32
+	* src/tds/numeric.c: removed warning if int64 not available
+
+Fri Oct  7 12:22:44 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/net.c include/tds_sysdep_private.h:
+	- continue merge patch for dos32
+
+Fri Oct  7 12:12:39 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dbopen.c src/tds/config.c src/tds/convert.c:
+	- patch to support dos32 (thanks to Flaviano Maricotti)
+	* src/tds/token.c:
+	- fixed silly bug for empty not-null text (thanks to Flaviano
+	  Maricotti)
+
+Sun Oct  2 22:37:53 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/Makefile.am doc/userguide.dsl.in
+	- DocBook HTML output now references a stylesheet. 
+	* doc/userguide.css added this HTML stylesheet
+	* doc/userguide.sgml small fix
+	* include/sybdb.h doc/dblib_errors.txt src/dblib/dblib.c
+	- added unicode errors
+	* src/pool/member.c src/tds/token.c
+	- fixed compiler warnings
+
+Fri Sep 30 16:00:47 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/bsqldb.txt src/apps/bsqldb.c
+	- added -q to suppress metadata, and updated man page
+
+Tue Sep 27 16:30:54 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/apps/bsqldb.c write server messages to stderr
+
+Sun Sep 25 15:29:56 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/net.c:
+	- fix possible core (patch from Sergey A. Cherukhin)
+
+Thu Sep 22 16:31:58 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/array.c: fix bug in test
+
+Thu Sep 22 16:15:59 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/dblib.h src/dblib/dblib.c:
+	- fix reentrancy problem for dblib
+
+Wed Sep 21 16:44:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/cspublic.h include/cstypes.h include/ctlib.h:
+	* include/tds.h src/ctlib/ct.c:
+	- improve binary compatibility with Sybase libraries
+
+Mon Sep 19 16:53:05 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/query.c: check valid id for prepared on tds7+
+
+Mon Sep 19 16:50:46 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/numeric.c: small optimization
+
+Mon Sep 19 16:45:42 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/array.c: fix test
+
+Wed Aug 31 17:21:12 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c: delete invalid dynamic
+
+Wed Aug 31 17:19:15 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/unittests/done_handling.c:
+	- use common code and PWD
+
+Thu Aug 25 17:05:00 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dblib.c:
+	- do not overwrite state if not in IDLE state
+	* src/odbc/sql2tds.c: typo
+	* src/tds/convert.c: comments
+
+Wed Aug 23 19:25:32 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/convert_tds2sql.c src/odbc/prepare_query.c:
+	* src/tds/challenge.c src/tds/locale.c src/tds/numeric.c:
+	* src/tds/read.c src/tds/tdsstring.c src/tds/threadsafe.c:
+	* src/tds/write.c:
+	- updated copyright
+
+Tue Aug 16 17:02:32 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/dblib.h include/tds.h src/dblib/buffering.h:
+	* src/dblib/dblib.c src/dblib/unittests/.cvsignore:
+	* src/dblib/unittests/Makefile.am:
+	* src/dblib/unittests/text_buffer.c(added):
+	* src/tds/mem.c src/tds/tds_checks.c:
+	- redone buffering in dblib fixing text problems
+
+Sun Aug 14 18:45:55 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c: fix race condition setting current_statement
+
+Sun Aug 14 11:20:11 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/unittests/preperror.c:
+	- catch error preparing statement
+	* src/odbc/unittests/array.c src/odbc/unittests/array_out.c:
+	* src/odbc/unittests/common.c src/odbc/unittests/common.h:
+	- code reuse, new common function
+
+Fri Aug 12 11:36:35 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* acinclude.m4 configure.in src/replacements/readpassphrase.c:
+	- fixes for mingw32
+	* src/tds/query.c: fix possible read buffer overflow
+
+Thu Aug 11 09:38:02 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/ct.c: correct logging
+	* src/tds/write.c: avoid buffer reading overflow during logging
+
+Wed Aug 10 14:05:44 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tdsbytes.h: fix for big endian machines
+	* src/odbc/convert_tds2sql.c: remove some memcpy use
+	* src/tds/unittests/dataread.c: do not read unexisting parameter
+	* misc/test-other.sh: portability issues
+
+Tue Aug  9 16:24:04 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* misc/test-other.sh: improve DBD::ODBC test
+	* src/odbc/odbc.c src/odbc/unittests/print.c:
+	- removed a too strict test that make DBD::ODBC unhappy
+	* src/tds/query.c: fix wrong state change
+
+Tue Aug  9 12:55:20 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO: updated
+	* include/tds_sysdep_private.h src/tds/mem.c src/tds/net.c:
+	* src/tds/write.c: 
+	- start network write code optimization
+	* misc/test-other.sh phptests/rpc1.php(added):
+	* phptests/.cvsignore(added):
+	- add PHP tests
+	- add a test for binding
+
+Mon Aug  8 21:09:21 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* acinclude.m4 configure.in src/tds/threadsafe.c:
+	- improve mingw compile
+	* src/tds/query.c: remove warning
+
+Mon Aug  8 14:31:08 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/unittests/rpc.c: add test for dbrpcparam problem
+
+Mon Aug  8 13:16:00 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/unittests/lang_ct_param.c src/tds/query.c:
+	- support unnamed parameters for tds_submit_query_params
+	- support '?' style parameters for tds_submit_query_params
+	- improve test
+	* src/dblib/rpc.c:
+	- support strange MS specifications (workaround for PHP)
+
+Wed Aug  3 08:24:43 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/convert_error.c: updated
+
+Tue Aug  2 14:08:11 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/Makefile.am src/tds/numeric.c src/tds/read.c:
+	* include/tdsbytes.h(added):
+	- optimizations for endian code
+	- added TDS_PUT_*/TDS_GET_* macro to read int from memory
+	* src/tds/num_limits.pl: commented
+	* src/tds/convert.c:
+	- added some missing overflow checking
+	- optimize int -> numeric conversions
+
+Mon Aug  1 20:31:08 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc_util.c:
+	- check for NULL pointer (suggested by Chad Jones)
+	* misc/test-dist.sh: check arguments
+
+Mon Aug  1 12:52:24 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/pool/main.c: remove warning
+
+Sat Jul 30 10:59:05 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/pool/Makefile.am src/pool/config.c src/pool/main.c:
+	* src/pool/member.c src/pool/pool.h src/pool/stream.c:
+	* src/pool/user.c:
+	- use static if possible
+	- cleanup
+	- reuse configuration parsing from libTDS
+	- stream.c not used anymore
+
+Fri Jul 29 12:30:24 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c: fix typo
+
+Thu Jul 28 10:05:58 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/convert.c: remove useless code
+	* src/tds/login.c: small optimization
+	* src/tds/unittests/numeric.c: improve coverage test
+
+Wed Jul 27 11:05:55 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/ctlib/ct.c src/tds/query.c:
+	- tds_submit_query_params was not used
+	- cleanup a bit
+	- reuse tds_ascii_to_ucs2 to speed up conversions
+
+Tue Jul 26 15:01:02 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/unittests/lang_ct_param.c:
+	- style update
+	- better check for insert
+	* src/ctlib/unittests/rpc_ct_setparam.c: style update
+
+Tue Jul 26 11:24:08 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/cstypes.h include/tds.h src/ctlib/ct.c:
+	* src/ctlib/unittests/ct_options.c:
+	* src/ctlib/unittests/lang_ct_param.c src/tds/query.c:
+	* src/tds/token.c:
+	- applied Bill Thompson patch with some changes
+	* src/ctlib/Makefile.am: bumped so version
+
+Mon Jul 25 11:44:05 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c: use preprocessor to avoid rewrite
+
+Mon Jul 25 11:42:09 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* win32/dev-cpp/FreeTDS.dev win32/dev-cpp/Makefile.win:
+	* win32/msvc6/libTDS.dsp:
+	- do not include useless code
+
+Mon Jul 25 10:53:00 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/unittests/thread.c:
+	- applied Liam Widdowson patch for thread test
+	* src/tds/query.c: cleanup
+
+Mon Jul 25 08:39:40 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/data.c: fix for bit type
+	* src/tds/query.c: fix for numeric type
+
+Sun Jul 24 17:25:04 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/odbc_util.c src/odbc/sql2tds.c:
+	* src/tds/read.c include/tdsodbc.h:
+	- cleanup
+
+Sun Jul 24 12:50:46 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/query.c: cleanup
+	* src/odbc/sql2tds.c src/odbc/unittests/genparams.c:
+	- fixes for numeric in odbc
+	* src/tds/Makefile.am src/tds/threadsafe.c:
+	- do include unused code
+	* src/tds/convert.c: remove unneeded memcpy
+	* src/tds/numeric.c src/tds/unittests/numeric.c:
+	- fix for changing precision in numeric
+
+Sat Jul 23 13:59:51 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/prepare_query.c:
+	- fix for binary in constant parameter
+	* src/odbc/unittests/array_out.c:
+	- fix type causing wrong results
+
+Sat Jul 23 12:12:16 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/query.c: fix for big endian machine
+
+Sat Jul 23 10:38:23 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc_util.c src/odbc/sql2tds.c:
+	* src/odbc/unittests/genparams.c:
+	- improve test
+	- fix for BIT as input parameter
+
+Fri Jul 22 13:32:40 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* configure.in src/tds/convert.c:
+	- fix possible core calling strftime
+	- constify static functions
+	- reuse code
+	* src/odbc/sql2tds.c: add needed include
+
+Fri Jul 22 11:00:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/sql2tds.c src/odbc/unittests/const_params.c:
+	* src/odbc/unittests/genparams.c:
+	- improve test for more type for constant parameter in rpc
+	- improve test for mote type for input parameter
+	- fix conversion from odbc time to tds datetime
+
+Thu Jul 21 11:41:22 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c: update comments
+
+Wed Jul 20 12:57:19 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/ctlib/blk.c src/ctlib/ct.c src/dblib/bcp.c:
+	* src/dblib/dblib.c src/tds/query.c:
+	- use mnemonic constants for packet types
+
+Tue Jul 19 14:10:30 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* win32/winlogin.c win32/winsetup.c win32/dev-cpp/FreeTDS.dev:
+	* win32/msvc6/FreeTDS.dsp:
+	- updates for odbc
+
+Mon Jul 18 20:48:49 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* configure.in src/replacements/Makefile.am:
+	* src/replacements/strl.c(removed):
+	* src/replacements/strlcpy.c(added):
+	* src/replacements/strlcat.c(added):
+	- use replacement in configure
+	- split strl.c
+
+Mon Jul 18 11:11:54 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/apps/tsql.c:
+	- fix quiet option if readline is available
+	- use static for function
+
+Sun Jul 17 17:56:11 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* include/dblib.h src/dblib/bcp.c src/dblib/dblib.c
+	* src/dblib/dbutil.c 
+	- use dbperror consistently throughout db-lib
+
+Sun Jul 17 14:23:33 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/dblib.c 
+	- convert to use new dbperror() for internal errors
+	- libtds -> db-lib calling semantics unchanged
+
+Sun Jul 17  9:45:01 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/connectparams.h(removed):
+	* src/odbc/convert_tds2sql.h(removed):
+	* src/odbc/odbc_checks.h(removed):
+	* src/odbc/odbc_util.h(removed):
+	* src/odbc/prepare_query.h(removed):
+	* src/odbc/sql2tds.h(removed) include/tdsodbc.h:
+	* src/odbc/Makefile.am src/odbc/connectparams.c:
+	* src/odbc/convert_tds2sql.c src/odbc/descriptor.c:
+	* src/odbc/error.c src/odbc/native.c src/odbc/odbc.c:
+	* src/odbc/odbc_checks.c src/odbc/odbc_util.c:
+	* src/odbc/prepare_query.c src/odbc/sql2tds.c:
+	- put odbc private declarations in include/tdsodbc.h
+	- fix include in C sources
+	- do not include tds.h twice
+	- optimization for gcc4
+
+Fri Jul 15 13:51:44 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/unittests/dbmorecmds.c:
+	- do not output password
+	* src/ctlib/blk.c src/ctlib/cs.c src/ctlib/ct.c src/ctlib/ctutil.c:
+	* src/dblib/unittests/dbmorecmds.c src/replacements/asprintf.c:
+	* src/replacements/atoll.c src/replacements/basename.c:
+	* src/replacements/iconv.c src/replacements/strl.c:
+	* src/replacements/strtok_r.c src/replacements/vasprintf.c:
+	* src/tds/tds_checks.c:
+	- use TDS_RCSID for $Id
+
+Wed Jul 13 12:49:18 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dbopen.c: fix compile error
+
+Wed Jul 13  9:53:00 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/query.c: do not use alloca
+
+Wed Jul 13  9:48:33 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/prepare_query.c:
+	* src/odbc/convert_sql2string.c(removed):
+	* src/odbc/convert_sql2string.h(removed):
+	- cleanup
+
+Tue Jul 12 13:54:57 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dblib.c: improve dbmoretext
+
+Tue Jul 12 13:52:53 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tdsodbc.h src/odbc/error.c src/odbc/odbc.c:
+	* src/odbc/prepare_query.c:
+	- remove unused parameter in odbc_errs_add
+
+Fri Jul  8 10:20:55 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/bcp.c src/dblib/dblib.c src/dblib/dbopen.c:
+	* src/dblib/dbutil.c src/dblib/rpc.c src/dblib/xact.c:
+	- use TDS_RCSID macro
+	* include/dblib.h include/des.h include/md4.h include/md5.h:
+	* include/replacements.h include/tdsiconv.h include/tds_configs.h:
+	- remove $Id from private headers
+
+Thu Jul  7 20:33:09 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tdsstring.h src/tds/tdsstring.c:
+	- don't do strange cast
+	- make tds_dstr_empty const
+	* src/tds/util.c: link optimization
+
+Thu Jul  7 13:45:24 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/Makefile.am doc/datacopy.txt editing for style
+
+Thu Jul  7 15:03:45 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS TODO: updates
+	* include/tds_sysdep_private.h src/odbc/connectparams.c:
+	* src/odbc/convert_sql2string.c src/odbc/convert_tds2sql.c:
+	* src/odbc/error.c src/odbc/native.c src/odbc/odbc.c:
+	* src/odbc/odbc_checks.c src/odbc/odbc_util.c:
+	* src/odbc/prepare_query.c src/odbc/sql2tds.c:
+	* src/tds/challenge.c src/tds/config.c src/tds/convert.c:
+	* src/tds/data.c src/tds/des.c src/tds/iconv.c:
+	* src/tds/locale.c src/tds/login.c src/tds/md4.c:
+	* src/tds/md5.c src/tds/mem.c src/tds/net.c src/tds/numeric.c:
+	* src/tds/read.c src/tds/tdsstring.c src/tds/threadsafe.c:
+	* src/tds/token.c src/tds/util.c src/tds/vstrbuild.c:
+	* src/tds/write.c:
+	- use TDS_RCSID macro for $Id in sources
+
+Thu Jul  7 13:17:14 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/bcp.c: compile fix
+
+Wed Jul  6 14:50:00 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* win32/dev-cpp/FreeTDS.dev win32/dev-cpp/Makefile.win:
+	- win32 updates
+
+Wed Jul  6 14:32:23 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tdsodbc.h src/tds/net.c src/tds/numeric.c:
+	* src/tds/query.c win32/msvc6/libTDS.dsp:
+	- win32 updates
+	* include/tdsthread.h:
+	- cleanup
+	- for for recursive mutex
+	* src/dblib/dblib.c: do not use recursive mutex
+	* src/odbc/unittests/array.c: prevent dangerous use of stack
+
+Wed Jul  6 12:14:54 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/unittests/array.c:
+	- optimize way paramset result are handled
+	- avoid param result overwriting
+	- use malloc in array test to detect possible overflows
+
+Tue Jul  5 11:07:07 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tdsodbc.h src/odbc/odbc.c src/odbc/odbc_util.c:
+	* src/odbc/prepare_query.c src/odbc/sql2tds.c src/odbc/sql2tds.h:
+	* src/odbc/unittests/array.c:
+	- full support for paramset
+	- cleanup done handling
+	- remove c++ style comments
+	- update paramset test (now working)
+
+Tue Jul  5  9:51:30 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* Makefile.am: clean more
+
+Tue Jul  5  9:20:10 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/tds/query.c:
+	- tds_multiple_execute implementation
+
+Mon Jul  4 11:21:24 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/bcp.c src/dblib/dblib.c:
+	- applied Bill Thompson patch for dblib bcp
+
+Mon Jul  4 11:15:20 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/replacements.h src/apps/bsqldb.c src/apps/defncopy.c:
+	* src/dblib/unittests/common.c src/replacements/basename.c(added):
+	- if basename not found use replacement
+
+Fri Jul  1 12:04:43 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/query.c include/tds.h:
+	- implement partial multiple queries
+
+Thu Jun 30 14:13:47 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/data.c src/tds/iconv.c src/tds/mem.c src/tds/query.c:
+	* src/tds/read.c src/tds/token.c src/tds/write.c:
+	- doc updates
+
+Thu Jun 30 12:58:05 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/checkexport.sh src/odbc/odbc.c:
+	- add SQLParamOptions to implemented ODBC functions
+
+Thu Jun 30 11:46:20 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/apps/tsql.c src/ctlib/ctutil.c:
+	* src/dblib/dbutil.c src/odbc/odbc.c src/tds/mem.c src/tds/token.c:
+	- rename some TDSMESSAGE fields as James suggested
+
+Wed Jun 29 09:18:06 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/apps/bsqldb.c src/apps/freebcp.c src/ctlib/cs.c:
+	* src/ctlib/ct.c src/ctlib/unittests/t0002.c:
+	* src/ctlib/unittests/t0006.c src/dblib/bcp.c:
+	* src/dblib/dblib.c src/dblib/dbutil.c src/dblib/unittests/t0013.c:
+	* src/dblib/unittests/t0014.c src/odbc/convert_sql2string.c:
+	* src/odbc/convert_tds2sql.c src/odbc/error.c:
+	* src/odbc/native.c src/odbc/odbc.c src/odbc/odbc_util.c:
+	* src/odbc/prepare_query.c src/odbc/unittests/t0002.c:
+	* src/odbc/unittests/testodbc.c src/odbc/unittests/type.c:
+	* src/tds/config.c src/tds/convert.c src/tds/iconv.c:
+	* src/tds/mem.c src/tds/net.c src/tds/query.c src/tds/read.c:
+	* src/tds/tdsstring.c src/tds/token.c src/tds/write.c:
+	* src/tds/unittests/t0007.c:
+	- update comments
+
+Tue Jun 28 21:07:40 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/tds.net:
+	- make tds_goodread/tds_goodwrite static again
+
+Tue Jun 28 10:26:49 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dblib.c: remove warning
+
+Mon Jun 27 18:23:50 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/dblib_errors.txt include/sybdb.h src/dblib/dblib.c
+	- created error message structure
+
+Mon Jun 27 15:54:39 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* configure.in src/dblib/unittests/Makefile.am
+	- thread.c needed ENABLE_THREADSAFE conditional
+	* src/dblib/dblib.c rewrote dbbind, added error messages
+
+Mon Jun 27 21:05:49 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/array.c src/odbc/unittests/array_out.c:
+	* src/tds/unittests/dataread.c:
+	- remove warnings
+
+Mon Jun 27 16:46:57 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/unittests/array_out.c:
+	- fix array_out test
+
+Mon Jun 27 10:05:48 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/dblib_errors.txt fixed error severity table
+
+Mon Jun 27 09:30:02 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/tds/query.c:
+	- typo fixes
+	- rename tds_next_placeholders to tds_next_placeholder
+
+Mon Jun 27 07:07:59 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/unittests/array.c: comments added
+
+Sun Jun 26 10:22:15 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* tds.dox doc/api_status.txt
+	* include/sybdb.dox.h include/sybdb.h
+	* src/dblib/bcp.c src/dblib/dblib.c src/dblib/rpc.c
+	* src/replacements/iconv.c
+	* src/tds/convert.c src/tds/iconv.c src/tds/query.c src/tds/token.c
+	- Documentation improvements, mostly.  Cf. Doxygen output.  
+
+Wed Jun 22 20:33:38 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/apps/bsqldb.c src/apps/defncopy.c src/ctlib/ctutil.c:
+	- remove warnings
+
+Wed Jun 22 10:21:17 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/blk.c: remove warning compiling under gcc4
+
+Tue Jun 21 22:50:20 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/query.c: updated comments
+
+Mon Jun 20 08:34:00 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* acinclude.m4: do not suggest openssl for SSL support
+	* src/ctlib/ct.c: small optimization
+
+Sun Jun 19 01:44:59 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* tds.dox doc/api_status.txt
+	* include/sybdb.h include/sybdb.dox.h  src/dblib/dblib.c
+	- Documentation fixes.  Added lowercase macros to define
+	- as Microsoft does. 
+
+Fri Jun 17 10:27:24 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/query.c:
+	- fix typo
+	- remove useless comments
+
+Thu Jun 16 23:58:05 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/tds/query.c added tds_put_n_as_ucs2, removed USC2 data
+
+Mon Jun 13 22:39:04 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/rpc.c added better Doxygen comments
+
+Mon Jun 13 22:18:58 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/api_status.txt doc/userguide.sgml small fixes
+	* doc/htdoc/faq.html added output parameters
+
+Sat Jun 11 14:40:10 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/bcp.c: minor fixes and comments
+
+Wed Jun 08 08:38:10 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/native.c: use rpc only for rpc
+	* src/tds/query.c src/tds/tds_checks.c:
+	- use on_server to send parameters
+
+Fri Jun 03 11:01:17 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS TODO include/tds.h src/dblib/dblib.c src/odbc/odbc.c:
+	* src/tds/config.c src/tds/login.c src/tds/net.c:
+	- removed query_timeout_func and query_timeout_param from
+	  TDSLOGIN and TDSCONNECTION (rarely used)
+	- merged Liam patch for timeout
+	- add a total_timeout parameter to query_timeout_func
+
+Fri Jun 03 09:15:19 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/unittests/array.c:
+	* src/odbc/unittests/array_out.c:
+	- SQL_ATTR_ROW_ARRAY_SIZE is no more developing stuff
+
+Thu Jun 02 14:01:23 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* configure.in: check sizeof wchar_t and SQLWCHAR
+
+Tue May 31 11:30:15 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* doc/datacopy.txt(added) doc/Makefile.am src/apps/datacopy.c(added):
+	* src/apps/Makefile.am:
+	- add datacopy program and man page
+	* include/sybdb.h src/dblib/dblib.c:
+	- add dbtablecolinfo required for datacopy
+
+Tue May 31 09:24:55 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dblib.c:
+	- fix dbstrcpy and dbvarylen
+	- reuse tds_strlcpy
+	- import new dbcolinfo implementation from Bill patch
+	* src/apps/Makefile.am: add replacement lib
+
+Tue May 31 08:57:05 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/replacements/strl.c(added) configure.in include/replacements.h:
+	* src/apps/defncopy.c src/ctlib/ct.c src/ctlib/ctutil.c:
+	* src/dblib/rpc.c src/odbc/connectparams.c src/odbc/error.c:
+	* src/pool/member.c src/replacements/Makefile.am src/tds/config.c:
+	* src/tds/iconv.c src/tds/mem.c src/tds/net.c src/tds/threadsafe.c:
+	* src/tds/token.c:
+	- use new tds_strlcpy/tds_strlcat functions
+
+Sat May 28 12:46:34 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/cspublic.h include/ctpublic.h include/sybdb.h:
+	- applied modified patch from Christos Zoulas to use
+	  -Wold-style-cast with g++
+
+Thu May 26 17:03:10 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO doc/userguide.sgml: update for SSL support
+
+Thu May 26 14:45:23 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/net.c: changed ciphers using GnuTLS
+
+Thu May 26 00:55:57 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/htdoc/contrib.html doc/htdoc/docs.html doc/htdoc/faq.html
+	* doc/htdoc/index.html doc/htdoc/news.html doc/htdoc/software.html
+	* doc/htdoc/support.html doc/htdoc/which_api.html
+	- cleaned up html, some reformatting.
+
+Wed May 25 12:02:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/net.c TODO NEWS:
+	- fix leak using OpenSSL
+	- use correct cipher with OpenSSL
+
+Tue May 24 12:53:16 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* acinclude.m4 configure.in src/tds/login.c src/tds/mem.c:
+	* src/tds/net.c:
+	- support OpenSSL for SSL
+
+Mon May 23 10:04:25 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/tds/login.c src/tds/mem.c src/tds/net.c:
+	- move ssl code in net.c
+	- fix query_timeout setting during connect
+
+Mon May 23 10:04:25 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/unittests/dbmorecmds.c src/dblib/unittests/rpc.c:
+	* src/dblib/unittests/t0001.c src/dblib/unittests/t0003.c:
+	* src/dblib/unittests/t0004.c src/dblib/unittests/t0005.c:
+	* src/dblib/unittests/t0006.c src/dblib/unittests/t0007.c:
+	* src/dblib/unittests/t0008.c src/dblib/unittests/t0009.c:
+	* src/dblib/unittests/t0010.c src/dblib/unittests/t0012.c:
+	* src/dblib/unittests/t0013.c src/dblib/unittests/t0015.c:
+	* src/dblib/unittests/t0016.c src/dblib/unittests/t0017.c:
+	* src/dblib/unittests/t0018.c src/dblib/unittests/t0023.c:
+	- do not delete temporary table
+
+Sun May 22 11:03:16 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS TODO configure.in: use odbc_config if possible
+
+Sun May 22 10:26:02 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/prepare_query.c src/odbc/unittests/const_params.c:
+	- fix problems with Sybase
+	* src/odbc/unittests/array_out.c: remove warning compiling
+
+Fri May 20 17:15:12 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS TODO: updated
+	* src/odbc/unittests/Makefile.am:
+	* src/odbc/unittests/array_out.c(added):
+	- added test for array binding
+
+Fri May 20 14:36:52 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/ctlib/ct.c src/ctlib/unittests/cancel.c:
+	* src/dblib/bcp.c src/dblib/dblib.c src/odbc/odbc.c:
+	* src/tds/token.c:
+	- fix ctlib cancellation
+	* src/odbc/native.c src/odbc/prepare_query.c:
+	* src/odbc/prepare_query.h:
+	- handle different type in constant parameters in rpc
+
+Fri May 20 08:54:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dblib.c: thread safe fix
+
+Wed May 18 17:54:24 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/unittests/cancel.c:
+	- do not fail if ct_send is very slow
+
+Wed May 18 13:59:41 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/unittests/array_bind.c src/ctlib/unittests/cancel.c:
+	* src/ctlib/unittests/ct_diagall.c:
+	* src/ctlib/unittests/ct_diagclient.c:
+	* src/ctlib/unittests/ct_diagserver.c:
+	* src/ctlib/unittests/get_send_data.c:
+	* src/ctlib/unittests/lang_ct_param.c:
+	* src/ctlib/unittests/rpc_ct_param.c:
+	* src/ctlib/unittests/rpc_ct_setparam.c:
+	* src/ctlib/unittests/t0003.c:
+	* src/ctlib/unittests/t0004.c:
+	* src/ctlib/unittests/t0009.c:
+	- remove warnings dropping objects
+	* src/dblib/unittests/thread.c: fix syntax on Sybase
+
+Tue May 17 16:02:20 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/Makefile.am: fix distro
+	* src/dblib/buffering.h src/tds/net.c:
+	- fix portability problem
+	* src/dblib/unittests/thread.c: update comment
+
+Tue May 17 14:08:58 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/unittests/thread.c(added) src/dblib/unittests/.cvsignore:
+	* src/dblib/unittests/Makefile.am src/dblib/dblib.c:
+	* include/tdsthread.h configure.in:
+	- improve pthread support and detection
+	- add dblib test for thread safety
+	- recursive dbinit/dbexit calls
+
+Tue May 17 11:12:02 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dblib.c:
+	- fix leaks on connection error
+	* src/odbc/unittests/array.c: remove warning 
+	* include/tds.h src/tds/net.c src/tds/config.c src/tds/threadsafe.c:
+	- use new tds_inet_ntoa_r
+
+Mon May 16 14:29:24 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/array.c(added) src/odbc/unittests/.cvsignore:
+	* src/odbc/unittests/Makefile.am:
+	- added a test for array binding
+
+Mon May 16 09:15:52 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc_util.c: small fixes
+
+Sat May 14 08:30:44 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/unittests/t0008.c: fix test
+
+Sat May 14 07:44:59 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/net.c: fix problem on *BSD
+
+Wed May 11 21:52:10 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/native.c src/odbc/unittests/const_params.c:
+	- fix portability problems
+
+Wed May 11 14:01:29 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO: update
+	* include/tds.h src/odbc/native.c src/odbc/prepare_query.c:
+	* src/odbc/unittests/const_params.c src/tds/tds_checks.c:
+	- support empty parameters in odbc rpc
+
+Wed May 11 10:54:44 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dblib.c:
+	- cleanup and minor fixes
+	* src/odbc/native.c:
+	- better support for numeric constants
+	* src/odbc/unittests/const_params.c:
+	- do more developing stuff
+	* src/tds/read.c:
+	- add support for VOID type
+
+Wed May 11 09:52:59 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/unittests/rpc_ct_param.c:
+	* src/ctlib/unittests/rpc_ct_setparam.c:
+	* src/dblib/unittests/t0005.c:
+	* src/dblib/unittests/t0014.c:
+	* src/dblib/unittests/t0022.c:
+	* src/odbc/unittests/const_params.c:
+	- more cleanup of tables and procs in tests
+
+Tue May 10 14:54:43 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/native.c src/odbc/odbc.c src/odbc/odbc_checks.c:
+	* src/odbc/odbc_util.c src/odbc/prepare_query.c:
+	* src/odbc/prepare_query.h src/odbc/unittests/const_params.c:
+	- initial support for constant parameters in rpc calls
+
+Fri May  6 14:21:17 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tdsthread.h(added) include/Makefile.am src/dblib/dblib.c:
+	* src/tds/util.c:
+	- merge partially Liam Widdowson patch on thread safety
+
+Fri May  6 10:38:31 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/config.c src/dblib/dblib.c include/tds.h:
+	- add "query timeout" configuration
+	- remove timeout member from TDSCONNECTION
+	* src/odbc/unittests/timeout.c:
+	- report error with correct statement
+
+Fri May  6 08:51:13 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c: other reuse
+
+Tue May  3 17:04:31 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c:
+	- reuse odbc_process_tokens
+
+Tue May  3 13:52:44 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tdsodbc.h src/odbc/odbc.c:
+	- read as much tokens as it can (like ms one)
+
+Tue May  3 13:47:56 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/rpc.c: fix dump
+	* src/odbc/unittests/raiserror.c: update
+
+Tue May  3 10:01:15 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* doc/Makefile.am src/tds/Makefile.am:
+	- ignore warnings
+
+Sat Apr 30 18:45:49 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/htdoc/index.html doc/htdoc/news.html doc/htdoc/software.html
+	- update the website for 0.63. 
+
+Sat Apr 23 16:45:32 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/tds/Makefile.am $(srcdir) not needed on make variables
+	* src/dblib/rpc.c blobs as parameters (thanks, Frediano)
+
+Tue Apr 19 13:52:43 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/unittests/raiserror.c:
+	- fix problem reading data before and after SQLFetch
+
+Mon Apr 18 23:47:09 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/unittests/bcp.c src/dblib/unittests/dbmorecmds.c
+	* src/dblib/unittests/rpc.c src/dblib/unittests/t0001.c
+	* src/dblib/unittests/t0003.c src/dblib/unittests/t0004.c
+	* src/dblib/unittests/t0005.c src/dblib/unittests/t0006.c
+	* src/dblib/unittests/t0007.c src/dblib/unittests/t0008.c
+	* src/dblib/unittests/t0009.c src/dblib/unittests/t0010.c
+	* src/dblib/unittests/t0011.c src/dblib/unittests/t0012.c
+	* src/dblib/unittests/t0013.c src/dblib/unittests/t0014.c
+	* src/dblib/unittests/t0015.c src/dblib/unittests/t0016.c
+	* src/dblib/unittests/t0017.c src/dblib/unittests/t0018.c
+	* src/dblib/unittests/t0019.c src/dblib/unittests/t0020.c
+	* src/dblib/unittests/t0021.c src/dblib/unittests/t0022.c
+	* src/dblib/unittests/t0023.c
+	- add comments in a standard form to describe the purpose of
+	- the test and the functions tested.
+
+Mon Apr 18 11:34:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dblib.c: fix a small error in dblib
+
+Mon Apr 18 01:14:40 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* configure.in exclude vms from outputs (use EXTRA_DIST)
+
+Sat Apr 16 19:52:13 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* Makefile.am vms/Makefile.am don't try to generate a vms makefile
+	* include/dblib.h src/dblib/dblib.c src/dblib/buffering.h 
+	* src/dblib/unittests/t0002.c New buffering algorithm
+
+Fri Apr 15 15:33:08 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/unittests/prepare_results.c:
+	* src/odbc/unittests/typeinfo.c:
+	- imported some tests from DBD::ODBC (fixed)
+
+Fri Apr 15 13:48:06 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/ctlib.h include/dblib.h include/tds.h:
+	* include/tdsconvert.h src/apps/tsql.c src/ctlib/cs.c:
+	* src/ctlib/ctutil.c src/dblib/dblib.c src/dblib/dbutil.c:
+	* src/odbc/odbc.c src/pool/member.c src/server/login.c:
+	* src/tds/convert.c src/tds/mem.c src/tds/token.c:
+	* src/tds/util.c:
+	- TDSCONTEXT constification
+	- removed tds_ctx_set_parent/tds_ctx_get_parent
+	- add parent argument to tds_alloc_context
+
+Thu Apr 14 13:33:14 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/apps/tsql.c: check proper result type for rows
+	* include/tds.h src/dblib/dblib.c src/odbc/odbc.c:
+	* src/tds/token.c:
+	- removed tds_process_trailing_tokens
+	* src/tds/unittests/t0005.c src/tds/unittests/t0006.c:
+	* src/tds/unittests/utf8_1.c:
+	- remove warnings
+
+Thu Apr 14 13:33:14 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS include/tds.h src/apps/tsql.c src/ctlib/blk.c:
+	* src/ctlib/ct.c src/dblib/bcp.c src/dblib/dblib.c:
+	* src/odbc/odbc.c src/tds/token.c src/tds/example/token1.c:
+	* src/tds/example/token2.c src/tds/unittests/common.c:
+	* src/tds/unittests/dataread.c src/tds/unittests/dynamic1.c:
+	* src/tds/unittests/flags.c src/tds/unittests/t0002.c:
+	* src/tds/unittests/t0004.c src/tds/unittests/t0005.c:
+	* src/tds/unittests/t0006.c src/tds/unittests/utf8_1.c:
+	* src/tds/unittests/utf8_2.c src/tds/unittests/utf8_3.c:
+	- reuse new tds_process_tokens
+	* src/odbc/unittests/moreandcount.c: more verbose
+
+Wed Apr 13 18:20:57 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/dblib.c src/dblib/unittests/t0002.c
+	- fixed dbclrbuf, probably.  dbgetrow is broken.
+
+Wed Apr 13 13:44:58 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/unittests/t0002.c 
+	- changed to test multiple resultsets. 
+	- test works: buffering is broken.  
+
+Wed Apr 13 13:44:58 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/unittests/t0002.c cleanup, no functional change
+
+Wed Apr 13 18:57:21 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/tds/token.c:
+	- added tds_process_tokens function
+	- use new function to code old one
+	* src/odbc/unittests/moreandcount.c: more verbose
+
+Tue Apr 12 09:17:06 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c:
+	- proper cursor state check
+	- fix print and compute tests
+	* src/odbc/unittests/common.c: error to error stream
+	* src/odbc/unittests/prepare_results.c: reuse and update
+	* src/odbc/unittests/print.c: update
+
+Mon Apr 11 15:50:35 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS TODO: update
+
+Mon Apr 11 13:05:39 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tdsodbc.h src/odbc/odbc.c:
+	- do not return data if not present
+	* src/odbc/unittests/print.c: updated
+
+Mon Apr 11 11:34:54 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* freetds.spec.in:
+	- cleanup
+	- put *.so file in -devel package
+	* src/odbc/unittests/moreandcount.c:
+	- add some comments
+	* src/odbc/unittests/raiserror.c:
+	- update to catch some problems
+
+Fri Apr  8 16:56:06 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* src/odbc/unittests/raiserror.c slight reformatting
+	* samples/odbc_rpc.pl added error handler
+
+Fri Apr  8 15:46:13 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/bcp.c:
+	- comments style update
+	- fix small buffer underflow reading format file
+	- better handle of memory errors
+	- added some TODO/FIXME comments
+
+Wed Apr  6 11:50:40 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* samples/odbc_rpc.pl works
+
+Wed Apr  6 02:38:19 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* autogen.sh src/tds/Makefile.am src/tds/encodings.pl
+	- allowed for out-of-tree building.  Do not assume .c and .o 
+	- are in the same directory.  Put built .h files in $(srcdir). 
+	* doc/userguide.sgml edited debug flags for idiom, plus explanations.  
+
+Tue Apr  5 19:02:49 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* samples/odbc_rpc.pl fixed silly getopt misprocessing
+
+Tue Apr  5 18:47:05 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* samples/odbc_rpc.pl added datatyping feature
+
+Tue Apr  5 18:08:50 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* samples/odbc_rpc.pl new example of RPC use
+
+Tue Apr  5 11:44:48 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/userguide.sgml doc/htdoc/faq.html 
+	- updated, moved CVS instructions
+
+Tue Apr  5 16:53:02 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* configure.in src/tds/encodings.h(removed):
+	* src/tds/sybase_character_sets.h(removed):
+	* src/tds/sybase_character_sets.h.pl(removed):
+	* src/tds/tds_willconvert.h(removed):
+	* src/tds/tds_willconvert.pl(added):
+	* src/tds/convert.c src/tds/Makefile.am src/tds/encodings.pl:
+	- normalize perl generated file
+	 - moved embedded perl from convert.c to tds_willconvert.c
+	 - move sybase_character_sets.pl code in encodings.pl
+	 - removed autogenerated files
+
+Tue Apr  5 13:41:55 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* configure.in src/tds/Makefile.am src/tds/numeric.pl(removed):
+	* src/tds/num_limits.pl(added):
+	- moved src/tds/numeric.pl to src/tds/num_limits.pl
+
+Tue Apr  5 11:15:12 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS TODO: updates
+	* freetds.spec.in:
+	- improved dependency for RedHat and SUSE
+	- install drivers in unixODBC
+
+Tue Apr  5 10:36:58 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* doc/userguide.sgml: committed new debug flag option
+
+Mon Apr  4 18:02:53 EDT 2005	JK Lowden <jklowden@schemamania.org>
+	* samples/odbctest.pl made a little more useful
+
+Mon Apr  4 10:34:02 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/dblib.h src/dblib/bcp.c:
+	- make static some functions
+
+Sun Apr  3 15:36:12 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/apps/freebcp.c src/ctlib/cs.c src/ctlib/ct.c:
+	* src/ctlib/unittests/cancel.c src/dblib/bcp.c:
+	* src/dblib/dblib.c src/dblib/rpc.c:
+	* src/dblib/unittests/rpc.c src/tds/convert.c:
+	* src/tds/mem.c src/tds/token.c:
+	- removed NULL casts
+
+Sun Apr  3 11:21:24 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* Makefile.am configure.in vms/Makefile.am(added):
+	- make VMS distribution as subdirectory do not include everything
+	* src/tds/Makefile.am:
+	- cleanup
+
+Fri Apr  1 15:42:22 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* configure.in src/tds/Makefile.am removed commented-out code.
+
+Fri Apr  1 15:33:17 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* autogen.sh use autoregen
+	* configure.in src/tds/Makefile.am 
+	- build num_limits.h only if numlimits.pl is present.
+
+Wed Mar 30 11:53:58 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* src/tds/Makefile.am reformatted
+
+Wed Mar 30 11:20:38 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* src/tds/Makefile.am build num_limits.h with Perl (for CVS)
+
+Wed Mar 30 10:10:43 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/dblib.c remove broken casts
+
+Wed Mar 30 12:57:02 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/ct.c:
+	- remove warning
+	- check datalen >= 0
+
+Tue Mar 29 17:18:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/blk.c src/dblib/unittests/bcp.c:
+	* src/odbc/odbc.c src/odbc/unittests/genparams.c:
+	* src/odbc/unittests/insert_speed.c src/odbc/unittests/params.c:
+	* src/odbc/unittests/prepare_results.c src/odbc/unittests/preperror.c:
+	* src/odbc/unittests/raiserror.c src/odbc/unittests/t0003.c:
+	* src/odbc/unittests/tables.c src/odbc/unittests/timeout.c:
+	* src/odbc/unittests/transaction.c src/tds/query.c:
+	* src/tds/unittests/utf8_1.c src/tds/unittests/utf8_2.c:
+	- remove some warnings
+
+Tue Mar 29 11:57:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/server/query.c src/ctlib/blk.c:
+	- remove some warnings
+
+Mon Mar 28 09:52:42 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/convert.c src/tds/unittests/convert.c:
+	- optimizations for char -> numeric conversions
+
+Fri Mar 25 17:21:07 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/convert.c:
+	- use new function to change scale/precesion
+	* src/tds/numeric.c:
+	- use asm to improve performance on Intel
+
+Thu Mar 24 15:43:14 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/tds/numeric.c src/tds/numeric.pl:
+	* src/tds/unittests/numeric.c:
+	- change precision and scale of numeric together
+
+Wed Mar 23 17:50:56 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/Makefile.am: fix distribution
+	* src/tds/numeric.c: fix compile, remove ugly goto
+
+Wed Mar 23 17:50:56 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/tds/Makefile.am src/tds/numeric.c:
+	* src/tds/unittests/Makefile.am:
+	* src/tds/unittests/numeric.c(added):
+	- scale numeric in a faster way
+	* misc/test-auto.sh: updated, better output
+
+Mon Mar 14 13:48:36 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/token.c: avoid infinite loop on cancel
+
+Sun Mar 13 09:16:17 PST 2005	Peter Deacon <peterd@iea-software.com>
+	* src/odbc/error.c: rank did not clear trans status
+
+Sun Mar 13 11:21:40 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/error.c:
+	- make rank_errors static
+	- change style
+	* src/tds/net.c: int FAR have no sense in no pointer context
+
+Sat Mar 12 01:23:17 PST 2005	Peter Deacon <peterd@iea-software.com>
+	* include/tdsodbc.h src/odbc/error.c:
+	- order messages by severity and type
+	* include/tds_sysdep_private.h src/tds/util.c src/tds/login.c
+	* src/tds/config.c:
+	- fixed incorrect client process id on the windows platform
+	* src/tds/query.c: include numeric characters in quote exception
+	* src/tds/mem.c: native error to sqlstate mappings
+	* src/tds/net.c: prevent infinite wait if socket connect fails
+
+Sun Feb 27 09:47:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/iconv.c:
+	- make sure we don't core if server charset is not supported
+
+Sat Feb 26 14:08:27 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/alternative_character_sets.h:
+	* src/tds/character_sets.h src/tds/encodings.h:
+	* src/tds/iconv.c src/tds/sybase_character_sets.h:
+	- support for CP437 charset
+
+Tue Feb 22 17:03:21 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/apps/bsqldb.c src/ctlib/ct.c src/odbc/unittests/compute.c:
+	* src/replacements/readpassphrase.c src/tds/net.c:
+	- remove some warning
+
+Mon Feb 21 15:43:17 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/login.c: do not do pre-login if SSL not enabled
+
+Sun Feb 20 10:18:47 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* misc/test-other.sh: improved
+	* src/odbc/unittests/print.c: some fixes
+	* src/tds/query.c: fix core in emulated prepared, handle NULLs
+	* src/tds/token.c: fix buffer overflow using text
+	* src/tds/unittests/dataread.c:
+	- improved to catch problems reallocating BLOBs
+
+Fri Feb 18 13:55:26 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO: updated
+	* include/tdsodbc.h src/odbc/odbc.c src/odbc/unittests/typeinfo.c:
+	- fix problem using SQLGetTypeInfo in Sybase and ODBC 3.x
+	- do not prepare too much on Sybase
+	- update for NODM environment
+	* src/ctlib/blk.c: add comment
+	* src/ctlib/unittests/cancel.c: decrease timeout, too high
+
+Thu Feb 17 22:27:45 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/unittests/timeout.c:
+	- fix timeout in ODBC
+
+Wed Feb 16 20:22:37 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/tds/util.c:
+	- fix reentrancy problem using logs and append mode
+	- make tdsdump_append static
+	* src/ctlib/ct.c:
+	- fix use of freed memory
+
+Tue Feb 15 14:03:00 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/net.c TODO:
+	- improve support for getting port on mssql2k (mainly using clusters)
+
+Tue Feb 15 10:07:12 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO: updated
+	* src/ctlib/ct.c: fix possible client buffer overflow
+	* src/odbc/odbc.c: correctly free dynamic if fails
+	* src/tds/login.c: comment
+
+Mon Feb 14 13:44:44 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* doc/.cvsignore doc/Makefile.am:
+	- use less temporary files
+
+Fri Feb 11 14:12:30 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/cspublic.h include/cstypes.h include/ctlib.h:
+	* include/ctpublic.h include/tds.h src/ctlib/cs.c:
+	* src/ctlib/ct.c src/ctlib/unittests/ct_cursor.c:
+	* src/ctlib/unittests/rpc_ct_setparam.c:
+	* src/tds/login.c src/tds/mem.c src/tds/query.c:
+	* src/tds/token.c src/ctlib/unittests/Makefile.am:
+	* src/ctlib/unittests/ct_dynamic.c(added):
+	- applied Bill Thompson patch:
+	 - extra cursor functionality
+	 - support for ct_dynamic()
+	 - full ct_cancel implementation
+	 - Alex Kiesel patch for CS_SERVERADDR etc.
+
+Wed Feb  9 20:44:55 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/tds/mem.c src/tds/unittests/dynamic1.c:
+	- better fix for leak on dynamics and Sybase
+
+Wed Feb  9 20:17:53 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/common.c src/odbc/unittests/convert_error.c:
+	* src/odbc/unittests/raiserror.c src/odbc/unittests/timeout.c:
+	* src/odbc/unittests/typeinfo.c src/tds/unittests/dynamic1.c:
+	- fix leaks in tests
+
+Wed Feb 9 11:08:02 EST 2005   JK Lowden <jklowden@schemamania.org>
+	* include/dblib.h include/tds.h include/tdsodbc.h src/apps/bsqldb.c
+	* src/apps/freebcp.c src/apps/tsql.c src/ctlib/blk.c src/ctlib/cs.c
+	* src/ctlib/ct.c src/dblib/bcp.c src/dblib/dblib.c src/dblib/rpc.c
+	* src/odbc/connectparams.c src/odbc/connectparams.h src/odbc/odbc_util.c
+	* src/odbc/odbc_util.h src/odbc/sql2tds.c src/pool/member.c
+	* src/pool/stream.c src/pool/user.c src/tds/config.c src/tds/convert.c
+	* src/tds/data.c src/tds/iconv.c src/tds/login.c src/tds/mem.c
+	* src/tds/query.c src/tds/tds_checks.c src/tds/token.c src/tds/util.c
+	* src/tds/unittests/flags.c src/tds/unittests/utf8_3.c
+	- updated copyright
+
+Wed Feb  9 15:55:45 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO: updated
+	* configure.in src/tds/login.c:
+	- check error during SSL initialization
+	- fix some possible memory leaks
+	* src/tds/mem.c: remove memory leak
+	* src/dblib/dblib.c: srclen == 0 means NULL for dbconvert
+
+Tue Feb  8 16:42:14 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/userguide.sgml add to OS-specific, and use mdash element
+
+Tue Feb  8 14:50:39 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/ctlib/blk.c src/ctlib/cs.c:
+	* src/dblib/bcp.c src/tds/numeric.c src/tds/query.c:
+	* src/tds/tds_checks.c src/tds/token.c:
+	- add tds_swap_numeric, use it
+	- fix numeric and bcp
+
+Tue Feb  8 13:08:12 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS: updated
+	* include/tds.h src/tds/config.c src/tds/login.c:
+	* src/tds/mem.c src/tds/util.c:
+	- support "debug flags" option
+	* src/dblib/bcp.c:
+	- fix invalid free
+
+Tue Feb  8 10:26:40 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dblib.c: fix return from dbretlen
+
+Tue Feb  8 10:22:05 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/unittests/rpc.c: improved, fix leak
+	* include/tds.h src/tds/login.c src/tds/mem.c:
+	- fix leak using SSL
+	- free access to not allocated data
+
+Mon Feb  7 15:22:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO: updated
+	* configure.in include/tds.h src/tds/login.c src/tds/mem.c:
+	* src/tds/net.c:
+	- support for encrypted connection under mssql
+	- fix memory leak freeing result with text (introduced recently)
+
+Fri Feb  4 15:02:17 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO: updated
+	* src/tds/login.c: do not send NT login using TDS < 7.0
+
+Thu Feb  3 10:38:00 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/apps/freebcp.c vms/descrip_mms.template vms/getpass.c:
+	- applied patch from Craig A. Berry for bcp and VMS
+
+Thu Feb  3 10:03:57 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* doc/tds_ssl.html doc/userguide.sgml:
+	- update some docs
+
+Thu Feb  3 09:24:25 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/bcp.c:
+	- applied patch from Craig A. Berry, fix an overflow using utf8
+
+Wed Feb  2 20:08:08 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* freetds.conf include/tds.h src/odbc/connectparams.c:
+	* src/odbc/odbc.c src/tds/config.c src/tds/login.c:
+	* src/tds/mem.c:
+	- cleanup of old configurations parameters about NT domain
+
+Tue Feb  1 13:59:52 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/ctlib/ct.c src/dblib/dblib.c:
+	* src/tds/mem.c src/tds/token.c:
+	- fix int overflow if compute BY clause have more than 255 columns
+	* src/ctlib/blk.c: small fixes
+	* src/dblib/bcp.c: cleanup
+
+Mon Jan 31 14:06:33 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/unittests/utf8_3.c: small fix
+	* src/tds/net.c: use always no-blocking socket
+
+Mon Jan 31 10:54:40 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/apps/tsql.c src/ctlib/ct.c:
+	* src/dblib/bcp.c src/dblib/dblib.c src/dblib/rpc.c:
+	* src/odbc/odbc.c src/odbc/odbc_util.c src/odbc/sql2tds.c:
+	* src/tds/data.c src/tds/mem.c src/tds/query.c:
+	* src/tds/tds_checks.c src/tds/token.c:
+	- use column_cur_size to store nullability flag
+
+Sun Jan 30 12:46:17 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* doc/userguide.sgml: updated
+	* doc/api_status.txt: add view source
+
+Sun Jan 30 11:09:18 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS TODO: updates
+	* src/tds/net.c: small improve and comments
+
+Sat Jan 29 09:11:11 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h: just comment
+
+Wed Jan 26 09:29:03 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* win32/msvc6/FreeTDS.dsp win32/msvc6/dblib.dsp:
+	* win32/msvc6/libTDS.dsp:
+	- use Multithreaded DLL as default (as Frank M. Kromann 
+	  suggested)
+
+Wed Jan 26 09:17:35 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* doc/tds_ssl.html(added) doc/Makefile.am:
+	- add doc for mssql and encryption
+
+Tue Jan 25 09:51:52 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* win32/msvc6/dblib.dsp(added) win32/msvc6/libTDS.dsp(added):
+	* include/replacements.h win32/msvc6/FreeTDS.dsp:
+	* win32/msvc6/FreeTDS.dsw win32/msvc6/Makefile.am:
+	- imported Frank M. Kromann dblib project file for msvc6
+	- add projec for libTDS (shared by ODBC and dblib)
+	- fix include for win32
+
+Mon Jan 24 21:07:36 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/odbc/connectparams.c src/tds/config.c:
+	* src/tds/login.c src/tds/mem.c:
+	- implement named instance in libTDS and ODBC
+
+Mon Jan 24 19:37:48 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/timeout.c: comment
+	* src/tds/token.c: do set wrong state processing tokens
+
+Mon Jan 24 16:03:24 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO: updated
+	* src/odbc/connectparams.c: check memory allocation
+	* include/tds.h src/tds/net.c:
+	- start implementing named instance for mssql2k
+
+Fri Jan 21 13:59:30 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/sql2tds.c:
+	- workaround for DBD::ODBC
+
+Fri Jan 21 12:37:00 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/ctlib/unittests/cancel.c: not developing anymore
+	* src/odbc/odbc.c: improve timeout
+	* src/odbc/unittests/const_params.c: compile check
+	* src/tds/net.c: small update
+
+Thu Jan 20 17:17:20 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS TODO include/tds.h src/dblib/dblib.c src/odbc/odbc.c:
+	* src/tds/config.c src/tds/login.c src/tds/mem.c:
+	* src/tds/net.c src/tds/query.c src/tds/token.c:
+	- timeout stuff improved, now works
+
+Thu Jan 20 15:37:37 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* include/tds.h src/ctlib/blk.c src/ctlib/ct.c src/dblib/bcp.c:
+	* src/dblib/dblib.c src/tds/query.c src/tds/tds_checks.c:
+	* src/tds/token.c src/tds/util.c:
+	- add TDS_READING state
+	- fix changing state
+	- fix cancelling
+	* src/odbc/odbc.c: fix for possible link problem
+
+Mon Jan 17 20:10:41 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* doc/api_status.txt src/odbc/odbc.c vms/odbc_driver_axp.opt:
+	* win32/FreeTDS.def:
+	- implemented SQLExtendedFetch
+	* src/ctlib/ct.c:
+	- ct_get_data
+	 - fix null column
+	 - fix a possible buffer overflow
+	* src/dblib/dblib.c: small update
+
+Sun Jan 16 10:45:05 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/bcp.c:
+	- better quote
+	- fix possible memory leak
+
+Sat Jan 15 19:28:32 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS: update
+	* src/tds/query.c TODO: limit max size
+
+Fri Jan 14 11:52:45 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* src/apps/bsqldb.c corrected 'go' batch separator
+
+Fri Jan 14 11:48:27 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* TODO updated
+	* src/dblib/bcp.c quote column names
+
+Fri Jan 14  9:05:08 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/dblib.c:
+	- quote database name in dbuse
+	- removed useless casts
+	* src/tds/query.c:
+	- fixed id quoting
+
+Thu Jan 13 16:17:26 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO: updated
+	* include/tds.h:
+	- fix problem with long column name and multibyte charset
+	* src/tds/query.c: remove a FIXME
+	* src/tds/unittests/Makefile.am src/tds/unittests/utf8_3.c(added):
+	- add a test for long column name
+
+Thu Jan 13 11:07:27 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* TODO src/odbc/odbc.c:
+	- updated TODO
+	- finished compute fixes
+
+Thu Jan 13  9:38:19 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/common.c src/odbc/unittests/compute.c:
+	- finish compute test
+	- allow compile of tests under win32
+
+Wed Jan 12 21:42:47 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/odbc.c src/odbc/unittests/compute.c:
+	- fix metadata handling in compute
+	- improve compute test
+	* src/tds/token.c:
+	- fix wrong return
+	- handle error correctly in tds_process_result_tokens
+
+Wed Jan 12 20:40:14 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS include/tds.h include/tdsodbc.h src/dblib/bcp.c:
+	* src/odbc/odbc.c src/odbc/unittests/compute.c:
+	* src/tds/mem.c src/tds/token.c:
+	- removed tds_do_until_done (not used)
+	- handle correctly COMPUTE in ODBC
+
+Wed Jan 12  9:43:34 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* NEWS TODO doc/api_status.txt include/tds.h src/ctlib/cs.c:
+	* src/dblib/dblib.c src/tds/login.c src/tds/mem.c:
+	* src/tds/token.c:
+	- changed tds_alloc_compute_results declaration
+	- implemented some dbmny* function in dblib
+	- added some additional test in dblib
+
+Mon Jan 10 10:37:40 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/unittests/rpc.c: improved
+
+Mon Jan 10  9:50:52 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/bcp.c src/dblib/dblib.c:
+	- constify
+	- check input
+	* src/dblib/rpc.c: fix column_cur_size value
+
+Sun Jan  9 20:40:50 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/tds/config.c src/tds/des.c src/tds/iconv.c:
+	* src/tds/util.c:
+	- paranoid constify
+
+Sun Jan  9 18:24:26 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/unittests/insert_speed.c: fixed
+
+Sun Jan  9 14:51:43 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/unittests/t0018.c: improved from #1088672
+
+Sun Jan  9 14:24:44 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/dblib/rpc.c src/tds/convert.c:
+	- fix output parameter on mssql
+
+Fri Jan  7 11:56:52 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/dblib.c src/dblib/unittests/t0002.c
+	- SYBVARBINARY  and patch #1083180
+
+Fri Jan  7 13:49:56 CET 2005    Frediano Ziglio <freddy77@angelfire.com>
+	* src/odbc/sql2tds.c: update logging
+
+Thu Jan  6 23:44:59 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* src/dblib/unittests/rpc.c correct rpc unittest
+
+Thu Jan  6 15:13:56 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* doc/tds.html src/dblib/unittests/README updated docs
+
+Wed Jan  5 22:07:07 EST 2005	JK Lowden <jklowden@schemamania.org>
+	* include/dblib.h src/dblib/dblib.c src/dblib/rpc.c
+	- Patch 1095806 by Bill Thompson
+	- PRINT packets handled correctly (do not yield stale metadata).
+

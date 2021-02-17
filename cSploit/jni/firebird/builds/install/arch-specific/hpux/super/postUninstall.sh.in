@@ -1,0 +1,72 @@
+#! /bin/sh
+
+#------------------------------------------------------------------------
+# remove line from config file if it exists in it.
+
+removeLineFromFile() {
+    FileName=$1
+    oldLine=$2
+
+    if [ ! -z "$oldLine" ] 
+      then
+        cat $FileName | grep -v "$oldLine" > ${FileName}.tmp
+        mv ${FileName}.tmp $FileName
+        echo "Updated."
+
+    fi
+}
+
+
+#------------------------------------------------------------------------
+#  removeLinksForBackCompatibility
+#  Remove links for back compatibility to InterBase and Firebird1.0 
+#  linked systems.
+
+removeLinksForBackCompatibility() {
+
+    if [ -L @libdir@/libgds.so ]
+      then
+        rm -f @libdir@/libgds.so
+    fi
+    if [ -L @libdir@/libgds.so.0 ]
+      then
+        rm -f @libdir@/libgds.so.0
+    fi
+
+}
+
+#= Main PostUn ===============================================================
+
+
+    if [ "$1"=0 ] 
+      then 
+    
+        removeLinksForBackCompatibility
+
+
+    # If we have right systems remove the service autoconfig stuff.
+        if [ -x sbin/insserv ] 
+          then
+            sbin/insserv /etc/init.d/
+        fi
+        
+        if [ -x sbin/chkconfig ] 
+          then
+            /sbin/chkconfig --del firebird
+        fi
+
+    # Remove /usr/sbin/rcfirebird symlink
+
+        if [ -e /usr/sbin/rcfirebird ]
+          then
+            rm -f /usr/sbin/rcfirebird
+        fi
+        
+    # Remove initd script
+        
+        if [ -e /sbin/init.d/firebird ]
+          then
+            rm -f /sbin/init.d/firebird
+        fi
+            
+    fi        

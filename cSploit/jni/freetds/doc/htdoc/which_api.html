@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- $Id: which_api.html,v 1.4 2011/04/01 03:37:18 jklowden Exp $ -->
+
+<head>
+  <meta name="generator" content=
+  "HTML Tidy for NetBSD (vers 1st August 2004), see www.w3.org" />
+
+  <title>Which FreeTDS API is best for me?</title>
+	<link href="freetds.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+	<div id="Navigation">
+	<table>
+		<tr valign="bottom">
+			<td> <a href="index.html">
+				<img src="freetdslogo3.gif" alt="FreeTDS.org" /> </a></td>
+			<td><ul>
+					<li> <a href="index.html">Home</a> </li>
+					<li> <a href="news.html">News</a> </li>
+					<li> <a href="software.html">Software</a> </li>
+					<li> <a href="docs.html">Documentation</a> </li>
+					<li> <a href="support.html">Support</a> </li>
+					<li> <a href="contrib.html">Contribute</a> </li>	
+					</ul>
+				</td></tr>
+		</table>
+				</div>
+  <hr size="1" noshade="noshade" />
+  
+<h1>Which API should I use?</h1>
+
+  <p>There are three APIs.&nbsp; Any will work with any
+  server.&nbsp;</p>
+
+  <h2>db-lib</h2>
+
+  <p><tt>db-lib</tt> is the oldest and simplest. It's the only API
+  supported by both vendors, which is important to people porting
+  applications that use the vendors' libraries. <tt>db-lib</tt> was
+  the first API implemented by FreeTDS, and is still the best
+  supported, for what that's worth. Anything that can be done in
+  FreeTDS can be done through <tt>db-lib</tt>. Among other places,
+  <tt>db-lib</tt> is used by PHP.</p>
+
+  <h2>ct-lib</h2>
+
+  <p><tt>ct-lib</tt> is Sybase's second-generation API. People who
+  really know Sybase rely on <tt>ct-lib</tt> because it fixes a
+  bunch of implementation and conceptual gaps in <tt>db-lib</tt>.
+  That's why <tt>sqsh</tt> and Perl's <tt>DBD::Sybase</tt> use
+  <tt>ct-lib</tt>. <tt>ct-lib</tt> is not our most complete
+  implementation, but is getting some attention from the
+  developers. We're committed to making it work perfectly with
+  <tt>DBD::Sybase</tt>.</p>
+
+  <h2>odbc</h2>
+
+  <p><tt>ODBC</tt> is our most recent addition. Its chief advantage
+  is that it makes FreeTDS servers look like other <tt>ODBC</tt>
+  servers, a big help to people who know <tt>ODBC</tt> and/or write
+  applications for several kinds of servers. Recent releases of
+  FreeTDS have included large expansions of functionality in the
+  <tt>ODBC</tt> library, and the CVS version almost always includes
+  still more features.</p>
+
+  <h2>Bottom line</h2>
+
+  <p>There is no bottom line.&nbsp; The shortest path lies between
+  two points that only you, dear reader, know: where you are and
+  where you're going.&nbsp;</p>
+
+  <p>I like <tt>db-lib</tt> and think it's easy to get to know; it
+  has always done what I need.&nbsp; But the real experts out there
+  believe in <tt>ct-lib</tt>, so it's probably the right answer for
+  people just starting out, unless you want compatibility with
+  Microsoft's libraries.&nbsp; FreeTDS swings both ways: you can
+  use any client library API to connect to either vendor's
+  server.</p>
+
+  <p>Another consideration is what you have for a reference
+  platform.&nbsp; If you have access to vendor libraries, it can be
+  very handy to use their docs and write small tests against their
+  implementation.</p>
+
+  <h2>Where's the documentation?</h2>
+
+  <p>Links to the vendors' library docs are in the <a href=
+  "http://www.freetds.org/faq.html">FreeTDS FAQ</a>.</p>
+
+  <h1>What is "bcp"?</h1>
+
+  <p>"bcp" stands for "bulk copy". It is the name Sybase gave to a
+  feature of their server and TDS protocol.</p>
+
+  <p>Normal <tt>INSERT</tt> statements are first applied to the
+  transaction log and then applied to the table. A bcp insertion,
+  on the other hand, never<a href="#footnote.1"><sup>1</sup></a> touches the
+  transaction log. It's applied directly to the table and committed
+  wholesale. bcp operations are often an order of magnitude faster
+  than ordinary inserts, and are easier on the server, too.</p>
+
+  <p>To make bcp possible, Sybase included a feature in the TDS
+  protocol to (1) alert the server and (2) structure the incoming
+  data such that it's easy for the server to accept them. This
+  feature is made accessible to client applications via a set of
+  bcp functions in <tt>db-lib</tt> and <tt>ct-lib</tt>.&nbsp;
+  (Microsoft's ODBC driver supports bcp as an extension; it's not
+  part of the ODBC specification.)&nbsp; The APIs allow the
+  programmer to indicate the name of a file to load, or to send
+  rows of data from variables inside the application. The latter
+  feature is especially useful to the kind of
+  numerical/quantitative programming I do for a living; it's rare
+  that I'm working with under a million rows.</p>
+
+  <p>Sybase and Microsoft both include a <tt>bcp</tt> utility to
+  load/unload the server. It's the standard way to import data from
+  another server, for example. FreeTDS hadn't had one (we supply
+  the library, you supply the application), but Bill Thompson has
+  written <tt>freebcp</tt> (Yay, Bill!) so that gap is filled.</p>
+
+  <p>One sometimes hears of "bcp out" i.e., extracting data to a
+  file with the bcp utility. From the server's and protocol's point
+  of view, there's no (or almost no) such thing. The real advantage
+  of bcp is bypassing the transaction log and its concomitant locks
+  and I/O, elements that aren't significant when reading a
+  table.</p>
+
+  <p>As far as I know, bcp is a unique feature in the database
+  world. Other databases have ways to load data, of course, but not
+  via the client protocol.</p>
+
+  <p>RTFM for more.</p>
+
+  <p><a name="footnote.1"><sup>1</sup></a> Actually&mdash;to be
+  pedantic about it&mdash;the table allocations are still logged
+  (i.e. which pages get allocated during the insert). And you can
+  only run the non-logged (aka "fast") bcp if the target table has
+  no indexes and there are no triggers.</p>
+
+  <p>--jkl, with clarification from M. Peppler</p>
+</body>
+</html>

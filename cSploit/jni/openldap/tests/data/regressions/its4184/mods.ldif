@@ -1,0 +1,15 @@
+dn: cn=Another Group,ou=Groups,dc=example,dc=com
+changetype: modify
+add: member
+member: uid=user3,ou=People,dc=example,dc=com
+
+dn: cn=Another Group,ou=Groups,dc=example,dc=com
+changetype: modify
+delete: member
+member: uid=user3,ou=people,dc=example,dc=com
+
+dn: uid=special1,ou=Special,dc=example,dc=com
+changetype: modify
+replace: sn
+sn: NewName
+

@@ -1,0 +1,66 @@
+Introduction
+============
+Makefile.svn aids Subversion developers on unix-like systems set up an
+SVN development environment without requiring root priviliges. It does
+this by fetching Subversion along with many of its dependencies from
+the internet and building them using sane defaults suitable for
+development (for example, it invokes --enable-maintainer-mode while
+compiling Subversion itself). However, indirect dependencies are not
+covered; you need OpenSSL installed to get SSL support in neon and
+serf for example. Also, it doesn't build all the bindings by default
+(javahl for example).
+
+This README only covers basic usage. Please read Makefile.svn for more
+details.
+
+Requirements
+============
+In addition to the usual GNU buildtools including a sane compiler and
+GNU autotools, some version of Subversion is required to be in
+$PATH. It is used to fetch the desired version of Subversion from the
+repository.
+
+Usage
+=====
+First, choose a directory $(SVN_DEV) to set up the environment. Note
+that this directory cannot be changed later because the script
+hardcodes build and link paths relative to the current working
+directory.
+
+To fetch and build trunk, simply don't pass anything.
+Pass the branch you want to build in BRANCH, e.g.
+	$ make BRANCH="1.5.x"
+You can also pass a tag to build: 
+	$ make TAG="1.6.6"
+And you can specify a working copy to use, in case you need more
+than one working copy of the same branch:
+	$ make BRANCH="1.6.x" WC="1.6.x-test2"
+
+When the script has finished fetching and building, it uses
+$(SVN_DEV)/prefix to install Subversion libraries and
+binaries. $(SVN_DEV)/prefix/svn-trunk (or whatever you choose to
+build) will contain the latest Subversion binaries: you should add
+$(SVN_DEV)/prefix/svn-trunk/bin to your $PATH to use them. The
+Makefile in $(SVN_DEV)/svn-trunk is configured to build with sane
+options: while developing Subversion, simply `svn up` to pull the
+latest changes, `make` and `make install` to install the binaries in
+$(SVN_DEV)/prefix/svn-trunk.
+
+If at any point, you want to re-configure any of the packages to the
+default configuration in Makefile.svn, just run the "<PACKAGE>-reset"
+target in Makefile.svn before trying to rebuild again. If, in the
+extreme case, you want to remove everything including the installed
+binaries effectively returning to the starting point, use the "nuke"
+target.
+
+Extended usage
+==============
+The script can also run Subversion's regression test suite via all
+repository backends and RA methods. It generates the necessary
+configuration files and starts svnserve and httpd daemons
+automatically on non-privileged ports. The default test target to test
+everything is "svn-check".
+
+Notes
+=====
+The script currently doesn't build Ctypes Python bindings.

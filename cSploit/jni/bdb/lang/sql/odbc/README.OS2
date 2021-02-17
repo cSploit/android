@@ -1,0 +1,22 @@
+The OS/2 port of the sqlite ODBC driver is compiled with
+the GCC 3.2.2 compiler. The makefile is set up to use
+the unixODBC header files for common definitions of the
+ODBC driver manager.
+
+The port uses the SQLite 2.8.15 OS/2 port package done by 
+Andrew MacIntyre
+email: andymac@bullseye.apana.org.au, or andymac@pcug.org.au
+web:   http://www.andymac.org/
+
+The build file requires the presence of of a subdirectory
+containing sqlite.h and sqlite.lib from the SQLite-2.8.15
+package.
+
+There are three variables at the beginning of the make file
+for OS/2 that have to set for your environment
+SQLITELIB - location of the SQLite.h and SQLite.lib files
+UNIXODBCROOT - root directory of the unixodbc source tree
+this is used to locate the 'include' and 'odbcinst' directories
+KITDLL - location to copy the SQLLODBC.DLL file after it is built
+
+

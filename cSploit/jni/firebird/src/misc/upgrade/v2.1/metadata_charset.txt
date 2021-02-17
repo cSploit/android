@@ -1,0 +1,76 @@
+v2.5 notes
+==========
+
+This script should not be used anymore in "normal" conditions in favour of GBAK options -FIX_FSS_DATA
+and -FIX_FSS_METADATA. It serves as a reference to fix malformed data stored in inconsistent way, for
+example after restore with -FIX_FSS_DATA NONE.
+
+GBAK (restore) options:
+
+-FIX_FSS_DATA <charset>: This option works for user (i.e., non-system) tables.
+If <charset> is NONE, UNICODE_FSS columns ([VAR]CHAR and BLOB) are created using NONE charset.
+If <charset> is not NONE, UNICODE_FSS columns are created normally but data read from backup
+is considered to be in <charset> encoding instead of UNICODE_FSS, and is transliterated to be stored
+on the columns.
+
+-FIX_FSS_METADATA <charset>: This option is to fix wrong stored metadata, as replacement for the
+metadata script. Metadata read from backup is considered to be in <charset> encoding instead of
+UNICODE_FSS, and is transliterated to be stored on the restored database. NONE charset has no effect
+for this option.
+
+
+---------------------------------------
+
+Firebird versions prior 2.1 has two problems related to character sets and metadata extraction:
+ - 1. When creating/altering objects, they never transliterate metadata texts (procedures/triggers sources,
+descriptions, constraints/defaults texts, etc) from the client character set to the system (UNICODE_FSS) character set.
+They put raw bytes inside UNICODE_FSS columns.
+ - 2. When reading text BLOBs, they don't transliterate from the BLOB character set to the client character set.
+
+Note that even in version 2.1, the item 1 may occur if you create/alter objects connected with NONE or UNICODE_FSS
+character set using non-UNICODE_FSS data.
+
+If you created metadata with non-ASCII letters, you need to repair your database to correctly read 
+metadata after upgrading to 2.1.
+
+For the following steps, the database should already be in ODS11.1.
+Before doing anything, make a copy of the database.
+
+You should better connect each time to the database to do each step.
+
+Creating the procedures in the database
+---------------------------------------
+ - 1. isql database.fdb
+ - 2. SQL> input 'misc/upgrade/metadata/metadata_charset_create.sql';
+
+Checking your database
+----------------------
+ - 1. isql database.fdb
+ - 2. SQL> select * from rdb$check_metadata;
+
+The rdb$check_metadata procedure will return all objects that are touched by it.
+
+If it doesn't raise an exception, it seems your metadata is ok and you can go to the
+"Removing the upgrade procedures" section.
+
+Otherwise, the first bad object is the last one listed before the exception.
+
+To fix the metadata, you need to know in what character set the objects was created.
+The upgrade script will work correctly only if all your metadata was created using the same character set.
+
+Fixing the metadata
+-------------------
+ - 1. isql database.fdb
+ - 2. SQL> input 'misc/upgrade/metadata/metadata_charset_create.sql';
+ - 3. SQL> select * from rdb$fix_metadata('WIN1252');  -- replace WIN1252 by your charset
+ - 4. SQL> commit;
+
+The rdb$fix_metadata procedure will return the same data as rdb$check_metadata, but will change
+the metadata texts. It should be run only once!
+
+After this, you can remove the upgrade procedures.
+
+Removing the upgrade procedures
+-------------------------------
+ - 1. isql database.fdb
+ - 2. SQL> input 'misc/upgrade/metadata/metadata_charset_drop.sql';

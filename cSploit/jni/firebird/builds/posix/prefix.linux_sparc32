@@ -1,0 +1,23 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+# Copyright (C) Inprise Corporation.
+#
+# All Rights Reserved.
+# Contributor(s): ______________________________________.
+# Start of file prefix.linux:	$(VERSION)	$(PLATFORM)
+#
+# 2 Oct 2002, Nickolay Samofatov - Major cleanup
+
+COMMON_FLAGS=-DLINUX -pipe -MMD -fPIC -Dsparc -DFB_SEND_FLAGS=MSG_NOSIGNAL
+PROD_FLAGS=-ggdb -mcpu=ultrasparc -mtune=ultrasparc -O3 $(COMMON_FLAGS)
+DEV_FLAGS=-ggdb -p -Wall -Wno-switch  $(COMMON_FLAGS) -Wno-non-virtual-dtor

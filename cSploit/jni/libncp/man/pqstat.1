@@ -1,0 +1,116 @@
+.TH PQSTAT 1 03/03/1998 pqstat pqstat
+.SH NAME
+pqstat \- List jobs in NetWare print queue
+.SH SYNOPSIS
+.B pqstat
+[
+.B -h
+] [
+.B -S
+.I server
+] [
+.B -U
+.I user name
+] [
+.B -P
+.I password
+ |
+.B -n
+] [
+.B -C
+] [
+.B -B
+]
+.I queue name
+[
+.I job count
+]
+.SH DESCRIPTION
+.B pqstat
+lists specified number of jobs from the specified NetWare print queue available
+to you on some server. If you are already connected to some server, this one 
+is used.
+
+If pqstat does not print to a tty, the decorative header line is
+not printed, so that you can count the jobs in print queue by doing
+
+  pqstat -S server queue | wc -l
+
+.B pqstat
+looks up the file
+.I $HOME/.nwclient
+to find a file server, a user name and possibly a password. See
+nwclient(5) for more information. Please note that the access
+permissions of .nwclient MUST be 600, for security reasons.
+
+.SH OPTIONS
+
+.B queue name
+.RS 3
+.B queue name
+is used to specify queue. You can not use wildcards in the name.
+.RE
+
+.B job count
+.RS 3
+.B job count
+is used to specify how much entries will be shown. Default is to show all
+entries.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user name
+.RS 3
+If the user name your NetWare administrator gave to you differs
+from your unix user-id, you should use
+.B -U
+to tell the server about your NetWare user name.
+.RE
+
+.B -P
+.I password
+.RS 3
+You may want to give the password required by the server on the
+command line. You should be careful about using passwords in scripts.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given to mount shares which do not require a password to log in.
+
+If neither
+.B -n
+nor
+.B -P
+are given, pqstat prompts for a password.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.B -B
+.RS 3
+By default, pqstat lists the Netware name of the print job owner. 
+.B -B
+causes it to list the banner name instead.
+.RE
+
+.SH SEE ALSO
+.B nwclient(5), nprint(1), slist(1), ncpmount(8), ncpumount(8), pqlist(1), pqrm(1)
+
+.SH CREDITS
+pqstat was written by David Woodhouse (dave@imladris.demon.co.uk)
+

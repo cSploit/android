@@ -1,0 +1,271 @@
+.TH SLAPO-DDS 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2005-2014 The OpenLDAP Foundation, All Rights Reserved.
+.\" Copying restrictions apply.  See the COPYRIGHT file.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-dds \- Dynamic Directory Services overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The
+.B dds
+overlay to
+.BR slapd (8)
+implements dynamic objects as per RFC 2589.
+The name 
+.B dds
+stands for
+Dynamic Directory Services.
+It allows to define dynamic objects, characterized by the
+.B dynamicObject
+objectClass.
+
+Dynamic objects have a limited lifetime, determined by a time-to-live
+(TTL) that can be refreshed by means of a specific
+.B refresh
+extended operation.
+This operation allows to set the Client Refresh Period (CRP),
+namely the period between refreshes that is required to preserve the
+dynamic object from expiration.
+The expiration time is computed by adding the requested TTL to the 
+current time.
+When dynamic objects reach the end of their lifetime without being
+further refreshed, they are automatically deleted.
+There is no guarantee of immediate deletion, so clients should not count
+on it.
+
+Dynamic objects can have subordinates, provided these also are dynamic
+objects.
+RFC 2589 does not specify what the behavior of a dynamic directory
+service should be when a dynamic object with (dynamic) subordinates
+expires.
+In this implementation, the lifetime of dynamic objects with subordinates
+is prolonged until all the dynamic subordinates expire.
+
+
+This 
+.BR slapd.conf (5)
+directive adds the 
+.B dds
+overlay to the current database:
+
+.TP
+.B overlay dds
+
+.LP
+The database must have a
+.B rootdn
+specified, otherwise, the
+.B dds
+overlay will not be able to delete expired objects. The 
+.B dds
+overlay may be used with any backend that implements the 
+.BR add ,
+.BR modify ,
+.BR search ,
+and
+.BR delete
+operations.
+Since its use may result in many internal entry lookups, adds
+and deletes, it should be best used in conjunction with backends
+that have reasonably good write performances.
+
+.LP 
+The config directives that are specific to the
+.B dds
+overlay are prefixed by
+.BR dds\- ,
+to avoid potential conflicts with directives specific to the underlying 
+database or to other stacked overlays.
+
+.TP
+.B dds\-max\-ttl <ttl>
+Specifies the max TTL value.
+This is also the default TTL newly created
+dynamic objects receive, unless
+.B dds\-default\-ttl
+is set.
+When the client with a refresh extended operation requests a TTL higher
+than it, sizeLimitExceeded is returned.
+This value must be between 86400 (1 day, the default) and 31557600
+(1 year plus 6 hours, as per RFC 2589).
+
+.TP
+.B dds\-min\-ttl <ttl>
+Specifies the min TTL value; clients requesting a lower TTL by means
+of the refresh extended operation actually obtain this value as CRP.
+If set to 0 (the default), no lower limit is set.
+
+.TP
+.B dds\-default\-ttl <ttl>
+Specifies the default TTL value that newly created dynamic objects get.
+If set to 0 (the default), the
+.B dds\-max\-ttl
+is used.
+
+.TP
+.B dds\-interval <ttl>
+Specifies the interval between expiration checks; defaults to 1 hour.
+
+.TP
+.B dds\-tolerance <ttl>
+Specifies an extra time that is added to the timer that actually wakes up
+the thread that will delete an expired dynamic object.
+So the nominal lifetime of the entry is that specified in the
+.B entryTtl
+attribute, but its lifetime will actually be
+.BR "entryTtl + tolerance" .
+Note that there is no guarantee that the lifetime of a dynamic object
+will be
+.I exactly
+the requested TTL; due to implementation details, it may be longer, which 
+is allowed by RFC 2589.
+By default, tolerance is 0.
+
+.TP
+.B dds\-max\-dynamicObjects <num>
+Specifies the maximum number of dynamic objects that can simultaneously exist
+within a naming context.
+This allows to limit the amount of resources (mostly in terms of
+run-queue size) that are used by dynamic objects.
+By default, no limit is set.
+
+.TP
+.B dds\-state {TRUE|false}
+Specifies if the Dynamic Directory Services feature is enabled or not.
+By default it is; however, a proxy does not need to keep track of dynamic
+objects itself, it only needs to inform the frontend that support for
+dynamic objects is available.
+
+.SH ACCESS CONTROL
+The
+.B dds
+overlay restricts the refresh operation by requiring 
+.B manage
+access to the 
+.B entryTtl
+attribute (see
+.BR slapd.access (5)
+for details about the 
+.B manage
+access privilege).
+Since the
+.B entryTtl
+is an operational, NO-USER-MODIFICATION attribute, no direct write access
+to it is possible.
+So the 
+.B dds
+overlay turns refresh extended operation into an internal modification to
+the value of the
+.B entryTtl
+attribute with the
+.B relax
+control set.
+
+RFC 2589 recommends that anonymous clients should not be allowed to refresh
+a dynamic object.
+This can be implemented by appropriately crafting access control to obtain 
+the desired effect.
+
+Example: restrict refresh to authenticated clients
+
+.RS
+.nf
+access to attrs=entryTtl
+	by users manage
+	by * read
+
+.fi
+.RE
+Example: restrict refresh to the creator of the dynamic object
+
+.RS
+.nf
+access to attrs=entryTtl
+	by dnattr=creatorsName manage
+	by * read
+
+.fi
+.RE
+Another suggested usage of dynamic objects is to implement dynamic meetings;
+in this case, all the participants to the meeting are allowed to refresh 
+the meeting object, but only the creator can delete it (otherwise it will
+be deleted when the TTL expires)
+
+Example: assuming \fIparticipant\fP is a valid DN-valued attribute, 
+allow users to start a meeting and to join it; restrict refresh 
+to the participants; restrict delete to the creator
+
+.RS
+.nf
+access to dn.base="cn=Meetings"
+		attrs=children
+	by users write
+
+access to dn.onelevel="cn=Meetings"
+		attrs=entry
+	by dnattr=creatorsName write
+	by * read
+
+access to dn.onelevel="cn=Meetings"
+		attrs=participant
+	by dnattr=creatorsName write
+	by users selfwrite
+	by * read
+
+access to dn.onelevel="cn=Meetings"
+		attrs=entryTtl
+	by dnattr=participant manage
+	by * read
+
+.fi
+.RE
+
+.SH REPLICATION
+This implementation of RFC 2589 provides a restricted interpretation of how
+dynamic objects replicate.  Only the master takes care of handling dynamic
+object expiration, while replicas simply see the dynamic object as a plain
+object.
+
+When replicating these objects, one needs to explicitly exclude the 
+.B dynamicObject
+class and the
+.B entryTtl
+attribute.
+This implementation of RFC 2589 introduces a new operational attribute,
+.BR entryExpireTimestamp ,
+that contains the expiration timestamp.  This must be excluded from 
+replication as well.
+
+The quick and dirty solution is to set 
+.B schemacheck=off
+in the syncrepl configuration
+and, optionally, exclude the operational attributes from replication, using
+
+.RS
+.nf
+syncrepl ...
+	exattrs=entryTtl,entryExpireTimestamp
+.fi
+.RE
+
+In any case the overlay must be either statically built in or run-time loaded 
+by the consumer, so that it is aware of the 
+.B entryExpireTimestamp
+operational attribute; however, it must not be configured in the shadow 
+database.
+Currently, there is no means to remove the 
+.B dynamicObject
+class from the entry; this may be seen as a feature, since it allows to see
+the dynamic properties of the object.
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd (8).
+.SH AUTHOR
+Implemented by Pierangelo Masarati.

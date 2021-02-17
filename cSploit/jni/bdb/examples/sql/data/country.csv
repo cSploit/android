@@ -1,0 +1,60 @@
+country,abbr,Top 100,Top 200,Top 500,Top 1000
+USA,us,65,94,155,296
+Canada,ca,6,12,25,38
+United Kingdom,uk,5,10,36,70
+Japan,jp,3,7,13,50
+Germany,de,2,14,49,63
+Sweden,se,2,6,10,14
+Netherlands,nl,2,4,12,13
+Switzerland,ch,2,3,6,10
+Norway,no,2,3,4,4
+Spain,es,1,6,27,43
+Australia,au,1,6,13,28
+Taiwan,tw,1,5,14,35
+Brazil,br,1,5,12,32
+Italy,it,1,4,17,38
+Czech Republic,cz,1,2,7,10
+Austria,at,1,2,6,9
+Hong Kong,hk,1,2,5,6
+Finland,fi,1,1,7,11
+Belgium,be,1,1,6,7
+Mexico,mx,1,1,4,6
+China,cn,0,2,6,19
+France,fr,0,1,8,36
+Portugal,pt,0,1,7,9
+Korea,kr,0,1,6,12
+Denmark,dk,0,1,5,8
+Thailand,th,0,1,4,9
+Israel,il,0,1,4,7
+Ireland,ie,0,1,4,6
+Saudi Arabia,sa,0,1,2,4
+Singapore,sg,0,1,2,2
+Russia,ru,0,1,1,5
+Poland,pl,0,0,5,16
+Greece,gr,0,0,3,7
+Hungary,hu,0,0,3,5
+Chile,cl,0,0,2,4
+Turkey,tr,0,0,1,8
+New Zealand,nz,0,0,1,7
+Colombia,co,0,0,1,5
+South Africa,za,0,0,1,5
+Argentina,ar,0,0,1,3
+Estonia,ee,0,0,1,2
+Serbia,rs,0,0,1,2
+Slovenia,si,0,0,1,2
+Costa Rica,cr,0,0,1,1
+Iceland,is,0,0,1,1
+Malaysia,my,0,0,0,6
+India,in,0,0,0,4
+Slovakia,sk,0,0,0,4
+Lithuania,lt,0,0,0,3
+Romania,ro,0,0,0,3
+Indonesia,id,0,0,0,2
+Peru,pe,0,0,0,2
+Venezuela,ve,0,0,0,2
+Bulgaria,bg,0,0,0,1
+Iran,ir,0,0,0,1
+Jamaica,jm,0,0,0,1
+Philippines,ph,0,0,0,1
+Puerto Rico,pr,0,0,0,1
+Uruguay,uy,0,0,0,1

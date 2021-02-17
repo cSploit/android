@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>set_open_flags</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="configuration_reference.html" title="Appendix D. DB_CONFIG Parameter Reference" />
+    <link rel="prev" href="set_mp_mmapsize_parameter.html" title="set_mp_mmapsize" />
+    <link rel="next" href="set_shm_key_parameter.html" title="set_shm_key" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">set_open_flags</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="set_mp_mmapsize_parameter.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix D. DB_CONFIG Parameter Reference</th>
+          <td width="20%" align="right"> <a accesskey="n" href="set_shm_key_parameter.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="set_open_flags_parameter"></a>set_open_flags</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+            Initializes specific subsystems of the Berkeley DB environment. 
+            </p>
+      <p>
+                The syntax of the entry in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> is a single line
+                with the string <code class="literal">set_open_flags</code>, one or
+                more whitespace characters, the method flag parameter as a
+                string, optionally one or more whitespace characters, and
+                the string <code class="literal">on</code> or <code class="literal">off</code>.
+                If the optional string is omitted, the default is
+                <code class="literal">on</code>; for example, 
+                <code class="literal">set_open_flags DB_INIT_REP</code> or
+                <code class="literal">set_open_flags DB_INIT_REP on</code>.  Because
+                the DB_CONFIG file is read when the database environment is
+                opened, it will silently overrule configuration done before
+                that time.
+            </p>
+      <p>
+            The method flag parameters are as follows:
+            </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            DB_INIT_REP 
+            <p>
+            Enables/disables DB_INIT_REP in the DB_ENV-&gt;open method. For example:
+            </p><pre class="programlisting">set_open_flags DB_INIT_REP on</pre><p>
+                This enables initializing the replication subsystem. This
+                subsystem should be used whenever an application plans on
+                using replication.  This setting overwrites the DB_INIT_REP
+                flag passed from the application's DB_ENV-&gt;open
+                method.
+            </p></li>
+          <li>
+            DB_PRIVATE
+            <p>
+             Enables/disables DB_PRIVATE in the DB_ENV-&gt;open method. For example:
+            </p><pre class="programlisting">set_open_flags DB_PRIVATE on</pre><p>
+            This enables region memory allocation from the heap instead of from memory backed by the filesystem or
+			system shared memory.
+			This flag implies the environment will only be accessed by a single process (although that
+			process may be multithreaded). This flag has two effects on the Berkeley DB environment.
+			First, all underlying data structures are allocated from per-process memory instead of from
+			shared memory that is accessible to more than a single process. Second, mutexes are only
+			configured to work between threads.
+			This setting overwrites the DB_PRIVATE flag passed from the application's DB_ENV-&gt;open method.
+            </p></li>
+          <li>
+            DB_THREAD
+            <p>
+             Enables/disables DB_THREAD in the DB_ENV-&gt;open method. For example:
+            </p><pre class="programlisting">set_open_flags DB_THREAD on</pre><p>This enables the DB_ENV handle returned by the DB_ENV-&gt;open method to be free-threaded; that is, concurrently usable by multiple threads in the address space.
+            This setting overwrites the DB_THREAD flag passed from the application's DB_ENV-&gt;open method.</p></li>
+        </ul>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="set_mp_mmapsize_parameter.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="configuration_reference.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="set_shm_key_parameter.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">set_mp_mmapsize </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> set_shm_key</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

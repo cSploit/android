@@ -1,0 +1,6 @@
+ldap_memfree.3
+ldap_memvfree.3
+ldap_memalloc.3
+ldap_memcalloc.3
+ldap_memrealloc.3
+ldap_strdup.3

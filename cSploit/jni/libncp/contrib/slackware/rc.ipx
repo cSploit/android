@@ -1,0 +1,45 @@
+#!/bin/sh
+# /etc/rc.d/rc.ipx
+# This script starts up IPX networking
+#
+# If you have any problems with this read the IPX-HOWTO and look at
+# the output of cat /proc/net/ipx*
+#
+# Written for Slackware Linux by Jacek Lipkowski <sq5bpf@acid.ch.pw.edu.pl>
+#
+
+echo "Starting IPX networking..."
+
+# Load the IPX module just in case
+/sbin/modprobe ipx
+
+# Set this to yes, unless you know what you're doing
+IPX_AUTO_SETUP="yes"
+
+# If $IPX_AUTO_SETUP is not "yes" the values below take effect:
+
+#the network device where we want ipx running
+IPX_DEV="eth0" 
+#the ipx frame type, valid types are EtherII, SNAP, 802.3, 802.2TR, 802.2
+IPX_FRAME="802.2" 
+# the ipx network, if empty it will autoconfigure if there are Netware 
+# servers or anything else that sends RIP packets on this network segment
+IPX_NET=""
+ 
+if [ "$IPX_AUTO_SETUP" = "yes" ]; then
+# Automagic IPX setup
+/usr/sbin/ipx_configure --auto_interface=on --auto_primary=on
+else
+# Manual IPX setup
+/usr/sbin/ipx_interface add -p $IPX_DEV $IPX_FRAME $IPX_NET
+
+# Fire up ipxripd if it is present
+if [ -x /usr/sbin/ipxd ]; then
+echo "Starting ipxripd"
+# Remove the -p if you want to be an ipx router
+/usr/sbin/ipxd -p
+fi
+
+fi
+
+# Done

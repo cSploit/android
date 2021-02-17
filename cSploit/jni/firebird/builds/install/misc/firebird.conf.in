@@ -1,0 +1,856 @@
+#######################################
+#
+# Firebird configuration file
+#
+# Comments
+# --------
+# The # character is used for comments and can be placed anywhere on a
+# line.  Anything following the # character on a line is considered a
+# comment.
+#
+# Examples:
+#
+#    # This is a comment
+#    DefaultDbCachePages = 2048   # This is an end-of-line comment
+#
+# Entries
+# -------
+# The default value for each entry is listed to the right of the "=".
+# To activate an entry, remove the leading "#"s and supply the desired
+# value.
+#
+# Please note, by default a number of the values are specified in **Bytes** (Not KB).
+# You may add obvious abbreviations k, m and g in the end of a number to specify
+# kilobytes, megabytes and gigabytes.
+#
+# There are three types of configuration values: integer, boolean and string.
+#
+# Integer
+# -------
+# Integers is what they sound like, an integral value. Examples:
+#   1
+#   42
+#   4711
+#   24M		# 24 * 1024 * 1024
+#
+# Boolean
+# -------
+# Boolean is expressed as integer values with 0 (zero) being "false" and
+# non-zero is taken to mean "true". For consistency we recommend you
+# only use 0/1. Also strings 'y', 'yes' and 'true' stand for "true".
+#
+# String
+# ------
+# Strings are also what they sound like, strings. Examples:
+#   RemoteServiceName = gds_db
+#   RemotePipeName = pipe47
+#
+# Scopes
+# ------
+# Some parameters are marked as per-database / per-connection configurable.
+# Per-database configuration is done in file databases.conf (former aliases.conf).
+# Per-connection configuration is primarily client tool and done using
+# isc_dpb_config parameter in DPB (isc_spb_config for services).
+# Notice that per-database entries also may be tuned using DPB in case of
+# embedded engine when attaching to database first time.
+#
+# Macro substitution
+# ------------------
+# There is a number of predefined macro commands, that can be used in config
+# files where directory name is needed. They are available using $(name) syntax.
+# The complete list of them as follows:
+#	root - root directory of firebird instance
+#	install - directory where firebird is installed
+#	this - directory where current configuration file is located
+#	dir_conf - directory where firebird.conf and databases.conf are located
+#	dir_secDb - directory where default security database is located
+#	dir_plugins - directory where plugins are located
+#	dir_udf - directory where UDFs are located by default
+#	dir_sample - directory where samples are located
+#	dir_sampleDb - directory where sample DB (employee.fdb) is located
+#	dir_intl - directory where international modules are located
+#	dir_msg - directory where messages file (firebird.msg) is located
+# Like the rest of config internals macros are case-insensitive.
+# Capital letters here are used only for better human readability.
+#
+#
+# Includes
+# --------
+# One can include one config file into another one.
+# When relative path is used, it's treated relative to current config file.
+# I.e. when
+#	include some_file.conf
+# is used in /opt/config/master.conf, we include /opt/config/some_file.conf.
+# Traditional wildcards * and ? may be used in include operator. In this case
+# all matching files will be included in undefined order. Example:
+#	include $(dir_plugins)/config/*.conf
+#
+# Portions of this file have been reproduced/made available with the
+# permission of Ann Harrison @ IBPhoenix.
+#
+#######################################
+
+
+# ----------------------------
+# Database Paths/Directories
+#
+# DatabaseAccess may be None, Full or Restrict. If you choose Restrict,
+# provide ';'-separated trees list, where database files are stored.
+# Relative paths are treated relative to the root directory of firebird.
+# Default value 'Full' gives full access to all files on your site.
+# To specify access to specific trees, enum all required paths 
+# (for Win32 this may be something like 'C:\DataBase;D:\Mirror',
+# for unix - '/db;/mnt/mirrordb'). If you choose 'None', then only
+# databases listed in databases.conf can be attached.
+#
+# Note: simple quotation marks shown above should *NOT* be used when
+# specifying values and directory path names. Examples:
+#
+# DatabaseAccess = None
+# DatabaseAccess = Restrict C:\DataBase
+# DatabaseAccess = Restrict C:\DataBase;D:\Mirror
+# DatabaseAccess = Restrict /db
+# DatabaseAccess = Restrict /db;/mnt/mirrordb
+# DatabaseAccess = Full
+#
+# UNCONTROLLED DATABASE ACCESS MAY COMPROMISE YOUR SYSTEM!
+# IT IS STRONGLY RECOMMENDED THAT THIS SETTING BE USED TO LIMIT
+# DATABASE LOCATIONS!
+#
+# Type: string (special format)
+#
+#DatabaseAccess = Full
+
+
+# ----------------------------
+# Ability to access databases remotely
+#
+# RemoteAccess may be true or false (1/0, Yes/No) - it's boolean value.
+# By default RemoteAccess to all databases except security DB is enabled.
+# If you plan to use more than one dedicated security database it's
+# recommended to disable remote access to them in databases.conf.
+# However (as an additional method to have secure enhanced firebird
+# installation) one can disable remote access globally and re-enable
+# in databases.conf only for specific databases.
+#
+# Per-database configurable.
+#
+# Type: boolean
+#
+#RemoteAccess = true
+
+
+# ----------------------------
+# External File Paths/Directories
+#
+# ExternalFileAccess may be None, Full or Restrict. If you choose
+# Restrict, provide ';'-separated trees list, where external files
+# are stored. Relative paths are treated relative to the root directory 
+# of firebird. Default value 'None' disables any use of external files
+# on your site. To specify access to specific trees, enum all required
+# paths (for Win32 this may be something like 'C:\ExternalTables',
+# for unix - '/db/extern;/mnt/extern').
+#
+# Per-database configurable.
+#
+# NOTE: THE EXTERNAL TABLE ENGINE FEATURE COULD BE USED TO COMPROMISE
+# THE SERVER/HOST AS WELL AS DATABASE SECURITY!!
+#
+# IT IS STRONGLY RECOMMENDED THAT THIS SETTING BE USED TO LIMIT
+# EXTERNAL TABLE LOCATIONS!
+#
+# Type: string (special format)
+#
+#ExternalFileAccess = None
+
+
+# ----------------------------
+# External Function (UDF) Paths/Directories
+#
+# UdfAccess may be None, Full or Restrict. If you choose
+# Restrict, provide ';'-separated trees list, where UDF libraries
+# are stored. Relative paths are treated relative to the root directory 
+# of firebird.
+#
+# Default value 'Restrict UDF' provides the same restrictions
+# as in FB 1.0. To specify access to specific trees, enum all required
+# paths (for Win32 this may be something like 'C:\ExternalFunctions',
+# for unix - '/db/extern;/mnt/extern').
+@UDF_COMMENT@
+# NOTE: THE EXTERNAL FUNCTION ENGINE FEATURE COULD BE USED TO COMPROMISE
+# THE SERVER/HOST AS WELL AS DATABASE SECURITY!!
+#
+# IT IS STRONGLY RECOMMENDED THAT THIS SETTING BE USED TO LIMIT
+# EXTERNAL FUNCTION LOCATIONS!
+#
+# Type: string (special format)
+#
+#UdfAccess = Restrict UDF
+
+
+# ----------------------------
+# Temporary directories
+#
+# Provide ';'-separated trees list, where temporary files are stored.
+# Relative paths are treated relative to the root directory of firebird.
+# Default value is determined using FIREBIRD_TMP, TEMP or TMP 
+# environment options. Once the first specified directory has no 
+# available space, the engine will switch to the next one, and so on.
+#
+# E.g.:
+# TempDirectories = c:\temp
+# or
+# TempDirectories = c:\temp;d:\temp
+#
+# Type: string (special format)
+#
+#TempDirectories =
+
+
+# ----------------------------
+# Trace configuration file for system audit
+#
+# Empty value means that system audit is turned off.
+#
+# Type: string
+#
+#AuditTraceConfigFile =
+
+# ----------------------------
+# Maximum summary size of each user trace session's log files in MB.
+# When log files size reach this limit, trace session automatically 
+# suspends until interactive user service read and delete some log files.
+#
+# Type: integer
+#
+#MaxUserTraceLogSize = 10
+
+
+# ----------------------------
+# Number of cached database pages
+#
+# This sets the number of pages from any one database that can be held
+# in cache at once. If you increase this value, the engine will
+# allocate more pages to the cache for every database. By default, the
+# SuperServer allocates 2048 pages for each database and the classic
+# allocates 256 pages per client connection per database.
+#
+# Per-database configurable.
+#
+# Type: integer
+#
+#DefaultDbCachePages = 2048
+
+# ----------------------------
+# Disk space preallocation
+#
+# Sets the amount of preallocated disk space in bytes. Disk space
+# preallocation allows to reduce physical file fragmentation and to make 
+# database work in out of disk space condition. With preallocation enabled,
+# engine allocates 1/16nth of already allocated disk space at a time but 
+# not less than 128KB and no more than DatabaseGrowthIncrement (128MB by 
+# default). To disable preallocation set DatabaseGrowthIncrement to zero.
+# Shadow database files are not preallocated.
+#
+# Per-database configurable.
+#
+# Type: integer
+#
+#DatabaseGrowthIncrement = 128M
+
+# ----------------------------
+# File system cache threshold
+#
+# The threshold value that determines whether Firebird will use file system
+# cache or not. File system caching is used if database cache size in pages 
+# (configured explicitly in database header or via DefaultDbCachePages setting)
+# is less than FileSystemCacheThreshold value.
+#
+# To use file system cache always set FileSystemCacheThreshold to a large value.
+# To bypass file system cache for all databases set FileSystemCacheThreshold to 
+# zero.
+# 
+# Type: integer, measured in database pages
+#
+# Per-database configurable.
+#
+#FileSystemCacheThreshold = 64K
+
+# ----------------------------
+# File system cache size
+#
+# This setting controls the maximum amount of RAM used by Windows file system
+# cache on 64-bit Windows XP, Windows Server 2003 SP1 or later host. It has no
+# effect for Unix hosts in this release yet.
+#
+# Note that the lowest number presently supported is 10%, and the highest number
+# is 95%; numbers outside these limits will be set to the default of 30%.
+#
+# If the cache size has already been selected when the engine starts the host
+# setting will not be changed. Thus you may need to reboot the host for the
+# change of this setting to have effect.
+#
+# To leave host caching settings unchanged set this parameter to 0. This is
+# the default parameter value.
+#
+# Security note
+# To adjust the setting engine needs SeIncreaseQuotaPrivilege right. Built-in
+# service accounts and administrators have it by default. Installer grants this
+# right to Firebird service account. If the engine fails to adjust the cache 
+# size setting it will log warning message to the firebird.log and continue.
+#
+# Type: integer, measured in % of total physical RAM
+#
+#FileSystemCacheSize = 0
+
+# ----------------------------
+# Remove protection against opening databases on NFS mounted volumes on
+# Linux/Unix and SMB/CIFS volumes on Windows.
+#
+# This also permits creating database shadows on mounted network volumes.
+#
+#     ***WARNING*** ***WARNING*** ***WARNING*** ***WARNING***
+#
+# This option removes an important safety feature of Firebird and can
+# cause irrecoverable database corruption. Do not use this option unless
+# you understand the risks and are prepared to accept the loss of the
+# contents of your database.
+# Unless this configuration option is changed from 0 to 1, Firebird can
+# open a database only if the database is stored on a drive physically
+# attached to the local computer - the computer running that copy of
+# Firebird. Requests for connections to databases stored on NFS mounted
+# drives are redirected to a Firebird server running on the computer that
+# "owns" the disk.
+# This restriction prevents two different copies of Firebird from opening
+# the same database without coordinating their activities. Uncoordinated
+# access by multiple copies of Firebird will corrupt a database. On a local
+# system, the system-level file locking prevents uncoordinated access to
+# the database file.
+#
+# NFS does not provide a reliable way to detect multiple users of a file on
+# an NFS mounted disk. If a second copy of Firebird connects to a database on
+# an NFS mounted disk, it will corrupt the database.
+# Under some circumstances, running a Firebird server on the computer that
+# owns NFS mounted volumes is inconvenient or impossible. Applications that
+# use the "embedded" variant of Firebird and never share access to a database
+# can use this option to permit direct access to databases on NFS mounted
+# volumes.
+#
+# The situation for SMB/CIFS is quite similar to NFS with not all configurations
+# providing file locking mechanisms needed for safe operation. Using SuperServer
+# engine with the database on NT file server may be considered relatively safe 
+# as file locking protects the database from being used by the several engines.
+# Network stack can still change order of writes so you may get a corrupted
+# database in case of network errors or power outage.
+#
+# The useful and safe case is working with a shared database marked read-only.
+#
+# DO NOT ENABLE THIS OPTION UNLESS YOU REALLY KNOW WHAT YOU ARE DOING.
+#
+# Type: boolean
+#
+#RemoteFileOpenAbility = 0
+
+# ----------------------------
+# Temporary space management
+#
+# Temporary storage is used by the sorting module, it's also
+# intended to store temporary datasets etc.
+#
+# The parameters below handle the allocation and caching policy
+# for the temporary space manager. In previous Firebird versions,
+# they were prefixed with "SortMem" instead of current "Temp".
+#
+# The smallest block size being allocated in the temporary storage.
+# This value reflects the allocation granularity.
+#
+# Type: integer
+#
+#TempBlockSize = 1M
+
+#
+# The maximum amount of the temporary space that can be cached
+# in memory.
+#
+# For Classic servers, this setting is defaulted to 8 MB.
+# Although it can be increased, the value applies to each client
+# connection/server instance and thus consumes a lot of memory.
+#
+# Type: integer
+#
+#TempCacheLimit = 64M
+
+
+# ----------------------------
+#
+# This group of parameters determines what plugins will be used by firebird.
+# Format of string is the list of plugins, separated by space, ',' or ';'.
+# Plugins will be tried in an order, specified here.
+# In many cases correct order is important!
+#
+# Type: string
+
+# AuthServer and AuthClient determine what authentication methods will be used
+# by network server and client redirector. Secure remote passwords plugin
+# is default one. Except configured by default SRP plugin firebird also has
+# Legacy_Auth plugin which is used to emulate pre-FB3 login protocol making it
+# possible for client to talk to old servers and for server to listen to requests
+# from old clients. Legacy_Auth is VERY unsecure. On windows Win_Sspi plugin may
+# be also used - it implements windows trusted authentication and backward
+# compatible with 2.1 and 2.5 clients and servers running on windows.
+#
+# Per-database configurable.
+#
+#AuthServer = Srp
+#
+# Per-connection and per-database configurable.
+#
+#AuthClient = Srp, Win_Sspi, Legacy_Auth
+#
+# If you need to use server plugins that do not provide encryption key (both Legacy_Auth
+# & Win_Sspi) you should also turn off required encryption on the wire with WireCrypt
+# configuration parameter except when working with never encrypted XNET protocol.
+#
+
+# UserManager sets plugin used to work with security database. If more than
+# one plugin is given, first plugin from the list is used. If you need to manage
+# legacy logins set it to Legacy_UserManager.
+#
+# Per-database configurable.
+#
+#UserManager = Srp
+
+# TracePlugin is used by firebird trace facility to send trace data to the user
+# or log file in audit case.
+#
+#TracePlugin = fbtrace
+
+# Crypt plugins are used to crypt data transferred over the wire.
+# In default case wire is encrypted using Alleged RC4
+# (key must be generated by auth plugin).
+#
+# Per-connection configurable.
+#
+#CryptPlugin = Arc4
+
+# Key holder is a kind of temp storage for DB crypt keys.
+# There is no default for this kind of plugins.
+#
+#KeyHolderPlugin =
+
+
+# ----------------------------
+#
+# This parameter determines what providers will be used by firebird.
+# Format is the same as for the list of plugins (see a few lines before).
+# This is not strange because internally provider is just a kind of plugin.
+#
+# Type: string
+#
+# Per-database & per-connection configurable.
+#
+#Providers = Remote,Engine12,Loopback
+
+
+# ----------------------------
+#
+# Determines the number of seconds that the lock manager will wait after a
+# conflict has been encountered before purging locks from dead processes
+# and doing extra deadlock scan cycle. Engine detects deadlocks instantly
+# in all normal cases, so this value affects things only if something goes
+# wrong. Setting it too low may degrade system performance.
+#
+# Per-database configurable.
+#
+# Type: integer
+#
+#DeadlockTimeout = 10
+
+
+# ----------------------------
+#
+# How often the pages are flushed on disk
+# (for databases with ForcedWrites=Off only)
+#
+# Number of unflushed writes which will accumulate before they are
+# flushed, at the next transaction commit.  For non-Win32 ports,
+# the default value is -1 (Disabled)
+#
+# Per-database configurable.
+#
+# Type: integer
+#
+#MaxUnflushedWrites = 100
+
+#
+# Number of seconds during which unflushed writes will accumulate
+# before they are flushed, at the next transaction commit. For non-Win32
+# ports, the default value is -1 (Disabled)
+#
+# Per-database configurable.
+#
+# Type: integer
+#
+#MaxUnflushedWriteTime = 5
+
+
+# ----------------------------
+#
+# This option controls whether to call abort() when internal error or BUGCHECK
+# is encountered thus invoke post-mortem debugger which can dump core suitable
+# for off-line analysis. When disabled engine tries to minimize damage and
+# continue execution.
+#
+# Note that setting this option to 1 makes engine produce traceable coredumps
+# when something nasty like SIGSEGV happens inside UDF. On Windows enabling
+# this option makes engine invoke JIT debugger facilities when errors happen.
+#
+# For debugging builds (DEV_BUILD), default value is 1 (Enabled)
+#
+# Type: boolean
+#
+#BugcheckAbort = 0
+
+
+# ----------------------------
+# Relaxing relation alias checking rules in SQL
+#
+# Since Firebird 2.0, strict alias checking rules were implemented in the SQL
+# parser to accord with the SQL standard requirements. This setting allows
+# these rules to be relaxed in order to allow legacy applications to run on 
+# Firebird 2.0.
+# A setting of 1 (true) allows the parser to resolve a qualified column reference 
+# using the relation name, where an alias has been specified for that relation.
+#
+# For example, it allows a query such as:
+#       SELECT TABLE.X FROM TABLE A
+#
+# It is not recommended to enable this setting. It should be regarded as an 
+# interim workaround for porting untidy legacy code, until it is practicable to 
+# revise such code. 
+# 
+# CAUTION!
+# There is no guarantee that this setting will be available in future Firebird 
+# versions.
+#
+# Type: boolean
+#
+#RelaxedAliasChecking = 0
+
+
+# ----------------------------
+# Client Connection Settings (Basic)
+#
+# Seconds to wait before concluding an attempt to connect has failed.
+#
+# Per-connection configurable.
+#
+# Type: integer
+#
+#ConnectionTimeout = 180
+
+#
+# Should connection over the wire be encrypted?
+# Has 3 different values: Required, Enabled or Disabled. Enabled behavior
+# depends another side requirements. If both sides set to enabled, connection
+# is encrypted when possible.
+#
+# Attention: default depends upon connection type: incoming (server)
+#            or outgoing (client).
+#
+# Per-connection configurable.
+#
+# Type: integer
+#
+#WireCrypt = Enabled (for client) / Required (for server)
+
+#
+# Seconds to wait on a silent client connection before the server sends
+# dummy packets to request acknowledgment.
+#
+# NOTE. This option may hang or crash Windows NT4 or Windows 2000 pre SP3 
+# on the client side as explained here: 
+# http://support.microsoft.com/default.aspx?kbid=296265.
+# or may not prevent eventual inactive client disconnection for other OS.
+#
+# Normally, Firebird uses SO_KEEPALIVE socket option to keep track of
+# active connections. If you do not like default 2-hour keepalive timeout
+# then adjust your server OS settings appropriately. On UNIX-like OS's,
+# modify contents of /proc/sys/net/ipv4/tcp_keepalive_*. On Windows,
+# follow instrutions of this article:
+# http://support.microsoft.com/default.aspx?kbid=140325
+#
+# Per-connection configurable.
+#
+# Type: integer
+#
+#DummyPacketInterval = 0
+
+
+# ----------------------------
+# TCP Protocol Settings
+#
+# The TCP Service name/Port number to be used for client database
+# connections.
+#
+# It is only necessary to change one of the entries, not both.  The
+# order of precendence is the 'RemoteServiceName' (if an entry is
+# found in the 'services.' file) then the 'RemoteServicePort'.
+#
+# Per-connection configurable.
+#
+# Type: string, integer
+#
+#RemoteServiceName = gds_db
+#RemoteServicePort = 3050
+
+#
+# The TCP Port Number to be used for server Event Notification
+# messages.  The value of 0 (Zero) means that the server will choose
+# a port number randomly.
+#
+# Per-connection configurable.
+#
+# Type: integer
+#
+#RemoteAuxPort = 0
+
+#
+# TCP/IP buffer size for send and receive buffers of both the client
+# and server. The engine reads ahead of the client and can send
+# several rows of data in a single packet. The larger the packet size,
+# the more data is sent per transfer. Range is 1448 to 32767 (MAX_SSHORT).
+#
+# Type: integer
+#
+#TcpRemoteBufferSize = 8192
+
+#
+# Either enables or disables Nagle algorithm (TCP_NODELAY option of
+# socket) of the socket connection.
+#
+# Note: Currently is a default for classic and super servers.
+#
+# Per-connection configurable.
+#
+# Type: boolean
+#
+#TcpNoNagle = 1
+
+#
+# Allows incoming connections to be bound to the IP address of a
+# specific network card. It enables rejection of incoming connections
+# through any other network interface except this one. By default,
+# connections from any available network interface are allowed.
+# If you are using Classic Server, this setting is for Windows only.
+# Under Linux, BSD or Mac OS X, with Classic server use xinetd or launchd
+# configuration file (bind parameter).
+#
+# Type: string
+#
+#RemoteBindAddress =
+
+
+# ----------------------------
+# Locking and shared memory parameters
+#
+# Bytes of shared memory allocated for lock manager.
+# In Classic mode, the size given is used for the initial allocation. The
+# table expands dynamically up to the limit of memory.
+#
+# Per-database configurable.
+#
+# Type: integer
+#
+#LockMemSize = 1M
+
+#
+# In Classic, only one client process may access the lock table at any
+# time. Access to the lock table is governed by a mutex. The mutex can
+# be requested conditionally - a wait is a failure and the request must
+# be retried - or unconditionally - the request will wait until it is
+# satisfied. This parameter establishes the number of attempts that
+# will be made conditionally. Zero value means unconditional mode.
+# Relevant only on SMP machines.
+#
+# Per-database configurable.
+#
+# Type: integer
+#
+#LockAcquireSpins = 0
+
+#
+# Tune lock hash list; more hash slots mean shorter hash chains. Only
+# necessary under very high load. Prime number values are recommended.
+#
+# Per-database configurable.
+#
+# Type: integer
+#
+#LockHashSlots = 8191
+
+# ----------------------------
+#
+# Bytes of shared memory allocated for event manager.
+#
+# Per-database configurable.
+#
+# Type: integer
+#
+#EventMemSize = 64K
+
+
+# ===========================
+# Engine Settings
+# ===========================
+#
+# ----------------------------
+# Which CPUs should be used (Windows Only)
+#
+# In an SMP system, sets which processors can be used by the server.
+# The value is taken from a bit map in which each bit represents a CPU.
+# Thus, to use only the first processor, the value is 1. To use both
+# CPU 1 and CPU 2, the value is 3. To use CPU 2 and CPU 3, the value
+# is 6. The default value is 0 - no affinity will be set.
+#
+# Type: integer
+#
+#CpuAffinityMask = 0
+
+
+# ----------------------------
+# Garbage collection policy
+#
+# Defines how engine does garbage collection. Valid values are :
+#	cooperative
+#	background
+#	combined
+#
+# Superserver has by default "combined" policy
+# Classic has by default "cooperative" policy.
+#	Other values are ignored by classic server build
+#
+# Per-database configurable.
+#
+# Type: string (special format)
+#
+#GCPolicy = combined
+
+
+# ----------------------------
+# Security database
+#
+# Defines locations of security database (one that stores logins and passwords),
+# used by server to validate remote connections.
+#
+# Per-database configurable.
+#
+# Type: string (pathname)
+#
+#SecurityDatabase = $(dir_secDb)/security3.fdb
+
+
+# ==============================
+# Settings for Windows platforms
+# ==============================
+#
+# ----------------------------
+# Does the guardian restart the server every time it crashes?
+#    0 - only start the engine/service once
+#    1 - always restart the engine/service if it terminates
+#
+# Type: integer/boolean
+#
+#GuardianOption = 1
+
+
+#
+# ----------------------------
+# Priority level/class for the server process.
+#
+# The values are:
+#     0 (Zero) - normal priority,
+#     positive value - high priority (same as -B command line option)
+#     negative value - low priority.
+#
+# Note: All changes to this value should be carefully tested to ensure
+# that engine is more responsive to requests.
+#
+# Type: integer
+#
+#ProcessPriorityLevel = 0
+
+
+# ----------------------------
+# Local Connection Settings
+#
+# The name of the shared memory area used as a transport channel in local protocol.
+# Note that the local protocol in v2.0 is not compatible with any previous version
+# if Firebird or InterBase.
+#
+# Please note that the server can register objects in Global\ kernel namespace
+# only if it runs under the account with SE_CREATE_GLOBAL_NAME privilege.
+# This means that if you run the server under a restricted account under
+# Windows Vista/XP SP2/2000 SP4 it will not be accessible using the
+# local protocol from other sessions.
+#
+# Per-connection configurable.
+#
+# Type: string
+#
+#IpcName = FIREBIRD
+
+#
+# The name of the pipe used as a transport channel in NetBEUI protocol.
+# Has the same meaning as a port number for TCP/IP. The default value is
+# compatible with IB/FB1.
+#
+# Per-connection configurable.
+#
+# Type: string
+#
+#RemotePipeName = interbas
+
+
+# ============================
+# Settings for Unix/Linux platforms
+# ============================
+
+# ----------------------------
+# Remove protection against redirecting requests to other servers
+#
+#     ***WARNING*** ***WARNING*** ***WARNING*** ***WARNING***
+#
+# Ability to redirect requests to other servers was initially present
+# in Interbase, but was broken by Borland in Interbase 6.0, when
+# they added SQL dialects. Request redirection was fixed in firebird 2.0,
+# but today such behaviour (proxy) seems to be dangerous from security
+# point of view. Imagine, you have one carefully protected firebird server,
+# access to which is possible from global net. But in case when this server
+# has access to your internal LAN (may and should be restricted,
+# but often possible), it will work as a gateway for incoming requests like:
+# firebird.your.domain.com:internal_server:/private/database.fdb
+# It's enough to know name/IP of some internal server on your LAN, and for
+# this connection one even need not know login/password on external server.
+# Such gateway easily overrides firewall, installed to protect your LAN
+# from outside attack.
+#
+# DO NOT ENABLE THIS OPTION UNLESS YOU REALLY KNOW WHAT YOU ARE DOING.
+#
+# Type: boolean
+#
+#Redirection = 0
+
+
+# Type: boolean
+#SharedCache = true
+
+# Type: boolean
+#SharedDatabase = false
+
+
+# SharedCache	SharedDatabase	Mode
+# false			false			Classic with exclusive access	// single attachment only ?
+# false			true			Classic with shared access		// traditional CS/SC
+# true			false			Super with exclusive access		// traditional SS
+# true			true			Super with shared access		// 

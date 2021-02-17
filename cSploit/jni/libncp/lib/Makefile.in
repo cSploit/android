@@ -1,0 +1,137 @@
+#
+#
+#
+
+top_srcdir = @top_srcdir@
+top_builddir = ..
+this_srcdir = ${top_srcdir}/lib
+
+include ${top_builddir}/Make.rules
+
+vpath %.c ${this_srcdir}
+
+LIBS := @LIBS@
+REENTRANT_CFLAGS := @REENTRANT_CFLAGS@
+VERSIONED_LINK := @VERSIONED_LINK@
+
+SHARED_NCPLIB := libncp.so
+SHARED_NCPLIB_BIN := $(SHARED_NCPLIB).$(VERSION_SOLIB)
+SHARED_NCPLIB_SONAME := $(SHARED_NCPLIB).$(VERSION_SONAME)
+STATIC_NCPLIB := libncp.a
+STATIC_NCPLIB_BIN := $(STATIC_NCPLIB)
+
+CCFLAGS += -I.
+PIC_FLAGS := -fPIC
+NWCOMPAT := 1
+
+SHARED_VLINK :=
+SHARED_VLINK_CFLAGS :=
+ifeq ($(VERSIONED_LINK),yes)
+SHARED_VLINK := -Wl,-version-script=${this_srcdir}/libncp.vers
+SHARED_VLINK_CFLAGS := -DMULTIVERSION
+endif
+
+STATIC_BASE_OBJ := ncplib.o filemgmt.o queue.o nwcalls.o nwtime.o cfgfile.o \
+		fs/eas.o strops.o ncpext.o nwclient.o resolve.o fs/filelock.o stats.o
+ifdef NDS_SUPPORT
+STATIC_NDS_OBJ := ndslib.o mpilib.o
+STATIC_BASE_OBJ += ndscrypt.o nwnet.o wcs.o \
+		rdn.o ds/filter.o ds/search.o ds/request.o ds/setkeys.o \
+		ds/dsgetstat.o ds/partops.o ds/iterhandle.o ds/effright.o \
+		ds/dsread.o ds/dslist.o ds/bindctx.o ds/classes.o \
+		ds/syntaxes.o ds/dsstream.o \
+		o_ndslib.o
+endif
+ifdef SIGNATURES
+STATIC_BASE_OBJ += ncpsign.o
+endif
+
+SHARED_BASE_OBJ := $(STATIC_BASE_OBJ:.o=.do)
+SHARED_NDS_OBJ := $(STATIC_NDS_OBJ:.o=.do)
+
+STATIC_O_OBJ := $(STATIC_BASE_OBJ) $(STATIC_NDS_OBJ)
+SHARED_O_OBJ := $(SHARED_BASE_OBJ) $(SHARED_NDS_OBJ)
+
+BASE_CFLAGS := -DHAVE_CONFIG_H -DMAKE_NCPLIB -D_GNU_SOURCE 
+NDS_CFLAGS := $(BASE_CFLAGS) -DPORTABLE -DUPTON
+CFLAGS_ncplib.o   := -DNWSFIND=\"$(bindir)/nwsfind\"
+CFLAGS_cfgfile.o  := -DGLOBALCFGFILE=\"$(sysconfdir)/ncpfs.conf\"
+
+STATIC_CFLAGS    := $(CFLAGS) $(CCFLAGS) $(REENTRANT_CFLAGS) @FFUNCTION_SECTIONS@
+SHARED_CFLAGS    := $(CFLAGS) $(CCFLAGS) $(REENTRANT_CFLAGS) $(PIC_FLAGS) $(SHARED_VLINK_CFLAGS)
+
+.PHONY : all dep install install-dev clean mrproper distclean
+.PHONY : install_shared install_static install_static_su 
+
+all: $(STATIC_NCPLIB) $(SHARED_NCPLIB)
+
+install: install_shared
+
+%.d: %.c
+	set -e; $(CC) -M $(STATIC_CFLAGS) $(CFLAGS_$(@:.d=.o)) $(BASE_CFLAGS) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+$(STATIC_NDS_OBJ): %.o: %.c
+	$(CC) $(STATIC_CFLAGS) $(CFLAGS_$@) $(NDS_CFLAGS) -o $@ -c $<
+
+$(STATIC_BASE_OBJ): %.o: %.c
+	$(CC) $(STATIC_CFLAGS) $(CFLAGS_$@) $(BASE_CFLAGS) -o $@ -c $<
+
+$(SHARED_NDS_OBJ): %.do: %.c
+	$(CC) $(SHARED_CFLAGS) $(CFLAGS_$(@:.do=.o)) $(NDS_CFLAGS) -o $@ -c $<
+
+$(SHARED_BASE_OBJ): %.do: %.c
+	$(CC) $(SHARED_CFLAGS) $(CFLAGS_$(@:.do=.o)) $(BASE_CFLAGS) -o $@ -c $<
+
+dep:
+
+clean:
+	rm -f *.o *.do *.to *~ ds/*.o ds/*.do ds/*.to ds/*~ fs/*.o fs/*.do fs/*.to fs/*~
+	rm -f libncp.a libncp.so* libncpsu.*
+
+mrproper: clean
+	rm -f $(UTILS) $(DISTFILE) *.d fs/*.d ds/*.d
+
+distclean: mrproper
+
+install_shared: $(SHARED_NCPLIB_BIN)
+	$(INSTALL) -d $(DESTDIR)$(libsodir)
+	$(INSTALL) $(SHARED_NCPLIB_BIN) $(DESTDIR)$(libsodir)
+	-ldconfig
+
+install-dev: install_shared install_static
+	ln -sf $(SHARED_NCPLIB_SONAME) $(DESTDIR)$(libsodir)/$(SHARED_NCPLIB)
+	$(INSTALL) -d $(DESTDIR)$(includedir)/ncp
+	$(INSTALL) -d $(DESTDIR)$(includedir)/ncp/ext
+	$(INSTALL) -d $(DESTDIR)$(includedir)/ncp/kernel
+	$(INSTALL) -d $(DESTDIR)$(includedir)/ncp/obsolete
+	$(INSTALL_DATA) ${top_builddir}/include/ncp/*.h $(DESTDIR)$(includedir)/ncp
+	$(INSTALL_DATA) ${top_builddir}/include/ncp/ext/*.h $(DESTDIR)$(includedir)/ncp/ext
+	$(INSTALL_DATA) ${top_builddir}/include/ncp/kernel/*.h $(DESTDIR)$(includedir)/ncp/kernel
+	$(INSTALL_DATA) ${top_builddir}/include/ncp/obsolete/*.h $(DESTDIR)$(includedir)/ncp/obsolete
+ifneq (${top_srcdir},${top_builddir})
+	$(INSTALL_DATA) ${top_srcdir}/include/ncp/*.h $(DESTDIR)$(includedir)/ncp
+	$(INSTALL_DATA) ${top_srcdir}/include/ncp/ext/*.h $(DESTDIR)$(includedir)/ncp/ext
+	$(INSTALL_DATA) ${top_srcdir}/include/ncp/kernel/*.h $(DESTDIR)$(includedir)/ncp/kernel
+	$(INSTALL_DATA) ${top_srcdir}/include/ncp/obsolete/*.h $(DESTDIR)$(includedir)/ncp/obsolete
+endif
+
+$(SHARED_NCPLIB): $(SHARED_NCPLIB_BIN)
+	rm -f $@
+	ln -sf $< $@
+
+$(SHARED_NCPLIB_BIN): $(SHARED_O_OBJ) ${this_srcdir}/libncp.vers
+	$(CC) -shared -o $@ -Wl,-soname=$(SHARED_NCPLIB_SONAME) $(SHARED_VLINK) $(SHARED_O_OBJ) ${LIBS} -lc
+
+install_static: $(STATIC_NCPLIB_BIN)
+	$(INSTALL) -d $(DESTDIR)$(libadir)
+	$(INSTALL_DATA) $(STATIC_NCPLIB_BIN) $(DESTDIR)$(libadir)
+
+$(STATIC_NCPLIB): $(STATIC_O_OBJ)
+	ar r $@ $(STATIC_O_OBJ) 
+
+ifeq ($(NEED_DEP),yes)
+include $(STATIC_O_OBJ:.o=.d)
+endif
+

@@ -1,0 +1,129 @@
+# Searching databases __before__ append...
+dn: olcDatabase={-1}frontend,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcFrontendConfig
+olcDatabase: {-1}frontend
+olcAddContentAcl: FALSE
+olcLastMod: TRUE
+olcMaxDerefDepth: 0
+olcReadOnly: FALSE
+olcSchemaDN: cn=Subschema
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcAccess: {0}to *  by * none
+olcAddContentAcl: TRUE
+olcLastMod: TRUE
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcRootDN: cn=config
+olcRootPW: config
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+
+dn: olcDatabase={1}monitor,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {1}monitor
+olcAddContentAcl: FALSE
+olcLastMod: TRUE
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+
+# Searching databases __after__ append...
+dn: olcDatabase={-1}frontend,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcFrontendConfig
+olcDatabase: {-1}frontend
+olcAddContentAcl: FALSE
+olcLastMod: TRUE
+olcMaxDerefDepth: 0
+olcReadOnly: FALSE
+olcSchemaDN: cn=Subschema
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcAccess: {0}to *  by * none
+olcAddContentAcl: TRUE
+olcLastMod: TRUE
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcRootDN: cn=config
+olcRootPW: config
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+
+dn: olcDatabase={1}monitor,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {1}monitor
+olcAddContentAcl: FALSE
+olcLastMod: TRUE
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+
+dn: olcDatabase={2}bdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcBdbConfig
+olcDatabase: {2}bdb
+olcDbDirectory: ./testrun/db.1.a
+olcSuffix: dc=com
+
+# Searching databases __after__ insert...
+dn: olcDatabase={-1}frontend,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcFrontendConfig
+olcDatabase: {-1}frontend
+olcAddContentAcl: FALSE
+olcLastMod: TRUE
+olcMaxDerefDepth: 0
+olcReadOnly: FALSE
+olcSchemaDN: cn=Subschema
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcAccess: {0}to *  by * none
+olcAddContentAcl: TRUE
+olcLastMod: TRUE
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcRootDN: cn=config
+olcRootPW: config
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+
+dn: olcDatabase={1}bdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcBdbConfig
+olcDatabase: {1}bdb
+olcDbDirectory: ./testrun/db.2.a
+olcSuffix: dc=org
+
+dn: olcDatabase={2}monitor,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {2}monitor
+olcAddContentAcl: FALSE
+olcLastMod: TRUE
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+
+dn: olcDatabase={3}bdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcBdbConfig
+olcDatabase: {3}bdb
+olcDbDirectory: ./testrun/db.1.a
+olcSuffix: dc=com
+

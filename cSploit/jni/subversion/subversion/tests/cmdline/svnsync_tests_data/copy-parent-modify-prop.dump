@@ -1,0 +1,91 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 265b4915-c811-0410-a32e-b5d713837d08
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2006-04-19T12:49:15.123309Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 113
+Content-length: 113
+
+K 10
+svn:author
+V 2
+pl
+K 8
+svn:date
+V 27
+2006-04-19T12:50:29.623828Z
+K 7
+svn:log
+V 16
+add dir and file
+PROPS-END
+
+Node-path: dir
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: dir/f
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 0
+Text-content-md5: d41d8cd98f00b204e9800998ecf8427e
+Text-content-sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 126
+Content-length: 126
+
+K 10
+svn:author
+V 2
+pl
+K 8
+svn:date
+V 27
+2006-04-19T12:51:15.837786Z
+K 7
+svn:log
+V 29
+copy dir and modify prop of f
+PROPS-END
+
+Node-path: dir2
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 1
+Node-copyfrom-path: dir
+
+
+Node-path: dir2/f
+Node-kind: file
+Node-action: change
+Prop-content-length: 27
+Content-length: 27
+
+K 4
+prop
+V 3
+val
+PROPS-END
+
+

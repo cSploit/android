@@ -1,0 +1,416 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="intl" ProjectGUID="{DFFA2117-E6A8-4806-BB69-94DAC8F8F42A}">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Release|Win32" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" PreprocessorDefinitions="_DEBUG" MkTypLibCompatible="true" TargetEnvironment="1" />
+      <Tool Name="VCCLCompilerTool" Optimization="2" InlineFunctionExpansion="1" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen;../../../extern/icu/include;../../../src/include,../../../src/include/gen" PreprocessorDefinitions="NDEBUG;_WINDOWS;_USRDLL;INTL_EXPORTS;WINDOWS_ONLY;SUPERCLIENT;WIN32" BrowseInformation="1" AdditionalOptions="/EHsc-" OmitFramePointers="true" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" AdditionalDependencies="comctl32.lib ws2_32.lib mpr.lib version.lib" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\$(ProjectName)\fb$(ProjectName).dll" LinkIncremental="1" AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/$(ConfigurationName)/lib" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" GenerateManifest="false" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+    <Configuration Name="Debug|Win32" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" PreprocessorDefinitions="_DEBUG" MkTypLibCompatible="true" TargetEnvironment="1" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen;../../../extern/icu/include;../../../src/include,../../../src/include/gen" PreprocessorDefinitions="_DEBUG;_WINDOWS;_USRDLL;WINDOWS_ONLY;SUPERCLIENT;WIN32;DEV_BUILD" BrowseInformation="1" AdditionalOptions="/EHsc-" OmitFramePointers="true" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" AdditionalDependencies="comctl32.lib ws2_32.lib mpr.lib version.lib" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\$(ProjectName)\fb$(ProjectName).dll" LinkIncremental="1" AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/release/lib" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" GenerateManifest="false" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="INTL files" Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+      <File RelativePath="..\..\..\src\jrd\CharSet.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cs_big5.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cs_gb2312.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cs_icu.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cs_jis.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cs_ksc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cs_narrow.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cs_unicode_fss.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cs_unicode_ucs2.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cv_big5.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cv_gb2312.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cv_icu.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cv_jis.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cv_ksc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cv_narrow.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cv_unicode_fss.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_ascii.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_big5.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_dos.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_gb2312.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_icu.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_iso8859_1.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_iso8859_13.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_iso8859_2.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_jis.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_ksc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_narrow.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_unicode_ucs2.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\intl\ld.cpp">
+      </File>
+    </Filter>
+    <Filter Name="Header files" Filter="h;hpp;hxx;hm;inl">
+      <File RelativePath="..\..\..\src\intl\collations\ascii.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\ascii2.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591ca0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591da0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591de0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591es0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591fi0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591fr0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591is0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591it0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591nl0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591no0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591pt0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591sv0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591uk0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\bl88591us0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\blNEXTde0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\blNEXTes0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\blNEXTfr0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\blNEXTit0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\blNEXTus0.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\CharSet.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\countries.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\country_codes.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_437.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_850.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_852.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_857.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_860.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_861.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_863.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_865.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_big5.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_cyrl.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_gb2312.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cs_icu.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_iso8859_1.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_iso8859_2.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_jis_0208_1990.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_koi8r.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_koi8u.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_ksc5601.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_next.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_sjis.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_w1250.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_w1251.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_w1252.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_w1253.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\charsets\cs_w1254.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\cv_icu.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db437de0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db437es1.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db437fi0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db437fr0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db437it0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db437nl0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db437sv0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db437uk0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db437us0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db850cf0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db850de0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db850es0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db850fr0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db850it1.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db850nl0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db850pt0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db850sv1.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db850uk0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db850us0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db852cz0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db852hdc.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db852po0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db852sl0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db857tr0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db860pt0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db863cf1.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db865da0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db865no0.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\db866ru0.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\gds_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\IntlUtil.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\kanji.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\kanji_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\koi8r_ru.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\koi8u_ua.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\langdrv.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\lc_icu.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\ld.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\ld_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\ldcommon.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\mod_loader.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\os_utils.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pd437intl.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pd437swedfin.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pd852hundc.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pd852polish.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pd852slovene.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pd857turk.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pd861iceland.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pd865nordan40.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pd866cyrr.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\ps852czech.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1250czech.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1250hun.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1250hundc.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1250polish.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1250slov.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1251cyrr.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1252i850.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1252intl.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1252nor4.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1252ptbr.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1252span.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1252swfn.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1253greek1.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\pw1253turk.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\conversions\tx437_865.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\conversions\tx437_lat1.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\conversions\tx865_lat1.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\undef.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\unicode_util.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\win1251_ua.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\win1257_ee.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\win1257_lt.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\win1257_lv.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\win_cz.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\win_cz_ci_ai.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\xx885913lt.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\xx88592czech.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\xx88592hun.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\collations\xx88592plk.h">
+      </File>
+    </Filter>
+    <Filter Name="Resource files">
+      <File RelativePath="..\..\..\src\jrd\version.rc">
+        <FileConfiguration Name="Release|Win32">
+          <Tool Name="VCResourceCompilerTool" AdditionalIncludeDirectories="..\..\..\src\jrd;$(NoInherit)" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|Win32">
+          <Tool Name="VCResourceCompilerTool" AdditionalIncludeDirectories="..\..\..\src\jrd;$(NoInherit)" />
+        </FileConfiguration>
+      </File>
+    </Filter>
+    <Filter Name="COMMON files">
+      <File RelativePath="..\..\..\src\common\dllinst.cpp">
+      </File>
+    </Filter>
+    <Filter Name="JRD files">
+      <File RelativePath="..\..\..\src\jrd\gds.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\IntlUtil.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\mod_loader.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\os_utils.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\unicode_util.cpp">
+      </File>
+    </Filter>
+    <File RelativePath="..\defs\intl.def">
+    </File>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

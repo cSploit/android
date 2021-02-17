@@ -1,0 +1,190 @@
+# collective.schema -- Collective attribute schema
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+## Portions Copyright (C) The Internet Society (2003).
+## Please see full copyright statement below.
+
+# From RFC 3671 [portions trimmed]:
+# 	Collective Attributes in LDAP
+
+#Abstract
+#
+#  X.500 collective attributes allow common characteristics to be shared
+#  between collections of entries.  This document summarizes the X.500
+#  information model for collective attributes and describes use of
+#  collective attributes in LDAP (Lightweight Directory Access Protocol).
+#  This document provides schema definitions for collective attributes
+#  for use in LDAP.
+
+#3. Collective Attribute Types
+#
+#  A userApplications attribute type can be defined to be COLLECTIVE
+#  [RFC2252].  This indicates that the same attribute values will appear
+#  in the entries of an entry collection subject to the use of the
+#  collectiveExclusions attribute and other administrative controls.
+#
+#  Collective attribute types are commonly defined as subtypes of non-
+#  collective attribute types.  By convention, collective attributes are
+#  named by prefixing the name of their non-collective supertype with
+#  "c-".  For example, the collective telephone attribute is named
+#  c-TelephoneNumber after its non-collective supertype telephoneNumber.
+#
+#  Non-collective attributes types SHALL NOT subtype collective
+#  attributes.
+#
+#  Collective attributes SHALL NOT be SINGLE-VALUED.  Collective
+#  attribute types SHALL NOT appear in the attribute types of an object
+#  class definition.
+#
+#  Operational attributes SHALL NOT be defined to be collective.
+#
+#  The remainder of section provides a summary of collective attributes
+#  derived from those defined in [X.520].  Implementations of this
+#  specification SHOULD support the following collective attributes and
+#  MAY support additional collective attributes.
+#
+#
+#3.1. Collective Locality Name
+#
+#  The c-l attribute type specifies a locality name for a collection of
+#  entries.
+#
+attributeType      ( 2.5.4.7.1 NAME 'c-l'
+	SUP l COLLECTIVE )
+#
+#
+#3.2. Collective State or Province Name
+#
+#  The c-st attribute type specifies a state or province name for a
+#  collection of entries.
+#
+attributeType      ( 2.5.4.8.1 NAME 'c-st'
+	SUP st COLLECTIVE )
+#
+#
+#3.3. Collective Street Address
+#
+#  The c-street attribute type specifies a street address for a
+#  collection of entries.
+#
+attributeType      ( 2.5.4.9.1 NAME 'c-street'
+	SUP street COLLECTIVE )
+#
+#
+#3.4. Collective Organization Name
+#
+#  The c-o attribute type specifies an organization name for a collection
+#  of entries.
+#
+attributeType      ( 2.5.4.10.1 NAME 'c-o'
+	SUP o COLLECTIVE )
+#
+#
+#3.5. Collective Organizational Unit Name
+#
+#  The c-ou attribute type specifies an organizational unit name for a
+#  collection of entries.
+#
+attributeType      ( 2.5.4.11.1 NAME 'c-ou'
+	SUP ou COLLECTIVE )
+#
+#
+#3.6. Collective Postal Address
+#
+#  The c-PostalAddress attribute type specifies a postal address for a
+#  collection of entries.
+#
+attributeType      ( 2.5.4.16.1 NAME 'c-PostalAddress'
+	SUP postalAddress COLLECTIVE )
+#
+#
+#3.7. Collective Postal Code
+#
+#  The c-PostalCode attribute type specifies a postal code for a
+#  collection of entries.
+#
+attributeType      ( 2.5.4.17.1 NAME 'c-PostalCode'
+	SUP postalCode COLLECTIVE )
+#
+#
+#3.8. Collective Post Office Box
+#
+#  The c-PostOfficeBox attribute type specifies a post office box for a
+#  collection of entries.
+#
+attributeType ( 2.5.4.18.1 NAME 'c-PostOfficeBox'
+	SUP postOfficeBox COLLECTIVE )
+#
+#
+#3.9. Collective Physical Delivery Office Name
+#
+#  The c-PhysicalDeliveryOfficeName attribute type specifies a physical
+#  delivery office name for a collection of entries.
+#
+attributeType ( 2.5.4.19.1 NAME 'c-PhysicalDeliveryOfficeName'
+	SUP physicalDeliveryOfficeName COLLECTIVE )
+#
+#
+#3.10. Collective Telephone Number
+#
+#  The c-TelephoneNumber attribute type specifies a telephone number for
+#  a collection of entries.
+#
+attributeType ( 2.5.4.20.1 NAME 'c-TelephoneNumber'
+	SUP telephoneNumber COLLECTIVE )
+#
+#
+#3.11. Collective Telex Number
+#
+#  The c-TelexNumber attribute type specifies a telex number for a
+#  collection of entries.
+#
+attributeType ( 2.5.4.21.1 NAME 'c-TelexNumber'
+	SUP telexNumber COLLECTIVE )
+#
+#
+#3.13. Collective Facsimile Telephone Number
+#
+#  The c-FacsimileTelephoneNumber attribute type specifies a facsimile
+#  telephone number for a collection of entries.
+#
+attributeType ( 2.5.4.23.1 NAME 'c-FacsimileTelephoneNumber'
+	SUP facsimileTelephoneNumber COLLECTIVE )
+#
+#
+#3.14. Collective International ISDN Number
+#
+#  The c-InternationalISDNNumber attribute type specifies an
+#  international ISDN number for a collection of entries.
+#
+attributeType ( 2.5.4.25.1 NAME 'c-InternationalISDNNumber'
+	SUP internationalISDNNumber COLLECTIVE )
+
+# Full Copyright
+#
+# Copyright (C) The Internet Society (2003). All Rights Reserved.
+# 
+# This document and translations of it may be copied and furnished
+# to others, and derivative works that comment on or otherwise explain
+# it or assist in its implmentation may be prepared, copied, published
+# and distributed, in whole or in part, without restriction of any
+# kind, provided that the above copyright notice and this paragraph
+# are included on all such copies and derivative works.  However,
+# this document itself may not be modified in any way, such as by
+# removing the copyright notice or references to the Internet Society
+# or other Internet organizations, except as needed for the  purpose
+# of developing Internet standards in which case the procedures for
+# copyrights defined in the Internet Standards process must be followed,
+# or as required to translate it into languages other than English.

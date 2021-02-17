@@ -1,0 +1,155 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 5bd4ad05-a105-0410-b7b7-c014cebbdc5c
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2005-11-15T21:10:49.994595Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 103
+Content-length: 103
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-15T21:10:58.608841Z
+K 7
+svn:log
+V 3
+ttb
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 116
+Content-length: 116
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-15T21:11:19.415517Z
+K 7
+svn:log
+V 15
+first version!
+
+PROPS-END
+
+Node-path: trunk/file.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 14
+Text-content-md5: 9f089b639127e2f5a79c4eda189678d6
+Text-content-sha1: b1c2f43edab746cec4857f5d4b00579922a83d92
+Content-length: 24
+
+PROPS-END
+first version
+
+
+Revision-number: 3
+Prop-content-length: 117
+Content-length: 117
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-15T21:11:29.391885Z
+K 7
+svn:log
+V 16
+second version!
+
+PROPS-END
+
+Node-path: trunk/file.txt
+Node-kind: file
+Node-action: change
+Text-content-length: 15
+Text-content-md5: 27f60b341727cb8ed1de139b0da7c173
+Text-content-sha1: b61e81f23c338df5c1dff26963f755d4226227c6
+Content-length: 15
+
+second version
+
+
+Revision-number: 4
+Prop-content-length: 122
+Content-length: 122
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-15T21:11:50.278301Z
+K 7
+svn:log
+V 21
+a copy, but modified
+
+PROPS-END
+
+Node-path: trunk/copy-of-file.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 2
+Node-copyfrom-path: trunk/file.txt
+Text-copy-source-md5: 9f089b639127e2f5a79c4eda189678d6
+Text-copy-source-sha1: b1c2f43edab746cec4857f5d4b00579922a83d92
+Text-content-length: 28
+Text-content-md5: 7b4d0f5ac875af39d2ee3a67798f5754
+Text-content-sha1: 2040e27d431428a216382b42560dccaaa5e1b3b6
+Content-length: 28
+
+first version, but modified
+
+

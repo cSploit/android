@@ -1,0 +1,42 @@
+<?xml version='1.0'?>
+<!DOCTYPE service_bundle SYSTEM '/usr/share/lib/xml/dtd/service_bundle.dtd.1'>
+<!--
+    Service manifest for firebird 
+-->
+
+<service_bundle type='manifest' name='firebird'>
+<service
+	name='application/firebird'
+	type='service'
+	version='1'>
+	<create_default_instance enabled='true' />
+
+	<exec_method
+		type='method'
+		name='start'
+		exec='/opt/firebird/bin/fbmgr.bin -start'
+		timeout_seconds='10'>
+		<method_context>
+			<method_credential user='firebird' group='firebird' />
+		</method_context>
+	</exec_method>
+
+	<exec_method
+		type='method'
+		name='stop'
+		exec='/opt/firebird/bin/fbmgr.bin -stop'
+		timeout_seconds='10'>
+		<method_context>
+			<method_credential user='firebird' group='firebird' />
+		</method_context>
+	</exec_method>
+
+	<template>
+		<common_name>
+			<loctext xml:lang='C'>
+			Firebird	
+			</loctext>
+		</common_name>
+	</template>
+</service>
+</service_bundle>

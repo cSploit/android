@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Appendix B. DB_CONFIG Parameter Reference</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="prev" href="sqlite3.html" title="sqlite3" />
+    <link rel="next" href="add_data_dir_parameter.html" title="add_data_dir" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Appendix B. DB_CONFIG Parameter Reference</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="sqlite3.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="add_data_dir_parameter.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="appendix" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="configuration_reference"></a>Appendix B. DB_CONFIG Parameter Reference</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+            The following <code class="literal">DB_CONFIG</code> parameters can be used to
+            manage various aspects of your application's database
+            environment. 
+        </p>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="configlist"></a>DB_CONFIG Parameters</h2>
+            </div>
+          </div>
+        </div>
+        <div class="navtable">
+          <table border="1" width="80%">
+            <thead>
+              <tr>
+                <th>DB_CONFIG Parameters</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <a class="xref" href="add_data_dir_parameter.html" title="add_data_dir">add_data_dir</a>
+                </td>
+                <td>Sets the mutex alignment.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="mutex_set_align_parameter.html" title="mutex_set_align">mutex_set_align</a>
+                </td>
+                <td>Sets the mutex alignment.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="mutex_set_increment_parameter.html" title="mutex_set_increment">mutex_set_increment</a>
+                </td>
+                <td>Configures the number of additional mutexes to allocate.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="mutex_set_max_parameter.html" title="mutex_set_max">mutex_set_max</a>
+                </td>
+                <td>Configures the total number of mutexes to allocate.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="mutex_set_tas_spins_parameter.html" title="mutex_set_tas_spins">mutex_set_tas_spins</a>
+                </td>
+                <td>Specifies the number of times the test-and-set mutexes should spin without blocking.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="rep_set_clockskew_parameter.html" title="rep_set_clockskew">rep_set_clockskew</a>
+                </td>
+                <td>Sets the clock skew ratio.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="rep_set_config_parameter.html" title="rep_set_config">rep_set_config</a>
+                </td>
+                <td>Configures the Berkeley DB replication subsystem.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="rep_set_limit_parameter.html" title="rep_set_limit">rep_set_limit</a>
+                </td>
+                <td>Sets record transmission throttling.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="rep_set_nsites_parameter.html" title="rep_set_nsites">rep_set_nsites</a>
+                </td>
+                <td>Specifies the total number of sites in a replication group.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="rep_set_priority_parameter.html" title="rep_set_priority">rep_set_priority</a>
+                </td>
+                <td>Specifies the database environment's priority.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="rep_set_request_parameter.html" title="rep_set_request">rep_set_request</a>
+                </td>
+                <td>Sets a threshold before requesting retransmission of a missing message.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="rep_set_timeout_parameter.html" title="rep_set_timeout">rep_set_timeout</a>
+                </td>
+                <td>Specifies a variety of replication timeout values.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="repmgr_set_ack_policy_parameter.html" title="repmgr_set_ack_policy">repmgr_set_ack_policy</a>
+                </td>
+                <td>Specifies how master and client sites     will handle acknowledgment.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="repmgr_site_parameter.html" title="repmgr_site">repmgr_site</a>
+                </td>
+                <td>Identifies a Replication Manager host.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_cachesize_parameter.html" title="set_cachesize">set_cachesize</a>
+                </td>
+                <td>Sets the size of the shared memory buffer pool.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_cache_max_parameter.html" title="set_cache_max">set_cache_max</a>
+                </td>
+                <td>Sets the maximum size for set_cachesize                   parameter.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_create_dir_parameter.html" title="set_create_dir">set_create_dir</a>
+                </td>
+                <td>Sets the directory path to create the access method database files.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_data_len_parameter.html" title="set_data_len">set_data_len</a>
+                </td>
+                <td>Sets the maximum number of bytes displayed by some utilities.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_flags_parameter.html" title="set_flags">set_flags</a>
+                </td>
+                <td>Configures a database environment.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_intermediate_dir_mode_parameter.html" title="set_intermediate_dir_mode">set_intermediate_dir_mode</a>
+                </td>
+                <td>Configures the directory permissions. </td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_lg_bsize_parameter.html" title="set_lg_bsize">set_lg_bsize</a>
+                </td>
+                <td>Sets the size of the in-memory log buffer.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_lg_dir_parameter.html" title="set_lg_dir">set_lg_dir</a>
+                </td>
+                <td>Sets the path of the directory for logging files.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_lg_filemode_parameter.html" title="set_lg_filemode">set_lg_filemode</a>
+                </td>
+                <td>Sets the absolute file mode for created log files.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_lg_max_parameter.html" title="set_lg_max">set_lg_max</a>
+                </td>
+                <td>Sets the maximum size of a single file in the log.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_lg_regionmax_parameter.html" title="set_lg_regionmax">set_lg_regionmax</a>
+                </td>
+                <td>Sets the size of the underlying logging area.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_lk_detect_parameter.html" title="set_lk_detect">set_lk_detect</a>
+                </td>
+                <td>Sets the maximum number of locking entities.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_lk_max_lockers_parameter.html" title="set_lk_max_lockers">set_lk_max_lockers</a>
+                </td>
+                <td>Sets the maximum number of locking entities.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_lk_max_locks_parameter.html" title="set_lk_max_locks">set_lk_max_locks</a>
+                </td>
+                <td>Sets the maximum number of locks supported by the Berkeley DB                  environment.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_lk_max_objects_parameter.html" title="set_lk_max_objects">set_lk_max_objects</a>
+                </td>
+                <td>Sets the maximum number of locked objects.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_lk_partitions_parameter.html" title="set_lk_partitions">set_lk_partitions</a>
+                </td>
+                <td>Sets the number of lock table partitions in the Berkeley DB environment. </td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="log_set_config_parameter.html" title="log_set_config">log_set_config</a>
+                </td>
+                <td>Configures the Berkeley DB logging subsystem.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_mp_max_openfd_parameter.html" title="set_mp_max_openfd">set_mp_max_openfd</a>
+                </td>
+                <td>Limits the number of file descriptors the library     will open concurrently when flushing dirty pages from the cache.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_mp_max_write_parameter.html" title="set_mp_max_write">set_mp_max_write</a>
+                </td>
+                <td>Limits the number of sequential write operations</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_mp_mmapsize_parameter.html" title="set_mp_mmapsize">set_mp_mmapsize</a>
+                </td>
+                <td>Sets the maximum file size.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_open_flags_parameter.html" title="set_open_flags">set_open_flags</a>
+                </td>
+                <td>Initializes specific subsystems of the Berkeley DB environment.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_shm_key_parameter.html" title="set_shm_key">set_shm_key</a>
+                </td>
+                <td>Configures the database environment's base segment ID.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_thread_count_parameter.html" title="set_thread_count">set_thread_count</a>
+                </td>
+                <td>Declares an approximate number of threads in the database environment.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_timeout_parameter.html" title="set_timeout">set_timeout</a>
+                </td>
+                <td>Sets timeout values for locks or transactions.</td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_tmp_dir_parameter.html" title="set_tmp_dir">set_tmp_dir</a>
+                </td>
+                <td>Specifies the directory path of temporary files. </td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_tx_max_parameter.html" title="set_tx_max">set_tx_max</a>
+                </td>
+                <td>Configures support of simultaneously active transactions. </td>
+              </tr>
+              <tr>
+                <td>
+                  <a class="xref" href="set_verbose_parameter.html" title="set_verbose">set_verbose</a>
+                </td>
+                <td>Enables/disables the Berkeley DB message output.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="sqlite3.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="add_data_dir_parameter.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">sqlite3 </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> add_data_dir</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

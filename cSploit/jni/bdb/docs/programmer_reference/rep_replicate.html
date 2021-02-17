@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Running replication using the db_replicate utility</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="rep.html" title="Chapter 12.  Berkeley DB Replication" />
+    <link rel="prev" href="rep_mgrmulti.html" title="Running Replication Manager in multiple processes" />
+    <link rel="next" href="rep_mgr_ack.html" title="Choosing a Replication Manager acknowledgement policy" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Running replication using the db_replicate utility</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="rep_mgrmulti.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 12. 
+		Berkeley DB Replication
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="rep_mgr_ack.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="rep_replicate"></a>Running replication using the db_replicate utility</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="rep_replicate.html#idp1979648">One replication process and multiple subordinate processes</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="rep_replicate.html#idp1961080">Common use case</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="rep_replicate.html#idp2019664">Avoiding rollback</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="rep_replicate.html#idp2024776">When to consider an integrated replication application</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>Replication Manager supports shared access to a database
+environment from multiple processes.  Berkeley DB provides a
+replication-aware utility, db_replicate, that enables you to upgrade an existing Transactional Data Store
+application, as discussed in the <a class="xref" href="transapp.html#transapp_intro" title="Transactional Data Store introduction">Transactional Data Store introduction</a> section,
+to a replication application with
+minor modifications.  While the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility simplifies the use
+of replication with a Transactional Data Store application, you
+must still understand replication and its impact on the application.
+</p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp1979648"></a>One replication process and multiple subordinate processes</h3>
+            </div>
+          </div>
+        </div>
+        <p>Based on the terminology introduced in the <a class="xref" href="rep_mgrmulti.html" title="Running Replication Manager in multiple processes">Running Replication Manager in multiple processes</a> section,
+application processes are subordinate processes and the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility
+is the replication process.</p>
+        <p>
+You must consider the following items when
+planning to use the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility in combination with
+a Transactional Data Store application.
+</p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>Memory regions
+	<p>
+	The <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility requires shared memory access among
+	separate processes, and therefore cannot be used with <a href="../api_reference/C/envopen.html#envopen_DB_PRIVATE" class="olink">DB_PRIVATE</a>.
+	</p></li>
+            <li>Multi-process implications
+	<p>
+	You must understand and accept all of the Transactional Data Store
+	implications
+	of multi-process use as specified in <a class="xref" href="transapp_app.html" title="Architecting Transactional Data Store applications">Architecting Transactional Data Store applications</a>.  Special attention should be
+	paid to the coordination needed for unrelated processes to
+	start up correctly.
+	</p></li>
+            <li>Replication configuration
+	<p>
+	Several configuration settings are required for replication.
+	You must set the <a href="../api_reference/C/envopen.html#envopen_DB_INIT_REP" class="olink">DB_INIT_REP</a>
+	and <a href="../api_reference/C/dbopen.html#open_DB_THREAD" class="olink">DB_THREAD</a> flags for the <a href="../api_reference/C/envopen.html" class="olink">DB_ENV-&gt;open()</a> method.
+	Another required configuration item is the local address. You identify
+    this by creating a <a href="../api_reference/C/db_site.html" class="olink">DB_SITE</a> handle and then setting the
+    <code class="literal">DB_LOCAL_SITE</code> parameter using the
+    <a href="../api_reference/C/dbsite_set_config.html" class="olink">DB_SITE-&gt;set_config()</a> method. You also tell sites how to contact other
+    sites by creating <a href="../api_reference/C/db_site.html" class="olink">DB_SITE</a> handles for those sites.
+	Most replication configuration options start with reasonable
+	defaults, but applications have to customize
+	at least some of them.  You can set all replication related configuration options
+	either programmatically or in the <a href="../api_reference/C/configuration_reference.html" class="olink">DB_CONFIG</a> file.
+	</p></li>
+            <li> Starting the application and replication
+	<p>
+	The <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility assumes that an
+	environment exists and that the application has run recovery,
+	if necessary, and created and configured the environment.
+	The startup flow of a typical Transactional Data Store application
+	may not be the best flow for a replication application and you
+	must understand the issues involved. 
+	For instance, if an application starts, runs recovery,
+	and performs update operations before starting the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility,
+	then if that site becomes a client when replication starts,
+	those update operations will be rolled back.
+	</p></li>
+            <li> Handling events
+	<p>
+	Almost all of the replication-specific events are handled
+	by the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility process, and therefore the application
+	process does not see them.  If the application needs to know
+	the information from those replication-specific events, such as
+	role changes, the application must call the <a href="../api_reference/C/repstat.html" class="olink">rep_stat()</a> method method.
+	The one replication-specific event the application can now
+	receive is the <a href="../api_reference/C/envevent_notify.html#event_notify_DB_EVENT_REP_PERM_FAILED" class="olink">DB_EVENT_REP_PERM_FAILED</a> event.
+	See <a class="xref" href="rep_mgr_ack.html" title="Choosing a Replication Manager acknowledgement policy">Choosing a Replication Manager acknowledgement policy</a>
+	for additional information about this event.
+	</p></li>
+            <li> Handling errors
+	<p>
+	There are some error return values that relate only to replication.
+    Specifically, the <code class="literal">DB_REP_HANDLE_DEAD</code> error should now be handled
+	by the application.  Also, if master leases are in use, then the
+    application also needs to consider the <code class="literal">DB_REP_LEASE_EXPIRED</code> error.
+	</p></li>
+            <li> Flexibility tradeoff
+	<p>
+	You are giving up flexibility
+	for the ease of use of the utility. 
+	Application complexity or requirements may eventually
+	dictate integrating replication calls into the application
+	instead of using the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility.  </p></li>
+            <li> Read-only client application
+	<p>
+	The application requires additional changes to manage
+	the read-only status when the application takes on the role of 
+	a client.
+	</p></li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp1961080"></a>Common use case</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+This section lists the steps needed to get replication running for
+a common use case of the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility.
+The use case presented is an existing Transactional Data Store application that
+already has its environment and databases created and is up and running.
+At some point, replication is considered because failover protection
+or balancing the read load may now be desired.
+</p>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p>
+	To understand the issues involved in a replication application, see 
+	the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility section in the <span class="emphasis"><em>API Reference Guide</em></span>, the <a href="../api_reference/C/rep.html" class="olink">Replication Chapter</a> in the <span class="emphasis"><em>
+	Programmer's Reference Guide</em></span>, and the source code of the ex_rep_mgr
+	example program.
+	</p>
+            </li>
+            <li>
+              <p>
+	Make a local hot backup of the current
+	application environment to a new location to use as a testing area.
+	</p>
+            </li>
+            <li>
+              <p>
+	Add the <a href="../api_reference/C/envopen.html#envopen_DB_INIT_REP" class="olink">DB_INIT_REP</a> and <a href="../api_reference/C/dbopen.html#open_DB_THREAD" class="olink">DB_THREAD</a> flags (if not already
+	being used) to the application or the <a href="../api_reference/C/configuration_reference.html" class="olink">DB_CONFIG</a> file.
+	</p>
+            </li>
+            <li>
+              <p>
+	Modify the <a href="../api_reference/C/configuration_reference.html" class="olink">DB_CONFIG</a> file to add the necessary replication
+	configuration values.  At a minimum, the local
+    host and port information must be added using
+    the <a href="../api_reference/C/repmgr_site_parameter.html" class="olink">repmgr_site</a> method parameter.
+	As more sites are added to the group, remote host and port
+    information can optionally also be added by adding
+    more <a href="../api_reference/C/repmgr_site_parameter.html" class="olink">repmgr_site</a> method parameters to the <a href="../api_reference/C/configuration_reference.html" class="olink">DB_CONFIG</a> file.
+	</p>
+            </li>
+            <li>
+              <p>
+	Rebuild the application and restart
+	it in the current testing directory.
+	</p>
+            </li>
+            <li>
+              <p>
+	Start the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility on the master site with the -M option and
+	any other options needed such as -h for the home directory.
+	At this point you have a lone master site running in an
+	environment with no other replicated sites in the group.
+	</p>
+            </li>
+            <li>
+              <p>
+	Optionally, prepare to start a client site by performing a
+	manual hot backup of the running master environment to
+	initialize a client target directory.  While replication
+	can make its own copy, the hot backup will expedite the
+	synchronization process.  Also, if the application assumes
+	the existence of a database and the client site is started
+	without data, the application may have errors or incorrectly
+	attempt to create the database.
+	</p>
+            </li>
+            <li>
+              <p>
+	Copy the application to the client target.
+	</p>
+            </li>
+            <li>
+              <p>
+	Modify the client environment's <a href="../api_reference/C/configuration_reference.html" class="olink">DB_CONFIG</a> file to set the client's local host and port values and to add 
+	remote site information for the master site and any
+	other replication configuration choices necessary.
+	</p>
+            </li>
+            <li>
+              <p>
+	Start the application on the client.  The client application
+	should not update data at this point, as explained previously.
+	</p>
+            </li>
+            <li>
+              <p>
+	Start the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility specifying the
+	client environment's home directory using the -h option.  Omit the -M
+	option in this case, because the utility defaults to
+	starting in the client role.
+	</p>
+            </li>
+          </ol>
+        </div>
+        <p>
+Once the initial replication group is established, do not use the -M option with
+the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility.
+After the initial start, the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility assumes the use of
+elections.  If a site crashes, it should rejoin the group as
+a client so that it can synchronize with the rest of the group.
+</p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2019664"></a>Avoiding rollback</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+Depending on how an application is structured, transactional rollback
+can occur.  If this is possible, then you must make application
+changes or be prepared for successful transactions to disappear.
+Consider a common program flow where the application first creates
+and opens the environment with recovery.  Then, immediately after
+that, the application opens up the databases it expects to use.
+Often an application will use the <a href="../api_reference/C/dbopen.html#open_DB_CREATE" class="olink">DB_CREATE</a> flag so that if the
+database does not exist it is created, otherwise the existing one is
+used automatically.  Then the application begins servicing transactions
+to write and read data.
+</p>
+        <p>
+When replication is introduced, particularly via the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility, the
+possibility of rollback exists unless the application takes steps
+to prevent it.  In the situation described above, if all of the
+above steps occur before the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility process starts, and
+the site is started as a client, then all the operations will be
+rolled back when the site finds the master.  The client site will
+synchronize with the log and operations on the master site, so
+any operations that occurred in the client application before it
+knew it was a client will be discarded.
+</p>
+        <p>
+One way to reduce the possibility of rollback is to modify the
+application so that it only performs update operations (including
+creation of a database) if it is the master site.  If the application
+refrains from updating until it is the master, then it will not perform
+operations when it is in the undefined state before replication
+has been started. 
+The event indicating a site is master will be delivered to the 
+<a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility process, so the application process must look
+for that information via the <a href="../api_reference/C/repstat.html" class="olink">rep_stat()</a> method.
+A site that is expecting to perform updates may need to poll
+via the <a href="../api_reference/C/repstat.html" class="olink">rep_stat()</a> method to see the state change from an undefined
+role to either the master or client role.  Similarly, since a
+client site cannot create a database, it may need to poll for
+the database's existence while the client synchronizes with the master
+until the database is created at the client site.
+</p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2024776"></a>When to consider an integrated replication application</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+The <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility provides the means to achieve
+a replicated application quickly.  However,
+the trade-off for this rapid implementation is that the full
+flexibility of replication is not available.  Some applications
+may eventually need to consider integrating directly with
+replication rather than using the <a href="../api_reference/C/db_replicate.html" class="olink">db_replicate</a> utility if greater flexibility is desired.
+</p>
+        <p>
+One likely reason for considering integration would be the
+convenience of receiving all replication-related events in
+the application process and gaining direct knowledge of such
+things as role changes.
+Using the event callback is cleaner and easier than
+polling for state changes via the <a href="../api_reference/C/repstat.html" class="olink">rep_stat()</a> method.
+</p>
+        <p>
+A second likely reason for integrating replication directly
+into the application is the multi-process aspect of the
+utility program.  The developer may find it easier to insert
+the start of replication directly into the code once the
+environment is created, recovered, or opened, and avoid
+the scenario where the application is running in the
+undefined state.  Also it may simply be easier to start
+the application once than to coordinate different processes
+and their startup order in the system.
+</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="rep_mgrmulti.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="rep_mgr_ack.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Running Replication Manager in multiple processes </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Choosing a Replication Manager acknowledgement policy</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

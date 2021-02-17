@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Sizing a database environment</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="env.html" title="Chapter 9.  The Berkeley DB Environment" />
+    <link rel="prev" href="env_create.html" title="Creating a database environment" />
+    <link rel="next" href="env_open.html" title="Opening databases within the environment" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Sizing a database environment</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="env_create.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 9. 
+		The Berkeley DB Environment
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="env_open.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="env_size"></a>Sizing a database environment</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+        The Berkeley DB environment allocates memory to hold shared
+        structures, either in shared regions or in process data space (if the
+        <a href="../api_reference/C/envopen.html#envopen_DB_PRIVATE" class="olink">DB_PRIVATE</a> flag is specified).  There are three distinct memory
+        regions:
+    </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                The memory pool (also known as the database page cache),
+            </p>
+          </li>
+          <li>
+            <p>
+                the area containing mutexes, and
+            </p>
+          </li>
+          <li>
+            <p>
+                the main region which holds all other shared structures.
+            </p>
+          </li>
+        </ul>
+      </div>
+      <p>
+        The shared structures in the main region are used by the lock,
+        transaction, logging, thread and replicatoin subsystems.
+    </p>
+      <p>
+        Determining the amount of space allocated for each of these shared
+        structures is dependent upon the structure in question. The sizing
+        of the memory pool is discussed in 
+        <a class="xref" href="mp_config.html" title="Configuring the memory pool">Configuring the memory pool</a>. The amount
+        of memory needed for mutexes is calculated from the number of
+        mutexes needed by various subsystems and can be adjusted using the
+        <a href="../api_reference/C/mutexset_increment.html" class="olink">DB_ENV-&gt;mutex_set_increment()</a> method.
+    </p>
+      <p>
+        For applications using shared memory (that is, they do not specify
+        <a href="../api_reference/C/envopen.html#envopen_DB_PRIVATE" class="olink">DB_PRIVATE</a>), a maximum memory size for the main region must be
+        specified or left to default. The maximum memory size is specified
+        using the <a href="../api_reference/C/envset_memory_max.html" class="olink">DB_ENV-&gt;set_memory_max()</a> method.
+    </p>
+      <p>
+        The amount of memory needed by an application is dependent
+        on the resources that the application uses. For a very rough
+        estimate, add all of the following together:
+    </p>
+      <div class="orderedlist">
+        <ol type="1">
+          <li>
+            <p>
+                The environment has an overhead of about 80 kilobytes
+                without statistics enabled or 250 kilobytes with statistics
+                enabled.
+            </p>
+          </li>
+          <li>
+            <p>
+                Identify the amount of space you require for your locks:
+            </p>
+            <div class="orderedlist">
+              <ol type="a">
+                <li>
+                  <p>
+                        Estimate the number of threads of control that will
+                        simultaneously access the environment.
+                    </p>
+                </li>
+                <li>
+                  <p>
+                        Estimate the number of concurrency locks that, on average,
+                        will be required by each thread. For information on
+                        sizing concurrency locks, see 
+                        <a class="xref" href="lock_max.html" title="Configuring locking: sizing the system">Configuring locking: sizing the system</a>.
+                    </p>
+                </li>
+                <li>
+                  <p>
+                        Multiply these two numbers, then multiply by 1/2 to
+                        arrive at the number of kilobytes required to
+                        service your locks.
+                    </p>
+                </li>
+              </ol>
+            </div>
+          </li>
+          <li>
+            <p>
+                Estimate the number of open database handles you will use
+                at any given time. For each database handle, there is an
+                overhead of about 1/2 kilobyte.
+            </p>
+          </li>
+          <li>
+            <p>
+                Add 1 kilobyte for each active transaction.
+            </p>
+          </li>
+        </ol>
+      </div>
+      <p>
+        Note that these are very rough guidelines. It is best to
+        overestimate the needs of your applications, because if the memory
+        allocation is exhausted the application must be shutdown to
+        increase the allocation.
+    </p>
+      <p>
+        The estimate for maximum memory need not be exact. In most
+        situations there is little penalty for over estimating. For systems
+        using memory mapped files for the shared environment, this only
+        allocates the address space in the process to hold the maximum
+        memory. The backing file will only be extended as needed. For
+        systems running with <a href="../api_reference/C/envopen.html#envopen_DB_PRIVATE" class="olink">DB_PRIVATE</a> specified, the maximum memory
+        serves only as a limit and memory is allocated from the process
+        data space as needed. No maximum need be set for private
+        environments.
+    </p>
+      <p>
+        For locking and thread information, groups of objects are allocated
+        when needed so that there is less contention in the allocator
+        during performance critical operations. Once allocated to a
+        particular use, this memory will only be used for that structure.
+        To avoid runtime contention, or to ensure a minimum number of a
+        particular type of object, the <a href="../api_reference/C/envset_memory_init.html" class="olink">DB_ENV-&gt;set_memory_init()</a> method can be
+        used. This method can set the initial numbers of particular types
+        of structures to allocate at environment creation time.
+    </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="env_create.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="env.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="env_open.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Creating a database environment </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Opening databases within the environment</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+This directory contains a series of test scripts which are used to
+verify basic functionality of the LDAP libraries and slapd.
+
+	To run all of the tests, type "make test".
+	To run BDB tests, type "make bdb".
+	To run HDB tests, type "make hdb".
+	To run MDB tests, type "make mdb".
+	To run SQL tests, define SLAPD_USE_SQL=<rdbms> and type
+		"make sql"; define SLAPD_USE_SQLWRITE=yes
+		to enable write tests as well.
+	To run regression tests, type "make regressions"
+
+The test scripts depends on a number of tools commonly available on
+Unix (and Unix-like) systems.  While attempts have been made to make
+these scripts reasonably portable, they may not run properly on your
+system.  You may have to adjust your path so that compatible versions
+of tools used are available to the scripts and/or you may have to
+install replacement tools.  Platform specific hints may be found at:
+	http://www.openldap.org/faq/index.cgi?file=9
+
+To modify the debug level the tests run slapd with, set the SLAPD_DEBUG
+environment variable.
+	env SLAPD_DEBUG=1 make test
+

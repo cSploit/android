@@ -1,0 +1,67 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+#
+# Copyright (C) 2000 Inprise Corporation
+# All Rights Reserved.
+# Contributor(s): ______________________________________.
+# 2 Oct 2002, Nickolay Samofatov - Major Cleanup
+# Wed Jan 28 2009 Alex Peshkov - moved common part of prefix.darwin* to separate file
+
+# Options 
+#FirebirdInstallPrefix=
+LIB_BUNDLE_OPTIONS=$(LD_FLAGS) -bundle -flat_namespace -undefined suppress
+LIB_LINK_OPTIONS=$(LD_FLAGS) -dynamiclib -flat_namespace
+LIB_LINK_SONAME:=-current_version @FIREBIRD_VERSION@ -compatibility_version @FIREBIRD_VERSION@ -seg1addr 0x30000000
+LIB_LINK_MAPFILE=-Wl,-exported_symbols_list,$(1)
+
+LIB_LINK_RPATH:=-install_name /Library/Frameworks/Firebird.framework/Versions/A/Libraries/
+LIB_EMBED_LINK_OPTIONS:=-install_name /Library/Frameworks/Firebird.framework/Versions/A/Firebird
+LIB_CLIENT_LINK_OPTIONS:=-install_name /Library/Frameworks/Firebird.framework/Versions/A/Firebird
+FBEMBED_LINK:=-F../gen/firebird -framework Firebird -L$(LIB) -lfbembed
+
+PLATFORM_PATH=os/darwin
+PLATFORM_FALLBACK=os/posix
+
+PLAT_CLASSIC_PRE_TARGET=darwin_setup_framework
+PLAT_CLASSIC_POST_TARGET=darwin_finish_cs_framework
+
+PLAT_SUPER_PRE_TARGET=darwin_setup_framework
+PLAT_SUPER_POST_TRAGET=darwin_finish_ss_framework
+
+PLATFORM_POSTBUILD_TARGET=darwin_postbuild_target
+
+# Per-library link rules
+LINK_UDF = $(LIB_LINK) $(LIB_BUNDLE_OPTIONS) -L$(LIB)
+LINK_UDF_LIBS = -lm $(THR_FLAGS) $(THR_LIBS)
+
+LINK_IB_UTIL = $(LIB_LINK) $(LINK_IBUTIL_SYMBOLS) $(LIB_LINK_OPTIONS)\
+$(LIB_LINK_RPATH) $(LIB_LINK_SONAME)
+
+LINK_INTL = $(LIB_LINK) $(LIB_BUNDLE_OPTIONS)
+
+LINK_TRACE = $(LIB_LINK) $(LIB_BUNDLE_OPTIONS)
+
+LINK_CLIENT = $(LIB_LINK) -nodefaultlibs $(LINK_FIREBIRD_CLIENT_SYMBOLS) $(LIB_LINK_OPTIONS) $(LIB_LINK_IMPLIB)\
+ $(LIB_CLIENT_LINK_OPTIONS) $(LIB_LINK_SONAME)
+
+ifeq (@VOID_PTR_SIZE@,8)
+GCCS=-lgcc_s.10.5
+else
+GCCS=-lgcc_s.10.4
+endif
+STATIC_CXX_SUPPORT = -lsupc++ $(GCCS) -lgcc_eh -lSystem
+
+LINK_EMBED = $(LIB_LINK) $(LINK_FIREBIRD_EMBED_SYMBOLS) $(LIB_LINK_OPTIONS)\
+ $(LIB_EMBED_LINK_OPTIONS) $(LIB_LINK_SONAME)
+
+INLINE_EDIT_SED:= -i ""

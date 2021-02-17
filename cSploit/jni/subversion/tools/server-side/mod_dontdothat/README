@@ -1,0 +1,53 @@
+mod_dontdothat is an Apache module that allows you to block specific types
+of Subversion requests.  Specifically, it's designed to keep users from doing
+things that are particularly hard on the server, like checking out the root
+of the tree, or the tags or branches directories.  It works by sticking an
+input filter in front of all REPORT requests and looking for dangerous types
+of requests.  If it finds any, it returns a 403 Forbidden error.
+
+You can compile and install it via apxs:
+
+$ apxs -c \
+       -I$PREFIX/include/subversion-1 \
+       -L$PREFIX/lib -lsvn_subr-1
+       mod_dontdothat.c
+
+$ apxs -i -n dontdothat mod_dontdothat.la
+
+It is enabled via single httpd.conf directive, DontDoThatConfigFile:
+
+<Location /svn>
+  DAV svn
+  SVNParentPath /path/to/repositories
+  DontDoThatConfigFile /path/to/config.file
+  DontDoThatDisallowReplay off
+</Location>
+
+The file you give to DontDoThatConfigFile is a Subversion configuration file
+that contains the following sections.
+
+[recursive-actions]
+/*/trunk = allow
+/ = deny
+/* = deny
+/*/tags = deny
+/*/branches = deny
+/*/* = deny
+/*/*/tags = deny
+/*/*/branches = deny
+
+As you might guess, this defines a set of patterns that control what the
+user is not allowed to do.  Anything with a 'deny' after it is denied, and
+as a fallback mechanism anything with an 'allow' after it is special cased
+to be allowed, even if it matches something that is denied.
+
+Note that the wildcard portions of a rule only swallow a single directory,
+so /* will match /foo, but not /foo/bar.  They also must be at the end of
+a directory segment, so /foo* or /* are valid, but /*foo is not.
+
+These rules are applied to any recursive action, which basically means any
+Subversion command that goes through the update-report, like update, diff,
+checkout, merge, etc.
+
+The DontDoThatDisallowReplay option makes mod_dontdothat disallow
+replay requests, which is on by default.

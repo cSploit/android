@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Building the Java API</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="build_win.html" title="Chapter 5.  Building Berkeley DB for Windows" />
+    <link rel="prev" href="win_build_stl.html" title="Building the C++ STL API" />
+    <link rel="next" href="build_win_csharp.html" title="Building the C# API" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Building the Java API</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="win_build_stl.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5.  Building Berkeley DB for Windows </th>
+          <td width="20%" align="right"> <a accesskey="n" href="build_win_csharp.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="build_win_java"></a>Building the Java API</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+            Java support is not built automatically. The following
+            instructions assume that you have installed the Sun Java
+            Development Kit in <code class="filename">d:\java</code>. Of
+            course, if you installed elsewhere or have different Java
+            software, you will need to adjust the pathnames
+            accordingly.
+        </p>
+      <div class="orderedlist">
+        <ol type="1">
+          <li>
+                Set your include directories. 
+                <div class="itemizedlist"><ul type="disc"><li>
+                        In Visual Studio 2005/Visual Studio
+                        2008 - Choose <span class="emphasis"><em>Tools -&gt; Options
+                            -&gt; Projects -&gt; VC++
+                            Directories</em></span>. Under the "Show
+                        directories for" pull-down, select "Include
+                        files". Add the full pathnames for the
+                            <code class="filename">d:\java\include</code> and
+                            <code class="filename">d:\java\include\win32</code>
+                        directories. Then click OK. 
+                    </li><li> 
+                        In Visual Studio 2010 - Right-click
+                        db_java project, choose
+                            <span class="emphasis"><em>Properties-&gt;Configuration
+                            Properties-&gt; VC++
+                            Directories-&gt;Include
+                            Directories</em></span>. Add the full
+                        pathnames for the
+                            <code class="filename">d:\java\include</code> and
+                            <code class="filename">d:\java\include\win32</code>
+                        directories. Then click OK. 
+                    </li></ul></div><p>
+                These are the directories needed when
+                including jni.h.
+                </p></li>
+          <li>
+                Set the executable files directories. 
+                <div class="itemizedlist"><ul type="disc"><li>
+                        In Visual Studio 2005/Visual Studio
+                        2008 - Choose <span class="emphasis"><em>Tools -&gt; Options
+                            -&gt; Projects -&gt; VC++
+                            Directories</em></span>. Under the "Show
+                        directories for" pull-down, select "Executable
+                        files". Add the full pathname for the
+                            <code class="filename">d:\java\bin</code>
+                        directory, then click OK. 
+                    </li><li>
+                        In Visual Studio 2010 - Right-click
+                        db_java project, choose
+                            <span class="emphasis"><em>Properties-&gt;Configuration
+                            Properties-&gt; VC++
+                            Directories-&gt;Executable
+                            Directories</em></span>. Add the full
+                        pathnames for the
+                            <code class="filename">d:\java\bin</code>
+                        directories. Then click OK. 
+                    </li></ul></div>
+                This is the directory needed to find
+                javac.
+            </li>
+          <li>
+                Set the build type to Release or Debug in the
+                drop-down on the tool bar.
+            </li>
+          <li> 
+                Change the compiling option if you are using
+                Java 1.7 
+                <div class="itemizedlist"><ul type="disc"><li> 
+                        In Visual Studio 2005/Visual Studio
+                        2008/Visual Studio 2010 - Right-click db_java
+                        project, choose
+                            <span class="emphasis"><em>Properties-&gt;Configuration
+                            Properties-&gt; Custom Build
+                            Step</em></span>, Remove the option of
+                        "-target 1.5" in the "Command Line".
+                    </li></ul></div></li>
+          <li>
+            <p> 
+                    To build, right-click on db_java and select
+                    Build. This builds the Java support library for
+                    Berkeley DB and compiles all the java files,
+                    placing the resulting <code class="filename">db.jar</code>
+                    and <code class="filename">dbexamples.jar</code> files in
+                    one of the following Berkeley DB subdirectories,
+                    depending on the configuration that you chose: 
+                </p>
+            <table class="simplelist" border="0" summary="Simple list">
+              <tr>
+                <td>
+                  <code class="filename">build_windows\Win32\Debug</code>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <code class="filename">build_windows\Win32\Release</code>
+                </td>
+              </tr>
+            </table>
+          </li>
+        </ol>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="win_build_stl.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="build_win.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="build_win_csharp.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Building the C++ STL
+            API </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Building the C# API</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

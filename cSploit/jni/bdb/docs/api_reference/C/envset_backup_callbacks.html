@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_ENV-&gt;set_backup_callbacks()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="env.html" title="Chapter 5.  The DB_ENV Handle" />
+    <link rel="prev" href="envset_app_dispatch.html" title="DB_ENV-&gt;set_app_dispatch()" />
+    <link rel="next" href="envset_backup_config.html" title="DB_ENV-&gt;set_backup_config()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_ENV-&gt;set_backup_callbacks()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envset_app_dispatch.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. 
+                The DB_ENV Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envset_backup_config.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envset_backup_callbacks"></a>DB_ENV-&gt;set_backup_callbacks()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+ 
+DB_ENV-&gt;set_backup_callbacks(DB_ENV, 
+        int (*open_func)(DB_ENV *, const char *dbname, 
+                         const char *target, void **handle),
+        int (*write_func)(DB_ENV *, u_int32_t offset_gbytes, 
+                          u_int32_t offset_bytes, u_int32_t size, 
+                          u_int8_t *buf, void *handle),
+        int (*close_func)(DB_ENV *, const char *dbname, void *handle));  </pre>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;set_backup_callbacks()</code> method
+         configures three callback functions which can be used by the
+         <a class="xref" href="envbackup.html" title="DB_ENV-&gt;backup()">DB_ENV-&gt;backup()</a>
+         or
+         <a class="xref" href="envdbbackup.html" title="DB_ENV-&gt;dbbackup()">DB_ENV-&gt;dbbackup()</a>
+         methods to override their default behavior. If one callback is
+         configured, then all three callbacks must be configured.
+         These callbacks are required if the <code class="literal">target</code> parameter is 
+         set to <code class="literal">NULL</code> for the
+         <a class="xref" href="envbackup.html" title="DB_ENV-&gt;backup()">DB_ENV-&gt;backup()</a>
+         or
+         <a class="xref" href="envdbbackup.html" title="DB_ENV-&gt;dbbackup()">DB_ENV-&gt;dbbackup()</a>
+         methods.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;set_backup_callbacks()</code> method
+         configures operations performed using the specified 
+         <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a>  handle, not all operations
+         performed on the underlying database environment.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;set_backup_callbacks()</code> method may
+         be called at any time during the life of the application.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;set_backup_callbacks()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51854608"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51826808"></a>open_func</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The <span class="bold"><strong>open_func</strong></span> parameter 
+                is the function used when a target location is opened
+                during a backup. This function should do whatever is
+                necessary to prepare the backup destination for
+                writing the data.
+            </p>
+          <p>
+                This function takes four parameters:
+            </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                        <code class="literal">dbenv</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>dbenv</strong></span>
+                        parameter is the enclosing database environment
+                        handle.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">dbname</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>dbname</strong></span> parameter is the
+                        name of the database being backed up.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">target</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>target</strong></span> parameter is the
+                        backup's directory destination.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">handle</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>handle</strong></span> parameter references
+                        the handle (usually a file handle) to which the backup will be
+                        written.
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51824952"></a>write_func</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The <span class="bold"><strong>write_func</strong></span> parameter 
+                is the function used to write data during a backup. 
+                The function takes six parameters:
+            </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                        <code class="literal">dbenv</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>dbenv</strong></span>
+                        parameter is the enclosing database environment
+                        handle.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">offset_gbytes</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>offset_gbytes</strong></span>
+                        parameter specifies the number of gigabytes into
+                        the output handle where the data can should be
+                        written. This value, plus the value specified on
+                        <code class="literal">offset_bytes</code>, indicates the
+                        offset within the output handle where the backup
+                        should begin.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">offset_bytes</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>offset_bytes</strong></span>
+                        parameter specifies the number of bytes into the
+                        output handle where the data can be located. This
+                        value, plus the value specified on
+                        <code class="literal">offset_gbytes</code>, indicates the
+                        offset within the output handle where the backup
+                        should begin.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">size</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>size</strong></span>
+                        parameter specifies the number of bytes to back up
+                        from the buffer.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">buf</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>buf</strong></span>
+                        parameter is the buffer which contains the data to
+                        be backed up.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">handle</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>handle</strong></span>
+                        parameter references the handle (usually a file
+                        handle) to which the backup will be written.
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp51822912"></a>close_func</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The <span class="bold"><strong>close_func</strong></span> parameter 
+                is the function used when ending a backup and closing a 
+                backup target. The function takes three parameters:
+            </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                        <code class="literal">dbenv</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>dbenv</strong></span>
+                        parameter is the enclosing database environment
+                        handle.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">dbname</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>dbname</strong></span> parameter is the
+                        name of the database that has now been backed up.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">handle</code>
+                    </p>
+                <p>
+                        The <span class="bold"><strong>handle</strong></span>
+                        parameter references the handle (usually a file
+                        handle) to which the backup was written, and which
+                        now must be closed or otherwise discarded.
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51834728"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51821024"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="xref" href="env.html#envlist" title="Database Environments and Related Methods">Database Environments and Related Methods</a>,
+            <a class="xref" href="envget_backup_callbacks.html" title="DB_ENV-&gt;get_backup_callbacks()">DB_ENV-&gt;get_backup_callbacks()</a>,
+            <a class="xref" href="envbackup.html" title="DB_ENV-&gt;backup()">DB_ENV-&gt;backup()</a>, and
+            <a class="xref" href="envdbbackup.html" title="DB_ENV-&gt;dbbackup()">DB_ENV-&gt;dbbackup()</a>.
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envset_app_dispatch.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="env.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envset_backup_config.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_ENV-&gt;set_app_dispatch() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_ENV-&gt;set_backup_config()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

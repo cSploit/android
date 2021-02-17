@@ -1,0 +1,14 @@
+/* $Id: freetds.css,v 1.1 2011-04-01 03:37:18 jklowden Exp $ */
+
+  	body {bgcolor = #F9F9F9}
+
+  	#Navigation li {
+		list-style-type: none;
+		padding: 0.25em;
+		float: left;
+	  	display: inline
+	}
+
+	hr { clear: left; }
+
+	kbd.input { font-weight: bold; }

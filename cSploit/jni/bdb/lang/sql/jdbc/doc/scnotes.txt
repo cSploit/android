@@ -1,0 +1,24 @@
+2007-08-29
+
+Hi,
+
+I've just compiled javasqlite-20070823 on MacOS X. The procedure is as follows:
+
+1) ./configure --with-jdk=/System/Library/Frameworks/JavaVM.framework/Home
+2) Edit Makefile and change:
+   JNIINCLUDE = -I/System/Library/Frameworks/JavaVM.framework/Headers 
+3) Add a target
+   libsqlite_jni.jnilib: native/sqlite_jni.h native/sqlite_jni.c
+   $(CC) -c $(CFLAGS) native/sqlite_jni.c -o native/sqlite_jni.o
+   $(CC) -dynamiclib -o libsqlite_jni.jnilib native/sqlite_jni.o \
+     -framework JavaVM -L/usr/local/lib -lsqlite3 
+
+This is Mac OS specific: libtool which is used in the Makefile produces
+a "common" dylib which is not so simple to load under java environment.
+/usr/local/lib is path to libsqlite3.dylib in my configuration, other
+paths are standard for this OS. 
+
+Till now I've tested test, test3 and shell. All work.
+
+Hope that helps and best regards,
+Stanislaw Ciszewski

@@ -1,0 +1,29 @@
+# base
+
+dn: o=unique
+objectClass: top
+objectClass: organization
+o: unique
+description: unique test database
+
+# container
+
+dn: ou=users,o=unique
+objectClass: top
+objectClass: organizationalUnit
+ou: users
+description: container for test users
+
+# manager
+dn: uid=george,ou=users,o=unique
+objectClass: inetOrgPerson
+uid: george
+sn: jungle
+cn: george
+businessCategory: test
+carLicense: SAMPLE
+departmentNumber: 6969
+displayName: George
+employeeNumber: 5150
+employeeType: contractor
+givenName: Big G

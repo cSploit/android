@@ -1,0 +1,37 @@
+OVERVIEW
+
+This directory contains working copies (and other data) used to
+test Subversion's working copy ugrade process. The files are
+typically stored as a .tar.bz2 in order to hide their "funny"
+format data from Subversion's normal administrative processes.
+
+
+=============================================================================
+
+FORMAT_*
+
+The format_*.tar.bz2 data files each represent a checkout of
+^/trunk/notes/wc-ng at approximately revision 917840. These
+checkouts were performed using specific revisions of Subversion
+in order to produce a .svn administrative area with the required
+format.
+
+SVN_WC__VERSION   Subversion revision used
+---------------   ------------------------
+12 (a)            877576
+12 (b)            879401
+13                879813
+14                880116
+15                886350
+16                917838
+
+There are two "format 12" working copies:
+  (a) the wcprop values are stored in .svn/all-wcprops
+  (b) the wcprop values are stored in BASE_NODE.dav_cache
+
+You'll note that ($revision + 1) is the revision where the
+format was bumped, or the wcprops were moved into the
+database. Therefore, these working copies represent the last
+revision of Subversion to use the specific format value.
+
+=============================================================================

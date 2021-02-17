@@ -1,0 +1,36 @@
+Cleaning TODO.
+Taken from Blas' v1.5 checklist and revised for v2 by Claudio and for v3 by Popa Adrian.
+
+The order is not significant.
+
+Macros
+M1.- Remove NOT_USED_OR_REPLACED Macro
+Pending.
+
+M2.- Remove BOOLEAN, TRUE and FALSE macros and replace with keywords.
+Done where except some places where it doesn't make sense to remove them.
+
+M4.- Remove TEXT and SCHAR macros.
+Tricky and in some places SCHAR is really used as signed char.
+
+Code
+C1.- Remove clang++ warnings (excluding parentheses, unused var, non complete switches and pragmas)
+Pending.
+
+C2.- Define (type-safe?) unions for nod_arg and lls_object. 
+	Nod_arg is used in several places of the code to contain pointers to several kinds of objects or numbers, whether is defined as pointer to xxx_nod.
+	The same happends with lls_object in lls (linked list) where the lls_object can store pointers or numbers, whether is defined as pointer to xxx_nod.
+	See gpre.h nod_arg in gpre_nod struct and lls_object in lls struct.
+Another solution exists.
+
+C3.- Remove casts.
+Partially done.
+
+C4.- Replace macros with code with inline functions.
+Partially done.
+
+Builds
+B1.- Posix take cpp generated from epp out of src directory.
+Unknown state.
+
+

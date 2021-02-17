@@ -1,0 +1,11 @@
+--- libnet.orig/doc/man/man3/libnet_802_1q_hdr.3
++++ libnet/doc/man/man3/libnet_802_1q_hdr.3
+@@ -2,7 +2,7 @@
+ .ad l
+ .nh
+ .SH NAME
+-libnet_802_1q_hdr \- 
++libnet_802_1q_hdr \- IEEE 802.1Q VLAN header
+ .SH SYNOPSIS
+ .br
+ .PP

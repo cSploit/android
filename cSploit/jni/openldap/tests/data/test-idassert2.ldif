@@ -1,0 +1,27 @@
+dn: dc=example,dc=it
+objectClass: organization
+objectClass: dcObject
+o: Example
+o: Esempio S.p.A.
+dc: example
+
+dn: ou=People,dc=example,dc=it
+objectClass: organizationalUnit
+ou: People
+
+dn: uid=dots,ou=People,dc=example,dc=it
+objectClass: inetOrgPerson
+cn: Dorothy Stevens
+sn: Stevens
+uid: dots
+userPassword:: ZG90cw==
+mail: dots@example.it
+
+dn: uid=jaj,ou=People,dc=example,dc=it
+objectClass: inetOrgPerson
+cn: James A Jones 1
+sn: Jones
+uid: jaj
+userPassword:: amFq
+mail: jaj@example.it
+

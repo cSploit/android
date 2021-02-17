@@ -1,0 +1,54 @@
+#!/usr/bin/stap
+/*
+ * Copyright (c) 2012, 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * apitimes - Graph the time spent in DB API calls grouped by thread or processid
+ *
+ * The path to the DB library is required to be the first argument.
+ *
+ * To limit tracing to a particular process use one of the stap options:
+ *	-x <pid> or
+ *	-c "<program> [<program arguments>..]"
+ *
+ */
+
+global functioncount, maxcount, starts, times;
+
+probe begin
+{
+	functioncount = 0;
+	maxcount = -1;
+	%( $# >= 2 %? maxcount = $2 %)
+	printf("DB API times of ");
+	if (target() == 0)
+		printf("processes using \"%s\"", @1)
+	else
+		printf("process %d", target());
+	printf(" grouped by function; interrupt to display summary\n");
+}
+
+probe process(@1).function("db*_create").call,
+      process(@1).function("__*_pp").call
+{
+	starts[tid(), probefunc()] = gettimeofday_ns();
+}
+
+      
+probe process(@1).function("db*_create").return,
+      process(@1).function("__*_pp").return
+{
+	if ((start = starts[tid(), probefunc()]) != 0) {
+		times[tid(), probefunc()] <<< gettimeofday_ns() - start;
+		if (++functioncount == maxcount)
+			exit();
+	}
+}
+
+probe end
+{
+	foreach ([tid, func] in times) {
+		printf("Times that thread %x spent in %s in nanoseconds\n",
+		    tid, func);
+		print(@hist_log(times[tid, func]));
+	}
+}

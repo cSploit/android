@@ -1,0 +1,67 @@
+Copyright (c) 1998-1999 NeoSoft, Inc.
+
+For licensing information, see the file neoXldap.c and/or the COPYRIGHT
+file contained in the directory you found this file.
+
+This directory contains an extension to Tcl to interface with an
+LDAP server.  While this software is being released to the OpenLDAP
+community, it is the authors' intention that support continue (and
+be added) for other client libraries as well.  As time goes on, it
+is expected that code will converge rather than diverge.
+
+Support is provided for University of Michigan LDAP version 3.3,
+OpenLDAP, and Netscape.  The default configuration supports
+OpenLDAP 1.2.4 and above.
+
+OpenLDAP 2.x is supported, but there is not yet any support for
+using SASL or TLS.  There may be interface changes in the LDAP API
+which the author is unaware of (a leak was recently fixed for the
+return values of ldap_first/next_attribute() calls).
+
+It uses GNU autoconf.  It builds and installs without requiring
+parallel directories, but it does require that Tcl and Extended Tcl
+are installed in the directory pointed to by --prefix (/usr/local
+by default).
+
+For further info, try "./configure --help".
+
+For example, I run:
+
+    ./configure  --prefix=/opt/neotcl --enable-shared \
+	--with-ldap=/usr/local/ldap
+
+Remember that --prefix must be the same prefix used when building
+and installint Tcl.
+
+Netscape configuration has not been well tested, and you may have to
+play with the resulting Makefile to get it to work.  In particular,
+you will probably need to modify the LDAP_LIBFLAGS.  However, the
+C code itself is reasonably well tested with Netscape.
+
+This module will install a regular shell (ldaptclsh) a windowing
+shell (ldapwish) a library, a pkgIndex.tcl, and a manpage (ldap.n).
+
+If your Tcl installation has been configured with --enable-shared,
+then you must also use --enable-shared here.
+
+Shared libraries and Tcl packages.
+
+If Tcl is built with --enable-shared, AND OpenLDAP (or another version
+for that matter) has been build to create -llber and -lldap as shared
+libaries, AND you build ldaptcl with --enable-shared, it should be
+possible to run a plain Tcl interpreter (eg. tclsh8.0) and do
+
+		package require Ldaptcl
+
+which will install the "ldap" command into the interpreter.
+
+You may need to set the LD_LIBRARY_PATH environment variable appropriately,
+or use -R or -W,-rpath ld command options to resolve the search for ldap
+and lber libraries.
+
+This package was test built on a Alpha OSF4.0e with the native C
+compiler.
+
+Please email comments or bug fixes to openldap-devel@OpenLDAP.org,
+or to kunkee@OpenLDAP.org.  I would also like to know if you are
+using this interface, so I invite you to drop me an email if you do.

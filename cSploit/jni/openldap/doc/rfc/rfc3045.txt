@@ -1,0 +1,339 @@
+
+
+
+
+
+
+Network Working Group                                        M. Meredith
+Request for Comments: 3045                                   Novell Inc.
+Category: Informational                                     January 2001
+
+
+            Storing Vendor Information in the LDAP root DSE
+
+Status of this Memo
+
+   This memo provides information for the Internet community.  It does
+   not specify an Internet standard of any kind.  Distribution of this
+   memo is unlimited.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2001).  All Rights Reserved.
+
+Abstract
+
+   This document specifies two Lightweight Directory Access Protocol
+   (LDAP) attributes, vendorName and vendorVersion that MAY be included
+   in the root DSA-specific Entry (DSE) to advertise vendor-specific
+   information.  These two attributes supplement the attributes defined
+   in section 3.4 of RFC 2251.
+
+   The information held in these attributes MAY be used for display and
+   informational purposes and MUST NOT be used for feature advertisement
+   or discovery.
+
+Conventions used in this document
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+   document are to be interpreted as described in [RFC2219]
+
+1. Overview
+
+   LDAP clients discover server-specific data--such as available
+   controls, extensions, etc.--by reading the root DSE.  See section 3.4
+   of [RFC2251] for details.
+
+   For display, information, and limited function discovery, it is
+   desirable to be able to query an LDAP server to determine the vendor
+   name of that server and also to see what version of that vendor's
+   code is currently installed.
+
+
+
+
+
+
+Meredith                     Informational                      [Page 1]
+
+RFC 3045      LDAP Root DSE to Display Vendor Information   January 2001
+
+
+1.1 Function discovery
+
+   There are many ways in which a particular version of a vendor's LDAP
+   server implementation may be functionally incomplete, or may contain
+   software anomalies.  It is impossible to identify every known
+   shortcoming of an LDAP server with the given set of server data
+   advertisement attributes.  Furthermore, often times, the anomalies of
+   an implementation are not found until after the implementation has
+   been distributed, deployed, and is in use.
+
+   The attributes defined in this document MAY be used by client
+   implementations in order to identify a particular server
+   implementation so that it can 'work around' such anomalies.
+
+   The attributes defined in this document MUST NOT be used to gather
+   information related to supported features of an LDAP implementation.
+   All LDAP features, mechanisms, and capabilities--if advertised--MUST
+   be advertised through other mechanisms, preferably advertisement
+   mechanisms defined in concert with said features, mechanisms, and
+   capabilities.
+
+2. Attribute Types
+
+   These attributes are an addition to the Server-specific Data
+   Requirements defined in section 3.4 of [RFC2251].  The associated
+   syntaxes are defined in section 4 of [RFC2252].
+
+   Servers MAY restrict access to vendorName or vendorVersion and
+   clients MUST NOT expect these attributes to be available.
+
+2.1 vendorName
+
+   This attribute contains a single string, which represents the name of
+   the LDAP server implementer.
+
+   All LDAP server implementations SHOULD maintain a vendorName, which
+   is generally the name of the company that wrote the LDAP Server code
+   like "Novell, Inc."
+
+      ( 1.3.6.1.1.4 NAME 'vendorName' EQUALITY
+        1.3.6.1.4.1.1466.109.114.1 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+        SINGLE-VALUE NO-USER-MODIFICATION USAGE dSAOperation )
+
+2.2 vendorVersion
+
+   This attribute contains a string which represents the version of the
+   LDAP server implementation.
+
+
+
+
+Meredith                     Informational                      [Page 2]
+
+RFC 3045      LDAP Root DSE to Display Vendor Information   January 2001
+
+
+   All LDAP server implementations SHOULD maintain a vendorVersion.
+   Note that this value is typically a release value--comprised of a
+   string and/or a string of numbers--used by the developer of the LDAP
+   server product (as opposed to the supportedLDAPVersion, which
+   specifies the version of the LDAP protocol supported by this server).
+   This is single-valued so that it will only have one version value.
+   This string MUST be unique between two versions, but there are no
+   other syntactic restrictions on the value or the way it is formatted.
+
+      ( 1.3.6.1.1.5 NAME 'vendorVersion' EQUALITY
+        1.3.6.1.4.1.1466.109.114.1 SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+        SINGLE-VALUE NO-USER-MODIFICATION USAGE dSAOperation )
+
+   The intent behind the equality match on vendorVersion is to not allow
+   a less than or greater than type of query.  Say release "LDAPv3 8.0"
+   has a problem that is fixed in the next release "LDAPv3 8.5", but in
+   the mean time there is also an update release say version "LDAPv3
+   8.01" that fixes the problem.  This will hopefully stop the client
+   from saying it will not work with a version less than "LDAPv3 8.5"
+   when it would also work with "LDAPv3 8.01".  With the equality match
+   the client would have to exactly match what it is looking for.
+
+3. Notes to Server Implementers
+
+   Server implementers may consider tying the vendorVersion attribute
+   value to the build mechanism so that it is automatically updated when
+   the version value changes.
+
+4. Notes to Client Developers
+
+   As mentioned in section 2.1, the use of vendorName and vendorVersion
+   MUST NOT be used to discover features.
+
+   It should be noted that an anomalies often on affect subset of
+   implementations reporting the same version information.  Most
+   implementations support multiple platforms, have numerous
+   configuration options, and often support plug-ins.
+
+   Client implementations SHOULD be written in such a way as to accept
+   any value in the vendorName and vendorVersion attributes.  If a
+   client implementation does not recognize the specific vendorName or
+   vendorVersion as one it recognizes, then for the purposes of 'working
+   around' anomalies, the client MUST assume that the server is complete
+   and correct.  The client MUST work with implementations that do not
+   publish these attributes.
+
+
+
+
+
+
+Meredith                     Informational                      [Page 3]
+
+RFC 3045      LDAP Root DSE to Display Vendor Information   January 2001
+
+
+5. Security Considerations
+
+   The vendorName and vendorVersion attributes are provided only as
+   display or informational mechanisms, or as anomaly identifying
+   mechanisms.  Client and application implementers must consider that
+   the existence of a given value in the vendorName or vendorVersion
+   attribute is no guarantee that the server was actually built by the
+   asserted vendor or that its version is the asserted version and
+   should act accordingly.
+
+   Server implementers should be aware that this information could be
+   used to exploit a security hole a server provides either by feature
+   or flaw.
+
+6. IANA Considerations
+
+   This document seeks to create two attributes, vendorName and
+   vendorVersion, which the IANA will primarily be responsible.  This is
+   a one time effort; there is no need for any recurring assignment
+   after this stage.
+
+7. References
+
+   [RFC2219]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC2026]  Bradner, S., "The Internet Standards Process -- Revision
+              3", BCP 9, RFC 2026, October 1996.
+
+   [RFC2251]  Wahl, M., Howes, T. and S. Kille, "Lightweight Directory
+              Access Protocol (v3)", RFC 2251, December 1997.
+
+   [RFC2252]  Wahl, M., Coulbeck, A., Howes, T. and S. Kille,
+              "Lightweight Directory Access Protocol (v3): Attribute
+              Syntax Definitions", RFC 2252, December 1997.
+
+8. Acknowledgments
+
+   The author would like to thank the generous input and review by
+   individuals at Novell including but not limited to Jim Sermersheim,
+   Mark Hinckley, Renea Campbell, and Roger Harrison.  Also IETF
+   contributors Kurt Zeilenga, Mark Smith, Mark Wahl, Peter Strong,
+   Thomas Salter, Gordon Good, Paul Leach, Helmut Volpers.
+
+
+
+
+
+
+
+
+Meredith                     Informational                      [Page 4]
+
+RFC 3045      LDAP Root DSE to Display Vendor Information   January 2001
+
+
+9. Author's Address
+
+   Mark Meredith
+   Novell Inc.
+   1800 S. Novell Place
+   Provo, UT 84606
+
+   Phone: 801-861-2645
+   EMail: mark_meredith@novell.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Meredith                     Informational                      [Page 5]
+
+RFC 3045      LDAP Root DSE to Display Vendor Information   January 2001
+
+
+10. Full Copyright Statement
+
+   Copyright (C) The Internet Society (2001).  All Rights Reserved.
+
+   This document and translations of it may be copied and furnished to
+   others, and derivative works that comment on or otherwise explain it
+   or assist in its implementation may be prepared, copied, published
+   and distributed, in whole or in part, without restriction of any
+   kind, provided that the above copyright notice and this paragraph are
+   included on all such copies and derivative works.  However, this
+   document itself may not be modified in any way, such as by removing
+   the copyright notice or references to the Internet Society or other
+   Internet organizations, except as needed for the purpose of
+   developing Internet standards in which case the procedures for
+   copyrights defined in the Internet Standards process must be
+   followed, or as required to translate it into languages other than
+   English.
+
+   The limited permissions granted above are perpetual and will not be
+   revoked by the Internet Society or its successors or assigns.
+
+   This document and the information contained herein is provided on an
+   "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+   TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+   BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+   HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+   MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Acknowledgement
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Meredith                     Informational                      [Page 6]
+

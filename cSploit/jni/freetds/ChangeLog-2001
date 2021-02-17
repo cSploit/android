@@ -1,0 +1,299 @@
+Sun Dec 16 10:32:57 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/ctlib/ct.c: Add stubs for ct_send_data and ct_data_info per 
+	Michael Peppler for DBD::Sybase 0.94
+	
+Thu Dec  6 11:53:04 2001  James Cameron  <quozl@us.netrek.org>
+
+	* doc/userguide.sgml: complete instructions for Microsoft SQL
+	Server 2000.
+
+Wed Dec  5 15:45:49 2001  James Cameron  <quozl@us.netrek.org>
+
+	* doc/userguide.sgml: describe precise sequence to turn on SQL
+	Server authentication under Microsoft SQL Server 7.  Still need
+	description for Microsoft SQL Server 2000.  Wrapped ChangeLog.
+
+Sun Dec  2 11:10:24 EST 2001	Brian Bruns <camber@ais.org>
+	
+	* src/odbc/odbc.c: Implemented SQLGetFunctions
+	* include/tds.h.in: Added TDSINPUTPARAM structure, added
+	num_params and params array to TDSDYNAMIC
+	* src/tds/mem.c: Added tds_add_input_param() and
+	tds_free_input_params() functions.  Added call to
+	tds_free_input_params to tds_free_socket()
+	* src/tds/query.c: Added tds_submit_execute() for dynamic
+	placeholder suport.
+	* src/tds/convert.c: Added tds_get_null_type to convert fixed
+	datatypes to their nullable type.
+	* src/ctlib/ct.c: Added CS_EXECUTE support to ct_send and ct_param
+
+Fri Nov 30 18:41:10 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/odbc/odbc.c: Change missing "Database" parameter to
+	Servername.  Force SQLGetFunctions to return SQL_FALSE for ODBC3
+	* Makefile.am: No longer install interfaces file by default
+
+Thu Nov 29 18:13:01 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/dblib/unittests/t0009.c: changed varchar(10) to char(10)
+	* src/ctlib/unittests/t0004.c: fixed results order for update and
+	added insert and select
+
+Mon Nov 26 16:06:05 EST 2001	Brian Bruns <camber@ais.org>
+	
+	* doc/userguide.sgml: added new chapter "advanced configurations"
+
+Sun Nov 25 18:02:24 CST 2001    Steve Langasek <vorlon@netexpress.net>
+
+	* added an explicit pointer check in tds/token.c when handling
+	  messages sent by the server; fixes a segfault when using the
+	  ODBC driver.
+	* s/SQL_DATETIME/SQL_DATE/ in ODBC source, for compatibility
+	  with older ODBC driver managers
+
+Sun Nov 25 13:45:45 EST 2001	Brian Bruns <camber@ais.org>
+
+	* include/tds.h.in: add TDS_STR_CLCHARSET define and all
+	client_charset to the TDSCONFIG structure.
+	* src/tds/mem.c(tds_free_config): free client_charset 
+	* src/tds/mem.c(tds_free_socket): call tds_iconv_close()
+	* src/tds/config.c: check for 'client charset' in freetds.conf
+	* src/tds/iconv.c: set tds->use_iconv on successful loading of
+	iconv routines
+	* src/tds/login.c(tds_connect): call tds_iconv_open() if
+	client_charset is
+	* doc/userguide.sgml: add 'client charset' description to
+	freetds.conf table
+
+Thu Nov 22 18:26:34 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/dblib/dblib.c: modify DBROWS to check for validity of resinfo
+
+Wed Nov 21 17:15:23 2001  James Cameron  <quozl@us.netrek.org>
+
+	* .cvsignore: remove all generated files from CVS.
+	* doc/faq.html: add pointer to instructions for building from CVS
+	after a checkout.
+
+Tue Nov 20 12:44:13 2001  James Cameron  <quozl@us.netrek.org>
+
+	* autogen.sh: new file to perform package configuration from 'make
+	maintainer-clean' state, copied from Glade.
+
+Tue Nov 20 12:31:25 2001  James Cameron  <quozl@us.netrek.org>
+
+	* INSTALL.CVS: new file to explain process of building from CVS.
+
+Tue Nov 20 11:48:26 2001  James Cameron  <quozl@us.netrek.org>
+
+	* doc/userguide.sgml: adjust build instructions; gmake does not
+	work on some Linux systems, as GNU make is installed as make not
+	gmake.  Ensure that the instructions match against INSTALL.  Fix
+	name of GNU Project and software development tools therein.
+
+Tue Nov 20 11:41:40 2001  James Cameron  <quozl@us.netrek.org>
+
+	* INSTALL: simplify installation instructions in favour of user
+	guide, fix URL to guide.
+
+Tue Nov 20 11:34:54 2001  James Cameron  <quozl@us.netrek.org>
+
+	* README, doc/faq.html: fix User Guide URL
+
+Tue Nov 13 23:41:17 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/dblib/dbutil.c: fix call to tds_reset_msg after libtds change.
+	
+Tue Nov 13 16:04:54 2001  James Cameron  <quozl@us.netrek.org>
+
+	* doc/faq.html: add MAC OS X build FAQ entry, make a few language
+	adjustments to text.
+
+Sat Nov 10 12:37:27 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/tds/unittests/common.c: fix call to tds_connect()
+	* src/tds/config.c: revert Marks call to lookup_host for the host_name
+	field.
+
+Fri Nov  9 20:16:21 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/tds/util.c: Add 'append mode' for logging
+	* src/tds/config.c: Add freetds.conf support for append mode.
+	* include/tds.h.in: Add TDS_STR_APPENDMODE
+
+Fri Nov  9 11:49:58 2001  James Cameron  <quozl@us.netrek.org>
+
+	* doc/faq.html: 5.1, adjust the CVS instructions in response to
+	Norman's feedback, including module name.
+
+Fri Nov  9 09:31:35 2001  James Cameron  <quozl@us.netrek.org>
+
+	* include/tds.h.in: add tds_free_login, it was missing.
+
+Thu Nov  8 15:25:34 2001  James Cameron  <quozl@us.netrek.org>
+
+	* interfaces: reformat interfaces file and add note that it is
+	superceded by freetds.conf, but still usable.
+
+Thu Nov  8 14:21:47 2001  James Cameron  <quozl@us.netrek.org>
+
+	* include/tds.h.in: surround malloc.h include with HAVE_MALLOC_H
+	* include/config.h.in: add HAVE_MALLOC_H
+	* configure.in: add check for malloc.h
+
+Thu Nov  8 14:05:49 EST 2001	Mark Lilback <mark@lilback.com>
+	
+	* src/tds/config.c: check for nulls before calling strlen, sets
+	config->id_addr
+	* src/tds/write.c: added explicit return instead of using implied
+	* src/dblib/dbutil.c: added function parameters to message handler
+	declarations
+	* src/dblib/bcp.c: modified hardcoded rowbuffer size to use a
+	#define that is lowered for Mac OS 8/9
+	* include/tdsutil.h: added declaration of tds_get_int
+	* include/cspublic.h: added function parameters to mesage handler
+	declarations
+	* include/sybdb.h: added functions for proper error handling,
+	missing dbcoltypeinfo declaration, added typeinfo struct to
+	DBPROCESS
+	* include/tds.h: added fields to colinfo struct
+	* include/tds.h.in: added fields to colinfo struct
+	* src/dblib/dblib.c: proper error handling possible, colinfo
+	function thread safe, time adjustment on Mac OS
+	* src/tds/convert.c: added missing return statements
+	* src/tds/numeric.c: added missing return statements
+	* src/tds/token.c: retrieves column info that was being ignored,
+	message number swapped on big endian systems
+	
+Wed Nov  7 22:18:02 CST 2001    Steve Langasek <vorlon@netexpress.net>
+	
+	* Removed --enable-dbmfix configure option, because there's no
+	longer a reason to ever disable this
+
+Thu Nov  8 13:55:20 2001  James Cameron  <quozl@us.netrek.org>
+
+	* .cvsignore: populate list of files to ignore during cvs update.
+
+Wed Nov  7 22:21:06 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/tds/ct.c: adding more tdsdump stuff
+	* include/cspublic.h: added timestamp fields to iodesc for
+	DBD::Sybase 0.93
+
+Tue Nov  6 20:00:14 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/tds/iconv.c: Check for null input on tds7_ascii2unicode and 
+	tds7_unicode2ascii functions
+
+Mon Nov  5 18:47:08 EST 2001  Brian Bruns <camber@ais.org>
+
+	* src/tds/token.c(tds7_send_login): Precompute the lengths of
+	login field and check for null strings.
+
+Sun Nov  4 00:21:46 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/tds/token.c(tds_client_msg): Client messages were not
+	updated to pass TDSSOCKET instead of parent to CLI message
+	handler.
+
+Fri Nov  2 12:03:44 2001  James Cameron  <quozl@us.netrek.org>
+
+	* include/tds.h.in, src/tds/token.c (tds_process_col_name):
+	optimisation to add the column name length in the tds_column_info
+	structure so as to obviate the need for strlen calls higher up.
+	Since the length value is already available, this costs nothing.
+	Derived from a patch by Ruslan R. Laishev <laishev@mail.dls.net>
+
+Wed Oct 31 12:21:57 2001  James Cameron  <quozl@us.netrek.org>
+
+	* src/ctlib/ct.c (ct_results): return CS_END_RESULTS instead of
+	CS_SUCCEED on subsequent call after we had returned CS_SUCCEED.
+	Related to special handling of queries with no result sets.  PHP
+	was looping trying to flush the connection of result sets after
+	the first one.
+
+Tue Oct 30 14:04:57 EST 2001	Brian Bruns <camber@ais.org>
+
+	* src/ctlib/ct.c (ct_results): add special handling of queries
+	with no result sets (set rowcount/set textsize).
+
+Tue Oct 30 13:23:27 2001  James Cameron  <quozl@us.netrek.org>
+
+	* include/Makefile.am (maintainer-clean-local): clean up after
+	generation of tds_configs.h
+
+	* freetds.conf: improve formatting and layout of configuration
+	file, and add a few fragments of additional information.
+
+Mon Oct 29 18:40:03 EST 2001 Brian Bruns <camber@ais.org>
+	
+	* src/tds/token.c(tds_process_env_chg): add special handling for
+	environment change type 7.
+
+Fri Oct 26 07:11:05 2001  Brian Bruns <camber@ais.org>
+	
+	* src/tds/token.c(tds_process_msg): called message handler will be
+	passed tdssocket instead of the parent structure.
+	* src/dblib/dbutil.c: cast from TDSSOCKET, then lookup dbproc as
+	above
+	* src/dblib/dbutil.c: cast from TDSSOCKET, then lookup connection
+	as above
+	* src/tds/login.c(tds_connect): Take in second param 'parent' so
+	callbacks can be called before having an established connection.
+	* src/ctlib/ct.c: remove call to tds_set_parent and pass into
+	tds_connect
+	* src/dblib/dblib.c: remove call to tds_set_parent and pass into
+	tds_connect
+	* src/odbc/odbc.c: remove call to tds_set_parent and pass NULL to
+	tds_connect
+	* src/tds/config.c(tds_alloc_config): add default hostname
+	returned from gethostname() to fix TDS 7 problem.
+
+Thu Oct 25 10:58:38 2001  James Cameron  <quozl@us.netrek.org>
+
+	* configure.in: add include/tds_configs.h to AC_OUTPUT
+	
+Tue Oct 24 19:07:15 2001 Brian Bruns <camber@ais.org>
+	
+	* configure.in: Added AM_CONFIG_HEADER
+	* acconfig.h: needed for config header because of BSD_COMP
+	* doc/faq/html: made XHTML 1.0 valid
+	* src/*/*.c: added config.h include
+	* acinclude.m4: iconv autoconf macro
+
+Tue Oct 23 23:42:03 2001 Brian Bruns <camber@ais.org>
+	
+	* src/tds/iconv.c: new iconv functions for handling TDS7 unicode
+	* src/tds/login.c: tds7_ascii2unicode() and tds7_unicode2ascii()
+	moved to iconv.c
+	* aclocal.m4: iconv detection
+
+Sat Oct 20 15:54:28 2001 Brian Bruns <camber@ais.org>
+
+	* src/tds/login.c: error handling for return of inet_addr()
+	* doc/userguide.sgml: added freetds.conf and unixODBC sections,
+	minor version updates
+
+Fri Oct 20 10:43:31 Brian Bruns <camber@ais.org>
+
+	* src/tds/config.c: Added optional debugging of server lookup
+
+Fri Oct 19 12:26:02 2001  James Cameron  <quozl@us.netrek.org>
+
+	* README: add users guide pointer.
+
+Fri Oct 19 09:52:22 2001  James Cameron  <quozl@us.netrek.org>
+
+	* NEWS: old ChangeLog placed here. This file is now the release
+	notes for the project. Place a one line description of changes
+	here.
+
+Fri Oct 19 09:49:58 2001  James Cameron  <quozl@us.netrek.org>
+
+	* ChangeLog: per discussions with Brian, this file now becomes the
+	place for developers to write up their changes that are committed
+	back to CVS. The file is reverse date order, and is appended to
+	semi-automatically by some editors. For example, Emacs key
+	sequence 'c-x 4 a' adds an entry.
+

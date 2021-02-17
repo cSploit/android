@@ -1,0 +1,202 @@
+src/backend/executor/README
+
+The Postgres Executor
+=====================
+
+The executor processes a tree of "plan nodes".  The plan tree is essentially
+a demand-pull pipeline of tuple processing operations.  Each node, when
+called, will produce the next tuple in its output sequence, or NULL if no
+more tuples are available.  If the node is not a primitive relation-scanning
+node, it will have child node(s) that it calls in turn to obtain input
+tuples.
+
+Refinements on this basic model include:
+
+* Choice of scan direction (forwards or backwards).  Caution: this is not
+currently well-supported.  It works for primitive scan nodes, but not very
+well for joins, aggregates, etc.
+
+* Rescan command to reset a node and make it generate its output sequence
+over again.
+
+* Parameters that can alter a node's results.  After adjusting a parameter,
+the rescan command must be applied to that node and all nodes above it.
+There is a moderately intelligent scheme to avoid rescanning nodes
+unnecessarily (for example, Sort does not rescan its input if no parameters
+of the input have changed, since it can just reread its stored sorted data).
+
+For a SELECT, it is only necessary to deliver the top-level result tuples
+to the client.  For INSERT/UPDATE/DELETE, the actual table modification
+operations happen in a top-level ModifyTable plan node.  If the query
+includes a RETURNING clause, the ModifyTable node delivers the computed
+RETURNING rows as output, otherwise it returns nothing.  Handling INSERT
+is pretty straightforward: the tuples returned from the plan tree below
+ModifyTable are inserted into the correct result relation.  For UPDATE,
+the plan tree returns the computed tuples to be updated, plus a "junk"
+(hidden) CTID column identifying which table row is to be replaced by each
+one.  For DELETE, the plan tree need only deliver a CTID column, and the
+ModifyTable node visits each of those rows and marks the row deleted.
+
+XXX a great deal more documentation needs to be written here...
+
+
+Plan Trees and State Trees
+--------------------------
+
+The plan tree delivered by the planner contains a tree of Plan nodes (struct
+types derived from struct Plan).  Each Plan node may have expression trees
+associated with it, to represent its target list, qualification conditions,
+etc.  During executor startup we build a parallel tree of identical structure
+containing executor state nodes --- every plan and expression node type has
+a corresponding executor state node type.  Each node in the state tree has a
+pointer to its corresponding node in the plan tree, plus executor state data
+as needed to implement that node type.  This arrangement allows the plan
+tree to be completely read-only as far as the executor is concerned: all data
+that is modified during execution is in the state tree.  Read-only plan trees
+make life much simpler for plan caching and reuse.
+
+Altogether there are four classes of nodes used in these trees: Plan nodes,
+their corresponding PlanState nodes, Expr nodes, and their corresponding
+ExprState nodes.  (Actually, there are also List nodes, which are used as
+"glue" in all four kinds of tree.)
+
+
+Memory Management
+-----------------
+
+A "per query" memory context is created during CreateExecutorState();
+all storage allocated during an executor invocation is allocated in that
+context or a child context.  This allows easy reclamation of storage
+during executor shutdown --- rather than messing with retail pfree's and
+probable storage leaks, we just destroy the memory context.
+
+In particular, the plan state trees and expression state trees described
+in the previous section are allocated in the per-query memory context.
+
+To avoid intra-query memory leaks, most processing while a query runs
+is done in "per tuple" memory contexts, which are so-called because they
+are typically reset to empty once per tuple.  Per-tuple contexts are usually
+associated with ExprContexts, and commonly each PlanState node has its own
+ExprContext to evaluate its qual and targetlist expressions in.
+
+
+Query Processing Control Flow
+-----------------------------
+
+This is a sketch of control flow for full query processing:
+
+	CreateQueryDesc
+
+	ExecutorStart
+		CreateExecutorState
+			creates per-query context
+		switch to per-query context to run ExecInitNode
+		ExecInitNode --- recursively scans plan tree
+			CreateExprContext
+				creates per-tuple context
+			ExecInitExpr
+		AfterTriggerBeginQuery
+
+	ExecutorRun
+		ExecProcNode --- recursively called in per-query context
+			ExecEvalExpr --- called in per-tuple context
+			ResetExprContext --- to free memory
+
+	ExecutorFinish
+		ExecPostprocessPlan --- run any unfinished ModifyTable nodes
+		AfterTriggerEndQuery
+
+	ExecutorEnd
+		ExecEndNode --- recursively releases resources
+		FreeExecutorState
+			frees per-query context and child contexts
+
+	FreeQueryDesc
+
+Per above comments, it's not really critical for ExecEndNode to free any
+memory; it'll all go away in FreeExecutorState anyway.  However, we do need to
+be careful to close relations, drop buffer pins, etc, so we do need to scan
+the plan state tree to find these sorts of resources.
+
+
+The executor can also be used to evaluate simple expressions without any Plan
+tree ("simple" meaning "no aggregates and no sub-selects", though such might
+be hidden inside function calls).  This case has a flow of control like
+
+	CreateExecutorState
+		creates per-query context
+
+	CreateExprContext	-- or use GetPerTupleExprContext(estate)
+		creates per-tuple context
+
+	ExecPrepareExpr
+		temporarily switch to per-query context
+		run the expression through expression_planner
+		ExecInitExpr
+
+	Repeatedly do:
+		ExecEvalExprSwitchContext
+			ExecEvalExpr --- called in per-tuple context
+		ResetExprContext --- to free memory
+
+	FreeExecutorState
+		frees per-query context, as well as ExprContext
+		(a separate FreeExprContext call is not necessary)
+
+
+EvalPlanQual (READ COMMITTED Update Checking)
+---------------------------------------------
+
+For simple SELECTs, the executor need only pay attention to tuples that are
+valid according to the snapshot seen by the current transaction (ie, they
+were inserted by a previously committed transaction, and not deleted by any
+previously committed transaction).  However, for UPDATE and DELETE it is not
+cool to modify or delete a tuple that's been modified by an open or
+concurrently-committed transaction.  If we are running in SERIALIZABLE
+isolation level then we just raise an error when this condition is seen to
+occur.  In READ COMMITTED isolation level, we must work a lot harder.
+
+The basic idea in READ COMMITTED mode is to take the modified tuple
+committed by the concurrent transaction (after waiting for it to commit,
+if need be) and re-evaluate the query qualifications to see if it would
+still meet the quals.  If so, we regenerate the updated tuple (if we are
+doing an UPDATE) from the modified tuple, and finally update/delete the
+modified tuple.  SELECT FOR UPDATE/SHARE behaves similarly, except that its
+action is just to lock the modified tuple and return results based on that
+version of the tuple.
+
+To implement this checking, we actually re-run the query from scratch for
+each modified tuple (or set of tuples, for SELECT FOR UPDATE), with the
+relation scan nodes tweaked to return only the current tuples --- either
+the original ones, or the updated (and now locked) versions of the modified
+tuple(s).  If this query returns a tuple, then the modified tuple(s) pass
+the quals (and the query output is the suitably modified update tuple, if
+we're doing UPDATE).  If no tuple is returned, then the modified tuple(s)
+fail the quals, so we ignore the current result tuple and continue the
+original query.
+
+In UPDATE/DELETE, only the target relation needs to be handled this way.
+In SELECT FOR UPDATE, there may be multiple relations flagged FOR UPDATE,
+so we obtain lock on the current tuple version in each such relation before
+executing the recheck.
+
+It is also possible that there are relations in the query that are not
+to be locked (they are neither the UPDATE/DELETE target nor specified to
+be locked in SELECT FOR UPDATE/SHARE).  When re-running the test query
+we want to use the same rows from these relations that were joined to
+the locked rows.  For ordinary relations this can be implemented relatively
+cheaply by including the row TID in the join outputs and re-fetching that
+TID.  (The re-fetch is expensive, but we're trying to optimize the normal
+case where no re-test is needed.)  We have also to consider non-table
+relations, such as a ValuesScan or FunctionScan.  For these, since there
+is no equivalent of TID, the only practical solution seems to be to include
+the entire row value in the join output row.
+
+We disallow set-returning functions in the targetlist of SELECT FOR UPDATE,
+so as to ensure that at most one tuple can be returned for any particular
+set of scan tuples.  Otherwise we'd get duplicates due to the original
+query returning the same set of scan tuples multiple times.  (Note: there
+is no explicit prohibition on SRFs in UPDATE, but the net effect will be
+that only the first result row of an SRF counts, because all subsequent
+rows will result in attempts to re-update an already updated target row.
+This is historical behavior and seems not worth changing.)

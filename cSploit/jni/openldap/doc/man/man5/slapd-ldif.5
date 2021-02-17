@@ -1,0 +1,54 @@
+.TH SLAPD-LDIF 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd\-ldif \- LDIF backend to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The LDIF backend to
+.BR slapd (8)
+is a basic storage backend that stores entries in text files in LDIF format,
+and exploits the filesystem to create the tree structure of the database.
+It is intended as a cheap, low performance easy to use backend, and it is
+exploited by higher-level internal structures to provide a permanent
+storage.
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the LDIF backend database.
+That is, they must follow a "database ldif" line and come before
+any subsequent "backend" or "database" lines.
+Other database options are described in the
+.BR slapd.conf (5)
+manual page.
+.TP
+.B directory <dir>
+Specify the directory where the database tree starts.  The directory
+must exist and grant appropriate permissions (rwx) to the identity slapd
+is running with.
+.SH ACCESS CONTROL
+The
+.B LDIF
+backend does not honor any of the access control semantics described in
+.BR slapd.access (5).
+Only
+.B read (=r)
+access to the
+.B entry
+pseudo-attribute and to the other attribute values of the entries
+returned by the
+.B search
+operation is honored, which is performed by the frontend.
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd (8),
+.BR ldif (5).
+.SH AUTHOR
+Eric Stokes

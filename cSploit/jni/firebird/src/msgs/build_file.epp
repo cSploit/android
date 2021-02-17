@@ -1,0 +1,562 @@
+/*
+ *	PROGRAM:		JRD Message Facility
+ *	MODULE:			build_file.epp
+ *	DESCRIPTION:	Build message file
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ *
+ * 2002.02.15 Sean Leyne - Code Cleanup, removed obsolete "XENIX" port
+ * 2002.02.15 Sean Leyne - Code Cleanup, removed obsolete "DELTA" port
+ *
+ * 2002.10.30 Sean Leyne - Removed support for obsolete "PC_PLATFORM" define
+ *
+ */
+
+#include "firebird.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "../jrd/ibase.h"
+#include "../jrd/msg.h"
+#include "../yvalve/gds_proto.h"
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+const int max_levels = 4;
+typedef msgnod* msgnod_ptr_array[max_levels];
+
+DATABASE DB = "msg.fdb";
+
+static void ascii_str_to_upper(TEXT*);
+static char* copy_terminate(char* dest, const char* src, size_t bufsize);
+static USHORT do_msgs(const TEXT*, const TEXT*, bool);
+static void propagate(msgnod**, msgnod**, ULONG, ULONG);
+static SLONG write_bucket(const msgnod*, USHORT);
+static void sanitize(TEXT*);
+
+static SLONG global_file_position;
+static int global_file;
+
+// keep the LOCALE_PAT names in sync with file_params.h
+// CVC: It's #define MSG_FILE_LANG	"intl/%.8s.msg"
+// in common/file_params.h, it seems we are already out of sync!
+
+#ifdef WIN_NT
+#include <io.h> // open, lseek, write, close
+const char path_separator = '\\';
+#else
+const char path_separator = '/';
+#endif
+
+const char* const locale_pattern = "%.10s.msg";
+const char* const FILENAME	= "firebird.msg";
+
+#include <sys/types.h>
+#ifndef WIN_NT
+#include <sys/file.h>
+#endif
+
+#ifndef O_RDWR
+#include <fcntl.h>
+#endif
+
+#ifndef O_BINARY
+#define O_BINARY	0
+#endif
+
+
+int CLIB_ROUTINE main( int argc, char** argv)
+{
+/**************************************
+ *
+ *	m a i n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Top level routine.
+ *
+ **************************************/
+	TEXT db_file[MAXPATHLEN], filename[MAXPATHLEN], pathbuffer[MAXPATHLEN];
+	BASED ON LOCALES.LOCALE this_locale;
+
+	strcpy(db_file, "msg.fdb");
+	strcpy(filename, FILENAME);
+	TEXT* pathname = NULL;
+	TEXT* locale = NULL;
+
+	bool sw_warning = false;
+	const TEXT* const* const end_args = argv + argc;
+
+	for (++argv; argv < end_args;)
+	{
+		const TEXT* p = *argv++;
+		bool sw_bad = false;
+		if (*p != '-')
+			sw_bad = true;
+		else
+		{
+			switch (UPPER(p[1]))
+			{
+			case 'D':
+				if (argv >= end_args)
+					sw_bad = true;
+				else
+					copy_terminate(db_file, *argv++, MAXPATHLEN);
+				break;
+
+			case 'F':
+				if (argv >= end_args)
+					sw_bad = true;
+				else
+					copy_terminate(filename, *argv++, MAXPATHLEN);
+				break;
+
+			case 'P':
+				if (argv >= end_args)
+					sw_bad = true;
+				else
+				{
+					copy_terminate(pathbuffer, *argv++, MAXPATHLEN);
+					pathname = pathbuffer;
+				}
+				break;
+
+			case 'L':
+				if (argv >= end_args)
+					sw_bad = true;
+				else
+					locale = *argv++;
+				break;
+
+			case 'W':
+				sw_warning = true;
+				break;
+
+			default:
+				sw_bad = true;
+			}
+		}
+		if (sw_bad)
+		{
+			printf("Invalid option \"%s\".  Valid options are:\n", p);
+			printf("\t-D\tDatabase name\n");
+			printf("\t-F\tMessage file name\n");
+			printf("\t-P\tMessage file path (should end with '/')\n");
+			printf("\t-L\tLocale name\n");
+			printf("\t-W\tVerbose warning messages\n");
+			exit(FINI_ERROR);
+		}
+	}
+
+	// Get db_file ready to go
+
+	READY db_file AS DB;
+	START_TRANSACTION;
+
+	// make sure the path name ends in a '/'
+
+	if (pathname)
+	{
+		const size_t len = strlen(pathname);
+		//fb_assert(len + 1 < MAXPATHLEN);
+		if (pathname[len - 1] != path_separator)
+		{
+			pathname[len] = path_separator;
+			pathname[len + 1] = 0;
+		}
+	}
+
+	const size_t separator_pos = pathname ? strlen(pathname) : 0;
+
+	// check for the locale option
+
+	if (!locale)
+	{
+		// no locale given: do the regular US msgs
+		if (!pathname)
+			do_msgs(filename, NULL, false);
+		else
+		{
+		    //fb_assert(strlen(pathname) + strlen(filename) < MAXPATHLEN);
+			strcat(pathname, filename);
+			do_msgs(pathname, NULL, false);
+		}
+	}
+	else
+	{
+		bool got_one = false;
+		FOR FIRST 1 L IN LOCALES WITH L.LOCALE = locale
+			got_one = true;
+		END_FOR;
+		if (got_one)
+		{
+			// do only 1 locale
+			strcpy(this_locale, locale);
+			sanitize(locale);
+			if (pathname)
+			{
+				sprintf(filename, locale_pattern, locale);
+				strcat(pathname, filename);
+				do_msgs(pathname, this_locale, sw_warning);
+			}
+			else
+				do_msgs(filename, this_locale, sw_warning);
+		}
+		else
+		{
+			strncpy(this_locale, locale, sizeof(this_locale));
+			ascii_str_to_upper(this_locale);
+			if (!strcmp(this_locale, "ALL"))
+			{
+				FOR LC IN LOCALES // do all locales except piglatin
+					WITH LC.LOCALE != 'pg_PG' AND LC.LOCALE != 'piglatin';
+					locale = LC.LOCALE;
+					strcpy(this_locale, LC.LOCALE);
+					printf("build_file: building locale %s", this_locale);
+					sanitize(locale);
+					sprintf(filename, locale_pattern, locale);
+					if (pathname)
+					{
+						strcat(pathname, filename);
+						printf(" to file %s\n", pathname);
+						do_msgs(pathname, this_locale, sw_warning);
+						pathname[separator_pos] = 0; // for the next iteration.
+					}
+					else
+					{
+						printf(" to file %s\n", filename);
+						do_msgs(filename, this_locale, sw_warning);
+					}
+				END_FOR;
+			}
+			else
+			{
+				printf("build_file: Unknown locale: %s\n", locale);
+				printf("Valid options are:\n");
+				FOR LO IN LOCALES
+					printf("\t%s\n", LO.LOCALE);
+				END_FOR;
+				printf("\tall\n");
+
+				COMMIT;
+				FINISH DB;
+				exit(FINI_ERROR);
+			}
+		}
+	}
+
+	COMMIT;
+	FINISH;
+
+	return(FINI_OK);
+}
+
+
+static void ascii_str_to_upper( TEXT* s)
+{
+/**************************************
+ *
+ *	a s c i i _ s t r _ t o _ u p p e r
+ *
+ **************************************
+ *
+ * Functional description
+ *	change the a - z chars in string to upper case
+ *
+ **************************************/
+
+	while (*s)
+	{
+		if (*s >= 'a' && *s <= 'z')
+			*s &= 0xDF;
+		s++;
+	}
+}
+
+
+static char* copy_terminate(char* dest, const char* src, size_t bufsize)
+{
+/**************************************
+ *
+ * c o p y _ t e r m i n a t e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Do the same as strncpy but ensure the null terminator is written.
+ *	To avoid putting here #include "../common/utils_proto.h"
+ *
+ **************************************/
+	if (!bufsize) // Was it a joke?
+		return dest;
+
+	--bufsize;
+	strncpy(dest, src, bufsize);
+	dest[bufsize] = 0;
+	return dest;
+}
+
+
+static USHORT do_msgs( const TEXT* filename, const TEXT* locale, bool sw_warning)
+{
+/**************************************
+ *
+ *	d o _ m s g s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Build the message file
+ *
+ **************************************/
+
+	// Divy up memory among various buffers
+	// Memory leaking until the program finishes?
+	msgrec* leaf_node = (msgrec*) gds__alloc((SLONG) MSG_BUCKET);
+	msgrec* const leaf = leaf_node;
+	const TEXT* const end_leaf = (TEXT*) leaf + MSG_BUCKET;
+
+	// Open output file
+
+	global_file = open(filename, O_WRONLY | O_CREAT | O_BINARY, 0666);
+	if (global_file == -1)
+	{
+		printf("Can't open %s\n", filename);
+		return FINI_ERROR;
+	}
+	global_file_position = 0;
+
+	// Format and write header
+	isc_msghdr header;
+	header.msghdr_major_version = MSG_MAJOR_VERSION;
+	header.msghdr_minor_version = MSG_MINOR_VERSION;
+	header.msghdr_bucket_size = MSG_BUCKET;
+	// CVC: Since this is an unused field that holds garbage in the *.msg file,
+	// we'll initialize it to the date the FB project was registered with SF.
+	header.msghdr_origin = 20000730; // 2000-07-30
+	write_bucket((msgnod*) &header, sizeof(header));
+
+	// Write out messages building B-tree
+
+	int warning_counter = 0;
+	USHORT n = 0;
+	ULONG position = 0, prior_code = 0;
+	TEXT msg_text[256];
+	msgnod_ptr_array buckets, nodes;
+	nodes[0] = NULL;
+	size_t len = 0;
+
+	FOR X IN MESSAGES SORTED BY X.CODE
+
+		// pre-load with US English message - just in case we don't
+		// have a translation available.
+
+		strcpy(msg_text, X.TEXT);
+		len = strlen(msg_text);
+		if (locale)
+		{
+			// want translated output
+			// Overwrite English message with translation, if we find one
+			int found_one = 0;
+			FOR Y IN TRANSMSGS WITH Y.FAC_CODE = X.FAC_CODE
+				AND Y.NUMBER = X.NUMBER
+					AND Y.LOCALE = locale
+					AND Y.TEXT NOT MISSING AND Y.TEXT != ' ';
+				strcpy(msg_text, Y.TEXT);
+				len = strlen(msg_text);
+				found_one++;
+			END_FOR;
+			if (!found_one && sw_warning)
+				printf
+					("build_file: Warning - no %s translation of msg# %"QUADFORMAT"d\n",
+					 locale, X.CODE);
+			if (found_one > 1 && sw_warning)
+				printf
+					("build_file: Warning - multiple %s translations of msg# %"QUADFORMAT"d\n",
+					 locale, X.CODE);
+			if (found_one != 1)
+				warning_counter++;
+		}
+
+		if (leaf_node->msgrec_text + len >= end_leaf)
+		{
+			position = write_bucket((msgnod*) leaf, n);
+			propagate(buckets, nodes, prior_code, position);
+			leaf_node = leaf;
+		}
+		leaf_node->msgrec_code = prior_code = MSG_NUMBER(X.FAC_CODE, X.NUMBER);
+
+		leaf_node->msgrec_length = len;
+		// Let's not store trash in flags.
+		leaf_node->msgrec_flags = X.FLAGS.NULL ? 0 : X.FLAGS;
+		//n = OFFSETA(MSGREC, msgrec_text) + len; // useless? See assignment below.
+		TEXT* p = leaf_node->msgrec_text;
+		memcpy(p, msg_text, len);
+		n = p + len - (SCHAR*) leaf; // For the next iteration.
+		leaf_node = NEXT_LEAF(leaf_node);
+	END_FOR;
+
+	// Write a high water mark on leaf node
+
+	if (leaf_node->msgrec_text + len >= end_leaf)
+	{
+		n = (SCHAR *) leaf_node - (SCHAR *) leaf;
+		position = write_bucket((msgnod*) leaf, n);
+		propagate(buckets, nodes, prior_code, position);
+		leaf_node = leaf;
+	}
+
+	leaf_node->msgrec_code = ~0;
+	leaf_node->msgrec_length = 0;
+	leaf_node->msgrec_flags = 0;
+	n = (SCHAR *) leaf_node - (SCHAR *) leaf;
+	position = write_bucket((msgnod*) leaf, n);
+
+	// Finish off upper levels of tree
+
+	header.msghdr_levels = 1;
+
+	for (msgnod** ptr = nodes, **ptr2 = buckets; *ptr; ptr++, ptr2++)
+	{
+		msgnod* node = *ptr;
+		node->msgnod_code = ~0;
+		node->msgnod_seek = position;
+		n = (SCHAR *) (node + 1) - (SCHAR *) * ptr2;
+		position = write_bucket(*ptr2, n);
+		++header.msghdr_levels;
+	}
+
+	header.msghdr_top_tree = position;
+
+	// Re-write header record and finish
+
+	lseek(global_file, LSEEK_OFFSET_CAST 0, 0);
+	FB_UNUSED(write(global_file, &header, sizeof(header)));
+	close(global_file);
+	global_file = -1;
+
+	if (warning_counter)
+	{
+		printf("build_file: %d messages lack translations in locale %s\n",
+				  warning_counter, locale);
+	}
+
+	return FINI_OK;
+}
+
+
+static void propagate(msgnod** buckets, msgnod** nodes, ULONG prior_code, ULONG position)
+{
+/**************************************
+ *
+ *	p r o p a g a t e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Propagate a full bucket upward.
+ *
+ **************************************/
+
+	// Make sure current level has been allocated
+
+	if (!*nodes)
+	{
+		*nodes = *buckets = (msgnod*) gds__alloc((SLONG) MSG_BUCKET);
+		nodes[1] = NULL;
+	}
+
+	// Insert into current bucket
+
+	msgnod* node = (*nodes)++;
+	node->msgnod_code = prior_code;
+	node->msgnod_seek = position;
+
+	// Check for full bucket.  If not, we're done
+
+	const msgnod* const end = (msgnod*) ((SCHAR*) *buckets + MSG_BUCKET);
+
+	if (*nodes < end)
+		return;
+
+	// Bucket is full -- write it out, propagate the split, and re-initialize
+
+	position = write_bucket(*buckets, MSG_BUCKET);
+	propagate(buckets + 1, nodes + 1, prior_code, position);
+	*nodes = *buckets;
+}
+
+
+static SLONG write_bucket( const msgnod* bucket, USHORT length)
+{
+/**************************************
+ *
+ *	w r i t e _ b u c k e t
+ *
+ **************************************
+ *
+ * Functional description
+ *	Write stuff, return position of stuff written.
+ *
+ **************************************/
+	const USHORT padded_length = ROUNDUP(length, sizeof(SLONG));
+	const SLONG position = global_file_position;
+	int n = write(global_file, bucket, length);
+	if (n == -1)
+	{
+		fprintf(stderr, "IO error on write()\n");
+		exit(FINI_ERROR);
+	}
+
+	const SLONG zero_bytes = 0;
+	n = write(global_file, &zero_bytes, padded_length - length);
+	if (n == -1)
+	{
+		fprintf(stderr, "IO error on write()\n");
+		exit(FINI_ERROR);
+	}
+	global_file_position += padded_length;
+
+	return position;
+}
+
+
+static void sanitize( TEXT* locale)
+{
+/**************************************
+ *
+ *	s a n i t i z e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Clean up a locale to make it acceptable for use in file names
+ *	  for Windows NT: replace any period with '_'
+ *	  Keep this in sync with gds.cpp
+ *
+ **************************************/
+	while (*locale)
+	{
+		if (*locale == '.')
+			*locale = '_';
+		locale++;
+	}
+}

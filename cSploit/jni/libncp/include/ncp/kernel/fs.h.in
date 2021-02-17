@@ -1,0 +1,7 @@
+#ifndef _KERNEL_FS_H
+#define _KERNEL_FS_H
+
+@ncp_sys_mount_h@
+@ncp_linux_fs_h@
+
+#endif

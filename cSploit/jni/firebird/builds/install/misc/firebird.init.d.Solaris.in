@@ -1,0 +1,49 @@
+#!/bin/sh
+#
+
+# This script is also called indirectly by the CDE dtconfig command.
+# This file belongs in /etc/init.d where it will be run
+# on system startup and shutdown to start the background
+# Firebird database server daemon 
+
+mode=$1
+
+ISC_USER=sysdba
+ISC_PASSWORD=masterkey
+FIREBIRD=/usr/local/firebird
+RUN_USER=firebird
+
+export ISC_USER ISC_PASSWORD FIREBIRD
+
+usage_error() {
+      echo "  $0 start             (start Firebird SS server process)"
+      echo "  $0 stop              (stop Firebird SS server process)"
+      echo " "
+}
+
+if [ ! -d /usr/local/firebird ]
+then
+	echo "Firebird SS directory /usr/local/firebird does not exist!"
+	exit 1
+fi
+
+case "$mode" in
+
+'start')
+	echo "trying to start Firebird SS Server.."
+	/usr/bin/su - $RUN_USER -c "$FIREBIRD/bin/fbmgr -start -forever"
+	;;
+
+'stop') 	
+	echo "trying to stop Firebird SS Server.."
+	su - $RUN_USER -c "$FIREBIRD/bin/fbmgr -shut -user $ISC_USER -pass $ISC_PASSWORD"
+
+	;;
+
+*)
+	usage_error
+	exit 1
+	;;
+esac
+
+exit 0

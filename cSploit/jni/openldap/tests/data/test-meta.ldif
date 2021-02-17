@@ -1,0 +1,25 @@
+dn: ou=Meta,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Meta
+seeAlso: dc=OpenLDAP,dc=org
+
+dn: cn=John Belushi,ou=Meta,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: John Belushi
+sn: Belushi
+userPassword: jack
+description: Joliet Jack Blues
+
+dn: cn=Dan Aykroyd,ou=Meta,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Dan Aykroyd
+sn: Aykroyd
+userPassword: elwood
+description: Elwood Blues
+
+dn: cn=Somewhere,ou=Meta,dc=example,dc=com
+objectClass: referral
+objectClass: extensibleObject
+cn: Somewhere
+ref: ldap://localhost:9016
+

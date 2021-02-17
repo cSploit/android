@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="fb2control" ProjectGUID="{1AE02D41-7E24-43CC-9BCB-E4CEB6037D16}" Keyword="MFCProj">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Release|Win32" ConfigurationType="2" UseOfMFC="1" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" PreprocessorDefinitions="NDEBUG" MkTypLibCompatible="true" TargetEnvironment="1" />
+      <Tool Name="VCCLCompilerTool" Optimization="3" InlineFunctionExpansion="1" FavorSizeOrSpeed="2" PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;WINVER=0x400" RuntimeLibrary="0" UsePrecompiledHeader="0" BrowseInformation="1" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_AFXDLL;NDEBUG" Culture="1036" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" AdditionalDependencies="shlwapi.lib version.lib" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\system32\Firebird2Control.cpl" Version="1.0" LinkIncremental="1" ModuleDefinitionFile="..\..\..\src\utilities\fbcpl\FBControl.def" SubSystem="2" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+    <Configuration Name="Debug|Win32" OutputDirectory="$(SolutionDir)$(ConfigurationName)" ConfigurationType="2" UseOfMFC="1" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" PreprocessorDefinitions="_DEBUG" MkTypLibCompatible="true" TargetEnvironment="1" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" PreprocessorDefinitions="_DEBUG;_WINDOWS;WIN32;DEV_BUILD;_USRDLL;WINVER=0x400" RuntimeLibrary="1" BrowseInformation="1" UndefinePreprocessorDefinitions="TRACE" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_AFXDLL;_DEBUG" Culture="2057" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" AdditionalDependencies="shlwapi.lib version.lib" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\system32\Firebird2Control.cpl" Version="1.0" LinkIncremental="1" ModuleDefinitionFile="..\..\..\src\utilities\fbcpl\FBControl.def" SubSystem="2" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="Source Files" Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+      <File RelativePath="..\..\..\src\utilities\fbcpl\ctrlpan.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\FBControl.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\FBControl.def">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\FBDialog.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\FBPanel.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\install\services.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\StdAfx.cpp">
+        <FileConfiguration Name="Release|Win32">
+          <Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1" PrecompiledHeaderThrough="stdafx.h" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|Win32">
+          <Tool Name="VCCLCompilerTool" UsePrecompiledHeader="1" PrecompiledHeaderThrough="stdafx.h" />
+        </FileConfiguration>
+      </File>
+    </Filter>
+    <Filter Name="Header Files" Filter="h;hpp;hxx;hm;inl">
+      <File RelativePath="..\..\..\src\utilities\fbcpl\ctrlpan.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\FBControl.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\FBDialog.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\FBPanel.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\install\registry.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\Resource.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\install\servi_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\StdAfx.h">
+      </File>
+    </Filter>
+    <Filter Name="Resource Files" Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+      <File RelativePath="..\..\..\src\utilities\fbcpl\FBControl.rc">
+        <FileConfiguration Name="Release|Win32">
+          <Tool Name="VCResourceCompilerTool" AdditionalIncludeDirectories="" />
+        </FileConfiguration>
+        <FileConfiguration Name="Debug|Win32">
+          <Tool Name="VCResourceCompilerTool" AdditionalIncludeDirectories="" />
+        </FileConfiguration>
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\res\FBControl.rc2">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\res\server.ico">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\fbcpl\res\server_stop.ico">
+      </File>
+    </Filter>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

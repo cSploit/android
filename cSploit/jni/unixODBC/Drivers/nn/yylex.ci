@@ -1,0 +1,63 @@
+static keywd_ent_t	keywd_tab[] =
+{
+	kwd_select,	"select",
+	kwd_all,	"all",
+	kwd_news,	"news",
+	kwd_xnews,	"xnews",
+	kwd_distinct,	"distinct",
+	kwd_count,	"count",
+	kwd_from,	"from",
+	kwd_where,	"where",
+	kwd_group,	"group",
+	kwd_by, 	"by",
+	kwd_having,	"having",
+	kwd_order,	"order",
+	kwd_insert,	"insert",
+	kwd_into,	"into",
+	kwd_values,	"values",
+	kwd_delete,	"delete",
+	kwd_is, 	"is",
+	kwd_null,	"null",
+	kwd_update,	"update",
+	kwd_create,	"create",
+	kwd_alter,	"alter",
+	kwd_drop,	"drop",
+	kwd_for,	"for",
+	kwd_of, 	"of",
+	kwd_current,	"current",
+	kwd_grant,	"grant",
+	kwd_revoke,	"revoke",
+	kwd_in, 	"in",
+	kwd_like,	"like",
+	kwd_escape,	"escape",
+	kwd_between,	"between",
+	kwd_call,	"call",
+	kwd_or, 	"or",
+	kwd_and,	"and",
+	kwd_not,	"not",
+	kwd_index,	"index",
+	kwd_view,	"view",
+	kwd_table,	"table",
+	kwd_column,	"column",
+	kwd_case,	"case",
+	kwd_uncase,	"uncase"
+};
+
+static keywd_ent_t xkeywd_tab[] =
+/* keyword which scope in an extersion block -- { extension } */
+{
+	kwd_fn, 	"fn",
+	kwd_d,		"d"
+};
+
+static keywd_ent_t	cmpop_tab[] =
+{
+	en_cmpop_eq,	"=",
+	en_cmpop_eq,	"==",
+	en_cmpop_ne,	"<>",
+	en_cmpop_ne,	"!=",
+	en_cmpop_gt,	">",
+	en_cmpop_ge,	">=",
+	en_cmpop_lt,	"<",
+	en_cmpop_le,	"<="
+};

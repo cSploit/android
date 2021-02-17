@@ -1,0 +1,147 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/ur.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/ur.xml
+ */
+ur{
+    ExemplarCharacters{
+        "[أ ؤ ا آ ب پ ت ٹ ث ج چ ح خ د ڈ ذ ر ڑ ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں و ہ"
+        " ی ء ئ ے ٻ ة ٺ ټ ٽ ه ھ ي]"
+    }
+    LocaleScript{
+        "Arab",
+    }
+    NumberElements{
+        ".",
+        ",",
+        ";",
+        "%",
+        "0",
+        "#",
+        "-",
+        "E",
+        "‰",
+        "∞",
+        "NaN",
+        "+",
+    }
+    NumberPatterns{
+        "#,##0.###",
+        "¤#,##0.00",
+        "#,##0%",
+        "#E0",
+    }
+    Version{"2.0.47.65"}
+    calendar{
+        gregorian{
+            DateTimePatterns{
+                "h:mm:ss a zzzz",
+                "h:mm:ss a z",
+                "h:mm:ss a",
+                "h:mm a",
+                "EEEE, d, MMMM y",
+                "d, MMMM y",
+                "d, MMM y",
+                "d/M/yy",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            dayNames{
+                format{
+                    wide{
+                        "اتوار",
+                        "پير",
+                        "منگل",
+                        "بده",
+                        "جمعرات",
+                        "جمعہ",
+                        "ہفتہ",
+                    }
+                }
+            }
+            eras{
+                abbreviated{
+                    "ق م",
+                    "عيسوی سن",
+                }
+                wide{
+                    "قبل مسيح",
+                    "عيسوی سن",
+                }
+            }
+            fields{
+                day{
+                    relative{
+                        "-1"{"کل"}
+                        "0"{"آج"}
+                        "1"{"کل"}
+                    }
+                }
+                dayperiod{
+                    dn{"رات/صبح"}
+                }
+            }
+            monthNames{
+                format{
+                    wide{
+                        "جنوری",
+                        "فروری",
+                        "مار چ",
+                        "اپريل",
+                        "مئ",
+                        "جون",
+                        "جولائ",
+                        "اگست",
+                        "ستمبر",
+                        "اکتوبر",
+                        "نومبر",
+                        "دسمبر",
+                    }
+                }
+            }
+            quarters{
+                format{
+                    wide{
+                        "پہلی سہ ماہی",
+                        "دوسری سہ ماہی",
+                        "تيسری سہ ماہی",
+                        "چوتهی سہ ماہی",
+                    }
+                }
+            }
+        }
+        islamic{
+            monthNames{
+                format{
+                    wide{
+                        "محرم",
+                        "صفر",
+                        "ر بيع الاول",
+                        "ر بيع الثانی",
+                        "جمادی الاول",
+                        "جمادی الثانی",
+                        "رجب",
+                        "شعبان",
+                        "رمضان",
+                        "شوال",
+                        "Dhuʻl-Qiʻdah",
+                        "Dhuʻl-Hijjah",
+                    }
+                }
+            }
+        }
+    }
+    layout{
+        characters{"right-to-left"}
+        lines{"top-to-bottom"}
+    }
+}

@@ -1,0 +1,14 @@
+# dc=example,dc=com naming context
+dn: dc=example,dc=com
+objectClass: domain
+objectClass: domainRelatedObject
+dc: example
+associatedDomain: example.com
+
+dn: cn=Geographical Naming Contexts,dc=example,dc=com
+objectClass: groupOfNames
+cn: Geographical Naming Contexts
+member: o=Example,c=US
+member: o=Example,c=UK
+member: o=Esempio,c=IT
+

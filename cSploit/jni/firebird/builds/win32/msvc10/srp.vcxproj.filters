@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\defs\plugin.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source files">
+      <UniqueIdentifier>{ae75b2f0-6301-43d5-ac84-b552b3f9b1fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{8a20ce21-8fe2-4921-bdf3-9e65efd23d2a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\auth\SecureRemotePassword\manage\SrpManagement.cpp">
+      <Filter>Source files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

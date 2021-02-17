@@ -1,0 +1,293 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+define database "msg.fdb"
+	page_size 1024;
+
+
+/*	Global Field Definitions	*/
+
+define field ACTION blob;
+define field CHANGE_DATE date;
+define field CHANGE_NUMBER long;
+define field CHANGE_WHO varying [32];
+define field CLASS char [10];
+define field DESCRIPTION blob segment_length 80;
+define field EXPLANATION blob;
+define field FACILITY char [10];
+define field FAC_CODE short;
+define field FILE varying [30];
+define field FLAGS short;
+define field LANGUAGE varying [10];
+define field LAST_CHANGE date;
+define field LOCALE varying [20];
+define field MAX_NUMBER short;
+define field MODULE varying [32];
+define field NUMBER short;
+define field OLD_SEQUENCE short;
+define field QLI$PROCEDURE blob segment_length 80 sub_type text
+	system_flag 2;
+define field QLI$PROCEDURE_NAME char [31]
+	system_flag 2;
+define field ROUTINE varying [32];
+define field SEQUENCE short;
+define field SEVERITY short;
+define field SEVERITY_TEXT char [7];
+define field SQL_CODE short;
+define field SYMBOL varying [32];
+define field TEMPLATE blob segment_length 256;
+define field TEXT varying [118];
+define field TRANSLATOR varying [32];
+define field TRANS_DATE date;
+define field TRANS_NOTES blob;
+define field TYPE char [12];
+define field VALUE long;
+define field VMS_CODE long;
+
+
+/*	Relation Definitions	*/
+
+
+define relation FACILITIES
+    FACILITY	position 0,
+    FAC_CODE	position 1,
+    MAX_NUMBER	position 2,
+    LAST_CHANGE;
+
+define relation HISTORY
+    CHANGE_NUMBER	position 1,
+    CHANGE_WHO	position 2,
+    CHANGE_DATE	position 3,
+    FAC_CODE	position 5,
+    NUMBER	position 6,
+    OLD_TEXT based on TEXT	position 7,
+    OLD_ACTION based on ACTION	position 8,
+    OLD_EXPLANATION based on EXPLANATION	position 9,
+    LOCALE	position 10,
+    CODE computed by (fac_code * 10000 + number)	position 4;
+
+define relation LOCALES
+    LOCALE	position 1,
+    DESCRIPTION	position 2;
+
+define relation MESSAGES
+    FAC_CODE	position 1,
+    NUMBER	position 2,
+    FLAGS	position 3,
+    TEXT	position 4,
+    ACTION	position 5,
+    EXPLANATION	position 6,
+    SQL_CODE	position 7,
+    SEVERITY_TEXT	position 8,
+    SEVERITY	position 9,
+    VMS_CODE	position 10,
+    MODULE,
+    ROUTINE,
+    SYMBOL,
+    TRANS_NOTES,
+    CODE computed by (fac_code * 10000 + number)	position 0;
+
+define relation QLI$PROCEDURES
+	system_flag 2
+    QLI$PROCEDURE_NAME	position 0
+	system_flag 2,
+    QLI$PROCEDURE	position 1
+	system_flag 2;
+
+define relation SYMBOLS
+    SYMBOL	position 0,
+    VALUE	position 1,
+    CLASS	position 2,
+    TYPE	position 3,
+    SEQUENCE	position 4;
+
+define relation TEMPLATES
+    LANGUAGE	position 1,
+    FILE	position 2,
+    TEMPLATE	position 3;
+
+define relation TRANSMSGS
+    FAC_CODE	position 2,
+    NUMBER	position 3,
+    LOCALE	position 4,
+    TEXT	position 5,
+    ACTION	position 6,
+    EXPLANATION	position 7,
+    TRANSLATOR	position 8,
+    TRANS_DATE	position 9,
+    ENG_ACTION based on ACTION,
+    ENG_EXPLANATION based on EXPLANATION,
+    ENG_TEXT based on TEXT,
+    CODE computed by (fac_code * 10000 + number)	position 1;
+
+
+/*	View Definitions	*/
+
+
+define view MAJOR_CODES of m in messages with
+	m.fac_code = 0 and m.code < 64 and m.symbol not missing
+        M.SQL_CODE	position 1,
+    M.CODE	position 2,
+    M.SYMBOL	position 3,
+    GDS_TEXT FROM M.TEXT	position 4,
+    APOLLO_TEXT FROM M.TEXT	position 5,
+    M.EXPLANATION	position 6,
+    M.ACTION	position 7,
+    M.SEVERITY	position 8,
+    M.SEVERITY_TEXT	position 9,
+    M.VMS_CODE	position 10;
+
+define view MINOR_CODES of m in messages with
+	m.fac_code = 0 and m.code >= 64 and m.symbol not missing
+        M.CODE	position 1,
+    M.SYMBOL	position 2,
+    GDS_TEXT FROM M.TEXT	position 3,
+    APOLLO_TEXT FROM M.TEXT	position 4,
+    M.EXPLANATION	position 5,
+    M.ACTION	position 6,
+    M.SEVERITY	position 7,
+    M.VMS_CODE	position 8;
+
+
+/*	Index Definitions	*/
+
+
+define index FAC_1 for FACILITIES unique
+	FAC_CODE;
+
+define index FAC_2 for FACILITIES unique
+	FACILITY;
+
+define index UNIQUE_LOCALES for LOCALES unique
+	LOCALE;
+
+define index MSG_1 for MESSAGES unique
+	FAC_CODE,
+	NUMBER;
+
+define index SYM1 for SYMBOLS 
+	CLASS,
+	TYPE;
+
+define index SYM2 for SYMBOLS unique
+	SYMBOL;
+
+define index TMSG_1 for TRANSMSGS unique
+	LOCALE,
+	FAC_CODE,
+	NUMBER;
+
+
+/*	Generator Definitions	*/
+
+
+define generator CHANGE_NUM;
+
+/*	Trigger Definitions	*/
+
+
+
+define trigger FACILITIES$MODIFY for FACILITIES
+	pre modify 0:
+begin
+	new.last_change = 'now';
+    end;
+
+	end_trigger;
+
+define trigger FACILITIES$STORE for FACILITIES
+	pre store 0:
+begin
+	new.last_change = 'now';
+    end;
+
+	end_trigger;
+
+define trigger MESSAGES$MODIFY for MESSAGES
+	post modify 0:
+begin
+	for f in facilities with f.fac_code = new.fac_code
+	    modify f using
+		f.last_change = 'now';
+	    end_modify;
+	end_for;
+    end;
+
+
+	end_trigger;
+
+define trigger MSGS$MODIFY for MESSAGES
+	post modify 1:
+begin
+   if (new.text ne old.text)
+      begin
+         store h in history using
+            h.change_number = gen_id(change_num, 1);
+            h.change_date   = "now";
+            h.change_who    = rdb$user_name;
+            h.fac_code      = old.fac_code;
+            h.number        = old.number;
+            h.old_text      = old.text;
+ 	    h.old_action    = old.action;
+ 	    h.old_explanation = old.explanation
+            h.locale        = "c_pg";
+         end_store;
+      end;
+end;
+
+	
+	end_trigger;
+
+define trigger TRANSMSGS$MODIFY for TRANSMSGS
+	post modify 0:
+begin
+   if (new.text ne old.text)
+      begin
+         store h in history using
+            h.change_number = gen_id(change_num, 1);
+            h.change_date   = "now";
+            h.change_who    = rdb$user_name;
+            h.fac_code      = old.fac_code;
+            h.number        = old.number;
+            h.old_text      = old.text;
+ 	    h.old_action    = old.action;
+ 	    h.old_explanation = old.explanation
+            h.locale        = old.locale;
+         end_store;
+      end;
+end;
+
+	
+	end_trigger;
+
+define trigger TRANSMSGS$STORE for TRANSMSGS
+	pre store 0:
+begin
+   if (new.translator missing)
+	   new.translator = rdb$user_name;
+   if (new.trans_date missing)
+	   new.trans_date = "now";
+   if (new.locale missing)
+	   abort 1;
+   if (not any t in locales with t.locale = new.locale)
+	   abort 2;
+end;
+
+	end_trigger 
+	message  1:  'LOCALE must be present',
+	message  2:  'Unknown locale name';

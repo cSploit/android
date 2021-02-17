@@ -1,0 +1,99 @@
+#!/usr/bin/ruby -w
+=begin
+This approach doesn't work well when the options found can differ by platform.
+
+At least for defines, there need to be ifdef guards around them. PF_ defines, for example, vary
+across libc.
+=end
+
+pattern = ARGV.shift
+
+RXDEF = %r{^\s*(?:[#]\s*define)?\s*#{pattern}_(\w+)(.*)}
+RXDOC = %r{/[/*](.*)}
+
+
+OPTS = []
+
+ARGF.each do |line|
+  next unless line =~ RXDEF
+
+  name = $1
+  doc  = nil
+
+  if $2 =~ RXDOC
+    doc = $1.gsub(/\*\/.*/, "").strip
+  end
+
+  #p [name, doc, line]
+
+  next if name == "MAX"
+
+  cname = pattern + "_" + name
+  lname = name.gsub(/_/, "-").downcase
+
+=begin
+Catch cases like:
+
+enum
+  {
+      IPPROTO_IP = 0,        /* Dummy protocol for TCP.  */
+#define IPPROTO_IP              IPPROTO_IP
+=end
+
+  if OPTS.last and OPTS.last[1] == cname
+    if not OPTS.last[2]
+      OPTS.last[2] = doc
+    end
+    next
+  end
+
+  OPTS << [lname, cname, doc]
+
+  #p OPTS.last
+end
+
+width = 10
+
+OPTS.each do |lname, cname, doc|
+  if lname.size > width
+    width = lname.size + 2
+  end
+end
+
+puts "-- DOCUMENTATION"
+
+OPTS.each do |lname, cname, doc|
+  line = "  #{lname}#{" " * (width - lname.size)}-- #{cname}"
+  if doc
+    line << ", #{doc}"
+  end
+  puts line
+end
+
+puts""
+puts""
+
+puts "static const char* " + pattern + "_opts[] = {"
+
+OPTS.each do |lname, cname, doc|
+  puts "  #{lname.inspect},"
+end
+puts "  NULL"
+puts "};"
+
+puts "static int " + pattern + "_vals[] = {"
+OPTS.each do |lname, cname, doc|
+  puts "  #{cname},"
+end
+puts "};"
+puts "static int " + pattern + "_vals_size = " + OPTS.size.to_s + ";" # cvt to sizeof(pattern _vals) / sizeof(pattern _vals[0])
+
+puts <<__
+static int check_#{pattern}(lua_State* L, int argn)
+{
+  int opt = luaL_checkoption(L, argn, NULL /* default? */, #{pattern}_opts);
+  int val = #{pattern}_vals[opt];
+  return val;
+}
+__
+

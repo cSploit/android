@@ -1,0 +1,714 @@
+INTERNET-DRAFT                                        Kurt D. Zeilenga
+Intended Category: Standards Track                 OpenLDAP Foundation
+Extends: draft-ietf-ldapext-ldap-c-api-03.txt
+Expires: 28 March 2000
+                                                     28 September 1999
+
+                    LDAP C API Concurrency Extensions
+              <draft-zeilenga-ldap-c-api-concurrency-00.txt>
+
+1.   Status of this Memo
+
+  This document is an Internet-Draft and is in full conformance with all
+  provisions of Section 10 of RFC2026.
+
+  This draft document will be submitted to the RFC Editor as a Standards
+  Track document. Distribution of this memo is unlimited.  Technical
+  discussion of this document will take place on the IETF LDAP Extension
+  Working Group mailing list <ietf-ldapext@netscape.com>.  Please send
+  editorial comments directly to the author <Kurt@OpenLDAP.org>.
+
+  Internet-Drafts are working documents of the Internet Engineering Task
+  Force (IETF), its areas, and its working groups.  Note that other
+  groups may also distribute working documents as Internet-Drafts.
+
+  Internet-Drafts are draft documents valid for a maximum of six months
+  and may be updated, replaced, or obsoleted by other documents at any
+  time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as "work in progress."
+
+  The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/ietf/1id-abstracts.txt
+
+  The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html.
+
+  Copyright 1999, The Internet Society.  All Rights Reserved.
+
+  Please see the Copyright section near the end of this document for
+  more information.
+
+2.   Abstract
+
+  This document defines extensions to the LDAP C API to support use in
+  concurrent execution environments.  The document describes and defines
+
+Zeilenga                                                        [Page 1]
+
+INTERNET-DRAFT      LDAP C API Concurrency Extensions  28 September 1999
+
+  requirements for multiple concurrency levels: thread safe, session
+  thread safe, and operation thread safe.
+
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED",  and "MAY" in this document are
+  to be interpreted as described in RFC 2119 [KEYW].
+
+3.   Introduction
+
+  This document extends the LDAP C API [CAPI] specification to support
+  use in concurrent execution environments.  The extensions add powerful
+  concurrent processing capabilities to the simple to use CAPI.  This
+  document provides an overview of different levels of concurrent
+  execution support and offers a number of CAPI "features" to provide
+  capabilities at these levels.
+
+  The remainder of this section describes three levels of concurrent
+  execution: thread safe, session thread safe, operation thread safe
+  APIs.
+
+3.1. Thread Safe
+
+  An implementation which allows applications to safely execute in
+  concurrent execution environments where the application provides
+  necessary synchronization to ensure serialization of CAPI usage is
+  considered to be "thread safe."   Applications may execute non-CAPI
+  calls in concurrent execution contexts when using thread safe
+  implementations.
+
+3.2. Session Thread Safe
+
+  A "thread safe" implementation which allows CAPI calls associated with
+  different LDAP sessions to proceed asychronously is considered to be
+  "session thread safe."
+
+3.3. Operation Thread Safe
+
+  A "session thread safe" implementation which allows CAPI calls
+  associated with different LDAP operations to proceed asychronously is
+  considered to be "operation thread safe".
+
+4.   Basic Thread Safe Feature
+
+Zeilenga                                                        [Page 2]
+
+INTERNET-DRAFT      LDAP C API Concurrency Extensions  28 September 1999
+
+  This section details requirements for the thread safe CAPI feature.
+  Implementations fulfilling these requirements are said to support the
+  LDAP_API_FEATURE_THREAD_SAFE feature and SHOULD advertise this support
+  as detailed below.  This feature SHOULD be provided by
+  implementations.
+
+  Implementations of this feature MUST implement the LDAP error handling
+  extension [ERRNO].
+
+  Implementations of this feature MUST allow non-CAPI calls to proceed
+  asynchronously.
+
+  Implementations of this feature MUST NOT use any non-thread safe call
+  or mechanism provided by C environment or operating system.  An
+  example of non-reentrant calls is the UNIX strtok() function.  Example
+  of a non-reentrant mechanism is global (i.e.: non-thread specific)
+  errno.
+
+5.   Session Thread Safe Feature
+
+  This section details requirements for the session thread safe CAPI
+  feature.  Implementations fulfilling these requirements are said to
+  support the LDAP_API_FEATURE_SESSION_THREAD_SAFE feature and SHOULD
+  advertise this support as detailed below.  This feature is
+  RECOMMENDED.
+
+5.1. Prerequisite Features
+
+  Implementations providing this feature MUST provide and advertise both
+  LDAP_API_FEATURE_CONTEXT_SPECIFIC_ERRNO [ERRNO] and
+  LDAP_API_FEATURE_THREAD_SAFE.
+
+5.2. Atomic Session Handles
+
+  Implementations providing this feature SHOULD ensure that operations
+  upon a given session handle are atomic.  Implementations which provide
+  atomic session handles SHOULD advertise the feature
+  LDAP_API_FEATURE_ATOMIC_SESSION_HANDLES.
+
+5.3. Concurrency Requirements
+
+  Implementations providing this feature MUST not restrict CAPI calls
+  acting upon a given LDAP session to a particular execution context.
+  Applications MAY use a session handle on any thread.  Applications
+
+Zeilenga                                                        [Page 3]
+
+INTERNET-DRAFT      LDAP C API Concurrency Extensions  28 September 1999
+
+  MUST NOT assume that operations upon a session are atomic.
+
+  Implementations providing this feature MUST allow CAPI calls acting
+  upon different LDAP sessions to safely proceed asynchronously.
+
+  Implementations providing this feature MUST allow CAPI calls not
+  acting upon an LDAP session to safely proceed asynchronously.
+
+6.   Operation Thread Safe Feature
+
+  This section details requirements for the operation thread safe CAPI
+  feature based upon a duplicate session handles mechanism.
+
+  Implementations fulfilling these requirements are said to support the
+  LDAP_API_FEATURE_DUPLICATE_SESSION_HANDLES feature and SHOULD
+  advertise this support as detailed below.  This feature is OPTIONAL.
+
+6.1. Prerequisite Features
+
+  Implementations of this feature MUST provide and advertise
+  LDAP_API_FEATURE_CONTEXT_SPECIFIC_ERRNO [ERRNO],
+  LDAP_API_FEATURE_THREAD_SAFE, LDAP_API_FEATURE_SESSION_THREAD_SAFE,
+  and LDAP_API_FEATURE_ATOMIC_SESSION_HANDLES.
+
+6.2. Duplicated Session Handles
+
+  Implementations of this feature MUST support duplicated session
+  handles.
+
+  As defined in CAPI, a session handle refers to an LDAP session
+  encompassing connections with one or more servers, associated message
+  results, a set of properties (options), and state information.  This
+  feature provides a mechanism for a handle to be duplicated.  A session
+  handle and its duplicates are considered siblings.  Each sibling
+  session handle refers to the same LDAP session and message results.
+  Some properties and state are specific to a handle and others shared
+  between siblings as detailed below.
+
+  CAPI calls made on a handle are atomic.  Calls made on sibling (or
+  other) handles MAY proceed asynchronously.
+
+  Session handles are duplicated using ldap_dup() and destroyed using
+  ldap_destroy().  Use of duplicated session handles with CAPI calls
+  have the following semantics detailed in the sections below.
+
+Zeilenga                                                        [Page 4]
+
+INTERNET-DRAFT      LDAP C API Concurrency Extensions  28 September 1999
+
+6.2.1.    Creating and Destroying duplicated sessions
+
+  Implementations of this feature are required to provide two new
+  routines:      LDAP *ldap_dup( ld );      int ldap_destroy( ld );
+
+  Parameters are:      ld      The session handle
+
+  The ldap_dup() function returns a duplicate of a session handle.  The
+  returned session handle may be used concurrently with the original
+  session handle as described below. ldap_dup returns NULL if it is not
+  able to duplicate the session handle and sets LDAP_OPT_ERROR_NUMBER
+  and ldap_errno indicating the nature of the failure.
+
+  The ldap_destroy() function destroys the session handle.  If the
+  session handle has no siblings, ldap_destroy behaves exactly like
+  ldap_unbind.  If the session handle has siblings, the resources
+  assocated with the handle are released and the siblings remain valid.
+  ldap_destroy() returns LDAP_SUCCESS or an error number indicating the
+  nature of failure.  Regardless of returned value, the handle SHOULD be
+  considered invalid and MUST not be used in subsequent calls.  Attempts
+  to use a destroyed session handle MUST NOT result in
+  LDAP_INVALID_SESSION error being reported.  Implementations SHOULD
+  report LDAP_PARAM_ERROR in such cases.
+
+6.2.2.    ldap_unbind and siblings
+
+  When ldap_unbind() is called on a session handle with siblings, the
+  siblings become invalid.  The siblings must be destroyed using
+  ldap_destroy().  All attempts to obtain the siblings'
+  LDAP_OPT_ERROR_NUMBER will return LDAP_INVALID_SESSION.  Any use other
+  than ldap_destroy() or reading LDAP_OPT_ERROR_NUMBER will fail with an
+  LDAP_INVALID_SESSION error being reported.
+
+6.2.3.    ldap_result()
+
+  Message queues are shared between siblings.  Results of operations on
+  a duplicated session handles are accessible to all sibling session
+  handles.
+
+  Applications desiring results associated with a specific operation
+  SHOULD provide the appropriate msgid to ldap_result().  Applications
+  SHOULD avoid calling ldap_result() with LDAP_RES_ANY as such may
+  "steal" and return results which an operation on a sibling requires to
+  complete.
+
+Zeilenga                                                        [Page 5]
+
+INTERNET-DRAFT      LDAP C API Concurrency Extensions  28 September 1999
+
+6.2.4.    Session Options
+
+  The following CAPI options access values shared between siblings:
+
+       LDAP_OPT_API_INFO      LDAP_OPT_DESC      LDAP_OPT_REFERRALS
+       LDAP_OPT_PROTOCOL_VERSION      LDAP_OPT_API_FEATURE_INFO
+       LDAP_OPT_HOST_NAME
+
+  The following CAPI options access values specific to a sibling:
+
+       LDAP_OPT_DEREF      LDAP_OPT_SIZELIMIT      LDAP_OPT_TIMELIMIT
+       LDAP_OPT_RESTART      LDAP_OPT_CLIENT_CONTROLS
+       LDAP_OPT_SERVER_CONTROLS      LDAP_OPT_ERROR_NUMBER
+       LDAP_OPT_ERROR_STRING      LDAP_OPT_MATCHED_DN
+
+6.2.4.1.  LDAP_OPT_SESSION_REFCNT
+
+  In addition, implementations MUST provide the READ-ONLY, shared
+  LDAP_OPT_SESSION_REFCNT option.  LDAP_OPT_SESSION_REFCNT returns the
+  reference count associated with the supplied session handle argument.
+  The session handle argument is required. The outvalue argument should
+  be a pointer to an integer.  Example use:
+
+      int refcount(LDAP *ld) {
+
+      #ifdef LDAP_OPT_SESSION_REFCNT
+
+        if(ld != NULL) {
+          int refcnt, rc;
+          rc = ldap_get_option(ld,
+              LDAP_OPT_SESSION_REFCNT, &refcnt);
+
+          if(rc == LDAP_OPT_SUCCESS) {
+            return refcnt;
+          }
+        }
+
+      #endif
+
+        return -1;
+      }
+
+7.   Advertising Features
+
+  This document REQUIRES that supported features with the name in the
+  form LDAP_API_FEATURE_x be advertised to consumers of the CAPI as
+
+Zeilenga                                                        [Page 6]
+
+INTERNET-DRAFT      LDAP C API Concurrency Extensions  28 September 1999
+
+  follows:
+
+       SHOULD provide the macro LDAP_API_FEATURE_x with the value
+       of 1000 + revision number of this draft (i.e.: 1000+0 for
+       this 0 revision of the draft).
+
+       MUST provide the CAPI extension "x" when returning API
+       information upon LDAP_OPT_API_INFO option access, and
+
+       MUST provide feature info for "x" via LDAP_OPT_FEATURE_INFO
+       option mechanism.  The feature version provided MUST      match
+  the value LDAP_API_FEATURE_x macro
+
+  where x is replaced appropriately.
+
+  As implementations may not provide macros for all features,
+  applications SHOULD use LDAP_OPT_API_INFO to determine which features
+  are provided by a given implementation.
+
+8.   Changes to the C API specification
+
+8.1. New Symbols
+
+  This extension introduces the following macros:
+
+       LDAP_API_FEATURE_ATOMIC_SESSION_HANDLES
+       LDAP_API_FEATURE_DUPLICATE_SESSION_HANDLES
+       LDAP_API_FEATURE_SESSION_THREAD_SAFE
+       LDAP_API_FEATURE_THREAD_SAFE
+       LDAP_API_FEATURE_OPERATION_THREAD_SAFE      LDAP_INVALID_SESSION
+       LDAP_OPT_SESSION_REFCNT
+
+  This extension introduces these new functions:
+
+       ldap_destroy()      ldap_dup()
+
+  This extension introduces no new typedefs nor structure names.
+
+8.2. Duplicated Session Handles
+
+  This extension introduces duplicated session handles and requirements
+  for handling duplicated session handles.  Semantics of non-duplicated
+  session handles are not affected by this introduction.  However, the
+  semantics of calls upon duplicate session handles differs as described
+  in the extension.
+
+Zeilenga                                                        [Page 7]
+
+INTERNET-DRAFT      LDAP C API Concurrency Extensions  28 September 1999
+
+9.   Security Considerations
+
+  None taken, none given.
+
+10.  Copyright
+
+  Copyright 1999, The Internet Society.  All Rights Reserved.
+
+  This document and translations of it may be copied and furnished to
+  others, and derivative works that comment on or otherwise explain it
+  or assist in its implementation may be prepared, copied, published and
+  distributed, in whole or in part, without restriction of any kind,
+  provided that the above copyright notice and this paragraph are
+  included on all such copies and derivative works.  However, this
+  document itself may not be modified in any way, such as by removing
+  the copyright notice or references to the Internet Society or other
+  Internet organizations, except as needed for the  purpose of
+  developing Internet standards in which case the procedures for
+  copyrights defined in the Internet Standards process must be followed,
+  or as required to translate it into languages other than English.
+
+  The limited permissions granted above are perpetual and will not be
+  revoked by the Internet Society or its successors or assigns.
+
+  This document and the information contained herein is provided on an
+  "AS IS" basis and THE AUTHORS, THE INTERNET SOCIETY, AND THE INTERNET
+  ENGINEERING TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED,
+  INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+  INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+  WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+11.  Bibliography
+
+  [CAPI]  M. Smith, T. Howes, A. Herron, M. Wahl, A. Anantha,      "The
+  C LDAP Application Program Interface", INTERNET-DRAFT,      <draft-
+  ietf-ldapext-ldap-c-api-03.txt> + LDAPext discussions,      June 1999.
+
+  [ERRNO] K. Zeilenga, "LDAP C API Error Reporting Extension",
+       INTERNET-DRAFT, <draft-zeilenga-ldap-c-api-errno-00.txt>,
+       June 1999.
+
+  [KEYW]  S. Bradner, "Key words for use in RFCs to Indicate
+       Requirement Levels", RFC 2119, March 1997.
+
+Zeilenga                                                        [Page 8]
+
+INTERNET-DRAFT      LDAP C API Concurrency Extensions  28 September 1999
+
+  [LDAP]  M. Wahl, T. Howes, S. Kille, "Lightweight Directory
+       Access Protocol (v3)", RFC 2251, December 1997.
+
+13.  Author's Address
+
+  Kurt D. Zeilenga
+  OpenLDAP Foundation
+  <Kurt@OpenLDAP.org>
+
+  This document expires on 28 March 2000.
+
+Zeilenga                                                        [Page 9]
+
+    ---------------------------------------------------------------------
+
+INTERNET-DRAFT                                        Kurt D. Zeilenga
+Intended Category: Standards Track                 OpenLDAP Foundation
+Extends: draft-ietf-ldapext-ldap-c-api-03.txt
+Expires: 28 March 2000
+                                                     28 September 1999
+
+                   LDAP C API Error Reporting Extension
+                 <draft-zeilenga-ldap-c-api-errno-00.txt>
+
+1.   Status of this Memo
+
+  This document is an Internet-Draft and is in full conformance with all
+  provisions of Section 10 of RFC2026.
+
+  This draft document will be submitted to the RFC Editor as a Standards
+  Track document. Distribution of this memo is unlimited.  Technical
+  discussion of this document will take place on the IETF LDAP Extension
+  Working Group mailing list <ietf-ldapext@netscape.com>.  Please send
+  editorial comments directly to the author <Kurt@OpenLDAP.org>.
+
+  Internet-Drafts are working documents of the Internet Engineering Task
+  Force (IETF), its areas, and its working groups.  Note that other
+  groups may also distribute working documents as Internet-Drafts.
+
+  Internet-Drafts are draft documents valid for a maximum of six months
+  and may be updated, replaced, or obsoleted by other documents at any
+  time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as ``work in progress.''
+
+  The list of current Internet-Drafts can be accessed at
+  http://www.ietf.org/ietf/1id-abstracts.txt
+
+  The list of Internet-Draft Shadow Directories can be accessed at
+  http://www.ietf.org/shadow.html.
+
+  Copyright 1999, The Internet Society.  All Rights Reserved.
+
+  Please see the Copyright section near the end of this document for
+  more information.
+
+2.   Abstract
+
+  This document defines a manatory extension to the LDAP C API to
+  provide error reporting for all API calls.  The mechanism is
+  nonintrusive and can, optionally, support concurrent execution
+  environments.
+
+Zeilenga                                                        [Page 1]
+
+INTERNET-DRAFT    LDAP C API Error Reporting Extension 28 September 1999
+
+  The key words ``MUST'', ``MUST NOT'', ``REQUIRED'', ``SHALL'', ``SHALL
+  NOT'', ``SHOULD'', ``SHOULD NOT'', ``RECOMMENDED'',  and ``MAY'' in
+  this document are to be interpreted as described in RFC 2119 [KEYW].
+
+3.   Background and Intent of Use
+
+  The LDAP [LDAP] C API [CAPI] provides an interface which (due to
+  legacy compatibiity issues) does not provide a consistent mechanism
+  for reporting errors.  A large number of the calls within the
+  specification have no mechanism to indicate the nature of a failure.
+  The usefulness of a CAPI without a consistent, easy to use, error
+  reporting mechanism is limited.
+
+  This document defines an mandatory extension to the CAPI.  All
+  implementations of the CAPI MUST provide this extension.
+
+  The extension details additional requirements for error reporting.
+  Implementations MUST fulfill all other CAPI error reporting
+  requirements.
+
+4.   Error Handling Extension
+
+  This extension provides a mechanism that applications MAY use to
+  obtain an LDAP error number indicating the nature of the failure
+  associated with the last failed CAPI call.
+
+  Implementations MUST provide access to an LDAP error number (CAPI,
+  Section 9) resulting from the last failed CAPI call via the symbol
+  ldap_errno.  The last failed CAPI call may be within the global
+  context or within the current execution context.
+
+  The ldap_errno MUST evaluate to a modifiable lvalue that has type
+  'int', the value of which is set to a LDAP error number.  It is
+  unspecified whether ldap_errno is a macro or an identifier declared
+  with external linkage.  If a macro definition is suppressed in order
+  to access an actual object, or a program defines an identifier with
+  the name ldap_errno, the behavior is undefined.
+
+  Applications MUST access ldap_errno within the same concurrent
+  execution context, commonly a thread, in which the failure occurred.
+  The value of ldap_errno is LDAP_SUCCESS (0) if no API failure has
+  occurred within the supported context and the user has not assigned a
+  value within the supported context.
+
+Zeilenga                                                        [Page 2]
+
+INTERNET-DRAFT    LDAP C API Error Reporting Extension 28 September 1999
+
+  Implementations SHALL NOT update the ldap_errno value upon successful
+  CAPI call completion.
+
+  Implementations providing a current execution context specific
+  ldap_errno MUST advertise the feature LDAP_API_CONTEXT_SPECIFIC_ERRNO
+  as described in Section 6.  Implementation of
+  LDAP_API_CONTEXT_SPECIFIC_ERRNO is RECOMMENDED.
+
+4.1. Reporting Server Errors
+
+  It is not a CAPI failure for a server to return an error number.
+  Implementations SHALL NOT assign error results returned by servers to
+  ldap_errno.
+
+4.2. Implementation Specific Reporting
+
+  The CAPI specification stated that the caller may obtain an indication
+  of failure of certain calls (see listed below) using implementation
+  specific and/or operating system specific requirements.
+  Implementations are NOT REQUIRED to support any implementation
+  specific and/or operating system mechanism for ANY call detailed by
+  the CAPI specification or its extensions.
+
+  Affected calls include ldap_init(), ldap_open(), and ber_*().
+
+4.3. Example
+
+  The following is an example showing how an application may obtain the
+  error information resulting from a failed CAPI calls:
+
+    int msgid;
+    LDAP *ld = ldap_init("localhost", 389);
+
+    if(ld == NULL) {
+      printf("ldap_init failed, ldap_errno=%d (%s)\n",
+        ldap_errno, ldap_err2string(ldap_errno));
+
+      printf("unable to initialize LDAP session\n");
+      return -1;
+    }
+
+    msgid = ldap_simple_bind(ld, NULL, NULL);
+
+    if(msgid == -1) {
+      int err = ldap_errno;
+
+      if (err != LDAP_SUCCESS ) {
+
+Zeilenga                                                        [Page 3]
+
+INTERNET-DRAFT    LDAP C API Error Reporting Extension 28 September 1999
+
+        /* API failure */
+        printf("ldap_simple_bind failure: ldap_errno=%d (%s)\n",
+          err, ldap_err2string(err));
+
+      } else {
+        int lderr, rc;
+
+        printf("ldap_simple_bind failed\n");
+
+        rc = ldap_get_option(ld,
+          LDAP_OPT_ERROR_NUMBER, &lderr);
+
+        if(rc == LDAP_OPT_SUCCESS) {
+          printf("  reason=%d (%s)\n",
+            lderr, ldap_err2string(lderr));
+
+        } else {
+          printf("ldap_get_option failed, ldap_errno=%d (%s)\n",
+            ldap_errno, ldap_err2string(ldap_errno));        }
+      }
+
+      goto unbind;
+    }
+
+    /* ... */
+
+    unbind: if(ldap_unbind(ld) != 0) {
+      printf("ldap_unbind failed, ldap_errno=%d (%s)\n",
+        ldap_errno, ldap_error2str(ldap_errno));
+
+      return -1;
+    }
+    return 0;
+
+5.   Advertising Features
+
+  This document REQUIRES that supported features with the name in the
+  form LDAP_API_FEATURE_x be advertised to consumers of the CAPI as
+  follows:
+
+       SHOULD provide the macro LDAP_API_FEATURE_x with the value
+       of 1000 + revision number of this draft (i.e.: 1000+0 for
+       this 0 revision of the draft).
+
+       MUST provide the CAPI extension "x" when returning API
+       information upon LDAP_OPT_API_INFO option access, and
+
+Zeilenga                                                        [Page 4]
+
+INTERNET-DRAFT    LDAP C API Error Reporting Extension 28 September 1999
+
+       MUST provide feature info for "x" via LDAP_OPT_FEATURE_INFO
+       option mechanism.  The feature version provided MUST      match
+  the value LDAP_API_FEATURE_x macro
+
+  where x is replaced appropriately.
+
+  As implementations may not provide macros for all features,
+  applications SHOULD use LDAP_OPT_API_INFO to determine which features
+  are provided by a given implementation.
+
+6.   Changes to the LDAP C API
+
+  This section provides a summary of changes to the CAPI specification.
+
+6.1. LDAP_API_VERSION
+
+  LDAP_API_VERSION should be set to the RFC number of this extension if
+  and when it is published as a Standards Track RFC.  (see purpose of
+  this draft above).
+
+  Until such time as this document is published as an RFC,
+  implementations should use the value specified by CAPI plus 100 + 10 *
+  the number of this draft.
+
+  For the third draft of CAPI and this 0 revision of draft, the value of
+  2103 ((2000+3) + (100+10*0)) should be used.
+
+6.2. New Symbols
+
+  This extension introduces two new symbols:
+       LDAP_API_FEATURE_CONTEXT_SPECIFIC_ERRNO      ldap_errno
+
+  LDAP_API_FEATURE_CONTEXT_SPECIFIC_ERRNO is a macro.  ldap_errno MAY be
+  a MACRO.
+
+  This extension indroductes no new functions, typedefs, or structure
+  names.
+
+6.3. Implementation/System Specific Error Handling
+
+  This extensions removes any requirements that implementations to use
+  implementation and/or operating system specific error reporting
+  mechanisms.
+
+Zeilenga                                                        [Page 5]
+
+INTERNET-DRAFT    LDAP C API Error Reporting Extension 28 September 1999
+
+7.   Security Considerations
+
+  None taken, none given.
+
+8.   Copyright
+
+  Copyright 1999, The Internet Society.  All Rights Reserved.
+
+  This document and translations of it may be copied and furnished to
+  others, and derivative works that comment on or otherwise explain it
+  or assist in its implementation may be prepared, copied, published and
+  distributed, in whole or in part, without restriction of any kind,
+  provided that the above copyright notice and this paragraph are
+  included on all such copies and derivative works.  However, this
+  document itself may not be modified in any way, such as by removing
+  the copyright notice or references to the Internet Society or other
+  Internet organizations, except as needed for the  purpose of
+  developing Internet standards in which case the procedures for
+  copyrights defined in the Internet Standards process must be followed,
+  or as required to translate it into languages other than English.
+
+  The limited permissions granted above are perpetual and will not be
+  revoked by the Internet Society or its successors or assigns.
+
+  This document and the information contained herein is provided on an
+  "AS IS" basis and THE AUTHORS, THE INTERNET SOCIETY, AND THE INTERNET
+  ENGINEERING TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED,
+  INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+  INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+  WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+9.   Bibliography
+
+  [CAPI]  M. Smith, T. Howes, A. Herron, M. Wahl, A. Anantha,
+          "The C LDAP Application Program Interface", INTERNET-DRAFT,
+          <draft-ietf-ldapext-ldap-c-api-03.txt> + LDAPext discussions,
+       June 1999.
+
+  [KEYW]  S. Bradner, "Key words for use in RFCs to Indicate
+          Requirement Levels", RFC 2119, March 1997.
+
+  [LDAP]  M. Wahl, T. Howes, S. Kille, "Lightweight Directory
+          Access Protocol (v3)", RFC 2251, December 1997.
+
+Zeilenga                                                        [Page 6]
+
+INTERNET-DRAFT    LDAP C API Error Reporting Extension 28 September 1999
+
+10.  Author's Address
+
+  Kurt D. Zeilenga
+  OpenLDAP Foundation
+  <Kurt@OpenLDAP.org>
+
+  This document expires on 28 March 2000.
+
+Zeilenga                                                        [Page 7]

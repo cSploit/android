@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Closing a connection</TITLE>
+<LINK REL="Stylesheet" href="odbc.css">
+</HEAD>
+<BODY bgcolor="white">
+
+<table width="90%" cols="3" border="0">
+<TR>
+   <TD colspan="3" class="big">Closing a connection</TD>
+</TR>
+<TR>
+  <TD colspan="3"><P>Before your program terminates you need to free all resources you
+  have allocated. If you checked the source on the previous page, you certainly
+  spotted <CODE><A HREF="gloss.html#free">SQLFreeHandle</A></CODE>. This function must be used 
+  to free each allocated handle. It expects a parameter which states the type of the handle
+  to be freed and the handle itself. So if you want to free an environment handle you should 
+  call (in our example program):</P>
+  <CODE>
+  SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+  </CODE>
+  <P>
+  Before you free any handle make sure that it is no longer needed, wouldn't be funny, if you
+  released to connection handle but forgot to close the connection ;)</P>
+  <P>
+  And if you want to close a connection you need <CODE><A HREF="gloss.html#clos">SQLDisconnect</A></CODE>.
+  This closes the connection associated with the connection handle offered as argument to <CODE>SQLDisconnect</CODE>.
+  In our programm we need to call:</P>
+  <CODE>
+  SQLDisconnect(V_OD_hdbc);
+  </CODE>
+  <P>
+  If you need source code, please have a look <A HREF="conne.html#list">here</A>.</P>
+</TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>

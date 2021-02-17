@@ -1,0 +1,41 @@
+OpenLDAP Devel README
+	This software was obtained from a development branch of the
+	OpenLDAP Software Repository.  This copy is likely already
+	not current, the development branch changes frequently.  These
+	changes include code implementing experimental features and
+	unproven bug fixes.  Please do NOT redistribute copies of the
+	development branch.
+
+	The OpenLDAP Developer's FAQ is available at:
+		<http://www.openldap.org/faq/index.cgi?file=4>
+
+	Client developers seeking a suitable development platform
+	should use "release" or "stable" versions.
+		<http://www.openldap.org/software/>
+
+Contributing
+	See <http://www.openldap.org/devel/contributing.html> for how to
+	contribute code or documentation to OpenLDAP.  Use the Issue Tracking
+	System <http://www.openldap.org/its/> to submit contributions.
+	While you are encouraged to coordinate and discuss the development
+	activities on the openldap-devel@openldap.org mailing list prior
+	to submission, it is noted that contributions must be submitted
+	using the Issue Tracking System to be considered.
+
+---
+$OpenLDAP$
+
+This work is part of OpenLDAP Software <http://www.openldap.org/>.
+
+Copyright 1998-2014 The OpenLDAP Foundation.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in the file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+<http://www.OpenLDAP.org/license.html>.
+
+OpenLDAP is a registered trademark of the OpenLDAP Foundation.

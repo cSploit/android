@@ -1,0 +1,17 @@
+Bulk Copy
+---------
+
+
+
+BCP Data Format
+
++---------+-----+-----+---------------+----------+-------------+------------+
+|         | non | row |               |          |             |  size of   |
+|   size  | var | num | fixed columns | row size | var columns | adjustment |
+|         | cols|     |               |          |             |  table     |
++---------+-----+-----+---------------+----------+-------------+------------+
++---------+------------+
+|  end of |  offsets   |
+|   data  |  to varlen |
+| pointer |    data    |
++---------+------------+

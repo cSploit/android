@@ -1,0 +1,166 @@
+/*
+ *	PROGRAM:	JRD Backup and Restore Program
+ *	MODULE:		OdsDetection.cpp
+ *	DESCRIPTION:	Detecting the backup (source) or restore (target) ODS
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ *
+ */
+
+#include "firebird.h"
+#include "../burp/burp.h"
+#include "../burp/burp_proto.h"
+#include "../burp/OdsDetection.h"
+
+
+namespace
+{
+	// table used to determine capabilities, checking for specific
+	// fields in system relations
+	struct rel_field_t
+	{
+		const char* relation;
+		const char* field;
+		int ods_version;
+	};
+
+	const rel_field_t relations[] =
+	{
+		{"RDB$PROCEDURES",	0,	DB_VERSION_DDL8},	// IB4
+		{"RDB$ROLES",		0,	DB_VERSION_DDL9},	// IB5
+		{"RDB$PACKAGES",	0,	DB_VERSION_DDL12},	// FB3
+		{0, 0, 0}
+	};
+
+	const rel_field_t rel_fields[] =
+	{
+		{"RDB$FIELDS",					"RDB$FIELD_PRECISION",	DB_VERSION_DDL10},		// FB1, FB1.5
+		{"RDB$ROLES",					"RDB$DESCRIPTION",		DB_VERSION_DDL11},		// FB2
+		{"RDB$RELATIONS",				"RDB$RELATION_TYPE",	DB_VERSION_DDL11_1},	// FB2.1
+		{"RDB$PROCEDURE_PARAMETERS",	"RDB$FIELD_NAME",		DB_VERSION_DDL11_2},	// FB2.5
+		{"RDB$PROCEDURES",				"RDB$ENGINE_NAME",		DB_VERSION_DDL12},		// FB3.0
+		{0, 0, 0}
+	};
+
+	void general_on_error();
+}
+
+
+DATABASE DB = STATIC FILENAME "yachts.lnk";
+
+#define DB			tdgbl->db_handle
+#define gds_trans	tdgbl->tr_handle
+#define isc_status	tdgbl->status_vector
+
+
+void detectRuntimeODS()
+{
+/**************************************
+ *
+ *	d e t e c t R u n t i m e O D S
+ *
+ **************************************
+ *
+ * Functional description
+ *	Find the ODS version number of the database.
+ *	Use system_flag to avoid any possibility of ambiguity (someone using the rdb$ prefix).
+ *
+ **************************************/
+
+	BurpGlobals* tdgbl = BurpGlobals::getSpecific();
+	tdgbl->runtimeODS = 0;
+
+	// Detect very old server before IB4 just in case to exit gracefully.
+	// select count(*) from rdb$relation_fields
+	// where rdb$relation_name in ('RDB$RELATIONS', 'RDB$RELATION_FIELDS')
+	// and rdb$field_name = 'RDB$SYSTEM_FLAG';
+
+	int count = 0;
+	isc_req_handle req_handle = 0;
+	FOR (REQUEST_HANDLE req_handle)
+		RFR IN RDB$RELATION_FIELDS
+		WITH (RFR.RDB$RELATION_NAME = 'RDB$RELATIONS' OR RFR.RDB$RELATION_NAME = 'RDB$RELATION_FIELDS')
+		AND RFR.RDB$FIELD_NAME = 'RDB$SYSTEM_FLAG'
+		++count;
+	END_FOR;
+	ON_ERROR
+		general_on_error();
+	END_ERROR;
+	MISC_release_request_silent(req_handle);
+
+	if (count != 2)
+		return;
+
+	isc_req_handle req_handle2 = 0;
+	for (const rel_field_t* rel = relations; rel->relation; ++rel)
+	{
+		FOR (REQUEST_HANDLE req_handle2)
+			FIRST 1 X IN RDB$RELATIONS
+			WITH X.RDB$RELATION_NAME = rel->relation
+			AND X.RDB$SYSTEM_FLAG = 1
+			if (tdgbl->runtimeODS < rel->ods_version)
+				tdgbl->runtimeODS = rel->ods_version;
+		END_FOR;
+		ON_ERROR
+			general_on_error();
+		END_ERROR;
+	}
+	MISC_release_request_silent(req_handle2);
+
+	if (tdgbl->runtimeODS < DB_VERSION_DDL8)
+		return;
+
+	isc_req_handle req_handle3 = 0;
+	for (const rel_field_t* rf = rel_fields; rf->relation; ++rf)
+	{
+		FOR (REQUEST_HANDLE req_handle3)
+			FIRST 1 X2 IN RDB$RELATION_FIELDS
+			WITH X2.RDB$RELATION_NAME = rf->relation
+			AND X2.RDB$FIELD_NAME = rf->field
+			AND X2.RDB$SYSTEM_FLAG = 1
+			if (tdgbl->runtimeODS < rf->ods_version)
+				tdgbl->runtimeODS = rf->ods_version;
+		END_FOR;
+		ON_ERROR
+			general_on_error();
+		END_ERROR;
+	}
+	MISC_release_request_silent(req_handle3);
+}
+
+namespace
+{
+	// copy/paste from backup.epp
+	void general_on_error()
+	{
+	/**************************************
+	 *
+	 *	g e n e r a l _ o n _ e r r o r
+	 *
+	 **************************************
+	 *
+	 * Functional description
+	 *	Handle any general ON_ERROR clause during ODS level detection.
+	 *
+	 **************************************/
+		BurpGlobals* tdgbl = BurpGlobals::getSpecific();
+
+		BURP_print_status(true, isc_status);
+		BURP_abort();
+	}
+}

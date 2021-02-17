@@ -1,0 +1,35 @@
+dn: dc=example,dc=com
+dc: example
+objectClass: organization
+objectClass: extensibleObject
+o: Example, Inc.
+o;lang-x;lang-xx;lang-y;lang-yy;lang-z;lang-zz: Example, Inc.
+name;lang-en-us: Billy Ray
+name;lang-en-us: Billy Bob
+cn;lang-en-us: Billy Ray
+name: Billy Ray
+sn;lang-en-gb;lang-en-us: Billy Ray
+sn: Ray
+
+dn: dc=example,dc=com
+o: Example, Inc.
+o;lang-x;lang-xx;lang-y;lang-yy;lang-z;lang-zz: Example, Inc.
+name;lang-en-us: Billy Ray
+name;lang-en-us: Billy Bob
+cn;lang-en-us: Billy Ray
+name: Billy Ray
+sn;lang-en-gb;lang-en-us: Billy Ray
+sn: Ray
+
+dn: dc=example,dc=com
+name;lang-en-us: Billy Ray
+name;lang-en-us: Billy Bob
+cn;lang-en-us: Billy Ray
+sn;lang-en-gb;lang-en-us: Billy Ray
+
+dn: dc=example,dc=com
+name;lang-en-us: Billy Ray
+name;lang-en-us: Billy Bob
+cn;lang-en-us: Billy Ray
+sn;lang-en-gb;lang-en-us: Billy Ray
+

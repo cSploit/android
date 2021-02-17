@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+    <!ENTITY rfc2119 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+    <!ENTITY rfc4510 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4510.xml'>
+    <!ENTITY rfc4511 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4511.xml'>
+    <!ENTITY rfc4512 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4512.xml'>
+    <!ENTITY rfc4517 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4517.xml'>
+]>
+
+<!-- $OpenLDAP$ -->
+
+<rfc category="std" ipr="full3978" docName="draft-masarati-ldap-deref-00.txt">
+
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+
+<?rfc toc="yes" ?>
+<?rfc symrefs="yes" ?>
+<?rfc sortrefs="yes"?>
+<?rfc iprnotified="no" ?>
+<?rfc strict="yes" ?>
+
+    <front>
+        <title abbrev='LDAP Deref'>LDAP Dereference Control</title>
+        <author initials='P.' surname="Masarati" fullname='Pierangelo Masarati'>
+            <organization abbrev='Politecnico di Milano'>
+                Politecnico di Milano
+            </organization>
+            <address>
+                <postal>
+                    <street>Dipartimento di Ingegneria Aerospaziale</street>
+                    <street>via La Masa 34</street>
+                    <city>Milano</city>
+                    <code>20156</code>
+                    <country>IT</country>
+                </postal>
+                <phone>+39 02 2399 8309</phone>
+                <facsimile>+39 02 2399 8334</facsimile>
+                <email>ando@OpenLDAP.org</email>
+                <uri>http://www.aero.polimi.it/masarati/</uri>
+            </address>
+        </author>
+        <author initials="H.Y." surname="Chu" fullname="Howard Y. Chu">
+            <organization abbrev="Symas Corp.">
+                Symas Corporation
+            </organization>
+            <address>
+	    	<postal>
+		    <street>18740 Oxnard St., Suite 313A</street>
+		    <city>Tarzana</city>
+		    <region>California</region>
+		    <code>91356</code>
+		    <country>USA</country>
+		</postal>
+		<phone>+1 818 757-7087</phone>
+                <email>hyc@symas.com</email>
+		<uri>http://www.symas.com/</uri>
+            </address>
+        </author>
+        <date/>
+        <abstract>
+            <t>
+This document describes the Dereference Control for LDAP.
+This control is intended to provide a concise means to collect
+extra information related to cross-links present in entries
+returned as part of search responses.
+            </t>
+        </abstract>
+    </front>
+
+    <middle>
+        <section title="Background and Intended Use">
+            <t>
+Cross-links between entries are often used to describe relationships
+between entries.
+To exploit the uniqueness of entries naming, these links are usually
+represented by the distinguished name (DN) of the linked entries.
+            </t>
+
+            <t>
+In many cases, DUAs need to collect information about linked entries.
+This requires to explicitly dereference each linked entry in order to
+collect the desired attributes, resulting in the need to perform a
+specific sequence of search operations, using the links as search base,
+with a SearchRequest.scope of baseObject <xref target="RFC4511" />.
+            </t>
+
+            <t>
+This document describes a LDAP Control <xref target="RFC4511" />
+that allows a DUA to request the DSA to return specific attributes
+of linked entries along with the link, under the assumption that
+this operation can be performed by the DSA in a more efficient manner
+than the DUA would itself by performing the complete sequence
+of required search operations.
+            </t>
+
+            <t>
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+"SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
+and "OPTIONAL" in this document are to be interpreted as
+described in <xref target="RFC2119" />.
+            </t>
+        </section>
+
+        <section title="The LDAP Dereference Control">
+            <section title="Control Semantics">
+                <t>
+This control allows specifying a dereference attribute and a set
+of attributes to be dereferenced, as illustrated
+in <xref target="control_request" />.
+The dereference attribute's syntax MUST be 1.3.6.1.4.1.1466.115.121.1.12
+(DN) <xref target="RFC4517" />.
+Each value of the dereference attribute in a SearchResultEntry SHOULD
+result in dereferencing the corresponding entry, collecting the values
+of the attributes to be dereferenced, and returning them as part
+of the control value in the SearchResultEntry response, in the format
+detailed in <xref target="control_response" />.
+                </t>
+
+                <t>
+The control value may contain dereference attribute values without any
+dereferenced attribute values, as detailed in
+<xref target="control_response" />.
+The control semantics does not specify whether this is a consequence
+of a dangling link or of the application of access restrictions
+on the values of the attributes to be dereferenced.
+                </t>
+
+                <t>
+Attribute description hierarchy <xref target="RFC4512" /> SHALL NOT
+be exploited when collecting the values of the attributes
+to be dereferenced.
+On the contrary, all of the attribute descriptions in an attribute
+hierarchy SHOULD be treated as distinct and unrelated descriptions.
+                </t>
+
+                <t>
+This control is only appropriate for the search operation
+<xref target="RFC4511" />.
+                </t>
+
+                <t>
+The semantics of the criticality field are specified in
+<xref target="RFC4511" />.
+In detail, the criticality of the control determines whether the control
+will or will not be used, and if it will not be used, whether the operation
+will continue without returning the control in the response, or fail,
+returning unavailableCriticalExtension.
+If the control is appropriate for an operation and, for any reason,
+it cannot be applied in its entirety to a single SearchResultEntry response,
+it MUST NOT be applied to that specific SearchResultEntry response,
+without affecting its application to any subsequent SearchResultEntry
+response.
+                </t>
+
+                <t>
+Servers implementing this technical specification SHOULD publish
+the object identifier deref-oid (IANA assigned;
+see <xref target="iana_considerations" />) as a value
+of the 'supportedControl' attribute <xref target="RFC4512" />
+in their root DSE.
+                </t>
+
+                <t>
+This control is totally unrelated to alias dereferencing
+<xref target="RFC4511" />.
+                </t>
+            </section>
+
+            <section anchor="control_request" title="Control Request">
+                <figure>
+                    <preamble>
+The control type is deref-oid (IANA assigned;
+see <xref target="iana_considerations" />).
+The specification of the Dereference Control request is:
+                    </preamble>
+                    <artwork>
+      controlValue ::= SEQUENCE OF derefSpec DerefSpec
+
+      DerefSpec ::= SEQUENCE {
+          derefAttr       attributeDescription,    ; with DN syntax
+          attributes      AttributeList }
+
+      AttributeList ::= SEQUENCE OF attr AttributeDescription
+                    </artwork>
+                    <postamble>
+Each derefSpec.derefAttr MUST be unique within controlValue.
+                    </postamble>
+                </figure>
+            </section>
+
+            <section anchor="control_response" title="Control Response">
+                <figure>
+                    <preamble>
+The control type is deref-oid (IANA assigned;
+see <xref target="iana_considerations" />).
+The specification of the Dereference Control response is:
+                    </preamble>
+                    <artwork>
+      controlValue ::= SEQUENCE OF derefRes DerefRes
+
+      DerefRes ::= SEQUENCE {
+          derefAttr       AttributeDescription,
+          derefVal        LDAPDN,
+          attrVals        [0] PartialAttributeList OPTIONAL }
+
+      PartialAttributeList ::= SEQUENCE OF
+                     partialAttribute PartialAttribute
+                    </artwork>
+                </figure>
+                <figure>
+                    <preamble>
+PartialAttribute is defined in <xref target="RFC4511" />;
+the definition is reported here for clarity:
+                    </preamble>
+                    <artwork>
+      PartialAttribute ::= SEQUENCE {
+          type       AttributeDescription,
+          vals       SET OF value AttributeValue }
+                    </artwork>
+                    <postamble>
+If partialAttribute.vals is empty, the corresponding partialAttribute
+is omitted.
+If all partialAttribute.vals in attrVals are empty, that derefRes.attrVals
+is omitted.
+                    </postamble>
+                </figure>
+            </section>
+        </section>
+
+	<section title="Examples">
+            <figure>
+                <preamble>
+Given these entries:
+                </preamble>
+                <artwork>
+    dn: cn=Howard Chu,ou=people,dc=example,dc=org
+    objectClass: inetOrgPerson
+    cn: Howard Chu
+    sn: Chu
+    uid: hyc
+
+    dn: cn=Pierangelo Masarati,ou=people,dc=example,dc=org
+    objectClass: inetOrgPerson
+    cn: Pierangelo Masarati
+    sn: Masarati
+    uid: ando
+
+    dn: cn=Test Group,ou=groups,dc=example,dc=org
+    objectClass: groupOfNames
+    cn: Test Group
+    member: cn=Howard Chu,ou=people,dc=example,dc=org
+    member: cn=Pierangelo Masarati,ou=people,dc=example,dc=org
+                 </artwork>
+            </figure>
+            <figure>
+                <preamble>
+A search could be performed with a Dereference request control value
+specified as
+                </preamble>
+                <artwork>
+    { member, uid }
+                </artwork>
+            </figure>
+            <figure>
+                <preamble>
+and the "cn=Test Group" entry would be returned with the response control
+value
+                </preamble>
+                <artwork>
+    { { member, cn=Howard Chu,ou=people,dc=example,dc=org,
+        { { uid, [hyc] } } },
+      { member, cn=Pierangelo Masarati,ou=people,dc=example,dc=org,
+        { { uid, [ando] } } } }
+                </artwork>
+            </figure>
+	</section>
+
+        <section title="Implementation Notes">
+        <t>
+This LDAP extension is currently implemented in OpenLDAP software
+using the temporary OID 1.3.6.1.4.1.4203.666.5.16 under OpenLDAP's
+experimental OID arc.
+        </t>
+        </section>
+
+        <section title="Security Considerations">
+        <t>
+The control result MUST NOT disclose information the client's identity
+could not have accessed by performing the related search operations.
+The presence of a derefRes.derefVal in the response control, with
+no derefRes.attrVals, does not imply neither the existence of nor any
+access privilege to the corresponding entry.
+It is merely a consequence of the read access the client's identity has
+on the corresponding value of the derefRes.derefAttr that would be returned
+as part of the attributes of a SearchResultEntry response
+<xref target="RFC4511" />.
+        </t>
+        <t>
+Security considerations described in documents listed in
+<xref target="RFC4510" /> apply.
+        </t>
+        </section>
+
+        <section anchor="iana_considerations" title="IANA Considerations">
+            <section title="Object Identifier Registration">
+                <figure>
+                    <preamble>
+It is requested that IANA register upon Standards Action an LDAP
+Object Identifier for use in this technical specification.
+                    </preamble>
+                    <artwork>
+      Subject: Request for LDAP OID Registration
+      Person &amp; email address to contact for further information:
+          Pierangelo Masarati &lt;ando@OpenLDAP.org&gt;
+      Specification: (I-D)
+      Author/Change Controller: IESG
+      Comments:
+          Identifies the LDAP Dereference Control request
+          and response
+                    </artwork>
+                </figure>
+            </section>
+        </section>
+
+        <section title="Acknowledgments">
+        <t>
+TBD
+        </t>
+        </section>
+    </middle>
+
+    <back>
+        <references title='Normative References'>
+        &rfc2119;
+        &rfc4510;
+        &rfc4511;
+        &rfc4512;
+        &rfc4517;
+    </references>
+
+    </back>
+
+</rfc>

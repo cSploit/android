@@ -1,0 +1,91 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+# Copyright (C) Inprise Corporation.
+#
+# All Rights Reserved.
+# Contributor(s): Paul Beach, Jerry Adair, Bill Oliver
+#
+
+# Compiler settings for HPUX using aCC
+
+# Notes:
+
+# Firebird requires the HP-UX Atomic APIs ("AtomicAPI" bundle), released as an
+# optional Software Pack (SPK) for HP-UX 11i v2 or v3. 
+
+# Before attempting the HPUX build, you must export necessary
+# CFLAGS and CXXFLAGS to be picked up by the configure process and
+# subsequent build. Make sure CC is in the path!
+#
+# for typical 64-bit build
+#    export CC=cc
+#    export CXX=CC
+#    export CFLAGS="+DD64"
+#    export CXXFLAGS=$CFLAGS
+
+# Useful predefined macros from HP aCC
+# __HP_aCC, identifies the HP aC++ compiler driver version
+# __HP_cc, identifies the HP C compiler driver version
+# _ILP32, defined for +DD32
+# _LP64, defined for +DD64
+# __hpux
+# __hppa, defined for PA RISC
+# __ia64, defined for IA-64
+# __unix
+
+# Common flags shared by production and debug build
+# Suppress these warnings for now
+# 2830, function "operator new..." has no corresponding operator delete
+# 4232, conversion to a more strictly aligned type may cause misaligned access
+# 749, cast from/to is 'reinterpret_cast'. This operation is non-portable
+# 863, result of operation is widened
+# 1042, subscript out of range
+# 2175, subscript out of range (again)
+# 2111, statement is unreachable (used to suppress g++ warnings)
+# 2161, unrecognized pragma (mostly FB_COMPILER_MESSAGE)
+# 2177, function declared but never referenced
+COMMON_FLAGS= -DHP11 -DHPUX -D_XOPEN_SOURCE_EXTENDED -D_HP_ATOMIC_INLINE \
+    -AA +e \
+    +W2830,4232,749,863,1042,2175,2111,2161,2177
+
+# Flags specific to production or debug build...
+# -z, disallow dereferencing of null pointers at runtime
+# -DLIBC_CALLS_NEW, Firebird macro, used when C++ runtime can call
+#   redefined by us operator new before initialization of global variables.
+#   Required on IA-64, but evidently only by debug build!?
+
+ifeq ($(shell uname -m),ia64)
+# ...for IA-64
+PROD_FLAGS= +O2 +Onolimit +Ofltacc=strict +Ofenvaccess \
+	$(COMMON_FLAGS)
+DEV_FLAGS= -g -z -DLIBC_CALLS_NEW \
+	$(COMMON_FLAGS)
+else
+# ...for PA-RISC
+# PA-RISC requires old version of aCC, 3.85, with different flags
+PROD_FLAGS= +O2 +Onolimit +Olibcalls +Onomoveflops \
+	$(COMMON_FLAGS)
+DEV_FLAGS= -g -z \
+	$(COMMON_FLAGS)
+endif
+
+# link options for HP-UX linker, /usr/bin/ld
+EXE_LINK_OPTIONS= $(LDFLAGS) $(THR_FLAGS) $(UNDEF_FLAGS) $(LIB_PATH_OPTS) -AA +e -Wl,+concatrpath
+LIB_LINK_OPTIONS= $(LDFLAGS) $(THR_FLAGS) -b +e -Wl,+concatrpath
+
+# From original HPUX prefix file
+LIB_LINK_RPATH= -Wl,+b,$(1)
+LIB_LINK_SONAME= -Wl,+h,$(1)
+LIB_LINK_MAPFILE= -Wl,-c,$(1)
+
+UNDEF_PLATFORM=

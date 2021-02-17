@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.gnu.inet</groupId>
+  <artifactId>libidn</artifactId>
+  <name>GNU IDN Library</name>
+  <version>@VERSION@</version>
+
+  <description>
+    GNU Libidn is a fully documented implementation of the Stringprep,
+    Punycode and IDNA specifications. Libidn's purpose is to encode
+    and decode internationalized domain names.
+  </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.5</maven.compiler.source>
+    <maven.compiler.target>1.5</maven.compiler.target>
+    <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
+    <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
+  </properties>
+
+  <url>http://www.gnu.org/software/libidn/</url>
+
+  <inceptionYear>2002</inceptionYear>
+
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License version 3.0 or later</name>
+      <url>http://www.gnu.org/licenses/licenses.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <connection>scm:git:git://git.savannah.gnu.org/libidn.git</connection>
+    <url>http://git.savannah.gnu.org/gitweb/?p=libidn.git</url>
+  </scm>
+
+  <organization>
+    <name>GNU</name>
+    <url>http://www.gnu.org/</url>
+  </organization>
+
+  <dependencies>
+      <dependency>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>annotations</artifactId>
+          <version>2.0.1</version>
+          <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+	  <groupId>junit</groupId>
+	  <artifactId>junit</artifactId>
+	  <version>4.11</version>
+	  <scope>test</scope>
+      </dependency>
+
+      <dependency>
+	  <groupId>com.google.guava</groupId>
+	  <artifactId>guava</artifactId>
+	  <version>14.0.1</version>
+	  <scope>test</scope>
+      </dependency>
+
+      <dependency>
+	  <groupId>com.google.caliper</groupId>
+	  <artifactId>caliper</artifactId>
+	  <version>0.5-rc1</version>
+	  <scope>test</scope>
+      </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+      </plugin>
+
+      <plugin>
+	    <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-surefire-plugin</artifactId>
+	    <version>2.14.1</version>
+      </plugin>
+    </plugins>
+  </build>
+
+  <profiles>
+      <profile>
+	  <id>caliper</id>
+	  <build>
+	      <plugins>
+		  <plugin>
+		      <artifactId>maven-surefire-plugin</artifactId>
+		      <configuration>
+			  <includes>
+			      <include>**/Caliper*.java</include>
+			  </includes>
+		      </configuration>
+		  </plugin>
+	      </plugins>
+	  </build>
+      </profile>
+  </profiles>
+
+</project>

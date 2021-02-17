@@ -1,0 +1,29 @@
+Tools           ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+slapacl            D F              U  X   b d f        o     uv
+slapadd              F            S        bcd fg  j l no q s uvw
+slapauth             F      M    R  U  X     d f        o      v
+slapcat              F H                  abcd fg    l no   s  v
+slapdn               F       N P             d f        o      v
+slapindex            F                     bcd fg      no q  t v
+slappasswd                         T        c    h          s uv
+slapschema	     F H                  abcd fg    l no   s  v
+slaptest             F          Q            d f       no     uv
+
+* General flags:
+	-F config directory
+	-U authcID
+	-X authzID
+	-b suffix (slapacl: entryDN)
+	-c continue mode
+	-d debug level
+	-f config file
+	-l LDIF file
+	-n database number
+	-o options
+	-q "quick" mode
+	-s subtree
+	-u dryrun (slappasswd: RFC2307 userPassword)
+	-v verbose
+
+---
+$OpenLDAP$

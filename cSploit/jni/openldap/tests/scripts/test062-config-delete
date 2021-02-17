@@ -1,0 +1,177 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+if test $SYNCPROV = syncprovno; then
+	echo "Syncrepl provider overlay not available, test skipped"
+	exit 0
+fi
+
+CONFDIR=$TESTDIR/slapd.d
+DBDIR=$TESTDIR/db
+RCOUT=$TESTDIR/rcout
+
+mkdir -p $TESTDIR $CONFDIR $DBDIR
+
+$SLAPPASSWD -g -n >$CONFIGPWF
+
+#
+# Test dynamic add/delete of syncprov overlay:
+# - Create minimal back-conf setup
+# - Add syncprov overlay to the cn=config database
+# - Remove the overlay again
+#
+
+echo "Starting slapd on TCP/IP port $PORT1... $PWD"
+. $CONFFILTER $BACKEND $MONITORDB < $DYNAMICCONF > $CONFLDIF
+$SLAPADD -F $CONFDIR -n 0 -l $CONFLDIF
+cd $TESTDIR
+$SLAPD -F ./slapd.d -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID"
+cd $TESTWD
+
+sleep 1
+
+echo "Using ldapsearch to check that slapd is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI1 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Inserting syncprov overlay ..."
+if [ "$SYNCPROV" = syncprovmod ]; then
+	$LDAPADD -D cn=config -H $URI1 -y $CONFIGPWF <<EOF > $TESTOUT 2>&1
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/overlays
+olcModuleLoad: syncprov.la
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed for moduleLoad ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+fi
+read CONFIGPW < $CONFIGPWF
+$LDAPMODIFY -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcOverlay=syncprov,olcDatabase={0}config,cn=config
+changetype: add
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: syncprov
+EOF
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for syncrepl config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting a refreshAndPersist search in background"
+rm -f $RCOUT
+(
+  $LDAPSEARCH -D cn=config -H $URI1 -y $CONFIGPWF -bcn=config -E \!sync=rp >/dev/null 2>&1
+  RC=$?
+  echo $RC > $RCOUT
+  exit $RC
+) &
+
+SEARCHPID=$!
+
+sleep 2
+
+echo "Removing syncprov overlay again ..."
+$LDAPDELETE -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+olcOverlay={0}syncprov,olcDatabase={0}config,cn=config
+EOF
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapmodify failed for syncrepl config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+for i in 0 1 2 3 4; do
+	if test -f "$RCOUT" ; then
+		break
+	else
+		echo "Waiting 2 seconds for RefreshAndPersist search to end ..."
+		sleep 2
+	fi
+done
+
+if test -f "$RCOUT" ; then
+	wait $SEARCHPID
+	SEARCHRC=`cat $RCOUT`
+	echo "Checking return code of backgrounded RefreshAndPersist search ..."
+	if test 52 != "$SEARCHRC" ; then
+		echo "Error: Backgrounded ldapsearch returned the wrong error code: $SEARCHRC"
+		RC=1
+	else
+		echo "Exit code correct."
+	fi
+else
+	echo "Backgrounded ldapsearch did not exit after overlay removal."
+	kill -HUP $SEARCHPID
+	RC=2
+fi
+if test $RC != 0 ; then
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Running a refreshOnly search, should fail..."
+$LDAPSEARCH -D cn=config -H $URI1 -y $CONFIGPWF -bcn=config -E \!sync=ro > /dev/null 2>&1
+
+RC=$?
+if test $RC != 12 ; then
+	echo "ldapsearch should have failed with Critical extension is unavailable (12)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+else
+	echo "Failed with \"Critical extension is unavailable (12)\". Ok."
+fi
+
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

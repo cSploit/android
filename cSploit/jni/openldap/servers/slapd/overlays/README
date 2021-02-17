@@ -1,0 +1,5 @@
+This directory contains a number of SLAPD overlays, some
+project-maintained, some not.  Some are generally usable,
+others are purely experimental.  Additional overlays can
+be found in the contrib/slapd-modules directory.
+

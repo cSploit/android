@@ -1,0 +1,56 @@
+.TH SLAPD-PASSWD 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd\-passwd \- /etc/passwd backend to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The PASSWD backend to
+.BR slapd (8)
+serves up the user account information listed in the system
+.BR passwd (5)
+file.  This backend is provided for demonstration purposes only.
+The DN of each entry is "uid=<username>,<suffix>".
+Note that non-base searches scan the entire passwd file, and
+are best suited for hosts with small passwd files.
+.SH CONFIGURATION
+This
+.B slapd.conf
+option applies to the PASSWD backend database.
+That is, it must follow a "database passwd" line and come before any
+subsequent "backend" or "database" lines.
+Other database options are described in the
+.BR slapd.conf (5)
+manual page.
+.TP
+.B file <filename>
+Specifies an alternate passwd file to use.
+The default is
+.BR /etc/passwd .
+.SH ACCESS CONTROL
+The
+.B passwd
+backend does not honor any of the access control semantics described in
+.BR slapd.access (5).
+Only
+.B read (=r)
+access to the
+.B entry
+pseudo-attribute and to the other attribute values of the entries
+returned by the
+.B search
+operation is honored, which is performed by the frontend.
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.TP
+/etc/passwd
+user account information
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd (8),
+.BR passwd (5).

@@ -1,0 +1,107 @@
+.TH LDAP_PARSE_RESULT 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_parse_result \- Parsing results
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_parse_result( LDAP *ld, LDAPMessage *result,
+	int *errcodep, char **matcheddnp, char **errmsgp,
+	char ***referralsp, LDAPControl ***serverctrlsp,
+	int freeit )
+.LP
+.ft B
+int ldap_parse_sasl_bind_result( LDAP *ld, LDAPMessage *result,
+	struct berval **servercredp, int freeit )
+.LP
+.ft B
+int ldap_parse_extended_result( LDAP *ld, LDAPMessage *result,
+	char **retoidp, struct berval **retdatap, int freeit )
+.SH DESCRIPTION
+.LP
+These routines are used to extract information from a result message.
+They will operate on the first result message in a chain of search
+results (skipping past other message types). They take the \fIresult\fP
+as returned by a call to
+.BR ldap_result (3),
+.BR ldap_search_s (3)
+or
+.BR ldap_search_st (3).
+In addition to
+.BR ldap_parse_result() ,
+the routines
+.B ldap_parse_sasl_bind_result()
+and
+.B ldap_parse_extended_result()
+are used to get all the result information from SASL bind and extended
+operations.
+.LP
+The \fIerrcodep\fP parameter will be filled in with the result code from
+the result message.
+.LP
+The server might supply a matched DN string in the message indicating
+how much of a name in a request was recognized. The \fImatcheddnp\fP
+parameter will be filled in with this string if supplied, else it will
+be NULL. If a string is returned, it should be freed using
+.BR ldap_memfree (3).
+.LP
+The \fIerrmsgp\fP parameter will be filled in with the error message
+field from the parsed message. This string should be freed using
+.BR ldap_memfree (3).
+.LP
+The \fIreferralsp\fP parameter will be filled in with an allocated array of
+referral strings from the parsed message. This array should be freed using
+.BR ldap_memvfree (3).
+If no referrals were returned, \fI*referralsp\fP is set to NULL.
+.LP
+The \fIserverctrlsp\fP parameter will be filled in with an allocated array of
+controls copied from the parsed message. The array should be freed using
+.BR ldap_controls_free (3).
+If no controls were returned, \fI*serverctrlsp\fP is set to NULL.
+.LP
+The \fIfreeit\fP parameter determines whether the parsed message is
+freed or not after the extraction. Any non-zero value will make it
+free the message. The
+.BR ldap_msgfree (3)
+routine can also be used to free the message later.
+.LP
+For SASL bind results, the \fIservercredp\fP parameter will be filled in
+with an allocated berval structure containing the credentials from the
+server if present. The structure should be freed using
+.BR ber_bvfree (3).
+.LP
+For extended results, the \fIretoidp\fP parameter will be filled in
+with the dotted-OID text representation of the name of the extended
+operation response. The string should be freed using
+.BR ldap_memfree (3).
+If no OID was returned, \fI*retoidp\fP is set to NULL.
+.LP
+For extended results, the \fIretdatap\fP parameter will be filled in
+with a pointer to a berval structure containing the data from the
+extended operation response. The structure should be freed using
+.BR ber_bvfree (3).
+If no data were returned, \fI*retdatap\fP is set to NULL.
+.LP
+For all the above result parameters, NULL values can be used in calls
+in order to ignore certain fields.
+.SH ERRORS
+Upon success LDAP_SUCCESS is returned. Otherwise the values of the
+result parameters are undefined.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_result (3),
+.BR ldap_search (3),
+.BR ldap_memfree (3),
+.BR ldap_memvfree (3),
+.BR ldap_get_values (3),
+.BR ldap_controls_free (3),
+.BR lber-types (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

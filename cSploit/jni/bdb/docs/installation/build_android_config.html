@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Android Configuration Options</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="build_android_intro.html" title="Chapter 4. Building Berkeley DB for Android" />
+    <link rel="prev" href="build_android_jdbc.html" title="Building the Android JDBC Driver" />
+    <link rel="next" href="build_win.html" title="Chapter 5.  Building Berkeley DB for Windows" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Android Configuration Options</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="build_android_jdbc.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 4. Building Berkeley DB for Android</th>
+          <td width="20%" align="right"> <a accesskey="n" href="build_win.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="build_android_config"></a>Android Configuration Options</h2>
+          </div>
+        </div>
+      </div>
+      <p>There are several configuration options you can specify in <code class="literal">LOCAL_CFLAGS</code> located in the <code class="literal">Android.mk</code> file. </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+            BDBSQL_CONVERT_SQLITE
+        </p>
+            <p>
+            This option enables to convert SQLite database to BDB SQL database format. See <a class="xref" href="build_android_intro.html#build_android_migrate" title="Migrating from SQLite to Berkeley DB">Migrating from SQLite to Berkeley DB</a>
+ for more information.
+        </p>
+          </li>
+          <li>
+            <p>
+            BDBSQL_SHARE_PRIVATE
+        </p>
+            <p>
+            This flag is enabled by default and keeps all the region files in 
+            memory instead of the disk. 
+            This flag also implements database-level locking. 
+        </p>
+          </li>
+          <li>
+            <p>
+            SQLITE_DEFAULT_CACHE_SIZE
+        </p>
+            <p>
+           SQLite provides an in-memory cache which you size according to the maximum number of
+			database pages that you want to hold in memory at any given time.
+			See <a class="xref" href="build_unix_sql.html#config_sql" title="Changing Compile Options">Changing Compile Options</a>.
+        </p>
+          </li>
+          <li>
+            <p>
+            SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT
+        </p>
+            <p>
+           For SQLite, this pragma identifies the maximum size that the
+           journal file is allowed to be. Berkeley DB does not have a
+           journal file, but it writes and uses log files. A new log file
+           is created when the current log file has reached the defined
+           maximum size.  This flag defines the maximum size for a log
+           file. Default value is 10 MB for Berkeley DB SQL interface.
+        </p>
+          </li>
+          <li>
+            <p>
+            SQLITE_HAS_CODEC
+        </p>
+            <p>
+            Causes the Berkeley DB SQL interface to be built with
+            encryption support. See <a href="../bdb-sql/sql_encryption.html" class="olink">SQL Encryption</a> in the 
+            <em class="citetitle">Berkeley DB Getting Started with the SQL APIs</em> guide for usage details.
+        </p>
+          </li>
+        </ul>
+      </div>
+      <p>
+Hard-coded numbers in the build can be adjusted using the following SQLite PRAGMA commands: </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>PRAGMA cache_size</li>
+          <li>PRAGMA journal_size_limit</li>
+        </ul>
+      </div>
+      <p>
+You can configure most aspects of your Berkeley DB environment by using the <a href="../api_reference/C/configuration_reference.html" class="olink">DB_CONFIG</a> file.
+
+</p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="build_android_jdbc.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="build_android_intro.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="build_win.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Building the Android JDBC Driver </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 5.  Building Berkeley DB for Windows </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

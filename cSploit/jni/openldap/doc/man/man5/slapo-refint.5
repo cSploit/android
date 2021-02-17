@@ -1,0 +1,78 @@
+.TH SLAPO-REFINT 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2004-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-refint \- Referential Integrity overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The Referential Integrity overlay can be used with a backend database such as
+.BR slapd\-bdb (5)
+to maintain the cohesiveness of a schema which utilizes reference attributes.
+.LP
+Integrity is maintained by updating database records which contain the named
+attributes to match the results of a
+.B modrdn
+or
+.B delete
+operation. For example, if the integrity attribute were configured as
+.BR manager ,
+deletion of the record "uid=robert,ou=people,dc=example,dc=com" would trigger a
+search for all other records which have a
+.B manager
+attribute containing that DN. Entries matching that search would have their
+.B manager
+attribute removed.
+Or, renaming the same record into "uid=george,ou=people,dc=example,dc=com" 
+would trigger a search for all other records which have a
+.B manager
+attribute containing that DN.
+Entries matching that search would have their
+.B manager
+attribute deleted and replaced by the new DN.
+.LP
+.B rootdn
+must be set for the database.  refint runs as the rootdn
+to gain access to make its updates.
+.B rootpw
+is not needed.
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the Referential Integrity overlay.
+They should appear after the
+.B overlay
+directive.
+.TP
+.B refint_attributes <attribute> [...]
+Specify one or more attributes for which integrity will be maintained
+as described above.
+.TP
+.B refint_nothing <string>
+Specify an arbitrary value to be used as a placeholder when the last value
+would otherwise be deleted from an attribute. This can be useful in cases
+where the schema requires the existence of an attribute for which referential
+integrity is enforced. The attempted deletion of a required attribute will
+otherwise result in an Object Class Violation, causing the request to fail.
+The string must be a valid DN.
+.TP
+.B refint_modifiersname <DN>
+Specify the DN to be used as the modifiersName of the internal modifications
+performed by the overlay.
+It defaults to "\fIcn=Referential Integrity Overlay\fP".
+.LP
+Modifications performed by this overlay are not propagated during
+replication. This overlay must be configured identically on
+replication consumers in order to maintain full synchronization
+with the provider.
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5).
+.SH ACKNOWLEDGEMENTS
+.so ../Project

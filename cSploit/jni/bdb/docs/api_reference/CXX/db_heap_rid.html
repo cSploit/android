@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbHeapRecordId</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="db.html" title="Chapter 2.  The Db Handle" />
+    <link rel="prev" href="dbverify.html" title="Db::verify()" />
+    <link rel="next" href="dbc.html" title="Chapter 3.  The Dbc Handle" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbHeapRecordId</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbverify.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 2. 
+                The Db Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbc.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="db_heap_rid"></a>DbHeapRecordId</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+
+class _exported DbHeapRecordId : private DB_HEAP_RID
+{
+public:
+    db_pgno_t get_pgno() const      { return pgno; }
+    void set_pgno(db_pgno_t value)  { pgno = value; }
+
+    db_indx_t get_indx() const      { return indx; }
+    void set_indx(db_indx_t value)  { indx = value; }
+
+    DB_HEAP_RID *get_DB_HEAP_RID()  { return (DB_HEAP_RID *)this; }
+    const DB_HEAP_RID *get_const_DB_HEAP_RID() const
+                    { return (const DB_HEAP_RID *)this; }
+
+    static DbHeapRecordId* get_DbHeapRecordId(DB_HEAP_RID *rid)
+                    { return (DbHeapRecordId *)rid; }
+    static const DbHeapRecordId* get_const_DbHeapRecordId(DB_HEAP_RID *rid)
+                    { return (const DbHeapRecordId *)rid; }
+
+    DbHeapRecordId(db_pgno_t pgno, db_indx_t indx);
+    DbHeapRecordId();
+    ~DbHeapRecordId();
+    DbHeapRecordId(const DbHeapRecordId &amp;);
+    DbHeapRecordId &amp;operator = (const DbHeapRecordId &amp;);
+};</pre>
+      <p>
+        Content used for the key in a Heap database record. Berkeley DB 
+        
+        <span>instantiates an object of this class</span>
+        for you when you create a record in a Heap database. You should
+        never
+        
+        <span>instantiate an object of this class or modify the contents of this class</span>
+        yourself; Berkeley DB must create and manage it for you.
+    </p>
+      <p>
+        This 
+        
+        <span>object</span>
+        is returned in the <span class="bold"><strong>key</strong></span>
+        Dbt parameter of the method that you use to add a record to the 
+        Heap database.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp617120"></a>Class Methods</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp592848"></a>get_pgno()</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 Returns the database page number where the record is stored.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idm7965072"></a>get_indx()</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                Returns the index in the offset table where the record can be found.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idm7964632"></a>get_DB_HEAP_RID()</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                Returns a pointer to the underlying C-language structure
+                used to store the database page number and offset table
+                index information.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp649360"></a>set_pgno()</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                For internal use only. Changing the offset index has
+                unpredictable results.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp649808"></a>set_indx()</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                For internal use only. Changing the offset index has
+                unpredictable results.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp602680"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="db.html#dblist" title="Database and Related Methods">Database and Related Methods</a>, 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbverify.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="db.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbc.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Db::verify() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 3. 
+                The Dbc Handle
+        </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

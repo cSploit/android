@@ -1,0 +1,442 @@
+/*
+ *	PROGRAM:	JRD Access Method
+ *	MODULE:		include.epp
+ *	DESCRIPTION:	Include file generator
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+#include "firebird.h"
+#include <stdio.h>
+
+DATABASE DB = "msg.fdb";
+
+FILE* output;
+
+static bool check_option(const SCHAR*, SSHORT *, SCHAR **);
+static void define_format(const SCHAR*, SCHAR*);
+static void gen(const char*, const char*);
+static void process_line(FILE *, const SCHAR*);
+static void put_error(FILE *, SCHAR **, const SCHAR*, SSHORT);
+static void put_symbol(FILE *, const SCHAR*, const SCHAR*, SLONG, SSHORT);
+static void put_symbols(FILE *, SCHAR **, const SCHAR*, SSHORT);
+
+const SSHORT OPT_byte		= 1;
+const SSHORT OPT_signed		= 2;
+const SSHORT OPT_sans_dollar	= 4;
+
+static SSHORT defaults;
+static SCHAR *formats[40], *format_ptr, format_buffer[1024];
+
+
+void main( int argc, char **argv)
+{
+/**************************************
+ *
+ *	m a i n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Generate include files.
+ *
+ **************************************/
+	const char *file, *db_name;
+	bool sw_all = false;
+
+	file = db_name = 0;
+	const char* language = "C";
+
+	char** end;
+	for (end = argv + argc, ++argv; argv < end;)
+	{
+		const char* p = *argv++;
+		if (*p == '-')
+		{
+			switch (UPPER(p[1]))
+			{
+			case 'F':
+				file = *argv++;
+				continue;
+
+			case 'L':
+				language = *argv++;
+				continue;
+
+			case 'D':
+				db_name = *argv++;
+				continue;
+
+			case 'A':
+				sw_all = true;
+				continue;
+			}
+		}
+		printf("Bad switch %s\n", *p);
+		exit(FINI_ERROR);
+	}
+
+	if (db_name)
+		READY db_name AS DB;
+	else
+		READY;
+
+	START_TRANSACTION;
+
+	if (sw_all)
+        FOR X IN TEMPLATES
+            gen(X.LANGUAGE, FILE);
+	    END_FOR
+	else
+	    gen(language, file);
+
+	COMMIT;
+	FINISH;
+	exit(FINI_OK);
+}
+
+
+static bool check_option(const SCHAR* string,
+						SSHORT* option_ptr, SCHAR ** format_ptr)
+{
+/**************************************
+ *
+ *	c h e c k _ o p t i o n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Check an word for a known option.
+ *
+ **************************************/
+	SCHAR **format;
+
+	if (!strcmp(string, "BYTE"))
+	{
+		*option_ptr |= OPT_byte;
+		return true;
+	}
+
+	if (!strcmp(string, "SIGNED"))
+	{
+		*option_ptr |= OPT_signed;
+		return true;
+	}
+
+	if (!strcmp(string, "SANS_DOLLAR"))
+	{
+		*option_ptr |= OPT_sans_dollar;
+		return true;
+	}
+
+	if (!format_ptr)
+		return false;
+
+	for (format = formats; *format; format += 2)
+	{
+		if (!strcmp(string, *format))
+		{
+			*format_ptr = format[1];
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+static void define_format( const SCHAR* name, SCHAR * format)
+{
+/**************************************
+ *
+ *	d e f i n e _ f o r m a t
+ *
+ **************************************
+ *
+ * Functional description
+ *	Define named format.
+ *
+ **************************************/
+	SCHAR **ptr;
+
+	if (!name)
+	{
+		printf("Format redefined\n");
+		return;
+	}
+
+/* Find next free slot */
+
+	for (ptr = formats; *ptr; ptr += 2);
+
+/* Copy in format name */
+
+	*ptr++ = format_ptr;
+
+	while (*format_ptr++ = *name++);
+
+/* Copy in format */
+
+	*ptr++ = format_ptr;
+
+	while (*format_ptr++ = *format++);
+
+/* Zero next entry */
+
+	*ptr = NULL;
+}
+
+
+static void gen( const char* language, const char* filename)
+{
+/**************************************
+ *
+ *	g e n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Generate an include file for a single language.
+ *
+ **************************************/
+	format_ptr = format_buffer;
+	formats[0] = NULL;
+	defaults = 0;
+
+	FOR X IN TEMPLATES WITH X.LANGUAGE EQ language
+		if (!filename)
+			filename = FILE;
+		if (!(output = fopen(filename, "w")))
+		{
+			perror(FILE);
+			return;
+		}
+		printf("Generating %s for %s\n", filename, X.LANGUAGE);
+		FOR Y IN X.TEMPLATE
+			SCHAR* end = Y.SEGMENT + Y.LENGTH;
+			*end = 0;
+			if (Y.LENGTH && end[-1] == '\n')
+				end[-1] = 0;
+			process_line(output, Y.SEGMENT);
+		END_FOR;
+		fclose(output);
+	END_FOR;
+}
+
+
+static void process_line( FILE * file, const SCHAR* line_ptr)
+{
+/**************************************
+ *
+ *	p r o c e s s _ l i n e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Process an output line.
+ *
+ **************************************/
+	SCHAR c, *words[10], stuff[512];
+
+	const SCHAR* line = line_ptr;
+
+/* If the line doesn't start with a $, just copy it */
+
+	if (*line != '$')
+	{
+		fprintf(output, "%s\n", line);
+		return;
+	}
+
+	SCHAR* p = stuff;
+	SCHAR* format = 0;
+	SSHORT options = defaults;
+	SCHAR** word = words;
+	++line;
+
+	while (*line)
+	{
+		*word = 0;
+		while (*line == ' ' || *line == '\t')
+			line++;
+		if (*line == '"')
+		{
+			++line;
+			break;
+		}
+		*word++ = p;
+		while (*line && *line != ' ' && *line != '\t' && *line != '"')
+			*p++ = *line++;
+		*p++ = 0;
+		if (check_option(word[-1], &options, &format))
+			--word;
+	}
+
+	if (!format)
+	{
+		for (format = p, line; *line;)
+		{
+			if ((c = *line++) != '\\')
+				*p++ = c;
+			else if (*line == 'n')
+			{
+				*p++ = '\n';
+				++line;
+			}
+			else if (*line == 't')
+			{
+				*p++ = '\t';
+				++line;
+			}
+			else
+				*p++ = c;
+		}
+		*p = 0;
+	}
+
+	if (!words[0])
+	{
+		printf("no class for line\n");
+		return;
+	}
+
+	if (!strcmp(words[0], "SYMBOLS"))
+		put_symbols(file, words + 1, format, options);
+	else if (!strcmp(words[0], "ERROR"))
+		put_error(file, words + 1, format, options);
+	else if (!strcmp(words[0], "FORMAT"))
+		define_format(words[1], format);
+	else if (!strcmp(words[0], "SET") && words[1])
+		defaults = options;
+	else
+		printf("don't understand %s\n", words[0]);
+
+}
+
+
+static void put_error(FILE* file,
+					 SCHAR** words, const SCHAR* format, SSHORT options)
+{
+/**************************************
+ *
+ *	p u t _ e r r o r
+ *
+ **************************************
+ *
+ * Functional description
+ *	Error codes to a file.
+ *
+ **************************************/
+	SCHAR symbol[64];
+
+	const SCHAR* option = words[0];
+	options &= ~(OPT_byte | OPT_signed);
+
+	if (!option || !strcmp(option, "MAJOR") || !strcmp(option, "MINOR"))
+	FOR X IN SYSTEM_ERRORS SORTED BY X.CODE
+		strcpy(symbol, "gds__");
+		strcat(symbol, X.GDS_SYMBOL);
+		put_symbol(file, format, symbol,
+				   (X.CODE + gds_err_base) * gds_err_factor, options);
+	END_FOR;
+}
+
+
+static void put_symbol(FILE* file,
+					  const SCHAR* format,
+					  const SCHAR* symbol, SLONG value, SSHORT options)
+{
+/**************************************
+ *
+ *	p u t _ s y m b o l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Write out a symbol.
+ *
+ **************************************/
+	SCHAR buffer[64];
+
+	if (!format)
+	{
+		printf("No format for symbol\n");
+		return;
+	}
+
+	if (options & OPT_byte)
+	{
+		if (value > 255)
+			return;
+		value = (UCHAR) value;
+	}
+
+	if (options & OPT_signed)
+		value = (SCHAR) value;
+
+	if (options & OPT_sans_dollar)
+	{
+		SCHAR* p;
+		for (p = buffer; *symbol; symbol++)
+		{
+			if (*symbol != '$')
+				*p++ = *symbol;
+		}
+		*p = 0;
+		symbol = buffer;
+	}
+
+	fprintf(file, format, symbol, value);
+}
+
+
+static void put_symbols(FILE* file,
+					   SCHAR** words, const SCHAR* format, SSHORT options)
+{
+/**************************************
+ *
+ *	p u t _ s y m b o l s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Dump symbols to a file.
+ *
+ **************************************/
+	int count = 0;
+
+	if (words[1] && strcmp(words[1], "*"))
+	{
+		FOR X IN SYMBOLS WITH X.CLASS EQ words[0] AND X.TYPE EQ words[1] SORTED BY X.SEQUENCE
+			++count;
+			put_symbol(file, format, X.SYMBOL, X.VALUE, options);
+		END_FOR;
+		if (!count)
+			printf("No symbols found for %s/%s\n", words[0], words[1]);
+	}
+	else
+	{
+		FOR X IN SYMBOLS WITH X.CLASS EQ words[0] SORTED BY X.SEQUENCE
+			++count;
+			put_symbol(file, format, X.SYMBOL, X.VALUE, options);
+		END_FOR;
+		if (!count)
+			printf("No symbols found for %s\n", words[0]);
+	}
+}
+

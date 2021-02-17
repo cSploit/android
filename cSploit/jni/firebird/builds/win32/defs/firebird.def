@@ -1,0 +1,371 @@
+; The contents of this file are subject to the Interbase Public
+; License Version 1.0 (the "License"); you may not use this file
+; except in compliance with the License. You may obtain a copy
+; of the License at http://www.Inprise.com/IPL.html
+;
+; Software distributed under the License is distributed on an
+; "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+; or implied. See the License for the specific language governing
+; rights and limitations under the License.
+;
+; The Original Code was created by Inprise Corporation
+; and its predecessors. Portions created by Inprise Corporation are
+; Copyright (C) Inprise Corporation.
+;
+; All Rights Reserved.
+; Contributor(s): ______________________________________.
+
+EXPORTS
+
+;-------------------
+; PRIVATE INTERFACE
+;-------------------
+
+	gds__alloc	@1
+	gds__attach_database	@2
+	gds__blob_info	@3
+	gds__blob_size	@4
+	gds__cancel_blob	@5
+	gds__cancel_events	@6
+	gds__close	@7
+	gds__close_blob	@8
+	gds__commit_retaining	@9
+	gds__commit_transaction	@10
+	gds__compile_request	@11
+	gds__compile_request2	@12
+	gds__create_blob	@13
+	gds__create_blob2	@14
+	gds__create_database	@15
+	gds__database_cleanup	@16
+	gds__database_info	@17
+	gds__ddl	@18
+	gds__declare	@19
+	gds__decode	@20
+	gds__decode_date	@21
+	gds__describe	@22
+	gds__describe_bind	@23
+	gds__detach_database	@24
+	gds__disable_subsystem	@25
+	gds__dsql_finish	@26
+	gds__edit	@27
+	gds__enable_subsystem	@28
+	gds__encode	@29
+	gds__encode_date	@30
+	gds__event_block	@31
+	gds__event_counts	@32
+	gds__event_wait	@33
+	gds__execute	@34
+	gds__execute_immediate	@35
+	gds__fetch	@36
+	gds__free	@37
+	gds__ftof	@38
+	gds__get_prefix	@248
+	gds__get_segment	@39
+	gds__get_slice	@40
+	gds__interprete	@41
+	gds__log	@42
+	gds__log_status	@142
+	gds__map_blobs	@240
+	gds__msg_close	@223
+	gds__msg_format	@43
+	gds__msg_lookup	@44
+	gds__msg_open	@45
+	gds__msg_put	@46
+	gds__open	@47
+	gds__open_blob	@48
+	gds__open_blob2	@49
+	gds__parse_bpb	@50
+	gds__prefix	@51
+	gds__prefix_lock	@249
+	gds__prefix_msg	@250
+	gds__prepare	@52
+	gds__prepare_transaction	@53
+	gds__prepare_transaction2	@54
+	gds__print_blr	@55
+	gds__print_status	@56
+	gds__put_error	@57
+	gds__put_segment	@58
+	gds__put_slice	@59
+	gds__qtoq	@60
+	gds__que_events	@61
+	gds__receive	@62
+	gds__reconnect_transaction	@63
+	gds__register_cleanup	@64
+	gds__release_request	@65
+	gds__request_info	@66
+	gds__rollback_transaction	@67
+	gds__seek_blob	@68
+	gds__send	@69
+	gds__set_debug	@70
+	gds__sqlcode	@71
+	gds__start_and_send	@72
+	gds__start_multiple	@73
+	gds__start_request	@74
+	gds__start_transaction	@75
+	gds__temp_file	@231
+	gds__thread_enable	@76
+	gds__thread_enter	@77
+	gds__thread_exit	@78
+	gds__thread_start	@79
+	gds__to_sqlda	@80
+	gds__transaction_cleanup	@235
+	gds__transaction_info	@81
+	gds__unregister_cleanup	@224
+	gds__unwind_request	@82
+	gds__validate_lib_path	@255
+	gds__vax_integer	@83
+	gds__version	@84
+	gds__vtof	@85
+	gds__vtov	@86
+	gds__default_printer @87
+
+    gds__alloc_debug
+
+    gds_alloc_flag_unfreed
+    gds_alloc_report
+
+	fb_shutdown
+	fb_shutdown_callback
+	fb_cancel_operation
+	fb_disconnect_transaction
+
+	perf_format	@100
+	perf_get_info	@101
+	perf_report	@102
+
+	perf64_format
+	perf64_get_info
+	perf64_report
+
+;----------------------------
+; PUBLIC INTERFACE, i.e. API
+;----------------------------
+
+	; Array functions
+
+	isc_array_gen_sdl	@217
+	isc_array_get_slice	@218
+	isc_array_lookup_bounds	@219
+	isc_array_lookup_desc	@220
+	isc_array_put_slice	@221
+	isc_array_set_desc	@222
+	isc_get_slice	@140
+	isc_put_slice	@153
+
+	; BLOB functions
+
+	isc_blob_default_desc	@239
+	isc_blob_gen_bpb	@236
+	isc_blob_info	@108
+	isc_blob_lookup_desc	@237
+	isc_blob_set_desc	@238
+	isc_cancel_blob	@110
+	isc_close_blob	@113
+	isc_create_blob	@118
+	isc_create_blob2	@119
+	isc_get_segment	@139
+	isc_open_blob	@144
+	isc_open_blob2	@145
+	isc_put_segment	@152
+	
+	; Database functions
+
+	isc_attach_database	@103
+	isc_create_database	@120
+	isc_database_info	@122
+	isc_detach_database	@128
+	isc_drop_database	@229
+	isc_expand_dpb	@135
+	isc_modify_dpb	@244
+	isc_version	@174
+	isc_get_client_major_version	@268
+	isc_get_client_minor_version	@269
+	isc_get_client_version	@270
+
+	; Conversion functions
+
+	isc_decode_date	@125
+	isc_decode_sql_date	@261
+	isc_decode_sql_time	@262
+	isc_decode_timestamp	@263
+	isc_encode_date	@129
+	isc_encode_sql_date	@264
+	isc_encode_sql_time	@265
+	isc_encode_timestamp	@266
+	isc_portable_integer	@259
+	isc_vax_integer	@173
+
+	; DSQL functions
+
+	isc_dsql_allocate_statement	@178
+	isc_dsql_alloc_statement2	@179
+	isc_dsql_describe	@180
+	isc_dsql_describe_bind	@181
+	isc_dsql_execute	@182
+	isc_dsql_execute2	@183
+	isc_dsql_execute_m	@184
+	isc_dsql_execute2_m	@185
+	isc_dsql_execute_immediate	@186
+	isc_dsql_exec_immed2	@187
+	isc_dsql_execute_immediate_m	@188
+	isc_dsql_exec_immed2_m	@189
+	isc_dsql_exec_immed3_m	@230
+	isc_dsql_fetch	@190
+	isc_dsql_fetch_a	@191
+	isc_dsql_fetch_m	@192
+	isc_dsql_finish	@193
+	isc_dsql_free_statement	@194
+	isc_dsql_insert	@195
+	isc_dsql_insert_m	@196
+	isc_dsql_prepare	@197
+	isc_dsql_prepare_m	@198
+	isc_dsql_release	@199
+	isc_dsql_set_cursor_name	@200
+	isc_dsql_sql_info	@201
+
+	; ESQL functions
+
+	isc_embed_dsql_close	@202
+	isc_embed_dsql_declare	@203
+	isc_embed_dsql_describe	@204
+	isc_embed_dsql_describe_bind	@205
+	isc_embed_dsql_execute	@206
+	isc_embed_dsql_execute2	@207
+	isc_embed_dsql_execute_immed	@208
+	isc_embed_dsql_exec_immed2	@209
+	isc_embed_dsql_fetch	@210
+	isc_embed_dsql_fetch_a	@211
+	isc_embed_dsql_insert	@212
+	isc_embed_dsql_open	@213
+	isc_embed_dsql_open2	@214
+	isc_embed_dsql_prepare	@215
+	isc_embed_dsql_release	@216
+	isc_embed_dsql_length	@273
+
+	; Error-handling functions
+
+	isc_interprete	@141
+	fb_interpret
+	isc_print_sqlerror	@150
+	isc_print_status	@151
+	isc_sqlcode	@165
+	isc_sql_interprete	@164
+	isc_sqlcode_s		@278
+	fb_sqlstate			@279
+
+	; Event functions
+
+	isc_cancel_events	@111
+	isc_event_block	@130
+	isc_event_counts	@131
+	isc_que_events	@155
+	isc_wait_for_event	@177
+	isc_event_block_a	@274
+	isc_event_block_s	@275
+
+	; Security functions
+
+	isc_add_user	@256
+	isc_delete_user	@257
+	isc_modify_user	@258
+
+	; Services functions
+
+	isc_service_attach	@225
+	isc_service_detach	@226
+	isc_service_query	@227
+	isc_service_start	@228
+
+	; Transaction control functions
+
+	isc_commit_retaining	@114
+	isc_commit_transaction	@115
+	isc_prepare_transaction	@147
+	isc_prepare_transaction2	@148
+	isc_rollback_retaining	@260
+	isc_rollback_transaction	@160
+	isc_start_multiple	@167
+	isc_start_transaction	@169
+	isc_transaction_info	@171
+
+	; Other functions
+
+	isc_compile_request	@116
+	isc_compile_request2	@117
+	isc_ddl	@123
+	isc_prepare	@146
+	isc_receive	@156
+	isc_reconnect_transaction	@157
+	isc_release_request	@158
+	isc_request_info	@159
+	isc_seek_blob	@161
+	isc_send	@162
+	isc_start_and_send	@166
+	isc_start_request	@168
+	isc_transact_request	@132
+	isc_unwind_request	@172
+
+	; Other SQL functions
+
+	isc_close	@112
+	isc_declare	@124
+	isc_describe	@126
+	isc_describe_bind	@127
+	isc_execute	@133
+	isc_execute_immediate	@134
+	isc_fetch	@136
+	isc_fetch_a	@137
+	isc_open	@143
+
+	; Other BLOB functions
+
+	BLOB_close	@91
+	BLOB_display	@92
+	BLOB_dump	@93
+	BLOB_edit	@94
+	BLOB_get	@95
+	BLOB_load	@96
+	BLOB_open	@97
+	BLOB_put	@98
+	BLOB_text_dump	@242
+	BLOB_text_load	@243
+	Bopen	@99
+
+	; Other misc functions
+
+	isc_ftof	@138
+	isc_free	@241
+	isc_print_blr	@149
+	fb_print_blr	@280
+	isc_qtoq	@154
+	isc_reset_fpe
+	isc_set_debug	@163
+	isc_to_sqlda	@170
+	isc_vtof	@175
+	isc_vtov	@176
+	isc_baddress	@276
+	isc_baddress_s	@277
+
+	_isc_start_transaction=isc_start_transaction
+	_isc_expand_dpb=isc_expand_dpb
+	_isc_event_block=isc_event_block
+
+	fb_ping
+	fb_get_master_interface
+	fb_get_database_handle
+	fb_get_transaction_handle
+	fb_database_crypt_callback
+
+	gds__trace                                                                                                                                     
+	gds__trace_raw                                                                                                                                 
+	gds__trace_printer
+	gds__parse_bpb2
+
+;-----------------
+; OTHER FUNCTIONS
+;-----------------
+
+	CVT_move	@267
+
+	KEYWORD_stringIsAToken	@271
+	KEYWORD_getTokens	@272

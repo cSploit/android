@@ -1,0 +1,335 @@
+/* include/config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* If you want native IP support, uncomment CONFIG_NATIVE_IP Do not forget
+   that it is VERY ALPHA code, with almost no support Enable only if you are
+   interested in NCP over IP and you want help me. -A ip.address is your
+   friend. At this time you have to silently ignore Login to server XXXX as
+   YYYY - think that XXXX is ip.address and not one taken from .nwclient.
+   Also, if you have not .nwclient, you have to add -S DUMMY on commandline.
+   */
+#undef CONFIG_NATIVE_IP
+
+/* If you do not want IPX support, comment CONFIG_NATIVE_IPX out... I cannot
+   recommend doing it */
+#undef CONFIG_NATIVE_IPX
+
+/* Define to one of `_getb67', `GETB67', `getb67' for Cray-2 and Cray-YMP
+   systems. This function is required for `alloca.c' support on those systems.
+   */
+#undef CRAY_STACKSEG_END
+
+/* Define to 1 if using `alloca.c'. */
+#undef C_ALLOCA
+
+/* Define to 1 if translation of program messages to the user's native
+   language is requested. */
+#undef ENABLE_NLS
+
+/* Define to 1 if you have `alloca', as a function or macro. */
+#undef HAVE_ALLOCA
+
+/* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
+   */
+#undef HAVE_ALLOCA_H
+
+/* Define to 1 if you have the <argz.h> header file. */
+#undef HAVE_ARGZ_H
+
+/* Define if the GNU dcgettext() function is already present or preinstalled.
+   */
+#undef HAVE_DCGETTEXT
+
+/* Define to 1 if you have the `feof_unlocked' function. */
+#undef HAVE_FEOF_UNLOCKED
+
+/* Define to 1 if you have the `fgets_unlocked' function. */
+#undef HAVE_FGETS_UNLOCKED
+
+/* Define to 1 if you have the `getcwd' function. */
+#undef HAVE_GETCWD
+
+/* Define to 1 if you have the `getc_unlocked' function. */
+#undef HAVE_GETC_UNLOCKED
+
+/* Define to 1 if you have the `getegid' function. */
+#undef HAVE_GETEGID
+
+/* Define to 1 if you have the `geteuid' function. */
+#undef HAVE_GETEUID
+
+/* Define to 1 if you have the `getgid' function. */
+#undef HAVE_GETGID
+
+/* Define to 1 if you have the `getpagesize' function. */
+#undef HAVE_GETPAGESIZE
+
+/* Define if the GNU gettext() function is already present or preinstalled. */
+#undef HAVE_GETTEXT
+
+/* Define to 1 if you have the `getuid' function. */
+#undef HAVE_GETUID
+
+/* Define if you have the iconv() function. */
+#undef HAVE_ICONV
+
+/* Define to 1 if you have the <iconv.h> header file. */
+#undef HAVE_ICONV_H
+
+/* Define if <inttypes.h> exists and doesn't clash with <sys/types.h>. */
+#undef HAVE_INTTYPES_H
+
+/* Define if <inttypes.h> exists, doesn't clash with <sys/types.h>, and
+   declares uintmax_t. */
+#undef HAVE_INTTYPES_H_WITH_UINTMAX
+
+/* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
+#undef HAVE_LANGINFO_CODESET
+
+/* Define if your <locale.h> file defines LC_MESSAGES. */
+#undef HAVE_LC_MESSAGES
+
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
+
+/* Define if you have IPX header linux/ipx.h */
+#undef HAVE_LINUX_IPX_H
+
+/* Define to 1 if you have the <locale.h> header file. */
+#undef HAVE_LOCALE_H
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#undef HAVE_MALLOC_H
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `mempcpy' function. */
+#undef HAVE_MEMPCPY
+
+/* Define to 1 if you have a working `mmap' system call. */
+#undef HAVE_MMAP
+
+/* Define to 1 if you have the `munmap' function. */
+#undef HAVE_MUNMAP
+
+/* Define if you have IPX header netipx/ipx.h */
+#undef HAVE_NETIPX_IPX_H
+
+/* Define to 1 if you have the <nl_types.h> header file. */
+#undef HAVE_NL_TYPES_H
+
+/* Define to 1 if you have the `putenv' function. */
+#undef HAVE_PUTENV
+
+/* Define to 1 if you have the `setenv' function. */
+#undef HAVE_SETENV
+
+/* Define to 1 if you have the `setlocale' function. */
+#undef HAVE_SETLOCALE
+
+/* Define to 1 if you have the <stddef.h> header file. */
+#undef HAVE_STDDEF_H
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define if <stdint.h> exists, doesn't clash with <sys/types.h>, and declares
+   uintmax_t. */
+#undef HAVE_STDINT_H_WITH_UINTMAX
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `stpcpy' function. */
+#undef HAVE_STPCPY
+
+/* Define to 1 if you have the `strcasecmp' function. */
+#undef HAVE_STRCASECMP
+
+/* Define to 1 if you have the `strdup' function. */
+#undef HAVE_STRDUP
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the `strtoul' function. */
+#undef HAVE_STRTOUL
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
+#undef HAVE_SYS_WAIT_H
+
+/* Define to 1 if you have the `tsearch' function. */
+#undef HAVE_TSEARCH
+
+/* Define if you have the 'uintmax_t' type in <stdint.h> or <inttypes.h>. */
+#undef HAVE_UINTMAX_T
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define if you have the 'unsigned long long' type. */
+#undef HAVE_UNSIGNED_LONG_LONG
+
+/* Define to 1 if you have the <wchar.h> header file. */
+#undef HAVE_WCHAR_H
+
+/* Define to 1 if you have the `wcscasecmp' function. */
+#undef HAVE_WCSCASECMP
+
+/* Define to 1 if you have the `wcscmp' function. */
+#undef HAVE_WCSCMP
+
+/* Define to 1 if you have the `wcscpy' function. */
+#undef HAVE_WCSCPY
+
+/* Define to 1 if you have the `wcsdup' function. */
+#undef HAVE_WCSDUP
+
+/* Define to 1 if you have the `wcslen' function. */
+#undef HAVE_WCSLEN
+
+/* Define to 1 if you have the `wcsncasecmp' function. */
+#undef HAVE_WCSNCASECMP
+
+/* Define to 1 if you have the `wcsncmp' function. */
+#undef HAVE_WCSNCMP
+
+/* Define to 1 if you have the `wcsrev' function. */
+#undef HAVE_WCSREV
+
+/* Define to 1 if you have the `__argz_count' function. */
+#undef HAVE___ARGZ_COUNT
+
+/* Define to 1 if you have the `__argz_next' function. */
+#undef HAVE___ARGZ_NEXT
+
+/* Define to 1 if you have the `__argz_stringify' function. */
+#undef HAVE___ARGZ_STRINGIFY
+
+/* Define as const if the declaration of iconv() needs const. */
+#undef ICONV_CONST
+
+/* Define if integer division by zero raises signal SIGFPE. */
+#undef INTDIV0_RAISES_SIGFPE
+
+/* If defined, support for Linux2.0.x is compiled in */
+#undef MOUNT2
+
+/* If defined, support for Linux2.1-3.x is compiled in */
+#undef MOUNT3
+
+/* Define to 8 (big-endian) or 16 (32 bit little-endian except i386) or 32
+   (i386) */
+#undef MULTUNITSIZE
+
+/* Enable support for NCP_DEBUG environment variable. */
+#undef NCP_DEBUG
+
+/* If you want to trace ncp calls uncomment this. */
+#undef NCP_TRACE_ENABLE
+
+/* If you want to include NDS support, define NDS_SUPPORT symbol Change only
+   through 'configure', copies of this value are in makefiles */
+#undef NDS_SUPPORT
+
+/* neither net/if.h nor linux/if.h was found, so ipx_* will not build... */
+#undef NO_NET_IF_SUPPORT
+
+/* neither net/route.h nor linux/route.h was found ... */
+#undef NO_NET_ROUTE_SUPPORT
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define if <inttypes.h> exists and defines unusable PRI* macros. */
+#undef PRI_MACROS_BROKEN
+
+/* If you want to include packet signature support uncomment this. If you are
+   using 2.0.x Linux kernel, make sure that you also applied kernel patches.
+   Change only through 'configure', copies of this value are in makefiles */
+#undef SIGNATURES
+
+/* If using the C implementation of alloca, define if you know the
+   direction of stack growth for your system; otherwise it will be
+   automatically deduced at run-time.
+	STACK_DIRECTION > 0 => grows toward higher addresses
+	STACK_DIRECTION < 0 => grows toward lower addresses
+	STACK_DIRECTION = 0 => direction of growth unknown */
+#undef STACK_DIRECTION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#undef TIME_WITH_SYS_TIME
+
+/* Define to 1 if your <sys/time.h> declares `struct tm'. */
+#undef TM_IN_SYS_TIME
+
+/* Define to 8 (big-endian) or 16 (32 bit little-endian except i386) or 32
+   (i386) */
+#undef UNITSIZE
+
+/* Define when compiling for Linux kernel */
+#undef USE_KERNEL
+
+/* Define if you need this for correct threading_MIT_POSIX_THREADS ... */
+#undef _MIT_POSIX_THREADS
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const
+
+/* Define to `int' if <sys/types.h> doesn't define. */
+#undef gid_t
+
+/* Define to `__inline__' or `__inline' if that's what the C compiler
+   calls it, or to nothing if 'inline' is not supported under any name.  */
+#ifndef __cplusplus
+#undef inline
+#endif
+
+/* Define to `int' if <sys/types.h> does not define. */
+#undef mode_t
+
+/* Define to `long' if <sys/types.h> does not define. */
+#undef off_t
+
+/* Define to `int' if <sys/types.h> does not define. */
+#undef pid_t
+
+/* Define to `unsigned' if <sys/types.h> does not define. */
+#undef size_t
+
+/* Define to `int' if <sys/types.h> doesn't define. */
+#undef uid_t
+
+/* Define to unsigned long or unsigned long long if <stdint.h> and
+   <inttypes.h> don't define. */
+#undef uintmax_t
+
+/* Define to 'unsigned int' if wchar_t is not defined. */
+#undef wchar_t

@@ -1,0 +1,117 @@
+.TH NWREVOKE 8 7/9/1996 nwrevoke nwrevoke
+.SH NAME
+nwrevoke \- Revoke a Trustee Right from a directory
+.SH SYNOPSIS
+.B nwrevoke
+[
+.B -h
+] [
+.B -S
+.I server
+] [
+.B -U
+.I user name
+] [
+.B -P
+.I password
+|
+.B -n
+] [
+.B -C
+] [
+.B -o
+.I object name
+] [
+.B -t
+.I type
+] [
+.B -r
+.I rights
+]
+.B file/directory
+
+.SH DESCRIPTION
+.B nwrevoke
+revokes the specified bindery object with the corresponding trustee
+rights from the directory.
+
+.B nwrevoke
+looks up the file
+.I $HOME/.nwclient
+to find a file server, a user name and possibly a password. See
+nwclient(5) for more information. Please note that the access
+permissions of $HOME/.nwclient MUST be 600 for security reasons.
+
+.SH OPTIONS
+
+\fB-h\fP
+.RS 3
+\fB-h\fP is used to print out a short help text.
+.RE
+
+\fB-S\fP \fIserver\fP
+.RS 3
+\fBserver\fP is the name of the server you want to use.
+.RE
+
+\fB-U\fP \fIuser\fP
+.RS 3
+\fBuser\fP is the user name to use for login.
+.RE
+
+\fB-P\fP \fIpassword\fP
+.RS 3
+\fBpassword\fP is the password to use for login. If neither
+\fB-n\fP nor \fB-P\fP are given, and the user has no open 
+connection to the server, nwrevoke prompts for a password.
+.RE
+
+\fB-n\fP
+.RS 3
+\fB-n\fP should be given if no password is required for the login.
+.RE
+
+\fB-C\fP
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by \fB-C\fP.
+.RE
+
+\fB-o\fP \fIobject name\fP
+.RS 3
+The name of the object to be added as trustee.
+.RE
+
+\fB-t\fP \fIobject type\fP
+.RS 3
+The type of the object. \fIObject type\fP must be specified as 
+a decimal value. Common values are 1 for user objects, 2 for group 
+objects and 3 for print queues. Other values are allowed, but are 
+usually used for specialized applications. If \fIobject type\fP is
+not specified, \fIobject name\fP is taken as \fBNDS\fP name.
+.RE
+
+\fBfile/directory\fP
+.RS 3
+You must specify the file/directory from which to remove the object as
+trustee. If you specified \fB-S\fP, it must be fully qualified 
+NetWare notation for DOS namespace. Otherwise it must be file or directory
+mounted to your system using ncpfs.
+
+Example:
+
+nwrevoke -S NWSERVER -o linus -t 1 'src:bsd_src'
+
+With this example, user linus is removed as trustee from the bsd_src
+directory on the src volume on server NWSERVER.
+
+nwrevoke -o linus -t 1 /home/vana/ncpfs/nwserver/src/bsd_src
+
+With this example, user linus is removed as trustee from the bsd_src
+directory.
+
+.SH AUTHORS
+nwrevoke was written by Volker Lendecke with the corresponding NetWare
+utility in mind. See the Changes file of ncpfs for other contributors.
+

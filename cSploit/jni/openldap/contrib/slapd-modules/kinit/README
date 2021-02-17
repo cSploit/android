@@ -1,0 +1,36 @@
+This directory contains the "kinit" slapd module. It is a simple plugin to
+have slapd request a Kerberos TGT and keep it renewed as long as slapd is
+running.
+
+The current implementation has only been tested against the MIT variant of
+the Kerberos libraries. (Heimdal support might come later)
+
+To use the overlay just load it into the slapd process:
+
+    moduleload </path/to>/kinit.so <principal> </path/to/key.tab>
+
+The module accepts two arguments. The first one being the principal for which
+to request the TGT (it defaults to "ldap/<your hostname>@<DEFAULTREALM>")
+and the second one is the path to the keytab file to use for
+authentication, defaulting to whatever your system wide kerberos settings
+default to).
+
+Use Makefile or the following commands should work to
+build it from inside the unpacked slapd sources, provided the required KRB5
+header files and libaries are installed on your system:
+
+    gcc -fPIC -c -I ../../../include/ -I ../../../servers/slapd kinit.c
+    gcc -shared -o kinit.so kinit.o -lkrb5
+
+---
+This work is part of OpenLDAP Software <http://www.openldap.org/>.
+
+Copyright 2010-2014 The OpenLDAP Foundation.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in the file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+<http://www.OpenLDAP.org/license.html>.

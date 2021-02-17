@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir>..\..\..\temp\$(PlatformName)\$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>..\..\..\temp\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalOptions>/EHsc- %(AdditionalOptions)</AdditionalOptions>
+      <OmitFramePointers>true</OmitFramePointers>
+      <AdditionalIncludeDirectories>../../../src/include;../../../src/include/gen;../../../extern/libtommath;../../../extern/icu/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <PrecompiledHeaderOutputFile>..\..\..\temp\$(Platform)\$(Configuration)\$(ProjectName)\$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>..\..\..\temp\$(Platform)\$(Configuration)\$(ProjectName)/</AssemblerListingLocation>
+      <ObjectFileName>..\..\..\temp\$(Platform)\$(Configuration)\$(ProjectName)/</ObjectFileName>
+      <ProgramDataBaseFileName>..\..\..\temp\$(Platform)\$(Configuration)\$(ProjectName)/</ProgramDataBaseFileName>
+      <BrowseInformation>true</BrowseInformation>
+      <BrowseInformationFile>..\..\..\temp\$(Platform)\$(Configuration)\$(ProjectName)\</BrowseInformationFile>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <UseFullPaths>false</UseFullPaths>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>$(IntDir)$(TargetName).lib</ImportLibrary>
+    </Link>
+    <Bscmake>
+      <OutputFile>$(IntDir)$(TargetName).bsc</OutputFile>
+    </Bscmake>
+  </ItemDefinitionGroup>
+</Project>

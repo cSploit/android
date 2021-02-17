@@ -1,0 +1,4 @@
+if ( $TestDBMS =~ /^pgsql/ )
+{
+	`echo "DROP TABLE simple;" | time $FrontEnd`;
+}

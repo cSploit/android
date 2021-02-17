@@ -1,0 +1,40 @@
+# $OpenLDAP$
+# Copyright 2007-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Upgrading from 2.3.x
+
+The following sections attempt to document the steps you will need to take in order 
+to upgrade from the latest 2.3.x OpenLDAP version.
+
+The normal upgrade procedure, as discussed in the {{SECT:Maintenance}} section, should 
+of course still be followed prior to doing any of this.
+
+H2: {{B:cn=config}} olc* attributes
+
+Quite a few {{olc*}} attributes have now become obsolete, if you see in your logs 
+entries like below, just remove them from the relevant ldif file.
+
+>           olcReplicationInterval: value #0: <olcReplicationInterval> keyword is obsolete (ignored)
+
+H2: ACLs: searches require privileges on the search base
+
+Search operations now require "search" privileges on the "entry" pseudo-attribute of the search
+base. While upgrading from 2.3.x, make sure your ACLs grant such privileges to all desired search
+bases.
+
+For example, assuming you have the following ACL:
+
+>           access to dn.sub="ou=people,dc=example,dc=com" by * search
+
+Searches using a base of "dc=example,dc=com" will only be allowed if you add the following ACL:
+
+>           access to dn.base="dc=example,dc=com" attrs=entry by * search
+
+Note: The {{slapd.access}}(5) man page states that this requirement was introduced
+with OpenLDAP 2.3. However, it is the default behavior only since 2.4.
+
+
+
+ADD MORE HERE
+

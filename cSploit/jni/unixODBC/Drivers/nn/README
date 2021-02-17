@@ -1,0 +1,36 @@
+***************************************************************
+* This code is GPL.                                           *
+***************************************************************
+
++-------------------------------------------------------------+
+| unixODBC                                                    |
+| Driver for internet News Servers                            |
++-------------------------------------------------------------+
+
+This is Ke Jin's NN ODBC driver, adapted for unixODBC. Ke Jin's
+original README is in README.orig.
+
+This is a first pass at the effort to integrate it into
+unixODBC. It works, in its current state, but much more needs
+to be done (see the TODO).
+
+THIS CODE IS FUNCTIONAL BUT IS IN MID-HACK; ONLY THE MOST
+ADVENTUROUS SHOULD EVEN TRY TO FIGURE THIS OUT IN ITS
+CURRENT STATE. - PAH
+
+The basic concept is that a news server is like a
+SERVER/DATABASE, a news group is like a TABLE, and data such
+as Subject is a COLUMN.
+
+A useful subset of SQL is supported in the driver. Check out
+Ke Jins original README (README.orig).
+
+This driver can be quite usefull so I hope someone volunteers
+to tackle some of the items in the TODO list.
+
++-------------------------------------------------------------+
+| Peter Harvey pharvey@codebydesign.com                       |
+| http://www.unixodbc.org                                     |
++-------------------------------------------------------------+
+
+

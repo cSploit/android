@@ -1,0 +1,17 @@
+ldap_str2syntax.3
+ldap_syntax2str.3
+ldap_syntax2name.3
+ldap_syntax_free.3
+ldap_str2matchingrule.3
+ldap_matchingrule2str.3
+ldap_matchingrule2name.3
+ldap_matchingrule_free.3
+ldap_str2attributetype.3
+ldap_attributetype2str.3
+ldap_attributetype2name.3
+ldap_attributetype_free.3
+ldap_str2objectclass.3
+ldap_objectclass2str.3
+ldap_objectclass2name.3
+ldap_objectclass_free.3
+ldap_scherr2str.3

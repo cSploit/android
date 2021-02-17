@@ -1,0 +1,13 @@
+# bundled ICU is used when user configures --with-system-icu=no
+
+f none @prefix@/lib/libicudata.so.30.0=$SRCDIR/lib/libicudata.so.30.0 0755 firebird firebird
+s none @prefix@/lib/libicudata.so.30=@prefix@/lib/libicudata.so.30.0
+s none @prefix@/lib/libicudata.so=@prefix@/lib/libicudata.so.30
+
+f none @prefix@/lib/libicui18n.so.30.0=$SRCDIR/lib/libicui18n.so.30.0 0755 firebird firebird
+s none @prefix@/lib/libicui18n.so.30=@prefix@/lib/libicui18n.so.30.0
+s none @prefix@/lib/libicui18n.so=@prefix@/lib/libicui18n.so.30
+
+f none @prefix@/lib/libicuuc.so.30.0=$SRCDIR/lib/libicuuc.so.30.0 0755 firebird firebird
+s none @prefix@/lib/libicuuc.so.30=@prefix@/lib/libicuuc.so.30.0
+s none @prefix@/lib/libicuuc.so=@prefix@/lib/libicuuc.so.30

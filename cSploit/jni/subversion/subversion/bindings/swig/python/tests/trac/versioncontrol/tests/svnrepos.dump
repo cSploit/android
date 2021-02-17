@@ -1,0 +1,388 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 92ea810a-adf3-0310-b540-bef912dcf5ba
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2005-04-01T09:57:41.312767Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 124
+Content-length: 124
+
+K 7
+svn:log
+V 25
+Initial directory layout.
+K 10
+svn:author
+V 4
+john
+K 8
+svn:date
+V 27
+2005-04-01T10:00:52.353248Z
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 112
+Content-length: 112
+
+K 7
+svn:log
+V 13
+Added README.
+K 10
+svn:author
+V 4
+john
+K 8
+svn:date
+V 27
+2005-04-01T13:12:18.216267Z
+PROPS-END
+
+Node-path: trunk/README.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 8
+Text-content-md5: a0691c0f61f52683bcb05da98fe028c8
+Content-length: 18
+
+PROPS-END
+A text.
+
+
+Revision-number: 3
+Prop-content-length: 113
+Content-length: 113
+
+K 7
+svn:log
+V 14
+Fixed README.
+
+K 10
+svn:author
+V 4
+kate
+K 8
+svn:date
+V 27
+2005-04-01T13:24:58.234643Z
+PROPS-END
+
+Node-path: trunk/README.txt
+Node-kind: file
+Node-action: change
+Prop-content-length: 75
+Text-content-length: 8
+Text-content-md5: eaf1c95c78c9f848636d357788bd4a4c
+Content-length: 83
+
+K 13
+svn:mime-type
+V 10
+text/plain
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+A test.
+
+
+Revision-number: 4
+Prop-content-length: 116
+Content-length: 116
+
+K 7
+svn:log
+V 17
+More directories.
+K 10
+svn:author
+V 4
+john
+K 8
+svn:date
+V 27
+2005-04-01T15:42:35.450595Z
+PROPS-END
+
+Node-path: trunk/dir1
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/dir2
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/dir3
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 5
+Prop-content-length: 117
+Content-length: 117
+
+K 7
+svn:log
+V 18
+Moved directories.
+K 10
+svn:author
+V 4
+kate
+K 8
+svn:date
+V 27
+2005-04-01T16:25:39.658099Z
+PROPS-END
+
+Node-path: trunk/dir1/dir2
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 4
+Node-copyfrom-path: trunk/dir2
+
+
+Node-path: trunk/dir1/dir3
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 4
+Node-copyfrom-path: trunk/dir3
+
+
+Node-path: trunk/dir2
+Node-action: delete
+
+
+Node-path: trunk/dir3
+Node-action: delete
+
+
+Revision-number: 6
+Prop-content-length: 118
+Content-length: 118
+
+K 7
+svn:log
+V 19
+More things to read
+K 10
+svn:author
+V 4
+john
+K 8
+svn:date
+V 27
+2005-04-01T18:56:46.985846Z
+PROPS-END
+
+Node-path: trunk/README2.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 3
+Node-copyfrom-path: trunk/README.txt
+
+
+Revision-number: 7
+Prop-content-length: 151
+Content-length: 151
+
+K 7
+svn:log
+V 42
+test the tag operation (copy of directory)
+K 10
+svn:author
+V 13
+Administrator
+K 8
+svn:date
+V 27
+2005-04-14T15:06:20.717616Z
+PROPS-END
+
+Node-path: tags/v1
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 6
+Node-copyfrom-path: trunk
+
+
+Revision-number: 8
+Prop-content-length: 124
+Content-length: 124
+
+K 7
+svn:log
+V 15
+Fix stuff in v1
+K 10
+svn:author
+V 13
+Administrator
+K 8
+svn:date
+V 27
+2005-04-22T08:57:33.499643Z
+PROPS-END
+
+Node-path: branches/v1x
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 7
+Node-copyfrom-path: tags/v1
+
+
+Revision-number: 9
+Prop-content-length: 127
+Content-length: 127
+
+K 7
+svn:log
+V 18
+Now that's the fix
+K 10
+svn:author
+V 13
+Administrator
+K 8
+svn:date
+V 27
+2005-04-22T08:59:24.308979Z
+PROPS-END
+
+Node-path: branches/v1x/README.txt
+Node-kind: file
+Node-action: change
+Text-content-length: 16
+Text-content-md5: 02bcabffffd16fe0fc250f08cad95e0c
+Content-length: 16
+
+This is a test.
+
+
+Revision-number: 10
+Prop-content-length: 141
+Content-length: 141
+
+K 7
+svn:log
+V 32
+Tagging v1.1 from the fix branch
+K 10
+svn:author
+V 13
+Administrator
+K 8
+svn:date
+V 27
+2005-04-22T09:00:34.549980Z
+PROPS-END
+
+Node-path: tags/v1.1
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 9
+Node-copyfrom-path: branches/v1x
+
+
+Revision-number: 11
+Prop-content-length: 191
+Content-length: 191
+
+K 7
+svn:log
+V 82
+''(a few months later)'' We don't need the fix branch anymore, 1.1 is super-stable
+K 10
+svn:author
+V 13
+Administrator
+K 8
+svn:date
+V 27
+2005-04-22T09:01:38.361737Z
+PROPS-END
+
+Node-path: branches/v1x
+Node-action: delete
+
+
+Revision-number: 12
+Prop-content-length: 166
+Content-length: 166
+
+K 7
+svn:log
+V 57
+''(a few years later)'' Argh... v1.1 was buggy, after all
+K 10
+svn:author
+V 13
+Administrator
+K 8
+svn:date
+V 27
+2005-04-22T09:06:37.011174Z
+PROPS-END
+
+Node-path: branches/v1x
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 11
+Node-copyfrom-path: tags/v1.1
+
+

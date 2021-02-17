@@ -1,0 +1,48 @@
+--- src/btree.h
++++ src/btree.h
+@@ -120,6 +120,14 @@
+ int sqlite3BtreeNewDb(Btree *p);
+ 
+ /*
++ * BEGIN Berkeley DB specific function forward declarations.
++ */
++int sqlite3BtreeHandleCacheFixup(Btree *, int);
++/*
++ * END Berkeley DB specific function forward declarations.
++ */
++
++/*
+ ** The second parameter to sqlite3BtreeGetMeta or sqlite3BtreeUpdateMeta
+ ** should be one of the following values. The integer values are assigned 
+ ** to constants so that the offset of the corresponding field in an
+--- src/vdbe.c
++++ src/vdbe.c
+@@ -3065,11 +3065,13 @@
+ case OP_VerifyCookie: {
+   int iMeta;
+   int iGen;
++  int iSchemaUpdated;
+   Btree *pBt;
+ 
+   assert( pOp->p1>=0 && pOp->p1<db->nDb );
+   assert( (p->btreeMask & (((yDbMask)1)<<pOp->p1))!=0 );
+   assert( sqlite3SchemaMutexHeld(db, pOp->p1, 0) );
++  iSchemaUpdated = 0;
+   pBt = db->aDb[pOp->p1].pBt;
+   if( pBt ){
+     sqlite3BtreeGetMeta(pBt, BTREE_SCHEMA_VERSION, (u32 *)&iMeta);
+@@ -3098,12 +3100,14 @@
+     ** a v-table method.
+     */
+     if( db->aDb[pOp->p1].pSchema->schema_cookie!=iMeta ){
++      iSchemaUpdated = 1;
+       sqlite3ResetOneSchema(db, pOp->p1);
+     }
+ 
+     p->expired = 1;
+     rc = SQLITE_SCHEMA;
+   }
++  sqlite3BtreeHandleCacheFixup(pBt, iSchemaUpdated);
+   break;
+ }
+ 

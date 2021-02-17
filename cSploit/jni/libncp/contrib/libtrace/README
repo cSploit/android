@@ -1,0 +1,96 @@
+Hello everybody,
+
+ltrace does not trace calls made to dynamically loaded objects,
+and this made my testing of ncpfs Perl wrapper very hard, as
+I was not able to confirm what's going inside without adding
+debugging prints into either ncpfs or into generated wrapper...
+
+I found this unacceptable, and so I cooked this code. You can
+use it to create wrapper around any library you want, it just
+must be dynamic library, not a static one.
+
+Usage is simple:
+
+NCP_TRACE_FILE=demo.trc LD_PRELOAD=./tracencp.so demo.pl
+
+and enjoy demo.trc file.
+
+I hope that in future I'll be able to persuade SWIG to create
+trace_in_* and trace_out_* wrappers for me automatically - but
+of course you can do it yourself meanwhile.
+
+trace_in_XXX function has same arguments as XXX function, with 
+two parameters added in front of the list - const char* functionName 
+and void* caller. trace_out_XXX function has also arguments of
+wrapped function - with added int returnValue and void* caller. 
+So for example for NWDSFreeContext() you have:
+
+NWDSCCODE NWDSFreeContext(NWDSContextHandle ctx);
+void trace_in_NWDSFreeContext(const char* name, void* addr, NWDSContextHandle ctx);
+void trace_out_NWDSFreeContext(NWDSCCODE err, void* addr, NWDSContextHandle ctx);
+
+You should not modify arguments passed to you - depending on
+optimization level your changes may be visible to function you
+are wrapping and/or to caller. And you should use logprintf()
+in trace_in_* and resprintf() in trace_out_*. These functions
+take a care of automatic indenting and printing address of caller.
+
+And of course, currently there are several limitations:
+- only i386 version exists... Write your own assembly code, and send me it
+  if you want this on your architecture.
+- you cannot create C wrappers around functions which return 64bit
+  quantities (if you'll cook wrapper in assembly, you'll find upper
+  32bits in %edx register).
+- on callchain deeper than 256 levels it dies.
+- versioned symbols are not properly wrapped with version, they
+  are wrapped without version information.
+- maybe more... Use of weak symbols is intentional feature and not a bug.
+
+Example (this example also shows that context handle is automatically
+destroyed when it is no longer referenced from Perl - this is why
+I wrote this tracer...):
+
+$ NCP_TRACE_FILE=demo.trc LD_PRELOAD=./tracencp.so demo.pl
+NWDSCreateContext() = ok, ctx=ncpfs::NWDSContextHandle=SCALAR(0x80f6408)
+NWDSDuplicateContext(ctx) = ok, nctx=ncpfs::NWDSContextHandle=SCALAR(0x80f6444)
+$ cat demo.trc
+402B593D: NWDSCreateContext() = ...
+401E3787:   NWDSCreateContextHandle() = ...
+401E3242:     NWDSInitRequester() = ...
+401E22B2:       my_iconv() = 0
+401E22C0:       my_iconv_close() = 0
+(cont'd.)     ... = 0
+401E3377:     NWDSSetContext() = ...
+401E39B3:       my_iconv_open() = 135390952
+401E39D6:       my_iconv_open() = 135305312
+(cont'd.)     ... = 0
+401E33CA:     NWDSSetTransport() = 0
+(cont'd.)   ... = 0
+(cont'd.) ... = 137280664
+402B5BB0: NWDSDuplicateContext() = ...
+401E37BE:   NWDSDuplicateContextHandle() = ...
+401E3508:     NWDSSetContext() = ...
+401E39B3:       my_iconv_open() = 135292056
+401E39D6:       my_iconv_open() = 135291776
+(cont'd.)     ... = 0
+401E360E:     NWDSSetContext() = ...
+401E39B3:       my_iconv_open() = 135404088
+401E39D6:       my_iconv_open() = 135733664
+401E3A05:       my_iconv_close() = 0
+401E3A22:       my_iconv_close() = 0
+(cont'd.)     ... = 0
+(cont'd.)   ... = 0
+(cont'd.) ... = 136991752
+40255E93: NWDSFreeContext() = ...
+401E36A1:   my_iconv_close() = 0
+401E36B5:   my_iconv_close() = 0
+(cont'd.) ... = 0
+40255E93: NWDSFreeContext() = ...
+401E36A1:   my_iconv_close() = 0
+401E36B5:   my_iconv_close() = 0
+(cont'd.) ... = 0
+$
+
+					Enjoy,
+						Petr Vandrovec
+						vandrove@vc.cvut.cz

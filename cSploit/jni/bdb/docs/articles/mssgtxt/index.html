@@ -1,0 +1,3271 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Berkeley DB Message Reference Guide</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Message Reference Guide" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>(Library Version 12.1.6.0)</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Berkeley DB Message Reference Guide</th>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="article" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="idm360488"></a>Berkeley DB Message Reference Guide</h1>
+          </div>
+          <div>
+            <div class="legalnotice">
+              <a id="idm376760"></a>
+              <p class="legalnotice-title">
+                <b>Legal Notice</b>
+              </p>
+              <span>
+        <p>
+            This documentation is distributed under an open source license.
+            You may review the terms of this license at:
+            <a class="ulink" href="http://www.oracle.com/technetwork/database/berkeleydb/downloads/oslicense-093458.html" target="_top">http://www.oracle.com/technetwork/database/berkeleydb/downloads/oslicense-093458.html</a>
+            
+            
+        </p>
+
+        <p>
+                Oracle, Berkeley DB,
+                
+                
+                and
+                Sleepycat are trademarks or registered trademarks of
+                Oracle. All rights to these marks are reserved.
+                No third-party use is permitted without the
+                express prior written consent of Oracle.
+        </p>
+        
+        <p>
+            Other names may be trademarks of their respective owners.
+        </p>
+        <p>
+            To obtain a copy of this document's original source code, please
+            submit a request to the Oracle Technology Network forum at:
+            <a class="ulink" href="https://forums.oracle.com/forums/forum.jspa?forumID=271" target="_top">https://forums.oracle.com/forums/forum.jspa?forumID=271</a>
+            
+            
+        </p>
+    </span>
+            </div>
+          </div>
+          <div>
+            <p class="pubdate">1/24/2014</p>
+          </div>
+        </div>
+        <hr />
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#intro">Introduction</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="index.html#stripped">Stripped Libraries</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="index.html#i18n">Localized Libraries</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="index.html#msgs">Message Organization</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#am">Access Methods Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#blob">Binary Large Objects Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#common">Common Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#db">Database Handle Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#env">Environment Handle Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#lock">Locking Subsystem Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#log">Logging Subsystem Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#mpool">Memory Pool Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#rep">Replication Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#sequence">Sequences Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#txn">Transaction Messages</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="index.html#util">Command Line Utilities Messages</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="intro"></a>Introduction</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <dl>
+            <dt>
+              <span class="sect2">
+                <a href="index.html#stripped">Stripped Libraries</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="index.html#i18n">Localized Libraries</a>
+              </span>
+            </dt>
+            <dt>
+              <span class="sect2">
+                <a href="index.html#msgs">Message Organization</a>
+              </span>
+            </dt>
+          </dl>
+        </div>
+        <p>
+                By default, Berkeley DB messages (error and
+                informational) include both a message number and
+                message text. The message number uses a
+                <code class="literal">BDB</code> prefix, followed by a unique
+                4-digit number. The message text provides contextual
+                information about the message.
+            </p>
+        <p>
+                When you build Berkeley DB, it is possible to remove the
+                message text so as to minimize the library's footprint
+                on devices where memory and storage are severely
+                constrained. This is called a 
+                <span class="emphasis"><em>stripped library</em></span>. It is also possible to add
+                internationalization/localization support to the library.
+                This is called a <span class="emphasis"><em>localized library</em></span>.
+            </p>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="stripped"></a>Stripped Libraries</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+                    How you strip error messages from your
+                    library depends on the platform you are building on. 
+                    For *nix platforms, you do this when 
+                    <a href="../../installation/build_unix_conf.html" class="olink">you configure your build</a>
+                    using the 
+                    <a href="../../installation/build_unix_conf.html#build_unix_conf.--enable-stripped_messages" class="olink">--enable-stripped_messages</a>
+                    configuration option. Your messages will also be stripped if you 
+                    <a href="../../installation/build_unix_small.html" class="olink">configure for small builds.</a>
+                </p>
+          <p>
+                    For Windows, you can enable stripped messages using the
+                    <a href="../../installation/win_additional_options.html#HAVE_STRIPPED_MESSAGES" class="olink">HAVE_STRIPPED_MESSAGES</a> build
+                    property. Your messages will also be stripped if you 
+                    <a href="../../installation/build_win_small.html" class="olink">build a small memory footprint library.</a>
+                </p>
+          <p>
+                    Stripped libraries still issue error messages, but the
+                    only thing displayed is the error number — the
+                    text of the message is not available for the library to
+                    display. This document provides the missing error
+                    message text.
+                </p>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="i18n"></a>Localized Libraries</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+                    To support globalization, you must provide a
+                    localization function that translate message, as well
+                    as translation files used to map default messages to
+                    the localized text. You then must provide the proper
+                    flags at library build time to indicate that you have
+                    added localization to the library. An overview of this
+                    process is described in
+                    <a href="../../programmer_reference/program_i18n.html" class="olink">Globalization Support</a>
+                    in the
+                    <em class="citetitle">Berkeley DB Programmer's Reference Guide</em>.
+                </p>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="msgs"></a>Message Organization</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+                    Message text is organized into tables, where each table
+                    identifies a specific portion of the library. Each such
+                    table is then sorted by message number.
+                </p>
+          <p>
+                    The areas of the library which can issue messages are:
+                </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                            Access method. These are error messages related
+                            to usage of the various access methods (Btree,
+                            Heap, Queue, and so forth).
+                        </p>
+              </li>
+              <li>
+                <p>
+                            Common error messages. These are messages that
+                            can be commonly issued by any area of the
+                            library.
+                        </p>
+              </li>
+              <li>
+                <p>
+                            Database error messages. These are error
+                            messages related to the usage of database
+                            handles.
+                        </p>
+              </li>
+              <li>
+                <p>
+                            Environment error messages. These are error
+                            messages related to the usage of environment
+                            handles.
+                        </p>
+              </li>
+              <li>
+                <p>
+                            Locking subsystem error messages.
+                        </p>
+              </li>
+              <li>
+                <p>
+                            Logging subsystem error messages.
+                        </p>
+              </li>
+              <li>
+                <p>
+                            Memory pool error messages.
+                        </p>
+              </li>
+              <li>
+                <p>
+                            Replication error messages. These error
+                            messages are issued by methods specific to
+                            either Base API or
+                            Replication Manager applications.
+                        </p>
+              </li>
+              <li>
+                <p>
+                            Sequences error messages.
+                        </p>
+              </li>
+              <li>
+                <p>
+                            Transactions error messages.
+                        </p>
+              </li>
+              <li>
+                <p>
+                            Command line utility error messages.
+                        </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="am"></a>Access Methods Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1001</td>
+                <td>illegal record number size</td>
+              </tr>
+              <tr>
+                <td>1002</td>
+                <td>illegal record number of 0</td>
+              </tr>
+              <tr>
+                <td>1004</td>
+                <td>Existing data sorts differently from put data</td>
+              </tr>
+              <tr>
+                <td>1005</td>
+                <td>cursor adjustment after delete failed</td>
+              </tr>
+              <tr>
+                <td>1006</td>
+                <td>prefix comparison may not be specified for default comparison routine</td>
+              </tr>
+              <tr>
+                <td>1018</td>
+                <td>open method type is Btree, database type is Recno</td>
+              </tr>
+              <tr>
+                <td>1019</td>
+                <td>open method type is Recno, database type is Btree</td>
+              </tr>
+              <tr>
+                <td>1023</td>
+                <td>Compact cannot handle zero length key</td>
+              </tr>
+              <tr>
+                <td>1024</td>
+                <td>DB_RECNUM cannot be used with compression</td>
+              </tr>
+              <tr>
+                <td>1025</td>
+                <td>DB_DUP cannot be used with compression without DB_DUPSORT</td>
+              </tr>
+              <tr>
+                <td>1026</td>
+                <td>compression support has not been compiled in</td>
+              </tr>
+              <tr>
+                <td>1027</td>
+                <td>compression cannot be used with DB_RECNUM</td>
+              </tr>
+              <tr>
+                <td>1028</td>
+                <td>compression cannot be used with DB_DUP without DB_DUPSORT</td>
+              </tr>
+              <tr>
+                <td>1029</td>
+                <td>to enable compression you need to supply both function arguments</td>
+              </tr>
+              <tr>
+                <td>1030</td>
+                <td>compression support has not been compiled in</td>
+              </tr>
+              <tr>
+                <td>1031</td>
+                <td>minimum bt_minkey value is 2</td>
+              </tr>
+              <tr>
+                <td>1032</td>
+                <td>Existing data sorts differently from put data</td>
+              </tr>
+              <tr>
+                <td>1033</td>
+                <td>Both cursors must be initialized before calling DBC-&gt;cmp.</td>
+              </tr>
+              <tr>
+                <td>1122</td>
+                <td>Invalid flag in __ham_curadj_recover</td>
+              </tr>
+              <tr>
+                <td>1123</td>
+                <td>Cannot replicate prepared transactions from master running release 4.2.</td>
+              </tr>
+              <tr>
+                <td>1130</td>
+                <td>H_NOMORE returned to __hamc_get</td>
+              </tr>
+              <tr>
+                <td>1131</td>
+                <td>Existing data sorts differently from put data</td>
+              </tr>
+              <tr>
+                <td>1132</td>
+                <td>Attempt to return a deleted item</td>
+              </tr>
+              <tr>
+                <td>1133</td>
+                <td>library build did not include support for the Hash access method</td>
+              </tr>
+              <tr>
+                <td>1134</td>
+                <td>Extent size may not be specified for in-memory queue database</td>
+              </tr>
+              <tr>
+                <td>1135</td>
+                <td>Multiversion queue databases are not supported</td>
+              </tr>
+              <tr>
+                <td>1140</td>
+                <td>Extent size must be at least 1</td>
+              </tr>
+              <tr>
+                <td>1141</td>
+                <td>Queue does not support multiple databases per file</td>
+              </tr>
+              <tr>
+                <td>1143</td>
+                <td>illegal record number size</td>
+              </tr>
+              <tr>
+                <td>1144</td>
+                <td>illegal record number of 0</td>
+              </tr>
+              <tr>
+                <td>1145</td>
+                <td>library build did not include support for the Queue access method</td>
+              </tr>
+              <tr>
+                <td>1168</td>
+                <td>region size may not be 0</td>
+              </tr>
+              <tr>
+                <td>1170</td>
+                <td>The key/data pairs in the buffer are not sorted.</td>
+              </tr>
+              <tr>
+                <td>1171</td>
+                <td>The key/data pairs in the buffer are not sorted.</td>
+              </tr>
+              <tr>
+                <td>1172</td>
+                <td>The DBT items in the buffer are not sorted</td>
+              </tr>
+              <tr>
+                <td>1185</td>
+                <td>Blob item key.</td>
+              </tr>
+              <tr>
+                <td>1186</td>
+                <td>Error - found a blob file in a duplicate data set.</td>
+              </tr>
+              <tr>
+                <td>1198</td>
+                <td>compression cannot be used with blobs enabled.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="blob"></a>Binary Large Objects Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0211</td>
+                <td>Error, cursor does not point to a blob.</td>
+              </tr>
+              <tr>
+                <td>0212</td>
+                <td>Error, do not use DB_DBT_PARTIAL with DB_STREAM.</td>
+              </tr>
+              <tr>
+                <td>0213</td>
+                <td>Error, blob is read only.</td>
+              </tr>
+              <tr>
+                <td>0214</td>
+                <td>Error, do not use DB_DBT_PARTIAL with DB_STREAM.</td>
+              </tr>
+              <tr>
+                <td>0217</td>
+                <td>library build did not include support for blobs</td>
+              </tr>
+              <tr>
+                <td>0218</td>
+                <td>library build did not include support for blobs</td>
+              </tr>
+              <tr>
+                <td>0219</td>
+                <td>library build did not include support for blobs</td>
+              </tr>
+              <tr>
+                <td>0220</td>
+                <td>library build did not include support for blobs</td>
+              </tr>
+              <tr>
+                <td>0221</td>
+                <td>Error creating blob directory.</td>
+              </tr>
+              <tr>
+                <td>0233</td>
+                <td>Error reading blob file.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="common"></a>Common Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0001</td>
+                <td>fcntl(F_SETFD)</td>
+              </tr>
+              <tr>
+                <td>0003</td>
+                <td>Transactional create on replication client disallowed</td>
+              </tr>
+              <tr>
+                <td>0040</td>
+                <td>Encrypted environment: library build did not include cryptography support</td>
+              </tr>
+              <tr>
+                <td>0041</td>
+                <td>unsupported byte order, only big and little-endian supported</td>
+              </tr>
+              <tr>
+                <td>0060</td>
+                <td>PANIC: fatal region error detected; run recovery</td>
+              </tr>
+              <tr>
+                <td>0061</td>
+                <td>PANIC</td>
+              </tr>
+              <tr>
+                <td>0062</td>
+                <td>Successful return: 0</td>
+              </tr>
+              <tr>
+                <td>0063</td>
+                <td>DB_BUFFER_SMALL: User memory too small for return value</td>
+              </tr>
+              <tr>
+                <td>0064</td>
+                <td>DB_DONOTINDEX: Secondary index callback returns null</td>
+              </tr>
+              <tr>
+                <td>0065</td>
+                <td>DB_FOREIGN_CONFLICT: A foreign database constraint has been violated</td>
+              </tr>
+              <tr>
+                <td>0066</td>
+                <td>DB_KEYEMPTY: Non-existent key/data pair</td>
+              </tr>
+              <tr>
+                <td>0067</td>
+                <td>DB_KEYEXIST: Key/data pair already exists</td>
+              </tr>
+              <tr>
+                <td>0068</td>
+                <td>DB_LOCK_DEADLOCK: Locker killed to resolve a deadlock</td>
+              </tr>
+              <tr>
+                <td>0069</td>
+                <td>DB_LOCK_NOTGRANTED: Lock not granted</td>
+              </tr>
+              <tr>
+                <td>0070</td>
+                <td>DB_LOG_BUFFER_FULL: In-memory log buffer is full</td>
+              </tr>
+              <tr>
+                <td>0071</td>
+                <td>DB_LOG_VERIFY_BAD: Log verification failed</td>
+              </tr>
+              <tr>
+                <td>0072</td>
+                <td>DB_NOSERVER: No message dispatch call-back function has been configured</td>
+              </tr>
+              <tr>
+                <td>0073</td>
+                <td>DB_NOTFOUND: No matching key/data pair found</td>
+              </tr>
+              <tr>
+                <td>0074</td>
+                <td>DB_OLDVERSION: Database requires a version upgrade</td>
+              </tr>
+              <tr>
+                <td>0075</td>
+                <td>DB_PAGE_NOTFOUND: Requested page not found</td>
+              </tr>
+              <tr>
+                <td>0076</td>
+                <td>DB_REP_DUPMASTER: A second master site appeared</td>
+              </tr>
+              <tr>
+                <td>0077</td>
+                <td>DB_REP_HANDLE_DEAD: Handle is no longer valid</td>
+              </tr>
+              <tr>
+                <td>0078</td>
+                <td>DB_REP_HOLDELECTION: Need to hold an election</td>
+              </tr>
+              <tr>
+                <td>0079</td>
+                <td>DB_REP_IGNORE: Replication record/operation ignored</td>
+              </tr>
+              <tr>
+                <td>0080</td>
+                <td>DB_REP_ISPERM: Permanent record written</td>
+              </tr>
+              <tr>
+                <td>0081</td>
+                <td>DB_REP_JOIN_FAILURE: Unable to join replication group</td>
+              </tr>
+              <tr>
+                <td>0082</td>
+                <td>DB_REP_LEASE_EXPIRED: Replication leases have expired</td>
+              </tr>
+              <tr>
+                <td>0083</td>
+                <td>DB_REP_LOCKOUT: Waiting for replication recovery to complete</td>
+              </tr>
+              <tr>
+                <td>0084</td>
+                <td>DB_REP_NEWSITE: A new site has entered the system</td>
+              </tr>
+              <tr>
+                <td>0085</td>
+                <td>DB_REP_NOTPERM: Permanent log record not written</td>
+              </tr>
+              <tr>
+                <td>0086</td>
+                <td>DB_REP_UNAVAIL: Too few remote sites to complete operation</td>
+              </tr>
+              <tr>
+                <td>0087</td>
+                <td>DB_RUNRECOVERY: Fatal error, run database recovery</td>
+              </tr>
+              <tr>
+                <td>0088</td>
+                <td>DB_SECONDARY_BAD: Secondary index inconsistent with primary</td>
+              </tr>
+              <tr>
+                <td>0089</td>
+                <td>DB_TIMEOUT: Operation timed out</td>
+              </tr>
+              <tr>
+                <td>0090</td>
+                <td>DB_VERIFY_BAD: Database verification failed</td>
+              </tr>
+              <tr>
+                <td>0091</td>
+                <td>DB_VERSION_MISMATCH: Database environment version mismatch</td>
+              </tr>
+              <tr>
+                <td>0096</td>
+                <td>Read-only transaction cannot be used for an update</td>
+              </tr>
+              <tr>
+                <td>0097</td>
+                <td>Transaction not specified for a transactional database</td>
+              </tr>
+              <tr>
+                <td>0098</td>
+                <td>Transaction specified for a non-transactional database</td>
+              </tr>
+              <tr>
+                <td>0099</td>
+                <td>Operation forbidden while secondary index is being created</td>
+              </tr>
+              <tr>
+                <td>0100</td>
+                <td>Transaction and database from different environments</td>
+              </tr>
+              <tr>
+                <td>0101</td>
+                <td>Transaction that opened the DB handle is still active</td>
+              </tr>
+              <tr>
+                <td>0103</td>
+                <td>DB environment not configured for transactions</td>
+              </tr>
+              <tr>
+                <td>0106</td>
+                <td>dbc_logging: Client update</td>
+              </tr>
+              <tr>
+                <td>0107</td>
+                <td>Dbc_logging: Master non-txn update</td>
+              </tr>
+              <tr>
+                <td>0114</td>
+                <td>architecture does not support locks inside system shared memory</td>
+              </tr>
+              <tr>
+                <td>0115</td>
+                <td>no base system shared memory ID specified</td>
+              </tr>
+              <tr>
+                <td>0120</td>
+                <td>architecture lacks mmap(2), shared environments not possible</td>
+              </tr>
+              <tr>
+                <td>0121</td>
+                <td>shmdt</td>
+              </tr>
+              <tr>
+                <td>0123</td>
+                <td>munmap</td>
+              </tr>
+              <tr>
+                <td>0124</td>
+                <td>fileops: munmap</td>
+              </tr>
+              <tr>
+                <td>0126</td>
+                <td>mmap</td>
+              </tr>
+              <tr>
+                <td>0127</td>
+                <td>mlock</td>
+              </tr>
+              <tr>
+                <td>0128</td>
+                <td>architecture doesn't support environments in system memory</td>
+              </tr>
+              <tr>
+                <td>0139</td>
+                <td>fcntl</td>
+              </tr>
+              <tr>
+                <td>0140</td>
+                <td>advisory file locking unavailable</td>
+              </tr>
+              <tr>
+                <td>0144</td>
+                <td>user-specified malloc function returned NULL</td>
+              </tr>
+              <tr>
+                <td>0146</td>
+                <td>User-specified realloc function returned NULL</td>
+              </tr>
+              <tr>
+                <td>0149</td>
+                <td>Guard byte incorrect during free</td>
+              </tr>
+              <tr>
+                <td>0151</td>
+                <td>fsync</td>
+              </tr>
+              <tr>
+                <td>0162</td>
+                <td>fcntl(F_SETFD)</td>
+              </tr>
+              <tr>
+                <td>0164</td>
+                <td>close</td>
+              </tr>
+              <tr>
+                <td>0166</td>
+                <td>fstat</td>
+              </tr>
+              <tr>
+                <td>0167</td>
+                <td>select</td>
+              </tr>
+              <tr>
+                <td>0172</td>
+                <td>Joining non-encrypted environment with encryption key</td>
+              </tr>
+              <tr>
+                <td>0173</td>
+                <td>Encryption algorithm not supplied</td>
+              </tr>
+              <tr>
+                <td>0174</td>
+                <td>Encrypted environment: no encryption key supplied</td>
+              </tr>
+              <tr>
+                <td>0175</td>
+                <td>Invalid password</td>
+              </tr>
+              <tr>
+                <td>0176</td>
+                <td>Environment encrypted using a different algorithm</td>
+              </tr>
+              <tr>
+                <td>0177</td>
+                <td>No cipher structure given</td>
+              </tr>
+              <tr>
+                <td>0178</td>
+                <td>Encrypted database: no encryption flag specified</td>
+              </tr>
+              <tr>
+                <td>0179</td>
+                <td>Database encrypted using a different algorithm</td>
+              </tr>
+              <tr>
+                <td>0180</td>
+                <td>Invalid password</td>
+              </tr>
+              <tr>
+                <td>0181</td>
+                <td>Unencrypted database with a supplied encryption key</td>
+              </tr>
+              <tr>
+                <td>0182</td>
+                <td>IPP AES NULL pointer error</td>
+              </tr>
+              <tr>
+                <td>0183</td>
+                <td>IPP AES length error</td>
+              </tr>
+              <tr>
+                <td>0184</td>
+                <td>IPP AES context does not match operation</td>
+              </tr>
+              <tr>
+                <td>0185</td>
+                <td>IPP AES srclen size error</td>
+              </tr>
+              <tr>
+                <td>0186</td>
+                <td>AES key direction is invalid</td>
+              </tr>
+              <tr>
+                <td>0187</td>
+                <td>AES key material not of correct length</td>
+              </tr>
+              <tr>
+                <td>0188</td>
+                <td>AES key passwd not valid</td>
+              </tr>
+              <tr>
+                <td>0189</td>
+                <td>AES cipher in wrong state (not initialized)</td>
+              </tr>
+              <tr>
+                <td>0190</td>
+                <td>AES bad block length</td>
+              </tr>
+              <tr>
+                <td>0191</td>
+                <td>AES cipher instance is invalid</td>
+              </tr>
+              <tr>
+                <td>0192</td>
+                <td>AES data contents are invalid</td>
+              </tr>
+              <tr>
+                <td>0193</td>
+                <td>AES unknown error</td>
+              </tr>
+              <tr>
+                <td>0194</td>
+                <td>AES error unrecognized</td>
+              </tr>
+              <tr>
+                <td>0195</td>
+                <td>Unencrypted checksum with a supplied encryption key</td>
+              </tr>
+              <tr>
+                <td>0196</td>
+                <td>Encrypted checksum: no encryption key specified</td>
+              </tr>
+              <tr>
+                <td>0198</td>
+                <td>no base shared memory ID specified</td>
+              </tr>
+              <tr>
+                <td>0200</td>
+                <td>shared memory segment already exists</td>
+              </tr>
+              <tr>
+                <td>0201</td>
+                <td>shared memory segment not initialized</td>
+              </tr>
+              <tr>
+                <td>0202</td>
+                <td>shared memory segment not initialized</td>
+              </tr>
+              <tr>
+                <td>0203</td>
+                <td>no segment name given</td>
+              </tr>
+              <tr>
+                <td>0204</td>
+                <td>Invalid segment id given</td>
+              </tr>
+              <tr>
+                <td>0205</td>
+                <td>shared memory segment not initialized</td>
+              </tr>
+              <tr>
+                <td>0207</td>
+                <td>DB_REP_WOULDROLLBACK: Client data has diverged</td>
+              </tr>
+              <tr>
+                <td>0208</td>
+                <td>DB_HEAP_FULL: no free space in db</td>
+              </tr>
+              <tr>
+                <td>0209</td>
+                <td>Exclusive database handles can only have one active transaction at a time.</td>
+              </tr>
+              <tr>
+                <td>0237</td>
+                <td>Blob enabled databases do not support DB_READ_UNCOMMITTED and TXN_SNAPSHOT</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="db"></a>Database Handle Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0503</td>
+                <td>Rename on temporary files invalid</td>
+              </tr>
+              <tr>
+                <td>0504</td>
+                <td>XA applications may not specify an environment to db_create</td>
+              </tr>
+              <tr>
+                <td>0505</td>
+                <td>Cannot open XA database before XA is enabled</td>
+              </tr>
+              <tr>
+                <td>0506</td>
+                <td>call implies an access method which is inconsistent with previous calls</td>
+              </tr>
+              <tr>
+                <td>0508</td>
+                <td>Database environment not configured for encryption</td>
+              </tr>
+              <tr>
+                <td>0511</td>
+                <td>page sizes must be a power-of-2</td>
+              </tr>
+              <tr>
+                <td>0516</td>
+                <td>DB_DBT_PARTIAL may not be set on key during join_get</td>
+              </tr>
+              <tr>
+                <td>0518</td>
+                <td>DB_SALVAGE requires a an output handle</td>
+              </tr>
+              <tr>
+                <td>0519</td>
+                <td>DB_ORDERCHKONLY requires a database name</td>
+              </tr>
+              <tr>
+                <td>0556</td>
+                <td>Subdatabase entry not page-number size</td>
+              </tr>
+              <tr>
+                <td>0559</td>
+                <td>Subdatabase entry of invalid size</td>
+              </tr>
+              <tr>
+                <td>0571</td>
+                <td>library build did not include support for database verification</td>
+              </tr>
+              <tr>
+                <td>0572</td>
+                <td>Databases may not become secondary indices while cursors are open</td>
+              </tr>
+              <tr>
+                <td>0573</td>
+                <td>Secondary index handles may not be re-associated</td>
+              </tr>
+              <tr>
+                <td>0574</td>
+                <td>Secondary indices may not be used as primary databases</td>
+              </tr>
+              <tr>
+                <td>0575</td>
+                <td>Primary databases may not be configured with duplicates</td>
+              </tr>
+              <tr>
+                <td>0576</td>
+                <td>Renumbering recno databases may not be used as primary databases</td>
+              </tr>
+              <tr>
+                <td>0577</td>
+                <td>The primary and secondary must be opened in the same environment</td>
+              </tr>
+              <tr>
+                <td>0578</td>
+                <td>The DB_THREAD setting must be the same for primary and secondary</td>
+              </tr>
+              <tr>
+                <td>0579</td>
+                <td>Callback function may be NULL only when database handles are read-only</td>
+              </tr>
+              <tr>
+                <td>0580</td>
+                <td>replication recovery unrolled committed transactions;</td>
+              </tr>
+              <tr>
+                <td>0581</td>
+                <td>DB-&gt;del with DB_MULTIPLE(_KEY) requires multiple key records</td>
+              </tr>
+              <tr>
+                <td>0582</td>
+                <td>Database does not have a valid file handle</td>
+              </tr>
+              <tr>
+                <td>0584</td>
+                <td>DB_DBT_READONLY should not be set on data DBT.</td>
+              </tr>
+              <tr>
+                <td>0585</td>
+                <td>DB_MULTIPLE requires DB_DBT_USERMEM be set</td>
+              </tr>
+              <tr>
+                <td>0586</td>
+                <td>DB_MULTIPLE does not support DB_DBT_PARTIAL</td>
+              </tr>
+              <tr>
+                <td>0587</td>
+                <td>DB_MULTIPLE buffers must be aligned, </td>
+              </tr>
+              <tr>
+                <td>0588</td>
+                <td>At least one secondary cursor must be specified to DB-&gt;join</td>
+              </tr>
+              <tr>
+                <td>0589</td>
+                <td>All secondary cursors must share the same transaction</td>
+              </tr>
+              <tr>
+                <td>0590</td>
+                <td>files containing multiple databases may only be opened read-only</td>
+              </tr>
+              <tr>
+                <td>0591</td>
+                <td>DB_TRUNCATE not supported on VxWorks</td>
+              </tr>
+              <tr>
+                <td>0592</td>
+                <td>DB_UNKNOWN type specified with DB_CREATE or DB_TRUNCATE</td>
+              </tr>
+              <tr>
+                <td>0594</td>
+                <td>database environment not yet opened</td>
+              </tr>
+              <tr>
+                <td>0595</td>
+                <td>environment did not include a memory pool</td>
+              </tr>
+              <tr>
+                <td>0596</td>
+                <td>environment not created using DB_THREAD</td>
+              </tr>
+              <tr>
+                <td>0597</td>
+                <td>DB_MULTIVERSION illegal without a transaction specified</td>
+              </tr>
+              <tr>
+                <td>0598</td>
+                <td>DB_MULTIVERSION illegal with queue databases</td>
+              </tr>
+              <tr>
+                <td>0600</td>
+                <td>Queue databases must be one-per-file</td>
+              </tr>
+              <tr>
+                <td>0601</td>
+                <td>DB-&gt;pget may only be used on secondary indices</td>
+              </tr>
+              <tr>
+                <td>0602</td>
+                <td>DB_MULTIPLE and DB_MULTIPLE_KEY may not be used on secondary indices</td>
+              </tr>
+              <tr>
+                <td>0603</td>
+                <td>DB_GET_BOTH on a secondary index requires a primary key</td>
+              </tr>
+              <tr>
+                <td>0604</td>
+                <td>DB-&gt;put forbidden on secondary indices</td>
+              </tr>
+              <tr>
+                <td>0605</td>
+                <td>DB-&gt;put: DB_MULTIPLE(_KEY) can only be combined with DB_OVERWRITE_DUP</td>
+              </tr>
+              <tr>
+                <td>0606</td>
+                <td>DB-&gt;put with DB_MULTIPLE(_KEY) requires a bulk key buffer</td>
+              </tr>
+              <tr>
+                <td>0607</td>
+                <td>DB-&gt;put with DB_MULTIPLE requires a bulk data buffer</td>
+              </tr>
+              <tr>
+                <td>0608</td>
+                <td>a partial put in the presence of duplicates requires a cursor operation</td>
+              </tr>
+              <tr>
+                <td>0609</td>
+                <td>DB-&gt;compact may not be called with active cursors in the transaction.</td>
+              </tr>
+              <tr>
+                <td>0610</td>
+                <td>Secondary indices may not be used as foreign databases</td>
+              </tr>
+              <tr>
+                <td>0611</td>
+                <td>Foreign databases may not be configured with duplicates</td>
+              </tr>
+              <tr>
+                <td>0612</td>
+                <td>Renumbering recno databases may not be used as foreign databases</td>
+              </tr>
+              <tr>
+                <td>0613</td>
+                <td>The associating database must be a secondary index.</td>
+              </tr>
+              <tr>
+                <td>0614</td>
+                <td>When specifying a delete action of nullify, a callback </td>
+              </tr>
+              <tr>
+                <td>0615</td>
+                <td>When not specifying a delete action of nullify, a </td>
+              </tr>
+              <tr>
+                <td>0616</td>
+                <td>Closing already-closed cursor</td>
+              </tr>
+              <tr>
+                <td>0617</td>
+                <td>DBcursor-&gt;cmp dbc pointer must not be null</td>
+              </tr>
+              <tr>
+                <td>0618</td>
+                <td>DBcursor-&gt;cmp both cursors must refer to the same database.</td>
+              </tr>
+              <tr>
+                <td>0619</td>
+                <td>DB_READ_UNCOMMITTED is not supported with DB_CONSUME or DB_CONSUME_WAIT</td>
+              </tr>
+              <tr>
+                <td>0620</td>
+                <td>DB_DBT_READONLY should not be set on data DBT.</td>
+              </tr>
+              <tr>
+                <td>0621</td>
+                <td>DB_MULTIPLE/DB_MULTIPLE_KEY require DB_DBT_USERMEM be set</td>
+              </tr>
+              <tr>
+                <td>0622</td>
+                <td>DB_MULTIPLE/DB_MULTIPLE_KEY do not support DB_DBT_PARTIAL</td>
+              </tr>
+              <tr>
+                <td>0623</td>
+                <td>DB_MULTIPLE/DB_MULTIPLE_KEY buffers must be </td>
+              </tr>
+              <tr>
+                <td>0624</td>
+                <td>DBcursor-&gt;pget may only be used on secondary indices</td>
+              </tr>
+              <tr>
+                <td>0625</td>
+                <td>DB_MULTIPLE and DB_MULTIPLE_KEY may not be used on secondary indices</td>
+              </tr>
+              <tr>
+                <td>0627</td>
+                <td>DB_GET_BOTH on a secondary index requires a primary key</td>
+              </tr>
+              <tr>
+                <td>0628</td>
+                <td>DBcursor-&gt;put forbidden on secondary indices</td>
+              </tr>
+              <tr>
+                <td>0631</td>
+                <td>Cursor position must be set before performing this operation</td>
+              </tr>
+              <tr>
+                <td>0632</td>
+                <td>DB_AUTO_COMMIT may not be specified along with a transaction handle</td>
+              </tr>
+              <tr>
+                <td>0633</td>
+                <td>DB_AUTO_COMMIT may not be specified in non-transactional environment</td>
+              </tr>
+              <tr>
+                <td>0634</td>
+                <td>Partitioned databases may not be in memory.</td>
+              </tr>
+              <tr>
+                <td>0635</td>
+                <td>DB_CREATE must be specified to create databases.</td>
+              </tr>
+              <tr>
+                <td>0636</td>
+                <td>DBTYPE of unknown without existing file</td>
+              </tr>
+              <tr>
+                <td>0637</td>
+                <td>Partitioned databases may not be included with multiple databases.</td>
+              </tr>
+              <tr>
+                <td>0642</td>
+                <td>Checksum failure requires catastrophic recovery</td>
+              </tr>
+              <tr>
+                <td>0643</td>
+                <td>Cannot replicate prepared transactions from master running release 4.2 </td>
+              </tr>
+              <tr>
+                <td>0645</td>
+                <td>Cannot specify callback and range keys.</td>
+              </tr>
+              <tr>
+                <td>0646</td>
+                <td>Must specify at least 2 partitions.</td>
+              </tr>
+              <tr>
+                <td>0647</td>
+                <td>Must specify either keys or a callback.</td>
+              </tr>
+              <tr>
+                <td>0648</td>
+                <td>May not specify both keys and a callback.</td>
+              </tr>
+              <tr>
+                <td>0650</td>
+                <td>Partitioning may only specified on BTREE and HASH databases.</td>
+              </tr>
+              <tr>
+                <td>0651</td>
+                <td>Partitioning specified on a non-partitioned database.</td>
+              </tr>
+              <tr>
+                <td>0652</td>
+                <td>Incompatible partitioning specified.</td>
+              </tr>
+              <tr>
+                <td>0653</td>
+                <td>Partition callback not specified.</td>
+              </tr>
+              <tr>
+                <td>0654</td>
+                <td>Record numbers are not supported in partitioned databases.</td>
+              </tr>
+              <tr>
+                <td>0655</td>
+                <td>Zero paritions specified.</td>
+              </tr>
+              <tr>
+                <td>0656</td>
+                <td>Number of partitions does not match.</td>
+              </tr>
+              <tr>
+                <td>0657</td>
+                <td>Hash database must specify a partition callback.</td>
+              </tr>
+              <tr>
+                <td>0658</td>
+                <td>Partitioning only supported on BTREE nad HASH.</td>
+              </tr>
+              <tr>
+                <td>0659</td>
+                <td>No range keys found.</td>
+              </tr>
+              <tr>
+                <td>0660</td>
+                <td>Keys found and callback set.</td>
+              </tr>
+              <tr>
+                <td>0661</td>
+                <td>Partition key 0 is not empty.</td>
+              </tr>
+              <tr>
+                <td>0663</td>
+                <td>A partitioned database can not be in a multiple databases file</td>
+              </tr>
+              <tr>
+                <td>0664</td>
+                <td>library build did not include support for the database partitioning</td>
+              </tr>
+              <tr>
+                <td>0665</td>
+                <td>upgrade not supported</td>
+              </tr>
+              <tr>
+                <td>0667</td>
+                <td>Attempt to upgrade an encrypted database without providing a password.</td>
+              </tr>
+              <tr>
+                <td>0674</td>
+                <td>Closing a primary DB while a secondary DB has active cursors is unsafe</td>
+              </tr>
+              <tr>
+                <td>0685</td>
+                <td>DB-&gt;truncate forbidden on secondary indices</td>
+              </tr>
+              <tr>
+                <td>0686</td>
+                <td>DB-&gt;truncate not permitted with active cursors</td>
+              </tr>
+              <tr>
+                <td>0688</td>
+                <td>CDS group has active cursors</td>
+              </tr>
+              <tr>
+                <td>0690</td>
+                <td>DB_LOG_NO_DATA may not be specified within a transaction.</td>
+              </tr>
+              <tr>
+                <td>0691</td>
+                <td>Remove on temporary files invalid</td>
+              </tr>
+              <tr>
+                <td>0692</td>
+                <td>Both cursors must be initialized before calling DBC-&gt;cmp.</td>
+              </tr>
+              <tr>
+                <td>0693</td>
+                <td>Both cursors must be initialized before calling DBC-&gt;cmp.</td>
+              </tr>
+              <tr>
+                <td>0694</td>
+                <td>DBCursor-&gt;cmp mismatched off page duplicate cursor pointers.</td>
+              </tr>
+              <tr>
+                <td>0695</td>
+                <td>Put results in a non-unique secondary key in an </td>
+              </tr>
+              <tr>
+                <td>0696</td>
+                <td>Duplicate data items are not supported with sorted data</td>
+              </tr>
+              <tr>
+                <td>0697</td>
+                <td>Write attempted on read-only cursor</td>
+              </tr>
+              <tr>
+                <td>0698</td>
+                <td>Attempt to execute cascading delete in a foreign index failed</td>
+              </tr>
+              <tr>
+                <td>0699</td>
+                <td>Foreign database application callback</td>
+              </tr>
+              <tr>
+                <td>0700</td>
+                <td>Attempt to overwrite item in foreign database with nullified value failed</td>
+              </tr>
+              <tr>
+                <td>0701</td>
+                <td>DB_PRIVATE is not supported by</td>
+              </tr>
+              <tr>
+                <td>0708</td>
+                <td>Invalid positioning flag combined with DB_DBT_PARTIAL</td>
+              </tr>
+              <tr>
+                <td>0709</td>
+                <td>The primary key returned by pget can't be partial</td>
+              </tr>
+              <tr>
+                <td>0710</td>
+                <td>Invalid positioning flag combined with DB_DBT_PARTIAL</td>
+              </tr>
+              <tr>
+                <td>0711</td>
+                <td>The primary key returned by pget can't be partial.</td>
+              </tr>
+              <tr>
+                <td>0716</td>
+                <td>Target directory may not be null.</td>
+              </tr>
+              <tr>
+                <td>0731</td>
+                <td>Sync failed</td>
+              </tr>
+              <tr>
+                <td>0735</td>
+                <td>Can't flush log</td>
+              </tr>
+              <tr>
+                <td>0736</td>
+                <td>Can't get log file names</td>
+              </tr>
+              <tr>
+                <td>0744</td>
+                <td>Exclusive database handles cannot be threaded.</td>
+              </tr>
+              <tr>
+                <td>0745</td>
+                <td>Exclusive database handles require transactional environments.</td>
+              </tr>
+              <tr>
+                <td>0746</td>
+                <td>Exclusive database handles cannot be opened on replication clients.</td>
+              </tr>
+              <tr>
+                <td>0748</td>
+                <td>Write failed.</td>
+              </tr>
+              <tr>
+                <td>0749</td>
+                <td>Exclusive database handles can only have one active transaction at a time.</td>
+              </tr>
+              <tr>
+                <td>0750</td>
+                <td>Error, cannot set both DB_STREAM_WRITE and DB_STREAM_READ.</td>
+              </tr>
+              <tr>
+                <td>0751</td>
+                <td>Secondary and primary databases cannot support blobs.</td>
+              </tr>
+              <tr>
+                <td>0752</td>
+                <td>Heap databases may not be used as secondary databases</td>
+              </tr>
+              <tr>
+                <td>0753</td>
+                <td>Blob enabled databases do not support READ_UNCOMMITTED and TXN_SNAPSHOT.</td>
+              </tr>
+              <tr>
+                <td>0754</td>
+                <td>Blob enabled databases do not support DB_READ_UNCOMMITTED.</td>
+              </tr>
+              <tr>
+                <td>0755</td>
+                <td>DB_MULTIVERSION illegal with blob enabled databases</td>
+              </tr>
+              <tr>
+                <td>0756</td>
+                <td>DB_READ_UNCOMMITTED illegal with blob enabled databases</td>
+              </tr>
+              <tr>
+                <td>0757</td>
+                <td>Blobs are not supported with replication.</td>
+              </tr>
+              <tr>
+                <td>0758</td>
+                <td>Unsupported flags when cloning the DBT.</td>
+              </tr>
+              <tr>
+                <td>0759</td>
+                <td>Unsupported flags when freeing the cloned DBT.</td>
+              </tr>
+              <tr>
+                <td>0760</td>
+                <td>Cannot enable blobs in databases with checksum, encryption, or duplicates.</td>
+              </tr>
+              <tr>
+                <td>0761</td>
+                <td>Cannot enable blobs in databases with compression.</td>
+              </tr>
+              <tr>
+                <td>0762</td>
+                <td>Blobs are not supported with replication.</td>
+              </tr>
+              <tr>
+                <td>0763</td>
+                <td>Cannot enable checksum, encryption, or duplicates with blob support.</td>
+              </tr>
+              <tr>
+                <td>0765</td>
+                <td>Offset or id size overflow.</td>
+              </tr>
+              <tr>
+                <td>0766</td>
+                <td>Blob identifier overflow.</td>
+              </tr>
+              <tr>
+                <td>0767</td>
+                <td>Blob size overflow.</td>
+              </tr>
+              <tr>
+                <td>0768</td>
+                <td>Blob size overflow.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="env"></a>Environment Handle Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1501</td>
+                <td>Logging region out of memory; you may need to increase its size</td>
+              </tr>
+              <tr>
+                <td>1503</td>
+                <td>DB_ENV-&gt;failchk requires DB_ENV-&gt;is_alive be configured</td>
+              </tr>
+              <tr>
+                <td>1504</td>
+                <td>is_alive method specified but no thread region allocated</td>
+              </tr>
+              <tr>
+                <td>1505</td>
+                <td>thread table must be allocated when the database environment is created</td>
+              </tr>
+              <tr>
+                <td>1506</td>
+                <td>unable to allocate a thread status block</td>
+              </tr>
+              <tr>
+                <td>1507</td>
+                <td>Thread died in Berkeley DB library</td>
+              </tr>
+              <tr>
+                <td>1508</td>
+                <td>Unable to allocate thread control block</td>
+              </tr>
+              <tr>
+                <td>1510</td>
+                <td>First log record not found</td>
+              </tr>
+              <tr>
+                <td>1512</td>
+                <td>Last log record not found</td>
+              </tr>
+              <tr>
+                <td>1516</td>
+                <td>First log record not found</td>
+              </tr>
+              <tr>
+                <td>1528</td>
+                <td>DB_REGISTER limits processes to one open DB_ENV handle per environment</td>
+              </tr>
+              <tr>
+                <td>1539</td>
+                <td>Build signature doesn't match environment</td>
+              </tr>
+              <tr>
+                <td>1540</td>
+                <td>configured environment flags incompatible with existing environment</td>
+              </tr>
+              <tr>
+                <td>1543</td>
+                <td>unable to create new master region array</td>
+              </tr>
+              <tr>
+                <td>1546</td>
+                <td>unable to join the environment</td>
+              </tr>
+              <tr>
+                <td>1547</td>
+                <td>environment reference count went negative</td>
+              </tr>
+              <tr>
+                <td>1550</td>
+                <td>architecture does not support locks inside process-local (malloc) memory</td>
+              </tr>
+              <tr>
+                <td>1551</td>
+                <td>application may not specify both DB_PRIVATE and DB_THREAD</td>
+              </tr>
+              <tr>
+                <td>1552</td>
+                <td>region memory was not correctly aligned</td>
+              </tr>
+              <tr>
+                <td>1553</td>
+                <td>no room remaining for additional REGIONs</td>
+              </tr>
+              <tr>
+                <td>1554</td>
+                <td>Library build did not include statistics support</td>
+              </tr>
+              <tr>
+                <td>1555</td>
+                <td>library build did not include support for cryptography</td>
+              </tr>
+              <tr>
+                <td>1556</td>
+                <td>Empty password specified to set_encrypt</td>
+              </tr>
+              <tr>
+                <td>1557</td>
+                <td>library build did not include support for cryptography</td>
+              </tr>
+              <tr>
+                <td>1558</td>
+                <td>Environment panic set</td>
+              </tr>
+              <tr>
+                <td>1559</td>
+                <td>DB_TXN_NOSYNC and DB_TXN_WRITE_NOSYNC</td>
+              </tr>
+              <tr>
+                <td>1560</td>
+                <td>Attempt to decrement hotbackup counter past zero</td>
+              </tr>
+              <tr>
+                <td>1562</td>
+                <td>is_alive method specified but no thread region allocated</td>
+              </tr>
+              <tr>
+                <td>1563</td>
+                <td>is_alive method specified but no thread region allocated</td>
+              </tr>
+              <tr>
+                <td>1567</td>
+                <td>The DB_RECOVER flag was not specified, and recovery is needed</td>
+              </tr>
+              <tr>
+                <td>1568</td>
+                <td>Berkeley DB library does not support DB_REGISTER on this system</td>
+              </tr>
+              <tr>
+                <td>1569</td>
+                <td>registration requires transaction support</td>
+              </tr>
+              <tr>
+                <td>1570</td>
+                <td>Berkeley DB library does not support replication on this system</td>
+              </tr>
+              <tr>
+                <td>1571</td>
+                <td>replication requires locking support</td>
+              </tr>
+              <tr>
+                <td>1572</td>
+                <td>replication requires transaction support</td>
+              </tr>
+              <tr>
+                <td>1573</td>
+                <td>recovery requires the create flag</td>
+              </tr>
+              <tr>
+                <td>1574</td>
+                <td>recovery requires transaction support</td>
+              </tr>
+              <tr>
+                <td>1575</td>
+                <td>DB_FAILCHK requires DB_ENV-&gt;is_alive be configured</td>
+              </tr>
+              <tr>
+                <td>1576</td>
+                <td>DB_FAILCHK requires DB_ENV-&gt;set_thread_count be configured</td>
+              </tr>
+              <tr>
+                <td>1577</td>
+                <td>Berkeley DB library configured to support only private environments</td>
+              </tr>
+              <tr>
+                <td>1578</td>
+                <td>architecture lacks fast mutexes: applications cannot be threaded</td>
+              </tr>
+              <tr>
+                <td>1579</td>
+                <td>Database handles still open at environment close</td>
+              </tr>
+              <tr>
+                <td>1581</td>
+                <td>File handles still open at environment close</td>
+              </tr>
+              <tr>
+                <td>1583</td>
+                <td>block not at end of region</td>
+              </tr>
+              <tr>
+                <td>1588</td>
+                <td>Maximum memory size too large: maximum is 4GB</td>
+              </tr>
+              <tr>
+                <td>1589</td>
+                <td>DB_PRIVATE is not </td>
+              </tr>
+              <tr>
+                <td>1591</td>
+                <td>Warning: Ignoring blob_threshold size when joining environment</td>
+              </tr>
+              <tr>
+                <td>1592</td>
+                <td>Must set a view callback.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="lock"></a>Locking Subsystem Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2001</td>
+                <td>library build did not include support for mutexes</td>
+              </tr>
+              <tr>
+                <td>2002</td>
+                <td>Win32 create event failed</td>
+              </tr>
+              <tr>
+                <td>2006</td>
+                <td>Win32 lock failed</td>
+              </tr>
+              <tr>
+                <td>2009</td>
+                <td>Win32 read lock failed</td>
+              </tr>
+              <tr>
+                <td>2012</td>
+                <td>Win32 unlock failed</td>
+              </tr>
+              <tr>
+                <td>2013</td>
+                <td>Unable to allocate memory for the mutex region</td>
+              </tr>
+              <tr>
+                <td>2014</td>
+                <td>Unable to allocate memory for mutexes from the region</td>
+              </tr>
+              <tr>
+                <td>2015</td>
+                <td>Unable to acquire/release a mutex; check configuration</td>
+              </tr>
+              <tr>
+                <td>2016</td>
+                <td>Unable to acquire/release a shared latch; check configuration</td>
+              </tr>
+              <tr>
+                <td>2018</td>
+                <td>DB_ENV-&gt;mutex_set_align: alignment value must be a non-zero power-of-two</td>
+              </tr>
+              <tr>
+                <td>2019</td>
+                <td>fcntl lock failed</td>
+              </tr>
+              <tr>
+                <td>2020</td>
+                <td>fcntl unlock failed: lock already unlocked</td>
+              </tr>
+              <tr>
+                <td>2021</td>
+                <td>unable to initialize mutex</td>
+              </tr>
+              <tr>
+                <td>2023</td>
+                <td>pthread lock failed</td>
+              </tr>
+              <tr>
+                <td>2024</td>
+                <td>pthread readlock failed</td>
+              </tr>
+              <tr>
+                <td>2025</td>
+                <td>pthread unlock failed: lock already unlocked</td>
+              </tr>
+              <tr>
+                <td>2026</td>
+                <td>unable to destroy cond</td>
+              </tr>
+              <tr>
+                <td>2027</td>
+                <td>unable to destroy mutex</td>
+              </tr>
+              <tr>
+                <td>2028</td>
+                <td>TAS: mutex not appropriately aligned</td>
+              </tr>
+              <tr>
+                <td>2029</td>
+                <td>TAS: mutex initialize</td>
+              </tr>
+              <tr>
+                <td>2033</td>
+                <td>Mutex allocated before mutex region.</td>
+              </tr>
+              <tr>
+                <td>2034</td>
+                <td>unable to allocate memory for mutex; resize mutex region</td>
+              </tr>
+              <tr>
+                <td>2036</td>
+                <td>Locker does not exist</td>
+              </tr>
+              <tr>
+                <td>2039</td>
+                <td>Not a child transaction</td>
+              </tr>
+              <tr>
+                <td>2040</td>
+                <td>Locker does not exist</td>
+              </tr>
+              <tr>
+                <td>2041</td>
+                <td>lock_open: incompatible deadlock detector mode</td>
+              </tr>
+              <tr>
+                <td>2042</td>
+                <td>unable to allocate memory for the lock table</td>
+              </tr>
+              <tr>
+                <td>2043</td>
+                <td>DB_ENV-&gt;set_lk_detect: unknown deadlock detection mode specified</td>
+              </tr>
+              <tr>
+                <td>2044</td>
+                <td>DB_ENV-&gt;set_lk_detect: incompatible deadlock detector mode</td>
+              </tr>
+              <tr>
+                <td>2046</td>
+                <td>Locker still has locks</td>
+              </tr>
+              <tr>
+                <td>2048</td>
+                <td>DB_ENV-&gt;lock_detect: unknown deadlock detection mode specified</td>
+              </tr>
+              <tr>
+                <td>2054</td>
+                <td>library build did not include support for locking</td>
+              </tr>
+              <tr>
+                <td>2058</td>
+                <td>Warning: Ignoring DB_SET_LOCK_TIMEOUT when joining the environment.</td>
+              </tr>
+              <tr>
+                <td>2059</td>
+                <td>Warning: Ignoring DB_SET_TXN_TIMEOUT when joining the environment.</td>
+              </tr>
+              <tr>
+                <td>2060</td>
+                <td>Freeing locker with locks</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="log"></a>Logging Subsystem Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2501</td>
+                <td>Set either an lsn range or a time range to verify logs </td>
+              </tr>
+              <tr>
+                <td>2503</td>
+                <td>callback: initialization</td>
+              </tr>
+              <tr>
+                <td>2507</td>
+                <td>Commonly caused by moving a database from one database environment</td>
+              </tr>
+              <tr>
+                <td>2508</td>
+                <td>to another without clearing the database LSNs, or by removing all of</td>
+              </tr>
+              <tr>
+                <td>2509</td>
+                <td>the log files from a database environment</td>
+              </tr>
+              <tr>
+                <td>2510</td>
+                <td>Logging not currently permitted</td>
+              </tr>
+              <tr>
+                <td>2511</td>
+                <td>DB_ENV-&gt;log_put is illegal on replication clients</td>
+              </tr>
+              <tr>
+                <td>2512</td>
+                <td>Non-replication DB_ENV handle attempting </td>
+              </tr>
+              <tr>
+                <td>2514</td>
+                <td>Write failed on MASTER commit.</td>
+              </tr>
+              <tr>
+                <td>2515</td>
+                <td>Short read while restoring log</td>
+              </tr>
+              <tr>
+                <td>2517</td>
+                <td>Database environment corrupt; the wrong log files may </td>
+              </tr>
+              <tr>
+                <td>2518</td>
+                <td>DB_ENV-&gt;log_file is illegal with in-memory logs</td>
+              </tr>
+              <tr>
+                <td>2519</td>
+                <td>DB_ENV-&gt;log_file: name buffer is too short</td>
+              </tr>
+              <tr>
+                <td>2522</td>
+                <td>DB_ENV-&gt;log_put is illegal on replication clients</td>
+              </tr>
+              <tr>
+                <td>2523</td>
+                <td>library build did not include support for log verification</td>
+              </tr>
+              <tr>
+                <td>2524</td>
+                <td>unable to allocate log region memory</td>
+              </tr>
+              <tr>
+                <td>2525</td>
+                <td>No log files found</td>
+              </tr>
+              <tr>
+                <td>2533</td>
+                <td>log record checksum mismatch</td>
+              </tr>
+              <tr>
+                <td>2534</td>
+                <td>Warning: truncating to point beyond end of log</td>
+              </tr>
+              <tr>
+                <td>2535</td>
+                <td>In-memory log buffer is full (an active transaction spans the buffer)</td>
+              </tr>
+              <tr>
+                <td>2570</td>
+                <td>no absolute path for the current directory</td>
+              </tr>
+              <tr>
+                <td>2571</td>
+                <td>log file auto-remove</td>
+              </tr>
+              <tr>
+                <td>2572</td>
+                <td>DB_ENV-&gt;log_archive: bad log record</td>
+              </tr>
+              <tr>
+                <td>2573</td>
+                <td>DB_ENV-&gt;log_archive: unable to read log record</td>
+              </tr>
+              <tr>
+                <td>2574</td>
+                <td>DB_LOGC-&gt;get: unset cursor</td>
+              </tr>
+              <tr>
+                <td>2576</td>
+                <td>Encountered zero length records while traversing backwards</td>
+              </tr>
+              <tr>
+                <td>2579</td>
+                <td>DB_LOGC-&gt;get: catastrophic recovery may be required</td>
+              </tr>
+              <tr>
+                <td>2584</td>
+                <td>Must provide a configuration structure.</td>
+              </tr>
+              <tr>
+                <td>2585</td>
+                <td>Warning: Ignoring maximum log file size when joining the environment</td>
+              </tr>
+              <tr>
+                <td>2586</td>
+                <td>Warning: Ignoring DB_LOG_AUTO_REMOVE when joining the environment.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="mpool"></a>Memory Pool Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3003</td>
+                <td>individual cache size too large: maximum is 4GB</td>
+              </tr>
+              <tr>
+                <td>3004</td>
+                <td>individual cache size too large: maximum is 10TB</td>
+              </tr>
+              <tr>
+                <td>3005</td>
+                <td>Truncate beyond the end of file</td>
+              </tr>
+              <tr>
+                <td>3006</td>
+                <td>Can't get the required free size while</td>
+              </tr>
+              <tr>
+                <td>3014</td>
+                <td>unable to create temporary backing file</td>
+              </tr>
+              <tr>
+                <td>3017</td>
+                <td>unable to allocate space from the buffer cache</td>
+              </tr>
+              <tr>
+                <td>3019</td>
+                <td>cannot remove the last cache</td>
+              </tr>
+              <tr>
+                <td>3025</td>
+                <td>DB_MPOOLFILE-&gt;get: buffer data is NOT size_t aligned</td>
+              </tr>
+              <tr>
+                <td>3026</td>
+                <td>Unable to allocate memory for mpool region</td>
+              </tr>
+              <tr>
+                <td>3029</td>
+                <td>DB_ENV-&gt;memp_fcreate: method not permitted when replication is configured</td>
+              </tr>
+              <tr>
+                <td>3030</td>
+                <td>get_fileid: file ID not set</td>
+              </tr>
+              <tr>
+                <td>3033</td>
+                <td>DB_MPOOLFILE-&gt;open: page sizes must be a power-of-2</td>
+              </tr>
+              <tr>
+                <td>3034</td>
+                <td>DB_MPOOLFILE-&gt;open: clear length larger than page size</td>
+              </tr>
+              <tr>
+                <td>3035</td>
+                <td>DB_MPOOLFILE-&gt;open: temporary files can't be readonly</td>
+              </tr>
+              <tr>
+                <td>3036</td>
+                <td>DB_MPOOLFILE-&gt;open: DB_MULTIVERSION requires transactions</td>
+              </tr>
+              <tr>
+                <td>3039</td>
+                <td>Cannot open DURABLE and NOT DURABLE handles in the same file</td>
+              </tr>
+              <tr>
+                <td>3041</td>
+                <td>DB_MULTIVERSION cannot be specified on a database file that is already open</td>
+              </tr>
+              <tr>
+                <td>3044</td>
+                <td>Warning: Ignoring maximum memory map size when joining environment</td>
+              </tr>
+              <tr>
+                <td>3045</td>
+                <td>Warning: Ignoring max open file descriptors value when joining environment</td>
+              </tr>
+              <tr>
+                <td>3046</td>
+                <td>Warning: Ignoring maximum sequential writes value when joining environment</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="rep"></a>Replication Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>3502</td>
+                <td>Client initialization failed.  Need to manually restore client</td>
+              </tr>
+              <tr>
+                <td>3504</td>
+                <td>Operation locked out.  Waiting for replication lockout to complete</td>
+              </tr>
+              <tr>
+                <td>3509</td>
+                <td>Operation locked out.  Waiting for replication lockout to complete</td>
+              </tr>
+              <tr>
+                <td>3513</td>
+                <td>DB_ENV-&gt;rep_process_message: control argument must be specified</td>
+              </tr>
+              <tr>
+                <td>3514</td>
+                <td>Environment not configured as replication master or client</td>
+              </tr>
+              <tr>
+                <td>3515</td>
+                <td>DB_ENV-&gt;rep_process_message: error retrieving DBT contents</td>
+              </tr>
+              <tr>
+                <td>3520</td>
+                <td>Inconsistent lease configuration</td>
+              </tr>
+              <tr>
+                <td>3527</td>
+                <td>DB_ENV-&gt;rep_elect: cannot call from Replication Manager application</td>
+              </tr>
+              <tr>
+                <td>3528</td>
+                <td>DB_ENV-&gt;rep_elect: must be called after DB_ENV-&gt;rep_set_transport</td>
+              </tr>
+              <tr>
+                <td>3529</td>
+                <td>DB_ENV-&gt;rep_elect: must be called after DB_ENV-&gt;rep_start</td>
+              </tr>
+              <tr>
+                <td>3530</td>
+                <td>DB_ENV-&gt;rep_elect: nsites must be zero if leases configured</td>
+              </tr>
+              <tr>
+                <td>3535</td>
+                <td>Application type mismatch for a replication </td>
+              </tr>
+              <tr>
+                <td>3550</td>
+                <td>DB_ENV-&gt;rep_set_config: leases must be </td>
+              </tr>
+              <tr>
+                <td>3551</td>
+                <td>DB_ENV-&gt;rep_set_config: leases cannot be turned off</td>
+              </tr>
+              <tr>
+                <td>3552</td>
+                <td>DB_ENV-&gt;rep_start: cannot call from Replication Manager application</td>
+              </tr>
+              <tr>
+                <td>3553</td>
+                <td>DB_ENV-&gt;rep_start: must specify DB_REP_CLIENT or DB_REP_MASTER</td>
+              </tr>
+              <tr>
+                <td>3554</td>
+                <td>DB_ENV-&gt;rep_start: must be called after DB_ENV-&gt;rep_set_transport</td>
+              </tr>
+              <tr>
+                <td>3555</td>
+                <td>DB_ENV-&gt;rep_start: must call DB_ENV-&gt;rep_set_timeout for leases first</td>
+              </tr>
+              <tr>
+                <td>3556</td>
+                <td>DB_ENV-&gt;rep_start: Cannot become master during internal init</td>
+              </tr>
+              <tr>
+                <td>3557</td>
+                <td>rep_start: Cannot become master without being elected when using leases.</td>
+              </tr>
+              <tr>
+                <td>3558</td>
+                <td>rep_start: Cannot become master with outstanding lease granted.</td>
+              </tr>
+              <tr>
+                <td>3559</td>
+                <td>First record not found</td>
+              </tr>
+              <tr>
+                <td>3563</td>
+                <td>Attempt to get first log record failed</td>
+              </tr>
+              <tr>
+                <td>3564</td>
+                <td>Final log record not found</td>
+              </tr>
+              <tr>
+                <td>3565</td>
+                <td>DB_ENV-&gt;rep_set_nsites: cannot call from Replication Manager application</td>
+              </tr>
+              <tr>
+                <td>3566</td>
+                <td>timeout value must be &gt; 0</td>
+              </tr>
+              <tr>
+                <td>3569</td>
+                <td>Unknown timeout type argument to DB_ENV-&gt;rep_set_timeout</td>
+              </tr>
+              <tr>
+                <td>3570</td>
+                <td>unknown timeout type argument to DB_ENV-&gt;rep_get_timeout</td>
+              </tr>
+              <tr>
+                <td>3571</td>
+                <td>DB_ENV-&gt;rep_set_request: Invalid min or max values</td>
+              </tr>
+              <tr>
+                <td>3572</td>
+                <td>DB_ENV-&gt;rep_set_transport: cannot call from </td>
+              </tr>
+              <tr>
+                <td>3573</td>
+                <td>DB_ENV-&gt;rep_set_transport: no send function specified</td>
+              </tr>
+              <tr>
+                <td>3574</td>
+                <td>DB_ENV-&gt;rep_set_transport: eid must be greater than or equal to 0</td>
+              </tr>
+              <tr>
+                <td>3575</td>
+                <td>DB_ENV-&gt;rep_set_clockskew: Zero only valid for </td>
+              </tr>
+              <tr>
+                <td>3576</td>
+                <td>DB_ENV-&gt;rep_set_clockskew: slow_clock value is </td>
+              </tr>
+              <tr>
+                <td>3577</td>
+                <td>DB_ENV-&gt;rep_set_clockskew: must be called before DB_ENV-&gt;rep_start</td>
+              </tr>
+              <tr>
+                <td>3578</td>
+                <td>DB_ENV-&gt;rep_flush: must be called after DB_ENV-&gt;rep_set_transport</td>
+              </tr>
+              <tr>
+                <td>3579</td>
+                <td>DB_ENV-&gt;rep_sync: must be called after DB_ENV-&gt;rep_set_transport</td>
+              </tr>
+              <tr>
+                <td>3580</td>
+                <td>non-replication commit token in replication env</td>
+              </tr>
+              <tr>
+                <td>3581</td>
+                <td>library build did not include support for replication</td>
+              </tr>
+              <tr>
+                <td>3582</td>
+                <td>closing socket</td>
+              </tr>
+              <tr>
+                <td>3583</td>
+                <td>releasing WSA event object</td>
+              </tr>
+              <tr>
+                <td>3584</td>
+                <td>can't create listen socket</td>
+              </tr>
+              <tr>
+                <td>3585</td>
+                <td>can't set REUSEADDR socket option</td>
+              </tr>
+              <tr>
+                <td>3586</td>
+                <td>can't bind socket to listening address</td>
+              </tr>
+              <tr>
+                <td>3587</td>
+                <td>listen()</td>
+              </tr>
+              <tr>
+                <td>3588</td>
+                <td>can't unblock listen socket</td>
+              </tr>
+              <tr>
+                <td>3589</td>
+                <td>unable to initialize Windows networking</td>
+              </tr>
+              <tr>
+                <td>3590</td>
+                <td>can't create event for listen socket</td>
+              </tr>
+              <tr>
+                <td>3593</td>
+                <td>EnumNetworkEvents</td>
+              </tr>
+              <tr>
+                <td>3614</td>
+                <td>select loop failed</td>
+              </tr>
+              <tr>
+                <td>3615</td>
+                <td>accept error</td>
+              </tr>
+              <tr>
+                <td>3616</td>
+                <td>can't set nonblock after accept</td>
+              </tr>
+              <tr>
+                <td>3617</td>
+                <td>connector thread failed</td>
+              </tr>
+              <tr>
+                <td>3618</td>
+                <td>set_nonblock in connnect thread</td>
+              </tr>
+              <tr>
+                <td>3619</td>
+                <td>illegal size for rep msg</td>
+              </tr>
+              <tr>
+                <td>3624</td>
+                <td>handshake is missing rec part</td>
+              </tr>
+              <tr>
+                <td>3625</td>
+                <td>malformed V1 handshake</td>
+              </tr>
+              <tr>
+                <td>3626</td>
+                <td>can't set KEEPALIVE socket option</td>
+              </tr>
+              <tr>
+                <td>3627</td>
+                <td>bad ack msg size</td>
+              </tr>
+              <tr>
+                <td>3628</td>
+                <td>library build did not include support for the Replication Manager</td>
+              </tr>
+              <tr>
+                <td>3629</td>
+                <td>unexpected election failure</td>
+              </tr>
+              <tr>
+                <td>3630</td>
+                <td>pthread_attr_init in repmgr_thread_start</td>
+              </tr>
+              <tr>
+                <td>3631</td>
+                <td>pthread_attr_setstacksize in repmgr_thread_start</td>
+              </tr>
+              <tr>
+                <td>3632</td>
+                <td>can't access signal handler</td>
+              </tr>
+              <tr>
+                <td>3633</td>
+                <td>can't access signal handler</td>
+              </tr>
+              <tr>
+                <td>3634</td>
+                <td>select</td>
+              </tr>
+              <tr>
+                <td>3635</td>
+                <td>repmgr_start: unrecognized flags parameter value</td>
+              </tr>
+              <tr>
+                <td>3636</td>
+                <td>Replication Manager needs an environment with DB_THREAD</td>
+              </tr>
+              <tr>
+                <td>3637</td>
+                <td>A local site must be named before calling repmgr_start</td>
+              </tr>
+              <tr>
+                <td>3638</td>
+                <td>Could not clean up repmgr</td>
+              </tr>
+              <tr>
+                <td>3639</td>
+                <td>A non-zero flags value is required for initial repmgr_start() call</td>
+              </tr>
+              <tr>
+                <td>3640</td>
+                <td>repmgr is already started</td>
+              </tr>
+              <tr>
+                <td>3642</td>
+                <td>can't configure repmgr elections from subordinate process</td>
+              </tr>
+              <tr>
+                <td>3643</td>
+                <td>subsequent repmgr_start() call may not specify DB_REP_ELECTION</td>
+              </tr>
+              <tr>
+                <td>3644</td>
+                <td>repmgr_start: nthreads parameter must be &gt;= 0</td>
+              </tr>
+              <tr>
+                <td>3645</td>
+                <td>can't start selector thread</td>
+              </tr>
+              <tr>
+                <td>3646</td>
+                <td>unknown ack_policy in DB_ENV-&gt;repmgr_set_ack_policy</td>
+              </tr>
+              <tr>
+                <td>3648</td>
+                <td>repmgr_site: a host name is required</td>
+              </tr>
+              <tr>
+                <td>3650</td>
+                <td>DB_ENV-&gt;repmgr_channel: must be called after DB_ENV-&gt;repmgr_start</td>
+              </tr>
+              <tr>
+                <td>3651</td>
+                <td>repmgr is stopped</td>
+              </tr>
+              <tr>
+                <td>3653</td>
+                <td>set_nonblock channel</td>
+              </tr>
+              <tr>
+                <td>3654</td>
+                <td>DB_CHANNEL-&gt;send_request() not supported on DB_EID_BROADCAST channel</td>
+              </tr>
+              <tr>
+                <td>3655</td>
+                <td>No message dispatch call-back function has been configured</td>
+              </tr>
+              <tr>
+                <td>3656</td>
+                <td>Application failed to provide a response</td>
+              </tr>
+              <tr>
+                <td>3657</td>
+                <td>a response has already been sent</td>
+              </tr>
+              <tr>
+                <td>3658</td>
+                <td>originator does not accept multi-segment response</td>
+              </tr>
+              <tr>
+                <td>3659</td>
+                <td>originator's USERMEM buffer too small</td>
+              </tr>
+              <tr>
+                <td>3662</td>
+                <td>Can't determine EID before env open</td>
+              </tr>
+              <tr>
+                <td>3663</td>
+                <td>Site config value not applicable to local site</td>
+              </tr>
+              <tr>
+                <td>3665</td>
+                <td>Unrecognized site config value</td>
+              </tr>
+              <tr>
+                <td>3666</td>
+                <td>A previously given local site may not be unset</td>
+              </tr>
+              <tr>
+                <td>3669</td>
+                <td>repmgr is not running</td>
+              </tr>
+              <tr>
+                <td>3670</td>
+                <td>No message dispatch call-back function has been configured</td>
+              </tr>
+              <tr>
+                <td>3671</td>
+                <td>Application failed to provide a response</td>
+              </tr>
+              <tr>
+                <td>3672</td>
+                <td>Nsites unknown before repmgr_start()</td>
+              </tr>
+              <tr>
+                <td>3673</td>
+                <td>rep_start</td>
+              </tr>
+              <tr>
+                <td>3674</td>
+                <td>A mismatching local site address has been set in the environment</td>
+              </tr>
+              <tr>
+                <td>3675</td>
+                <td>Not enough input bytes to fill a __repmgr_v4connect_reject message</td>
+              </tr>
+              <tr>
+                <td>3682</td>
+                <td>unexpected connection info in record_permlsn</td>
+              </tr>
+              <tr>
+                <td>3683</td>
+                <td>Cannot start replication with blobs enabled.</td>
+              </tr>
+              <tr>
+                <td>3684</td>
+                <td>Cannot start replication with blobs enabled.</td>
+              </tr>
+              <tr>
+                <td>3685</td>
+                <td>View site cannot become master</td>
+              </tr>
+              <tr>
+                <td>3686</td>
+                <td>Application environment and view callback mismatch</td>
+              </tr>
+              <tr>
+                <td>3687</td>
+                <td>View sites may not participate in elections</td>
+              </tr>
+              <tr>
+                <td>3688</td>
+                <td>Application environment and view mismatch </td>
+              </tr>
+              <tr>
+                <td>3692</td>
+                <td>Cannot start replication with blobs enabled.</td>
+              </tr>
+              <tr>
+                <td>3693</td>
+                <td>Cannot start replication with blobs enabled.</td>
+              </tr>
+              <tr>
+                <td>3694</td>
+                <td>A view site must be started with DB_REP_CLIENT</td>
+              </tr>
+              <tr>
+                <td>3695</td>
+                <td>A view site must be started with a view callback</td>
+              </tr>
+              <tr>
+                <td>3696</td>
+                <td>Current local site conflicts with earlier definition</td>
+              </tr>
+              <tr>
+                <td>3697</td>
+                <td>A (different) local site has already been set</td>
+              </tr>
+              <tr>
+                <td>3698</td>
+                <td>Local site cannot have HELPER or PEER attributes</td>
+              </tr>
+              <tr>
+                <td>3699</td>
+                <td>Site is not recorded as a view in the group membership database</td>
+              </tr>
+              <tr>
+                <td>3700</td>
+                <td>can't enable event for listener</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="sequence"></a>Sequences Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>4001</td>
+                <td>Zero length sequence key specified</td>
+              </tr>
+              <tr>
+                <td>4002</td>
+                <td>Sequences not supported in databases configured for duplicate data</td>
+              </tr>
+              <tr>
+                <td>4003</td>
+                <td>Sequence value out of range</td>
+              </tr>
+              <tr>
+                <td>4004</td>
+                <td>Sequence create failed</td>
+              </tr>
+              <tr>
+                <td>4005</td>
+                <td>Bad sequence record format</td>
+              </tr>
+              <tr>
+                <td>4008</td>
+                <td>Sequence value out of range</td>
+              </tr>
+              <tr>
+                <td>4009</td>
+                <td>Minimum sequence value must be less than maximum sequence value</td>
+              </tr>
+              <tr>
+                <td>4010</td>
+                <td>Bad sequence record format</td>
+              </tr>
+              <tr>
+                <td>4011</td>
+                <td>Sequence overflow</td>
+              </tr>
+              <tr>
+                <td>4012</td>
+                <td>Sequence update failed</td>
+              </tr>
+              <tr>
+                <td>4013</td>
+                <td>Sequence overflow</td>
+              </tr>
+              <tr>
+                <td>4014</td>
+                <td>Number of items to be cached is larger than the sequence range</td>
+              </tr>
+              <tr>
+                <td>4015</td>
+                <td>library build did not include support for sequences</td>
+              </tr>
+              <tr>
+                <td>4016</td>
+                <td>Heap databases may not be used with sequences.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="txn"></a>Transaction Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>4501</td>
+                <td>Transaction has in memory logs</td>
+              </tr>
+              <tr>
+                <td>4502</td>
+                <td>Transaction has in memory logs</td>
+              </tr>
+              <tr>
+                <td>4504</td>
+                <td>Transaction abort failed</td>
+              </tr>
+              <tr>
+                <td>4505</td>
+                <td>operation not permitted while in recovery</td>
+              </tr>
+              <tr>
+                <td>4507</td>
+                <td>No log records</td>
+              </tr>
+              <tr>
+                <td>4508</td>
+                <td>Unable to allocate memory for the transaction region</td>
+              </tr>
+              <tr>
+                <td>4511</td>
+                <td>Error: closing the transaction region with active transactions</td>
+              </tr>
+              <tr>
+                <td>4518</td>
+                <td>txn_checkpoint: failed to flush the buffer cache</td>
+              </tr>
+              <tr>
+                <td>4519</td>
+                <td>txn_checkpoint: failed to flush the buffer cache</td>
+              </tr>
+              <tr>
+                <td>4521</td>
+                <td>Family transactions cannot have parents</td>
+              </tr>
+              <tr>
+                <td>4522</td>
+                <td>Child transaction snapshot setting must match parent</td>
+              </tr>
+              <tr>
+                <td>4523</td>
+                <td>Unable to allocate transaction recycle buffer</td>
+              </tr>
+              <tr>
+                <td>4524</td>
+                <td>operation not permitted during recovery</td>
+              </tr>
+              <tr>
+                <td>4525</td>
+                <td>Unable to allocate memory for transaction detail</td>
+              </tr>
+              <tr>
+                <td>4526</td>
+                <td>commit token unavailable for nested txn</td>
+              </tr>
+              <tr>
+                <td>4527</td>
+                <td>may not be called on a replication client</td>
+              </tr>
+              <tr>
+                <td>4528</td>
+                <td>DB_TXN-&gt;prepare: log_write failed</td>
+              </tr>
+              <tr>
+                <td>4529</td>
+                <td>Unable to allocate memory for transaction name</td>
+              </tr>
+              <tr>
+                <td>4530</td>
+                <td>operation not permitted during recovery</td>
+              </tr>
+              <tr>
+                <td>4531</td>
+                <td>transaction has active cursors</td>
+              </tr>
+              <tr>
+                <td>4532</td>
+                <td>not a restored transaction</td>
+              </tr>
+              <tr>
+                <td>4533</td>
+                <td>Prepare disallowed on child transactions</td>
+              </tr>
+              <tr>
+                <td>4534</td>
+                <td>transaction already prepared</td>
+              </tr>
+              <tr>
+                <td>4536</td>
+                <td>DB_TXN-&gt;abort: in-memory log undo failed</td>
+              </tr>
+              <tr>
+                <td>4538</td>
+                <td>Child transaction is active</td>
+              </tr>
+              <tr>
+                <td>4539</td>
+                <td>replication commit token in non-replication env</td>
+              </tr>
+              <tr>
+                <td>4540</td>
+                <td>xa_get_txn: transaction begin failed</td>
+              </tr>
+              <tr>
+                <td>4541</td>
+                <td>xa_get_txn: XA transaction with parent</td>
+              </tr>
+              <tr>
+                <td>4542</td>
+                <td>xa_get_txn: transaction does not exist</td>
+              </tr>
+              <tr>
+                <td>4543</td>
+                <td>xa_get_txn: txn_continue fails</td>
+              </tr>
+              <tr>
+                <td>4544</td>
+                <td>xa_get_txn: os_malloc failed</td>
+              </tr>
+              <tr>
+                <td>4545</td>
+                <td>xa_open: Failure creating env handle</td>
+              </tr>
+              <tr>
+                <td>4546</td>
+                <td>xa_open: Failure setting thread count</td>
+              </tr>
+              <tr>
+                <td>4547</td>
+                <td>xa_open: Failure opening environment</td>
+              </tr>
+              <tr>
+                <td>4548</td>
+                <td>xa_open: Failure getting log configuration</td>
+              </tr>
+              <tr>
+                <td>4549</td>
+                <td>xa_open: In-memory logging not allowed in XA environment</td>
+              </tr>
+              <tr>
+                <td>4550</td>
+                <td>xa_start: failure mapping xid</td>
+              </tr>
+              <tr>
+                <td>4551</td>
+                <td>xa_end: failure mapping xid</td>
+              </tr>
+              <tr>
+                <td>4552</td>
+                <td>xa_end: cannot end with open cursors</td>
+              </tr>
+              <tr>
+                <td>4553</td>
+                <td>xa_end: txn_detail mismatch</td>
+              </tr>
+              <tr>
+                <td>4554</td>
+                <td>xa_end: ending transaction that is idle</td>
+              </tr>
+              <tr>
+                <td>4555</td>
+                <td>xa_prepare: failure mapping xid</td>
+              </tr>
+              <tr>
+                <td>4556</td>
+                <td>xa_prepare: xid not found</td>
+              </tr>
+              <tr>
+                <td>4557</td>
+                <td>xa_prepare: transaction neither active nor idle</td>
+              </tr>
+              <tr>
+                <td>4558</td>
+                <td>xa_prepare: txnp-&gt;prepare failed</td>
+              </tr>
+              <tr>
+                <td>4559</td>
+                <td>xa_commit: failure mapping xid</td>
+              </tr>
+              <tr>
+                <td>4560</td>
+                <td>xa_commit: xid not found</td>
+              </tr>
+              <tr>
+                <td>4561</td>
+                <td>xa_commit: commiting transaction active in branch</td>
+              </tr>
+              <tr>
+                <td>4562</td>
+                <td>xa_commit: attempting to commit unprepared transaction</td>
+              </tr>
+              <tr>
+                <td>4563</td>
+                <td>xa_commit: txnp-&gt;commit failed</td>
+              </tr>
+              <tr>
+                <td>4564</td>
+                <td>xa_recover: txn_get_prepared failed</td>
+              </tr>
+              <tr>
+                <td>4565</td>
+                <td>xa_rollback: failure mapping xid</td>
+              </tr>
+              <tr>
+                <td>4566</td>
+                <td>xa_rollback: xid not found</td>
+              </tr>
+              <tr>
+                <td>4568</td>
+                <td>xa_rollback: failure aborting transaction</td>
+              </tr>
+              <tr>
+                <td>4569</td>
+                <td>xa_forget: failure mapping xid</td>
+              </tr>
+              <tr>
+                <td>4570</td>
+                <td>xa_forget: xid not found</td>
+              </tr>
+              <tr>
+                <td>4571</td>
+                <td>xa_forget: txnp-&gt;discard failed</td>
+              </tr>
+              <tr>
+                <td>4572</td>
+                <td>DB_TXN_SNAPSHOT may not be used on a replication client</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="util"></a>Command Line Utilities Messages</h2>
+            </div>
+          </div>
+        </div>
+        <div class="informaltable">
+          <table border="1" width="80%">
+            <colgroup>
+              <col />
+              <col />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>Message Number</th>
+                <th>Message Text</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>5001</td>
+                <td>%s: Unsupported database type</td>
+              </tr>
+              <tr>
+                <td>5007</td>
+                <td>Unknown statistics flag</td>
+              </tr>
+              <tr>
+                <td>5008</td>
+                <td>close</td>
+              </tr>
+              <tr>
+                <td>5011</td>
+                <td>callback: initialization</td>
+              </tr>
+              <tr>
+                <td>5012</td>
+                <td>callback: initialization</td>
+              </tr>
+              <tr>
+                <td>5013</td>
+                <td>tx: dispatch</td>
+              </tr>
+              <tr>
+                <td>5017</td>
+                <td> data: </td>
+              </tr>
+              <tr>
+                <td>5027</td>
+                <td>cannot specify -d and -c </td>
+              </tr>
+              <tr>
+                <td>5028</td>
+                <td>cannot specify -D and -d or -l </td>
+              </tr>
+              <tr>
+                <td>5030</td>
+                <td>no source database environment specified </td>
+              </tr>
+              <tr>
+                <td>5031</td>
+                <td>no target backup directory specified </td>
+              </tr>
+              <tr>
+                <td>5033</td>
+                <td>DB_CONFIG must not contain an absolute path for the log directory </td>
+              </tr>
+              <tr>
+                <td>5043</td>
+                <td>HOT BACKUP FAILED! </td>
+              </tr>
+              <tr>
+                <td>5074</td>
+                <td>No keys specified in file</td>
+              </tr>
+              <tr>
+                <td>5075</td>
+                <td>Keys specified in file</td>
+              </tr>
+              <tr>
+                <td>5076</td>
+                <td>Btree and Hash must specify keys</td>
+              </tr>
+              <tr>
+                <td>5077</td>
+                <td>improper database type conversion specified</td>
+              </tr>
+              <tr>
+                <td>5078</td>
+                <td>no database type specified</td>
+              </tr>
+              <tr>
+                <td>5079</td>
+                <td>odd number of key/data pairs</td>
+              </tr>
+              <tr>
+                <td>5081</td>
+                <td>command-line configuration uses name=value format</td>
+              </tr>
+              <tr>
+                <td>5083</td>
+                <td>error reading db name</td>
+              </tr>
+              <tr>
+                <td>5088</td>
+                <td>unable to allocate memory</td>
+              </tr>
+              <tr>
+                <td>5089</td>
+                <td>boolean name=value pairs require a value of 0 or 1</td>
+              </tr>
+              <tr>
+                <td>5090</td>
+                <td>unexpected end of input data or key/data pair</td>
+              </tr>
+              <tr>
+                <td>5093</td>
+                <td>Program name too long </td>
+              </tr>
+              <tr>
+                <td>5096</td>
+                <td>received panic event </td>
+              </tr>
+              <tr>
+                <td>5101</td>
+                <td>open</td>
+              </tr>
+              <tr>
+                <td>5106</td>
+                <td>close</td>
+              </tr>
+              <tr>
+                <td>5117</td>
+                <td>close</td>
+              </tr>
+              <tr>
+                <td>5127</td>
+                <td>Heap must not specify keys</td>
+              </tr>
+              <tr>
+                <td>5128</td>
+                <td>improper database type conversion specified</td>
+              </tr>
+              <tr>
+                <td>5130</td>
+                <td>Password may not be specified twice</td>
+              </tr>
+              <tr>
+                <td>5131</td>
+                <td>Password may not be specified twice</td>
+              </tr>
+              <tr>
+                <td>5132</td>
+                <td>Password may not be specified twice</td>
+              </tr>
+              <tr>
+                <td>5133</td>
+                <td>Password may not be specified twice </td>
+              </tr>
+              <tr>
+                <td>5134</td>
+                <td>Password may not be specified twice</td>
+              </tr>
+              <tr>
+                <td>5135</td>
+                <td>Password may not be specified twice</td>
+              </tr>
+              <tr>
+                <td>5136</td>
+                <td>Password may not be specified twice</td>
+              </tr>
+              <tr>
+                <td>5137</td>
+                <td>Password may not be specified twice</td>
+              </tr>
+              <tr>
+                <td>5138</td>
+                <td>Password may not be specified twice</td>
+              </tr>
+              <tr>
+                <td>5139</td>
+                <td>Password may not be specified twice</td>
+              </tr>
+              <tr>
+                <td>5140</td>
+                <td>The environment does not exist or cannot be opened. \</td>
+              </tr>
+              <tr>
+                <td>5141</td>
+                <td>use of -l with DB_CONFIG file is deprecated </td>
+              </tr>
+              <tr>
+                <td>5142</td>
+                <td>Queue and recno databases cannot support blobs</td>
+              </tr>
+              <tr>
+                <td>5143</td>
+                <td>Encountered a data item too large to store in the database. </td>
+              </tr>
+              <tr>
+                <td>5144</td>
+                <td>Blob directory may not be specified twice</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+    </div>
+  </body>
+</html>

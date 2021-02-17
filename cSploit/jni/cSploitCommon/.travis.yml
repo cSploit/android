@@ -1,0 +1,3 @@
+language: c
+script: autoreconf -i; ./configure && make
+sudo: false

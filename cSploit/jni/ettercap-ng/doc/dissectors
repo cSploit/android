@@ -1,0 +1,64 @@
+===============================================================================
+
+TOPIC:      dissector
+
+ABSTRACT:   this file describes how to write a dissector and how to fill the
+            correct structures in order to ettercap understand them
+
+NOTE:       dissectors refers to functions analyzing application protocols
+            such as FTP or POP. functions that handle the lower level of the
+            TCP/IP stack are called decoder and they are stored in the
+            src/protocols directory.
+
+===============================================================================
+
+A dissector must use the macro provided in the ec_decode.h file. The main
+function must be declared as:
+
+   FUNC_DECODER(new_dissector) 
+   {
+      ...
+   }
+
+within the function code, some macro are provided to properly handle the structures.
+
+DECODE_DATALEN    (int) is the len of the data the decoder can parse 
+
+DECODE_DATA       (u_char) is the buffer containing the data
+
+PACKET            (struct packet_object) the PO structure associated with data 
+
+DECLARE_REAL_PTR_END(x,y) used to declare two u_char pointer, one (x) at the beginning
+                          of the data and one (y) at the end.
+
+DECLARE_DISP_PTR_END(x,y) used to declare two u_char pointer, one (x) at the beginning
+                          of the disp_data buffer and one (y) at the end.
+                   
+DISPLAY_DATA      (u_char) it is the buffer it will be displayed in the
+                  interface. this is made because encrypted protocols must be
+                  forwarded encrypted, but visualized as plain text.
+                  if the protocols is already in plain text don't have to copy
+                  the data in the buffer, else copy the decrypted text in this
+                  buffer
+                  
+DISPLAY_LEN       (int) set it to the len of the decrypted data.          
+
+
+
+User and pass information must be sent in the same packet. This is mandatory
+for the correct association with the passive profiling of the servers. They
+must be sent associated with a packet GOING TO the server. 
+
+
+The banner identification of the service have to be sent associate with a
+packet COMING FROM the server port.
+
+
+Since the dissector function is invoked one time per packet, the dissector has
+the scope of a single packet not a stream. You have to take care of this and
+use the sessions management (see the relative documentation) to pass data
+through subsequent activation of the function.
+
+
+EOF
+

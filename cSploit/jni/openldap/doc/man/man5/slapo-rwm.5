@@ -1,0 +1,675 @@
+.TH SLAPO-RWM 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation, All Rights Reserved.
+.\" Copying restrictions apply.  See the COPYRIGHT file.
+.\" Copyright 2004, Pierangelo Masarati, All rights reserved. <ando@sys-net.it>
+.\" $OpenLDAP$
+.\"
+.\" Portions of this document should probably be moved to slapd-ldap(5)
+.\" and maybe manual pages for librewrite.
+.\"
+.SH NAME
+slapo\-rwm \- rewrite/remap overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The
+.B rwm
+overlay to
+.BR slapd (8)
+performs basic DN/data rewrite and objectClass/attributeType mapping.
+Its usage is mostly intended to provide virtual views of existing data
+either remotely, in conjunction with the proxy backend described in
+.BR slapd\-ldap (5),
+or locally, in conjunction with the relay backend described in
+.BR slapd\-relay (5).
+.LP
+This overlay is experimental.
+.SH MAPPING
+An important feature of the
+.B rwm
+overlay is the capability to map objectClasses and attributeTypes
+from the local set (or a subset of it) to a foreign set, and vice versa.
+This is accomplished by means of the 
+.B rwm\-map
+directive.
+.TP
+.B rwm\-map "{attribute | objectclass} [<local name> | *] {<foreign name> | *}"
+Map attributeTypes and objectClasses from the foreign server to
+different values on the local slapd.
+The reason is that some attributes might not be part of the local
+slapd's schema, some attribute names might be different but serve the
+same purpose, etc.
+If local or foreign name is `*', the name is preserved.
+If local name is omitted, the foreign name is removed.
+Unmapped names are preserved if both local and foreign name are `*',
+and removed if local name is omitted and foreign name is `*'.
+.LP
+The local 
+.I objectClasses 
+and 
+.I attributeTypes 
+must be defined in the local schema; the foreign ones do not have to,
+but users are encouraged to explicitly define the remote attributeTypes
+and the objectClasses they intend to map.  All in all, when remapping
+a remote server via back-ldap (\fBslapd\-ldap\fP(5)) 
+or back-meta (\fBslapd\-meta\fP(5))
+their definition can be easily obtained by querying the \fIsubschemaSubentry\fP
+of the remote server; the problem should not exist when remapping a local 
+database.
+Note, however, that the decision whether to rewrite or not attributeTypes
+with 
+.IR "distinguishedName syntax" ,
+requires the knowledge of the attributeType syntax.
+See the REWRITING section for details.
+.LP
+Note that when mapping DN-valued attributes from local to remote,
+first the DN is rewritten, and then the attributeType is mapped;
+while mapping from remote to local, first the attributeType is mapped,
+and then the DN is rewritten.
+As such, it is important that the local attributeType is appropriately
+defined as using the distinguishedName syntax.
+Also, note that there are DN-related syntaxes (i.e. compound types with
+a portion that is DN-valued), like nameAndOptionalUID,
+whose values are currently not rewritten.
+.LP
+If the foreign type of an attribute mapping is not defined on the local 
+server, it might be desirable to have the attribute values normalized after
+the mapping process. Not normalizing the values can lead to wrong results, 
+when the
+.B rwm
+overlay is used together with e.g. the
+.B pcache
+overlay. This normalization can be enabled by means of the 
+.B rwm\-normalize\-mapped\-attrs
+directive.
+.TP
+.B rwm\-normalize\-mapped\-attrs {yes|no}
+Set this to "yes", if the
+.B rwm
+overlay should try to normalize the values of attributes that are mapped from
+an attribute type that is unknown to the local server. The default value of
+this setting is "no".
+.TP
+.B rwm-drop-unrequested-attrs {yes|no}
+Set this to "yes", if the
+.B rwm
+overlay should drop attributes that are not explicitly requested
+by a search operation.
+When this is set to "no", the
+.B rwm
+overlay will leave all attributes in place, so that subsequent modules
+can further manipulate them.
+In any case, unrequested attributes will be omitted from search results
+by the frontend, when the search entry response package is encoded.
+The default value of this setting is "yes".
+.SH SUFFIX MASSAGING
+A basic feature of the
+.B rwm
+overlay is the capability to perform suffix massaging between a virtual
+and a real naming context by means of the 
+.B rwm\-suffixmassage
+directive.
+This, in conjunction with proxy backends,
+.BR slapd\-ldap (5)
+and
+.BR slapd\-meta (5),
+or with the relay backend, 
+.BR slapd\-relay (5),
+allows to create virtual views of databases.
+A distinguishing feature of this overlay is that, when instantiated
+before any database, it can modify the DN of requests
+.I before
+database selection.
+For this reason, rules that rewrite the empty DN ("") 
+or the subschemaSubentry DN (usually "cn=subschema"),
+would prevent clients from reading the root DSE or the DSA's schema.
+.TP
+.B rwm\-suffixmassage "[<virtual naming context>]" "<real naming context>"
+Shortcut to implement naming context rewriting; the trailing part
+of the DN is rewritten from the virtual to the real naming context
+in the bindDN, searchDN, searchFilterAttrDN, compareDN, compareAttrDN,
+addDN, addAttrDN, modifyDN, modifyAttrDN, modrDN, newSuperiorDN,
+deleteDN, exopPasswdDN, and from the real to the virtual naming context
+in the searchEntryDN, searchAttrDN and matchedDN rewrite contexts.
+By default no rewriting occurs for the searchFilter 
+and for the referralAttrDN and referralDN rewrite contexts.
+If no \fI<virtual naming context>\fP is given, the first suffix of the
+database is used; this requires the 
+.B rwm\-suffixmassage
+directive be defined \fIafter\fP the database
+.B suffix
+directive.
+The
+.B rwm\-suffixmassage
+directive automatically sets the
+.B rwm\-rewriteEngine
+to
+.BR ON .
+.LP
+See the REWRITING section for details.
+.SH REWRITING
+A string is rewritten according to a set of rules, called a `rewrite
+context'.
+The rules are based on POSIX (''extended'') regular expressions with
+substring matching; basic variable substitution and map resolution 
+of substrings is allowed by specific mechanisms detailed in the following.
+The behavior of pattern matching/substitution can be altered by a set
+of flags.
+.LP
+.RS
+.nf
+<rewrite context> ::= <rewrite rule> [...]
+<rewrite rule> ::= <pattern> <action> [<flags>]
+.fi
+.RE
+.LP
+The underlying concept is to build a lightweight rewrite module
+for the slapd server (initially dedicated to the LDAP backend):
+.LP
+.SH Passes
+An incoming string is matched against a set of
+.IR rewriteRules .
+Rules are made of a 
+.IR "regex match pattern" , 
+a 
+.I "substitution pattern"
+and a set of actions, described by a set of 
+.IR "optional flags" .
+In case of match, string rewriting is performed according to the
+substitution pattern that allows to refer to substrings matched in the
+incoming string.
+The actions, if any, are finally performed.
+Each rule is executed recursively, unless altered by specific action 
+flags; see "Action Flags" for details.
+A default limit on the recursion level is set, and can be altered
+by the
+.B rwm\-rewriteMaxPasses
+directive, as detailed in the "Additional Configuration Syntax" section.
+The substitution pattern allows map resolution of substrings.
+A map is a generic object that maps a substitution pattern to a value.
+The flags are divided in "Pattern Matching Flags" and "Action Flags";
+the former alter the regex match pattern behavior, while the latter
+alter the actions that are taken after substitution.
+.SH "Pattern Matching Flags"
+.TP
+.B `C'
+honors case in matching (default is case insensitive)
+.TP
+.B `R'
+use POSIX ''basic'' regular expressions (default is ''extended'')
+.TP
+.B `M{n}'
+allow no more than
+.B n
+recursive passes for a specific rule; does not alter the max total count
+of passes, so it can only enforce a stricter limit for a specific rule.
+.SH "Action Flags"
+.TP
+.B `:'
+apply the rule once only (default is recursive)
+.TP
+.B `@'
+stop applying rules in case of match; the current rule is still applied 
+recursively; combine with `:' to apply the current rule only once 
+and then stop.
+.TP
+.B `#'
+stop current operation if the rule matches, and issue an `unwilling to
+perform' error.
+.TP
+.B `G{n}'
+jump
+.B n
+rules back and forth (watch for loops!).
+Note that `G{1}' is implicit in every rule.
+.TP
+.B `I'
+ignores errors in rule; this means, in case of error, e.g. issued by a
+map, the error is treated as a missed match.
+The `unwilling to perform' is not overridden.
+.TP
+.B `U{n}'
+uses
+.B
+n
+as return code if the rule matches; the flag does not alter the recursive
+behavior of the rule, so, to have it performed only once, it must be used 
+in combination with `:', e.g.
+.B `:U{32}'
+returns the value `32' (indicating noSuchObject) after exactly 
+one execution of the rule, if the pattern matches.
+As a consequence, its behavior is equivalent to `@', with the return
+code set to
+.BR n ;
+or, in other words, `@' is equivalent to `U{0}'.
+Positive errors are allowed, indicating the related LDAP error codes
+as specified in \fIdraft-ietf-ldapbis-protocol\fP.
+.LP
+The ordering of the flags can be significant.
+For instance: `IG{2}' means ignore errors and jump two lines ahead
+both in case of match and in case of error, while `G{2}I' means ignore
+errors, but jump two lines ahead only in case of match.
+.LP
+More flags (mainly Action Flags) will be added as needed.
+.SH "Pattern Matching"
+See
+.BR regex (7)
+and/or
+.BR re_format (7).
+.SH "Substitution Pattern Syntax"
+Everything starting with `$' requires substitution;
+.LP
+the only obvious exception is `$$', which is turned into a single `$';
+.LP
+the basic substitution is `$<d>', where `<d>' is a digit;
+0 means the whole string, while 1-9 is a submatch, as discussed in 
+.BR regex (7)
+and/or
+.BR re_format (7).
+.LP
+a `$' followed by a `{' invokes an advanced substitution.
+The pattern is:
+.LP
+.RS
+`$' `{' [ <operator> ] <name> `(' <substitution> `)' `}'
+.RE
+.LP
+where <name> must be a legal name for the map, i.e.
+.LP
+.RS
+.nf
+<name> ::= [a-z][a-z0-9]* (case insensitive)
+<operator> ::= `>' `|' `&' `&&' `*' `**' `$'
+.fi
+.RE
+.LP
+and <substitution> must be a legal substitution
+pattern, with no limits on the nesting level.
+.LP
+The operators are:
+.TP
+.B >
+sub-context invocation; <name> must be a legal, already defined
+rewrite context name
+.TP
+.B |
+external command invocation; <name> must refer to a legal, already
+defined command name (NOT IMPLEMENTED YET)
+.TP
+.B &
+variable assignment; <name> defines a variable in the running
+operation structure which can be dereferenced later; operator
+.B &
+assigns a variable in the rewrite context scope; operator
+.B &&
+assigns a variable that scopes the entire session, e.g. its value
+can be dereferenced later by other rewrite contexts
+.TP
+.B *
+variable dereferencing; <name> must refer to a variable that is
+defined and assigned for the running operation; operator
+.B *
+dereferences a variable scoping the rewrite context; operator
+.B **
+dereferences a variable scoping the whole session, e.g. the value
+is passed across rewrite contexts
+.TP
+.B $
+parameter dereferencing; <name> must refer to an existing parameter;
+the idea is to make some run-time parameters set by the system
+available to the rewrite engine, as the client host name, the bind DN
+if any, constant parameters initialized at config time, and so on;
+no parameter is currently set by either 
+.B back\-ldap
+or
+.BR back\-meta ,
+but constant parameters can be defined in the configuration file
+by using the
+.B rewriteParam
+directive.
+.LP
+Substitution escaping has been delegated to the `$' symbol, 
+which is used instead of `\e' in string substitution patterns
+because `\e' is already escaped by slapd's low level parsing routines;
+as a consequence, regex escaping requires
+two `\e' symbols, e.g. `\fB.*\e.foo\e.bar\fP' must
+be written as `\fB.*\e\e.foo\e\e.bar\fP'.
+.\"
+.\" The symbol can be altered at will by redefining the related macro in
+.\" "rewrite-int.h".
+.\"
+.SH "Rewrite Context"
+A rewrite context is a set of rules which are applied in sequence.
+The basic idea is to have an application initialize a rewrite
+engine (think of Apache's mod_rewrite ...) with a set of rewrite
+contexts; when string rewriting is required, one invokes the
+appropriate rewrite context with the input string and obtains the
+newly rewritten one if no errors occur.
+.LP
+Each basic server operation is associated to a rewrite context;
+they are divided in two main groups: client \-> server and
+server \-> client rewriting.
+.LP
+client \-> server:
+.LP
+.RS
+.nf
+(default)            if defined and no specific context 
+                     is available
+bindDN               bind
+searchDN             search
+searchFilter         search
+searchFilterAttrDN   search
+compareDN            compare
+compareAttrDN        compare AVA
+addDN                add
+addAttrDN            add AVA (DN portion of "ref" excluded)
+modifyDN             modify
+modifyAttrDN         modify AVA (DN portion of "ref" excluded)
+referralAttrDN       add/modify DN portion of referrals
+                     (default to none)
+renameDN             modrdn (the old DN)
+newSuperiorDN        modrdn (the new parent DN, if any)
+newRDN               modrdn (the new relative DN)
+deleteDN             delete
+exopPasswdDN         password modify extended operation DN
+.fi
+.RE
+.LP
+server \-> client:
+.LP
+.RS
+.nf
+searchEntryDN        search (only if defined; no default;
+                     acts on DN of search entries)
+searchAttrDN         search AVA (only if defined; defaults
+                     to searchEntryDN; acts on DN-syntax
+                     attributes of search results)
+matchedDN            all ops (only if applicable; defaults
+                     to searchEntryDN)
+referralDN           all ops (only if applicable; defaults
+                     to none)
+.fi
+.RE
+.LP
+.SH "Basic Configuration Syntax"
+All rewrite/remap directives start with the prefix
+.BR rwm\- ;
+for backwards compatibility with the historical
+.BR slapd\-ldap (5)
+and
+.BR slapd\-meta (5)
+builtin rewrite/remap capabilities, the prefix may be omitted, 
+but this practice is strongly discouraged.
+.TP
+.B rwm\-rewriteEngine { on | off }
+If `on', the requested rewriting is performed; if `off', no
+rewriting takes place (an easy way to stop rewriting without
+altering too much the configuration file).
+.TP
+.B rwm\-rewriteContext <context name> "[ alias <aliased context name> ]"
+<Context name> is the name that identifies the context, i.e. the name
+used by the application to refer to the set of rules it contains.
+It is used also to reference sub contexts in string rewriting.
+A context may alias another one.
+In this case the alias context contains no rule, and any reference to
+it will result in accessing the aliased one.
+.TP
+.B rwm\-rewriteRule "<regex match pattern>" "<substitution pattern>" "[ <flags> ]"
+Determines how a string can be rewritten if a pattern is matched.
+Examples are reported below.
+.SH "Additional Configuration Syntax"
+.TP
+.B rwm\-rewriteMap "<map type>" "<map name>" "[ <map attrs> ]"
+Allows to define a map that transforms substring rewriting into
+something else.
+The map is referenced inside the substitution pattern of a rule.
+.TP
+.B rwm\-rewriteParam <param name> <param value>
+Sets a value with global scope, that can be dereferenced by the
+command `${$paramName}'.
+.TP
+.B rwm\-rewriteMaxPasses <number of passes> [<number of passes per rule>]
+Sets the maximum number of total rewriting passes that can be
+performed in a single rewrite operation (to avoid loops).
+A safe default is set to 100; note that reaching this limit is still
+treated as a success; recursive invocation of rules is simply 
+interrupted.
+The count applies to the rewriting operation as a whole, not 
+to any single rule; an optional per-rule limit can be set.
+This limit is overridden by setting specific per-rule limits
+with the `M{n}' flag.
+
+.SH "MAPS"
+Currently, few maps are builtin but additional map types may be
+registered at runtime.
+
+Supported maps are:
+.TP
+.B LDAP <URI> [bindwhen=<when>] [version=<version>] [binddn=<DN>] [credentials=<cred>]
+The
+.B LDAP
+map expands a value by performing a simple LDAP search.
+Its configuration is based on a mandatory URI, whose
+.B attrs
+portion must contain exactly one attribute
+(use
+.B entryDN
+to fetch the DN of an entry).
+If a multi-valued attribute is used, only the first value is considered.
+
+The parameter
+.B bindwhen
+determines when the connection is established.
+It can take the values
+.BR now ,
+.BR later ,
+and
+.BR everytime ,
+respectively indicating that the connection should be created at startup,
+when required, or any time it is used.
+In the former two cases, the connection is cached, while in the latter
+a fresh new one is used all times.  This is the default.
+
+The parameters
+.B binddn
+and
+.B credentials
+represent the DN and the password that is used to perform an authenticated
+simple bind before performing the search operation; if not given,
+an anonymous connection is used.
+
+The parameter
+.B version
+can be 2 or 3 to indicate the protocol version that must be used.
+The default is 3.
+
+.TP
+.B slapd <URI>
+The
+.B slapd
+map expands a value by performing an internal LDAP search.
+Its configuration is based on a mandatory URI, which must begin with
+.B "ldap:///"
+(i.e., it must be an LDAP URI and it must not specify a host).
+As with the
+LDAP map, the
+.B attrs
+portion must contain exactly one attribute, and if
+a multi-valued attribute is used, only the first value is considered.
+
+.SH "REWRITE CONFIGURATION EXAMPLES"
+.nf
+# set to `off' to disable rewriting
+rwm\-rewriteEngine on
+
+# the rules the "suffixmassage" directive implies
+rwm\-rewriteEngine on
+# all dataflow from client to server referring to DNs
+rwm\-rewriteContext default
+rwm\-rewriteRule "(.+,)?<virtualnamingcontext>$" "$1<realnamingcontext>" ":"
+# empty filter rule
+rwm\-rewriteContext searchFilter
+# all dataflow from server to client
+rwm\-rewriteContext searchEntryDN
+rwm\-rewriteRule "(.+,)?<realnamingcontext>$" "$1<virtualnamingcontext>" ":"
+rwm\-rewriteContext searchAttrDN alias searchEntryDN
+rwm\-rewriteContext matchedDN alias searchEntryDN
+# misc empty rules
+rwm\-rewriteContext referralAttrDN
+rwm\-rewriteContext referralDN
+
+# Everything defined here goes into the `default' context.
+# This rule changes the naming context of anything sent
+# to `dc=home,dc=net' to `dc=OpenLDAP, dc=org'
+
+rwm\-rewriteRule "(.+,)?dc=home,[ ]?dc=net$"
+            "$1dc=OpenLDAP, dc=org"  ":"
+
+# since a pretty/normalized DN does not include spaces
+# after rdn separators, e.g. `,', this rule suffices:
+
+rwm\-rewriteRule "(.+,)?dc=home,dc=net$"
+            "$1dc=OpenLDAP,dc=org"  ":"
+
+# Start a new context (ends input of the previous one).
+# This rule adds blanks between DN parts if not present.
+rwm\-rewriteContext  addBlanks
+rwm\-rewriteRule     "(.*),([^ ].*)" "$1, $2"
+
+# This one eats blanks
+rwm\-rewriteContext  eatBlanks
+rwm\-rewriteRule     "(.*), (.*)" "$1,$2"
+
+# Here control goes back to the default rewrite
+# context; rules are appended to the existing ones.
+# anything that gets here is piped into rule `addBlanks'
+rwm\-rewriteContext  default
+rwm\-rewriteRule     ".*" "${>addBlanks($0)}" ":"
+
+.\" # Anything with `uid=username' is looked up in
+.\" # /etc/passwd for gecos (I know it's nearly useless,
+.\" # but it is there just as a guideline to implementing
+.\" # custom maps).
+.\" # Note the `I' flag that leaves `uid=username' in place 
+.\" # if `username' does not have a valid account, and the
+.\" # `:' that forces the rule to be processed exactly once.
+.\" rwm\-rewriteContext  uid2Gecos
+.\" rwm\-rewriteRule     "(.*)uid=([a\-z0\-9]+),(.+)"
+.\"                 "$1cn=$2{xpasswd},$3"      "I:"
+.\" 
+.\" # Finally, in a bind, if one uses a `uid=username' DN,
+.\" # it is rewritten in `cn=name surname' if possible.
+.\" rwm\-rewriteContext  bindDN
+.\" rwm\-rewriteRule     ".*" "${>addBlanks(${>uid2Gecos($0)})}" ":"
+.\" 
+# Rewrite the search base according to `default' rules.
+rwm\-rewriteContext  searchDN alias default
+
+# Search results with OpenLDAP DN are rewritten back with
+# `dc=home,dc=net' naming context, with spaces eaten.
+rwm\-rewriteContext  searchEntryDN
+rwm\-rewriteRule     "(.*[^ ],)?[ ]?dc=OpenLDAP,[ ]?dc=org$"
+                "${>eatBlanks($1)}dc=home,dc=net"    ":"
+
+# Bind with email instead of full DN: we first need
+# an ldap map that turns attributes into a DN (the
+# argument used when invoking the map is appended to 
+# the URI and acts as the filter portion)
+rwm\-rewriteMap ldap attr2dn "ldap://host/dc=my,dc=org?dn?sub"
+
+# Then we need to detect DN made up of a single email,
+# e.g. `mail=someone@example.com'; note that the rule
+# in case of match stops rewriting; in case of error,
+# it is ignored.  In case we are mapping virtual
+# to real naming contexts, we also need to rewrite
+# regular DNs, because the definition of a bindDN
+# rewrite context overrides the default definition.
+rwm\-rewriteContext bindDN
+rwm\-rewriteRule "^mail=[^,]+@[^,]+$" "${attr2dn($0)}" ":@I"
+
+# This is a rather sophisticated example. It massages a
+# search filter in case who performs the search has
+# administrative privileges.  First we need to keep
+# track of the bind DN of the incoming request, which is
+# stored in a variable called `binddn' with session scope,
+# and left in place to allow regular binding:
+rwm\-rewriteContext  bindDN
+rwm\-rewriteRule     ".+" "${&&binddn($0)}$0" ":"
+
+# A search filter containing `uid=' is rewritten only
+# if an appropriate DN is bound.
+# To do this, in the first rule the bound DN is
+# dereferenced, while the filter is decomposed in a
+# prefix, in the value of the `uid=<arg>' AVA, and 
+# in a suffix. A tag `<>' is appended to the DN. 
+# If the DN refers to an entry in the `ou=admin' subtree, 
+# the filter is rewritten OR-ing the `uid=<arg>' with
+# `cn=<arg>'; otherwise it is left as is. This could be
+# useful, for instance, to allow apache's auth_ldap-1.4
+# module to authenticate users with both `uid' and
+# `cn', but only if the request comes from a possible
+# `cn=Web auth,ou=admin,dc=home,dc=net' user.
+rwm\-rewriteContext searchFilter
+rwm\-rewriteRule "(.*\e\e()uid=([a\-z0\-9_]+)(\e\e).*)"
+  "${**binddn}<>${&prefix($1)}${&arg($2)}${&suffix($3)}"
+  ":I"
+rwm\-rewriteRule "^[^,]+,ou=admin,dc=home,dc=net$"
+  "${*prefix}|(uid=${*arg})(cn=${*arg})${*suffix}" ":@I"
+rwm\-rewriteRule ".*<>$" "${*prefix}uid=${*arg}${*suffix}" ":"
+
+# This example shows how to strip unwanted DN-valued
+# attribute values from a search result; the first rule
+# matches DN values below "ou=People,dc=example,dc=com";
+# in case of match the rewriting exits successfully.
+# The second rule matches everything else and causes
+# the value to be rejected.
+rwm\-rewriteContext searchEntryDN
+rwm\-rewriteRule ".+,ou=People,dc=example,dc=com$" "$0" ":@"
+rwm\-rewriteRule ".*" "" "#"
+.fi
+.SH "MAPPING EXAMPLES"
+The following directives map the object class `groupOfNames' to
+the object class `groupOfUniqueNames' and the attribute type
+`member' to the attribute type `uniqueMember':
+.LP
+.RS
+.nf
+map objectclass groupOfNames groupOfUniqueNames
+map attribute uniqueMember member
+.fi
+.RE
+.LP
+This presents a limited attribute set from the foreign
+server:
+.LP
+.RS
+.nf
+map attribute cn *
+map attribute sn *
+map attribute manager *
+map attribute description *
+map attribute *
+.fi
+.RE
+.LP
+These lines map cn, sn, manager, and description to themselves, and 
+any other attribute gets "removed" from the object before it is sent 
+to the client (or sent up to the LDAP server).  This is obviously a 
+simplistic example, but you get the point.
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd\-ldap (5),
+.BR slapd\-meta (5),
+.BR slapd\-relay (5),
+.BR slapd (8),
+.BR regex (7),
+.BR re_format (7).
+.SH AUTHOR
+Pierangelo Masarati; based on back-ldap rewrite/remap features
+by Howard Chu, Pierangelo Masarati.

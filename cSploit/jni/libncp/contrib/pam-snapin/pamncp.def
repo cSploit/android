@@ -1,0 +1,12 @@
+LIBRARY        PAMNCP
+DESCRIPTION    'NWAdmin Snapin for PAM NCP authentication module: 32 bit SnapIn'
+CODE           PRELOAD MOVEABLE DISCARDABLE
+DATA           PRELOAD MOVEABLE SINGLE
+
+HEAPSIZE       16000
+
+EXPORTS		InitSnapin
+				SnapinPamNcpProcUser
+				SnapinPamNcpProcGroup
+				PamNcpSnapinHelpDlg
+				PamNcpSnapinTraceDlg

@@ -1,0 +1,98 @@
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# You may obtain a copy of the Licence at
+# http://www.gnu.org/licences/lgpl.html
+# 
+# As a special exception this file can also be included in modules
+# with other source code as long as that source code has been 
+# released under an Open Source Initiative certificed licence.  
+# More information about OSI certification can be found at: 
+# http://www.opensource.org 
+# 
+# This module is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public Licence for more details.
+# 
+# This module was created by members of the firebird development 
+# team.  All individual contributions remain the Copyright (C) of 
+# those individuals and all rights are reserved.  Contributors to 
+# this file are either listed below or can be obtained from a CVS 
+# history command.
+#
+#  Created by:  Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#
+#  Contributor(s):
+#  Adriano dos Santos Fernandes
+#
+
+ROOT=$(shell cd ../..; pwd)
+
+ifeq ($(IsDeveloper), Y)
+  DefaultTarget := Debug
+else
+  DefaultTarget := Release
+endif
+
+CPPFLAGS+= -I$(FB_BUILD)/include
+
+include     $(ROOT)/gen/make.defaults
+include     $(ROOT)/gen/make.platform
+include     $(ROOT)/gen/make.rules
+include     $(ROOT)/gen/make.shared.variables
+
+@SET_MAKE@
+
+
+# Override make.defaults
+LINK_PLUGIN_SYMBOLS = $(call LIB_LINK_MAPFILE,../$(PLUGIN_VERS))
+
+
+.PHONY: all udrcpp_example dc_example kh_example
+
+all: udrcpp_example dc_example kh_example
+
+
+UDR_Objects = $(call makeObjects,../examples/udr,UdrCppExample.cpp)
+UDR_Plugin = $(PLUGINS)/udr/$(LIB_PREFIX)udrcpp_example.$(SHRLIB_EXT)
+AllObjects = $(UDR_Objects)
+
+udrcpp_example: $(UDR_Plugin)
+
+$(UDR_Plugin): $(UDR_Objects)
+ifeq ($(PLATFORM),DARWIN)
+	$(LIB_LINK) $(LIB_BUNDLE_OPTIONS) -o $@ $^ @PTHREAD_CFLAGS@ @PTHREAD_LIBS@ \
+		$(FIREBIRD_LIBRARY_LINK)
+else
+	$(LIB_LINK) $(LIB_LINK_OPTIONS) $(LIB_LINK_SONAME)udrcpp_example.$(SHRLIB_EXT) \
+		$(LIB_PATH_OPTS) -o $@ $^ $(THR_LIBS) $(PLUGINS)/$(LIB_PREFIX)udr_engine.$(SHRLIB_EXT) \
+		$(FIREBIRD_LIBRARY_LINK)
+endif
+
+
+DC_Objects = $(call makeObjects,../examples/dbcrypt,DbCrypt.cpp)
+DC_Plugin = $(call makePluginName,DbCrypt_example)
+AllObjects += $(DC_Objects)
+
+dc_example: $(DC_Plugin)
+
+$(DC_Plugin):	$(DC_Objects)
+	$(LINK_PLUGIN) $(call LIB_LINK_SONAME,$(notdir $@).0) -o $@ $^ $(LINK_PLUG_LIBS) $(FIREBIRD_LIBRARY_LINK)
+
+
+KH_Objects = $(call makeObjects,../examples/dbcrypt,CryptKeyHolder.cpp)
+KH_Plugin = $(call makePluginName,CryptKeyHolder_example)
+AllObjects += $(KH_Objects)
+
+kh_example: $(KH_Plugin)
+
+$(KH_Plugin):	$(KH_Objects)
+	$(LINK_PLUGIN) $(call LIB_LINK_SONAME,$(notdir $@).0) -o $@ $^ $(LINK_PLUG_LIBS) $(FIREBIRD_LIBRARY_LINK)
+
+
+include $(ROOT)/gen/make.shared.targets
+
+Dependencies = $(AllObjects:.o=.d)
+-include $(Dependencies)

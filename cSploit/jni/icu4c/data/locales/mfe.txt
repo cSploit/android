@@ -1,0 +1,231 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/mfe.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/mfe.xml
+ */
+mfe{
+    ExemplarCharacters{"[a b c d e f g h i j k l m n o p r s t u v w x y z]"}
+    ExemplarCharactersIndex{"[A B C D E F G H I J K L M N O P R S T U V W X Y Z]"}
+    LocaleScript{
+        "Latn",
+    }
+    NumberElements{
+        ".",
+        " ",
+        ";",
+        "%",
+        "0",
+        "#",
+        "-",
+        "E",
+        "‰",
+        "∞",
+        "NaN",
+        "+",
+    }
+    Version{"2.0.47.63"}
+    calendar{
+        gregorian{
+            DateTimePatterns{
+                "HH:mm:ss zzzz",
+                "HH:mm:ss z",
+                "HH:mm:ss",
+                "HH:mm",
+                "EEEE d MMMM y",
+                "d MMMM y",
+                "d MMM, y",
+                "d/M/yyyy",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            availableFormats{
+                M{"M"}
+                MMM{"MMM"}
+                MMMEd{"E d MMM"}
+                MMMMEd{"EEE d MMMM"}
+                MMMMd{"d MMMM"}
+                MMMd{"d MMM"}
+                MMMdd{"dd MMM"}
+                MMd{"d/MM"}
+                MMdd{"dd/MM"}
+                Md{"d/M"}
+                Med{"EEE d/M"}
+                ms{"m:ss"}
+                y{"y"}
+                yM{"M/y"}
+                yMEd{"EEE d/M/y"}
+                yMMM{"MMM y"}
+                yMMMEd{"EEE d MMM y"}
+                yMMMM{"MMMM y"}
+                yQ{"Q y"}
+                yQQQ{"QQQ y"}
+                yyMM{"MM/yy"}
+                yyMMM{"MMM yy"}
+                yyMMMEEEd{"EEE d MMM yy"}
+                yyMMMd{"d MMM yy"}
+            }
+            dayNames{
+                format{
+                    abbreviated{
+                        "dim",
+                        "lin",
+                        "mar",
+                        "mer",
+                        "ze",
+                        "van",
+                        "sam",
+                    }
+                    wide{
+                        "dimans",
+                        "lindi",
+                        "mardi",
+                        "merkredi",
+                        "zedi",
+                        "vandredi",
+                        "samdi",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "d",
+                        "l",
+                        "m",
+                        "m",
+                        "z",
+                        "v",
+                        "s",
+                    }
+                }
+            }
+            eras{
+                abbreviated{
+                    "av. Z-K",
+                    "ap. Z-K",
+                }
+                wide{
+                    "avan Zezi-Krist",
+                    "apre Zezi-Krist",
+                }
+            }
+            fields{
+                day{
+                    dn{"Zour"}
+                    relative{
+                        "-1"{"Yer"}
+                        "0"{"Zordi"}
+                        "1"{"Demin"}
+                    }
+                }
+                dayperiod{
+                    dn{"Peryod dan lazourne"}
+                }
+                era{
+                    dn{"Lepok"}
+                }
+                hour{
+                    dn{"Ler"}
+                }
+                minute{
+                    dn{"Minit"}
+                }
+                month{
+                    dn{"Mwa"}
+                }
+                second{
+                    dn{"Segonn"}
+                }
+                week{
+                    dn{"Semenn"}
+                }
+                weekday{
+                    dn{"Zour lasemenn"}
+                }
+                year{
+                    dn{"Lane"}
+                }
+                zone{
+                    dn{"Peryod letan"}
+                }
+            }
+            monthNames{
+                format{
+                    abbreviated{
+                        "zan",
+                        "fev",
+                        "mar",
+                        "avr",
+                        "me",
+                        "zin",
+                        "zil",
+                        "out",
+                        "sep",
+                        "okt",
+                        "nov",
+                        "des",
+                    }
+                    wide{
+                        "zanvie",
+                        "fevriye",
+                        "mars",
+                        "avril",
+                        "me",
+                        "zin",
+                        "zilye",
+                        "out",
+                        "septam",
+                        "oktob",
+                        "novam",
+                        "desam",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "z",
+                        "f",
+                        "m",
+                        "a",
+                        "m",
+                        "z",
+                        "z",
+                        "o",
+                        "s",
+                        "o",
+                        "n",
+                        "d",
+                    }
+                }
+            }
+            quarters{
+                format{
+                    abbreviated{
+                        "T1",
+                        "T2",
+                        "T3",
+                        "T4",
+                    }
+                    wide{
+                        "1e trimes",
+                        "2em trimes",
+                        "3em trimes",
+                        "4em trimes",
+                    }
+                }
+            }
+        }
+    }
+    delimiters{
+        alternateQuotationEnd{"’"}
+        alternateQuotationStart{"‘"}
+        quotationEnd{"”"}
+        quotationStart{"“"}
+    }
+}

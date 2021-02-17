@@ -1,0 +1,102 @@
+.TH LDAP_GET_VALUES 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_get_values, ldap_get_values_len, ldap_count_values \- LDAP attribute value handling routines
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+
+.LP
+.ft B
+char **ldap_get_values(ld, entry, attr)
+.ft
+LDAP *ld;
+LDAPMessage *entry;
+char *attr;
+.LP
+.ft B
+struct berval **ldap_get_values_len(ld, entry, attr)
+.ft
+LDAP *ld;
+LDAPMessage *entry;
+char *attr;
+.LP
+.ft B
+int ldap_count_values(vals)
+.ft
+char **vals;
+.LP
+.ft B
+int ldap_count_values_len(vals)
+.ft
+struct berval **vals;
+.LP
+.ft B
+void ldap_value_free(vals)
+.ft
+char **vals;
+.LP
+.ft B
+void ldap_value_free_len(vals)
+.ft
+struct berval **vals;
+.SH DESCRIPTION
+These routines are used to retrieve and manipulate attribute values
+from an LDAP entry as returned by
+.BR ldap_first_entry (3)
+or
+.BR ldap_next_entry (3).
+.B ldap_get_values()
+takes the \fIentry\fP and the attribute \fIattr\fP
+whose values are desired and returns a NULL-terminated array of the
+attribute's values.  \fIattr\fP may be an attribute type as returned
+from
+.BR ldap_first_attribute (3)
+or
+.BR ldap_next_attribute (3),
+or if the attribute type is known it can simply be given.
+.LP
+The number of values in the array can be counted by calling
+.BR ldap_count_values() .
+The array of values returned can be freed by calling
+.BR ldap_value_free() .
+.LP
+If the attribute values are binary in nature, and thus not suitable
+to be returned as an array of char *'s, the
+.B ldap_get_values_len()
+routine can be used instead.  It takes the same parameters as
+.BR ldap_get_values() ,
+but returns a NULL-terminated array of pointers
+to berval structures, each containing the length of and a pointer
+to a value.
+.LP
+The number of values in the array can be counted by calling
+.BR ldap_count_values_len() .
+The array of values returned can be freed by calling
+.BR ldap_value_free_len() .
+.SH ERRORS
+If an error occurs in
+.B ldap_get_values()
+or
+.BR ldap_get_values_len() ,
+NULL is returned and the
+.B ld_errno
+field in the \fIld\fP parameter is set to
+indicate the error.  See
+.BR ldap_error (3)
+for a description of possible error codes.
+.SH NOTES
+These routines dynamically allocate memory which the caller must free
+using the supplied routines.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_first_entry (3),
+.BR ldap_first_attribute (3),
+.BR ldap_error (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

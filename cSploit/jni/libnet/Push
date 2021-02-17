@@ -1,0 +1,7 @@
+#!/bin/sh
+
+V=$(git describe --tags)
+F="../$V.tar.gz ../README.txt"
+
+scp $F ras_u_ras_t@frs.sourceforge.net:/home/frs/project/libnet-dev/
+

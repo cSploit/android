@@ -1,0 +1,194 @@
+Capabilities
+------------
+
+The TDS_CAP_TOKEN token (decimal 226) in TDS is sent to the server immediately 
+after the login sequence in TDS 5.0. It is sent back as part of the login 
+acknowledgement stream. The client requests which capabilities it wants and 
+the server sends back which ones it supports.  
+
+I'm not certain but I believe a full 5.0 login sequence could be sent to an 
+MS-SQL or Sybase 4.x server and if the 226 token is absent from the return 
+stream then the protocol could default back to 4.2. This would eliminate the
+need for compiling two versions of the library, of course setting the proto
+version manually would not send the capabilities. I need someone to try this
+as I only have access to Sybase 11.x servers. 
+
+The layout of the capabilities packet is:
+  1 byte       2 bytes        n bytes
++---------+---------------+---------------------+
+|  226    | size of mask  | capabilities field  |
++---------+---------------+---------------------+ 
+
+The capabilities field looks like:
+  1 byte   1 byte   n bytes
++--------+--------+---------------+
+|   id   |  size  |    bitmask    |
++--------+--------+---------------+
+
+1) For id 1 seems to signify request capabilities and 2 is response capabilities.
+2) The size represents the size of the bitmask (7 for all I've seen).
+3) The bitmask is is a bitset mask denoting values set by ct_capability()
+   or similar call.  It is packed from the low order bit to high order bit.
+   The first bit (low order bit...bit 0 of byte 6) is not used for a capability.
+   It seems to be used by the protocol but its function is presently unknown.
+
+A listing of all known values for the bitmasks follows with its ctlib 
+constant.  Refer to the ctlib documentation for descriptions of these.
+
+REQUEST CAPABILITIES
+--------------------
+byte 0:
+default ctlib value: 3
+bit 0 (0x01): CS_PROTO_DYNPROC
+bit 1 (0x02): CS_DATA_FLTN
+bit 2 (0x04): CS_DATA_BITN
+bit 3 (0x08): CS_DATA_INT8 
+bit 4 (0x10): CS_DATA_VOID
+bit 5 (0x20): unknown
+bit 6 (0x40): unknown
+bit 7 (0x80): unknown
+
+byte 1:
+default ctlib value: 109 
+bit 0 (0x01): CS_CON_INBAND
+bit 1 (0x02): CS_CON_LOGICAL
+bit 2 (0x04): CS_PROTO_TEXT
+bit 3 (0x08): CS_PROTO_BULK
+bit 4 (0x10): CS_REQ_URGNOTIF
+bit 5 (0x20): CS_DATA_SENSITIVITY
+bit 6 (0x40): CS_DATA_BOUNDARY
+bit 7 (0x80): CS_PROTO_DYNAMIC
+
+byte 2:
+default ctlib value: 127
+bit 0 (0x01): CS_DATA_MONEYN
+bit 1 (0x02): CS_CSR_PREV
+bit 2 (0x04): CS_CSR_FIRST
+bit 3 (0x08): CS_CSR_LAST
+bit 4 (0x10): CS_CSR_ABS
+bit 5 (0x20): CS_CSR_REL
+bit 6 (0x40): CS_CSR_MULTI
+bit 7 (0x80): CS_CON_OOB
+
+byte 3:
+default ctlib value: 255
+bit 0 (0x01): CS_DATA_NUM
+bit 1 (0x02): CS_DATA_TEXT
+bit 2 (0x04): CS_DATA_IMAGE
+bit 3 (0x08): CS_DATA_DEC
+bit 4 (0x10): CS_DATA_LCHAR
+bit 5 (0x20): CS_DATA_LBIN
+bit 6 (0x40): CS_DATA_INTN
+bit 7 (0x80): CS_DATA_DATETIMEN
+
+byte 4:
+default ctlib value: 255
+bit 0 (0x01): CS_DATA_BIN
+bit 1 (0x02): CS_DATA_VBIN
+bit 2 (0x04): CS_DATA_MNY8
+bit 3 (0x08): CS_DATA_MNY4
+bit 4 (0x10): CS_DATA_DATE8
+bit 5 (0x20): CS_DATA_DATE4
+bit 6 (0x40): CS_DATA_FLT4
+bit 7 (0x80): CS_DATA_FLT8
+
+byte 5:
+default ctlib value: 255
+bit 0 (0x01): CS_REQ_MSG
+bit 1 (0x02): CS_REQ_PARAM
+bit 2 (0x04): CS_DATA_INT1
+bit 3 (0x08): CS_DATA_INT2
+bit 4 (0x10): CS_DATA_INT4
+bit 5 (0x20): CS_DATA_BIT
+bit 6 (0x40): CS_DATA_CHAR
+bit 7 (0x80): CS_DATA_VCHAR
+
+byte 6:
+default ctlib value: 254
+bit 0 (0x01): unknown
+bit 1 (0x02): CS_REQ_LANG
+bit 2 (0x04): CS_REQ_RPC
+bit 3 (0x08): CS_REQ_NOTIF
+bit 4 (0x10): CS_REQ_MSTMT
+bit 5 (0x20): CS_REQ_BCP
+bit 6 (0x40): CS_REQ_CURSOR
+bit 7 (0x80): CS_REQ_DYN
+
+RESPONSE CAPABILITIES
+---------------------
+byte 0:
+default ctlib value: 0
+bit 0 (0x01): unknown
+bit 1 (0x02): unknown
+bit 2 (0x04): unknown
+bit 3 (0x08): unknown
+bit 4 (0x10): unknown
+bit 5 (0x20): unknown
+bit 6 (0x40): unknown
+bit 7 (0x80): unknown
+
+byte 1:
+default ctlib value: 0
+bit 0 (0x01): unknown
+bit 1 (0x02): unknown
+bit 2 (0x04): unknown
+bit 3 (0x08): unknown
+bit 4 (0x10): unknown
+bit 5 (0x20): unknown
+bit 6 (0x40): unknown
+bit 7 (0x80): unknown
+
+byte 2: (88)
+default ctlib value: 10
+bit 0 (0x01): CS_DATA_NOBOUNDARY
+bit 1 (0x02): CS_DATA_NOTDSDEBUG
+bit 2 (0x04): CS_RES_NOSTRIPBLANKS
+bit 3 (0x08): CS_DATA_NOINT8
+bit 4 (0x10): unknown
+bit 5 (0x20): unknown
+bit 6 (0x40): unknown
+bit 7 (0x80): unknown
+
+byte 3: (89)
+default ctlib value: 120 
+bit 0 (0x01): CS_DATA_NOINTN
+bit 1 (0x02): CS_DATA_NODATETIMEN
+bit 2 (0x04): CS_DATA_MONEYN
+bit 3 (0x08): CS_CON_NOOOB
+bit 4 (0x10): CS_CON_NOINBAND
+bit 5 (0x20): CS_PROTO_NOTEXT
+bit 6 (0x40): CS_PROTO_NOBULK
+bit 7 (0x80): CS_DATA_NOSENSITIVITY
+
+byte 4: (90)
+default ctlib value: 0
+bit 0 (0x01): CS_DATA_NOFLT4
+bit 1 (0x02): CS_DATA_NOFLT8
+bit 2 (0x04): CS_DATA_NONUM
+bit 3 (0x08): CS_DATA_NOTEXT
+bit 4 (0x10): CS_DATA_IMAGE
+bit 5 (0x20): CS_DATA_NODEC
+bit 6 (0x40): CS_DATA_NOLCHAR
+bit 7 (0x80): CS_DATA_NOLBIN
+
+byte 5: (91)
+default ctlib value: 0
+bit 0 (0x01): CS_DATA_NOCHAR
+bit 1 (0x02): CS_DATA_NOVCHAR
+bit 2 (0x04): CS_DATA_NOBIN
+bit 3 (0x08): CS_DATA_NOVBIN
+bit 4 (0x10): CS_DATA_NOMNY8
+bit 5 (0x20): CS_DATA_NOMNY4
+bit 6 (0x40): CS_DATA_NODATE8
+bit 7 (0x80): CS_DATA_NODATE4
+
+byte 6: (92)
+default ctlib value: 0
+bit 0 (0x01): unknown
+bit 1 (0x02): CS_RES_NOMSG
+bit 2 (0x04): CS_RES_NOEED
+bit 3 (0x08): CS_RES_NOPARAM
+bit 4 (0x10): CS_DATA_NOINT1
+bit 5 (0x20): CS_DATA_NOINT2
+bit 6 (0x40): CS_DATA_NOINT4
+bit 7 (0x80): CS_DATA_NOBIT

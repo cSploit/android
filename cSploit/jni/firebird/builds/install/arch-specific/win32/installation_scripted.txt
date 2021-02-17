@@ -1,0 +1,185 @@
+
+Setup Command Line Parameters
+=============================
+
+Contents
+o Summary
+o Parameters specific to Firebird installs
+o Parameters specific to Firebird uninstalls
+
+
+Quick summary of available parameters
+-------------------------------
+
+Setup parameters specific to the Firebird Installer. They are case insensitive.
+However, string values passed to the parameters are not.
+
+/H
+/FORCE
+/NOCPL
+/NOGDS32
+/COPYFBCLIENT
+/COMPONENTS="comma separated list of component names"
+/TASKS="comma separated list of task names"
+/MERGETASKS="comma separated list of task names"
+/SYSDBANAME="SYSDBA"
+/SYSDBAPASSWORD="masterkey"
+/SUPPORTLEGACYCLIENTAUTH
+
+Setup parameters specific to the Firebird Uninstaller
+/CLEAN
+
+For general parameters available to all InnoSetup based installers see the 
+documentation for innosetup. A summary is available via /? or /HELP
+
+
+Parameters specific to Firebird installs
+----------------------------------------
+
+/h
+  Invoke this file as a help screen at installation time.
+  Note that /? and /HELP are now used by innosetup itself for
+  innosetup specific help.
+
+/COMPONENTS="comma separated list of component names"
+
+  Choose from - ServerComponent\SuperServerComponent,
+                ServerComponent\ClassicServerComponent,
+                ServerComponent,
+                DevAdminComponent and
+                ClientComponent
+
+  Overrides the default components settings. Using this command line
+  parameter causes Setup to automatically select a custom type. A full
+  install requires combining components. For example:
+
+  /COMPONENTS="ServerComponent\SuperServerComponent,ServerComponent,DevAdminComponent,ClientComponent"
+
+  would be required for a full install.
+
+/TASKS="comma separated list of task names"
+
+  Specifies a list of tasks that should be initially selected or
+  deselected. To deselect a task, prefix its name with a "!" character.
+
+  Choose from - UseGuardianTask
+                UseApplicationTask
+                UseServiceTask
+                AutoStartTask
+                InstallCPLAppletTask
+                MenuGroupTask
+                CopyFbClientToSysTask
+                CopyFbClientAsGds32Task
+
+  Only the specified tasks (and their children) will be selected; the rest
+  will be deselected. Use the /MERGETASKS parameter instead if you want to
+  keep the default set of tasks and only select/deselect some of them.
+
+  By default the following tasks are run:
+
+    UseGuardianTask
+    UseServiceTask
+    AutoStartTask
+    InstallCPLAppletTask
+    MenuGroupTask
+    CopyFbClientAsGds32Task
+
+  The /TASKS option is not recommended for use with the /NOCPL, NOGDS32
+  or /COPYFBCLIENT.
+
+
+/MERGETASKS="comma separated list of task names"
+
+  Like the /TASKS parameter, except the specified tasks will be merged
+  with the set of tasks that would have otherwise been selected by
+  default.
+
+  If UsePreviousTasks is set to yes, the specified tasks will be
+  selected/deselected after any previous tasks are restored.
+
+
+/FORCE
+
+  Tells the installer to ignore its analysis of the existing
+  environment. It will attempt to install and configure Firebird as
+  if no previous version of Firebird or InterBase was installed.
+
+  This can be useful if you have a seriously broken installation that
+  you cannot uninstall. Or it could be another way to aggravate your
+  users by breaking a perfectly good working install of Firebird or InterBase.
+  Its your choice.
+
+
+/NOCPL
+
+  Don't install the Control Panel Applet.
+
+  (This option is not intended to be used with the /TASKS parameter.)
+
+
+/NOGDS32
+
+  Don't install a copy of the client library as gds32 into the system directory,
+  even if installation analysis concludes it is OK to do so.
+
+  (This option is not intended to be used with the /TASKS parameter.)
+
+
+/COPYFBCLIENT
+
+  Copy the fbclient.dll to the system directory. This is recommended
+  for client installs if you are sure that you will only ever be
+  accessing a single server version. If your client applications are
+  likely to take advantage of accessing different server versions this
+  is not recommended. See
+    doc/README.Win32LibraryInstallation.txt
+  for more information.
+
+  (This option is not intended to be used with the /TASKS parameter.)
+
+  
+/SYSDBANAME="SYSDBA"
+
+  SYSDBA name will default to SYSDBA unless overridden with this parameter.
+  
+  NOTE: If an existing Security database is found this parameter should be 
+  ignored but this has not been fully tested as of Alpha1.
+
+  
+/SYSDBAPASSWORD="masterkey"
+
+  SYSDBA password will use the default "masterkey" password.
+  
+  NOTE: If an existing Security database is found this parameter should be 
+  ignored but this has not been fully tested as of Alpha1.
+  
+
+/SUPPORTLEGACYCLIENTAUTH
+
+  Updates firebird.conf. Sets AuthServer thus:
+    AuthServer = Srp, Win_Sspi, Legacy_Auth
+
+  NOTE: This option does not check to see if AuthServer has already been 
+  modified.
+
+
+  
+Parameters specific to Firebird uninstalls
+------------------------------------------
+
+/CLEAN
+
+  Uninstallation has always left the following files in place after
+  the uninstallation process has completed:
+
+    firebird.conf
+    databases.conf
+    firebird.log
+    security3.fdb
+	fbtrace.conf
+
+  The assumption is that these files will be useful to users
+  re-installing or upgrading Firebird. Starting with Firebird 2.1
+  (using InnoSetup 5 to build the installation package) it is now
+  possible to pass the /clean option to remove these files.
+

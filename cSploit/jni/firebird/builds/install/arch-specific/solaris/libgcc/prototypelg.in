@@ -1,0 +1,22 @@
+#-------------------------------------------------------------------------------
+
+!SRCDIR=/usr/local/lib
+
+i pkginfo=pkginfolg
+i prototype=prototypelg
+
+!default 755 root root
+d none  /usr         ? ? ?
+d none  /usr/lib     ? ? ?
+
+d none /opt
+d none @prefix@
+d none @prefix@/lib ? ? ?
+
+f none @prefix@/lib/libstdc++.so.6.0.9=$SRCDIR/libstdc++.so.6.0.9  0755 firebird firebird 
+f none @prefix@/lib/libgcc_s.so.1=$SRCDIR/libgcc_s.so.1  0755 firebird firebird 
+
+s none @prefix@/lib/libstdc++.so.6=@prefix@/lib/libstdc++.so.6.0.9
+s none @prefix@/lib/libstdc++.so=@prefix@/lib/libstdc++.so.6
+s none @prefix@/lib/libgcc_s.so=@prefix@/lib/libgcc_s.so.1
+# EOF

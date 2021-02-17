@@ -1,0 +1,6 @@
+sqliteodbc (@VER_INFO@-1) unstable; urgency=low
+
+  * automatically recreated by configure
+
+ -- Christian Werner <chw@ch-werner.de>  @DEB_CHANGELOG_TS@
+

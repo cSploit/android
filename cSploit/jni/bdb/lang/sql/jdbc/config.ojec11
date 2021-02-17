@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Settings for Oracle Java Embedded Client
+
+OJEC_HOME=/usr/local/Oracle_JavaME_Embedded_Client/1.1/emulator-platform
+JDBCSQLITE_HOME=`pwd`
+BOOT_CLASSPATH="-Xbootclasspath:$OJEC_HOME/lib/btclasses.zip:$OJEC_HOME/lib/foundation.jar:$OJEC_HOME/lib/jdbc.jar"
+JAVAC_FLAGS="-g -source 1.4 -target 1.4  $BOOT_CLASSPATH"
+JAVA_FLAGS="$BOOT_CLASSPATH:$JDBCSQLITE_HOME/sqlite.jar -Dsun.boot.library.path=$JDBCSQLITE_HOME/.libs"
+JAVA_RUN=$OJEC_HOME/bin/cvm
+JAR_DIR=$OJEC_HOME/lib/ext
+NATIVE_LIB_DIR=$OJEC_HOME/lib
+
+export JAVAC_FLAGS JAVA_FLAGS JAVA_RUN JAR_DIR NATIVE_LIB_DIR
+./configure

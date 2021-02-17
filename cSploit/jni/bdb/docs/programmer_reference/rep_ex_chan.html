@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Ex_rep_chan: a Replication Manager channel example</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="rep.html" title="Chapter 12.  Berkeley DB Replication" />
+    <link rel="prev" href="rep_ex_rq.html" title="Ex_rep_base: putting it all together" />
+    <link rel="next" href="xa.html" title="Chapter 13.  Distributed Transactions" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Ex_rep_chan: a Replication Manager
+channel example</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="rep_ex_rq.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 12. 
+		Berkeley DB Replication
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="xa.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="rep_ex_chan"></a>Ex_rep_chan: a Replication Manager
+channel example</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+    Ex_rep_chan, found in the <code class="filename">examples/c/ex_rep_chan</code>
+    subdirectory of the Berkeley DB distribution, is a simple but complete
+    demonstration of a replicated application that uses the Replication
+    Manager feature of channels to perform write forwarding.  The
+    application is a mock stock ticker.  Although similar to the ex_rep_mgr
+    example program, this example differs in that it provides an example of
+    using Replication Manager message channels.  Any site accepts a command
+    to write data to the database.  If the site is a client, then, using
+    the channels feature, the application forwards the request to the
+    master site. If the site is a master then the request is automatically
+    handled locally.  You can read and write stock values at any site
+    without needing to know what site is currently the master.
+</p>
+      <p>
+    The set of supported commands can be viewed with either the 
+    <span class="bold"><strong>help</strong></span> or the 
+    <span class="bold"><strong>?</strong></span> command.  Several commands work with
+    key/data pairs where the key is a stock symbol and the data is its
+    value.
+</p>
+      <p>
+    The command to retrieve and print the current site's database contents
+    is <span class="bold"><strong>print</strong></span> or simply an empty input
+    line.  To read the contents of the master's database from any site use
+    the <span class="bold"><strong>get key key ...</strong></span> command.  That
+    command will forward the read request to the master if necessary and
+    return the key/data pairs for all given keys.
+</p>
+      <p>
+    There are two commands to put data into the database. Both commands
+    take one or more key/data pairs, all of which are written into the
+    database in a single transaction at the master site.  The 
+    <span class="bold"><strong>put</strong></span> command sends the data to the
+    master site, and simply waits for a status response.  The 
+    <span class="bold"><strong>put_sync</strong></span> command sends the data to the
+    master site, and uses a transaction token returned by the master to
+    wait for the contents of that put to be available on the local
+    site. This serves as a demonstration of the 
+    <a class="link" href="rep_ryw.html" title="Read your writes consistency">read your writes</a> consistency feature.
+</p>
+      <p>
+    The Makefile created by the standard UNIX configuration will build the
+    ex_rep_chan example on most platforms.  Enter "make ex_rep_chan" to
+    build it.
+</p>
+      <p>
+    The synopsis for the program is as follows:
+</p>
+      <p>
+<code class="literal">ex_rep_chan <span class="bold"><strong>-h home</strong></span> <span class="bold"><strong>-l host:port</strong></span> [<span class="bold"><strong>-MC</strong></span>] [<span class="bold"><strong>-r host:port</strong></span>] [<span class="bold"><strong>-R host:port</strong></span>] [<span class="bold"><strong>-p priority</strong></span>] [<span class="bold"><strong>-v</strong></span>]</code>
+</p>
+      <p>
+    The options are as follows:
+</p>
+      <div class="variablelist">
+        <dl>
+          <dt>
+            <span class="term">
+              <span class="bold">
+                <strong>-h</strong>
+              </span>
+            </span>
+          </dt>
+          <dd>Specify a home directory for the database environment.</dd>
+          <dt>
+            <span class="term">
+              <span class="bold">
+                <strong>-l</strong>
+              </span>
+            </span>
+          </dt>
+          <dd>Listen on local host "host" at port "port" for incoming connections.</dd>
+          <dt>
+            <span class="term">
+              <span class="bold">
+                <strong>-M</strong>
+              </span>
+            </span>
+          </dt>
+          <dd>Configure this process as a master.</dd>
+          <dt>
+            <span class="term">
+              <span class="bold">
+                <strong>-C</strong>
+              </span>
+            </span>
+          </dt>
+          <dd>Configure this process as a client.</dd>
+          <dt>
+            <span class="term">
+              <span class="bold">
+                <strong>-r</strong>
+              </span>
+            </span>
+          </dt>
+          <dd>
+            Identifies the helper site used for joining the group.
+        </dd>
+          <dt>
+            <span class="term">
+              <span class="bold">
+                <strong>-R</strong>
+              </span>
+            </span>
+          </dt>
+          <dd>
+            Identifies a remote peer to be used for joining the group. This
+            peer is used for syncing purposes.  See 
+            <a class="xref" href="rep_mastersync.html#rep_c2c_sync" title="Client-to-client synchronization">Client-to-client synchronization</a>
+            for more information.
+        </dd>
+          <dt>
+            <span class="term">
+              <span class="bold">
+                <strong>-p</strong>
+              </span>
+            </span>
+          </dt>
+          <dd>
+            Set the election priority.  See 
+            <a class="xref" href="rep_elect.html" title="Elections">Elections</a> for more
+            information.
+        </dd>
+          <dt>
+            <span class="term">
+              <span class="bold">
+                <strong>-v</strong>
+              </span>
+            </span>
+          </dt>
+          <dd>
+            Indicates that additional informational and debugging output
+            should be enabled.
+        </dd>
+        </dl>
+      </div>
+      <p>
+    A typical ex_rep_chan session begins with a command such as the
+    following, to start a master:
+</p>
+      <pre class="programlisting">ex_rep_chan -M -h DIR1 -l localhost:30100</pre>
+      <p>
+    and several clients:
+</p>
+      <pre class="programlisting">ex_rep_chan -C -h DIR2 -l localhost:30101 -r localhost:30100
+ex_rep_chan -C -h DIR3 -l localhost:30102 -r localhost:30100
+ex_rep_chan -C -h DIR4 -l localhost:30103 -r localhost:30100</pre>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="rep_ex_rq.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="xa.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Ex_rep_base: putting it all together </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 13. 
+		Distributed Transactions
+        </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

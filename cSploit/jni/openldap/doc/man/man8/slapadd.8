@@ -1,0 +1,217 @@
+.TH SLAPADD 8C "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapadd \- Add entries to a SLAPD database
+.SH SYNOPSIS
+.B SBINDIR/slapadd
+[\c
+.BI \-b \ suffix\fR]
+[\c
+.BR \-c ]
+[\c
+.BI \-d \ debug-level\fR]
+[\c
+.BI \-f \ slapd.conf\fR]
+[\c
+.BI \-F \ confdir\fR]
+[\c
+.BR \-g ]
+[\c
+.BI \-j \ lineno\fR]
+[\c
+.BI \-l \ ldif-file\fR]
+[\c
+.BI \-n \ dbnum\fR]
+[\c
+.BI \-o \ option\fR[ = value\fR]]
+[\c
+.BR \-q ]
+[\c
+.BR \-s ]
+[\c
+.BI \-S \ SID\fR]
+[\c
+.BR \-u ]
+[\c
+.BR \-v ]
+[\c
+.BR \-w ]
+.SH DESCRIPTION
+.LP
+.B Slapadd
+is used to add entries specified in LDAP Directory Interchange Format
+(LDIF) to a
+.BR slapd (8)
+database.
+It opens the given database determined by the database number or
+suffix and adds entries corresponding to the provided LDIF to
+the database.
+Databases configured as
+.B subordinate
+of this one are also updated, unless \fB\-g\fP is specified.
+The LDIF input is read from standard input or the specified file.
+
+All files eventually created by
+.BR slapadd
+will belong to the identity
+.BR slapadd
+is run as, so make sure you either run
+.BR slapadd
+with the same identity
+.BR slapd (8)
+will be run as (see option
+.B \-u
+in
+.BR slapd (8)),
+or change file ownership before running
+.BR slapd (8).
+
+Note: slapadd will also perform the relevant indexing whilst adding the database if
+any are configured. For specfic details, please see 
+.BR slapindex (8).
+.SH OPTIONS
+.TP
+.BI \-b \ suffix 
+Use the specified \fIsuffix\fR to determine which database to
+add entries to.  The \fB\-b\fP cannot be used in conjunction
+with the
+.B \-n
+option.
+.TP
+.B \-c
+enable continue (ignore errors) mode.
+.TP
+.BI \-d \ debug-level
+enable debugging messages as defined by the specified
+.IR debug-level ;
+see
+.BR slapd (8)
+for details.
+.TP
+.BI \-f \ slapd.conf
+specify an alternative
+.BR slapd.conf (5)
+file.
+.TP
+.BI \-F \ confdir
+specify a config directory.
+If both
+.B \-f
+and
+.B \-F
+are specified, the config file will be read and converted to
+config directory format and written to the specified directory.
+If neither option is specified, an attempt to read the
+default config directory will be made before trying to use the default
+config file. If a valid config directory exists then the
+default config file is ignored. If dry-run mode is also specified,
+no conversion will occur.
+.TP
+.B \-g
+disable subordinate gluing.  Only the specified database will be
+processed, and not its glued subordinates (if any).
+.TP
+.BI \-j \ lineno
+Jump to the specified line number in the LDIF file before processing
+any entries. This allows a load that was aborted due to errors in the
+input LDIF to be resumed after the errors are corrected.
+.TP
+.BI \-l \ ldif-file
+Read LDIF from the specified file instead of standard input.
+.TP
+.BI \-n \ dbnum
+Add entries to the \fIdbnum\fR-th database listed in the
+configuration file.  The
+.B \-n
+cannot be used in conjunction with the
+.B \-b
+option.
+To populate the config database
+.BR slapd\-config (5),
+use 
+.B \-n 0
+as it is always the first database. It must physically exist
+on the filesystem prior to this, however.
+.TP
+.BI \-o \ option\fR[ = value\fR]
+Specify an
+.I option
+with a(n optional)
+.IR value .
+Possible generic options/values are:
+.LP
+.nf
+              syslog=<subsystems>  (see `\-s' in slapd(8))
+              syslog\-level=<level> (see `\-S' in slapd(8))
+              syslog\-user=<user>   (see `\-l' in slapd(8))
+
+              schema-check={yes|no}
+              value-check={yes|no}
+
+.in
+The \fIschema\-check\fR option toggles schema checking (default on);
+the \fIvalue\-check\fR option toggles value checking (default off).
+The latter is incompatible with \fB-q\fR.
+.TP
+.B \-q
+enable quick (fewer integrity checks) mode.  Does fewer consistency checks
+on the input data, and no consistency checks when writing the database.
+Improves the load time but if any errors or interruptions occur the resulting
+database will be unusable.
+.TP
+.B \-s
+disable schema checking.  This option is intended to be used when loading
+databases containing special objects, such as fractional objects on a
+partial replica.  Loading normal objects which do not conform to
+schema may result in unexpected and ill behavior.
+.TP
+.BI \-S \ SID
+Server ID to use in generated entryCSN.  Also used for contextCSN
+if \fB\-w\fP is set as well.  Defaults to \fB0\fP.
+.TP
+.B \-u
+enable dry-run (don't write to backend) mode.
+.TP
+.B \-v
+enable verbose mode.
+.TP
+.BI \-w
+write syncrepl context information.
+After all entries are added, the contextCSN
+will be updated with the greatest CSN in the database.
+.SH LIMITATIONS
+Your
+.BR slapd (8)
+should not be running 
+when you do this to ensure consistency of the database.
+.LP
+.B slapadd 
+may not provide naming or schema checks.  It is advisable to
+use
+.BR ldapadd (1)
+when adding new entries into an existing directory.
+.SH EXAMPLES
+To import the entries specified in file
+.B ldif
+into your
+.BR slapd (8)
+database give the command:
+.LP
+.nf
+.ft tt
+	SBINDIR/slapadd \-l ldif
+.ft
+.fi
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR ldif (5),
+.BR slapcat (8),
+.BR slapindex (8),
+.BR ldapadd (1),
+.BR slapd (8)
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

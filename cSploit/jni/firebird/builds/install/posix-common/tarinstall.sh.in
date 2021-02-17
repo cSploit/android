@@ -1,0 +1,35 @@
+#!/bin/sh
+#
+#  The contents of this file are subject to the Initial
+#  Developer's Public License Version 1.0 (the "License");
+#  you may not use this file except in compliance with the
+#  License. You may obtain a copy of the License at
+#  http://www.ibphoenix.com/main.nfs?a=ibphoenix&page=ibp_idpl.
+#
+#  Software distributed under the License is distributed AS IS,
+#  WITHOUT WARRANTY OF ANY KIND, either express or implied.
+#  See the License for the specific language governing rights
+#  and limitations under the License.
+#
+#  The Original Code was created by Mark O'Donohue
+#  for the Firebird Open Source RDBMS project.
+#
+#  Copyright (c) Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#  and all contributors signed below.
+#
+#  All Rights Reserved.
+#  Contributor(s): ______________________________________.
+#		Alex Peshkoff
+#
+
+# The way this works is that the buildroot file is stored relative to the root
+# directory and a tar -xzof at root directory will restore all the files in 
+# the position that we want them to be
+
+OrigDir=`pwd`
+
+cd /
+
+tar -xzof "$OrigDir/buildroot.tar.gz"
+
+cd "$OrigDir"

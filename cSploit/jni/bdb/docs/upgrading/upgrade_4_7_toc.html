@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 3. Upgrading Berkeley DB 4.6 applications to Berkeley DB 4.7</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Upgrade Guide" />
+    <link rel="up" href="index.html" title="Berkeley DB Upgrade Guide" />
+    <link rel="prev" href="upgrade_process.html" title="Chapter 2.  Upgrading from previous versions of Berkeley DB" />
+    <link rel="next" href="upgrade_4_7_rtc.html" title="Run-time configuration" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 3. Upgrading Berkeley DB 4.6 applications to Berkeley DB 4.7</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="upgrade_process.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="upgrade_4_7_rtc.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="upgrade_4_7_toc"></a>Chapter 3. Upgrading Berkeley DB 4.6 applications to Berkeley DB 4.7</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_7_toc.html#upgrade_4_7_intro">Introduction</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_7_rtc.html">Run-time configuration</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_7_repapi.html">Replication API</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_7_tcl.html">Tcl API</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_7_interdir.html">DB_ENV-&gt;set_intermediate_dir</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_7_log.html">Log configuration</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="upgrade_4_7_disk.html">Upgrade Requirements</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="changelog_4_7.html">Berkeley DB 4.7.25 Change Log</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp567392">Database or Log File On-Disk Format Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp421016">New Features:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp255328">Database Environment Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp16032">Concurrent Data Store Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp615768">General Access Method Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp218144">Btree Access Method Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp1319712">Hash Access Method Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp143104">Queue Access Method Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp111752">Recno Access Method Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idm13968">C-specific API Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp803968">Java-specific API Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp281584">Direct Persistence Layer (DPL), Bindings and Collections API:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp618784">Tcl-specific API Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp1431288">RPC-specific Client/Server Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp1169080">Replication Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp115608">XA Resource Manager Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp1405792">Locking Subsystem Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp1208272">Logging Subsystem Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp409800">Memory Pool Subsystem Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp86440">Mutex Subsystem Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp145144">Transaction Subsystem Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp129192">Utility Changes:</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect2">
+                  <a href="changelog_4_7.html#idp105704">Configuration, Documentation, Sample Application, Portability and Build Changes:</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+        </dl>
+      </div>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="upgrade_4_7_intro"></a>Introduction</h2>
+            </div>
+          </div>
+        </div>
+        <p>The following pages describe how to upgrade applications coded against
+the Berkeley DB 4.6 release interfaces to the Berkeley DB 4.7 release interfaces.
+This information does not describe how to upgrade Berkeley DB 1.85 release
+applications.</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="upgrade_process.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="upgrade_4_7_rtc.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 2. 
+		Upgrading from previous versions of Berkeley DB
+         </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Run-time configuration</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

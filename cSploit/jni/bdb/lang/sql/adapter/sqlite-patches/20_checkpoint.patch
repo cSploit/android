@@ -1,0 +1,21 @@
+--- src/sqliteLimit.h
++++ src/sqliteLimit.h
+@@ -113,7 +113,8 @@
+ ** checkpointing the database in WAL mode.
+ */
+ #ifndef SQLITE_DEFAULT_WAL_AUTOCHECKPOINT
+-# define SQLITE_DEFAULT_WAL_AUTOCHECKPOINT  1000
++#define SQLITE_DEFAULT_WAL_AUTOCHECKPOINT \
++	SQLITE_DEFAULT_JOURNAL_SIZE_LIMIT / SQLITE_DEFAULT_PAGE_SIZE
+ #endif
+ 
+ /*
+@@ -154,7 +155,7 @@
+ ** The default size of a database page.
+ */
+ #ifndef SQLITE_DEFAULT_PAGE_SIZE
+-# define SQLITE_DEFAULT_PAGE_SIZE 1024
++# define SQLITE_DEFAULT_PAGE_SIZE 4096
+ #endif
+ #if SQLITE_DEFAULT_PAGE_SIZE>SQLITE_MAX_PAGE_SIZE
+ # undef SQLITE_DEFAULT_PAGE_SIZE

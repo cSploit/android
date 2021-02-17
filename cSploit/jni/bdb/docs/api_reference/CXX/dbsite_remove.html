@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbSite::remove()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 11.  Replication Methods" />
+    <link rel="prev" href="dbsite_get_eid.html" title="DbSite::get_eid()" />
+    <link rel="next" href="dbsite_set_config.html" title="DbSite::set_config()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbSite::remove()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbsite_get_eid.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 11. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbsite_set_config.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbsite_remove"></a>DbSite::remove()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+
+int
+DbSite::remove();</pre>
+      <p>
+         The <code class="methodname">DbSite::remove()</code> method removes the
+         site from the replication group.  If called at the master site,
+         Replication Manager updates the group membership database directly. If
+         called from a
+         client, this method causes a request to be sent to the master to
+         perform the operation. The method then awaits confirmation.
+    </p>
+      <p>
+         The DbSite handle must not be accessed again after this
+         method is called, regardless of the return value.
+         This method may not be
+         called before starting Replication Manager.
+    </p>
+      <p>
+         The <code class="methodname">DbSite::remove()</code> <span>
+            
+            <span>
+                method either returns a non-zero error value or throws an
+                exception that encapsulates a non-zero error value on
+                failure, and returns 0 on success.
+            </span>
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp3989960"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DbSite::remove()</code> <span>
+            
+            <span>
+                method may fail and throw a <a class="link" href="dbexception.html" title="Chapter 6. The DbException Class">DbException</a> 
+                exception, encapsulating one of the following non-zero errors, or return one
+                of the following non-zero errors:
+            </span>
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp3965688"></a>DB_REP_UNAVAIL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The master updated the group membership database but did not
+                receive enough
+                acknowledgements from clients to meet the current
+                acknowledgement policy or there was an attempt to remove the
+                current master site from the replication group.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp3979848"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If Replication Manager has not been started.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp3982016"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="db_site.html" title="The DbSite Handle">DbSite</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp3990392"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="xref" href="rep.html#replist" title="Replication and Related Methods">Replication and Related Methods</a>
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbsite_get_eid.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbsite_set_config.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbSite::get_eid() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbSite::set_config()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

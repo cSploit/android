@@ -1,0 +1,803 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 2004-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+PERSONAL="(objectClass=inetOrgPerson)"
+NOWHERE="/dev/null"
+FAILURE="additional info:"
+
+if test $TRANSLUCENT = translucentno ; then 
+	echo "Translucent Proxy overlay not available, test skipped"
+	exit 0
+fi 
+
+if test $AC_ldap = ldapno ; then
+	echo "Translucent Proxy overlay requires back-ldap backend, test skipped"
+	exit 0
+fi
+
+# configure backside
+mkdir -p $TESTDIR $DBDIR1
+
+$SLAPPASSWD -g -n >$CONFIGPWF
+echo "rootpw `$SLAPPASSWD -T $CONFIGPWF`" >$TESTDIR/configpw.conf
+
+if test $MONITORDB != no ; then
+	DBIX=2
+else
+	DBIX=1
+fi
+
+. $CONFFILTER $BACKEND $MONITORDB < $TRANSLUCENTREMOTECONF > $CONF1
+echo "Running slapadd to build remote slapd database..."
+$SLAPADD -f $CONF1 -l $LDIFTRANSLUCENTCONFIG
+RC=$?
+if test $RC != 0 ; then
+	echo "slapadd failed ($RC)!"
+	exit $RC
+fi
+
+echo "Starting remote slapd on TCP/IP port $PORT1..."
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+REMOTEPID="$PID"
+KILLPIDS="$PID"
+
+sleep 1
+
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -H $URI1 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for remote slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# configure frontside
+mkdir -p $DBDIR2
+
+. $CONFFILTER $BACKEND $MONITORDB < $TRANSLUCENTLOCALCONF > $CONF2
+
+echo "Starting local slapd on TCP/IP port $PORT2..."
+$SLAPD -f $CONF2 -h $URI2 -d $LVL $TIMING > $LOG2 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+LOCALPID="$PID"
+KILLPIDS="$LOCALPID $REMOTEPID"
+
+sleep 1
+
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -H $URI2 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for local slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing slapd Translucent Proxy operations..."
+
+echo "Testing search: no remote data defined..."
+
+$LDAPSEARCH -H $URI2 -b "$TRANSLUCENTUSER" "$PERSONAL" >$SEARCHOUT 2>&1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+if test -s $SEARCHOUT; then
+	echo "ldapsearch should have returned no records!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Populating remote database..."
+
+$LDAPADD -D "$TRANSLUCENTROOT" -H $URI1 \
+	-w $PASSWD < $LDIFTRANSLUCENTDATA > $NOWHERE 2>&1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing search: remote database via local slapd..."
+
+$LDAPSEARCH -H $URI2 -b "$TRANSLUCENTUSER" "$PERSONAL" > $SEARCHOUT 2>&1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDIFFILTER < $SEARCHOUT > $SEARCHFLT
+$LDIFFILTER < $LDIFTRANSLUCENTDATA > $LDIFFLT
+$CMP $SEARCHFLT $LDIFFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "Comparison failed -- corruption from remote to local!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing add: prohibited local record..."
+
+$LDAPADD -D "$TRANSLUCENTDN" -H $URI2 \
+	-w $TRANSLUCENTPASSWD < $LDIFTRANSLUCENTADD > $TESTOUT 2>&1
+
+RC=$?
+if test $RC != 50 ; then
+	echo "ldapadd failed ($RC), expected INSUFFICIENT ACCESS!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing add: valid local record, no_glue..."
+
+$LDAPADD -v -v -v -D "$TRANSLUCENTROOT" -H $URI2 \
+	-w $PASSWD < $LDIFTRANSLUCENTADD > $TESTOUT 2>&1
+
+RC=$?
+if test $RC != 32 && test $RC,$BACKEND != 0,null ; then
+	echo "ldapadd failed ($RC), expected NO SUCH OBJECT!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing modrdn: valid local record, no_glue..."
+
+$LDAPMODRDN -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+	$TESTOUT 2>&1 'uid=fred,ou=users,o=translucent' 'uid=someguy'
+
+RC=$?
+if test $RC != 32 && test $RC,$BACKEND != 0,null ; then
+	echo "ldapmodrdn failed ($RC), expected NO SUCH OBJECT!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Dynamically configuring local slapd without translucent_no_glue..."
+
+$LDAPMODIFY -D cn=config -H $URI2 -y $CONFIGPWF <<EOF
+dn: olcOverlay={0}translucent,olcDatabase={$DBIX}$BACKEND,cn=config
+changetype: modify
+replace: olcTranslucentNoGlue
+olcTranslucentNoGlue: FALSE
+EOF
+RC=$?
+if test $RC != 0 ; then
+    echo "ldapmodify of dynamic config failed ($RC)"
+    test $KILLSERVERS != no && kill -HUP $KILLPIDS
+    exit 1
+fi
+
+echo "Testing add: valid local record..."
+
+$LDAPADD -D "$TRANSLUCENTROOT" -H $URI2 \
+	-w $PASSWD < $LDIFTRANSLUCENTADD > $TESTOUT 2>&1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed ($RC)!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing search: data merging..."
+
+$LDAPSEARCH -H $URI2 -b "$TRANSLUCENTUSER" "$PERSONAL" > $SEARCHOUT 2>&1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDIFFILTER < $SEARCHOUT > $SEARCHFLT
+$LDIFFILTER < $LDIFTRANSLUCENTMERGED > $LDIFFLT
+$CMP $SEARCHFLT $LDIFFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "Comparison failed -- local data failed to merge with remote!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing compare: valid local..."
+
+$LDAPCOMPARE -z -H $URI2 -w $TRANSLUCENTPASSWD -D $TRANSLUCENTDN \
+	"uid=danger,ou=users,o=translucent" "carLicense:LIVID"
+
+RC=$?
+if test $RC != 6 ; then
+	echo "ldapcompare failed ($RC), expected TRUE!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing compare: valid remote..."
+
+$LDAPCOMPARE -z -x -H $URI2 -w $TRANSLUCENTPASSWD -D $TRANSLUCENTDN \
+	"uid=binder,o=translucent" "businessCategory:binder-test-user"
+
+RC=$?
+if test $RC != 6 ; then
+	echo "ldapcompare failed ($RC), expected TRUE!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing compare: bogus local..."
+
+$LDAPCOMPARE -z -x -H $URI2 -w $TRANSLUCENTPASSWD -D $TRANSLUCENTDN \
+	"uid=danger,ou=users,o=translucent" "businessCategory:invalid-test-value"
+
+RC=$?
+if test $RC != 5 ; then
+	echo "ldapcompare failed ($RC), expected FALSE!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing compare: bogus remote..."
+
+$LDAPCOMPARE -z -x -H $URI2 -w $TRANSLUCENTPASSWD -D $TRANSLUCENTDN \
+	"uid=binder,o=translucent" "businessCategory:invalid-test-value"
+
+RC=$?
+if test $RC != 5 ; then
+	echo "ldapcompare failed ($RC), expected FALSE!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing modify: nonexistent record..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD
+version: 1
+dn: uid=bogus,ou=users,o=translucent
+changetype: modify
+replace: roomNumber
+roomNumber: 31J-2112
+EOF_MOD
+
+RC=$?
+if test $RC != 32 ; then
+	echo "ldapmodify failed ($RC), expected NO SUCH OBJECT!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing modify: valid local record, nonexistent attribute..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD1
+version: 1
+dn: uid=danger,ou=users,o=translucent
+changetype: modify
+replace: roomNumber
+roomNumber: 9N-21
+EOF_MOD1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDAPSEARCH -H $URI2 -b "uid=danger,ou=users,o=translucent" > $SEARCHOUT 2>&1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+ATTR=`grep roomNumber $SEARCHOUT` > $NOWHERE 2>&1
+if test "$ATTR" != "roomNumber: 9N-21" ; then
+	echo "modification failed!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing search: specific nonexistent remote attribute..."
+
+$LDAPSEARCH -H $URI2 -b "uid=danger,ou=users,o=translucent" roomNumber > $SEARCHOUT 2>&1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing modify: nonexistent local record, nonexistent attribute..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD2
+version: 1
+dn: uid=fred,ou=users,o=translucent
+changetype: modify
+replace: roomNumber
+roomNumber: 31J-2112
+EOF_MOD2
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDAPSEARCH -H $URI2 -b "uid=fred,ou=users,o=translucent" > $SEARCHOUT 2>&1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+ATTR=`grep roomNumber $SEARCHOUT` > $NOWHERE 2>&1
+if test "$ATTR" != "roomNumber: 31J-2112" ; then
+	echo "modification failed!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing modify: valid remote record, nonexistent attribute..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD9
+version: 1
+dn: uid=fred,ou=users,o=translucent
+changetype: modify
+delete: preferredLanguage
+EOF_MOD9
+
+RC=$?
+if test $RC != 16 ; then
+	echo "ldapmodify failed ($RC), expected NO SUCH ATTRIBUTE!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing delete: valid local record, nonexistent attribute..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD4
+version: 1
+dn: uid=fred,ou=users,o=translucent
+changetype: modify
+delete: roomNumber
+EOF_MOD4
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing modrdn: prohibited local record..."
+
+$LDAPMODRDN -D "$TRANSLUCENTDN" -H $URI2 -w $TRANSLUCENTPASSWD > \
+	$TESTOUT 2>&1 'uid=fred,ou=users,o=translucent' 'uid=someguy'
+
+RC=$?
+if test $RC != 50 ; then
+	echo "ldapmodrdn failed ($RC), expected INSUFFICIENT ACCESS!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing modrdn: valid local record..."
+
+$LDAPMODRDN -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+	$TESTOUT 2>&1 'uid=fred,ou=users,o=translucent' 'uid=someguy'
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodrdn failed ($RC)!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing delete: prohibited local record..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTDN" -H $URI2 -w $TRANSLUCENTPASSWD > \
+        $TESTOUT 2>&1 << EOF_DEL2
+version: 1
+dn: uid=someguy,ou=users,o=translucent
+changetype: delete
+EOF_DEL2
+
+RC=$?
+if test $RC != 50 ; then
+	echo "ldapadd failed ($RC), expected INSUFFICIENT ACCESS!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing delete: valid local record..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_DEL3
+version: 1
+dn: uid=someguy,ou=users,o=translucent
+changetype: delete
+EOF_DEL3
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing delete: valid remote record..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_DEL8
+version: 1
+dn: uid=fred,ou=users,o=translucent
+changetype: delete
+EOF_DEL8
+
+RC=$?
+if test $RC != 32 ; then
+	echo "ldapmodify failed ($RC), expected NO SUCH OBJECT!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing delete: nonexistent local record, nonexistent attribute..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_DEL1
+version: 1
+dn: uid=fred,ou=users,o=translucent
+changetype: modify
+delete: roomNumber
+EOF_DEL1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDAPSEARCH -H $URI2 -b "uid=fred,ou=users,o=translucent" > $SEARCHOUT 2>&1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing delete: valid local record, nonexistent attribute..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD8
+version: 1
+dn: uid=danger,ou=users,o=translucent
+changetype: modify
+delete: preferredLanguage
+EOF_MOD8
+
+RC=$?
+if test $RC != 16 ; then
+	echo "ldapmodify failed ($RC), expected NO SUCH ATTRIBUTE!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing delete: valid local record, remote attribute..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD8
+version: 1
+dn: uid=danger,ou=users,o=translucent
+changetype: modify
+delete: initials
+EOF_MOD8
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing modify: valid remote record, combination add-modify-delete..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD6
+version: 1
+dn: uid=fred,ou=users,o=translucent
+changetype: modify
+delete: carLicense
+-
+add: preferredLanguage
+preferredLanguage: ISO8859-1
+-
+replace: employeeType
+employeeType: consultant
+EOF_MOD6
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+$LDAPSEARCH -H $URI2 -b "uid=fred,ou=users,o=translucent" > $SEARCHOUT 2>&1
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+ATTR=`grep employeeType $SEARCHOUT` > $NOWHERE 2>&1
+if test "$ATTR" != "employeeType: consultant" ; then
+	echo "modification failed!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+ATTR=`grep preferredLanguage $SEARCHOUT` > $NOWHERE 2>&1
+if test "$ATTR" != "preferredLanguage: ISO8859-1" ; then
+	echo "modification failed!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Dynamically configuring local slapd with translucent_no_glue and translucent_strict..."
+
+$LDAPMODIFY -D cn=config -H $URI2 -y $CONFIGPWF <<EOF
+dn: olcOverlay={0}translucent,olcDatabase={$DBIX}$BACKEND,cn=config
+changetype: modify
+replace: olcTranslucentNoGlue
+olcTranslucentNoGlue: TRUE
+-
+replace: olcTranslucentStrict
+olcTranslucentStrict: TRUE
+EOF
+RC=$?
+if test $RC != 0 ; then
+    echo "ldapmodify of dynamic config failed ($RC)"
+    test $KILLSERVERS != no && kill -HUP $KILLPIDS
+    exit 1
+fi
+
+echo "Testing strict mode delete: nonexistent local attribute..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD5
+version: 1
+dn: uid=example,ou=users,o=translucent
+changetype: modify
+delete: preferredLanguage
+EOF_MOD5
+
+RC=$?
+if test $RC != 19 ; then
+	echo "ldapmodify failed ($RC), expected CONSTRAINT VIOLATION!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing strict mode delete: nonexistent remote attribute..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD3
+version: 1
+dn: uid=danger,ou=users,o=translucent
+changetype: modify
+delete: displayName
+EOF_MOD3
+
+RC=$?
+if test $RC != 19 ; then
+	echo "ldapmodify failed ($RC), expected CONSTRAINT VIOLATION!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing strict mode modify: combination add-modify-delete..."
+
+$LDAPMODIFY -v -D "$TRANSLUCENTROOT" -H $URI2 -w $PASSWD > \
+        $TESTOUT 2>&1 << EOF_MOD6
+version: 1
+dn: uid=example,ou=users,o=translucent
+changetype: modify
+delete: carLicense
+-
+add: preferredLanguage
+preferredLanguage: ISO8859-1
+-
+replace: employeeType
+employeeType: consultant
+EOF_MOD6
+
+RC=$?
+if test $RC != 19 ; then
+	echo "ldapmodify failed ($RC), expected CONSTRAINT VIOLATION!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing invalid Bind request..."
+$LDAPWHOAMI -D "$TRANSLUCENTDN" -H $URI2 -w Wrong"$TRANSLUCENTPASSWD" > \
+	$TESTOUT 2>&1
+RC=$?
+if test $RC != 49 ; then
+	echo "ldapwhoami failed ($RC), expected INVALID CREDENTIALS!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+$LDAPWHOAMI -D "$TRANSLUCENTDN" -H $URI2 -w "$TRANSLUCENTPASSWD" > \
+	$TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapwhoami failed ($RC), expected SUCCESS!"
+	grep "$FAILURE" $TESTOUT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing search: unconfigured local filter..."
+$LDAPSEARCH -H $URI2 -b "o=translucent" "(employeeType=consultant)" > $SEARCHOUT 2>&1
+
+ATTR=`grep dn: $SEARCHOUT` > $NOWHERE 2>&1
+if test -n "$ATTR" ; then
+	echo "got result $ATTR, should have been no result"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Dynamically configuring local slapd with translucent_local..."
+
+$LDAPMODIFY -D cn=config -H $URI2 -y $CONFIGPWF <<EOF
+dn: olcOverlay={0}translucent,olcDatabase={$DBIX}$BACKEND,cn=config
+changetype: modify
+add: olcTranslucentLocal
+olcTranslucentLocal: employeeType
+EOF
+RC=$?
+if test $RC != 0 ; then
+    echo "ldapmodify of dynamic config failed ($RC)"
+    test $KILLSERVERS != no && kill -HUP $KILLPIDS
+    exit 1
+fi
+
+echo "Testing search: configured local filter..."
+$LDAPSEARCH -H $URI2 -b "o=translucent" "(employeeType=consultant)" > $SEARCHOUT 2>&1
+
+ATTR=`grep dn: $SEARCHOUT` > $NOWHERE 2>&1
+if test -z "$ATTR" ; then
+	echo "got no result, should have found entry"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing search: unconfigured remote filter..."
+$LDAPSEARCH -H $URI2 -b "o=translucent" "(|(employeeType=foo)(carlicense=right))" > $SEARCHOUT 2>&1
+
+ATTR=`grep dn: $SEARCHOUT` > $NOWHERE 2>&1
+if test -n "$ATTR" ; then
+	echo "got result $ATTR, should have been no result"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Dynamically configuring local slapd with translucent_remote..."
+
+$LDAPMODIFY -D cn=config -H $URI2 -y $CONFIGPWF <<EOF
+dn: olcOverlay={0}translucent,olcDatabase={$DBIX}$BACKEND,cn=config
+changetype: modify
+add: olcTranslucentRemote
+olcTranslucentRemote: carLicense
+EOF
+RC=$?
+if test $RC != 0 ; then
+    echo "ldapmodify of dynamic config failed ($RC)"
+    test $KILLSERVERS != no && kill -HUP $KILLPIDS
+    exit 1
+fi
+
+echo "Testing search: configured remote filter..."
+$LDAPSEARCH -H $URI2 -b "o=translucent" "(|(employeeType=foo)(carlicense=right))" > $SEARCHOUT 2>&1
+
+ATTR=`grep dn: $SEARCHOUT` > $NOWHERE 2>&1
+if test -z "$ATTR" ; then
+	echo "got no result, should have found entry"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

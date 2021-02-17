@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML>
+<HEAD>
+	<META HTTP-EQUIV="CONTENT-TYPE" CONTENT="text/html; charset=iso-8859-1">
+	<TITLE></TITLE>
+	<META NAME="GENERATOR" CONTENT="OpenOffice.org 3.4.1  (Unix)">
+	<META NAME="CREATED" CONTENT="0;0">
+	<META NAME="CHANGED" CONTENT="20130611;16182500">
+	<STYLE TYPE="text/css">
+	<!--
+		@page { margin: 0.79in }
+		P { margin-bottom: 0.08in }
+	-->
+	</STYLE>
+</HEAD>
+<BODY LANG="en-US" DIR="LTR">
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><FONT SIZE=4>Providers.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><BR>
+</P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><FONT SIZE=4>Providers
+architecture is definitely one of key features of Firebird 3. But to
+be precise this is far not new feature - providers existed in
+Firebird's predecessors long ago, and in 'deeply hidden' form are
+present in any Firebird version. Initially providers were introduced
+to deal with a task which is currently well known to be performed by
+ODBC, ADO, BDE, etc. They were needed to make it possible to access
+different database engines using single external interface. But later
+providers architecture (known that time as OSRI - Open Systems
+Relational Interface) also showed itself as very efficient for
+supporting mix of old and new database formats (different major ODS)
+at single server and having mixed connections to local and remote
+databases. Implemented in Firebird 3 providers make it possible to
+support all this modes (remote connections, different ODS databases,
+foreign engines) and also providers chaining (when some provider is
+using callback to standard API when performig an operation on
+database).</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><FONT SIZE=4>Main
+element of providers architecture is YValve. On initial attach (or
+create) database call it scans the list of known providers and calls
+them one by one until tried provider completes requested operation
+successfully. For already established connection appropriate provider
+is called at once with almost zero overhead. Lets take a look at some
+samples of YValve operation when it selects appropriate provider at
+attach stage.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><BR>
+</P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><FONT SIZE=4>Next
+samples are with default configuration, which contains 3 providers:
+<B>Remote</B> (establish network connection), <B>Engine12</B> (main
+database engine) and <B>Loopback</B> (force network connection to
+local server for database name without explicitly given network
+protocol).</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><FONT SIZE=4>When
+one attaches to database called <I>RemoteHost:dbname</I> (TCP syntax)
+or <I>\\RemoteHost\dbname</I> (NetBios) <B>Remote</B> provider
+detects explicit network protocol syntax and (being the first
+provider in the list) at once redirects such call to <I>RemoteHost</I>.
+That's how typical client configuration works.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><FONT SIZE=4>When
+database name does not contain network protocol (just <I>dbname</I>)
+<B>Remote</B> provider rejects it and <B>Engine12</B> provider comes
+to stage. It tries to open <I>dbname</I> &ndash; and in case of
+success we get embedded connection to the database. Pay attention &ndash;
+we do not need special embedded library to have embedded connection,
+standard client loads appropriate provider and becomes embedded
+server.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><FONT SIZE=4>But
+what happens if engine returned an error on an attempt to attach to
+database? Certainly, if file for database to be attached does not
+exist there is no interest at all, but embedded connection may also
+be impossible when user, attaching to it, does not have enough rights
+to open database file. This is normal case if database was not
+created by that user in embedded mode or if he was not explicitly
+given OS rights for embedded access to databases on given box.
+Moreover, setting access rights in such a manner is a requirement for
+correct superserver operation. So after failure of <B>Engine12</B> to
+access database <B>Loopback</B> provider is attempted for an attach.
+It does not differ much from <B>Remote</B>, but tries to access
+database <I>dbname</I> on a server running on local host. On windows
+XNET protocol (also known as local connection) is used for it, posix
+systems prepend <I>dbname</I> with <I>localhost:</I> and use TCP
+connection. In case of success remote-like connection is established
+with database no matter that it's located on a local machine.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><BR>
+</P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><FONT SIZE=4>Certainly
+use of providers is not limited with this 3 standard ones. Firebird 3
+does not support pre-ODS 12 databases. But in FB 3 &ndash; not in
+alpha1 &ndash; we plan to have additional provider to access old (ODS
+from 8 to 11) format databases. Removing old ODS support from engine
+helps to make it's code simpler and a bit faster. Taking into an
+account that this faster sometimes takes place in performance
+critical places (like search of a key in an index block) avoiding old
+code and related branches makes Firebird work really faster.
+Providers architecture at the same time makes it possible to access
+old databases when changing Firebird version.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><FONT SIZE=4>The
+strong feature of providers architecture is ability for user to add
+his own providers to server and/or client. You may be surprised &ndash;
+what else except remote connection is needed on client? But do not
+forget about providers chaining. Imagine a case when database is
+accessed via very slow network connection &ndash; something like 3G
+or even worse GPRS. A strong desire to cache rarely changed but
+rather big tables on a client is first that comes on my mind to make
+it work faster. Such systems were really implemented, but to do it
+one had to rename fbclient to something arbitrary and load it into
+own library called fbclient. This makes it possible to use standard
+tools to access the database at the same time caching required
+tables. Works, but solution is obviously far from ideal. With
+providers architecture instead libraries renaming one just adds local
+caching provider which can use any method to detect connections to it
+(something like <I>cache@</I> prefix in the beginning of database
+name or whatever else you choose). In this sample when database name
+<I>cache@RemoteHost:dbname </I><SPAN STYLE="font-style: normal">is
+used caching provider accepts such connection and invokes YValve once
+again with traditional database name </SPAN><I>RemoteHost:dbname</I><SPAN STYLE="font-style: normal">.
+But when user later performs any call to his database caching
+provider gets control on it before </SPAN><SPAN STYLE="font-style: normal"><B>Remote</B></SPAN><SPAN STYLE="font-style: normal">
+one and for locally cached table can avoid calls to remote server.</SPAN></FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in; font-style: normal">
+<FONT SIZE=4>Using chaining one can implement a lot of other useful
+things like database replication without need in triggers - just
+repeat same calls for replication host when (for example) transaction
+is commited. In this case chaining provider is installed on server,
+not on client, and no modification of command line is needed at all.
+To avoid cycling when performing callback to YValve at attach time
+such provider can modify list of providers using isc_dpb_config
+parameter in DPB &ndash; for details please see README.configuration.
+BTW, same technique may be used at client too.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in; font-style: normal">
+<FONT SIZE=4>And certainly we should not forget about ability to
+access foreign DB engines using providers. This looks strange at the
+first glance when a lot of other tools performing this task already
+exist. But let's take into an account ability to access other
+Firebird databases using EXECUTE STATEMENT. With provider to ODBC or
+other common tool to access various data sources it's getting
+possible to directly access from procedures and triggers (using
+mentioned EXECUTE STATEMENT) data from almost any database, at least
+any, having a driver in chosen access tool. Certainly it's possible
+to have a provider to access some particular type of foreign database
+engine if one wants to avoid ODBC layer for some reason. </FONT>
+</P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in; font-style: normal">
+<FONT SIZE=4>Description of how to access databases using providers
+API is present in the interfaces part of Firebird examples and
+therefore there is no need repeating it here. Moreover, except
+IStatement (interface used for execution of SQL operators) and
+IEvents (works with Firebird events) all functions in interfaces are
+similar to old API.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in"><BR>
+</P>
+<P STYLE="margin-bottom: 0in"><FONT SIZE=4>Questions and answers.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in; font-style: normal">
+<FONT SIZE=4>Q. Interfaces and providers are probably very good, but
+I have old task written using plain functions API and for a lot of
+reasons I can't rewrite it in the nearest future. Does it mean I have
+problem migrating to Firebird 3?</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in; font-style: normal">
+<FONT SIZE=4>A. Definitely no problems. Old API is supported for
+backward compatibility in Firebird 3 and will be supported in future
+versions as long as people need it.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in; font-style: normal">
+<FONT SIZE=4>Q. And what about performance when using old API?</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in; font-style: normal">
+<FONT SIZE=4>A. Functional API is implemented as a very thin layer
+over interfaces. Code in most case is trivial &ndash; convert passed
+handles to pointers to interfaces (this step was always present but
+called 'handles validation') and invoke appropriate function from
+interface. The only a bit more complex place are functions that
+execute SQL operator and fetch data from it. But SQLDA and related to
+it data moves has never been the most fast place of functional API,
+it was one the reasons to have new API and logic between new and old
+API does not add much to that old overhead.</FONT></P>
+<P STYLE="text-indent: 0.39in; margin-bottom: 0in; font-style: normal">
+<BR>
+</P>
+</BODY>
+</HTML>

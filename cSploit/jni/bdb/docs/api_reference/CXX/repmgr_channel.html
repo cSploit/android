@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbEnv::repmgr_channel()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 11.  Replication Methods" />
+    <link rel="prev" href="repsync.html" title="DbEnv::rep_sync()" />
+    <link rel="next" href="repmgr_local_site.html" title="DbEnv::repmgr_local_site()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbEnv::repmgr_channel()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="repsync.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 11. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="repmgr_local_site.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="repmgr_channel"></a>DbEnv::repmgr_channel()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+
+int 
+DbEnv::repmgr_channel(int eid, DB_CHANNEL **channelp, u_int32_t flags);</pre>
+      <p>
+        The <code class="methodname">DbEnv::repmgr_channel()</code> method returns a 
+        DbChannel handle. This is used to create and manage custom
+        message traffic between the sites in the replication group.
+    </p>
+      <p>
+        This method allocates memory for the handle, returning a pointer to
+        the structure in the memory to which 
+        <span class="bold"><strong>channelp</strong></span> refers. To release the
+        allocated memory and discard the handle, call the
+        <a class="xref" href="dbchannel_close.html" title="DbChannel::close()">DbChannel::close()</a>
+        method.
+    </p>
+      <p>
+         The <code class="methodname">DbEnv::repmgr_channel()</code> method may be
+         called at any time after 
+         <a class="xref" href="repmgrstart.html" title="DbEnv::repmgr_start()">DbEnv::repmgr_start()</a> has
+         been called with a <code class="literal">0</code> return code.
+    </p>
+      <p>
+         The <code class="methodname">DbEnv::repmgr_channel()</code> <span>
+            
+            <span>
+                method either returns a non-zero error value or throws an
+                exception that encapsulates a non-zero error value on
+                failure, and returns 0 on success.
+            </span>
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp4448672"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp4448024"></a>eid</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 This parameter must be set to one of the following:
+             </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                         The numerical environment ID of a remote site in the
+                         replication group.
+                     </p>
+              </li>
+              <li>
+                <p>
+                         <code class="literal">DB_EID_MASTER</code>
+                     </p>
+                <p>
+                         Messages sent on this channel are sent only to the
+                         master site. Note that messages are always sent to
+                         the current master, even if the master has changed
+                         since the channel was opened. If the current
+                         master is disconnected or unknown, the operation
+                         fails and Replication Manager returns an error code.
+                     </p>
+                <p>
+                         If the local site is the master, then sending
+                         messages on this channel will result in the local
+                         site receiving those messages echoed back to
+                         itself.
+                     </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp4454616"></a>channelp</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 References memory into which a pointer to the
+                 allocated handle is copied.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp4447808"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  This parameter is currently unused, and must be
+                  set to 0.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp4434864"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            The <code class="methodname">DbEnv::repmgr_channel()</code>
+            <span>
+            
+            <span>
+                method may fail and throw a <a class="link" href="dbexception.html" title="Chapter 6. The DbException Class">DbException</a> 
+                exception, encapsulating one of the following non-zero errors, or return one
+                of the following non-zero errors:
+            </span>
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp4462672"></a>DB_REP_UNAVAIL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If the <span class="bold"><strong>eid</strong></span> parameter is 
+                <code class="literal">DB_EID_MASTER</code> but the current master is
+                disconnected or unknown.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp4463968"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If this method is called from a Base API application; 
+                or if an invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp4457488"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp4412904"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="xref" href="rep.html#replist" title="Replication and Related Methods">Replication and Related Methods</a>,
+            <a class="xref" href="db_channel.html" title="The DbChannel Handle">The DbChannel Handle</a>
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="repsync.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="repmgr_local_site.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbEnv::rep_sync() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbEnv::repmgr_local_site()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

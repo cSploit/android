@@ -1,0 +1,84 @@
+.TH LDAP_CONTROLS 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_control_create, ldap_control_find, ldap_control_dup,
+ldap_controls_dup, ldap_control_free, ldap_controls_free
+\- LDAP control manipulation routines
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.B #include <ldap.h>
+.LP
+.BI "int ldap_control_create(const char *" oid ", int " iscritical ", struct berval *" value ", int " dupval ", LDAPControl **" ctrlp ");"
+.LP
+.BI "LDAPControl *ldap_control_find( const char *" oid ", LDAPControl **" ctrls ", LDAPControl ***" nextctrlp ");"
+.LP
+.BI "LDAPControl *ldap_control_dup(LDAPControl *" ctrl ");"
+.LP
+.BI "LDAPControl **ldap_controls_dup(LDAPControl **" ctrls ");"
+.LP
+.BI "void ldap_control_free(LDAPControl *" ctrl ");"
+.LP
+.BI "void ldap_controls_free(LDAPControl **" ctrls ");"
+.SH DESCRIPTION
+These routines are used to manipulate structures used for LDAP controls.
+
+.BR ldap_control_create ()
+creates a control with the specified
+.I OID
+using the contents of the
+.I value
+parameter for the control value, if any.  The content of
+.I value 
+is duplicated if
+.I dupval
+is non-zero.  The
+.I iscritical
+parameter must be non-zero for a critical control. The created control
+is returned in the
+.I ctrlp
+parameter.  The routine returns
+.B LDAP_SUCCESS
+on success or some other error code on failure.
+The content of
+.IR value ,
+for supported control types, can be prepared using helpers provided
+by this implementation of libldap, usually in the form
+.BR "ldap_create_<control name>_control_value" ().
+Otherwise, it can be BER-encoded using the functionalities of liblber.
+
+.BR ldap_control_find ()
+searches the NULL-terminated
+.I ctrls
+array for a control whose OID matches the
+.I oid
+parameter.  The routine returns a pointer to the control if found,
+NULL otherwise.
+If the parameter
+.I nextctrlp
+is not NULL, on return it will point to the next control
+in the array, and can be passed to the
+.BR ldap_control_find ()
+routine for subsequent calls, to find further occurrences of the same 
+control type.
+The use of this function is discouraged; the recommended way of handling
+controls in responses consists in going through the array of controls,
+dealing with each of them in the returned order, since it could matter.
+
+.BR ldap_control_dup ()
+duplicates an individual control structure, and
+.BR ldap_controls_dup ()
+duplicates a NULL-terminated array of controls.
+
+.BR ldap_control_free ()
+frees an individual control structure, and
+.BR ldap_controls_free ()
+frees a NULL-terminated array of controls.
+
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_error (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

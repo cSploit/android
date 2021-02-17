@@ -1,0 +1,374 @@
+<VisualStudioProject ProjectType="Visual C++" Version="8.00" Name="db" ProjectGUID="{FD045D60-ABAD-4A6C-9794-9BFB085FC3E7}">
+  <Platforms>
+    <Platform Name="Win32"/>
+    <Platform Name="x64"/>
+  </Platforms>
+  <Configurations>
+    <Configuration Name="Debug|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;_UNICODE;UNICODE;DB_CREATE_DLL;CONFIG_TEST;_USRDLL" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db.pch" AssemblerListingLocation="$(OutDir)/db/" ObjectFile="$(OutDir)/db/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86 /FIXED:NO /export:__db_assert" AdditionalDependencies="ws2_32.lib" AdditionalLibraryDirectories="../../lib" OutputFile="$(OutDir)/libdb60d.dll" ProgramDatabaseFile="$(OutDir)/libdb60d.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/libdb60d.lib" ModuleDefinitionFile="..\..\build_windows\libdb.def" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_UNICODE;UNICODE;DB_CREATE_DLL;_USRDLL" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db.pch" AssemblerListingLocation="$(OutDir)/db/" ObjectFile="$(OutDir)/db/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="ws2_32.lib" AdditionalLibraryDirectories="../../lib" OutputFile="$(OutDir)/libdb60.dll" ProgramDatabaseFile="$(OutDir)/libdb60.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/libdb60.lib" ModuleDefinitionFile="..\..\build_windows\libdb.def" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Static Debug|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Static_Debug" IntermediateDirectory="./$(OutDir)/db" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_UNICODE;UNICODE;_LIB;" StringPooling="TRUE" RuntimeLibrary="1" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db.pch" AssemblerListingLocation="$(OutDir)/db/" ObjectFile="$(OutDir)/db/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb60sd.lib" AdditionalOptions="/machine:x86"/></Configuration>
+    <Configuration Name="Static Release|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Static_Release" IntermediateDirectory="./$(OutDir)/db" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_UNICODE;UNICODE;_LIB;" StringPooling="TRUE" RuntimeLibrary="0" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db.pch" AssemblerListingLocation="$(OutDir)/db/" ObjectFile="$(OutDir)/db/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb60s.lib" AdditionalOptions="/machine:x86"/></Configuration>
+    <Configuration Name="Debug|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;_UNICODE;UNICODE;DB_CREATE_DLL;CONFIG_TEST;_USRDLL" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db.pch" AssemblerListingLocation="$(OutDir)/db/" ObjectFile="$(OutDir)/db/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64 /FIXED:NO /export:__db_assert" AdditionalDependencies="ws2_32.lib" AdditionalLibraryDirectories="../../lib" OutputFile="$(OutDir)/libdb60d.dll" ProgramDatabaseFile="$(OutDir)/libdb60d.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/libdb60d.lib" ModuleDefinitionFile="..\..\build_windows\libdb.def" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_UNICODE;UNICODE;DB_CREATE_DLL;_USRDLL" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db.pch" AssemblerListingLocation="$(OutDir)/db/" ObjectFile="$(OutDir)/db/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="ws2_32.lib" AdditionalLibraryDirectories="../../lib" OutputFile="$(OutDir)/libdb60.dll" ProgramDatabaseFile="$(OutDir)/libdb60.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/libdb60.lib" ModuleDefinitionFile="..\..\build_windows\libdb.def" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Static Debug|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Static_Debug" IntermediateDirectory="./$(OutDir)/db" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_UNICODE;UNICODE;_LIB;" StringPooling="TRUE" RuntimeLibrary="1" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db.pch" AssemblerListingLocation="$(OutDir)/db/" ObjectFile="$(OutDir)/db/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb60sd.lib" AdditionalOptions="/machine:x64"/></Configuration>
+    <Configuration Name="Static Release|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Static_Release" IntermediateDirectory="./$(OutDir)/db" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_UNICODE;UNICODE;_LIB;" StringPooling="TRUE" RuntimeLibrary="0" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db.pch" AssemblerListingLocation="$(OutDir)/db/" ObjectFile="$(OutDir)/db/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb60s.lib" AdditionalOptions="/machine:x64"/></Configuration>
+  </Configurations>
+  <References/>
+  <Files>
+    <File RelativePath="..\..\src\crypto\aes_method.c"/>
+    <File RelativePath="..\..\src\blob\blob_fileops.c"/>
+    <File RelativePath="..\..\src\blob\blob_page.c"/>
+    <File RelativePath="..\..\src\blob\blob_stream.c"/>
+    <File RelativePath="..\..\src\blob\blob_util.c"/>
+    <File RelativePath="..\..\src\btree\bt_compact.c"/>
+    <File RelativePath="..\..\src\btree\bt_compare.c"/>
+    <File RelativePath="..\..\src\btree\bt_compress.c"/>
+    <File RelativePath="..\..\src\btree\bt_conv.c"/>
+    <File RelativePath="..\..\src\btree\bt_curadj.c"/>
+    <File RelativePath="..\..\src\btree\bt_cursor.c"/>
+    <File RelativePath="..\..\src\btree\bt_delete.c"/>
+    <File RelativePath="..\..\src\btree\bt_method.c"/>
+    <File RelativePath="..\..\src\btree\bt_open.c"/>
+    <File RelativePath="..\..\src\btree\bt_put.c"/>
+    <File RelativePath="..\..\src\btree\bt_rec.c"/>
+    <File RelativePath="..\..\src\btree\bt_reclaim.c"/>
+    <File RelativePath="..\..\src\btree\bt_recno.c"/>
+    <File RelativePath="..\..\src\btree\bt_rsearch.c"/>
+    <File RelativePath="..\..\src\btree\bt_search.c"/>
+    <File RelativePath="..\..\src\btree\bt_split.c"/>
+    <File RelativePath="..\..\src\btree\bt_stat.c"/>
+    <File RelativePath="..\..\src\btree\bt_upgrade.c"/>
+    <File RelativePath="..\..\src\btree\bt_verify.c"/>
+    <File RelativePath="..\..\src\btree\btree_auto.c"/>
+    <File RelativePath="..\..\src\db\crdel_auto.c"/>
+    <File RelativePath="..\..\src\db\crdel_rec.c"/>
+    <File RelativePath="..\..\src\crypto\crypto.c"/>
+    <File RelativePath="..\..\lang\cxx\cxx_channel.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_db.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_dbc.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_dbstream.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_dbt.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_env.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_except.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_lock.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_logc.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_mpool.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_multi.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_seq.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_site.cpp"/>
+    <File RelativePath="..\..\lang\cxx\cxx_txn.cpp"/>
+    <File RelativePath="..\..\src\db\db.c"/>
+    <File RelativePath="..\..\src\db\db_am.c"/>
+    <File RelativePath="..\..\src\db\db_auto.c"/>
+    <File RelativePath="..\..\src\common\clock.c"/>
+    <File RelativePath="..\..\src\db\db_backup.c"/>
+    <File RelativePath="..\..\src\common\db_byteorder.c"/>
+    <File RelativePath="..\..\src\db\db_cam.c"/>
+    <File RelativePath="..\..\src\db\db_cds.c"/>
+    <File RelativePath="..\..\src\db\db_compact.c"/>
+    <File RelativePath="..\..\src\db\db_conv.c"/>
+    <File RelativePath="..\..\src\db\db_copy.c"/>
+    <File RelativePath="..\..\src\db\db_dispatch.c"/>
+    <File RelativePath="..\..\src\db\db_dup.c"/>
+    <File RelativePath="..\..\src\common\db_err.c"/>
+    <File RelativePath="..\..\src\common\db_getlong.c"/>
+    <File RelativePath="..\..\src\common\db_idspace.c"/>
+    <File RelativePath="..\..\src\common\db_compint.c"/>
+    <File RelativePath="..\..\src\db\db_iface.c"/>
+    <File RelativePath="..\..\src\db\db_join.c"/>
+    <File RelativePath="..\..\src\common\db_log2.c"/>
+    <File RelativePath="..\..\src\db\db_meta.c"/>
+    <File RelativePath="..\..\src\db\db_method.c"/>
+    <File RelativePath="..\..\src\db\db_open.c"/>
+    <File RelativePath="..\..\src\db\db_overflow.c"/>
+    <File RelativePath="..\..\src\db\db_ovfl_vrfy.c"/>
+    <File RelativePath="..\..\src\db\db_pr.c"/>
+    <File RelativePath="..\..\src\db\db_rec.c"/>
+    <File RelativePath="..\..\src\db\db_reclaim.c"/>
+    <File RelativePath="..\..\src\db\db_remove.c"/>
+    <File RelativePath="..\..\src\db\db_rename.c"/>
+    <File RelativePath="..\..\src\db\db_ret.c"/>
+    <File RelativePath="..\..\src\db\db_setid.c"/>
+    <File RelativePath="..\..\src\db\db_setlsn.c"/>
+    <File RelativePath="..\..\src\common\db_shash.c"/>
+    <File RelativePath="..\..\src\db\db_sort_multiple.c"/>
+    <File RelativePath="..\..\src\db\db_stati.c"/>
+    <File RelativePath="..\..\src\db\db_truncate.c"/>
+    <File RelativePath="..\..\src\db\db_upg.c"/>
+    <File RelativePath="..\..\src\db\db_upg_opd.c"/>
+    <File RelativePath="..\..\src\db\db_vrfy.c"/>
+    <File RelativePath="..\..\src\db\db_vrfyutil.c"/>
+    <File RelativePath="..\..\src\db\partition.c"/>
+    <File RelativePath="..\..\lang\dbm\dbm.c"/>
+    <File RelativePath="..\..\src\dbreg\dbreg.c"/>
+    <File RelativePath="..\..\src\dbreg\dbreg_auto.c"/>
+    <File RelativePath="..\..\src\dbreg\dbreg_rec.c"/>
+    <File RelativePath="..\..\src\dbreg\dbreg_stat.c"/>
+    <File RelativePath="..\..\src\dbreg\dbreg_util.c"/>
+    <File RelativePath="..\..\src\common\dbt.c"/>
+    <File RelativePath="..\..\src\env\env_alloc.c"/>
+    <File RelativePath="..\..\src\env\env_backup.c"/>
+    <File RelativePath="..\..\src\env\env_config.c"/>
+    <File RelativePath="..\..\src\env\env_failchk.c"/>
+    <File RelativePath="..\..\src\env\env_file.c"/>
+    <File RelativePath="..\..\src\env\env_globals.c"/>
+    <File RelativePath="..\..\src\env\env_method.c"/>
+    <File RelativePath="..\..\src\env\env_name.c"/>
+    <File RelativePath="..\..\src\env\env_open.c"/>
+    <File RelativePath="..\..\src\env\env_recover.c"/>
+    <File RelativePath="..\..\src\env\env_region.c"/>
+    <File RelativePath="..\..\src\env\env_register.c"/>
+    <File RelativePath="..\..\src\env\env_sig.c"/>
+    <File RelativePath="..\..\src\env\env_stat.c"/>
+    <File RelativePath="..\..\src\fileops\fileops_auto.c"/>
+    <File RelativePath="..\..\src\fileops\fop_basic.c"/>
+    <File RelativePath="..\..\src\fileops\fop_rec.c"/>
+    <File RelativePath="..\..\src\fileops\fop_util.c"/>
+    <File RelativePath="..\..\src\hash\hash.c"/>
+    <File RelativePath="..\..\src\hash\hash_auto.c"/>
+    <File RelativePath="..\..\src\hash\hash_compact.c"/>
+    <File RelativePath="..\..\src\hash\hash_conv.c"/>
+    <File RelativePath="..\..\src\hash\hash_dup.c"/>
+    <File RelativePath="..\..\src\hash\hash_func.c"/>
+    <File RelativePath="..\..\src\hash\hash_meta.c"/>
+    <File RelativePath="..\..\src\hash\hash_method.c"/>
+    <File RelativePath="..\..\src\hash\hash_open.c"/>
+    <File RelativePath="..\..\src\hash\hash_page.c"/>
+    <File RelativePath="..\..\src\hash\hash_rec.c"/>
+    <File RelativePath="..\..\src\hash\hash_reclaim.c"/>
+    <File RelativePath="..\..\src\hash\hash_stat.c"/>
+    <File RelativePath="..\..\src\hash\hash_upgrade.c"/>
+    <File RelativePath="..\..\src\hash\hash_verify.c"/>
+    <File RelativePath="..\..\src\heap\heap.c"/>
+    <File RelativePath="..\..\src\heap\heap_auto.c"/>
+    <File RelativePath="..\..\src\heap\heap_backup.c"/>
+    <File RelativePath="..\..\src\heap\heap_conv.c"/>
+    <File RelativePath="..\..\src\heap\heap_method.c"/>
+    <File RelativePath="..\..\src\heap\heap_open.c"/>
+    <File RelativePath="..\..\src\heap\heap_rec.c"/>
+    <File RelativePath="..\..\src\heap\heap_reclaim.c"/>
+    <File RelativePath="..\..\src\heap\heap_stat.c"/>
+    <File RelativePath="..\..\src\heap\heap_upgrade.c"/>
+    <File RelativePath="..\..\src\heap\heap_verify.c"/>
+    <File RelativePath="..\..\src\hmac\hmac.c"/>
+    <File RelativePath="..\..\lang\hsearch\hsearch.c"/>
+    <File RelativePath="..\..\src\clib\isalpha.c"/>
+    <File RelativePath="..\..\build_windows\libdb.def"/>
+    <File RelativePath="..\..\build_windows\libdb.rc">
+      <FileConfiguration Name="Debug|Win32"><Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG;$(NoInherit))"/>
+      </FileConfiguration>
+      <FileConfiguration Name="Release|Win32"><Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="NDEBUG;$(NoInherit))"/>
+      </FileConfiguration>
+      <FileConfiguration Name="Debug|x64"><Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG;$(NoInherit))"/>
+      </FileConfiguration>
+      <FileConfiguration Name="Release|x64"><Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="NDEBUG;$(NoInherit))"/>
+      </FileConfiguration>
+    </File>
+    <File RelativePath="..\..\src\lock\lock.c"/>
+    <File RelativePath="..\..\src\lock\lock_deadlock.c"/>
+    <File RelativePath="..\..\src\lock\lock_failchk.c"/>
+    <File RelativePath="..\..\src\lock\lock_id.c"/>
+    <File RelativePath="..\..\src\lock\lock_list.c"/>
+    <File RelativePath="..\..\src\lock\lock_method.c"/>
+    <File RelativePath="..\..\src\lock\lock_region.c"/>
+    <File RelativePath="..\..\src\lock\lock_stat.c"/>
+    <File RelativePath="..\..\src\lock\lock_timer.c"/>
+    <File RelativePath="..\..\src\lock\lock_util.c"/>
+    <File RelativePath="..\..\src\log\log.c"/>
+    <File RelativePath="..\..\src\log\log_archive.c"/>
+    <File RelativePath="..\..\src\log\log_compare.c"/>
+    <File RelativePath="..\..\src\log\log_debug.c"/>
+    <File RelativePath="..\..\src\log\log_get.c"/>
+    <File RelativePath="..\..\src\log\log_method.c"/>
+    <File RelativePath="..\..\src\log\log_print.c"/>
+    <File RelativePath="..\..\src\log\log_put.c"/>
+    <File RelativePath="..\..\src\log\log_stat.c"/>
+    <File RelativePath="..\..\src\log\log_verify.c"/>
+    <File RelativePath="..\..\src\log\log_verify_util.c"/>
+    <File RelativePath="..\..\src\log\log_verify_auto.c"/>
+    <File RelativePath="..\..\src\log\log_verify_int.c"/>
+    <File RelativePath="..\..\src\common\mkpath.c"/>
+    <File RelativePath="..\..\src\mp\mp_alloc.c"/>
+    <File RelativePath="..\..\src\mp\mp_backup.c"/>
+    <File RelativePath="..\..\src\mp\mp_bh.c"/>
+    <File RelativePath="..\..\src\mp\mp_fget.c"/>
+    <File RelativePath="..\..\src\mp\mp_fmethod.c"/>
+    <File RelativePath="..\..\src\mp\mp_fopen.c"/>
+    <File RelativePath="..\..\src\mp\mp_fput.c"/>
+    <File RelativePath="..\..\src\mp\mp_fset.c"/>
+    <File RelativePath="..\..\src\mp\mp_method.c"/>
+    <File RelativePath="..\..\src\mp\mp_mvcc.c"/>
+    <File RelativePath="..\..\src\mp\mp_region.c"/>
+    <File RelativePath="..\..\src\mp\mp_register.c"/>
+    <File RelativePath="..\..\src\mp\mp_resize.c"/>
+    <File RelativePath="..\..\src\mp\mp_stat.c"/>
+    <File RelativePath="..\..\src\mp\mp_sync.c"/>
+    <File RelativePath="..\..\src\mp\mp_trickle.c"/>
+    <File RelativePath="..\..\src\crypto\mersenne\mt19937db.c"/>
+    <File RelativePath="..\..\src\mutex\mut_alloc.c"/>
+    <File RelativePath="..\..\src\mutex\mut_failchk.c"/>
+    <File RelativePath="..\..\src\mutex\mut_method.c"/>
+    <File RelativePath="..\..\src\mutex\mut_region.c"/>
+    <File RelativePath="..\..\src\mutex\mut_stat.c"/>
+    <File RelativePath="..\..\src\mutex\mut_win32.c"/>
+    <File RelativePath="..\..\src\common\openflags.c"/>
+    <File RelativePath="..\..\src\os\os_abort.c"/>
+    <File RelativePath="..\..\src\os\os_addrinfo.c"/>
+    <File RelativePath="..\..\src\os_windows\os_abs.c"/>
+    <File RelativePath="..\..\src\os\os_alloc.c"/>
+    <File RelativePath="..\..\src\os_windows\os_clock.c"/>
+    <File RelativePath="..\..\src\os_windows\os_config.c"/>
+    <File RelativePath="..\..\src\os_windows\os_cpu.c"/>
+    <File RelativePath="..\..\src\os\os_ctime.c"/>
+    <File RelativePath="..\..\src\os_windows\os_dir.c"/>
+    <File RelativePath="..\..\src\os_windows\os_errno.c"/>
+    <File RelativePath="..\..\src\os_windows\os_fid.c"/>
+    <File RelativePath="..\..\src\os_windows\os_flock.c"/>
+    <File RelativePath="..\..\src\os_windows\os_fsync.c"/>
+    <File RelativePath="..\..\src\os_windows\os_getenv.c"/>
+    <File RelativePath="..\..\src\os_windows\os_handle.c"/>
+    <File RelativePath="..\..\src\os_windows\os_map.c"/>
+    <File RelativePath="..\..\src\os_windows\os_mkdir.c"/>
+    <File RelativePath="..\..\src\os_windows\os_open.c"/>
+    <File RelativePath="..\..\src\os_windows\os_rmdir.c"/>
+    <File RelativePath="..\..\src\os\os_path.c"/>
+    <File RelativePath="..\..\src\os\os_pid.c"/>
+    <File RelativePath="..\..\src\os_windows\os_rename.c"/>
+    <File RelativePath="..\..\src\os\os_root.c"/>
+    <File RelativePath="..\..\src\os\os_rpath.c"/>
+    <File RelativePath="..\..\src\os_windows\os_rw.c"/>
+    <File RelativePath="..\..\src\os_windows\os_seek.c"/>
+    <File RelativePath="..\..\src\os\os_stack.c"/>
+    <File RelativePath="..\..\src\os_windows\os_stat.c"/>
+    <File RelativePath="..\..\src\os\os_tmpdir.c"/>
+    <File RelativePath="..\..\src\os_windows\os_truncate.c"/>
+    <File RelativePath="..\..\src\os\os_uid.c"/>
+    <File RelativePath="..\..\src\os_windows\os_unlink.c"/>
+    <File RelativePath="..\..\src\os_windows\os_yield.c"/>
+    <File RelativePath="..\..\src\qam\qam.c"/>
+    <File RelativePath="..\..\src\qam\qam_auto.c"/>
+    <File RelativePath="..\..\src\qam\qam_conv.c"/>
+    <File RelativePath="..\..\src\qam\qam_files.c"/>
+    <File RelativePath="..\..\src\qam\qam_method.c"/>
+    <File RelativePath="..\..\src\qam\qam_open.c"/>
+    <File RelativePath="..\..\src\qam\qam_rec.c"/>
+    <File RelativePath="..\..\src\qam\qam_stat.c"/>
+    <File RelativePath="..\..\src\qam\qam_upgrade.c"/>
+    <File RelativePath="..\..\src\qam\qam_verify.c"/>
+    <File RelativePath="..\..\src\rep\rep_automsg.c"/>
+    <File RelativePath="..\..\src\rep\rep_backup.c"/>
+    <File RelativePath="..\..\src\rep\rep_elect.c"/>
+    <File RelativePath="..\..\src\rep\rep_lease.c"/>
+    <File RelativePath="..\..\src\rep\rep_log.c"/>
+    <File RelativePath="..\..\src\rep\rep_method.c"/>
+    <File RelativePath="..\..\src\rep\rep_record.c"/>
+    <File RelativePath="..\..\src\rep\rep_region.c"/>
+    <File RelativePath="..\..\src\rep\rep_stat.c"/>
+    <File RelativePath="..\..\src\rep\rep_util.c"/>
+    <File RelativePath="..\..\src\rep\rep_verify.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_auto.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_automsg.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_elect.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_method.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_msg.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_net.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_queue.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_rec.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_sel.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_stat.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_util.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_windows.c"/>
+    <File RelativePath="..\..\src\crypto\rijndael\rijndael-alg-fst.c"/>
+    <File RelativePath="..\..\src\crypto\rijndael\rijndael-api-fst.c"/>
+    <File RelativePath="..\..\src\sequence\seq_stat.c"/>
+    <File RelativePath="..\..\src\sequence\sequence.c"/>
+    <File RelativePath="..\..\src\hmac\sha1.c"/>
+    <File RelativePath="..\..\src\clib\strsep.c"/>
+    <File RelativePath="..\..\src\txn\txn.c"/>
+    <File RelativePath="..\..\src\txn\txn_auto.c"/>
+    <File RelativePath="..\..\src\txn\txn_chkpt.c"/>
+    <File RelativePath="..\..\src\txn\txn_failchk.c"/>
+    <File RelativePath="..\..\src\txn\txn_method.c"/>
+    <File RelativePath="..\..\src\txn\txn_rec.c"/>
+    <File RelativePath="..\..\src\txn\txn_recover.c"/>
+    <File RelativePath="..\..\src\txn\txn_region.c"/>
+    <File RelativePath="..\..\src\txn\txn_stat.c"/>
+    <File RelativePath="..\..\src\txn\txn_util.c"/>
+    <File RelativePath="..\..\src\common\os_method.c"/>
+    <File RelativePath="..\..\src\common\util_cache.c"/>
+    <File RelativePath="..\..\src\common\util_log.c"/>
+    <File RelativePath="..\..\src\common\util_sig.c"/>
+    <File RelativePath="..\..\src\common\zerofill.c"/>
+    <File RelativePath="..\..\src\xa\xa.c"/>
+    <File RelativePath="..\..\src\xa\xa_map.c"/>
+  </Files>
+  <Globals/>
+</VisualStudioProject>

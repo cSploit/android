@@ -1,0 +1,57 @@
+#! /usr/bin/wish
+
+#This is a procedure for centering windows... 
+# 
+# 
+proc center {window_to_center} { 
+ 
+  update idletasks 
+ 
+  set width [expr [winfo reqwidth $window_to_center]] 
+  set height [expr [winfo reqheight $window_to_center]] 
+
+  if {$width < 400} {set width 400}
+ 
+  set x [expr [winfo screenwidth $window_to_center]/2 - $width/2] 
+  set y [expr [winfo screenheight $window_to_center]/2 - $height/2] 
+ 
+  wm geometry $window_to_center $width\x$height+$x+$y 
+ 
+  #update idletasks 
+  wm deiconify $window_to_center 
+ 
+} 
+ 
+
+#
+#
+#
+#
+#This is the main() proc...
+
+set argv_exist [string length $argv]
+if {$argv_exist <= 0} {puts "syntax:  tkmesg string\a";exit}
+
+wm withdraw .
+wm title . "Netware Client for Linux"
+wm resizable . 0 0 
+
+label .mesg -text [eval concat $argv]
+pack .mesg -padx 5 -pady 5
+
+button .ok -text "Ok"  -command exit -width 5
+pack .ok -padx 5 -pady 5
+
+focus .ok
+bind .ok <Return> exit
+
+
+center .
+
+#beep the users console after the window appears...
+catch {
+    set ofd [open /dev/console w]
+    puts -nonewline $ofd "\a"
+    close $ofd
+}
+

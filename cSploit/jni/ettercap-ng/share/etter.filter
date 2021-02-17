@@ -1,0 +1,26 @@
+############################################################################
+#                                                                          #
+#  ettercap -- etter.filter -- filter source file                          #
+#                                                                          #
+#  Copyright (C) ALoR & NaGA                                               #
+#                                                                          #
+#  This program is free software; you can redistribute it and/or modify    #
+#  it under the terms of the GNU General Public License as published by    #
+#  the Free Software Foundation; either version 2 of the License, or       #
+#  (at your option) any later version.                                     #
+#                                                                          #
+############################################################################
+
+##
+#
+#  This filter will substitute the word 'ethercap' with 'ettercap' and
+#  will log the content of the packet in /tmp/mispelled_ettercap.log
+#  It is only a dummy example.
+##
+
+if (ip.proto == TCP && search(DATA.data, "ethercap") ) {
+   log(DATA.data, "/tmp/mispelled_ettercap.log");
+   replace("ethercap", "ettercap");
+   msg("Correctly substituted and logged.\n");
+}
+

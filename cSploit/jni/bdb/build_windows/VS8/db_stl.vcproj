@@ -1,0 +1,103 @@
+<VisualStudioProject ProjectType="Visual C++" Version="8.00" Name="db_stl" ProjectGUID="{284CC197-0C66-11DE-8C30-0800200C9A66}">
+  <Platforms>
+    <Platform Name="Win32"/>
+    <Platform Name="x64"/>
+  </Platforms>
+  <Configurations>
+    <Configuration Name="Debug|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_stl" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/cxx/stl" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;_UNICODE;UNICODE;DB_CREATE_DLL;_USRDLL" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_stl.pch" AssemblerListingLocation="$(OutDir)/db_stl/" ObjectFile="$(OutDir)/db_stl/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="libdb60d.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/libdb_stl60d.dll" ProgramDatabaseFile="$(OutDir)/libdb_stl60d.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/libdb_stl60d.lib" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_stl" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/cxx/stl" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_UNICODE;UNICODE;DB_CREATE_DLL;_USRDLL" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_stl.pch" AssemblerListingLocation="$(OutDir)/db_stl/" ObjectFile="$(OutDir)/db_stl/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="libdb60.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/libdb_stl60.dll" ProgramDatabaseFile="$(OutDir)/libdb_stl60.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/libdb_stl60.lib" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Static Debug|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Static_Debug" IntermediateDirectory="./$(OutDir)/db_stl" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/cxx/stl" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_UNICODE;UNICODE;_LIB;" StringPooling="TRUE" RuntimeLibrary="1" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_stl.pch" AssemblerListingLocation="$(OutDir)/db_stl/" ObjectFile="$(OutDir)/db_stl/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb_stl60sd.lib" AdditionalOptions="/machine:x86"/></Configuration>
+    <Configuration Name="Static Release|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Static_Release" IntermediateDirectory="./$(OutDir)/db_stl" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/cxx/stl" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_UNICODE;UNICODE;_LIB;" StringPooling="TRUE" RuntimeLibrary="0" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_stl.pch" AssemblerListingLocation="$(OutDir)/db_stl/" ObjectFile="$(OutDir)/db_stl/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb_stl60s.lib" AdditionalOptions="/machine:x86"/></Configuration>
+    <Configuration Name="Debug|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_stl" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/cxx/stl" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;_UNICODE;UNICODE;DB_CREATE_DLL;_USRDLL" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_stl.pch" AssemblerListingLocation="$(OutDir)/db_stl/" ObjectFile="$(OutDir)/db_stl/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="libdb60d.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/libdb_stl60d.dll" ProgramDatabaseFile="$(OutDir)/libdb_stl60d.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/libdb_stl60d.lib" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_stl" ConfigurationType="2" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/cxx/stl" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;_UNICODE;UNICODE;DB_CREATE_DLL;_USRDLL" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_stl.pch" AssemblerListingLocation="$(OutDir)/db_stl/" ObjectFile="$(OutDir)/db_stl/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="libdb60.lib" AdditionalLibraryDirectories="$(OutDir);../../lib" OutputFile="$(OutDir)/libdb_stl60.dll" ProgramDatabaseFile="$(OutDir)/libdb_stl60.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" ImportLibrary="$(OutDir)/libdb_stl60.lib" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Static Debug|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Static_Debug" IntermediateDirectory="./$(OutDir)/db_stl" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/cxx/stl" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_UNICODE;UNICODE;_LIB;" StringPooling="TRUE" RuntimeLibrary="1" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_stl.pch" AssemblerListingLocation="$(OutDir)/db_stl/" ObjectFile="$(OutDir)/db_stl/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb_stl60sd.lib" AdditionalOptions="/machine:x64"/></Configuration>
+    <Configuration Name="Static Release|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Static_Release" IntermediateDirectory="./$(OutDir)/db_stl" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/cxx/stl" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_UNICODE;UNICODE;_LIB;" StringPooling="TRUE" RuntimeLibrary="0" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_stl.pch" AssemblerListingLocation="$(OutDir)/db_stl/" ObjectFile="$(OutDir)/db_stl/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb_stl60s.lib" AdditionalOptions="/machine:x64"/></Configuration>
+  </Configurations>
+  <References/>
+  <Files>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_exception.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_map.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_set.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_utility.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_vector.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_common.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_base_iterator.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_container.cpp"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_container.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_dbc.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_dbt.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_element_ref.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_inner_utility.h"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_resource_manager.cpp"/>
+    <File RelativePath="..\..\lang\cxx\stl\dbstl_resource_manager.h"/>
+  </Files>
+  <Globals/>
+</VisualStudioProject>

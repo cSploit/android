@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Using Replication Manager message channels</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="rep.html" title="Chapter 12.  Berkeley DB Replication" />
+    <link rel="prev" href="rep_clock_skew.html" title="Clock skew" />
+    <link rel="next" href="rep_twosite.html" title="Special considerations for two-site replication groups" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Using Replication Manager message channels</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="rep_clock_skew.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 12. 
+		Berkeley DB Replication
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="rep_twosite.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="repmgr_channels"></a>Using Replication Manager message channels</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="repmgr_channels.html#dbchannel_class">DB_CHANNEL</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="repmgr_channels.html#dbchannel_send">Sending messages over a message channel</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="repmgr_channels.html#dbchannel_receive">Receiving messages</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        The various sites comprising a replication group frequently need to
+        communicate with one another. Mostly, these messages are handled
+        for you internally by the Replication Manager. However, your
+        application may have a requirement to pass messages beyond what the
+        Replication Manager requires in order to satisfy its own internal
+        workings.
+    </p>
+      <p>
+        For this reason, you can access and use the Replication Manager's
+        internal message channels. You do this by using the
+        <code class="literal">DB_CHANNEL</code> class, and by implementing a message
+        handling function on each of your sites.
+    </p>
+      <p>
+        Note that an example of using Replication Manager message channels
+        is available in the distribution. See
+        <a class="xref" href="rep_ex_chan.html" title="Ex_rep_chan: a Replication Manager channel example">Ex_rep_chan: a Replication Manager
+channel example</a>
+        for more information.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="dbchannel_class"></a>DB_CHANNEL</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            The <code class="literal">DB_CHANNEL</code> class provides a series of
+            methods which allow you to send messages to the other sites in
+            your replication group. You create a <code class="literal">DB_CHANNEL</code>
+            handle using the <a href="../api_reference/C/repmgr_channel.html" class="olink">DB_ENV-&gt;repmgr_channel()</a> method. When you are
+            done with the handle, close it using the <a href="../api_reference/C/dbchannel_close.html" class="olink">DB_CHANNEL-&gt;close()</a>
+            method. A closed handle must never be accessed again. Note that
+            all channel handles should be closed before the associated
+            environment handle is closed. Also, allow all message
+            operations to complete on the channel before closing the
+            handle.
+        </p>
+        <p>
+            When you create a <code class="literal">DB_CHANNEL</code> handle, you
+            indicate what channel you want to use. Possibilities are:
+        </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                     The numerical env ID of a remote site in the
+                     replication group.
+                 </p>
+            </li>
+            <li>
+              <p>
+                     <code class="literal">DB_EID_MASTER</code>
+                 </p>
+              <p>
+                     Messages sent on this channel are sent only to the
+                     master site. Note that messages are always sent to
+                     the current master, even if the master has changed
+                     since the channel was opened.
+                 </p>
+              <p>
+                     If the local site is the master, then sending messages
+                     on this channel will result in the local site
+                     receiving those messages echoed back to itself.
+                 </p>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="dbchannel_send"></a>Sending messages over a message channel</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            You can send any message you want over a message channel. The
+            message can be as simple as a character string and as complex
+            as a large data structure. However, before you can send the
+            message, you must encapsulate it within one or more <a href="../api_reference/C/dbt.html" class="olink">DBT</a>s.
+            This means <a class="link" href="am_misc_struct.html" title="Storing C/C++ structures/objects">marshaling the message</a>
+            if it is contained within a complex data structure.
+        </p>
+        <p>
+           The methods that you use to send messages all accept an array of
+           <a href="../api_reference/C/dbt.html" class="olink">DBT</a>s. This means that in most circumstances it is perfectly
+           acceptable to send multi-part messages.
+        </p>
+        <p>
+            Messages may be sent either asynchronously or synchronously.
+            To send a message asynchronously, use the <a href="../api_reference/C/dbchannel_send_msg.html" class="olink">DB_CHANNEL-&gt;send_msg()</a>
+            method. This method sends its message and then immediately
+            returns without waiting for any sort of a response. 
+            
+            
+        </p>
+        <p>
+            To send a message synchronously, use the
+            <a href="../api_reference/C/dbchannel_send_request.html" class="olink">DB_CHANNEL-&gt;send_request()</a> method. This method blocks until it
+            receives a response from the site to which it sent the message
+            (or until a timeout threshold is reached).  
+            
+            
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="dbchannel_respond"></a>Message Responses</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                Message responses are required if a message is sent on a
+                channel using the <a href="../api_reference/C/dbchannel_send_request.html" class="olink">DB_CHANNEL-&gt;send_request()</a> method. That
+                method accepts the address of a single <a href="../api_reference/C/dbt.html" class="olink">DBT</a> which is used
+                to receive the response from the remote site.
+            </p>
+          <p>
+                Message responses are encapsulated in a single <a href="../api_reference/C/dbt.html" class="olink">DBT</a>. The
+                response can be anything from a complex data structure, to
+                a string, to a simple type, to no information at all. In
+                the latter case, receipt of the <a href="../api_reference/C/dbt.html" class="olink">DBT</a> is sufficient to
+                indicate that the request was received at the remote site.
+            </p>
+          <p>
+                Responses are sent back from the remote system using its
+                message handling function. Usually that function calls
+                <a href="../api_reference/C/dbchannel_send_msg.html" class="olink">DB_CHANNEL-&gt;send_msg()</a> to send a single response. 
+            </p>
+          <p>
+                The response must be contained in a single <a href="../api_reference/C/dbt.html" class="olink">DBT</a>. If a
+                multi-part response is required by the application, you can
+                configure the response <a href="../api_reference/C/dbt.html" class="olink">DBT</a> that you provide to
+                <a href="../api_reference/C/dbchannel_send_request.html" class="olink">DB_CHANNEL-&gt;send_request()</a> for 
+                <a class="link" href="am_misc_bulk.html" title="Retrieving and updating records in bulk">bulk operations</a>.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="dbchannel_receive"></a>Receiving messages</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            Messages received at a remote site are handled using a callback
+            function. This function is configured for the local environment
+            using the <a href="../api_reference/C/repmgr_msg_dispatch.html" class="olink">DB_ENV-&gt;repmgr_msg_dispatch()</a> method. For best results,
+            the message dispatch function should be configured for the
+            local environment before replication is started. In this way,
+            you do not run the risk of missing messages sent after
+            replication has started but before the message dispatch
+            function is configured for the environment.
+        </p>
+        <p>
+            The callback configured by <a href="../api_reference/C/repmgr_msg_dispatch.html" class="olink">DB_ENV-&gt;repmgr_msg_dispatch()</a> accepts
+            four parameters of note:
+        </p>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <p>
+                    A response channel. This is the channel the function
+                    will use to respond to the message, if a response is
+                    required. To respond to the message, the function uses
+                    the <a href="../api_reference/C/dbchannel_send_msg.html" class="olink">DB_CHANNEL-&gt;send_msg()</a> method.
+                </p>
+            </li>
+            <li>
+              <p>
+                    An array of <a href="../api_reference/C/dbt.html" class="olink">DBT</a>s. These hold the message that this
+                    function must handle.
+                </p>
+            </li>
+            <li>
+              <p>
+                    A numerical value that indicates how many elements the
+                    previously described array holds.
+                </p>
+            </li>
+            <li>
+              <p>
+                    A flag that indicates whether the message requires a
+                    response. If the flag is set to 
+                    <code class="literal">DB_REPMGR_NEED_RESPONSE</code>,
+                    then the function should send a single <a href="../api_reference/C/dbt.html" class="olink">DBT</a> in
+                    response using the channel provided to this function,
+                    and the <a href="../api_reference/C/dbchannel_send_msg.html" class="olink">DB_CHANNEL-&gt;send_msg()</a> method.
+                </p>
+            </li>
+          </ul>
+        </div>
+        <p>
+            For an example of using this callback, see the
+            <code class="literal">operation_dispatch()</code> function, which is
+            available with the <a class="link" href="rep_ex_chan.html" title="Ex_rep_chan: a Replication Manager channel example">ex_rep_chan example</a>
+            in your product distribution.
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="rep_clock_skew.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="rep_twosite.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Clock skew </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Special considerations for two-site replication groups</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

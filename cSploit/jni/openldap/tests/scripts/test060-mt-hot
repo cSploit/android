@@ -1,0 +1,304 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+# The default debug level logs more than 1Gb:
+case "$SLAPD_DEBUG_MT_HOT/$SLAPD_DEBUG" in
+/0 | /0x0 | /0X0 | /none | /NONE | /32768 | /0x8000 | 0X8000 | /0100000) :;;
+*) SLAPD_DEBUG=${SLAPD_DEBUG_MT_HOT-stats} ;;
+esac
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+if test $MONITORDB = "no" ; then 
+	echo "Monitor backend not available, test skipped"
+	exit 0
+fi 
+
+if test x$TESTLOOPS = x ; then
+	TESTLOOPS=50
+fi
+
+mkdir -p $TESTDIR $DBDIR1
+
+#
+# Populate and start up slapd server with some random data
+#
+
+echo "Running slapadd to build slapd database..."
+. $CONFFILTER $BACKEND $MONITORDB < $MCONF > $ADDCONF
+$SLAPADD -f $ADDCONF -l $LDIFORDERED
+RC=$?
+if test $RC != 0 ; then
+	echo "slapadd failed ($RC)!"
+	exit $RC
+fi
+
+echo "Running slapindex to index slapd database..."
+. $CONFFILTER $BACKEND $MONITORDB < $CONF > $CONF1
+$SLAPINDEX -f $CONF1
+RC=$?
+if test $RC != 0 ; then
+	echo "warning: slapindex failed ($RC)"
+	echo "  assuming no indexing support"
+fi
+
+echo "Starting slapd on TCP/IP port $PORT1..."
+echo $SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID"
+
+sleep 1
+
+# Perform a basic search, make sure of a functional setup
+echo "Testing basic monitor search..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITORDN" -H $URI1 \
+		'(objectclass=*)' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "mt-hot read failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+cat /dev/null > $MTREADOUT
+
+echo "Monitor searches"
+# Perform a basic single threaded search on a single connection
+THR=1
+OUTER=1
+INNER=`expr $TESTLOOPS \* 1000`
+echo "Testing basic mt-hot search: $THR threads ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$MONITORDN" \
+	-m $THR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$MONITORDN" -f "(objectclass=*)" \
+	-m $THR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Perform a basic multi-threaded search on a single connection
+THR=5
+OUTER=1
+INNER=`expr $TESTLOOPS \* 200`
+echo "Testing basic mt-hot search: $THR threads ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$MONITORDN" \
+	-m $THR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$MONITORDN" -f "(objectclass=*)" \
+	-m $THR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Perform a basic multi-threaded search on a single connection
+THR=100
+OUTER=5
+INNER=`expr $TESTLOOPS \* 2`
+echo "Testing basic mt-hot search: $THR threads ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$MONITORDN" \
+	-m $THR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$MONITORDN" -f "(objectclass=*)" \
+	-m $THR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Perform a single threaded random DB search on a single connection
+echo "Random searches"
+THR=1
+OUTER=1
+INNER=`expr $TESTLOOPS \* 1000`
+echo "Testing random mt-hot search: $THR threads ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(objectclass=*)" \
+	-m $THR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(objectclass=*)" \
+	-m $THR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Perform a multi-threaded random DB search on a single connection
+THR=5
+OUTER=1
+INNER=`expr $TESTLOOPS \* 200`
+echo "Testing random mt-hot search: $THR threads ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(objectclass=*)" \
+	-m $THR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(objectclass=*)" \
+	-m $THR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Perform a multi-threaded random DB search on a single connection
+THR=100
+OUTER=5
+INNER=`expr $TESTLOOPS \* 2`
+echo "Testing random mt-hot search: $THR threads ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(objectclass=*)" \
+	-m $THR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(objectclass=*)" \
+	-m $THR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Perform a basic multi-threaded search using multiple connections
+echo "Multiple threads and connection searches"
+CONN=5
+THR=5
+OUTER=1
+INNER=`expr $TESTLOOPS \* 200`
+echo "Testing basic mt-hot search: $THR threads $CONN conns ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$MONITORDN" \
+	-c $CONN -m $THR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$MONITORDN" -f "(objectclass=*)" \
+	-c $CONN -m $THR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Perform a basic multi-threaded search using multiple connections
+CONN=5
+THR=50
+OUTER=5
+INNER=`expr $TESTLOOPS \* 20`
+echo "Testing basic mt-hot search: $THR threads $CONN conns ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$MONITORDN" \
+	-c $CONN -m $THR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$MONITORDN" -f "(objectclass=*)" \
+	-c $CONN -m $THR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Perform a multi-threaded random DB search using multiple connections
+CONN=5
+THR=100
+OUTER=5
+INNER=`expr $TESTLOOPS \* 2`
+echo "Testing random mt-hot search: $THR threads $CONN conns ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(objectclass=*)" \
+	-c $CONN -m $THR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(objectclass=*)" \
+	-c $CONN -m $THR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Perform a multi-threaded random reads and writes using single connection
+CONN=1
+THR=10
+WTHR=10
+OUTER=5
+INNER=`expr $TESTLOOPS \* 2`
+echo "Testing random mt-hot r/w search: $THR read threads $WTHR write threads $CONN conns ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(&(!(cn=rwtest*))(objectclass=*))" \
+	-c $CONN -m $THR -M $WTHR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(&(!(cn=rwtest*))(objectclass=*))" \
+	-c $CONN -m $THR -M $WTHR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Perform a multi-threaded random reads and writes using multiple connections
+CONN=5
+THR=10
+WTHR=10
+OUTER=5
+INNER=`expr $TESTLOOPS \* 2`
+echo "Testing random mt-hot r/w search: $THR read threads $WTHR write threads $CONN conns ($OUTER x $INNER) loops..."
+echo $SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(&(!(cn=rwtest*))(objectclass=*))" \
+	-c $CONN -m $THR -M $WTHR -L $OUTER -l $INNER
+$SLAPDMTREAD -H $URI1 -D "$MANAGERDN" -w $PASSWD \
+	-e "$BASEDN" -f "(&(!(cn=rwtest*))(objectclass=*))" \
+	-c $CONN -m $THR -M $WTHR -L $OUTER -l $INNER >> $MTREADOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapd-mtread failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+echo ">>>>> Test succeeded"
+
+exit 0

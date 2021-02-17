@@ -1,0 +1,90 @@
+--- Makefile.in
++++ Makefile.in
+@@ -163,8 +163,8 @@
+ #
+ LIBOBJS0 = alter.lo analyze.lo attach.lo auth.lo \
+          backup.lo bitvec.lo btmutex.lo btree.lo build.lo \
+-         callback.lo complete.lo ctime.lo date.lo db_pragma.lo delete.lo \
+-         expr.lo fault.lo fkey.lo \
++         callback.lo complete.lo ctime.lo date.lo db_pragma.lo db_shell.lo \
++         delete.lo expr.lo fault.lo fkey.lo \
+          fts3.lo fts3_aux.lo fts3_expr.lo fts3_hash.lo fts3_icu.lo \
+          fts3_porter.lo fts3_snippet.lo fts3_tokenizer.lo fts3_tokenizer1.lo \
+          fts3_unicode.lo fts3_unicode2.lo fts3_write.lo \
+@@ -209,6 +209,7 @@
+   $(TOP)/src/ctime.c \
+   $(TOP)/src/date.c \
+   $(TOP)/../adapter/db_pragma.c \
++  $(TOP)/../adapter/db_shell.c \
+   $(TOP)/src/delete.c \
+   $(TOP)/src/expr.c \
+   $(TOP)/src/fault.c \
+@@ -599,6 +600,10 @@
+ 		$(TOP)/../adapter/btreeInt.h
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_pragma.c
+ 
++db_shell.lo:	$(TOP)/../adapter/db_shell.c $(HDR) \
++		$(TOP)/../adapter/btreeInt.h
++	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_shell.c
++
+ delete.lo:	$(TOP)/src/delete.c $(HDR)
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/src/delete.c
+ 
+--- src/shell.c
++++ src/shell.c
+@@ -1456,6 +1456,17 @@
+   "                         LIKE pattern TABLE.\n"
+   ".separator STRING      Change separator used by output mode and .import\n"
+   ".show                  Show the current values for various settings\n"
++  ".stat ?ITEM?           Print statistics\n"
++  "                         If ITEM=':env:', print statistics for the\n"
++  "                         Berkeley DB environment.\n"
++  "                         If ITEM=':rep:', print a summary of replication\n"
++  "                         statistics for the Berkeley DB environment.\n"
++  "                         If ITEM is the name of a table or index, print\n"
++  "                         statistics for the table or index.\n"
++  "                         If ITEM is not specified, print statistics for\n"
++  "                         the Berkeley DB environment followed by\n"
++  "                         statistics for all tables and indexes within the\n"
++  "                         database.\n"
+   ".stats ON|OFF          Turn stats on or off\n"
+   ".tables ?TABLE?        List names of tables\n"
+   "                         If TABLE specified, only list tables matching\n"
+@@ -2328,6 +2339,27 @@
+     }
+     fprintf(p->out,"\n");
+   }else
++  
++  if( c=='s' && strncmp(azArg[0], "stat", n)==0 ){
++    extern int bdbSqlDbStatPrint(sqlite3 *, FILE *, char *);
++    extern int bdbSqlEnvStatPrint(sqlite3 *db, FILE *);
++    extern int bdbSqlRepSumStatPrint(sqlite3 *db, FILE *);
++
++    open_db(p);
++
++    if (nArg == 1 || nArg == 2 && strcmp(azArg[1], ":env:") == 0)
++      rc = bdbSqlEnvStatPrint(p->db, p->out);
++    else if (nArg == 2 && strcmp(azArg[1], ":rep:") == 0)
++      rc = bdbSqlRepSumStatPrint(p->db, p->out);
++    if (rc != SQLITE_OK) {
++      fprintf(stderr, "Error: environment not created yet\n");
++      rc = 1;
++    }
++    else if (nArg == 1)
++      rc = bdbSqlDbStatPrint(p->db, p->out, NULL);
++    else
++      rc = bdbSqlDbStatPrint(p->db, p->out, azArg[1]);
++  }else
+ 
+   if( c=='s' && strncmp(azArg[0], "stats", n)==0 && nArg>1 && nArg<3 ){
+     p->statsOn = booleanValue(azArg[1]);
+--- tool/mksqlite3c.tcl
++++ tool/mksqlite3c.tcl
+@@ -261,6 +261,7 @@
+    btree.c
+    backup.c
+    db_pragma.c
++   db_shell.c
+ 
+    vdbemem.c
+    vdbeaux.c

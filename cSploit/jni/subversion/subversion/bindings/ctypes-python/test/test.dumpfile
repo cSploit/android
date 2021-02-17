@@ -1,0 +1,355 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 890f2569-e600-4cfc-842a-f574dec58d87
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2007-08-02T17:24:38.742153Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 142
+Content-length: 142
+
+K 7
+svn:log
+V 42
+Repository setup for future awesomeness.
+
+
+K 10
+svn:author
+V 5
+clark
+K 8
+svn:date
+V 27
+2007-08-02T17:30:43.849637Z
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 165
+Content-length: 165
+
+K 7
+svn:log
+V 65
+Add important documentation info. Almost ready for 0.1 release!
+
+
+K 10
+svn:author
+V 5
+bruce
+K 8
+svn:date
+V 27
+2007-08-02T17:33:17.989467Z
+PROPS-END
+
+Node-path: trunk/README.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 126
+Text-content-md5: 8d260c7bc0d9f43ec1eebf8cb5f063c3
+Content-length: 136
+
+PROPS-END
+This repository is for test purposes only. Any resemblance to any other
+repository, real or imagined, is purely coincidental.
+
+
+Revision-number: 3
+Prop-content-length: 134
+Content-length: 134
+
+K 7
+svn:log
+V 34
+Make sure everybody gets credit.
+
+
+K 10
+svn:author
+V 5
+henry
+K 8
+svn:date
+V 27
+2007-08-02T17:36:14.231181Z
+PROPS-END
+
+Node-path: trunk/README.txt
+Node-kind: file
+Node-action: change
+Text-content-length: 159
+Text-content-md5: 1d8302c39f9e873d48eb90b655e7c7e0
+Content-length: 159
+
+This repository is for test purposes only. Any resemblance to any other
+repository, real or imagined, is purely coincidental.
+
+Contributors:
+Clark
+Bruce
+Henry
+
+
+Revision-number: 4
+Prop-content-length: 153
+Content-length: 153
+
+K 7
+svn:log
+V 53
+Add important new file. This marks the 1.0 release.
+
+
+K 10
+svn:author
+V 5
+clark
+K 8
+svn:date
+V 27
+2007-08-02T17:38:08.361367Z
+PROPS-END
+
+Node-path: trunk/ANOTHERREADME.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 66
+Text-content-md5: 7078f8e625fb15490da0dd328c472f99
+Content-length: 76
+
+PROPS-END
+This file holds all the information too important for README.txt.
+
+
+Revision-number: 5
+Prop-content-length: 165
+Content-length: 165
+
+K 7
+svn:log
+V 65
+Start branch that does not follow the catastrophic path of 1.0.
+
+
+K 10
+svn:author
+V 5
+bruce
+K 8
+svn:date
+V 27
+2007-08-02T17:40:32.349920Z
+PROPS-END
+
+Node-path: branches/0.x
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: branches/0.x/README.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 234
+Text-content-md5: 41ae027ac4d5d16e506f06db1c5b5d14
+Content-length: 244
+
+PROPS-END
+This repository is for test purposes only. Any resemblance to any other
+repository, real or imagined, is purely coincidental.
+
+This branch preserves and refines the code of the excellent pre-1.0 days.
+
+Contributors:
+Clark
+Bruce
+Henry
+
+
+Revision-number: 6
+Prop-content-length: 146
+Content-length: 146
+
+K 7
+svn:log
+V 46
+What this project needs is more directories!
+
+
+K 10
+svn:author
+V 5
+clark
+K 8
+svn:date
+V 27
+2007-08-02T17:41:57.237766Z
+PROPS-END
+
+Node-path: trunk/also_a_dir
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/dir
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/dir/dir2
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 7
+Prop-content-length: 134
+Content-length: 134
+
+K 7
+svn:log
+V 34
+Get rid of needless directories.
+
+
+K 10
+svn:author
+V 5
+henry
+K 8
+svn:date
+V 27
+2007-08-02T17:43:05.471084Z
+PROPS-END
+
+Node-path: trunk/also_a_dir
+Node-action: delete
+
+
+Node-path: trunk/dir
+Node-action: delete
+
+
+Revision-number: 8
+Prop-content-length: 156
+Content-length: 156
+
+K 7
+svn:log
+V 56
+Set prop to indicate proper information on awesomeness.
+
+K 10
+svn:author
+V 5
+clark
+K 8
+svn:date
+V 27
+2007-08-02T18:19:04.608051Z
+PROPS-END
+
+Node-path: trunk/README.txt
+Node-kind: file
+Node-action: change
+Prop-content-length: 30
+Text-content-length: 0
+Text-content-md5: d41d8cd98f00b204e9800998ecf8427e
+Content-length: 30
+
+K 7
+Awesome
+V 3
+Yes
+PROPS-END
+
+
+Revision-number: 9
+Prop-content-length: 137
+Content-length: 137
+
+K 7
+svn:log
+V 37
+Restore information deleted in rev 8
+
+K 10
+svn:author
+V 5
+bruce
+K 8
+svn:date
+V 27
+2007-08-02T18:24:16.960652Z
+PROPS-END
+
+Node-path: trunk/README.txt
+Node-kind: file
+Node-action: change
+Text-content-length: 159
+Text-content-md5: 1d8302c39f9e873d48eb90b655e7c7e0
+Content-length: 159
+
+This repository is for test purposes only. Any resemblance to any other
+repository, real or imagined, is purely coincidental.
+
+Contributors:
+Clark
+Bruce
+Henry
+
+

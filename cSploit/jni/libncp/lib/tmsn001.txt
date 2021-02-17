@@ -1,0 +1,246 @@
+NOVELL TECHNICAL INFORMATION DOCUMENT
+
+TITLE:  TimeSync NCP
+AUTHOR:  DJE
+DOCUMENT ID:  TID102314
+DOCUMENT REVISION:  
+DATE:  2000/05/3 10:23 AM
+ALERT STATUS:  Yellow
+INFORMATION TYPE:  Issue
+README FOR:  TMSN001.EXE
+NOVELL PRODUCT CLASS:
+
+NetWare API
+
+NOVELL PRODUCT and VERSION:
+
+NetWare NDK Apr00
+
+CATEGORY:
+
+none
+
+COMPILER:
+
+CodeWarrior for NetWare r1
+
+TARGET OS:
+
+NetWare 5.0
+
+ABSTRACT:
+
+This document describes the timesync ncp (NCP 114)
+
+DETAILED DESCRIPTION
+
+TIMESYNC NCP DOCUMENTATION
+
+1. Timesync NCP Verb Number: 	114
+
+This is the NCP number which is reserved for Timesync. Timesync describes a set of sub functions under this which are as described below.
+
+2. Timesync NCP Sub Functions:
+
+a. TIMESYNC_GET_TIME    (1)
+NAME 
+              Func_Get_Time
+ 
+ SYNOPSIS
+                       LONG    Func_Get_Time  (void *parmIn, LONG inLen, void  *parmOut, LONG *outLen)
+ 
+ INPUT
+               ParmIn is unused.
+               inLen must be zero.
+               parmOut points to a buffer to receive the data.
+               *outLen contains the maximum size of the output data.
+ 
+ OUTPUT
+               *parmOut will receive the dataOut structure defined below.
+               *outLen will be the actual data length.
+ 
+                       typedef struct  DataOut
+                       {
+                               clockAndStatus  	theTime;
+                               int64                           eventOffset;
+                               LONG                         eventTime;
+                               void                            *eventParm;
+                       }       DataOut;
+ 
+ RETURN VALUES
+                        SUCCESS - Operation Completed successfully.
+                       ERR_NCP_BOUNDARY_CHECK_FAILED - Invalid input parameters (inLen inaccurate)
+                       ERR_BAD_PARAMETER - Invalid output parameters (outLen too small)
+ 
+DESCRIPTION
+                       Call this routine to get the current clock and status and the information about any scheduled network event.
+
+  b. TIMESYNC_EXCHANGE_TIME    (2)
+NAME 
+               Func_Exchange_Time
+ 
+SYNOPSIS
+               LONG    Func_Exchange_Time (void *parmIn, LONG inLen, void *parmOut, LONG *outLen)
+ 
+  INPUT
+               parmIn points to an Exchange_Time_Struct.
+               inLen is the length in bytes of *parmIn.
+               parmOut points to an Exchange_Time_Struct.
+               *outLen is the maximum length of the output data.
+                parmIn points to an Exchange_Time_Struct
+   typedef struct Exchange_Time_Struct
+{
+/* SubFunction information is to complete NCP header*/
+WORD	SubFunctionLength;
+BYTE	SubFunctionCode;
+LONG	protocolFlags;			/* of source */
+LONG	nodeFlags;			/* of source & target*/
+int64	sourceOriginateTime;
+int64	targetReceiveTime;
+int64	targetTransmitTime;
+int64	sourceReturnTime;
+int64	eventOffset;				/* seconds only - sub seconds used for flags*/
+LONG	eventTime;			/* seconds only */
+PaddedServerName	serverName;		/* source on input, target on output*/
+}	Exchange_Time_Struct;
+ 
+ OUTPUT
+               *outLen will hold the lenght of the output data
+               the Exhange_Time_Struct will be modifed to refelct the actual target data.
+ 
+ RETURN VALUES
+                        SUCCESS - Operation Completed successfully.
+                        ERR_NCP_BOUNDARY_CHECK_FAILED - Invalid input
+ 
+  DESCRIPTION
+                   This call can be called by other servers (primary, and secondary) and by clients to get the time.  Since the client originating the call knows how the data can be used he can choose to ignore fields which don't apply.  Note: The server name must be null terminated -- that is why the structure has an extra 49th byte in it.  If the server name is not null then this server will attempt to notify that server when a network event is received -- reinitialize, set time, etc.
+  
+c. TIMESYNC_GET_SERVER_LIST  (5)
+NAME 
+               Func_Get_Server_List
+ 
+  SYNOPSIS
+               LONG    Func_Get_Server_List   (void *parmIn, LONG inLen, void *parmOut, LONG *outLen)
+ 
+ INPUT
+               ParmIn is unused.
+               inLen must be zero.
+               parmOut points to a buffer to receive the data.
+               *outLen contains the maximum size of the output data.
+ 
+ OUTPUT
+               *parmOut will receive the Synchronized_Clock_T structure.
+               *outLen will be the actual data length.
+    typedef	struct	Synchronized_Clock_T
+{
+LONG	clock[2];		/* [0] = whole seconds, [1] = fractional*/
+LONG	statusFlags;
+LONG	adjustmentCount;
+LONG	adjustment[2];	/* [0] = whole seconds, [1] = fractional*/
+LONG	grossCorrection[2];	/* [0] = whole seconds, [1] = fractional*/
+LONG	tickIncrement[2];	/* [0] = whole seconds, [1] = fractional*/
+LONG	stdTickIncrement[2];	/* [0] = whole seconds, [1] = fractional*/
+LONG	eventOffset[2];	/* [0] = whole seconds, [1] = ignored fractional*/
+LONG	eventTime;		/* whole seconds only */
+LONG	daylight;		/* 1 if daylight savings time name is in 
+timeZoneString */
+long	timezoneOffset;		/* seconds to UTC;LocalTime+timezone = UTC*/
+long	tzname[2];			/* offset to normal and daylight timezone names in timeZoneString*/
+char	timeZoneString[MAX_TIME_ZONE_STRING_LENGTH];	/* The actual time zone string represented by above values */
+long	daylightOffset;		/* additional offset during Daylight Savings Time*/
+long	daylightOnOff;		/* 0 = not in daylight savings time (OFF), nonzero = ON */
+LONG	startDSTime;		/* When does Daylight Savings time begin*/
+LONG	stopDSTime;		/* When does Daylight Savings time stop */
+}	Synchronized_Clock_T;
+ 
+RETURN VALUES
+                  SUCCESS - Operation Completed successfully.
+                   ERR_NCP_BOUNDARY_CHECK_FAILED - Invalid input parameters (inLen inaccurate)
+                  ERR_BAD_PARAMETER - Invalid output parameters (outLen too small)
+ 
+ DESCRIPTION
+                  Call this routine to get the current synchronized clock structure.
+
+d. TIMESYNC_SET_SERVER_LIST   (6)
+NAME 
+               Func_Set_Server_List
+ 
+ SYNOPSIS
+               LONG    Func_Set_Server_List   (void *parmIn, LONG inLen, void *parmOut, LONG *outLen)
+ 
+ INPUT
+               ParmIn is unused.
+               inLen must be zero.
+               parmOut points to a buffer to receive the data.
+               *outLen contains the maximum size of the output data.
+ 
+ OUTPUT
+               *parmOut will receive the Synchronized_Clock_T structure.
+               *outLen will be the actual data length.
+ 
+ 
+ RETURN VALUES
+                     SUCCESS - Operation Completed successfully.
+                     ERR_NCP_BOUNDARY_CHECK_FAILED - Invalid input parameters (inLen inaccurate)
+                     ERR_BAD_PARAMETER - Invalid output parameters (outLen too small)
+ 
+ DESCRIPTION
+                       Call this routine to get the current synchronized clock structure.
+ 
+
+
+
+
+
+
+
+
+e. TIMESYNC_GET_VERSION (12)
+NAME 
+                Func_Get_Version
+ 
+  SYNOPSIS
+                       LONG    Func_Get_Version (void *parmIn, LONG inLen, void *parmOut, LONG *outLen)
+ 
+  INPUT
+               ParmIn is not used.
+               inLen must be zero.
+               parmOut points to a LONG.
+               *outLen must contain sizeof(LONG)
+ 
+  OUTPUT
+               *parmOut will receive the version number
+               *outLen will be the actual data length.
+ 
+  RETURN VALUES
+ 
+                       SUCCESS - Operation Completed successfully.
+                       ERR_NCP_BOUNDARY_CHECK_FAILED - Invalid input parameters (inLen inaccurate)
+                       ERR_BAD_PARAMETER - Invalid output parameters (outLen too small)
+ 
+  DESCRIPTION
+                       This is the NCP alternative to calling TimeSyncGetVersion.
+                       
+ 
+
+
+-----------------------------------------------------------------
+DISCLAIMER
+THE ORIGIN OF THIS INFORMATION MAY BE INTERNAL OR EXTERNAL TO NOVELL. NOVELL MAKES EVERY EFFORT WITHIN ITS MEANS TO VERIFY THIS INFORMATION. HOWEVER, THE INFORMATION PROVIDED IN THIS DOCUMENT IS FOR YOUR INFORMATION ONLY. NOVELL MAKES NO EXPLICIT OR IMPLIED CLAIMS TO THE VALIDITY OF THIS INFORMATION.
+-----------------------------------------------------------------
+
+Self-Extracting File Name:  TMSN001.EXE
+
+Files Included:		Size	Date	Time
+
+TMSN001.TXT	(this file)
+TMSN001.MSG		52	5-3-00    10:23 AM
+
+Installation Instructions:
+
+TMSN001.EXE can be found on:
+The DeveloperNet Support World Wide Web site (developer.novell.com/engsup/sample/recent.htm)
+
+-----------------------------------------------------------------
+Any trademarks referenced in this document are the property of their respective owners. Consult your product manuals for complete trademark information.
+-----------------------------------------------------------------

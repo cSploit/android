@@ -1,0 +1,12 @@
+#! /bin/bash
+
+if [ $# -ne 3 ]; then
+  echo "$0: usage: $0 server user message" 1>&2
+  exit
+fi
+XX=`nwdpvalues -S $1 -o $2 2>&1`
+if [ "${XX:0:4}" = "Name" ]; then
+  nsend -S $1 -i ${XX:$((${#XX}-8)):8} "$3"
+else
+  echo $XX
+fi

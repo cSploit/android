@@ -1,0 +1,2471 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+# This script tests a configuration scenario as described in these URLs:
+#
+# http://www.openldap.org/lists/openldap-devel/200806/msg00041.html
+# http://www.openldap.org/lists/openldap-devel/200806/msg00054.html
+#
+# Search for "TEST:" to find each major test this script performs.
+
+# The configuration here consist of 3 "sites", each with a "master" and
+# a "search" server. One of the sites is the "central", the other two
+# are called "site1" and "site2".
+
+# The following notations are used in variable names below to identify
+# these servers, the first number defines the $URL# and $PORT# variable
+# that server uses:
+#
+# 1: SMC_*	Site Master Central
+# 2: SM1_*	Site Master 1
+# 3: SM2_*	Site Master 2
+# 4: SSC_*	Search Site Central
+# 5: SS1_*	Search Site 1
+# 6: SS2_*	Search Site 2
+
+# The master servers all have a set of subordinate databases glued below
+# the same suffix database.  Each of the masters are the master for at
+# least one of these subordinate databases, but there are never more
+# than one master for any single database.  I.e, this is neither a
+# traditional single-master configuration, nor what most people think
+# of as multi-master, but more what can be called multiple masters.
+
+# The central master replicates to the two other masters, and receives
+# updates from them of the backends they are the master for.  There is
+# no direct connection between the other two master servers.  All of the
+# masters have the syncprov overlay configured on the glue database.
+
+# The search servers replicates from the master server at their site.
+# They all have a single database with the glue suffix, but their
+# database configuration doesn't matter much in this test.  (This
+# database layout was originally created before gluing was introduced
+# in OpenLDAP, which is why the search servers doesn't use it).
+
+# The primary objective for gluing the backend databases is not to make
+# them look like one huge database but to create a common search suffix
+# for the clients.  Searching is mostly done on the search servers, only
+# updates are done on the masters.
+
+# It varies which backends that are replicated to which server (hence
+# the name asymmetric in this test).  Access control rules on the
+# masters are used to control what their consumers receives.  The table
+# below gives an overview of which backend (the columns) that are
+# replicated to which server (the rows).  A "M" defines the master for
+# the backend, a "S" is a slave, and "-" means it is not replicated
+# there.  Oh, the table probably looks wrong without the 4-position
+# tab-stops OpenLDAP uses...
+
+#		glue	ou1		ou2		sm1ou1	sm1ou2	sm2ou1	sm2ou2
+# smc	M		M		M		S		S		S		-
+# sm1	S		S		-		M		M		-		-
+# sm2	S		S		S		S		-		M		M
+# ssc	S		S		-		-		S		-		-
+# ss1	S		S		-		S		S		-		-
+# ss2	S		S		S		-		-		S		S
+
+# On the central master syncrepl is configured on the subordinate
+# databases, as it varies which backends that exists on its providers.
+# Had it been used on the glue database then syncrepl would have removed
+# the backends replicated from site1 but not present on site2 when it
+# synchronizes with site2 (and vice versa).
+#
+# All the other servers uses syncrepl on the glue database, since
+# replicating more than one subordinate database from the same master
+# creates (as of the writing of this test script) race conditions that
+# causes the replication to fail, as the race tests at the end shows.
+
+# The databases controlled by syncrepl all have $UPDATEDN as their
+# RootDN, while the master servers has other RootDN values for the
+# backends they are the backend for them self.  This violates the current
+# guidelines for gluing databases, which states that the same rootdn
+# should be used on all of them.  Unfortunately, this cannot be done on
+# site masters 1 and 2.  The backends they manage locally are either not
+# present on the central master, or when so they are not replicated back
+# to their source, which causes syncrepl to try to remove the content of
+# these backends when it synchronizes with the central master.  The
+# differing rootdn values used on the backends controlled by syncrepl
+# and those managed locally prevents it from succeeding in this.  As
+# noted above, moving syncrepl to the subordinate databases is currently
+# not an option since that creates race conditions.
+
+# The binddn values used in the syncrepl configurations are chosen to
+# make the configuration and access control rules easiest to set up.  It
+# occasionally uses a DN that is also used as a RootDN.  This is not a
+# good practice and should not be taken as an example for real
+# configurations!
+
+# This script will print the content of any invalid contextCSN values it
+# detects if the environment variable CSN_VERBOSE is non-empty.  The
+# environment variable RACE_TESTS can be set to the number of race test
+# iterations the script should perform.
+
+if test "$BACKEND" = ldif ; then
+	echo "$BACKEND backend does not support access controls, test skipped"
+	exit 0
+fi
+
+#echo "Test 058 is currently disabled"
+#exit 0
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+if test $SYNCPROV = syncprovno; then
+	echo "Syncrepl provider overlay not available, test skipped"
+	exit 0
+fi
+
+SMC_DIR=$TESTDIR/smc
+SM1_DIR=$TESTDIR/sm1
+SM2_DIR=$TESTDIR/sm2
+SS1_DIR=$TESTDIR/ss1
+SS2_DIR=$TESTDIR/ss2
+SSC_DIR=$TESTDIR/ssc
+
+MNUM=1
+
+mkdir -p $TESTDIR
+
+for dir in $SMC_DIR $SM1_DIR $SM2_DIR $SS1_DIR $SS2_DIR $SSC_DIR; do
+	mkdir -p $dir $dir/slapd.d $dir/db
+done
+
+mkdir -p $SMC_DIR/ou1 $SMC_DIR/sm1ou1 $SMC_DIR/sm1ou2
+mkdir -p $SMC_DIR/ou2 $SMC_DIR/sm2ou1
+mkdir -p $SM1_DIR/ou1 $SM1_DIR/sm1ou1 $SM1_DIR/sm1ou2
+mkdir -p $SM2_DIR/ou2 $SM2_DIR/sm1ou1 $SM2_DIR/sm2ou1 $SM2_DIR/sm2ou2
+
+cd $TESTDIR
+
+KILLPIDS=
+
+$SLAPPASSWD -g -n >$CONFIGPWF
+
+ID=1
+
+if test $WAIT != 0 ; then
+	RETRY="1 60"
+else
+	RETRY="1 10"
+fi
+
+echo "Initializing master configurations..."
+for dir in $SMC_DIR $SM1_DIR $SM2_DIR; do
+	$SLAPADD -F $dir/slapd.d -n 0 <<EOF
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+olcServerID: $ID
+
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcRootPW:< file://$CONFIGPWF
+
+EOF
+	ID=`expr $ID + 1`
+done
+
+echo "Initializing search configurations..."
+for dir in $SS1_DIR $SS2_DIR $SSC_DIR; do
+	$SLAPADD -F $dir/slapd.d -n 0 <<EOF
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcRootPW:< file://$CONFIGPWF
+
+EOF
+done
+
+echo "Starting central master slapd on TCP/IP port $PORT1..."
+cd $SMC_DIR
+$SLAPD -F slapd.d -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+SMC_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $SMC_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $SMC_PID"
+cd $TESTWD
+sleep 1
+echo "Using ldapsearch to check that central master slapd is running..."
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI1 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting site1 master slapd on TCP/IP port $PORT2..."
+cd $SM1_DIR
+$SLAPD -F slapd.d -h $URI2 -d $LVL $TIMING > $LOG2 2>&1 &
+SM1_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $SM1_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $SM1_PID"
+cd $TESTWD
+sleep 1
+echo "Using ldapsearch to check that site1 master is running..."
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI2 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting site2 master slapd on TCP/IP port $PORT3..."
+cd $SM2_DIR
+$SLAPD -F slapd.d -h $URI3 -d $LVL $TIMING > $LOG3 2>&1 &
+SM2_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $SM2_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $SM2_PID"
+cd $TESTWD
+sleep 1
+echo "Using ldapsearch to check that site2 master is running..."
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI3 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting central search slapd on TCP/IP port $PORT4..."
+cd $SSC_DIR
+$SLAPD -F slapd.d -h $URI4 -d $LVL $TIMING > $LOG4 2>&1 &
+SSC_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $SSC_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $SSC_PID"
+cd $TESTWD
+sleep 1
+echo "Using ldapsearch to check that central search slapd is running..."
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI4 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+
+echo "Starting site1 search slapd on TCP/IP port $PORT5..."
+cd $SS1_DIR
+$SLAPD -F slapd.d -h $URI5 -d $LVL $TIMING > $LOG5 2>&1 &
+SS1_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $SS1_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $SS1_PID"
+cd $TESTWD
+sleep 1
+echo "Using ldapsearch to check that site1 search slapd is running..."
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI5 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+
+echo "Starting site2 search slapd on TCP/IP port $PORT6..."
+cd $SS2_DIR
+$SLAPD -F slapd.d -h $URI6 -d $LVL $TIMING > $LOG6 2>&1 &
+SS2_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $SS2_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $SS2_PID"
+cd $TESTWD
+sleep 1
+echo "Using ldapsearch to check that site2 search slapd is running..."
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI6 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+for uri in $URI1 $URI2 $URI3 $URI4 $URI5 $URI6; do
+	echo "Adding schema on $uri..."
+	$LDAPADD -D cn=config -H $uri -y $CONFIGPWF <<EOF > $TESTOUT 2>&1
+include: file://$ABS_SCHEMADIR/core.ldif
+
+include: file://$ABS_SCHEMADIR/cosine.ldif
+
+include: file://$ABS_SCHEMADIR/inetorgperson.ldif
+
+include: file://$ABS_SCHEMADIR/openldap.ldif
+
+include: file://$ABS_SCHEMADIR/nis.ldif
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed for schema config ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	[ "$BACKENDTYPE" = mod ] || continue
+
+	echo "Adding backend module on $uri..."
+	$LDAPADD -D cn=config -H $uri -y $CONFIGPWF <<EOF >>$TESTOUT 2>&1
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/back-$BACKEND
+olcModuleLoad: back_$BACKEND.la
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed for backend module ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+done
+
+echo "Adding database config on central master..."
+if [ "$SYNCPROV" = syncprovmod ]; then
+	$LDAPADD -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/overlays
+olcModuleLoad: syncprov.la
+
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed for moduleLoad ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+fi
+
+nullExclude="" nullOK="" wantNoObj=32
+test $BACKEND = null && nullExclude="# " nullOK="OK" wantNoObj=0
+
+$LDAPADD -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: $SMC_DIR/db
+olcSuffix: $BASEDN
+olcRootDN: $MANAGERDN
+olcRootPW: $PASSWD
+
+dn: olcOverlay={0}glue,olcDatabase={1}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+olcOverlay: {0}glue
+
+dn: olcOverlay={1}syncprov,olcDatabase={1}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: {1}syncprov
+olcSpCheckpoint: 3 1
+
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: $SMC_DIR/ou1
+olcSubordinate: TRUE
+olcSuffix: ou=ou1,$BASEDN
+olcRootDN: $MANAGERDN
+
+dn: olcDatabase={2}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {2}$BACKEND
+${nullExclude}olcDbDirectory: $SMC_DIR/ou2
+olcSubordinate: TRUE
+olcSuffix: ou=ou2,$BASEDN
+olcRootDN: $MANAGERDN
+
+dn: olcDatabase={3}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {3}$BACKEND
+${nullExclude}olcDbDirectory: $SMC_DIR/sm1ou1
+olcSubordinate: TRUE
+olcSuffix: ou=sm1ou1,$BASEDN
+olcRootDN: $UPDATEDN
+
+dn: olcDatabase={4}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {4}$BACKEND
+${nullExclude}olcDbDirectory: $SMC_DIR/sm1ou2
+olcSubordinate: TRUE
+olcSuffix: ou=sm1ou2,$BASEDN
+olcRootDN: $UPDATEDN
+
+dn: olcDatabase={5}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {5}$BACKEND
+${nullExclude}olcDbDirectory: $SMC_DIR/sm2ou1
+olcSubordinate: TRUE
+olcSuffix: ou=sm2ou1,$BASEDN
+olcRootDN: $UPDATEDN
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for central master database config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding database config on site1 master..."
+if [ "$SYNCPROV" = syncprovmod ]; then
+	$LDAPADD -D cn=config -H $URI2 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/overlays
+olcModuleLoad: syncprov.la
+
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed for moduleLoad ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+fi
+
+$LDAPADD -D cn=config -H $URI2 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: $SM1_DIR/db
+olcSuffix: $BASEDN
+olcRootDN: $UPDATEDN
+
+dn: olcOverlay={0}glue,olcDatabase={1}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+olcOverlay: {0}glue
+
+dn: olcOverlay={1}syncprov,olcDatabase={1}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: {1}syncprov
+
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: $SM1_DIR/ou1
+olcSubordinate: TRUE
+olcSuffix: ou=ou1,$BASEDN
+olcRootDN: $UPDATEDN
+
+dn: olcDatabase={2}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {2}$BACKEND
+${nullExclude}olcDbDirectory: $SM1_DIR/sm1ou1
+olcSubordinate: TRUE
+olcSuffix: ou=sm1ou1,$BASEDN
+olcRootDN: ou=sm1ou1,$BASEDN
+olcRootPW: $PASSWD
+
+dn: olcDatabase={3}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {3}$BACKEND
+${nullExclude}olcDbDirectory: $SM1_DIR/sm1ou2
+olcSubordinate: TRUE
+olcSuffix: ou=sm1ou2,$BASEDN
+olcRootDN: ou=sm1ou1,$BASEDN
+
+EOF
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for site1 master database config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding database config on site2 master..."
+if [ "$SYNCPROV" = syncprovmod ]; then
+	$LDAPADD -D cn=config -H $URI3 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/overlays
+olcModuleLoad: syncprov.la
+
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed for moduleLoad ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+fi
+
+$LDAPADD -D cn=config -H $URI3 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: $SM2_DIR/db
+olcSuffix: $BASEDN
+olcRootDN: $UPDATEDN
+
+dn: olcOverlay={0}glue,olcDatabase={1}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+olcOverlay: {0}glue
+
+dn: olcOverlay={1}syncprov,olcDatabase={1}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: {1}syncprov
+olcSpCheckpoint: 1 1
+
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: $SM2_DIR/ou2
+olcSubordinate: TRUE
+olcSuffix: ou=ou2,$BASEDN
+olcRootDN: $UPDATEDN
+
+dn: olcDatabase={2}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {2}$BACKEND
+${nullExclude}olcDbDirectory: $SM2_DIR/sm1ou1
+olcSubordinate: TRUE
+olcSuffix: ou=sm1ou1,$BASEDN
+olcRootDN: $UPDATEDN
+
+dn: olcDatabase={3}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {3}$BACKEND
+${nullExclude}olcDbDirectory: $SM2_DIR/sm2ou1
+olcSubordinate: TRUE
+olcSuffix: ou=sm2ou1,$BASEDN
+olcRootDN: ou=sm2ou1,$BASEDN
+olcRootPW: $PASSWD
+
+dn: olcDatabase={4}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {4}$BACKEND
+${nullExclude}olcDbDirectory: $SM2_DIR/sm2ou2
+olcSubordinate: TRUE
+olcSuffix: ou=sm2ou2,$BASEDN
+olcRootDN: ou=sm2ou1,$BASEDN
+
+EOF
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for site2 master database config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding access rules on central master..."
+$LDAPMODIFY -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={-1}frontend,cn=config
+changetype: modify
+add: olcAccess
+olcAccess: to dn.exact=dc=example,dc=com
+  by * read
+olcAccess: to dn.subtree=ou=ou1,dc=example,dc=com
+  by * read
+olcAccess: to dn.subtree=ou=ou2,dc=example,dc=com
+  by dn.exact=ou=ou1,dc=example,dc=com none
+  by dn.exact=ou=ou2,dc=example,dc=com read
+  by dn.exact=dc=example,dc=com none
+  by * read
+olcAccess: to dn.subtree=ou=sm1ou1,dc=example,dc=com
+  by dn.exact=ou=ou1,dc=example,dc=com none
+  by dn.exact=ou=ou2,dc=example,dc=com read
+  by dn.exact=dc=example,dc=com none
+  by * read
+olcAccess: to dn.subtree=ou=sm1ou2,dc=example,dc=com
+  by dn.exact=ou=ou1,dc=example,dc=com none
+  by dn.exact=ou=ou2,dc=example,dc=com none
+  by dn.exact=dc=example,dc=com read
+  by * read
+olcAccess: to dn.subtree=ou=sm2ou1,dc=example,dc=com
+  by dn.exact=ou=ou1,dc=example,dc=com none
+  by dn.exact=ou=ou2,dc=example,dc=com none
+  by dn.exact=dc=example,dc=com none
+  by * read
+olcAccess: to * by * read
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for central master access config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding access rules on site1 master..."
+$LDAPMODIFY -D cn=config -H $URI2 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={-1}frontend,cn=config
+changetype: modify
+add: olcAccess
+olcAccess: to dn.subtree=dc=example,dc=com
+  by * read
+olcAccess: to * by * read
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for site1 master access config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding access rules on site2 master..."
+$LDAPMODIFY -D cn=config -H $URI3 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={-1}frontend,cn=config
+changetype: modify
+add: olcAccess
+olcAccess: to dn.exact=dc=example,dc=com
+  by * read
+olcAccess: to dn.subtree=ou=ou2,dc=example,dc=com
+  by * read
+olcAccess: to dn.subtree=ou=sm1ou1,dc=example,dc=com
+  by users none
+  by * read
+olcAccess: to dn.subtree=ou=sm2ou1,dc=example,dc=com
+  by * read
+olcAccess: to dn.subtree=ou=sm2ou2,dc=example,dc=com
+  by dn.exact=dc=example,dc=com read
+  by users none
+  by * read
+olcAccess: to * by * read
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed for site2 master access config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding database config on central search..."
+$LDAPADD -D cn=config -H $URI4 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: $SSC_DIR/db
+olcSuffix: $BASEDN
+olcRootDN: $UPDATEDN
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for central search database config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding database config on site1 search..."
+$LDAPADD -D cn=config -H $URI5 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: $SS1_DIR/db
+olcSuffix: $BASEDN
+olcRootDN: $UPDATEDN
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for site1 search database config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding database config on site2 search..."
+$LDAPADD -D cn=config -H $URI6 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+${nullExclude}objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: $SS2_DIR/db
+olcSuffix: $BASEDN
+olcRootDN: $UPDATEDN
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed for site2 search database config ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Populating central master..."
+$LDAPADD -D "$MANAGERDN" -H $URI1 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: dc=example,dc=com
+objectClass: top
+objectClass: organization
+objectClass: dcObject
+dc: example
+o: Example, Inc
+userPassword: $PASSWD
+
+dn: ou=ou1,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: ou1
+userPassword: $PASSWD
+
+dn: ou=ou2,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: ou2
+userPassword: $PASSWD
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed to populate central master entry ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding syncrepl on site1 master..."
+$LDAPMODIFY -D cn=config -H $URI2 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={4}$BACKEND,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=1 provider=$URI1 searchbase="$BASEDN"
+  binddn="ou=ou1,$BASEDN" bindmethod=simple credentials=$PASSWD
+  type=refreshAndPersist retry="$RETRY" timeout=1
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed to add syncrepl on site1 master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding syncrepl on site2 master..."
+$LDAPMODIFY -D cn=config -H $URI3 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={5}$BACKEND,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=1 provider=$URI1 searchbase="$BASEDN"
+  binddn="ou=ou2,$BASEDN" bindmethod=simple credentials=$PASSWD
+  type=refreshAndPersist retry="$RETRY" timeout=1
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed to add syncrepl on site2 master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+sleep 1
+
+echo "Using ldapsearch to check that site1 master received changes..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI2 \
+		-s base -b "ou=ou1,$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check that site2 master received changes..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI3 \
+		-s base -b "ou=ou1,$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+sleep 1
+
+echo "Populating site1 master..."
+$LDAPADD -D "ou=sm1ou1,$BASEDN" -H $URI2 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=sm1ou1,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: sm1ou1
+
+dn: ou=sm1ou2,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: sm1ou2
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed to populate site1 master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+sleep 1
+
+echo "Populating site2 master..."
+$LDAPADD -D "ou=sm2ou1,$BASEDN" -H $URI3 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=sm2ou1,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: sm2ou1
+
+dn: ou=sm2ou2,dc=example,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: sm2ou2
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed to populate site2 master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+ERRORS=0
+
+# TEST:
+# Stop site1 master when adding syncrepl to the central master.  When
+# site1 master is started again both it and the central master will have
+# the same number of contextCSN values, but the ones on central master
+# will be the newest.  The central master will not update its contextCSN
+# values unless the bug in ITS#5597 have been fixed.
+echo "Stopping site1 master..."
+kill -HUP "$SM1_PID"
+wait "$SM1_PID"
+KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $SM1_PID / /"`;
+SM1_PID=
+
+echo "Adding syncrepl on central master..."
+$LDAPMODIFY -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={3}$BACKEND,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=3 provider=$URI2 searchbase="ou=sm1ou1,$BASEDN"
+  binddn="ou=sm1ou1,$BASEDN" bindmethod=simple credentials=$PASSWD
+  type=refreshAndPersist retry="$RETRY" timeout=1
+
+dn: olcDatabase={5}$BACKEND,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=5 provider=$URI3 searchbase="ou=sm2ou1,$BASEDN"
+  binddn="ou=sm2ou1,$BASEDN" bindmethod=simple credentials=$PASSWD
+  type=refreshAndPersist retry="$RETRY" timeout=1
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed to add syncrepl on central master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+sleep 1
+echo "Using ldapsearch to check that central master received site2 entries..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI1 \
+		-s base -b "ou=sm2ou1,$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Test for ITS#6716, modify on central master to ensure that the CSN
+# order is "sid2 < sid3 < sid1".  When site1 master starts it is likely
+# to sync with central master before it syncs with site1 master. When
+# central master syncs with site1 master they will share the sid1 and
+# sid3 CSNs, the additonal sid2 CSN hold by site1 master will be the
+# oldest. Central master will not receive the changes made on site1
+# master unless it completely ignores the CSNs presented by central
+# master.
+echo "Using ldapmodify to modify central master..."
+$LDAPMODIFY -D "$MANAGERDN" -H $URI1 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: dc=example,dc=com
+changetype: modify
+add: description
+description: Modify$MNUM
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+if test -z "$SM1_PID" ; then
+	echo "Restarting site1 master slapd on TCP/IP port $PORT2..."
+	cd $SM1_DIR
+	$SLAPD -F slapd.d -h $URI2 -d $LVL $TIMING >> $LOG2 2>&1 &
+	SM1_PID=$!
+	if test $WAIT != 0 ; then
+	    echo PID $SM1_PID
+	    read foo
+	fi
+	KILLPIDS="$KILLPIDS $SM1_PID"
+	cd $TESTWD
+	sleep 1
+fi
+sleep 1
+echo "Using ldapsearch to check that site1 master is running..."
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI2 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check that central master received site1 entries..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI1 \
+		-s base -b "ou=sm1ou1,$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check that site1 master received central master update..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI2 \
+		-s base -b "$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check that site2 master received central master update..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI3 \
+		-s base -b "$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Test done, now some more intialization...
+
+echo "Adding syncrepl consumer on central search..."
+$LDAPMODIFY -D cn=config -H $URI4 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=1 provider=$URI1 searchbase="$BASEDN"
+  binddn="$BASEDN" bindmethod=simple credentials=$PASSWD
+  type=refreshAndPersist retry="$RETRY" timeout=1
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed to add syncrepl on site1 search ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding syncrepl consumer on site1 search..."
+$LDAPMODIFY -D cn=config -H $URI5 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=1 provider=$URI2 searchbase="$BASEDN"
+  binddn="$BASEDN" bindmethod=simple credentials=$PASSWD
+  type=refreshAndPersist retry="$RETRY" timeout=1
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed to add syncrepl on site1 search ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Adding syncrepl consumer on site2 search..."
+$LDAPMODIFY -D cn=config -H $URI6 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=1 provider=$URI3 searchbase="$BASEDN"
+  binddn="$BASEDN" bindmethod=simple credentials=$PASSWD
+  type=refreshAndPersist retry="$RETRY" timeout=1
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed to add syncrepl on site2 search ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+sleep 1
+
+echo "Using ldapsearch to check that central search received changes..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI4 \
+		-s base -b "$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check that site1 search received changes..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI5 \
+		-s base -b "$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check that site2 search received changes..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI6 \
+		-s base -b "$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# Create a script that will check the contextCSN values of all servers,
+# and restart them to re-synchronize if it finds any errors:
+cat > $TESTDIR/checkcsn.sh <<'EOF'
+#!/bin/sh
+
+CSN_ERRORS=0
+
+CSN1=`$LDAPSEARCH -H $URI1 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+CSN2=`$LDAPSEARCH -H $URI2 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+CSN3=`$LDAPSEARCH -H $URI3 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+CSN4=`$LDAPSEARCH -H $URI4 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+CSN5=`$LDAPSEARCH -H $URI5 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+CSN6=`$LDAPSEARCH -H $URI6 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+
+if test -z "$CSN1" ; then
+	echo "ERROR: contextCSN empty on central master"
+	CSN_ERRORS=`expr $CSN_ERRORS + 1`
+fi
+nCSN=`echo "$CSN1" | wc -l`
+if test "$nCSN" -ne 3 ; then
+	echo "ERROR: Wrong contextCSN count on central master, should be 3"
+	CSN_ERRORS=`expr $CSN_ERRORS + 1`
+	if test -n "$CSN_VERBOSE"; then
+		echo "$CSN1"
+	fi
+fi
+if  test -z "$CSN2" -o "$CSN1" != "$CSN2" ; then
+	echo "ERROR: contextCSN mismatch between central master and site1 master"
+	CSN_ERRORS=`expr $CSN_ERRORS + 1`;
+	if test -n "$CSN_VERBOSE"; then
+		echo "contextCSN on central master:"
+		echo "$CSN1"
+		echo "contextCSN on site1 master:"
+		echo "$CSN2"
+	fi
+fi
+if  test -z "$CSN3" -o "$CSN1" != "$CSN3" ; then
+	echo "ERROR: contextCSN mismatch between central master and site2 master"
+	CSN_ERRORS=`expr $CSN_ERRORS + 1`;
+	if test -n "$CSN_VERBOSE"; then
+		echo "contextCSN on central master:"
+		echo "$CSN1"
+		echo "contextCSN on site2 master:"
+		echo "$CSN3"
+	fi
+fi
+if  test -z "$CSN4" -o "$CSN1" != "$CSN4" ; then
+	echo "ERROR: contextCSN mismatch between central master and central search"
+	CSN_ERRORS=`expr $CSN_ERRORS + 1`;
+	if test -n "$CSN_VERBOSE"; then
+		echo "contextCSN on central master:"
+		echo "$CSN1"
+		echo "contextCSN on central search:"
+		echo "$CSN4"
+	fi
+fi
+if  test -z "$CSN5" -o "$CSN2" != "$CSN5" ; then
+	echo "ERROR: contextCSN mismatch between site1 master and site1 search"
+	CSN_ERRORS=`expr $CSN_ERRORS + 1`;
+	if test -n "$CSN_VERBOSE"; then
+		echo "contextCSN on site1 master:"
+		echo "$CSN2"
+		echo "contextCSN on site1 search:"
+		echo "$CSN5"
+	fi
+fi
+if  test -z "$CSN6" -o "$CSN3" != "$CSN6" ; then
+	echo "ERROR: contextCSN mismatch between site2 master and site2 search:"
+	CSN_ERRORS=`expr $CSN_ERRORS + 1`;
+	if test -n "$CSN_VERBOSE"; then
+		echo "contextCSN on site2 master:"
+		echo "$CSN3"
+		echo "contextCSN on site2 search:"
+		echo "$CSN6"
+	fi
+fi
+
+if test $CSN_ERRORS != 0 ; then
+	echo "Stopping all servers to synchronize contextCSN..."
+	kill -HUP  $KILLPIDS
+	for pid in $KILLPIDS ; do wait $pid ; done
+	KILLPIDS=
+
+	echo "Restarting site1 master slapd on TCP/IP port $PORT2..."
+	cd $SM1_DIR
+	$SLAPD -F slapd.d -h $URI2 -d $LVL $TIMING >> $LOG2 2>&1 &
+	SM1_PID=$!
+	if test $WAIT != 0 ; then
+		echo PID $SM1_PID
+		read foo
+	fi
+	KILLPIDS="$KILLPIDS $SM1_PID"
+	cd $TESTWD
+	sleep 1
+	echo "Using ldapsearch to check that site1 master is running..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "" -H $URI2 \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to start..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Restarting site2 master slapd on TCP/IP port $PORT3..."
+	cd $SM2_DIR
+	$SLAPD -F slapd.d -h $URI3 -d $LVL $TIMING >> $LOG3 2>&1 &
+	SM2_PID=$!
+	if test $WAIT != 0 ; then
+		echo PID $SM2_PID
+		read foo
+	fi
+	KILLPIDS="$KILLPIDS $SM2_PID "
+	cd $TESTWD
+	sleep 1
+	echo "Using ldapsearch to check that site2 master is running..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "" -H $URI3 \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to start..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Restarting central master slapd on TCP/IP port $PORT1..."
+	cd $SMC_DIR
+	$SLAPD -F slapd.d -h $URI1 -d $LVL $TIMING >> $LOG1 2>&1 &
+	SMC_PID=$!
+	if test $WAIT != 0 ; then
+		echo PID $SMC_PID
+		read foo
+	fi
+	KILLPIDS="$KILLPIDS $SMC_PID"
+	cd $TESTWD
+	sleep 1
+	echo "Using ldapsearch to check that central master slapd is running..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "" -H $URI1 \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to start..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Sleeping 5 seconds to allow contextCSN to synchronize..."
+	sleep 5
+
+	echo "Stopping site1 and site2 master..."
+	kill -HUP  $SM1_PID $SM2_PID
+	for pid in $SM1_PID $SM2_PID ; do wait $pid ; done
+	KILLPIDS=" $SMC_PID"
+
+	echo "Restarting site1 master slapd on TCP/IP port $PORT2..."
+	cd $SM1_DIR
+	$SLAPD -F slapd.d -h $URI2 -d $LVL $TIMING >> $LOG2 2>&1 &
+	SM1_PID=$!
+	if test $WAIT != 0 ; then
+		echo PID $SM1_PID
+		read foo
+	fi
+	KILLPIDS="$KILLPIDS $SM1_PID"
+	cd $TESTWD
+	sleep 1
+	echo "Using ldapsearch to check that site1 master is running..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "" -H $URI2 \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to start..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Restarting site2 master slapd on TCP/IP port $PORT3..."
+	cd $SM2_DIR
+	$SLAPD -F slapd.d -h $URI3 -d $LVL $TIMING >> $LOG3 2>&1 &
+	SM2_PID=$!
+	if test $WAIT != 0 ; then
+		echo PID $SM2_PID
+		read foo
+	fi
+	KILLPIDS="$KILLPIDS $SM2_PID"
+	cd $TESTWD
+	sleep 1
+	echo "Using ldapsearch to check that site2 master is running..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "" -H $URI3 \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to start..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Sleeping 5 seconds to allow contextCSN to synchronize..."
+	sleep 5
+
+	echo "Restarting central search slapd on TCP/IP port $PORT4..."
+	cd $SSC_DIR
+	$SLAPD -F slapd.d -h $URI4 -d $LVL $TIMING >> $LOG4 2>&1 &
+	SSC_PID=$!
+	if test $WAIT != 0 ; then
+		echo PID $SSC_PID
+		read foo
+	fi
+	KILLPIDS="$KILLPIDS $SSC_PID"
+	cd $TESTWD
+	sleep 1
+	echo "Using ldapsearch to check that central search slapd is running..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "" -H $URI4 \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to start..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Restarting site1 search slapd on TCP/IP port $PORT5..."
+	cd $SS1_DIR
+	$SLAPD -F slapd.d -h $URI5 -d $LVL $TIMING >> $LOG5 2>&1 &
+	SS1_PID=$!
+	if test $WAIT != 0 ; then
+		echo PID $SS1_PID
+		read foo
+	fi
+	KILLPIDS="$KILLPIDS $SS1_PID"
+	cd $TESTWD
+	sleep 1
+	echo "Using ldapsearch to check that site1 search slapd is running..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "" -H $URI5 \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to start..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Restarting site2 search slapd on TCP/IP port $PORT6..."
+	cd $SS2_DIR
+	$SLAPD -F slapd.d -h $URI6 -d $LVL $TIMING >> $LOG6 2>&1 &
+	SS2_PID=$!
+	if test $WAIT != 0 ; then
+		echo PID $SS2_PID
+		read foo
+	fi
+	KILLPIDS="$KILLPIDS $SS2_PID"
+	cd $TESTWD
+	sleep 1
+	echo "Using ldapsearch to check that site2 search slapd is running..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "" -H $URI6 \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to start..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Sleeping 5 seconds to allow contextCSN to synchronize..."
+	sleep 5
+
+	echo "Checking contextCSN after restart..."
+	CSN1=`$LDAPSEARCH -H $URI1 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+	CSN2=`$LDAPSEARCH -H $URI2 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+	CSN3=`$LDAPSEARCH -H $URI3 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+	CSN4=`$LDAPSEARCH -H $URI4 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+	CSN5=`$LDAPSEARCH -H $URI5 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+	CSN6=`$LDAPSEARCH -H $URI6 -b $BASEDN -s base contextCSN | grep contextCSN | sort`
+	if test -z "$CSN1" ; then
+		echo "ERROR: contextCSN empty on central master"
+		CSN_ERRORS=`expr $CSN_ERRORS + 1`
+	fi
+
+	if  test -z "$CSN2" -o "$CSN1" != "$CSN2" ; then
+		echo "ERROR: contextCSN mismatch between central master and site1 master"
+		CSN_ERRORS=`expr $CSN_ERRORS + 1`;
+		if test -n "$CSN_VERBOSE"; then
+			echo "contextCSN on central master:"
+			echo "$CSN1"
+			echo "contextCSN on site1 master:"
+			echo "$CSN2"
+		fi
+	fi
+	if  test -z "$CSN3" -o "$CSN1" != "$CSN3" ; then
+		echo "ERROR: contextCSN mismatch between central master and site2 master"
+		CSN_ERRORS=`expr $CSN_ERRORS + 1`;
+		if test -n "$CSN_VERBOSE"; then
+			echo "contextCSN on central master:"
+			echo "$CSN1"
+			echo "contextCSN on site2 master:"
+			echo "$CSN3"
+		fi
+	fi
+	if  test -z "$CSN4" -o "$CSN1" != "$CSN4" ; then
+		echo "ERROR: contextCSN mismatch between central master and central search"
+		CSN_ERRORS=`expr $CSN_ERRORS + 1`;
+		if test -n "$CSN_VERBOSE"; then
+			echo "contextCSN on central master:"
+			echo "$CSN1"
+			echo "contextCSN on central search:"
+			echo "$CSN4"
+		fi
+	fi
+	if  test -z "$CSN5" -o "$CSN2" != "$CSN5" ; then
+		echo "ERROR: contextCSN mismatch between site1 master and site1 search"
+		CSN_ERRORS=`expr $CSN_ERRORS + 1`;
+		if test -n "$CSN_VERBOSE"; then
+			echo "contextCSN on site1 master:"
+			echo "$CSN2"
+			echo "contextCSN on site1 search:"
+			echo "$CSN5"
+		fi
+	fi
+	if  test -z "$CSN6" -o "$CSN3" != "$CSN6" ; then
+		echo "ERROR: contextCSN mismatch between site2 master and site2 search:"
+		CSN_ERRORS=`expr $CSN_ERRORS + 1`;
+		if test -n "$CSN_VERBOSE"; then
+			echo "contextCSN on site2 master:"
+			echo "$CSN3"
+			echo "contextCSN on site2 search:"
+			echo "$CSN6"
+		fi
+	fi
+fi
+
+ERRORS=`expr $ERRORS + $CSN_ERRORS`
+
+EOF
+
+test $BACKEND = null && echo : > $TESTDIR/checkcsn.sh
+
+chmod +x $TESTDIR/checkcsn.sh
+
+
+echo "Checking contextCSN after initial replication..."
+. $TESTDIR/checkcsn.sh
+
+# TEST:
+# Test that updates to the first backend on central master, which should
+# be replicated to all servers actually is so, and that the contextCSN is
+# updated everywhere:
+echo "Using ldapmodify to modify first backend on central master..."
+$LDAPMODIFY -D "$MANAGERDN" -H $URI1 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=ou1,dc=example,dc=com
+changetype: modify
+add: description
+description: Modify$MNUM
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+sleep 1
+
+echo "Using ldapsearch to check replication to central search..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI4 \
+		-s base -b "ou=ou1,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check replication to site1 search..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI5 \
+		-s base -b "ou=ou1,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check replication to site2 search..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI6 \
+		-s base -b "ou=ou1,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Checking contextCSN after modify of first backend on central master..."
+. $TESTDIR/checkcsn.sh
+
+# TEST:
+# Test that updates to the second backend on central master is only
+# replicated to those search servers that should receive that backend.
+# The contextCSN should still be updated everywhere:
+MNUM=`expr $MNUM + 1`
+echo "Using ldapmodify to modify second backend on central master..."
+$LDAPMODIFY -D "$MANAGERDN" -H $URI1 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=ou2,dc=example,dc=com
+changetype: modify
+add: description
+description: Modify$MNUM
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+sleep 1
+
+echo "Using ldapsearch to check replication to site2 search..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI6 \
+		-s base -b "ou=ou2,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check no replication to site1 master..."
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI2 \
+		-s base -b "ou=ou2,$BASEDN" \
+		"(description=Modify$NMUM)" 2>&1 | awk '/^dn:/ {print "NOK"}'`
+	if test "x$RESULT" = "xNOK" ; then
+		echo "Change was replicated to site1 search!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+	sleep 1
+done
+
+echo "Using ldapsearch to check no replication to central search..."
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI4 \
+		-s base -b "ou=ou2,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "NOK"}'`
+	if test "x$RESULT" = "xNOK" ; then
+		echo "Change was replicated to central search!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+	sleep 1
+done
+
+echo "Checking contextCSN after modify of second backend on central master..."
+. $TESTDIR/checkcsn.sh
+
+# TEST:
+# Test that updates to the first backend on site1 master, which should be
+# replicated everywhere except to central and site2 search.  The contextCSN
+# should be updated on all servers:
+MNUM=`expr $MNUM + 1`
+echo "Using ldapmodify to modify first backend on site1 master..."
+$LDAPMODIFY -D "ou=sm1ou1,$BASEDN" -H $URI2 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=sm1ou1,dc=example,dc=com
+changetype: modify
+add: description
+description: Modify$MNUM
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+sleep 1
+
+echo "Using ldapsearch to check replication to site1 search..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI5 \
+		-s base -b "ou=sm1ou1,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check replication to site2 master..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI3 \
+		-s base -b "ou=sm1ou1,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check no replication to site2 search..."
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI6 \
+		-s base -b "ou=sm1ou2,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "NOK"}'`
+	if test "x$RESULT" = "xNOK" ; then
+		echo "Change was replicated to central search!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+	sleep 1
+done
+
+echo "Using ldapsearch to check no replication to central search..."
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI4 \
+		-s base -b "ou=sm1ou2,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "NOK"}'`
+	if test "x$RESULT" = "xNOK" ; then
+		echo "Change was replicated to central search!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+	sleep 1
+done
+
+echo "Checking contextCSN after modify of first backend on site1 master..."
+. $TESTDIR/checkcsn.sh
+
+
+# TEST:
+# Test updates to the second backend on site1 master, which should only be
+# replicated to site1 search.  The contextCSN should be updated everywhere.
+MNUM=`expr $MNUM + 1`
+echo "Using ldapmodify to modify second backend on site1 master..."
+$LDAPMODIFY -D "ou=sm1ou1,$BASEDN" -H $URI2 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=sm1ou2,dc=example,dc=com
+changetype: modify
+add: description
+description: Modify$MNUM
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+sleep 1
+
+
+echo "Using ldapsearch to check replication to site1 search..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI5 \
+		-s base -b "ou=sm1ou2,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check no replication to central master..."
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI1 \
+		-s base -b "ou=sm1ou2,$BASEDN" \
+		"(description=Modify$NMUM)" 2>&1 | awk '/^dn:/ {print "NOK"}'`
+	if test "x$RESULT" = "xNOK" ; then
+		echo "Change was replicated to site2 search!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+	sleep 1
+done
+
+echo "Checking contextCSN after modify of second backend on site1 master..."
+. $TESTDIR/checkcsn.sh
+
+
+# TEST:
+# Test updates to first backend on site2 master, which should be
+# replicated to the central servers, but not site1.  The contextCSN
+# should be updated everywhere:
+MNUM=`expr $MNUM + 1`
+echo "Using ldapmodify to modify first backend on site2 master..."
+$LDAPMODIFY -D "ou=sm2ou1,$BASEDN" -H $URI3 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=sm2ou1,dc=example,dc=com
+changetype: modify
+add: description
+description: Modify$MNUM
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+sleep 1
+
+echo "Using ldapsearch to check replication to central master..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI1 \
+		-s base -b "ou=sm2ou1,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check replication to site2 search..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI6 \
+		-s base -b "ou=sm2ou1,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check no replication to site1 master..."
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI2 \
+		-s base -b "ou=sm2ou1,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "NOK"}'`
+	if test "x$RESULT" = "xNOK" ; then
+		echo "Change was replicated to site2 search!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+	sleep 1
+done
+
+echo "Using ldapsearch to check no replication to central search..."
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI4 \
+		-s base -b "ou=sm2ou1,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "NOK"}'`
+	if test "x$RESULT" = "xNOK" ; then
+		echo "Change was replicated to site2 search!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+	sleep 1
+done
+
+echo "Checking contextCSN after modify of first backend on site2 master..."
+. $TESTDIR/checkcsn.sh
+
+
+# TEST:
+# Test updates to the second backend on site2 master, which should only be
+# replicated to site2 search.  As always, contextCSN should be updated
+# everywhere:
+MNUM=`expr $MNUM + 1`
+echo "Using ldapmodify to modify second backend on site2 master..."
+$LDAPMODIFY -D "ou=sm2ou1,$BASEDN" -H $URI3 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=sm2ou2,dc=example,dc=com
+changetype: modify
+add: description
+description: Modify$MNUM
+
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+sleep 1
+
+echo "Using ldapsearch to check replication to site2 search..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI6 \
+		-s base -b "ou=sm2ou2,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check no replication to central master..."
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI4 \
+		-s base -b "ou=sm2ou2,$BASEDN" \
+		"(description=Modify$MNUM)" 2>&1 | awk '/^dn:/ {print "NOK"}'`
+	if test "x$RESULT" = "xNOK" ; then
+		echo "Change was replicated to central search!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+	sleep 1
+done
+
+echo "Checking contextCSN after modify of second backend on site2 master..."
+. $TESTDIR/checkcsn.sh
+
+# TEST:
+# Test that all contextCSN values are updated on the slaves when they
+# starts with an empty database.  Start site2 master first, then site2
+# search and finally central master so that the site2 search's syncrepl
+# connection has been set up when site2 master receives the database:
+echo "Stopping central master and site2 servers to test start with emtpy db..."
+kill -HUP  $SMC_PID $SM2_PID $SS2_PID
+for pid in $SMC_PID $SM2_PID $SS2_PID; do wait $pid ; done
+KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $SMC_PID / /"`;
+KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $SM2_PID / /"`;
+KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $SS2_PID / /"`;
+SMC_PID=
+SM2_PID=
+SS2_PID=
+rm -rf $SM2_DIR/db/*
+rm -rf $SS2_DIR/db/*
+
+echo "Starting site2 master slapd on TCP/IP port $PORT3..."
+cd $SM2_DIR
+$SLAPD -F slapd.d -h $URI3 -d $LVL $TIMING >> $LOG3 2>&1 &
+SM2_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $SM2_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $SM2_PID"
+cd $TESTWD
+sleep 1
+echo "Using ldapsearch to check that site2 master slapd is running..."
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI3 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting site2 search slapd on TCP/IP port $PORT6..."
+cd $SS2_DIR
+$SLAPD -F slapd.d -h $URI6 -d $LVL $TIMING >> $LOG6 2>&1 &
+SS2_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $SS2_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $SS2_PID"
+cd $TESTWD
+sleep 1
+echo "Using ldapsearch to check that site2 search slapd is running..."
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI6 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting central master slapd on TCP/IP port $PORT1..."
+cd $SMC_DIR
+$SLAPD -F slapd.d -h $URI1 -d $LVL $TIMING >> $LOG1 2>&1 &
+SMC_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $SMC_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $SMC_PID"
+cd $TESTWD
+sleep 1
+echo "Using ldapsearch to check that central master slapd is running..."
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $URI1 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check that site2 master received base..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI3 \
+		-s base -b "$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapsearch to check that site2 search received base..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI6 \
+		-s base -b "$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+sleep $SLEEP1
+
+echo "Checking contextCSN after site2 servers repopulated..."
+. $TESTDIR/checkcsn.sh
+
+if test $ERRORS -ne 0; then
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	echo "Found $ERRORS errors"
+	exit $ERRORS
+fi
+
+# TEST:
+# Adding syncrepl of the second site1 master backend on central master
+# will not initialize the database unless the contextCSN attribute is
+# stored in the suffix of the database and not the suffix of the glue
+# database:
+echo "Adding syncrepl of second site1 master backend on central master..."
+$LDAPMODIFY -D cn=config -H $URI1 -y $CONFIGPWF <<EOF >> $TESTOUT 2>&1
+dn: olcDatabase={4}$BACKEND,cn=config
+changetype: modify
+add: olcSyncRepl
+olcSyncRepl: rid=4 provider=$URI2 searchbase="ou=sm1ou2,$BASEDN"
+  binddn="ou=sm1ou1,$BASEDN" bindmethod=simple credentials=$PASSWD
+  type=refreshAndPersist retry="$RETRY" timeout=1
+EOF
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed to add syncrepl on central master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+sleep 1
+
+echo "Using ldapsearch to check that central master received second site1 backend..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI1 \
+		-s base -b "ou=sm1ou2,$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ERROR: Second site1 backend not replicated to central master"
+	ERRORS=`expr $ERRORS + 1`
+
+	echo "Restarting central master slapd on TCP/IP port $PORT1..."
+	kill -HUP $SMC_PID
+	wait $SMC_PID
+	KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $SMC_PID / /"`;
+
+	cd $SMC_DIR
+	$SLAPD -F slapd.d -h $URI1 -c rid=4,csn=0 -d $LVL $TIMING >> $LOG1 2>&1 &
+	SMC_PID=$!
+	if test $WAIT != 0 ; then
+		echo PID $SMC_PID
+		read foo
+	fi
+	KILLPIDS="$KILLPIDS $SMC_PID"
+	cd $TESTWD
+	echo "Using ldapsearch to check that central master slapd is running..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "" -H $URI1 \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to start..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Using ldapsearch to check that central master received second site1 backend..."
+	RC=32
+	for i in 1 2 3 4 5; do
+		RESULT=`$LDAPSEARCH -H $URI1 \
+			-s base -b "ou=sm1ou2,$BASEDN" \
+			'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+		if test "x$RESULT$nullOK" = "xOK" ; then
+			RC=0
+			break
+		fi
+		echo "Waiting $i seconds for syncrepl to receive changes..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+fi
+
+echo "Using ldapsearch to check that central search received second site1 backend..."
+RC=32
+for i in 1 2 3 4 5; do
+	RESULT=`$LDAPSEARCH -H $URI4 \
+		-s base -b "ou=sm1ou2,$BASEDN" \
+		'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+	if test "x$RESULT$nullOK" = "xOK" ; then
+		RC=0
+		break
+	fi
+	echo "Waiting $i seconds for syncrepl to receive changes..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ERROR: Second site1 backend not replicated to central search"
+	ERRORS=`expr $ERRORS + 1`
+
+	echo "Restarting central search slapd on TCP/IP port $PORT4..."
+	kill -HUP $SSC_PID
+	wait $SSC_PID
+	KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $SSC_PID / /"`;
+
+	cd $SSC_DIR
+	$SLAPD -F slapd.d -h $URI4 -c rid=1,csn=0 -d $LVL $TIMING >> $LOG4 2>&1 &
+	SSC_PID=$!
+	if test $WAIT != 0 ; then
+		echo PID $SSC_PID
+		read foo
+	fi
+	KILLPIDS="$KILLPIDS $SSC_PID"
+	cd $TESTWD
+	echo "Using ldapsearch to check that central search slapd is running..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "" -H $URI4 \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to start..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Using ldapsearch to check that central search received second site1 backend..."
+	RC=32
+	for i in 1 2 3 4 5; do
+		RESULT=`$LDAPSEARCH -H $URI4 \
+			-s base -b "ou=sm1ou2,$BASEDN" \
+			'(objectClass=*)' 2>&1 | awk '/^dn:/ {print "OK"}'`
+		if test "x$RESULT$nullOK" = "xOK" ; then
+			RC=0
+			break
+		fi
+		echo "Waiting $i seconds for syncrepl to receive changes..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+fi
+
+
+# TEST:
+# Run race tests when more than one backend is replicated from the same
+# provider.  This will usually fail long before 100 iterations unless
+# syncrepl stores the contextCSN in the suffix of its own database, and
+# that syncprov follows these rules before updating its own CSN when it
+# detects updates from syncrepl:
+# 1) A contextCSN value must have been stored in the suffix of all the
+#	 syncrepl configured databases within the glued syncprov database.
+# 2) Of all contextCSN values stored by syncrepl with the same SID,
+#	 syncprov must always select the one with the lowest csn value.
+test -z "$RACE_TESTS" && RACE_TESTS=10
+RACE_NUM=0
+RACE_ERROR=0
+
+SUB_DN=ou=sub,ou=sm1ou2,dc=example,dc=com
+
+while test $RACE_ERROR -eq 0 -a $RACE_NUM -lt $RACE_TESTS ; do
+	RACE_NUM=`expr $RACE_NUM + 1`
+	echo "Running $RACE_NUM of $RACE_TESTS syncrepl race tests..."
+
+	echo "Stopping central master..."
+	kill -HUP $SMC_PID
+	wait $SMC_PID
+	KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $SMC_PID / /"`;
+
+	MNUM=`expr $MNUM + 1`
+	echo "Using ldapadd to add entry on site1 master..."
+	$LDAPADD -D "ou=sm1ou1,$BASEDN" -H $URI2 -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: $SUB_DN
+objectClass: top
+objectClass: organizationalUnit
+ou: sub
+
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Starting central master again..."
+	cd $SMC_DIR
+	$SLAPD -F slapd.d -h $URI1 -d $LVL $TIMING >> $LOG1 2>&1 &
+	SMC_PID=$!
+	KILLPIDS="$KILLPIDS $SMC_PID"
+	cd $TESTWD
+	echo "Using ldapsearch to check that central master received entry..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "$SUB_DN"  -H $URI1 > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ERROR: entry not replicated to central master!"
+		RACE_ERROR=1
+		break
+	fi
+
+	echo "Using ldapsearch to check that central search received entry..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "$SUB_DN"  -H $URI4 > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ERROR: entry not replicated to central master!"
+		RACE_ERROR=1
+		break
+	fi
+
+	echo "Stopping central master..."
+	kill -HUP $SMC_PID
+	wait $SMC_PID
+	KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $SMC_PID / /"`;
+
+	echo "Using ldapdelete to delete entry on site1 master..."
+	$LDAPDELETE -D "ou=sm1ou1,$BASEDN" -H $URI2 -w $PASSWD "$SUB_DN"
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapdelete failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Starting central master again..."
+	cd $SMC_DIR
+	$SLAPD -F slapd.d -h $URI1 -d $LVL $TIMING >> $LOG1 2>&1 &
+	SMC_PID=$!
+	KILLPIDS="$KILLPIDS $SMC_PID"
+	cd $TESTWD
+
+	echo "Using ldapsearch to check that entry was deleted on central master..."
+	RC=0
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "$SUB_DN" -H $URI1 > /dev/null 2>&1
+		RC=$?
+		if test $RC = $wantNoObj; then break; fi
+		sleep $i
+	done
+
+	if test $RC != $wantNoObj; then
+		if test $RC != 0; then
+			echo "ldapsearch failed ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+		echo "ERROR: Entry not removed on central master!"
+		RACE_ERROR=1
+		break
+	fi
+
+	echo "Using ldapsearch to check that entry was deleted on central search..."
+	RC=0
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "$SUB_DN" -H $URI4 > /dev/null 2>&1
+		RC=$?
+		if test $RC != 0; then break; fi
+		sleep $i
+	done
+
+	if test $RC != $wantNoObj; then
+		echo "ERROR: Entry not removed on central search! (RC=$RC)"
+		RACE_ERROR=1
+		break
+	fi
+done
+
+if test $RACE_ERROR != 0; then
+	echo "Race error found after $RACE_NUM of $RACE_TESTS iterations"
+	ERRORS=`expr $ERRORS + $RACE_ERROR`
+else
+	echo "No race errors found after $RACE_TESTS iterations"
+fi
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+if test $ERRORS -ne 0; then
+	echo "Found $ERRORS errors"
+	echo ">>>>>> Exiting with a false success status for now"
+	exit 0
+fi
+
+echo ">>>>> Test succeeded"
+
+exit 0

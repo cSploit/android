@@ -1,0 +1,53 @@
+#! /bin/sh
+#
+# Build the configuration file for test 2 --
+#	We do this work in the shell script because we have to fill in
+#	
+	cat > $RUN/config/ubb.cfg << END_OF_UBB_FILE
+*RESOURCES
+IPCKEY          261110
+
+DOMAINID        BDBapp
+MASTER          L1
+MAXACCESSERS    100
+MAXSERVERS      50
+MAXSERVICES     200
+MODEL           SHM
+LDBAL           Y
+
+*MACHINES
+
+"$MACHINE_NAME"	LMID=L1
+		TUXDIR="$TUXDIR"
+		APPDIR="$APPDIR"
+		TUXCONFIG="$TUXCONFIG"
+		TLOGDEVICE="$TLOGDEVICE"
+		TLOGNAME="$TLOGNAME"
+		TYPE="machine1"
+
+*GROUPS
+BDBG
+        	LMID=L1 GRPNO=1 TMSNAME=TMS_BDB TMSCOUNT=3
+        	OPENINFO="BERKELEY-DB:$RUN/data"
+
+LMSG		LMID=L1 GRPNO=2 
+
+*SERVERS
+DEFAULT:
+              	CLOPT="-A"
+
+bdb1		SRVGRP=BDBG   SRVID=1 
+		MIN=2 MAX=2
+		#RQADDR="BDB1.QUEUE" REPLYQ=Y CLOPT="-A  -- -t 1"
+		RQADDR="BDB1.QUEUE" REPLYQ=Y CLOPT="-A -p L10,10:100,10 -- -t 1"
+
+bdb2		SRVGRP=BDBG   SRVID=11
+		MIN=1 MAX=1 RQADDR="BDB2.QUEUE" REPLYQ=Y 
+
+#LMS		SRVGRP=LMSG   SRVID= 1 CLOPT="-A -- -l$MACHINE_NAME:8080/tsam"
+
+*SERVICES
+DEFAULT:
+		SVCTIMEOUT=30
+END_OF_UBB_FILE
+	tmloadcf -y $RUN/config/ubb.cfg

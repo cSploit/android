@@ -1,0 +1,36 @@
+
+==================================
+Firebird 1.5.2       (Win32 Build)
+==================================
+
+La traduction et la création de documentation pour Firebird
+est un processus continu.
+Vous pouvez aujourd'hui trouver la traduction en français des 
+documents suivants :
+
+Le guide de démarrage de Firebird 1.5 (quick start guide)
+à :
+en pdf  -> http://www.firebirdsql.org/pdfmanual/fr/Firebird-1.5-Demarrage.pdf
+en html -> http://www.firebirdsql.org/manual/fr/index.html
+ou
+en pdf  -> http://firebird-fr.eu.org/IMG/pdf/Firebird-1.5-Demarrage.pdf
+en html -> http://firebird-fr.eu.org/manuel/index.html 
+
+Les notes de versions de Firebird 1.5.1 (release notes)
+à :
+en pdf -> http://www.ibphoenix.com/downloads/Firebird_v15pt1_ReleaseNotes_French.pdf
+
+Les notes de versions de Firebird 1.5 (release notes)
+à :
+en pdf -> http://www.ibphoenix.com/downloads/Firebird_v15.108_ReleaseNotesFrench.pdf
+ou
+en pdf -> http://www.firebird-fr.eu.org/fichiers/Firebird_v15.108_ReleaseNotesFrench.zip
+
+N'hésiter pas à visiter le site en français sur Firebird
+http://www.firebird-fr.eu.org
+et le sous projet documentation
+http://firebird.sourceforge.net/index.php?op=devel&sub=doc
+
+et à participer à l'effort de traduction et de documentation.
+
+

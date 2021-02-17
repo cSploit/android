@@ -1,0 +1,12 @@
+1) must add alias handling
+2) [sizelimit moved to frontend]
+  must set time limit when preparing all queries, and check size limit
+3) there was expressed a need to have access to IP in while constructing
+  queries, to have response alter in accordance to client IP. Will add
+  preprocessor for values in metatables, which would substitute things
+  like "$IP$".
+4) must handle NOT filters (see ITS#2652)
+5) must map attribute types and syntaxes between LDAP and SQL types (e.g.
+  use BLOBs for octet streams)
+6) must define another mech to add auxiliary objectClass to all entries
+  according to ldap_at_mappings (ldap_entry_objclasses has limitations)

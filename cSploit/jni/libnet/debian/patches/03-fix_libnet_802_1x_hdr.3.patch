@@ -1,0 +1,11 @@
+--- libnet.orig/doc/man/man3/libnet_802_1x_hdr.3
++++ libnet/doc/man/man3/libnet_802_1x_hdr.3
+@@ -2,7 +2,7 @@
+ .ad l
+ .nh
+ .SH NAME
+-libnet_802_1x_hdr \- 
++libnet_802_1x_hdr \- IEEE 802.1X EAP header
+ .SH SYNOPSIS
+ .br
+ .PP

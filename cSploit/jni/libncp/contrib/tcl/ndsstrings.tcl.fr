@@ -1,0 +1,88 @@
+# translation strings for the ndsclient suite
+#french version
+
+#common strings
+set STR(version)     {Client NDS pour Linux v 1.0}
+set STR(date_version) {18 Février 2001}
+set STR(ok)         {OK}
+set STR(cancel)     {Annuler}
+set STR(yes)        {oui}
+set STR(no)         {non}
+set STR(none)       {aucune}
+set STR(change)     {Changer}
+set STR(minus)      {Normal <<}
+set STR(plus)       {Avancé >>}
+set STR(about)       {A propos...}
+set STR(close)       {Fermer}
+set STR(tree)       {Arborescence:}
+set STR(trees)       {Arborescences:}
+set STR(context)    {Contexte:}
+set STR(user)       {Login:}
+set STR(mnt_point)  {Point de montage:}
+set STR(not_logged_in)  {vous n'êtes pas loggé}
+
+
+#title of TCL/TK windows
+set STR(ndswhoami)       {Qui suis-je ?}
+set STR(ndslogin)        {Login à Netware}
+set STR(ndslogout)       {Deconnexion d'une arborescence}
+set STR(ndspasswd)       {Changer son mot de passe}
+set STR(ndsspace)        {Quota disque}
+set STR(ncpmount)        {Monter des volumes Netware }
+set STR(ndsmount)        {Monter des volumes NDS}
+set STR(ndsabout)        {A propos de NDS client}
+set STR(ndslicense)      {License GPL}
+
+
+
+
+# ndspasswd
+set STR(old_pwd)   { Mot de passe actuel:}
+set STR(new_pwd)   { Nouveau mot de passe:}
+set STR(new_pwd2)   {Confirmation:}
+set STR(success_chg_pwd) {changement de mot de passe réussi.}
+set STR(no_chg_pwd) {non autorisé à changer}
+set STR(pwd_required) {requis:}
+set STR(pwd_exp_date) {date expiration:}
+set STR(pwd_min_len) {longueur minimale:}
+
+
+#ndslogin
+set STR(login)       {  Login  }
+set STR(loginname)       {Login:}
+set STR(password)       {Mot de passe:}
+
+#ndstree
+set STR(pick_tree)        {Selection d'une arborescence}
+set STR(available_trees)  {Arborescences visibles:}
+
+#ndsspace
+set STR(used) {Utilisé:}
+set STR(quota) {Limite:}
+set STR(left)  {Reste:}
+
+
+#ndsctx
+set STR(pick_ctx)       {Selection du contexte}
+set STR(available_ctxs) {Contextes visibles :}
+
+#ndsmount+ncpmount
+set  STR(browse)         {Parcourir...}
+set  STR(mount)         {Monter}
+set  STR(umount)         {Démonter}
+set STR(already_mounted) {Volumes déja montés:}
+set STR(nothing)         {Aucun volume à demonter}
+set STR(nds_volumes)     {Volumes disponibles:}
+
+#ndsabout
+set STR(name) {Nom:}
+set STR(author) {Auteur:}
+set STR(date)    {Date:}
+set STR(license) {License:}
+set STR(gpl) {GPL}
+set STR(see_gpl) {License GPL ...}
+
+#ndslicense
+
+
+

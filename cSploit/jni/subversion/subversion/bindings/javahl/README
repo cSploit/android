@@ -1,0 +1,95 @@
+About JavaHL
+------------
+
+JavaHL provides a (mostly native, using JNI and javah) implementation of
+a high level Java API for Subversion, which was originally targeted for
+implementors of GUI clients and IDE plug-ins for Subversion.  JavaHL
+currently provides a minimal-but-complete set of APIs which expose the
+core Subversion C API to Java.  It requires a JRE 1.2+ (runtime).
+
+It is currently quite mature, and can be considered for production use.
+
+
+Build system
+------------
+
+JavaHL should compile and run under Linux, Win32, and Mac OS X with a
+JDK 1.3+.
+
+Its build will produce both a native library (libsvnjavahl-1.so on Unix
+or libsvnjavahl-1.dll on Win32) and a platform independent archive of
+Java bytecode (svn-javahl.jar).
+
+To build JavaHL on non-Win32 platforms, just add "--enable-javahl" to
+the configure script's parameters.  "--with-jdk" can be provided to
+specify the path to a jdk.  "--with-maintainer-mode" will compile Java
+bytecode with debugging information.  Jikes will be the preferred
+compiler if it is auto-detected.  If not auto-detected, you can force
+its use via the "--with-jikes=path" flag to configure.
+
+The following make targets are provided:
+
+javahl                build javahl
+install-javahl        install javahl
+check-javahl          run javahl tests
+
+(In order to run check-javahl, you must have already installed JavaHL,
+and you must have specified a path to a JUnit jar file with
+--with-junit when running configure; JUnit version 3.8.1 has been
+tested.  JUnit can be downloaded from http://junit.sf.net/ .)
+
+
+MacOS X:
+
+After building libsvnjavahl.dynlib, you must rename it to
+libsvnjavahl.jnilib.  Additionally, it should probably be installed in
+/Library/Java/Extensions instead of wherever the build system chose to
+install it; patches to our build system to do this automatically are
+welcome.
+
+Windows:
+
+In MS Visual Studio, make sure that the bin directory of the JDK is in
+your path and that the include and the include\win32 directories are
+in the include path.
+
+To build, use the project/target "__JAVAHL__" of the main subversion
+workspace.  The private project/workspace is not used anymore.
+
+
+Success stories
+---------------
+
+Subclipse, Eclipse IDE plug-in <http://subclipse.tigris.org/>
+
+Svn-Up, Swing GUI and plug-in for the IDEA IDE
+<http://svnup.tigris.org/>
+
+
+Why not 100% pure Java?
+-----------------------
+
+Though 100% pure Java is often preferred by Java programmers, such an
+implementation would require significant effort to create, debug, and
+update a duplicate of _at least_ the entire Subversion client libraries
+in Java, taking the maintainers' time away from improving Subversion
+itself.  The official Subversion C libraries are the reference
+implementation of a Subversion client's logic, and are the most robust
+client implementation available.  Using JNI allows the effort that has
+gone into the existing libraries to be leveraged from Java, and allows
+developer time to me more efficently spent on further development of the
+underlying libraries shared by many implementations.
+
+The SVNKit <http://svnkit.com/> client library (formerly known as
+JavaSVN) is a 100% pure Java implementation, and attempts to track the
+latest changes to Subversion's core libraries; however, this is an
+independent project and the Subversion project cannot make any promises
+as to its compatibility with the official Subversion implementation.
+
+
+TODO
+----
+
+o Expose more of Subversion's core libraries through JNI.
+o More JUnit test cases.
+o Improve JavaDoc and coding style.

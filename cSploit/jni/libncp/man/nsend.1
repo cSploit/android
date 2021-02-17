@@ -1,0 +1,133 @@
+.TH NSEND 1 04/07/1999 nsend nsend
+.SH NAME
+nsend \- Send messages to users or groups
+.SH SYNOPSIS
+.B nsend
+[ \fB-h\fP ] [ \fB-S\fP \fIserver\fP ] [ \fB-U\fP \fIuser name\fP ]
+[ \fB-P\fP \fIpassword\fP | \fB-n\fP ] [ \fB-C\fP ] [ \fB-a\fP ]
+\fB-i\fP \fIobjectID\fP | \fB-c\fP \fIconnNum\fP[,\fI...\fP] | 
+{ [ \fB-t\fP \fIrecipient type\fP ] \fB-o\fP \fIrecipient name\fP |
+\fIrecipient name\fP } \fImessage\fP
+
+.SH DESCRIPTION
+With \fBnsend\fP, you can send messages to the user's workstations.
+
+\fBnsend\fP looks up the file \fI$HOME/.nwclient\fP to find a file 
+server, a user name and possibly a password. See nwclient(5) for more 
+information. Please note that the access permissions of \fI.nwclient\fP
+MUST be 0600, for security reasons.
+
+.SH OPTIONS
+
+.B recipient name
+.RS 3
+\fBrecipient name\fP is either the NetWare name of the user 
+to receive the message or the name of an existing user group on 
+that server. You can use wildcards in this specification.
+.RE
+
+.B -o
+.I recipient name
+.RS 3
+Specifies recipient's name. This can specify user or group.
+.RE
+
+.B -t
+.I recipent type
+.RS 3
+Specifies recipient's type.
+.RE
+
+\fB-c\fP \fIconnNum\fP[,\fI...\fP]
+.RS 3
+Specifies connection numbers of recipients. You can use this option
+as workaround to deliver messages to directory services users.
+.RE
+
+\fB-i\fP \fIuserID\fP
+.RS 3
+Specifies recipient's object ID. You can use this option as workaround
+to deliver messages to directory services users.
+.RE
+
+.B message
+.RS 3
+\fBmessage\fP is the message to be sent. Please note that this has 
+to be a single command line argument. If you want to send a message 
+that contains spaces, you have to quote them on the command line. 
+For example, to annoy your system administrator, you should try
+
+   nsend supervisor 'I know how this works!'
+   
+Program first searches (wildcards allowed) bindery with 
+\fIrecipients name\fP and \fItype\fP. If \fBuser\fP is found, message 
+is sent to this user, if \fBgroup\fP is found, message is sent to this 
+group. Other object types are ignored. If no suitable object was found 
+in this phase, \fBconnection list\fP for specified object is retrieved 
+(no wildcards allowed) and message is sent to this object (including
+\fBprint servers\fP and so on). No expansions on \fBgroup\fP is done
+this time.
+.RE
+
+.B -a
+.RS 3
+By default, nsend prepends 'From ....' text to message. You can suppress
+this by adding \fB-a\fP to command line.
+.RE
+
+.B -S
+.I server
+.RS 3
+\fBserver\fP is the name of the server you want to use.
+.RE
+
+.B -U
+.I user name
+.RS 3
+If the user name your NetWare administrator gave to you differs
+from your unix user-id, you should use \fB-U\fP to tell the 
+server about your NetWare user name.
+.RE
+
+.B -P
+.I password
+.RS 3
+You may want to give the password required by the server on the
+command line. You should be careful about using passwords in scripts.
+.RE
+
+.B -n
+.RS 3
+\fB-n\fP should be given if specified user does not have password.
+
+If neither \fB-n\fP nor \fB-P\fP are given, nsend prompts for a password.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by \fB-C\fP.
+.RE
+
+.SH BUGS
+Directory services connection are not supported yet.
+.br
+Options \fB-c\fP, \fB-i\fP and \fB-o\fP cannot be used together.
+.br
+If user is specified multiple times (using wildcards in group
+specification or by repeating same number in \fB-c\fP), message
+is delivered multiple times to him.
+
+.SH SEE ALSO
+.B nwclient(5), nprint(1), slist(1), ncpmount(8), ncpumount(8)
+
+.SH CREDITS
+nsend was written by looking at mars_nwe's message handling. Thanks to
+Martin Stover <mstover@freeway.de>.
+.br
+Support for Netware groups by Philippe Andersson
+<philippe_andersson@ste.scitex.com>.
+.br
+Support for connections greater than 255 by Petr Vandrovec 
+<vandrove@vc.cvut.cz>.

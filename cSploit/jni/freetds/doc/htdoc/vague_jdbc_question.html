@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- $Id: vague_jdbc_question.html,v 1.3 2011/04/01 03:37:18 jklowden Exp $ -->
+<head>
+<title>FreeTDS.org</title>
+	<link href="freetds.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+	<div id="Navigation">
+	<table>
+		<tr valign="bottom">
+			<td> <a href="index.html">
+				<img src="freetdslogo3.gif" alt="FreeTDS.org" /> </a></td>
+			<td><ul>
+					<li> <a href="index.html">Home</a> </li>
+					<li> <a href="news.html">News</a> </li>
+					<li> <a href="software.html">Software</a> </li>
+					<li> <a href="docs.html">Documentation</a> </li>
+					<li> <a href="support.html">Support</a> </li>
+					<li> <a href="contrib.html">Contribute</a> </li>	
+					</ul>
+				</td></tr>
+		</table>
+				</div>
+  <hr size="1" noshade="noshade" />
+  
+There's a good possibility that the problem you described may have been
+fixed in a more recent version of the driver code.  In order for someone
+to reproduce your problem, you need to supply a bit more information.
+At a minimum:
+<ol>
+<li>The version(s) of freetds_jdbc you are using.</li>
+<li>The version(s) of the TDS protocol you are using.</li>
+<li>The version(s) of the JVM you are using.</li>
+<li>Which DBMS you are using (including version and platform).</li>
+<li>Which platform(s) you are running your client software on.</li>
+<li>Whether the problem is present with the latest snapshot.</li>
+<li>What other layers are present (e.g., CGI wrappers).</li>
+</ol>
+<p>
+To determine #1, for each version of the driver you've tried and with
+which you've experienced the problem, run `ident freetds_jdbc.jar' and
+report the date for the most recently modified source code file.
+</p>
+<p>
+For #2, unless you're specifying ";tds=[version]" in your connection
+URL, you're using TDS 4.2.  Otherwise, you're specifying the TDS version
+explicitly.
+</p>
+<p>
+To find out the version of the JVM you're using (item #3), look at the
+output from the command `java -version'.
+</p>
+<p>
+For #4, report the output from the query `SELECT @@VERSION' (this will
+tell us which service pack you're running as well as the major version
+number and the particulars of the operating system underneath the DBMS).
+Depending on the nature of your problem, it may also be appropriate to
+include other information, such as the character set installed.  Use
+your judgment.
+</p>
+<p>
+You can get the information for #5 from the output of `uname -a' on
+*n*x systems, or from `VER' on Windows systems.
+</p>
+<p>
+For question #6, you need to pick up freetds_jdbc.snapshot.jar from [1]
+and determine whether the problem is resolved.  If it is, you should
+probably just upgrade to the latest snapshot.  (Remember, this is not
+production software -- the README describes it as a "sneak peek at an
+incomplete driver" -- so questions like "Is this version stable enough
+for my mission-critical production system?" aren't as appropriate as
+they would be in other contexts.  You're welcome to contribute to the
+project's work to help get closer to that goal, though.)  Be sure to
+inform the list in this case, so someone doesn't waste time trying to
+track down a problem which has already been resolved.
+</p>
+<p>
+In addition, any code needed to reproduce the problem (including any
+stored procedures) should also be included.  Try to reduce the problem
+to the minimum amount of code which is capable of exhibiting the
+behavior you're describing.  Don't include any sensitive information
+(such as account names and passwords).
+</p>
+<p>
+[1] ftp://freetds.internetcds.com/pub/freetds_jdbc/
+</p>
+</body>
+</html>

@@ -1,0 +1,12 @@
+--- src/ctime.c
++++ src/ctime.c
+@@ -39,6 +39,9 @@
+ #ifdef SQLITE_4_BYTE_ALIGNED_MALLOC
+   "4_BYTE_ALIGNED_MALLOC",
+ #endif
++#ifdef DB_VERSION_STRING
++  "BERKELEY_DB",
++#endif
+ #ifdef SQLITE_CASE_SENSITIVE_LIKE
+   "CASE_SENSITIVE_LIKE",
+ #endif

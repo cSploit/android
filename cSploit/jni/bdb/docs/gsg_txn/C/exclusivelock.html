@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Exclusive Database Handles</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with Berkeley DB Transaction Processing" />
+    <link rel="up" href="txnconcurrency.html" title="Chapter 4. Concurrency" />
+    <link rel="prev" href="txn_ccursor.html" title="Transactional Cursors and Concurrent Applications" />
+    <link rel="next" href="readmodifywrite.html" title="Read/Modify/Write" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Exclusive Database Handles</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="txn_ccursor.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 4. Concurrency</th>
+          <td width="20%" align="right"> <a accesskey="n" href="readmodifywrite.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="exclusivelock"></a>Exclusive Database Handles</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                In some cases, concurrent applications can benefit from
+                occasionally granting exclusive access to the entire
+                database to a single database handle. This is 
+                desirable when a thread will perform an operation that
+                touches all or most of the pages in a database.
+         </p>
+      <p>
+             To configure a handle to have exclusive access to a database,
+             you give it a single write lock to the entire database. This
+             causes all other threads to block when they attempt to gain a
+             read or write lock to any part of that database.
+         </p>
+      <p>
+             The exclusive lock allows for improved throughput
+             because the handle will not attempt to acquire any further
+             locks once it has the exclusive write lock. It will also never
+             be blocked waiting for a lock, and there is no possibility of
+             a deadlock/retry cycle.
+         </p>
+      <p>
+             Note that an exclusive database handle can only have one
+             transaction active for it at a time.
+         </p>
+      <p>
+             To configure a database handle with an exclusive lock, you
+             use the
+             <span>
+                 <code class="methodname">DB-&gt;set_lk_exclusive()</code>
+                 
+                 method before you open the database handle. Setting a
+                 value of <code class="literal">0</code> to this method means that
+                 the handle open operation will block until it can obtain
+                 the exclusive lock. A non-zero value means that if the
+                 method cannot obtain the exclusive lock immediately when
+                 the handle is opened, the open operation will exit with a
+                 <code class="literal">DB_LOCK_NOTGRANTED</code> error return.
+             </span>
+             
+         </p>
+      <p>
+             Once configured and opened, a handled configured with an
+             exclusive database lock will hold that lock until the handle
+             is closed.
+         </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="txn_ccursor.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="txnconcurrency.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="readmodifywrite.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Transactional Cursors and Concurrent Applications </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Read/Modify/Write</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

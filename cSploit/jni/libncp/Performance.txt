@@ -1,0 +1,41 @@
+Author:	Roumen Petrov (RYP) 7 jul 1999
+
+A. I change old "PACKAL" like style for put data into packet to "C" style.
+
+
+I added only for test purposes this function:
+
+/* ------------------------------------ */
+test (struct ncp_conn *_conn,
+		 __u8 _dir_handle, const char *_name,
+		 __u32 _object_id, __u16 _rights, __u16 _rights_mask)
+{
+	long result;
+
+	ncp_init_request_s(_conn, 12);
+	ncp_add_byte(_conn, 0);	/*??? name space */
+	ncp_add_byte(_conn, 0);	/*??? */
+	ncp_add_word_lh(_conn, 0x8000);	/*??? search attribs */
+	ncp_add_word_lh(_conn, _rights_mask);	/* lh or hl ? */
+	ncp_add_byte(_conn, 1);	/*??? */
+	ncp_add_byte(_conn, 0);	/*??? */
+	ncp_add_byte(_conn, _dir_handle);
+	ncp_add_dword_lh(_conn, 0x00000000);	/* lh or hl ? */
+	ncp_add_pstring2(_conn, _name, 299);
+	ncp_add_dword_hl(_conn, _object_id);
+	ncp_add_word_lh(_conn, _rights);
+
+/*	result = ncp_request(_conn, 87); */
+	ncp_unlock_conn(_conn);
+	return result;
+}
+
+/* ------------------------------------ */
+
+into  ../lib/ncplib.c in version 2.2.0.  Then in a loop of
+1000 * 10000 times I call this function and result is 221 [sec] to
+154 [sec] over i486(120 Mhz).
+In new version time for fill of packet is only 69.68% of time of old version.
+
+B. I renamed old function ncp_add_XXX to assert_ncp_add_XXX and
+make new ncp_add_XXX without call to assert_conn_locked(....).

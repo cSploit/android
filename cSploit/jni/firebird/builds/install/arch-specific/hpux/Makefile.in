@@ -1,0 +1,131 @@
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# You may obtain a copy of the Licence at
+# http://www.gnu.org/licences/lgpl.html
+# 
+# As a special exception this file can also be included in modules
+# with other source code as long as that source code has been 
+# released under an Open Source Initiative certificed licence.  
+# More information about OSI certification can be found at: 
+# http://www.opensource.org 
+# 
+# This module is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public Licence for more details.
+# 
+# This module was created by members of the firebird development 
+# team.  All individual contributions remain the Copyright (C) of 
+# those individuals and all rights are reserved.  Contributors to 
+# this file are either listed below or can be obtained from a CVS 
+# history command.
+#
+#  Created by:  Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#
+#  Contributor(s):
+# 
+#
+ROOT=..
+
+
+
+include     $(ROOT)/gen/make.defaults
+include     $(ROOT)/gen/make.platform
+include     $(ROOT)/gen/make.rules
+include     $(ROOT)/gen/make.shared.variables
+
+
+FirebirdInstallPrefix=@prefix@
+
+ @SET_MAKE@
+
+FIREBIRD=$(FirebirdInstallPrefix)
+
+export -n FIREBIRD
+export -n INTERBASE
+
+.PHONY: install dist packages depotfile tarfile 
+.PHONY: buildDepot buildTarDir buildImageDir buildRoot buildDebugInfo
+
+# Some of these targets are run from the root tree of the build.
+# those need to know where the install subdirectory is kept.
+# Others are run locally these need to know the path back to the
+# root of the build tree.
+
+BuildRoot=$(GEN_ROOT)
+
+InstallRoot=.
+
+
+FirebirdBuildPrefix=$(GEN_ROOT)
+
+#export FirebirdBuildPrefix
+#export FirebirdInstallPrefix
+#export PackageVersion
+
+BuildVersion=$(FirebirdVersion).$(BuildNum)
+
+Version=$(BuildVersion)-$(PackageVersion)
+
+
+
+# This means something like: FirebirdCS-2.0.0-1.i386.tar
+
+TarDir= Firebird-$(Version).$(CpuType)
+TarFile=Firebird-$(Version).$(CpuType).tar
+TgzFile=$(TarFile).gz
+DepotFile=Firebird-$(Version).$(CpuType).depot
+RPMFile=Firebird-$(Version).$(CpuType).rpm
+#DebugDir=Firebird-debuginfo-$(Version).$(CpuType)
+#DebugFile=Firebird-debuginfo-$(Version).$(CpuType).tar
+psfFile=firebird.psf
+
+PkgSrcDir=$(InstallRoot)/$(ArchType)
+ScriptDir=$(GEN_ROOT)/install/scripts/
+RPMSrcDir=$(GEN_ROOT)/install/scripts
+
+TarInstallDir=$(GEN_ROOT)/install
+
+dist : packages
+
+#packages: depotfile
+packages: tarfile depotfile
+#packages: tarfile debugfile depotfile
+
+depotfile: buildRoot $(DepotFile)
+
+$(DepotFile): buildDepot
+	(cd $(GEN_ROOT); /usr/sbin/swpackage -d "| gzip -c > $(DepotFile).gz" -x media_type=tape -s $(psfFile)) 
+
+tarfile:  buildRoot $(TgzFile)
+
+$(TgzFile) :  buildTarDir
+	(cd $(GEN_ROOT); tar -cvf - $(TarDir) | gzip -c >$(TgzFile))
+
+#debugfile:  $(DebugFile)
+
+#$(DebugFile) :  buildImageDir
+#	(cd $(GEN_ROOT)/$(DebugDir); tar -cvf ../$(DebugFile) *)
+
+buildRoot:
+	(cd $(GEN_ROOT); ./install/makeinstallImage.sh)
+
+# Use this line if you don't want to use separate debug info
+buildImageDir: buildRoot
+#buildImageDir: buildDebugInfo
+
+
+buildTarDir: buildImageDir
+	mkdir -p $(GEN_ROOT)/$(TarDir)
+	cp -r $(GEN_ROOT)/install/scripts $(GEN_ROOT)/$(TarDir)
+	cp -r $(GEN_ROOT)/install/scripts/tarmainInstall.sh $(GEN_ROOT)/$(TarDir)/install.sh
+	chmod a+x $(GEN_ROOT)/$(TarDir)/install.sh $(GEN_ROOT)/$(TarDir)/scripts/*sh
+	(cd $(GEN_ROOT)/buildroot; rm -f buildroot.tar manifest.txt; tar -cvf buildroot.tar * )
+	(cd $(GEN_ROOT)/buildroot; tar -tvf buildroot.tar > manifest.txt )
+	(cd $(GEN_ROOT)/buildroot; cp buildroot.tar ../$(TarDir)/buildroot.tar )
+	(cd $(GEN_ROOT)/buildroot; cp manifest.txt ../$(TarDir)/manifest.txt )
+
+install: buildTarDir
+	(cd $(GEN_ROOT)/$(TarDir); FIREBIRD= FIREBIRD_LOCK= ./install.sh)

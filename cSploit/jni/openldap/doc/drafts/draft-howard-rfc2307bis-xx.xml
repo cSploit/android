@@ -1,0 +1,1338 @@
+<?xml version="1.0"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+	<!ENTITY rfc1034 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1034.xml'>
+	<!ENTITY rfc1057 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1057.xml'>
+	<!ENTITY rfc1279 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.1279.xml'>
+	<!ENTITY rfc2119 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+	<!ENTITY rfc2195 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2195.xml'>
+	<!ENTITY rfc2373 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2373.xml'>
+	<!ENTITY rfc4422 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4422.xml'>
+	<!ENTITY rfc4511 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4511.xml'>
+	<!ENTITY rfc4513 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4513.xml'>
+	<!ENTITY rfc4515 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4515.xml'>
+	<!ENTITY rfc4517 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4517.xml'>
+	<!ENTITY rfc4519 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4519.xml'>
+	<!ENTITY rfc2831 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2831.xml'>
+	<!ENTITY rfc3062 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3062.xml'>
+	<!ENTITY rfc3112 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3112.xml'>
+	<!ENTITY rfc3383 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3383.xml'>
+	<!ENTITY rfc3672 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3672.xml'>
+	<!ENTITY ppolicy PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml3/reference.I-D.behera-ldap-password-policy.xml'>
+]>
+<?xml-stylesheet type='text/xsl' href='http://xml.resource.org/authoring/rfc2629.xslt' ?>
+<?rfc symrefs="yes" ?>
+<rfc 
+  obsoletes="2307"
+  ipr="trust200902" 
+  category="info"
+  docName="draft-howard-rfc2307bis-02">
+  <front>
+    <title abbrev="LDAP NameService Schema">
+      An Approach for Using LDAP as a Network Information Service
+    </title>
+    <author initials="L." surname="Howard" fullname="Luke Howard">
+      <organization abbrev="PADL Software">
+        PADL Software Pty. Ltd.
+      </organization>
+      <address>
+        <postal>
+          <street>PO Box 59</street>
+          <city>Central Park</city>
+          <region>Vic</region>
+          <code>3145</code>
+          <country>AU</country>
+        </postal>
+        <email>lukeh@padl.com</email>
+      </address>
+    </author>
+	<author initials="H." fullname="Howard Chu" surname="Chu" role="editor">
+		<organization>Symas Corp.</organization>
+		<address>
+			<postal>
+				<street>18740 Oxnard Street, Suite 313A</street>
+				<city>Tarzana</city>
+				<region>California</region>
+				<code>91356</code>
+				<country>US</country>
+			</postal>
+			<phone>+1 818 757-7087</phone>
+			<email>hyc@symas.com</email>
+		</address>
+	</author>
+    <date month="August" year="2009"/>
+    <abstract>
+      <t>This document describes a mechanism for mapping
+      entities related to <xref target="UNIX">TCP/IP and the UNIX 
+      system </xref> into <xref target="X.500"/> entries so
+      that they may be resolved with the <xref target="RFC4511">
+      Lightweight Directory Access Protocol</xref>. A set of attribute types
+      and object classes are proposed, along with specific guidelines for
+      interpreting them.  The intention is to assist the deployment of 
+      LDAP as an organizational nameservice. No proposed solutions are 
+      intended as standards for the Internet. Rather, it is hoped that a 
+      general consensus will emerge as to the appropriate solution to such 
+      problems, leading eventually to the adoption of standards. The 
+      proposed mechanism has already been implemented with some success.
+</t>
+    </abstract>
+  </front>
+
+  <middle>
+    <section anchor="background" title="Background and Motivation">
+      <t>The UNIX (R) operating system, and its derivatives (specifically,
+      those which support TCP/IP and conform to the <xref target="UNIX">
+      X/Open Single UNIX specification</xref>) require a means of looking up 
+      entities, by matching them against search criteria or by enumeration. 
+      (Other operating systems that support TCP/IP may provide some means of
+      resolving some of these entities. This schema is applicable to those 
+      environments also.)</t>
+      <t>These entities include users, groups, IP services (which map names
+      to IP ports and protocols, and vice versa), IP protocols (which map
+      names to IP protocol numbers and vice versa), RPCs (which map names
+      to <xref target="RFC1057">ONC Remote Procedure Call</xref>
+      numbers and vice versa), NIS netgroups, booting information (boot 
+      parameters and MAC address mappings), filesystem mounts, IP hosts 
+      and networks.</t> 
+      <t>Resolution requests are made through a set of C functions, provided
+      in the UNIX system's C library. For example, the UNIX system utility 
+      "ls", which enumerates the contents of a filesystem directory,
+      uses the C library function getpwuid() in order to map user IDs to
+      login names. Once the request is made, it is resolved using a
+      "nameservice" which is supported by the client library. The
+      nameservice may be, at its simplest, a collection of files in the
+      local filesystem which are opened and searched by the C library. Other
+      common nameservices include the Network Information Service (NIS)
+      and the <xref target="RFC1034">Domain Name System (DNS)</xref>. (The latter is typically used for
+      resolving hosts, services and networks.) Both these nameservices
+      have the advantage of being distributed and thus permitting a common
+      set of entities to be shared amongst many clients.</t>
+      <t>LDAP is a distributed, hierarchical directory service access 
+      protocol which is used to access repositories of users and other
+      network-related entities. Because LDAP is often not tightly integrated
+      with the host operating system, information such as users may need
+      to be kept both in LDAP and in an operating system supported
+      nameservice such as NIS. By using LDAP as the primary means of
+      resolving these entities, these redundancy issues are minimized and
+      the scalability of LDAP can be exploited. (By comparison, NIS services
+      based on flat files do not have the scalability or extensibility of
+      LDAP or X.500.)</t>
+      <t>The object classes and attributes defined below are suitable for
+      representing the aforementioned entities in a form compatible with
+      LDAP and X.500 directory services.</t>
+    </section>
+    <section anchor="general" title="General Issues">
+      <section anchor="genera.terms" title="Terminology">
+        <t>The key words "MUST", "SHOULD", and "MAY" used in this document
+        are to be interpreted as described in
+        <xref target="RFC2119"/>.</t>
+        <t>For the purposes of this document, the term "nameservice" refers
+        to a service, such as NIS or flat files, that is used by the
+        operating system to resolve entities within a single, local naming
+        context. Contrast this with a "directory service" such as LDAP, which
+        supports extensible schema and multiple naming contexts.</t>
+        <t>The term "NIS-related entities" broadly refers to entities which
+        are typically resolved using the Network Information Service. (NIS
+        was previously known as YP.) Deploying LDAP for resolving these
+        entities does not imply that NIS be used, as a gateway or otherwise.
+        In particular, the host and network classes are generically
+        applicable, and may be implemented on any system that wishes to use
+        LDAP or X.500 for host and network resolution.</t>
+        <t>The "DUA" (directory user agent) refers to the LDAP client
+        querying these entities, such as an LDAP to NIS gateway or the C
+        library. The "client" refers to the application which ultimately
+        makes use of the information returned by the resolution. It
+        is irrelevant whether the DUA and the client reside within the same
+        address space. The act of the DUA making this information to the
+        client is termed "republishing".</t>
+        <t>To avoid confusion, the term "login name" refers to the user's
+        login name (being the value of the uid attribute) and the term
+        "user ID" refers to the user's integer identification number (being
+        the value of the uidNumber attribute).</t>
+        <t>The phrases "resolving an entity" and "resolution of entities"
+        refer respectively to enumerating NIS-related entities of a given
+        type, and matching them against a given search criterion. One or
+        more entities are returned as a result of successful "resolutions"
+        (a "match" operation will only return one entity).</t>
+        <t>The use of the term UNIX does not confer upon this schema the
+        endorsement of owners of the UNIX trademark. Where necessary, the
+        term "TCP/IP entity" is used to refer to protocols, services,
+        hosts, and networks, and the term "UNIX entity" to its complement.
+        (The former category does not mandate the host operating system
+        supporting the interfaces required for resolving UNIX entities.)</t>
+        <t>The OIDs defined below are derived from iso(1) org(3) dod(6) 
+        internet(1) directory(1) nisSchema(1)</t>
+      </section>
+	  <section title="Schema">
+        <t>The attributes and classes defined in this document are summarized
+        below.</t>
+      <section anchor="general.attrs" title="Attributes">
+        <t>The following attributes are defined in this document:
+          <list style="empty">
+            <t>
+              uidNumber<vspace blankLines="0"/>
+              gidNumber<vspace blankLines="0"/>
+              gecos<vspace blankLines="0"/>
+              homeDirectory<vspace blankLines="0"/>
+              loginShell<vspace blankLines="0"/>
+              shadowLastChange<vspace blankLines="0"/>
+              shadowMin<vspace blankLines="0"/>
+              shadowMax<vspace blankLines="0"/>
+              shadowWarning<vspace blankLines="0"/>
+              shadowInactive<vspace blankLines="0"/>
+              shadowExpire<vspace blankLines="0"/>
+              shadowFlag<vspace blankLines="0"/>
+              memberUid<vspace blankLines="0"/>
+              memberNisNetgroup<vspace blankLines="0"/>
+              nisNetgroupTriple<vspace blankLines="0"/>
+              ipServicePort<vspace blankLines="0"/>
+              ipServiceProtocol<vspace blankLines="0"/>
+              ipProtocolNumber<vspace blankLines="0"/>
+              oncRpcNumber<vspace blankLines="0"/>
+              ipHostNumber<vspace blankLines="0"/>
+              ipNetworkNumber<vspace blankLines="0"/>
+              ipNetmaskNumber<vspace blankLines="0"/>
+              macAddress<vspace blankLines="0"/>
+              bootParameter<vspace blankLines="0"/>
+              bootFile<vspace blankLines="0"/>
+              nisMapName<vspace blankLines="0"/>
+              nisMapEntry<vspace blankLines="0"/>
+              nisPublicKey<vspace blankLines="0"/>
+              nisSecretKey<vspace blankLines="0"/>
+              nisDomain<vspace blankLines="0"/>
+              automountMapName<vspace blankLines="0"/>
+              automountKey<vspace blankLines="0"/>
+              automountInformation<vspace blankLines="0"/>
+            </t>
+          </list>
+          Additionally, some of the attributes defined in 
+          <xref target="RFC4519"/> and
+          <xref target="RFC3112"/> are required.
+        </t>
+      </section>
+	  <section anchor="attroptions" title="Attribute Option">
+	    <t>Centralizing a name service in LDAP allows heterogeneous
+		systems to obtain their information from a single place. However
+		in some cases, this information cannot be used uniformly on all
+		of the client systems. These attribute options are defined to allow
+		system-specific values to be used where necessary. The options
+		are defined as the following:
+		<list style="empty">
+		<t>host-&lt;hostname><vspace blankLines="0"/>
+		hostos-&lt;ostype></t>
+		</list>
+		where hostname is a string representing the name of a specific
+		machine, and ostype is a string representing a particular
+		operating system.</t>
+		<t>For example, a user named "Babs Jensen" may have a different
+		home directory on different machines. This could be represented as:
+		<list style="empty">
+		<t>
+		homeDirectory: /home/babsj<vspace blankLines="0"/>
+		homeDirectory;hostos-sunos: /export/home/bjensen<vspace blankLines="0"/>
+		homeDirectory;host-babshost: /home/root
+		</t>
+		</list></t>
+		<t>These attribute options follow sub-typing semantics. If a DUA
+		requests an attribute to be returned in a search operation, and
+		does not specify an option, all subtypes of that attribute are
+		returned.</t>
+	</section>
+      <section anchor="general.classes" title="Object Classes">
+        <t>The following object classes are defined in this document:
+          <list style="empty">
+            <t>
+              posixAccount<vspace blankLines="0"/>
+              shadowAccount<vspace blankLines="0"/>
+              posixGroup<vspace blankLines="0"/>
+              ipService<vspace blankLines="0"/>
+              ipProtocol<vspace blankLines="0"/>
+              oncRpc<vspace blankLines="0"/>
+              ipHost<vspace blankLines="0"/>
+              ipNetwork<vspace blankLines="0"/>
+              nisNetgroup<vspace blankLines="0"/>
+              nisMap<vspace blankLines="0"/>
+              nisObject<vspace blankLines="0"/>
+              ieee802Device<vspace blankLines="0"/>
+              bootableDevice<vspace blankLines="0"/>
+              nisKeyObject<vspace blankLines="0"/>
+              nisDomainObject<vspace blankLines="0"/>
+              automountMap<vspace blankLines="0"/>
+              automount<vspace blankLines="0"/>
+            </t>
+          </list>
+          Additionally, some of the attributes defined in 
+          <xref target="RFC4519"/> are required.
+        </t>
+      </section>
+	 </section>
+    </section>
+    <section anchor="attrdefs" title="Attribute Definitions">
+      <t>This section contains attribute definitions to be implemented 
+      by DUAs supporting this schema:
+      <figure title="">
+        <artwork>
+  ( 1.3.6.1.1.1.1.0 NAME 'uidNumber'
+      DESC 'An integer uniquely identifying a user in an
+            administrative domain'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.1 NAME 'gidNumber'
+      DESC 'An integer uniquely identifying a group in an
+            administrative domain'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.2 NAME 'gecos'
+      DESC 'The GECOS field; the common name'
+      EQUALITY caseIgnoreMatch
+      SUBSTRINGS caseIgnoreSubstringsMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.3 NAME 'homeDirectory'
+      DESC 'The absolute path to the home directory'
+      EQUALITY caseExactIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.4 NAME 'loginShell'
+      DESC 'The path to the login shell'
+      EQUALITY caseExactIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.5 NAME 'shadowLastChange'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.6 NAME 'shadowMin'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.7 NAME 'shadowMax'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.8 NAME 'shadowWarning'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.9 NAME 'shadowInactive'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.10 NAME 'shadowExpire'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.11 NAME 'shadowFlag'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.12 NAME 'memberUid'
+      EQUALITY caseExactMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.13 NAME 'memberNisNetgroup'
+      EQUALITY caseExactMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.14 NAME 'nisNetgroupTriple'
+      DESC 'Netgroup triple'
+      EQUALITY caseIgnoreMatch
+      SUBSTRINGS caseIgnoreSubstringsMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.15 NAME 'ipServicePort'
+      DESC 'Service port number'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.16 NAME 'ipServiceProtocol'
+      DESC 'Service protocol name'
+      EQUALITY caseIgnoreMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.17 NAME 'ipProtocolNumber'
+      DESC 'IP protocol number'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.18 NAME 'oncRpcNumber'
+      DESC 'ONC RPC number'
+      EQUALITY integerMatch
+      ORDERING integerOrderingMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.19 NAME 'ipHostNumber'
+      DESC 'IPv4 addresses as a dotted decimal omitting leading
+            zeros or IPv6 addresses as defined in RFC2373'
+      EQUALITY caseIgnoreIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.20 NAME 'ipNetworkNumber'
+      DESC 'IP network omitting leading zeros, eg. 192.168'
+      EQUALITY caseIgnoreIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.21 NAME 'ipNetmaskNumber'
+      DESC 'IP netmask omitting leading zeros, eg. 255.255.255.0'
+      EQUALITY caseIgnoreIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.22 NAME 'macAddress'
+      DESC 'MAC address in maximal, colon separated hex
+            notation, eg. 00:00:92:90:ee:e2'
+      EQUALITY caseIgnoreIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.23 NAME 'bootParameter'
+      DESC 'rpc.bootparamd parameter'
+      EQUALITY caseExactIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.24 NAME 'bootFile'
+      DESC 'Boot image name'
+      EQUALITY caseExactIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.26 NAME 'nisMapName'
+      DESC 'Name of a generic NIS map'
+      EQUALITY caseIgnoreMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{64} )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.27 NAME 'nisMapEntry'
+      DESC 'A generic NIS entry'
+      EQUALITY caseExactMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{1024}
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.28 NAME 'nisPublicKey'
+      DESC 'NIS public key'
+      EQUALITY octetStringMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.29 NAME 'nisSecretKey'
+      DESC 'NIS secret key'
+      EQUALITY octetStringMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.30 NAME 'nisDomain'
+      DESC 'NIS domain'
+      EQUALITY caseIgnoreIA5Match
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.26{256} )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.31 NAME 'automountMapName'
+      DESC 'automount Map Name'
+      EQUALITY caseExactMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.32 NAME 'automountKey'
+      DESC 'Automount Key value'
+      EQUALITY caseExactMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+      SINGLE-VALUE )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.1.33 NAME 'automountInformation'
+      DESC 'Automount information'
+      EQUALITY caseExactMatch
+      SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+      SINGLE-VALUE )
+        </artwork>
+      </figure></t>
+    </section>
+    <section anchor="classdefs" title="Class Definitions">
+      <t>This section contains class definitions to be implemented by DUAs
+      supporting the schema.</t>
+      <t>Various schema for mail routing and delivery using LDAP directories
+      have been proposed, and as such this document does not consider
+      schema for representing mail aliases or distribution lists.
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.0 NAME 'posixAccount' SUP top AUXILIARY
+      DESC 'Abstraction of an account with POSIX attributes'
+      MUST ( cn $ uid $ uidNumber $ gidNumber $ homeDirectory )
+      MAY ( authPassword $ userPassword $ loginShell $ gecos $
+            description ) )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.1 NAME 'shadowAccount' SUP top AUXILIARY
+      DESC 'Additional attributes for shadow passwords'
+      MUST uid
+      MAY ( authPassword $ userPassword $ description $
+            shadowLastChange $ shadowMin $ shadowMax $
+            shadowWarning $ shadowInactive $
+            shadowExpire $ shadowFlag ) )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.2 NAME 'posixGroup' SUP top AUXILIARY
+      DESC 'Abstraction of a group of accounts'
+      MUST gidNumber
+      MAY ( authPassword $ userPassword $ memberUid $
+            description ) )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.3 NAME 'ipService' SUP top STRUCTURAL
+      DESC 'Abstraction an Internet Protocol service.
+            Maps an IP port and protocol (such as tcp or udp)
+            to one or more names; the distinguished value of
+            the cn attribute denotes the service's canonical
+            name'
+      MUST ( cn $ ipServicePort $ ipServiceProtocol )
+      MAY description )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.4 NAME 'ipProtocol' SUP top STRUCTURAL
+      DESC 'Abstraction of an IP protocol. Maps a protocol number
+            to one or more names. The distinguished value of the cn
+            attribute denotes the protocol canonical name'
+      MUST ( cn $ ipProtocolNumber )
+      MAY description )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.5 NAME 'oncRpc' SUP top STRUCTURAL
+      DESC 'Abstraction of an Open Network Computing (ONC)
+           [RFC1057] Remote Procedure Call (RPC) binding.
+           This class maps an ONC RPC number to a name.
+           The distinguished value of the cn attribute denotes
+           the RPC service canonical name'
+      MUST ( cn $ oncRpcNumber )
+      MAY description )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.6 NAME 'ipHost' SUP top AUXILIARY
+      DESC 'Abstraction of a host, an IP device. The distinguished
+            value of the cn attribute denotes the host's canonical
+         name. Device SHOULD be used as a structural class'
+      MUST ( cn $ ipHostNumber )
+      MAY ( authPassword $ userPassword $ l $ description $
+            manager ) )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.7 NAME 'ipNetwork' SUP top STRUCTURAL
+      DESC 'Abstraction of a network. The distinguished value of
+            the cn attribute denotes the network canonical name'
+      MUST ipNetworkNumber
+      MAY ( cn $ ipNetmaskNumber $ l $ description $ manager ) )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.8 NAME 'nisNetgroup' SUP top STRUCTURAL
+      DESC 'Abstraction of a netgroup. May refer to other 
+            netgroups'
+      MUST cn
+      MAY ( nisNetgroupTriple $ memberNisNetgroup $ description ) )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.9 NAME 'nisMap' SUP top STRUCTURAL
+      DESC 'A generic abstraction of a NIS map'
+      MUST nisMapName
+      MAY description )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.10 NAME 'nisObject' SUP top STRUCTURAL
+      DESC 'An entry in a NIS map'
+      MUST ( cn $ nisMapEntry $ nisMapName )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.11 NAME 'ieee802Device' SUP top AUXILIARY
+      DESC 'A device with a MAC address; device SHOULD be
+            used as a structural class'
+      MAY macAddress )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.12 NAME 'bootableDevice' SUP top AUXILIARY
+      DESC 'A device with boot parameters; device SHOULD be
+            used as a structural class'
+      MAY ( bootFile $ bootParameter ) )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.14 NAME 'nisKeyObject' SUP top AUXILIARY
+      DESC 'An object with a public and secret key'
+      MUST ( cn $ nisPublicKey $ nisSecretKey )
+      MAY ( uidNumber $ description ) )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.15 NAME 'nisDomainObject' SUP top AUXILIARY
+      DESC 'Associates a NIS domain with a naming context'
+      MUST nisDomain )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.16 NAME 'automountMap' SUP top STRUCTURAL
+      MUST ( automountMapName )
+      MAY description )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.17 NAME 'automount' SUP top STRUCTURAL
+      DESC 'Automount information'
+      MUST ( automountKey $ automountInformation )
+      MAY description )
+        </artwork>
+      </figure>
+      <figure>
+        <artwork>
+  ( 1.3.6.1.1.1.2.18 NAME 'groupOfMembers' SUP top STRUCTURAL
+      DESC 'A group with members (DNs)'
+      MUST cn
+      MAY ( businessCategory $ seeAlso $ owner $ ou $ o $
+            description $ member ) )
+        </artwork>
+      </figure></t>
+    </section>
+    <section anchor="impl" title="Implementation Details">
+      <section anchor="impl.res_methods" 
+        title="Suggested Resolution Methods">
+        <t>The preferred means of directing a client application (one using
+        the shared services of the C library) to use LDAP as its information
+        source for the functions listed in <xref target="appendixb"/> is to modify the
+        source code to directly query LDAP. As the source to commercial C
+        libraries and applications is rarely available to the end-user, one
+        could emulate a supported nameservice (such as NIS). (This is also
+        an appropriate opportunity to perform caching of entries across
+        process address spaces.) In the case of NIS, reference
+        implementations are widely available and the RPC interface is well
+        known.</t>
+        <t>The means by which the operating system is directed to use LDAP
+        is implementation dependent. For example, some operating systems
+        and C libraries support end-user extensible resolvers using
+        dynamically loadable libraries and a nameservice "switch" (NSS).
+		The means in which the DUA locates LDAP servers is also
+		implementation dependent.</t>
+      </section>
+      <section anchor="impl.interp_user_group" 
+        title="Interpreting User and Group Entries">
+        <t>User and group resolution is initiated by the functions prefixed
+        by getpw and getgr respectively. The uid attribute contains the
+        user's login name. The cn attribute, in posixGroup entries, contains
+        the group's name.  This document preserves the use of the uid
+        attribute even though, being a naming attribute, its syntax is case
+        insensitive. This may cause a problem with existing deployments where
+        there exist login names differing only in case. If DUAs support
+        attribute mapping, a different attribute MAY be used to represent
+        users' login names.</t>
+        <t>The account object class provides a convenient structural class
+        for posixAccount, and SHOULD be used where additional attributes
+        are not required. Likewise, the groupOfMembers object class
+		SHOULD be used for groups. (The groupOfUniqueNames object class
+		is deprecated and SHOULD NOT be used.)</t>
+        <t>It is suggested that uid and cn are used as the naming attribute
+        for posixAccount and posixGroup entries, respectively. Group members
+        may either be login names (values of memberUid) or distinguished
+        names (values of member). In the latter case, the distinguished
+        name must be mapped to one or more login names by examining the 
+        name's RDN or, if it is not distinguished by uid, performing a base
+        search on the DN with a filter of "(objectclass=*)". DUAs MAY wish
+        to cache DN to login name mappings. The DUA MAY traverse nested
+        groups.</t>
+        <t>An account's GECOS field is preferably determined by a value of
+        the gecos attribute. If no gecos attribute exists, the value of the
+        cn attribute MUST be used. (The existence of the gecos attribute
+        allows information embedded in the GECOS field, such as a user's
+        telephone number, to be returned to the client without overloading
+        the cn attribute. It also accommodates directories where the common
+        name does not contain the user's full name.)</t>
+
+		<section title="Using Attribute Options">
+		<t>Some posixAccount attributes may be accompanied by <xref target="attroptions">options</xref>
+		identifying particular hosts or operating system types. The
+		attribute with a hostos option matching the operating system of
+		the DUA SHOULD be used in preference to an attribute without
+		any associated options. The attribute with a host option matching
+		the hostname of the DUA SHOULD be used in preference to any
+		other attribute.</t>
+		</section>
+		<section title="Authentication Considerations">
+		<section title="Using Password Values">
+		<t>When authenticating using a NIS to LDAP gateway or using NSS,
+		a lookup is performed to retrieve the password attribute and
+		the value is used in the DUA to authenticate a user. This
+		approach to authentication is deprecated, as it requires that
+		read access to the password attribute be granted across a
+		network.</t>
+        <t>An entry of class posixAccount, posixGroup, or shadowAccount
+        without an authPassword or userPassword attribute MUST NOT be used
+        for authentication.  In this case the client SHOULD be returned a
+        non-matchable password such as "x".</t>
+        <t>If userPassword is used, its values MUST be represented by
+        the following syntax:
+        <figure>
+          <artwork>
+    passwordvalue   = schemeprefix hashedpasswd
+    schemeprefix    = "{" scheme "}"
+    scheme          = "crypt" / "md5" / "sha" / "ssha" / altscheme
+    altscheme       = "x-" keystring
+    hashedpasswd    = hashed password
+          </artwork>
+        </figure></t>
+        <t>The hashed password contains a plaintext key hashed using
+        the algorithm scheme.  If the schema is "sha", the hashed
+        password is the base64 encoding of the SHA-1 digest of the plaintext
+        password.</t>
+        <t>userPassword values which do not adhere to this syntax MUST NOT be
+        used for authentication. The DUA MUST iterate through the values of
+        the attribute until a value matching the above syntax is found.
+        Only if hashedpassword is an empty string does the user have no
+        password.  DUAs are not required to consider hashing schemes
+        which the client will not recognize; in most cases, it may be 
+        sufficient to consider only "crypt".</t>
+        <t>DUA MAY use the authPassword attribute instead of userPassword,
+        defined in <xref target="RFC3112"/>.  The DUA MUST iterate the values of the
+        authPassword attribute until a value whose scheme is CRYPT is found.
+        The DUA MAY iterate through the values of the userPassword
+        attribute, using the syntax defined here, until a value
+        whose scheme is CRYPT is found. If no conforming value is found,
+        the client MUST be returned a non-matchable password such as "x".
+        Authentication using schemes other than CRYPT is, although advisable,
+        beyond the scope of this document</t>
+        <t>Below is an example of an authPassword attribute:
+        <figure>
+          <artwork>
+    authPassword: CRYPT$X5/DBrWPOQQaI
+          </artwork>
+        </figure></t>
+        <t>Below is an example of a (deprecated) userPassword attribute:
+        <figure>
+          <artwork>
+    userPassword: {CRYPT}X5/DBrWPOQQaI
+          </artwork>
+        </figure></t>
+        <t>A DUA MAY utilize the attributes in the shadowAccount class to
+        provide shadow password service (getspnam() and getspent()). In such
+        cases, the DUA MUST NOT make use of the userPassword attribute for
+        getpwnam() et al, and MUST return a non-matchable password (such as
+        "x") to the client instead.</t>
+		</section>
+		<section title="Using LDAP Bind">
+		<t>The preferred method for authenticating users with LDAP is to
+		perform an LDAP Bind operation with the user's name and password.
+		In this case the method the DSA uses to store and verify the password
+		is completely internal to the DSA and not of any concern to the DUA.</t>
+		<t>Likewise, using the shadowAccount attributes requires the DUA to
+		handle password policy enforcement. However the policies expressed
+		in the shadowAccount are limited in scope, and not uniformly
+		applicable to all the systems that will be using LDAP.</t>
+		<t>The preferred method is to leave password policy enforcement
+		to the DSA, so that it will be uniformly enforced across all of
+		the various systems that rely on the directory. This enforcement
+		occurs implicitly when authenticating using LDAP Bind if the
+		DSA supports the
+		<xref target="I-D.behera-ldap-password-policy">LDAP password
+		policy</xref> mechanisms.</t>
+		<t>The means in which authentication in the DUA is configured
+		is implementation dependent. Typically it is accomplished using
+		<xref target="PAM"/>. Further details of authentication are
+		beyond the scope of this document.</t>
+		</section>
+	   </section>
+	   <section title="Naming Considerations">
+	   <t>On UNIX systems, users and groups reside in separate name spaces
+	   and it is common for the same name to be used by both a user and a
+	   group. Since they are in separate name spaces there is no ambiguity
+	   and no conflict. However, when integrating a name service into LDAP
+	   the directory may be used with other systems besides UNIX and its
+	   derivatives. In particular, the Microsoft Windows operating system
+	   may also use LDAP for its own name service. In Windows, users and
+	   groups reside in a single name space and so one cannot use the same
+	   name for both a user and a group.</t>
+	   <t>Conflicts in naming conventions may arise in other deployments
+	   as well, and should be carefully taken into account when migrating
+	   from other naming services into LDAP.</t>
+	   </section>
+      </section>
+      <section anchor="impl.interp_host_net" 
+        title="Interpreting Hosts and Networks">
+        <t>The ipHostNumber and ipNetworkNumber attributes are defined in
+        preference to dNSRecord (defined in <xref target="RFC1279"/>), in order to simplify
+        the DUA's role in interpreting entries in the directory. A dNSRecord
+        expresses a complete resource record, including time to live and
+        class data, which is extraneous to this schema.</t>
+        <t>Additionally, the ipHost and ipNetwork classes permit a host or
+        network (respectively) and all its aliases to be represented by a
+        single entry in the directory. This is not necessarily possible if
+        a DNS resource record is mapped directly to an LDAP entry.
+        Implementations that wish to use LDAP to master DNS zone information
+        are not precluded from doing so, and may simply avoid the ipHost and
+        ipNetwork classes.</t>
+        <t>This document redefines, although not exclusively, the ipNetwork
+        class defined in <xref target="RFC1279"/>, in
+        order to achieve consistent naming with ipHost. The ipNetworkNumber
+        attribute is also used in the <xref target="ROSE">siteContact 
+        object class</xref>.</t>
+        <t>The authPassword and userPassword attributes are included in
+        ipHost such that hosts MAY be treated as authentication principals.
+        The treatment of these attributes and inherent caveats considered in
+        <xref target="impl.interp_user_group"></xref> apply here also.</t>
+        <t>The trailing zeros in a network address MUST be omitted.
+        CIDR-style network addresses (eg. 192.168.1/24) MAY be used. Leading
+        zeros MUST be removed from all components of an IPv6 address string
+        as defined by <xref target="RFC2373"/>, section 2.2, 
+        item 1.  The IPv6 address string MUST be further normalized
+        by following the "::" syntax as defined in 
+        <xref target="RFC2373"/>, section 2.2, item 2.
+        In addition, "::" MUST be used to replace the longest string of zero
+        bits.  If there are two or more longest strings of zero bits, then
+        the first string MUST be replaced. In addition, the syntax defined 
+        by <xref target="RFC2373"/>, section 2.2, item 3
+        MUST NOT be used.  IPv4 addresses MUST be represented by the IPv4
+        dotted decimal string syntax.</t>
+        <t>For example the following address:
+        <figure>
+          <artwork>
+    1080:0000:0:0:08:800:200C:417A
+    FF01:0:0:0:0:0:01
+    0:0:0:0:0:0:0:0001
+    0:0:0:0:0:0:0:0
+          </artwork>
+        </figure>
+        MUST be normalized as:
+        <figure>
+          <artwork>
+    1080::8:800:200C:417A
+    FF01::101
+    0::1
+    ::
+          </artwork>
+        </figure></t>
+      </section>
+      <section anchor="impl.interp_other" 
+        title="Interpreting Other Entities">
+        <t>In general, a one-to-one mapping between entities and LDAP entries
+        is proposed, in that each entity has exactly one representation in
+        the DIT. In some cases this is not feasible; for example, a service
+        which is represented in more than one protocol domain. Consider the
+        following entry:
+        <figure>
+          <artwork>
+    dn: cn=domain,ou=services,dc=aja,dc=com
+    objectClass: top
+    objectClass: ipService
+    cn: domain
+    cn: nameserver
+    ipServicePort: 53
+    ipServiceProtocol: tcp
+    ipServiceProtocol: udp
+          </artwork>
+        </figure>
+        This entry MUST map to the following two (2) services entities:
+        <figure>
+          <artwork>
+    domain  53/tcp  nameserver
+    domain  53/udp  nameserver
+          </artwork>
+        </figure>
+        While the above two entities may be represented as separate LDAP
+        entities, with different distinguished names (such as 
+        cn=domain+ipServiceProtocol=tcp, ... and 
+        cn=domain+ipServiceProtocol=udp, ...) it is convenient to represent
+        them as a single entry. If a service is represented in multiple
+        protocol domains with different ports, then multiple entries are
+        required; multi-valued RDNs MAY be used to distinguish them.)</t>
+        <t>With the exception of authPassword and userPassword values, empty
+        values (consisting of a zero length string) are returned by the DUA
+        to the client. The DUA MUST reject any entries which do not conform
+        to the schema (missing mandatory attributes). Non-conforming
+        entries SHOULD be ignored while enumerating entries.</t>
+        <t>The nisDomainObject object class is provided to associate a NIS
+        domain with a naming context. A DUA would retrieve the NIS domain
+        name from a configuration file and enumerate the naming contexts
+        served by an LDAP server, searching each naming context for 
+        (nisDomain=%s).  The first matching entry that is found MAY be used
+        as a search base for configuration profile information or for entries
+        themselves. For example, the following example shows an association
+        between the NIS domain "nis.aja.com" and the naming context
+        "dc=aja,dc=com":
+        <figure>
+          <artwork>
+    dn: dc=aja,dc=com
+    objectClass: top
+    objectClass: domain
+    objectClass: nisDomainObject
+    dc: aja
+    nisDomain: nis.aja.com
+          </artwork>
+        </figure>
+        The nisObject object class MAY be used as a generic means of 
+        representing NIS entities. Its use is not encouraged; where support
+        for entities not described in this schema is desired, an appropriate
+        schema should be devised. Implementers are strongly advised to 
+        support end-user extensible mappings between NIS entities and object
+        classes. (Where the nisObject class is used, the nisMapName
+        attribute MAY be used as a RDN.) The nisObject class might be used
+        to represent automount information.</t>
+      </section>
+      <section anchor="impl.canon_entries" 
+        title="Canonicalizing entries with multi-valued naming attributes">
+        <t>For entities such as hosts, services, networks, protocols, and
+        RPCs, where there may be one or more aliases, the respective entry's
+        relative distinguished name SHOULD be used to determine the canonical
+        name.  Any other values for the same attribute are used as aliases.
+        For example, the service described in 
+        <xref target="impl.interp_other" /> has the canonical name "domain"
+        and exactly one alias, "nameserver".</t>
+        <t>The schema in this document generally only defines one attribute
+        per class which is suitable for distinguishing an entity (excluding
+        any attributes with integer syntax; it is assumed that entries will
+        be distinguished on name). Usually, this is the common name (cn)
+        attribute.  This aids the DUA in determining the canonical name of
+        an entity, as it can examine the value of the relative distinguished
+        name. Aliases are thus any values of the distinguishing attribute
+        (such as cn) which do not match the canonical name of the entity.</t>
+        <t>In the event that a different attribute is used to distinguish the
+        entry, as may be the case where these object classes are used as
+        auxiliary classes, the entry's canonical name may not be present in
+        the RDN. In this case, the DUA MUST choose one of the 
+        non-distinguished values to represent the entity's canonical name. As
+        the directory server guarantees no ordering of attribute values, it
+        may not be possible to distinguish an entry deterministically. This
+        ambiguity SHOULD NOT be resolved by mapping one directory entry into
+        multiple entities.</t>
+      </section>
+    </section>
+    <section anchor="focus" title="Implementation Focus">
+      <t>Gateways between NIS and LDAP have been developed by PADL Software
+      and Sun Microsystems. They both support this schema.</t>
+      <t>An open source implementation of the C library resolution code has
+      been written and is available from PADL Software. It supports C
+      libraries on GNU, BSD, AIX, and Solaris operating systems. PADL
+      have also made available a set of scripts for migrating flat files
+      into a form suitable for loading into an LDAP server. Another
+	  open source implementation of the C library code is available from
+	  the OpenLDAP Project.</t>
+    </section>
+    <section anchor="security" title="Security Considerations">
+      <t>The entirety of related security considerations are outside the
+      scope of this document.  It is noted that making passwords
+      encrypted with a widely understood hash function (such as crypt())
+      available to non-privileged users is dangerous because it exposes
+      them to dictionary and brute-force attacks.  This is proposed only
+      for compatibility with existing UNIX system implementations. Sites
+      where security is critical SHOULD consider using a strong 
+      authentication service for user authentication.</t>
+      <t>Alternatively, the encrypted password could be made available only
+      to a subset of privileged DUAs, which would provide "shadow" password
+      service to client applications. This may be difficult to enforce.</t>
+      <t>Because the schema represents operating system-level entities,
+      access to these entities SHOULD be granted on a discretionary
+      basis. (There is little point in restricting access to data which
+      will be republished without restriction, however.) It is particularly
+      important that only administrators can modify entries defined in this
+      schema, with the exception of allowing a principal to change their
+      password (which MAY be done on behalf of the user by a client bound
+      as a superior principal, such that password restrictions MAY be
+      enforced). For example, if a user were allowed to change the value of
+      their uidNumber attribute, they could subvert security by
+      equivalencing their account with the superuser account.</t>
+      <t>A subtree of the DIT which is to be republished by a DUA (such as a
+      NIS gateway) SHOULD be within the same administrative domain that
+      the republishing DUA represents. (For example, principals outside
+      an organization, while conceivably part of the DIT, should not be
+      considered with the same degree of authority as those within the
+      organization.)</t>
+      <t>Finally, care should be exercised with integer attributes of a 
+      sensitive nature (particularly the uidNumber and gidNumber attributes)
+      which contain zero-length values. DUAs MAY treat such values as
+      corresponding to the "nobody" or "nogroup" user and group, 
+      respectively.</t>
+    </section>
+    <section anchor="acks" title="Acknowledgements">
+      <t> Thanks to Bob Joslin of the Hewlett Packard Company, and to all
+     those that helped with this document's predecessor, RFC 2307.</t>
+      <t> UNIX is a registered trademark of The Open Group.</t>
+    </section>
+  </middle>
+  <back>
+    <references>
+	  &rfc1034;
+	  &rfc1057;
+	  &rfc1279;
+	  &rfc2373;
+	  &rfc2119;
+	  &rfc4511;
+	  &rfc4515;
+	  &rfc4519;
+	  &rfc3112;
+	  &ppolicy;
+      <reference anchor="ROSE">
+        <front>
+          <title>
+            The Little Black Book: Mail Bonding with OSI Directory Services
+          </title>
+          <author initials="M. T." surname="Rose">
+            <organization abbrev="Prentice-Hall">
+              Prentice-Hall, Inc
+            </organization>
+          </author>
+          <date month="" year="2001"/>
+        </front>
+        <seriesInfo name="ISBN" value="0-13-683210-5"/>
+      </reference>
+      <reference anchor="X.500">
+        <front>
+          <title>
+            Information Processing Systems - Open Systems Interconnection -
+            The Directory: Overview of Concepts, Models and Service
+          </title>
+          <author>
+            <organization>
+              ISO/IEC JTC 1/SC21
+            </organization>
+          </author>
+          <date month="" year="1988"/>
+        </front>
+      </reference>  
+      <reference anchor="UNIX">
+        <front>
+          <title>
+            IEEE Std 1003.1, 2004 Edition, Single UNIX Specification Version 3
+          </title>
+          <author>
+            <organization>
+              Institute of Electrical and Electronics Engineers
+            </organization>
+          </author>
+          <author>
+            <organization>
+              The Open Group
+            </organization>
+          </author>
+          <date month="" year="2004" />
+        </front>
+      <seriesInfo name="IEEE" value="Standard 1003.1" />
+      </reference>
+	  <reference anchor="PAM">
+	    <front>
+		  <title>
+		  Unified Login with Pluggable Authentication Modules (PAM)
+		  </title>
+		  <author initials="V." surname="Samar" fullname="Vipin Samar">
+		  <organization>SunSoft, Inc.</organization>
+		  </author>
+		  <author initials="R.J." surname="Schemers"
+		  	fullname="Roland J. Schemers III">
+			<organization>SunSoft, Inc.</organization>
+		  </author>
+		  <date month="October" year="1995"/>
+		</front>
+		<seriesInfo name="OSF RFC" value="86.0"/>
+		<format type="TXT" octets="67952"
+		  	target="http://www.opengroup.org/rfc/mirror-rfc/rfc86.0.txt"/>
+		<format type="HTML" octets="59468"
+		    target="http://www.opengroup.org/rfc/rfc86.0.html" />
+	  </reference>
+    </references>
+    <section anchor="appendixa" title="Example Entries">
+      <t>The examples described in this section are provided to illustrate
+      the schema described in this draft. They are not meant to be
+      exhaustive.</t>
+      <t>The following entry is an example of the posixAccount class:
+      <figure>
+        <artwork>
+    dn: uid=lester,ou=people,dc=aja,dc=com
+    objectClass: top
+    objectClass: account
+    objectClass: posixAccount
+    uid: lester
+    cn: Lester the Nightfly
+    gecos: Lester
+    uidNumber: 10
+    gidNumber: 10
+    loginShell: /bin/csh
+    userPassword: {crypt}$X5/DBrWPOQQaI
+    homeDirectory: /home/lester
+        </artwork>
+      </figure>
+      This corresponds to the UNIX system password file entry:
+      <figure>
+        <artwork>
+    lester:X5/DBrWPOQQaI:10:10:Lester:/home/lester:/bin/sh
+        </artwork>
+      </figure>
+      The following entry is an example of the ipHost class:
+      <figure>
+        <artwork>
+    dn: cn=josie.aja.com,ou=hosts,dc=aja,dc=com
+    objectClass: top
+    objectClass: device
+    objectClass: ipHost
+    objectClass: bootableDevice
+    objectClass: ieee802Device
+    cn: josie.aja.com
+    cn: www.aja.com
+    ipHostNumber: 10.0.0.1
+    macAddress: 00:00:92:90:ee:e2
+    bootFile: mach
+    bootParameter: root=dan.aja.com:/nfsroot/peg
+    bootParameter: swap=dan.aja.com:/nfsswap/peg
+    bootParameter: dump=dan.aja.com:/nfsdump/peg
+        </artwork>
+      </figure>
+      This entry represents the host canonically josie.aja.com, also
+      known as www.aja.com. The Ethernet address and four boot parameters
+      are also specified.</t>
+      <t>An example of the nisNetgroup class:
+      <figure>
+        <artwork>
+    dn: cn=nightfly,ou=netgroup,dc=aja,dc=com
+    objectClass: top
+    objectClass: nisNetgroup
+    cn: nightfly
+    nisNetgroupTriple: (charlemagne,peg,dunes.aja.com)
+    nisNetgroupTriple: (lester,-,)
+    memberNisNetgroup: kamakiriad
+        </artwork>
+      </figure>
+        This entry represents the netgroup nightfly, which contains two
+        triples (the user charlemagne, the host peg, and the domain
+        dunes.aja.com; and, the user lester, no host, and any domain) and
+        one netgroup (kamakiriad).</t>
+        <t>Finally, an example of the nisObject class:
+      <figure>
+        <artwork>
+    dn: nisMapName=tracks,dc=dunes,dc=aja,dc=com
+    objectClass: top
+    objectClass: nisMap
+    nisMapName: tracks
+
+    dn: cn=Maxine,nisMapName=tracks,dc=dunes,dc=aja,dc=com
+    objectClass: top
+    objectClass: nisObject
+    cn: Maxine
+    nisMapName: tracks
+    nisMapEntry: Nightfly$4
+        </artwork>
+      </figure>
+      This represents the NIS map tracks, and a single map entry.</t>
+    </section>
+    <section anchor="appendixb" title="Affected Library Functions">
+      <t>The following functions are typically found in the C libraries of
+      most <xref target="UNIX">UNIX and POSIX compliant systems</xref>.
+      An <xref target="RFC4515"> LDAP search filter string</xref> which
+      may be used to satisfy the function call is included alongside each
+      function name. Parameters are denoted by %s and %d for string and
+      integer arguments, respectively. Long lines are broken:
+      <figure>
+        <artwork>
+    getpwnam()         (&amp;(objectClass=posixAccount)(uid=%s))
+    getpwuid()         (&amp;(objectClass=posixAccount)(uidNumber=%d))
+    getpwent()         (objectClass=posixAccount)
+    getspnam()         (&amp;(objectClass=shadowAccount)(uid=%s))
+    getspent()         (objectClass=shadowAccount)
+    
+    getgrnam()         (&amp;(objectClass=posixGroup)(cn=%s))
+    getgrgid()         (&amp;(objectClass=posixGroup)(gidNumber=%d))
+    getgrent()         (objectClass=posixGroup)
+    
+    getservbyname()    (&amp;(objectClass=ipService)(cn=%s)
+                        (ipServiceProtocol=%s))
+    getservbyport()    (&amp;(objectClass=ipService)(ipServicePort=%d)
+                         (ipServiceProtocol=%s))
+    getservent()       (objectClass=ipService)
+    
+    getrpcbyname()     (&amp;(objectClass=oncRpc)(cn=%s))
+    getrpcbynumber()   (&amp;(objectClass=oncRpc)(oncRpcNumber=%d))
+    getrpcent()        (objectClass=oncRpc)
+    
+    getprotobyname()   (&amp;(objectClass=ipProtocol)(cn=%s))
+    getprotobynumber() (&amp;(objectClass=ipProtocol)
+                          (ipProtocolNumber=%d))
+    getprotoent()      (objectClass=ipProtocol)
+    
+    gethostbyname()    (&amp;(objectClass=ipHost)(cn=%s))
+    gethostbyaddr()    (&amp;(objectClass=ipHost)(ipHostNumber=%s))
+    gethostent()       (objectClass=ipHost)
+    
+    getnetbyname()     (&amp;(objectClass=ipNetwork)(cn=%s))
+    getnetbyaddr()     (&amp;(objectClass=ipNetwork)(ipNetworkNumber=%s))
+    getnetent()        (objectClass=ipNetwork)
+    
+    setnetgrent()      (&amp;(objectClass=nisNetgroup)(cn=%s))
+    getpublickey()     (&amp;(objectClass=nisKeyObject)(...))
+        </artwork>
+      </figure></t>
+    </section>
+    <section anchor="appendixc" title="Suggested DIT structure">
+      <t>The cn attribute is typically used to name entities. The 
+      ipHostNumber, ipNetworkNumber, and ipServiceProtocol attributes are also
+      naming attributes, such that multi-valued RDNs may be used to
+      distinguish between, for example, different interfaces of a multihomed
+      host.</t>
+      <t>The following DIT structure MAY be used for deploying this schema.
+      It is not required that DC-naming be used, but it is encouraged:
+      <figure>
+        <artwork>
+    Naming context                        ObjectClass
+    ============================================================
+    ou=people,dc=...                      posixAccount
+                                          shadowAcount
+    ou=group,dc=...                       posixGroup
+    ou=services,dc=...                    ipService
+    ou=protocols,dc=...                   ipProtocol
+    ou=rpc,dc=...                         oncRpc
+    ou=hosts,dc=...                       ipHost
+    ou=ethers,dc=...                      ieee802Device
+                                          bootableDevice
+    ou=networks,dc=...                    ipNetwork
+    ou=netgroup,dc=...                    nisNetgroup
+    nisMapName=...,dc=...                 nisObject
+    automountMapName=...,dc=...           automountMap
+        </artwork>
+      </figure></t>
+    </section>
+  </back>
+</rfc>

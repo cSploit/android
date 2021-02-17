@@ -1,0 +1,22 @@
+.TH NWCALLSINIT 3NCP 04/13/1999 "libncp (>= 2.2.0.14)" "Netware Calls Library"
+.SH NAME
+NWCallsInit \- initializes NCP library
+.SH SYNOPSIS
+.B #include <nwcalls.h>
+
+.BI "NWCCODE NWCallsInit(void* " p1 ", void* " p2 ");"
+
+.SH DESCRIPTION
+You must call this function as first function from program using \fBlibncp\fP
+library. \fIp1\fP and \fIp2\fP are reserved and must be passed as
+\fINULL\fP to this function.
+
+.SH "RETURN VALUE"
+Function returns \fBzero\fP on success and \fBnon-zero\fP on failure.
+See \fInwerrors\fP(3ncp) for \fBlibncp\fP error codes.
+
+.SH BUGS
+None known.
+
+.SH SEE ALSO
+.BR "nwerrors" (3ncp), " NWCallsTerm"(3ncp)

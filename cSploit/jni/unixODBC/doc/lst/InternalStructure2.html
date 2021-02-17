@@ -1,0 +1,36 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.5 [en] (X11; I; Linux 2.0.35 i586) [Netscape]">
+   <title>LST - Cursor - Add B</title>
+</head>
+<body bgcolor="#FFFFFF">
+
+<center><b><font face="Arial,Helvetica"><font size=+1>LST</font></font></b>
+<br><b><font face="Arial,Helvetica"><font size=+1>Cursor</font></font></b>
+<br><b><font face="Arial,Helvetica"><font size=+1>Add B</font></font></b>
+<hr WIDTH="100%">
+<br><img SRC="InternalStructure2.gif" ALT="LST - Cursor - Add B" BORDER=0 height=247 width=431></center>
+
+<hr WIDTH="100%">
+<br><b><font face="Arial,Helvetica">Description</font></b>
+<p><font face="Arial,Helvetica">This diagram depicts a cursor (B) which
+is based upon the root list (A). The cursor was created with a call to
+lstOpenCursor(). This cursor contains a subset of items from the base list
+because a filter function was provided. Cursors can be manipulated using
+the same functions as a normal list and they are closed with a simple call
+to lstClose().</font>
+<p><font face="Arial,Helvetica">The pData in cursor items refer directly
+to the corresponding item in the root list. Reference counters are increased
+in the base list (A) and in each item. This prevents underlying data from
+being deleted while a derived cursor is still in use.</font>
+<p><b><font face="Arial,Helvetica">Related Functions</font></b>
+<p><font face="Arial,Helvetica">lstOpenCursor</font>
+<br>
+<hr>
+<center><a href="InternalStructure.html"><img SRC="back.gif" ALT="[Back]" BORDER=0 height=32 width=32></a><a href="InternalStructure3.html"><img SRC="next.gif" ALT="[Next]" BORDER=0 height=32 width=32></a>
+<p>Page 2 of 9</center>
+
+</body>
+</html>

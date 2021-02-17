@@ -1,0 +1,52 @@
+.TH NWCLIENT 5 12/27/1995 nwclient nwclient
+.SH NAME
+nwclient \- configuration file for NWClient program suite
+.SH DESCRIPTION
+This manual page describes the rather simple format of the file
+.B $HOME/.nwclient,
+the configuration file for the NWClient program suite.
+.SH FILE FORMAT
+The file 
+.B $HOME/.nwclient
+consists of several lines, each describing a NWClient
+connection. Lines beginning with # and empty lines are ignored as
+comments.
+
+Because you can store passwords in .nwclient, the user programs will
+only scan .nwclient when only the file owner has access rights to
+the file. The file must be have permissions 0600.
+
+To specify a NWClient connection, the name of the file server, the
+user name to be used and a password is necessary. The server name and
+the user name are specified as SERVER/USER, and the password is
+separated by a blank. The password field can be omitted. In this case
+the user programs will ask you for a password. If you specify the
+password to be just a dash, then no password is used.
+
+The first valid specification has a special meaning: If the user does
+not name a server on the command line, the first specification is used
+as a 'preferred connection'.
+
+An example might be the following:
+
+   # The preferred connection, the user is asked
+   # for a password
+   FS311/ME
+   # And a passwordless account on another server 
+   CD-SERV/GUEST -
+
+With these lines in $HOME/.nwclient, calling 'ncpmount /mnt' will mount
+the the file server FS311 with user name ME on /mnt after asking the
+user for a password.
+
+\fIncpmount -S cd-serv /cd\fP will silently mount the server cd-serv on /cd.
+
+\fBnprint\fP, \fBpqlist\fP and other user programs that require a valid 
+login also look up \fI$HOME/.nwclient\fP to find a file server, a user 
+name and possibly a password. 
+
+Please note that the access permissions of .nwclient MUST be 600, for
+security reasons.
+
+.SH SEE ALSO
+.B ncpmount(8), ncpumount(8), slist(1), pqlist(1), nprint(1)

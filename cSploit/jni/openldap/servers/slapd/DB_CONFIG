@@ -1,0 +1,28 @@
+# $OpenLDAP$
+# Example DB_CONFIG file for use with slapd(8) BDB/HDB databases.
+#
+# See the Oracle Berkeley DB documentation
+#   <http://www.oracle.com/technology/documentation/berkeley-db/db/ref/env/db_config.html>
+# for detail description of DB_CONFIG syntax and semantics.
+#
+# Hints can also be found in the OpenLDAP Software FAQ
+#	<http://www.openldap.org/faq/index.cgi?file=2>
+# in particular:
+#   <http://www.openldap.org/faq/index.cgi?file=1075>
+
+# Note: most DB_CONFIG settings will take effect only upon rebuilding
+# the DB environment.
+
+# one 0.25 GB cache
+set_cachesize 0 268435456 1
+
+# Data Directory
+#set_data_dir db
+
+# Transaction Log settings
+set_lg_regionmax 262144
+set_lg_bsize 2097152
+#set_lg_dir logs
+
+# Note: special DB_CONFIG flags are no longer needed for "quick"
+# slapadd(8) or slapindex(8) access (see their -q option). 

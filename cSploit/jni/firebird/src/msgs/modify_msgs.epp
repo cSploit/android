@@ -1,0 +1,204 @@
+/*
+ *	PROGRAM:		Firebird Message file modify for escape chars
+ *	MODULE:			modify_messages.epp
+ *	DESCRIPTION:	Allow modification of messages with translatation of escape sequences
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+#include "firebird.h"
+#include <stdio.h>
+#include "../jrd/ibase.h"
+
+#include <stdlib.h>
+
+
+DATABASE DB = "msg.fdb";
+
+static void explicit_print(const TEXT*);
+
+
+int main( int argc, char **argv)
+{
+/**************************************
+ *
+ *	m a i n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Top level routine.
+ *
+ **************************************/
+	SCHAR facility[20], newtext[256];
+	SCHAR innumber[4];
+	SSHORT number;
+
+	printf("\nHit Ctrl-D (or Ctrl-Z) at prompt to exit level\n");
+	printf("You will be prompted for fac_code and message number\n");
+	printf("Escape sequences will be translated to single bytes\n");
+
+	READY;
+	START_TRANSACTION;
+
+	for (;;)
+	{
+		printf("Facility: ");
+		if (!gets(facility))
+			break;
+		FOR Y IN FACILITIES WITH Y.FACILITY CONTAINING facility
+			printf("Message number: ");
+			if (!gets(innumber))
+				break;
+			number = atoi(innumber);
+			FOR X IN MESSAGES WITH X.FAC_CODE = Y.FAC_CODE AND X.NUMBER = number
+				printf(" Current text:");
+				explicit_print(X.TEXT);
+				printf("\n New text: ");
+				if (!gets(newtext))
+					break;
+
+				MODIFY X USING
+
+					SCHAR* p = X.TEXT;
+					const SCHAR* q = newtext;
+
+					/* translate scape sequences to single bytes */
+					while (*q)
+					{
+						if (*q == '\\')
+						{
+							*q++;
+							switch (*q)
+							{
+							case 'n':
+								*p++ = '\n';
+								break;
+							case 't':
+								*p++ = '\t';
+								break;
+							case 'f':
+								*p++ = '\f';
+								break;
+							case 'a':
+								*p++ = '\a';
+								break;
+							case 'b':
+								*p++ = '\b';
+								break;
+							case 'r':
+								*p++ = '\r';
+								break;
+							case 'v':
+								*p++ = '\v';
+								break;
+							case '\\':
+								*p++ = '\\';
+								break;
+							case '\"':
+								*p++ = '\"';
+								break;
+							case '\'':
+								*p++ = '\'';
+								break;
+							default:
+								printf
+									("\n\n*** Escape sequence not understood; being copied unchanged  ***\n\n");
+								*p++ = '\\';
+								*p++ = *q;
+								break;
+							}
+							*q++;
+						}
+						else
+							*p++ = *q++;
+					}
+					*p = 0;
+				END_MODIFY;
+			END_FOR;
+		END_FOR;
+	}
+
+	COMMIT;
+	FINISH;
+	exit(FINI_OK);
+}
+
+
+static void explicit_print( const TEXT* string)
+{
+/**************************************
+ *
+ *	e x p l i c i t _ p r i n t
+ *
+ **************************************
+ *
+ * Functional description
+ *	Let it all hang out: print line
+ *      with explicit \n \b \t \f etc.
+ *      to make changing messages easy
+ *
+ **************************************/
+	const TEXT* p = string;
+
+	while (*p)
+	{
+		switch (*p)
+		{
+		case '\n':
+			putchar('\\');
+			putchar('n');
+			break;
+		case '\t':
+			putchar('\\');
+			putchar('t');
+			break;
+		case '\f':
+			putchar('\\');
+			putchar('f');
+			break;
+		case '\b':
+			putchar('\\');
+			putchar('b');
+			break;
+		case '\r':
+			putchar('\\');
+			putchar('r');
+			break;
+		case '\v':
+			putchar('\\');
+			break;
+		case '\\':
+			putchar('\\');
+			putchar('\\');
+			break;
+		case '\"':
+			putchar('\\');
+			putchar('\"');
+			break;
+		case '\'':
+			putchar('\\');
+			putchar('\'');
+			break;
+		default:
+			putchar(*p);
+		}
+		*p++;
+	}
+}
+

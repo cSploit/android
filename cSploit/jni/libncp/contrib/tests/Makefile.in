@@ -1,0 +1,27 @@
+top_srcdir = @top_srcdir@
+top_builddir = ../..
+this_srcdir = ${top_srcdir}/contrib/tests
+
+include ${top_builddir}/Make.rules
+
+O_UTILS1 = dsfilter.o putfilte.o \
+	   #
+O_TMP1 =
+UTILS1 = $(O_UTILS1:%.o=%)
+
+.PHONY : all clean distclean mrproper
+
+all: $(UTILS1)
+
+$(O_UTILS1) $(O_TMP1): %.o: %.c
+	$(CC) $(CCFLAGS) $(CFLAGS) $(CFLAGS_$@) -I$(top_builddir)/include -I$(top_builddir)/intl -o $@ -c $<
+
+$(UTILS1):: %: %.o $(O_TMP1)
+	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $(addsuffix .o,$@) $(OBJS_$@) -L$(top_builddir)/lib -lncp $(LDFLAGS_$@) @INTLLIBS@ @LIBS@ 
+
+clean:
+	-rm -f $(UTILS1) $(O_UTILS1) $(O_TMP1)
+
+distclean: clean
+
+mrproper: clean

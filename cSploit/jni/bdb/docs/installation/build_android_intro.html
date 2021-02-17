@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Chapter 4. Building Berkeley DB for Android</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="prev" href="debug_printlog.html" title="Reviewing Berkeley DB log files" />
+    <link rel="next" href="build_android_jdbc.html" title="Building the Android JDBC Driver" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Chapter 4. Building Berkeley DB for Android</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="debug_printlog.html">Prev</a> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="build_android_jdbc.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="chapter" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title"><a id="build_android_intro"></a>Chapter 4. Building Berkeley DB for Android</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="sect1">
+              <a href="build_android_intro.html#build_android">Building the Drop-In Replacement for Android</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect2">
+                  <a href="build_android_intro.html#build_android_migrate">Migrating from SQLite to Berkeley DB</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="sect1">
+              <a href="build_android_jdbc.html">Building the Android JDBC Driver</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect1">
+              <a href="build_android_config.html">Android Configuration Options</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        Berkeley DB provides support for the Android platform enabling you to
+        develop and deploy a wide range of mobile applications and services.
+        Android provides SQLite as the default database for developing
+        applications that need database support. Berkeley DB SQL API is fully
+        compatible with SQLite and can be used as a replacement. The
+        <code class="literal">build_android</code> directory in the Berkeley DB
+        distribution contains a makefile, <code class="literal">Android.mk</code>, for
+        building a drop-in replacement for SQLite.
+    </p>
+      <p>
+        Oracle offers two different solutions for building the
+        BDB SQL API for Android. The first creates a library
+        that can be used as a drop-in replacement for SQLite on
+        Android. The second creates a JDBC driver for Android.
+    </p>
+      <div class="sect1" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h2 class="title" style="clear: both"><a id="build_android"></a>Building the Drop-In Replacement for Android</h2>
+            </div>
+          </div>
+        </div>
+        <div class="toc">
+          <dl>
+            <dt>
+              <span class="sect2">
+                <a href="build_android_intro.html#build_android_migrate">Migrating from SQLite to Berkeley DB</a>
+              </span>
+            </dt>
+          </dl>
+        </div>
+        <p>
+        This section describes how to build a library that can be used as a
+        drop-in replacement for SQLite on Android.
+    </p>
+        <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+          <h3 class="title">Note</h3>
+          <p>
+        A drop in replacement refers to replacing all instances of SQLite
+        in an Android OS build with Berkeley DB SQL. All databases will be 
+        created in the Berkeley DB SQL format including any created with the
+        Java SQLite.* API. This solution requires that users re-compile a custom
+        Android OS image (it is only relevant for platform/device vendors).
+      </p>
+        </div>
+        <div class="orderedlist">
+          <ol type="1">
+            <li>
+              <p>
+                Download and compile the Android source tree.
+            </p>
+              <p>
+                The compiling process takes time but is a one time activity.
+                For information on downloading and compiling the Android source
+                code, see 
+                <a class="ulink" href="http://source.android.com/source/download.html" target="_top">http://source.android.com/source/download.html</a>.
+            </p>
+            </li>
+            <li>
+              <p>
+                Copy the Berkeley DB code into the Android build tree.
+            </p>
+              <pre class="programlisting">$ cd &lt;root&gt;/external/sqlite/dist
+$ tar zxf ${DB_PATH} </pre>
+              <p>
+                where &lt;root&gt; is the root of the Android source tree and
+                ${DB_PATH} is the path where you saved the
+                <code class="literal">db-xx.tar.gz</code> version of the Berkeley DB
+                distribution.
+            </p>
+            </li>
+            <li>
+              <p>
+                Update the Android build file to identify Berkeley DB.
+            </p>
+              <p>
+                Replace the <code class="literal">Android.mk</code> file with the one
+                from the Berkeley DB source tree by doing the
+                following:
+            </p>
+              <pre class="programlisting">$ cd &lt;root&gt;/external/sqlite/dist
+$ mv Android.mk Android.mk.sqlite
+$ cp ${DB_INSTALL}/build_android/Android.mk ./ </pre>
+              <p>
+                where ${DB_INSTALL} is the directory into which you
+                installed the Berkeley DB library.
+            </p>
+            </li>
+            <li>
+              <p>
+                Tuning parameters.
+            </p>
+              <p>
+                The configuration options for performance tuning can be
+                added/edited in the <code class="literal">Android.mk</code> file by
+                modifying <code class="literal">LOCAL_CFLAGS</code> located in the
+                <code class="literal">build libsqlite replacement</code> section. For
+                more information, see 
+                <a class="xref" href="build_android_config.html" title="Android Configuration Options">Android Configuration Options</a>.
+            </p>
+              <p>
+                It is also possible to change these settings using PRAGMA
+                commands or through the <a href="../api_reference/C/configuration_reference.html" class="olink">DB_CONFIG</a> file.
+            </p>
+            </li>
+            <li>
+              <p>
+                Build the new Android image.
+            </p>
+              <p>
+                To build the Android image with Berkeley DB SQL included,
+                do the following:
+            </p>
+              <pre class="programlisting">$ cd &lt;root&gt;
+$ . build/envsetup.sh
+$ make clean-libsqlite
+$ mmm -B external/sqlite/dist
+$ make snod
+</pre>
+              <p>
+                You can locate the new image in
+                <code class="literal">&lt;root&gt;/out/target/product/generic</code>.
+            </p>
+            </li>
+          </ol>
+        </div>
+        <div class="sect2" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h3 class="title"><a id="build_android_migrate"></a>Migrating from SQLite to Berkeley DB</h3>
+              </div>
+            </div>
+          </div>
+          <p>
+        This section describes how to enable automatic conversion of SQLite
+        format databases to Berkeley DB SQL when they are opened.  To do
+        this, you must first make sure that the
+        <code class="literal">-DBDBSQL_CONVERT_SQLITE</code> option is added to
+        <code class="literal">LOCAL_CFLAGS</code> when you configure your Berkeley DB
+        database build.
+    </p>
+          <div class="orderedlist">
+            <ol type="1">
+              <li>
+                <p>
+                Build a static SQLite shell for Android platform.
+            </p>
+                <p>
+                Create a script, build_sqlite3_shell.sh, in the
+                &lt;root&gt;/external/sqlite/dist directory.
+            </p>
+                <pre class="programlisting">
+#!/bin/bash
+# This script shows how to use built-in toolchain to build
+# sqlite3 shell, which is required by Berkeley DB SQL 
+# on-the-fly migration feature.
+
+# Note: these variables should be set per active Android source tree
+# We assume $PWD=$ROOT/external/sqlite/dist
+ROOT=${PWD}/../../..
+TOOLCHAIN=${ROOT}/prebuilt/linux-x86/toolchain/arm-eabi-4.4.0
+CC=${TOOLCHAIN}/bin/arm-eabi-gcc
+LIB="${ROOT}/out/target/product/generic/obj/lib"
+INCLUDE="${ROOT}/ndk/build/platforms/android-8/arch-arm/usr/include"
+
+# CFLAGS should be set per Android.mk.sqlite (the original 
+# version of SQLite's Android.mk)
+CFLAGS="-DHAVE_USLEEP=1 -DSQLITE_THREADSAFE=1 -DNDEBUG=1 \
+ -DSQLITE_DEFAULT_JOURNAL_SIZE_LIMIT=1048576 \
+ -DSQLITE_ENABLE_MEMORY_MANAGEMENT=1 \
+ -DSQLITE_DEFAULT_AUTOVACUUM=1 \
+ -DSQLITE_TEMP_STORE=3 -DSQLITE_ENABLE_FTS3 \
+ -DSQLITE_ENABLE_FTS3_BACKWARDS -DTHREADSAFE=1"
+CFLAGS="${CFLAGS} -I${INCLUDE}"
+
+LDFLAGS="-ldl -nostdlib -Wl,--gc-sections -lc -llog -lgcc \
+ -Wl,--no-undefined,-z,nocopyreloc ${LIB}/crtend_android.o \
+ ${LIB}/crtbegin_dynamic.o -L${LIB} -Wl,-rpath,${LIB}"
+
+${CC} -DANDROID -DOS_ANDROID --sysroot="${SYSROOT}" -mandroid \
+      -fvisibility=hidden -ffunction-sections -fdata-sections \
+      -fPIC ${LDFLAGS} ${CFLAGS} \
+      sqlite3.c shell.c -o sqlite3orig
+</pre>
+                <p>
+                Ensure you adjust the variables as per your actual Android
+                environment. This script is suited for Android 2.2. 
+            </p>
+              </li>
+              <li>
+                <p>
+                 Execute the build_sqlite3_shell.sh script and to get the
+                 static sqlite3 shell utility - sqlite3orig.
+            </p>
+              </li>
+              <li>
+                <p>
+                Change the system image file.
+            </p>
+                <p>
+                Use the <code class="literal">xyaffs2</code> utiltiy to decompress
+                the <code class="literal">system.img</code> and get the directory
+                system.
+            </p>
+                <pre class="programlisting">$ xyaffs2 ./system.img system</pre>
+                <p>
+                Add static sqlite3 shell utility.
+            </p>
+                <pre class="programlisting">$ cp &lt;root&gt;/external/sqlite/dist/sqlite3orig \
+                      system/xbin/sqlite3orig</pre>
+                <p>
+              Use the <code class="literal">mkyaffs2image</code> utility to rebuild
+              <code class="literal">system.img</code> from the changed directory
+              system.
+          </p>
+                <pre class="programlisting">$ mkyaffs2image -f $PWD/system system.img</pre>
+                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                  <h3 class="title">Note</h3>
+                  <p>
+                    To open the database in the <code class="literal">SQLite</code>
+                    format use the <code class="literal">sqlite3orig</code>
+                    command.
+                </p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="debug_printlog.html">Prev</a> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="build_android_jdbc.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Reviewing Berkeley DB log files </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Building the Android JDBC Driver</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

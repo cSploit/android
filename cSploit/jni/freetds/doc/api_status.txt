@@ -1,0 +1,542 @@
+#!/usr/pkg/bin/perl
+# API status document
+#
+# $Id: api_status.txt,v 1.65 2010-12-31 16:34:15 jklowden Exp $s
+#
+# This tab-delimited file is a database of the "readiness" of the various
+# APIs.  Please feel free to modify it if you notice something is missing or 
+# wrong or incomplete.  
+#
+# Format rules
+#
+# 1.	Fields are delimited with one or more tab characters.  
+#	Multiple consecutive tabs make hand editing easier; they 
+#	do not delimit null fields.
+# 2.	The first column must be one of: 'odbc', 'dblib', 'ctlib'.
+#	Lines starting with *anything* else are ignored.  
+# 3.	Field definitions are: 
+#	Library:	odbc, dblib, or ctlib
+#	Category:	chunk of api functionality (bcp/cursors/etc.)
+#	Name[1,2]:	self-explanatory
+#			For db-lib, there are two names:
+#			Name 1: Microsoft's name
+#			Name 2: Sybase's name
+#	Status:		*OK	 thought to be working
+#			*stub	 present but non-functional
+#			*partial parts thought to be working
+#			*(blank) Mentioned in vendor documentation but
+#				 not in the FreeTDS C code.  
+#			Other statuses are acceptable if you see a need.
+#	Comments:	Whatever you'd like to say about the function.
+#
+
+# This little bit of perl will produce a data file suitable for uploading into a table thus:
+# create table api
+#	( vendor char(15)	NOT NULL
+#	, name	char(15)	NOT NULL
+#	, section char(15) 	    NULL
+#	, function varchar(30)	NOT NULL
+#	, status char(20)	    NULL
+#	, comment varchar(160)      NULL
+#	)
+
+# create view vapi
+# as
+#
+# select  *, Total - OK as ToDo, 100 * OK / Total as 'Done%'
+# from (
+#         select    name
+#                 , count(*) as Total
+#                 , sum(case status when 'OK'
+#                                         then 1 else 0 end) as OK
+#                 , sum(case status when 'partial'
+#                                         then 1 else 0 end) as Partial
+#                 , sum(case status when 'stub'
+#                                         then 1 else 0 end) as Stub
+#         from api
+#         group by name
+# ) as API
+#
+# go
+
+# create view vapisection
+# as
+#
+# select  *, Total - OK as ToDo, 100 * OK / Total as 'Done%'
+# from (
+#        select    name
+#                , section
+#                , count(*) as Total
+#                , sum(case status when 'OK'
+#                                        then 1 else 0 end) as OK
+#                , sum(case status when 'partial'
+#                                        then 1 else 0 end) as Partial
+#                , sum(case status when 'stub'
+#                                        then 1 else 0 end) as Stub
+#        from api
+#        group by name, section
+# ) as API
+#
+# go
+
+while( <DATA> ) {
+	chomp;
+	next if /^\s*$/;	#skip blank lines
+	@row = split /\t/, $_;
+	$row[1] =~ s/\(all\)//;	#nullify "all"
+
+	if( $row[0] eq 'dblib' ) {
+		@row = split /\t+/, $_;
+		my @ms = ('Microsoft', @row[0,1,2,  4,5]);
+		my @sy = ('Sybase',    @row[0,1,  3,4,5]);
+		
+		$sy[3] = $ms[3] if $sy[3] eq '(same)';
+		Print( @ms ) unless $ms[3] eq 'n/a';
+		Print( @sy ) unless $sy[3] eq 'n/a';
+		next;
+	}
+
+	if( $row[0] eq 'ctlib' && @row < 5 ) {
+		if( length($row[-1]) > 10 ) { 	# missing status
+			pop @row;
+			push @row, ("", $_);
+		}
+	}
+
+	unshift @row, 'Microsoft' if $row[0] eq 'odbc';
+	unshift @row, 'Sybase'    if $row[0] eq 'ctlib';
+
+	Print( @row );
+}
+
+sub Print() {
+	my @row = @_;
+
+	while( @row < 6 ) {
+		push @row, "";
+	}
+	print join ("\t", @row), $/;
+}
+
+# edit the data below the following line
+__DATA__
+odbc	(all)	SQLAllocConnect	OK
+odbc	(all)	SQLAllocEnv	OK
+odbc	(all)	SQLAllocHandle	OK
+odbc	(all)	SQLAllocStmt	OK
+odbc	(all)	SQLBindCol	OK
+odbc	(all)	SQLBindParam	OK
+odbc	(all)	SQLBindParameter	OK
+odbc	(all)	SQLBrowseConnect	
+odbc	(all)	SQLCancel	OK
+odbc	(all)	SQLCloseCursor	OK
+odbc	(all)	SQLColAttribute		OK
+odbc	(all)	SQLColAttributes	OK
+odbc	(all)	SQLColumnPrivileges	OK
+odbc	(all)	SQLColumns	OK
+odbc	(all)	SQLConnect	OK
+odbc	(all)	SQLCopyDesc	OK
+odbc	(all)	SQLDescribeCol	OK
+odbc	(all)	SQLDescribeParam	unimplemented
+odbc	(all)	SQLDisconnect	OK
+odbc	(all)	SQLDriverConnect	OK
+odbc	(all)	SQLEndTran	OK
+odbc	(all)	SQLError	OK
+odbc	(all)	SQLExecDirect	OK
+odbc	(all)	SQLExecute	OK
+odbc	(all)	SQLExtendedFetch	OK
+odbc	(all)	SQLFetch	OK
+odbc	(all)	SQLFetchScroll	OK
+odbc	(all)	SQLForeignKeys	OK
+odbc	(all)	SQLFreeConnect	OK
+odbc	(all)	SQLFreeEnv	OK
+odbc	(all)	SQLFreeHandle	OK
+odbc	(all)	SQLFreeStmt	OK
+odbc	(all)	SQLGetConnectAttr	OK
+odbc	(all)	SQLGetConnectOption	OK
+odbc	(all)	SQLGetCursorName	OK
+odbc	(all)	SQLGetData	OK
+odbc	(all)	SQLGetDescField	OK
+odbc	(all)	SQLGetDescRec	OK
+odbc	(all)	SQLGetDiagField	OK
+odbc	(all)	SQLGetDiagRec	OK
+odbc	(all)	SQLGetEnvAttr	OK
+odbc	(all)	SQLGetFunctions	OK
+odbc	(all)	SQLGetInfo	OK
+odbc	(all)	SQLGetStmtAttr	OK
+odbc	(all)	SQLGetStmtOption	OK
+odbc	(all)	SQLGetTypeInfo	OK
+odbc	(all)	SQLMoreResults	OK
+odbc	(all)	SQLNativeSql	partial
+odbc	(all)	SQLNumParams	OK
+odbc	(all)	SQLNumResultCols	OK
+odbc	(all)	SQLParamData	OK
+odbc	(all)	SQLParamOptions	OK
+odbc	(all)	SQLPrepare	OK
+odbc	(all)	SQLPrimaryKeys	OK
+odbc	(all)	SQLProcedureColumns	OK
+odbc	(all)	SQLProcedures	OK
+odbc	(all)	SQLPutData	OK
+odbc	(all)	SQLRowCount	OK
+odbc	(all)	SQLSetConnectAttr	OK
+odbc	(all)	SQLSetConnectOption	OK
+odbc	(all)	SQLSetCursorName	OK
+odbc	(all)	SQLSetDescField	OK
+odbc	(all)	SQLSetDescRec	OK
+odbc	(all)	SQLSetEnvAttr	partial
+odbc	(all)	SQLSetPos	OK
+odbc	(all)	SQLSetParam	OK
+odbc	(all)	SQLSetScrollOption	OK
+odbc	(all)	SQLSetStmtAttr	OK
+odbc	(all)	SQLSetStmtOption	OK
+odbc	(all)	SQLSpecialColumns	OK
+odbc	(all)	SQLStatistics	OK
+odbc	(all)	SQLTablePrivileges	OK
+odbc	(all)	SQLTables	OK
+odbc	(all)	SQLTransact	OK
+dblib	(none)   	n/a				db12hour	
+dblib	(none)   	n/a				dbaltbind_ps	
+dblib	(none)   	n/a				dbbind_ps	
+dblib	(none)   	n/a				dbbufsize	
+dblib	(none)   	n/a				dbcharsetconv	
+dblib	(none)   	n/a				dbcoltypeinfo	OK	
+dblib	(none)   	n/a				dbconvert_ps	OK	
+dblib	(none)   	n/a				dbfreesort	never
+dblib	(none)   	n/a				dbfree_xlate	never
+dblib	(none)   	n/a				dbgetcharset	
+dblib	(none)   	n/a				dbgetloginfo	never
+dblib	(none)   	n/a				dbgetlusername	
+dblib	(none)   	n/a				dbgetnatlang	
+dblib	(none)   	n/a				DBIORDESC	OK	
+dblib	(none)   	n/a				DBIOWDESC	OK	
+dblib	(none)   	n/a				dbloadsort	never
+dblib	(none)   	n/a				dbload_xlate	never
+dblib	(none)   	n/a				dbnpcreate	never
+dblib	(none)   	n/a				dbnpdefine	never
+dblib	(none)   	n/a				dbpoll		
+dblib	(none)   	n/a				DBRBUF		never
+dblib	(none)   	n/a				dbreadpage	never
+dblib	(none)   	n/a				dbrecftos	OK	
+dblib	(none)   	n/a				dbrecvpassthru	never
+dblib	(none)   	n/a				dbregdrop	never
+dblib	(none)   	n/a				dbregexec	never
+dblib	(none)   	n/a				dbreghandle	never
+dblib	(none)   	n/a				dbreginit	never
+dblib	(none)   	n/a				dbreglist	never
+dblib	(none)   	n/a				dbregnowatch	never
+dblib	(none)   	n/a				dbregparam	never
+dblib	(none)   	n/a				dbregwatch	never
+dblib	(none)   	n/a				dbregwatchlist	never
+dblib	(none)   	n/a				dbrpwclr	never
+dblib	(none)   	n/a				dbrpwset	never
+dblib	(none)   	n/a				dbsafestr	OK	
+dblib	(none)   	n/a				dbsechandle	
+dblib	(none)   	n/a				dbsendpassthru	never
+dblib	(none)   	n/a				dbsetbusy	
+dblib	(none)   	n/a				dbsetdefcharset	
+dblib	(none)   	n/a				dbsetdeflang	
+dblib	(none)   	n/a				dbsetidle	
+dblib	(none)   	n/a				dbsetifile	OK	
+dblib	(none)   	n/a				dbsetinterrupt	OK	
+dblib	(none)   	n/a				DBSETLCHARSET	
+dblib	(none)   	n/a				DBSETLENCRYPT	
+dblib	(none)   	n/a				dbsetloginfo	never
+dblib	(none)   	n/a				dbsetrow	OK
+dblib	(none)   	n/a				dbsetversion	OK	
+dblib	(none)   	n/a				dbspr1row	OK	
+dblib	(none)   	n/a				dbspr1rowlen	OK	
+dblib	(none)   	n/a				dbsprhead	OK	
+dblib	(none)   	n/a				dbsprline	OK	
+dblib	(none)   	n/a				dbstrcmp	never
+dblib	(none)   	n/a				dbstrsort	never
+dblib	(none)   	n/a				dbtextsize	
+dblib	(none)   	n/a				dbwritepage	never
+dblib	(none)   	n/a				dbxlate		never
+dblib	bcp      	bcp_batch			(same)		OK
+dblib	bcp      	bcp_bind			(same)		OK
+dblib	bcp      	bcp_colfmt			(same)		OK
+dblib	bcp      	n/a				bcp_colfmt_ps	
+dblib	bcp      	bcp_collen			(same)		OK
+dblib	bcp      	bcp_colptr			(same)		OK
+dblib	bcp      	bcp_columns			(same)		OK
+dblib	bcp      	bcp_control			(same)		OK
+dblib	bcp      	bcp_done			(same)		OK
+dblib	bcp      	bcp_exec			(same)		OK
+dblib	bcp      	n/a				bcp_getl	OK
+dblib	bcp      	bcp_init			(same)		OK
+dblib	bcp      	bcp_moretext			(same)		stub
+dblib	bcp      	n/a				bcp_options	partial
+dblib	bcp      	bcp_readfmt			(same)		OK
+dblib	bcp      	bcp_sendrow			(same)		OK
+dblib	bcp      	BCP_SETL			(same)		OK
+dblib	bcp      	bcp_writefmt			(same)		
+dblib	browse   	dbcolbrowse			n/a		never
+dblib	browse   	dbcolsource			n/a		never
+dblib	browse   	dbfreequal			n/a		never
+dblib	browse   	dbqual				n/a		never
+dblib	browse   	dbtabbrowse			n/a		never
+dblib	browse   	dbtabcount			n/a		never
+dblib	browse   	dbtabname			n/a		never
+dblib	browse   	dbtabsource			n/a		never
+dblib	browse   	dbtsnewlen			n/a		never
+dblib	browse   	dbtsnewval			n/a		never
+dblib	browse   	dbtsput				n/a		never
+dblib	core     	dbadata				(same)		OK
+dblib	core     	dbadlen				(same)		OK
+dblib	core     	dbaltbind			(same)		OK
+dblib	core     	dbaltcolid			(same)		OK
+dblib	core     	dbaltlen			(same)		OK
+dblib	core     	dbaltop				(same)		OK
+dblib	core     	dbalttype			(same)		OK
+dblib	core     	dbaltutype			(same)		OK
+dblib	core     	dbanullbind			(same)		OK
+dblib	core     	dbbind				(same)		OK
+dblib	core     	dbbylist			(same)		OK
+dblib	core     	dbcancel			(same)		OK
+dblib	core     	dbcanquery			(same)		OK
+dblib	core     	dbchange			(same)		OK
+dblib	core     	dbclose				(same)		OK
+dblib	core     	dbclrbuf			(same)		OK
+dblib	core     	dbclropt			(same)		partial
+dblib	core     	dbcmd				(same)		OK
+dblib	core     	dbcmdrow			DBCMDROW	OK
+dblib	core     	dbcolinfo			n/a		OK
+dblib	core     	dbcollen			(same)		OK
+dblib	core     	dbcolname			(same)		OK
+dblib	core     	dbcoltype			(same)		OK
+dblib	core     	dbcolutype			(same)		OK
+dblib	core     	dbconvert			(same)		OK
+dblib	core     	dbcount				DBCOUNT		OK
+dblib	core     	dbcurcmd			DBCURCMD	stub
+dblib	core     	dbcurrow			DBCURROW	stub
+dblib	core     	dbdata				(same)		OK
+dblib	core     	dbdataready			n/a		
+dblib	core     	dbdatecrack			(same)		OK
+dblib	core     	dbdatlen			(same)		OK
+dblib	core     	dbdead				DBDEAD		OK
+dblib	core     	dbenlisttrans			n/a		never
+dblib	core     	dbenlistxatrans			n/a		never
+dblib	core     	dberrhandle			(same)		OK
+dblib	core     	dbexit				(same)		OK
+dblib	core     	dbfcmd				(same)		OK
+dblib	core     	dbfirstrow			DBFIRSTROW	OK
+dblib	core     	dbfreebuf			(same)		OK
+dblib	core     	dbgetchar			(same)		OK
+dblib	core     	dbgetmaxprocs			(same)		OK
+dblib	core     	dbgetoff			(same)		never
+dblib	core     	dbgetpacket			(same)		OK
+dblib	core     	dbgetrow			(same)		OK
+dblib	core     	dbgettime			DBGETTIME	OK
+dblib	core     	dbgetuserdata			(same)		OK
+dblib	core     	dbinit				(same)		OK
+dblib	core     	dbisavail			DBISAVAIL	OK
+dblib	core     	dbiscount			n/a		OK
+dblib	core     	dbisopt				(same)		partial
+dblib	core     	dblastrow			DBLASTROW	OK
+dblib	core     	dblogin				(same)		OK
+dblib	core     	dbfreelogin			dbloginfree	OK
+dblib	money		n/a				dbmny4add	OK
+dblib	money		n/a				dbmny4cmp	OK
+dblib	money		n/a				dbmny4copy	OK
+dblib	money		n/a				dbmny4divide	stub
+dblib	money		n/a				dbmny4minus	OK
+dblib	money		n/a				dbmny4mul	stub
+dblib	money		n/a				dbmny4sub	OK
+dblib	money		n/a				dbmny4zero	OK
+dblib	money		n/a				dbmnyadd	stub
+dblib	money		n/a				dbmnycmp	OK
+dblib	money		n/a				dbmnycopy	OK
+dblib	money		n/a				dbmnydec	OK
+dblib	money		n/a				dbmnydivide	stub
+dblib	money		n/a				dbmnydown	stub
+dblib	money		n/a				dbmnyinc	OK
+dblib	money		n/a				dbmnyinit	stub
+dblib	money		n/a				dbmnymaxneg	OK
+dblib	money		n/a				dbmnymaxpos	OK
+dblib	money		n/a				dbmnyminus	OK
+dblib	money		n/a				dbmnymul	stub
+dblib	money		n/a				dbmnyndigit	stub
+dblib	money		n/a				dbmnyscale	stub
+dblib	money		n/a				dbmnysub	stub
+dblib	money		n/a				dbmnyzero	OK
+dblib	core     	dbmorecmds			DBMORECMDS	OK
+dblib	core     	dbmsghandle			(same)		OK
+dblib	core     	dbname				(same)		OK
+dblib	core     	dbnextrow			(same)		OK
+dblib	core     	dbnullbind			(same)		OK
+dblib	core     	dbnumalts			(same)		OK
+dblib	core     	dbnumcols			(same)		OK
+dblib	core     	dbnumcompute			(same)		OK
+dblib	core     	dbnumorders			DBNUMORDERS	never
+dblib	core     	dbopen				(same)		OK
+dblib	core     	dbordercol			(same)		never
+dblib	core     	dbprhead			(same)		OK
+dblib	core     	dbprocerrhandle			n/a		aliases dberrhandle
+dblib	core     	dbprocinfo			n/a		never
+dblib	core     	dbprocmsghandle			n/a		aliases dbmsghandle
+dblib	core     	dbprrow				(same)		OK
+dblib	core     	dbprtype			(same)		OK
+dblib	core     	dbresults			(same)		OK
+dblib	core     	dbrows				DBROWS		OK
+dblib	core     	dbrowtype			DBROWTYPE	OK
+dblib	core     	n/a				dbservcharset	OK
+dblib	core     	dbserverenum			n/a		never
+dblib	core     	dbsetavail			(same)		OK
+dblib	core     	dbsetlapp			DBSETLAPP	OK
+dblib	core     	dbsetlfallback			n/a		never
+dblib	core     	dbsetlhost			DBSETLHOST	OK
+dblib	core     	dbsetlnatlang			DBSETLNATLANG	OK
+dblib	core     	dbsetlogintime			(same)		OK
+dblib	core     	dbsetlpacket			DBSETLPACKET	OK
+dblib	core     	dbsetlpwd			DBSETLPWD	OK
+dblib	core     	dbsetlsecure			n/a		
+dblib	core     	dbsetltime			n/a		
+dblib	core     	dbsetluser			DBSETLUSER	OK
+dblib	core     	dbsetlversion			n/a		OK
+dblib	core     	dbsetmaxprocs			(same)		OK
+dblib	core     	dbsetnull			(same)		OK
+dblib	core     	dbsetopt			(same)		partial
+dblib	core     	dbsettime			(same)		OK
+dblib	core     	dbsetuserdata			(same)		OK
+dblib	core     	n/a				dbspid		OK
+dblib	core     	dbsqlexec			(same)		OK
+dblib	core     	dbsqlok				(same)		OK
+dblib	core     	dbsqlsend			(same)		OK
+dblib	core     	n/a				dbstrbuild	OK
+dblib	core     	dbstrcpy			(same)		OK
+dblib	core     	dbstrlen			(same)		OK
+dblib	core     	n/a				DBTDS		OK
+dblib	core     	dbuse				(same)		OK
+dblib	core     	dbvarylen			(same)		OK
+dblib	core     	n/a				dbversion	OK
+dblib	core     	dbwillconvert			(same)		OK
+dblib	core     	dbwinexit (Windows only)	n/a		no-op macro
+dblib	cursor   	dbcursor			(same)		never
+dblib	cursor   	dbcursorbind			(same)		never
+dblib	cursor   	dbcursorclose			(same)		never
+dblib	cursor   	dbcursorcolinfo			(same)		never
+dblib	cursor   	dbcursorfetch			(same)		never
+dblib	cursor   	dbcursorfetchex			n/a		never
+dblib	cursor   	dbcursorinfo			(same)		never
+dblib	cursor   	dbcursorinfoex			n/a		never
+dblib	cursor   	dbcursoropen			(same)		never
+dblib	datetime 	n/a				dbdate4cmp	never
+dblib	datetime 	n/a				dbdate4zero	never
+dblib	datetime 	n/a				dbdatechar	never
+dblib	datetime 	n/a				dbdatecmp	OK	
+dblib	datetime 	n/a				dbdatename	never
+dblib	datetime 	n/a				dbdateorder	never
+dblib	datetime 	n/a				dbdatepart	never
+dblib	datetime 	n/a				dbdatezero	never
+dblib	datetime 	n/a				dbdayname	never
+dblib	datetime 	n/a				dbmonthname	OK
+dblib	procedure	dbhasretstat			(same)		OK
+dblib	procedure	dbnumrets			(same)		OK
+dblib	procedure	dbretdata			(same)		OK
+dblib	procedure	dbretlen			(same)		OK
+dblib	procedure	dbretname			(same)		OK
+dblib	procedure	dbretstatus			(same)		OK
+dblib	procedure	dbrettype			(same)		OK
+dblib	procedure	dbrpcexec			n/a		
+dblib	procedure	dbrpcinit			(same)		OK
+dblib	procedure	dbrpcparam			(same)		OK
+dblib	procedure	dbrpcsend			(same)		OK
+dblib	text     	dbmoretext			(same)		OK
+dblib	text     	dbreadtext			(same)		OK
+dblib	text     	dbtxptr				(same)		OK
+dblib	text     	dbtxtimestamp			(same)		OK
+dblib	text     	dbtxtsnewval			(same)		
+dblib	text     	dbtxtsput			(same)		
+dblib	text     	dbupdatetext			n/a		
+dblib	text     	dbwritetext			(same)		OK
+ctlib	(all)	ct_bind	OK	Bind server results to program variables.
+ctlib	(all)	ct_br_column		Retrieve information about a column generated by a browse mode select.
+ctlib	(all)	ct_br_table		Return information about browse mode tables.
+ctlib	(all)	ct_callback	OK	Install or retrieve a Client-Library callback routine.
+ctlib	(all)	ct_cancel	OK	Cancel a command or the results of a command.
+ctlib	(all)	ct_capability	OK	Set or retrieve a client/server capability.
+ctlib	(all)	ct_close	OK	Close a server connection.
+ctlib	(all)	ct_cmd_alloc	OK	Allocate a CS_COMMAND structure.
+ctlib	(all)	ct_cmd_drop	OK	Deallocate a CS_COMMAND structure.
+ctlib	(all)	ct_cmd_props	OK	Set or retrieve command structure properties. For use by applications that resend commands.
+ctlib	(all)	ct_command	OK	Initiate a language, package, RPC, message, or send-data command.
+ctlib	(all)	ct_compute_info	OK	Retrieve compute result information.
+ctlib	(all)	ct_con_alloc	OK	Allocate a CS_CONNECTION structure.
+ctlib	(all)	ct_con_drop	OK	Deallocate a CS_CONNECTION structure.
+ctlib	(all)	ct_con_props	OK	Set or retrieve connection structure properties.
+ctlib	(all)	ct_config	OK	Set or retrieve context properties.
+ctlib	(all)	ct_connect	OK	Connect to a server.
+ctlib	(all)	ct_cursor	OK	Initiate a Client-Library cursor command.
+ctlib	(all)	ct_data_info	OK	Define or retrieve a data I/O descriptor structure.
+ctlib	(all)	ct_debug		Manage debug library operations.
+ctlib	(all)	ct_describe	OK	Return a description of result data.
+ctlib	(all)	ct_diag	OK	Manage inline error handling.
+ctlib	(all)	ct_ds_dropobj		Release the memory associated with a directory object.
+ctlib	(all)	ct_ds_lookup		Initiate or cancel a directory lookup operation.
+ctlib	(all)	ct_ds_objinfo		Retrieve information associated with a directory object.
+ctlib	(all)	ct_dynamic	OK	Initiate a dynamic SQL command.
+ctlib	(all)	ct_dyndesc		Perform operations on a dynamic SQL descriptor area.
+ctlib	(all)	ct_dynsqlda		Operate on a SQLDA structure.
+ctlib	(all)	ct_exit	OK	Exit Client-Library.
+ctlib	(all)	ct_fetch	OK	Fetch result data.
+ctlib	(all)	ct_get_data	OK	Read a chunk of data from the server.
+ctlib	(all)	ct_getformat		Return the server user-defined format string associated with a result column.
+ctlib	(all)	ct_getloginfo		Transfer TDS login response information from a CS_CONNECTION structure to a newly allocated CS_LOGINFO structure.
+ctlib	(all)	ct_init	OK	Initialize Client-Library for an application context.
+ctlib	(all)	ct_keydata		Specify or extract the contents of a key column.
+ctlib	(all)	ct_labels		Define a security label or clear security labels for a connection.
+ctlib	(all)	ct_options	OK	Set, retrieve, or clear the values of server query-processing options.
+ctlib	(all)	ct_param	OK	Supply values for a server command's input parameters.
+ctlib	(all)	ct_poll	stub	Poll connections for asynchronous operation completions and registered procedure notifications.
+ctlib	(all)	ct_recvpassthru		Receive a TDS (Tabular Data Stream) packet from a server.
+ctlib	(all)	ct_remote_pwd		Define or clear passwords to be used for server-to-server connections.
+ctlib	(all)	ct_res_info	OK	Retrieve current result set or command information.
+ctlib	(all)	ct_results	OK	Set up result data to be processed.
+ctlib	(all)	ct_send	OK	Send a command to the server.
+ctlib	(all)	ct_send_data	OK	Send a chunk of text or image data to the server.
+ctlib	(all)	ct_sendpassthru		Send a Tabular Data Stream (TDS) packet to a server.
+ctlib	(all)	ct_setloginfo		Transfer TDS login response information from a CS_LOGINFO structure to a CS_CONNECTION structure.
+ctlib	(all)	ct_setparam	OK	Specify source variables from which ct_send reads input parameter values for a server command.
+ctlib	(all)	ct_wakeup		Call a connection's completion callback.
+ctlib	(all)	cs_calc		Perform an arithmetic operation on two operands.
+ctlib	(all)	cs_cmp		Compare two data values.
+ctlib	(all)	cs_config	partial	Set or retrieve CS-Library properties.
+ctlib	(all)	cs_conv_mult	stub	Retrieve the conversion multiplier for converting character data from one character set to another.
+ctlib	(all)	cs_convert	OK	Convert a data value from one datatype, locale, or format to another datatype, locale, or format.
+ctlib	(all)	cs_ctx_alloc	OK	Allocate a CS_CONTEXT structure.
+ctlib	(all)	cs_ctx_drop	OK	Deallocate a CS_CONTEXT structure.
+ctlib	(all)	cs_ctx_global	OK	Allocate or return a CS_CONTEXT structure.
+ctlib	(all)	cs_diag	OK	Manage inline error handling.
+ctlib	(all)	cs_dt_crack	OK	Convert a machine-readable datetime value into a user-accessible format.
+ctlib	(all)	cs_dt_info	stub	Set or retrieve language-specific datetime information.
+ctlib	(all)	cs_loc_alloc	OK	Allocate a CS_LOCALE structure.
+ctlib	(all)	cs_loc_drop	OK	Deallocate a CS_LOCALE structure.
+ctlib	(all)	cs_locale	partial	Load a CS_LOCALE structure with localization values or retrieve the locale name previously used to load a CS_LOCALE structure.
+ctlib	(all)	cs_manage_convert	stub	Install or retrieve a user-defined character set conversion routine.
+ctlib	(all)	cs_objects	stub	Save, retrieve, or clear objects and data associated with them.
+ctlib	(all)	cs_set_convert	stub	Install or retrieve a user-defined conversion routine.
+ctlib	(all)	cs_setnull	stub	Define a null substitution value to be used when binding or converting NULL data.
+ctlib	(all)	cs_strbuild	OK	Construct native language message strings.
+ctlib	(all)	cs_strcmp	stub	Compare two strings using a specified sort order.
+ctlib	(all)	cs_time	stub	Retrieve the current date and time.
+ctlib	(all)	cs_will_convert	OK	Indicate whether a specific datatype conversion is available in the Client/Server libraries.
+ctlib	(all)	blk_alloc	OK	Allocate a CS_BLKDESC structure.
+ctlib	(all)	blk_bind	OK	Bind a program variable and a database column.
+ctlib	(all)	blk_colval	stub	Server-side routine to obtain the column value from a formatted bulk copy row.
+ctlib	(all)	blk_default	stub	Retrieve a column's default value.
+ctlib	(all)	blk_describe	OK	Retrieve a description of a database column.
+ctlib	(all)	blk_done	OK	Mark a complete bulk copy operation or a complete bulk copy batch.
+ctlib	(all)	blk_drop	OK	Deallocate a CS_BLKDESC structure.
+ctlib	(all)	blk_getrow	stub	Server-side routine to retrieve and store a formatted bulk copy row.
+ctlib	(all)	blk_gettext	stub	Server-side routine to retrieve the text, image, sensitivity, or boundary portion of an incoming bulk copy formatted row.
+ctlib	(all)	blk_init	OK	Initiate a bulk copy operation.
+ctlib	(all)	blk_props	OK	Set or retrieve bulk descriptor structure properties.
+ctlib	(all)	blk_rowalloc	stub	Server-side routine to allocate space for a formatted bulk copy row.
+ctlib	(all)	blk_rowdrop	stub	Server-side routine to free space previously allocated for a formatted bulk copy row.
+ctlib	(all)	blk_rowxfer	OK	Transfer one or more rows during a bulk copy operation without specifying or receiving a row count.
+ctlib	(all)	blk_rowxfer_mult	OK	Transfer one or more rows during a bulk copy operation.
+ctlib	(all)	blk_sendrow	stub	Server-side routine to send a formatted bulk copy row obtained from blk_getrow.
+ctlib	(all)	blk_sendtext	stub	Server-side routine to send text, image, sensitivity, or boundary data in a formatted bulk copy row obtained from blk_sendtext.
+ctlib	(all)	blk_srvinit	stub	Server-side routine to copy descriptions of server table columns to the client, if required.
+ctlib	(all)	blk_textxfer	stub	Transfer a column's data in chunks during a bulk copy operation.
+

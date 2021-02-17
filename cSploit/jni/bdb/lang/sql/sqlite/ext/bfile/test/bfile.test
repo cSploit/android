@@ -1,0 +1,453 @@
+# 2009 October 26
+#
+# The author disclaims copyright to this source code.  In place of
+# a legal notice, here is a blessing:
+#
+#    May you do good and not evil.
+#    May you find forgiveness for yourself and forgive others.
+#    May you share freely, never taking more than you give.
+#
+#***********************************************************************
+# This file implements regression tests for SQLite library.  The
+# focus of this file is testing the INSERT statement.
+#
+# $Id
+
+set testdir [file dirname $argv0]
+source $testdir/tester.tcl
+
+ifcapable !load_ext {
+  finish_test
+  return
+}
+
+# The name of the test extension varies by operating system.
+#
+if {$::tcl_platform(platform) eq "windows" || $::tcl_platform(platform) eq "os2"} {
+  set testextension bfile_ext.dll
+} else {
+  set testextension libbfile_ext.so
+}
+
+# enable load extension & load bfile.so
+do_test bfile-0 {
+  db enable_load_extension 1
+  execsql {
+    select load_extension($testextension);
+  }
+} {{}}
+
+# no dir alias
+do_test bfile-1.1 {
+  execsql {
+    create table test1(c1 int, c2 BFILE);
+    select BFILE_FULLPATH(c2) from test1;
+  }
+} {}
+
+do_test bfile-1.2 {
+  execsql {
+    insert into test1 values(1, BFILE_NAME('/usr/image','photo001.jpg'));
+    insert into test1 values(2, NULL);
+    insert into test1 values(3, BFILE_NAME('/usr/bin/image', 'photo002.jpg'));
+    select BFILE_FULLPATH(c2) from test1;
+  }
+} {/usr/image/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-1.3 {
+  execsql {
+    update test1 set c2 = BFILE_NAME('/usr/test', 'test001.jpg') where c1 = 3;
+    select BFILE_FULLPATH(c2) from test1;
+  }
+} {/usr/image/photo001.jpg {} /usr/test/test001.jpg}
+
+do_test bfile-1.4 {
+  execsql {
+    delete from test1 where c1 = 1;
+    select BFILE_FULLPATH(c2) from test1;
+  }
+} {{} /usr/test/test001.jpg}
+
+
+do_test bfile-1.4 {
+  execsql {
+    drop table test1;
+  }
+} {}
+
+
+#having dir alias: change dir
+do_test bfile-2.1 {
+  execsql {
+    create table test2(c1 int, c2 BFILE);
+    insert into test2 values(1, BFILE_NAME('/usr/image','photo001.jpg'));
+    insert into test2 values(2, NULL);
+    insert into test2 values(3, BFILE_NAME('/usr/bin/image', 'photo002.jpg'));
+    select BFILE_FULLPATH(c2) from test2;
+  }
+} {/usr/image/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-2.2 {
+  execsql {
+    select BFILE_CREATE_DIRECTORY('/usr/image', '/usr/temp'); 
+    select BFILE_FULLPATH(c2) from test2;
+  }
+} {{} /usr/temp/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+
+do_test bfile-2.3 {
+  execsql {
+    select BFILE_REPLACE_DIRECTORY('/usr/image', '/usr/package');
+    select BFILE_FULLPATH(c2) from test2;
+  }
+} {{} /usr/package/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+
+do_test bfile-2.4 {
+  execsql {
+    select BFILE_DROP_DIRECTORY('/usr/image');
+    select BFILE_FULLPATH(c2) from test2;
+  }
+} {{} /usr/image/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-2.5 {
+  execsql {
+    drop table test2;
+  }
+} {}
+
+#having dir alias: short for long name
+do_test bfile-3.1 {
+  execsql {
+    select BFILE_CREATE_DIRECTORY('IMG', '/usr/image');
+    select BFILE_CREATE_DIRECTORY('TEMP', '/usr/temp');
+    create table test3(c1 int, c2 BFILE);
+    insert into test3 values(1, BFILE_NAME('IMG','photo001.jpg'));
+    insert into test3 values(2, NULL);
+    insert into test3 values(3, BFILE_NAME('TEMP', 'photo002.jpg'));
+    select BFILE_FULLPATH(c2) from test3;
+  }
+} {{} {} /usr/image/photo001.jpg {} /usr/temp/photo002.jpg}
+
+do_test bfile-3.2 {
+  execsql {
+    select BFILE_REPLACE_DIRECTORY('IMG', '/usr/package');
+    select BFILE_FULLPATH(c2) from test3;
+  }
+} {{} /usr/package/photo001.jpg {} /usr/temp/photo002.jpg}
+
+do_test bfile-3.3 {
+  execsql {
+    select BFILE_DROP_DIRECTORY('IMG');
+    select BFILE_FULLPATH(c2) from test3;
+  }
+} {{} IMG/photo001.jpg {} /usr/temp/photo002.jpg}
+
+
+do_test bfile-3.4 {
+  execsql {
+    select BFILE_DROP_DIRECTORY('TEMP');
+    drop table test3;
+  }
+} {{}}
+
+#BFILe in txn context
+do_test bfile-4.1 {
+  execsql {
+    create table test4(c1 int, c2 BFILE);
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {}
+
+do_test bfile-4.2 {
+  execsql {
+    insert into test4 values(1, BFILE_NAME('/usr/image','photo001.jpg'));
+    insert into test4 values(2, NULL);
+    insert into test4 values(3, BFILE_NAME('/usr/bin/image', 'photo002.jpg'));
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {/usr/image/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-4.3 {
+  execsql {
+    begin;
+    update test4 set c2 = BFILE_NAME('/usr/test', 'test001.jpg') where c1 = 1;
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {/usr/test/test001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-4.4 {
+  execsql {
+    delete from test4 where c1 = 3;
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {/usr/test/test001.jpg {}}
+
+do_test bfile-4.5 {
+  execsql {
+    rollback;
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {/usr/image/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-4.6 {
+  execsql {
+    begin;
+    select BFILE_CREATE_DIRECTORY('/usr/image', '/usr/temp');
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {{} /usr/temp/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-4.7 {
+  execsql {
+    rollback;
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {/usr/image/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-4.8 {
+  execsql {
+    select BFILE_CREATE_DIRECTORY('/usr/image', '/usr/temp');
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {{} /usr/temp/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-4.9 {
+  execsql {
+    begin;
+    select BFILE_REPLACE_DIRECTORY('/usr/image', '/usr/package');
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {{} /usr/package/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-4.10 {
+  execsql {
+    rollback;
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {/usr/temp/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-4.11 {
+  execsql {
+    begin;
+    select BFILE_DROP_DIRECTORY('/usr/image');
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {{} /usr/image/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-4.12 {
+  execsql {
+    rollback;
+    select BFILE_FULLPATH(c2) from test4;
+  }
+} {/usr/temp/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-4.13 {
+  execsql {
+    select BFILE_DROP_DIRECTORY('/usr/image');
+    drop table test4;
+  }
+} {{}}
+
+# BFILE among checkpoint contexts
+do_test bfile-5.1 {
+  execsql {
+    create table test5(c1 int, c2 BFILE);
+    select BFILE_FULLPATH(c2) from test5;
+  }
+} {}
+
+do_test bfile-5.2 {
+  execsql {
+    insert into test5 values(1, BFILE_NAME('/usr/image','photo001.jpg'));
+    insert into test5 values(2, NULL);
+    insert into test5 values(3, BFILE_NAME('/usr/bin/image', 'photo002.jpg'));
+    select BFILE_FULLPATH(c2) from test5;
+  }
+} {/usr/image/photo001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-5.3 {
+  execsql {
+    savepoint p1;
+    update test5 set c2 = BFILE_NAME('/usr/temp', 'temp001.jpg') where c1 = 1;
+    select BFILE_FULLPATH(c2) from test5;
+  }
+} {/usr/temp/temp001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-5.4 {
+  execsql {
+    savepoint p2;
+    select BFILE_CREATE_DIRECTORY('/usr/bin/image', '/usr/package');
+    select BFILE_FULLPATH(c2) from test5;
+  }
+} {{} /usr/temp/temp001.jpg {} /usr/package/photo002.jpg}
+
+do_test bfile-5.5 {
+  execsql {
+    savepoint p3;
+    select BFILE_REPLACE_DIRECTORY('/usr/bin/image', '/usr/default');
+    select BFILE_FULLPATH(c2) from test5;
+  }
+} {{} /usr/temp/temp001.jpg {} /usr/default/photo002.jpg}
+
+do_test bfile-5.6 {
+  execsql {
+    select BFILE_DROP_DIRECTORY('/usr/bin/image');
+    select BFILE_FULLPATH(c2) from test5;
+  }
+} {{} /usr/temp/temp001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-5.7 {
+  execsql {
+    rollback to p3;
+    select BFILE_FULLPATH(c2) from test5;
+  }
+} {/usr/temp/temp001.jpg {} /usr/package/photo002.jpg}
+
+do_test bfile-5.8 {
+  execsql {
+    rollback to p2;
+    select BFILE_FULLPATH(c2) from test5;
+  }
+} {/usr/temp/temp001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-5.9 {
+  execsql {
+    release savepoint p1;
+    select BFILE_FULLPATH(c2) from test5;
+  }
+} {/usr/temp/temp001.jpg {} /usr/bin/image/photo002.jpg}
+
+do_test bfile-5.10 {
+  execsql {
+    drop table test5;
+  }
+} {}
+
+#directory object
+do_test bfile-6.1 {
+  catchsql {
+    select BFILE_CREATE_DIRECTORY('picture', '.');
+    select BFILE_CREATE_DIRECTORY('picture', '..');
+  }
+} {1 {Directory already exist}}
+
+do_test bfile-6.2 {
+  catchsql {
+    select BFILE_REPLACE_DIRECTORY('picture_none', '.');
+  }
+} {1 {Directory does not exist}}
+
+do_test bfile-6.3 {
+  catchsql {
+    select BFILE_DROP_DIRECTORY('picture_none');
+  }
+} {1 {Directory does not exist}}
+
+#accessing BFILE by SQL functions
+do_test bfile-7.0 {
+  exec rm -rf "./photo001.jpg"
+  exec rm -rf "./photo002.jpg"
+  exec rm -rf "./photo003.jpg"
+  set fp [open "./photo001.jpg" w]
+  puts $fp "who am I? That is photo001.jpg."
+  close $fp
+  set fp [open "./photo002.jpg" w]
+  puts $fp "where am I? I'm here."
+  close $fp
+} {}
+
+do_test bfile-7.1 {
+  execsql {
+    create table test1(c1 int, c2 BFILE);
+    insert into test1 values(1, BFILE_NAME('.','photo001.jpg'));
+    insert into test1 values(2, BFILE_NAME('.','photo002.jpg'));
+    insert into test1 values(3, NULL);
+    insert into test1 values(4, BFILE_NAME('.','photo003.jpg'));
+    select BFILE_FULLPATH(c2) from test1;
+  }
+} {./photo001.jpg ./photo002.jpg {} ./photo003.jpg}
+
+do_test bfile-7.2 {
+  execsql {SELECT BFILE_SIZE(0)}
+} {-1}
+
+do_test bfile-7.3 {
+  execsql {SELECT BFILE_OPEN(0)}
+} {0}
+
+do_test bfile-7.4.1 {
+  set v [catch {execsql {SELECT BFILE_READ(0, 1, 0)}} msg]
+  lappend v $msg
+} {1 {invalid bfile handle}}
+
+
+do_test bfile-7.4.2.1 {
+  set v [catch {execsql {SELECT BFILE_READ(BFILE_OPEN(c2), 0, 0) BFileHdl FROM test1 where c1 = 1}} msg]
+  lappend v $msg
+} {1 {invalid size}}
+
+do_test bfile-7.4.2.2 {
+  set v [catch {execsql {SELECT BFILE_READ(BFILE_OPEN(c2), -1, 0) BFileHdl FROM test1 where c1 = 1}} msg]
+  lappend v $msg
+} {1 {invalid size}}
+
+do_test bfile-7.4.2.3 {
+  set v [catch {execsql {SELECT BFILE_READ(BFILE_OPEN(c2), -100, 0) BFileHdl FROM test1 where c1 = 1}} msg]
+  lappend v $msg
+} {1 {invalid size}}
+
+do_test bfile-7.4.3.1 {
+  set v [catch {execsql {SELECT BFILE_READ(BFILE_OPEN(c2), 10, -1) BFileHdl FROM test1 where c1 = 1}} msg]
+  lappend v $msg
+} {1 {invalid offset}}
+
+do_test bfile-7.4.3.2 {
+  execsql {SELECT BFILE_READ(BFILE_OPEN(c2), 10, 100) BFileHdl FROM test1 where c1 = 1}
+} {{}}
+
+do_test bfile-7.5 {
+  execsql {SELECT BFILE_CLOSE(0)}
+} {{}}
+
+do_test bfile-7.6 {
+  set sql {SELECT c2 FROM test1}
+  set r {}
+  db eval $sql data {
+    set c2 $data(c2)
+    set sql2 {SELECT BFILE_SIZE($c2) bsize}
+    db eval $sql2 d2 {
+      lappend r $d2(bsize)
+    }
+  }
+  set r
+} {32 22 -1 -1}
+
+unset data
+do_test bfile-7.7 {
+  set sql {SELECT c2 FROM test1}
+  set r2 {}
+  db eval $sql data {
+    set c2 $data(c2)
+    set sql2 {SELECT BFILE_OPEN($c2) BFileHdl}
+    db eval $sql2 d2 {
+      set BFileHdl $d2(BFileHdl)
+      if {$BFileHdl == 0} {
+        lappend r2 $BFileHdl
+      } else {
+        set sql3 {SELECT BFILE_READ($BFileHdl, 5, 0) buffer}
+        db eval $sql3 d3 {
+          lappend r2 $d3(buffer)
+        }
+        execsql {SELECT BFILE_CLOSE($BFileHdl)}
+      }
+    }
+  }
+  set r2
+} {{who a} where 0 0}
+
+do_test bfile-7.8 {
+  exec rm -rf "./photo001.jpg"
+  exec rm -rf "./photo002.jpg"
+  exec rm -rf "./photo003.jpg"
+} {}

@@ -1,0 +1,59 @@
+#!/bin/sh
+#
+# /etc/rc.d/rc.firebirdss
+#
+# Start/stop/restart the firebird super server.
+#
+
+# To run more instances of firebird:
+#   Copy @prefix@ somewhere
+#   Copy this script under a new name
+#   Change INSTANCE and FIREBIRD below (all instance names should be unique)
+#   Edit the copied firebird.conf to change at least RemoteServicePort
+#   Optionally run rc-update to autostart the new service
+INSTANCE=default
+FIREBIRD=@FB_CONFDIR@
+
+# No changes needed below for multiple instances
+FBRunUser=firebird
+
+makeFbDir() {
+	mDir=${1}
+	mode=${2}
+	if [ ! -d $mDir ]; then
+		rm -rf $mDir
+		mkdir $mDir
+		if [ "$mode" ]; then
+			chmod $mode $mDir
+		fi
+	fi
+	chown $FBRunUser:$FBRunUser $mDir
+}
+runDir=/var/run/firebird
+makeFbDir $runDir
+lockDir=/tmp/firebird
+makeFbDir $lockDir 0770
+
+pidfile="$runDir/$INSTANCE.pid"
+FULLNAME="Firebird server [$INSTANCE]"
+LD_LIBRARY_PATH=$FIREBIRD/lib:$LD_LIBRARY_PATH
+
+export FIREBIRD LD_LIBRARY_PATH
+
+ISC_USER=
+ISC_PASSWORD=
+export ISC_USER ISC_PASSWORD
+
+GUARDIAN=$FIREBIRD/bin/fbguard
+if [ ! -x $GUARDIAN ]; then
+	GUARDIAN=@FB_SBINDIR@/fbguard
+fi
+
+case "$1" in
+	'start')	echo -n "Starting $FULLNAME: "
+			echo $GUARDIAN -pidfile $pidfile -daemon -forever | su $FBRunUser ;;
+	'stop')		echo -n "Stopping $FULLNAME: "
+			if [ -f $pidfile ]; then kill `cat $pidfile`; echo "done."; else echo "error: no PID file."; fi ;;
+	'restart')	$0 stop ; sleep 1; $0 start ;;
+	*)		echo "usage $0 start|stop|restart" ;;
+esac

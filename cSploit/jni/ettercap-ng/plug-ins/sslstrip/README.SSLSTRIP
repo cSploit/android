@@ -1,0 +1,59 @@
+Documentation for SSLStrip plugin for ettercap 0.7.5+
+
+SSLStrip:
+---------
+SSLStrip is a python script written by Moxie (http://www.thoughtcrime.org/software/sslstrip/) that basically
+strips all the https:// links from HTML respones so that users will submit everything via HTTP. The script
+keeps track of those HTTPS links so that it can talk to the actual web server via the right application protocol
+(HTTP or HTTPS). SSLStrip depends on ARPspoof and IPTables forwarding to intercept the victim(s)' traffic.
+
+
+Why add it to Ettercap?
+-----------------------
+Ettercap already performs the MiTM approach that ARPspoof does. It was very simple to write this
+as a plugin and allow the plugin to redirect HTTP (port 80) traffic to itself in order to perform
+the requests on behalf of the victim(s). Just as the script, the SSLStrip plugin keeps track of all
+HTTPS links so that it can go ahead and send those requests via HTTPS to the actual web server(s).
+It then strips all HTTPS links from the responses so that everything coming from the victim(s)
+is seen as HTTP, therefor, unencrypted.
+
+
+How to get it to work:
+----------------------
+In order for the plugin to compile, you must install libcurl. This can be done via 
+your operating system's package management. It needs versision 7.26.0 at least.
+
+On Mac OS X: 
+   Mac OS X already comes with libcurl installed but it is an older version. Please use/run the MacPorts
+version of it by typing:
+
+	$ port install curl
+
+On Linux:
+        Just installing the latest version of libcurl/curl will do.
+
+
+How to use?
+-----------
+Enabling the SSLStrip plugin will add an IPTables/IPFW rule that redirects traffic to port 80
+to a different port that the plugin will be listening on. Although not required, it is recommended
+if SSL MiTM (-S) is turned off to avoid any issues with the traffic coming from Ettercap to the 
+web server via HTTPS. If the targets lists are properly defined, SSL MiTM can also be used in
+conjunction of SSLStrip plugin just in case any HTTPS link slips by.
+
+
+Known Problems
+-------------
+The regex pattern used by the plugin picks up most HTTPS links but there are still some that will slip by. 
+For example if a link has href="/aslfksldfkjdflkjasdfj/******RANDOMTEXT<https link>", the plugin will
+fail to match that.
+
+
+Improvements?
+-------------
+Sure! If a better regex pattern can be used, any bugs, crashes, etc. Feel free to submit to
+the mailing list or email us directly (see AUTHORS file).
+
+
+Thanks,
+exfil (emescobar@users.sf.net).

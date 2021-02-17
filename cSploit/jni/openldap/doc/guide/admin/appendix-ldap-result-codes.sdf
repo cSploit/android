@@ -1,0 +1,269 @@
+# $OpenLDAP$
+# Copyright 2007-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1:  LDAP Result Codes
+
+For the purposes of this guide, we have incorporated the standard LDAP result 
+codes from {{Appendix A.  LDAP Result Codes}} of {{REF:RFC4511}}, a copy of which can 
+be found in {{F:doc/rfc}} of the OpenLDAP source code.
+
+We have expanded the description of each error in relation to the OpenLDAP 
+toolsets.
+LDAP extensions may introduce extension-specific result codes, which are not part
+of RFC4511.
+OpenLDAP returns the result codes related to extensions it implements.
+Their meaning is documented in the extension they are related to.
+
+H2:  Non-Error Result Codes
+
+These result codes (called "non-error" result codes) do not indicate
+an error condition:
+
+>        success (0),
+>        compareFalse (5),
+>        compareTrue (6),
+>        referral (10), and
+>        saslBindInProgress (14).
+
+The {{success}}, {{compareTrue}}, and {{compareFalse}} result codes indicate
+successful completion (and, hence, are referred to as "successful"
+result codes).
+
+The {{referral}} and {{saslBindInProgress}} result codes indicate the client
+needs to take additional action to complete the operation.
+
+H2:  Result Codes
+
+Existing LDAP result codes are described as follows:
+
+H2: success (0)
+
+Indicates the successful completion of an operation.  
+
+Note: this code is not used with the Compare operation.  See {{SECT:compareFalse (5)}} 
+and {{SECT:compareTrue (6)}}.
+
+H2: operationsError (1)
+
+Indicates that the operation is not properly sequenced with
+relation to other operations (of same or different type).
+
+For example, this code is returned if the client attempts to
+StartTLS ({{REF:RFC4511}} Section 4.14) while there are other uncompleted operations
+or if a TLS layer was already installed.
+
+H2: protocolError (2)
+
+Indicates the server received data that is not well-formed.
+
+For Bind operation only, this code is also used to indicate
+that the server does not support the requested protocol
+version.
+
+For Extended operations only, this code is also used to
+indicate that the server does not support (by design or
+configuration) the Extended operation associated with the
+{{requestName}}.
+
+For request operations specifying multiple controls, this may
+be used to indicate that the server cannot ignore the order
+of the controls as specified, or that the combination of the
+specified controls is invalid or unspecified.
+
+H2: timeLimitExceeded (3)
+
+Indicates that the time limit specified by the client was
+exceeded before the operation could be completed.
+
+H2: sizeLimitExceeded (4)
+
+Indicates that the size limit specified by the client was
+exceeded before the operation could be completed.
+
+H2: compareFalse (5)
+
+Indicates that the Compare operation has successfully
+completed and the assertion has evaluated to FALSE or
+Undefined.
+
+H2: compareTrue (6)
+
+Indicates that the Compare operation has successfully
+completed and the assertion has evaluated to TRUE.
+
+H2: authMethodNotSupported (7)
+
+Indicates that the authentication method or mechanism is not
+supported.
+
+H2: strongerAuthRequired (8)
+
+Indicates the server requires strong(er) authentication in
+order to complete the operation.
+
+When used with the Notice of Disconnection operation, this
+code indicates that the server has detected that an
+established security association between the client and
+server has unexpectedly failed or been compromised.
+
+H2: referral (10)
+
+Indicates that a referral needs to be chased to complete the
+operation (see {{REF:RFC4511}} Section 4.1.10).
+
+H2: adminLimitExceeded (11)
+
+Indicates that an administrative limit has been exceeded.
+
+H2: unavailableCriticalExtension (12)
+
+Indicates a critical control is unrecognized (see {{REF:RFC4511}} Section
+4.1.11).
+
+H2: confidentialityRequired (13)
+
+Indicates that data confidentiality protections are required.
+
+H2: saslBindInProgress (14)
+
+Indicates the server requires the client to send a new bind
+request, with the same SASL mechanism, to continue the
+authentication process (see {{REF:RFC4511}} Section 4.2).
+
+H2: noSuchAttribute (16)
+
+Indicates that the named entry does not contain the specified
+attribute or attribute value.
+
+H2: undefinedAttributeType (17)
+
+Indicates that a request field contains an unrecognized
+attribute description.
+
+H2: inappropriateMatching (18)
+
+Indicates that an attempt was made (e.g., in an assertion) to
+use a matching rule not defined for the attribute type
+concerned.
+
+H2: constraintViolation (19)
+
+Indicates that the client supplied an attribute value that
+does not conform to the constraints placed upon it by the
+data model.
+
+For example, this code is returned when multiple values are
+supplied to an attribute that has a SINGLE-VALUE constraint.
+
+H2: attributeOrValueExists (20)
+
+Indicates that the client supplied an attribute or value to
+be added to an entry, but the attribute or value already
+exists.
+
+H2: invalidAttributeSyntax (21)
+
+Indicates that a purported attribute value does not conform
+to the syntax of the attribute.
+
+H2: noSuchObject (32)
+
+Indicates that the object does not exist in the DIT.
+
+H2: aliasProblem (33)
+
+Indicates that an alias problem has occurred.  For example,
+the code may used to indicate an alias has been dereferenced
+that names no object.
+
+H2: invalidDNSyntax (34)
+
+Indicates that an LDAPDN or RelativeLDAPDN field (e.g., search
+base, target entry, ModifyDN newrdn, etc.) of a request does
+not conform to the required syntax or contains attribute
+values that do not conform to the syntax of the attribute's
+type.
+
+H2: aliasDereferencingProblem (36)
+
+Indicates that a problem occurred while dereferencing an
+alias.  Typically, an alias was encountered in a situation
+where it was not allowed or where access was denied.
+
+H2: inappropriateAuthentication (48)
+
+Indicates the server requires the client that had attempted
+to bind anonymously or without supplying credentials to
+provide some form of credentials.
+
+H2: invalidCredentials (49)
+
+Indicates that the provided credentials (e.g., the user's name
+and password) are invalid.
+
+H2: insufficientAccessRights (50)
+
+Indicates that the client does not have sufficient access
+rights to perform the operation.
+
+H2: busy (51)
+
+Indicates that the server is too busy to service the
+operation.
+
+H2: unavailable (52)
+
+Indicates that the server is shutting down or a subsystem
+necessary to complete the operation is offline.
+
+H2: unwillingToPerform (53)
+
+Indicates that the server is unwilling to perform the
+operation.
+
+H2: loopDetect (54)
+
+Indicates that the server has detected an internal loop (e.g.,
+while dereferencing aliases or chaining an operation).
+
+H2: namingViolation (64)
+
+Indicates that the entry's name violates naming restrictions.
+
+H2: objectClassViolation (65)
+
+Indicates that the entry violates object class restrictions.
+
+H2: notAllowedOnNonLeaf (66)
+
+Indicates that the operation is inappropriately acting upon a
+non-leaf entry.
+
+H2: notAllowedOnRDN (67)
+
+Indicates that the operation is inappropriately attempting to
+remove a value that forms the entry's relative distinguished
+name.
+
+H2: entryAlreadyExists (68)
+
+Indicates that the request cannot be fulfilled (added, moved,
+or renamed) as the target entry already exists.
+
+H2: objectClassModsProhibited (69)
+
+Indicates that an attempt to modify the object class(es) of
+an entry's 'objectClass' attribute is prohibited.
+
+For example, this code is returned when a client attempts to
+modify the structural object class of an entry.
+
+H2: affectsMultipleDSAs (71)
+
+Indicates that the operation cannot be performed as it would
+affect multiple servers (DSAs).
+
+H2: other (80)
+
+Indicates the server has encountered an internal error.

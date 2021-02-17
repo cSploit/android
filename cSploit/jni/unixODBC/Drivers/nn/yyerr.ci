@@ -1,0 +1,35 @@
+#include	<yyerr.h>
+
+static struct {
+	int	errcode;
+	char*	msg;
+} yy_errmsg[] = {
+	PARSER_ERROR,			0,
+	INVALID_COLUMN_NAME,		NNSQL_ERRHEAD	"Invalid column name",
+	NOT_SUPPORT_UPDATEABLE_CURSOR,	NNSQL_ERRHEAD	"Don't support update cursor",
+	NOT_SUPPORT_DISTINCT_SELECT,	NNSQL_ERRHEAD	"Don't support distinct select",
+	NOT_SUPPORT_MULTITABLE_QUERY,	NNSQL_ERRHEAD	"Don't support multi-table query",
+	NOT_SUPPORT_GROUP_CLAUSE,	NNSQL_ERRHEAD	"Don't support GROUP clause",
+	NOT_SUPPORT_HAVING_CLAUSE,	NNSQL_ERRHEAD	"Don't support HAVING condition",
+	NOT_SUPPORT_ORDER_CLAUSE,	NNSQL_ERRHEAD	"Don't support ORDER clause",
+	NOT_SUPPORT_DDL_DCL,		NNSQL_ERRHEAD	"Don't support DDL and DCL",
+	NOT_SUPPORT_UPDATE,		NNSQL_ERRHEAD	"Don't support UPDATE",
+	NOT_SUPPORT_POSITION_DELETE,	NNSQL_ERRHEAD	"Don't support position DELETE",
+	TOO_MANY_COLUMNS,		NNSQL_ERRHEAD	"Too many columns in select list",
+	NOT_SUPPORT_SPROC,		NNSQL_ERRHEAD	"Don't support stored procedure feature",
+	VARIABLE_IN_SELECT_LIST,	NNSQL_ERRHEAD	"A variable was used in select list",
+	VARIABLE_IN_TABLE_LIST, 	NNSQL_ERRHEAD	"A variable was used in table list",
+	UNSEARCHABLE_ATTR,		NNSQL_ERRHEAD	"Unsearchable column was used in "
+							"searching condition",
+	INSERT_VALUE_LESS,		NNSQL_ERRHEAD	"Number of values less than number of "
+							"columns in insert statement",
+	INSERT_VALUE_MORE,		NNSQL_ERRHEAD	"Number of values more than number of "
+							"columns in insert statement",
+	POST_WITHOUT_BODY,		NNSQL_ERRHEAD	"Try to post a article without body",
+	NO_POST_PRIVILEGE,		NNSQL_ERRHEAD	"No INSERT and DELETE privilege as "
+							"server not accept POST",
+	NO_INSERT_PRIVILEGE,		NNSQL_ERRHEAD	"No INSERT privilege",
+	NO_DELETE_PRIVILEGE,		NNSQL_ERRHEAD	"No DELETE privilege on any groups",
+	NO_DELETE_ANY_PRIVILEGE,	NNSQL_ERRHEAD	"No DELETE privilege on non-test groups",
+	TYPE_VIOLATION, 		NNSQL_ERRHEAD	"Restricted data type attribute violation"
+};

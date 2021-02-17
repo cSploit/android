@@ -1,0 +1,63 @@
+#
+# Makefile for the linux ncp-filesystem routines.
+#
+
+top_srcdir = @top_srcdir@
+top_builddir = ../..
+
+include $(top_builddir)/Make.rules
+
+LIBS = @INTLLIBS@ @LIBS@
+LIB_PAM_SECURITY = @LIB_PAM_SECURITY@
+
+NCP_LIB = libncp.so
+NCPLIB_DIR = ../../lib
+
+PAM_LIBRARY = pam_ncp_auth.so
+PAM_OBJECTS = pam_ncp_auth.do support.do
+
+CFLAGS_pam_ncp_auth.do := -DNCPMOUNT_PATH=\"$(bindir)/ncpmount\" -DNCPUMOUNT_PATH=\"$(bindir)/ncpumount\"
+
+.PHONY : all install install-dev dep clean mrproper distclean
+.PHONY : default
+
+default:
+	make -C ../..
+
+all: $(PAM_LIBRARY)
+
+install: all
+	${INSTALL} -d $(DESTDIR)$(LIB_PAM_SECURITY)
+	${INSTALL} -m 755 $(PAM_LIBRARY) $(DESTDIR)$(LIB_PAM_SECURITY)
+
+install-dev:
+
+$(NCPLIB_DIR)/$(NCP_LIB):
+	make -C $(NCPLIB_DIR) $(NCP_LIB)
+
+$(PAM_OBJECTS): %.do: %.c
+	$(CC) $(CFLAGS) $(CCFLAGS) $(CFLAGS_$@) -fPIC -o $@ -c $<
+
+%.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.do)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+
+$(PAM_LIBRARY): $(PAM_OBJECTS)
+	$(CC) $(CFLAGS) -shared -o $@ $(PAM_OBJECTS) -L$(NCPLIB_DIR) -lncp -lpam ${LIBS}
+
+dep:
+
+clean:
+	rm -f $(PAM_OBJECTS) $(PAM_LIBRARY) *~
+
+mrproper: clean
+	rm -f *.d
+
+distclean: mrproper
+
+ifeq ($(NEED_DEP),yes)
+include $(PAM_OBJECTS:%.do=%.d)
+endif
+

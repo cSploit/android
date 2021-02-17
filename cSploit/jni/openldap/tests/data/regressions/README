@@ -1,0 +1,20 @@
+This directory contains test related to regression tracking that require
+a specific setup and a complete test.  Each regression test must be 
+contained in a test directory whose name is "its<number>", where <number>
+is the ITS number, and it must be entirely executed by a script, contained
+in that directory and with the same name of the directory.  It can exploit
+all the helpers provided for common tests (variables in scripts/defines.sh,
+data files in data/, ...), but it should simultaneously be as self contained
+and as general as possible.  Warning: occasionally, data files and
+shell variables may change, so limit their use to real needs.
+
+For example, if an issue only appears with a certain database type, the
+test itself should only run when invoked for that database type; 
+otherwise, if the issue appears whatever backend is used, the test should
+be parametric, so that it is run with the backend selected at run-time
+via the "-b" switch of the "run" script.
+
+Regression tests are prepared on a voluntary basis, so don't expect all 
+bugs to have a test any soon.  When the issue reporter provides a simple,
+yet complete means to reproduce the bug she's reporting, this may speed up 
+the process.  In case, only put neutral data in bug exploitation reports.

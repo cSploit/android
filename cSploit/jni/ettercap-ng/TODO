@@ -1,0 +1,89 @@
+==========================
+  TODO for the NG series
+==========================
+
+>>> things to be fixed
+   
+   + remove GBL_OPTIONS->quiet from some plugins
+
+   + PCAP RELATED
+      - pcap_stat fix (even under linux the stats are cumulative)
+
+   + refresh the host list after the scan
+
+   + libnet_write under windows
+
+   http://ettercap.sourceforge.net/forum/viewtopic.php?p=13789#13789
+
+============================
+  In the next release(s)
+============================
+   
+   + ETTERLOG
+      - reassemble the stream based on sequence numbers
+      - extractors for HTTP, POP, SMTP, FTP, TFTP
+
+   + resolve ip in the message window
+
+   + use different counters for RX and TX bytes in the connection table
+
+   + record the MSS for the packet splitting
+
+   + multiple dissector on a single port
+
+   + CURSES
+      - modifiable text in widgets
+
+   + NETWORK MAPPER
+      - automatic scan (all the host in the profile list)
+      - specified ip address
+      - interconnections map (linked to the profiles)
+      - based on ttl (ala traceroute)
+      - png output (ala nagios)
+
+   + BINDER
+
+   + ETTERFILTER
+      - possibility to set flags in scripts 
+         - per packet
+         - per connection ???
+
+   + SSH - SSL
+      - decryption with given keys
+      - DES support
+
+==================
+  LONG TERM TODO
+==================
+   
+   + SSH2 dissection :) (yes, it can be done)
+
+   + IPv6
+      - NDIS mitm
+      - router discovery
+
+   + Rendevouz mitm
+
+   + SOCKS
+      - decode the internal connection
+
+   + multiple interfaces on gateway
+
+   + NEW DISSECTOR
+      - TACACS dissector
+      - Microsoft RPC
+      - postgresql
+      - pcanywhere
+      - TDS
+      - MS-SQL (http://www.nii.co.in/vuln/sqlpass.html)
+      - YMSG
+        (http://www.xi0n.com/forums/showthread.php?s=8dc997a1e1f0d3216c8956d64fcdb414&postid=2767#post2767
+         http://www.venkydude.com/articles/yahoo.htm)
+      - RDesktop
+      - MSN9 (http://www.hackerscenter.com/Articles/Article.asp?id=54)
+
+   + INET
+      - handle fragmented packets
+      - IPv6 support
+
+

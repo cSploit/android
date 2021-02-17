@@ -1,0 +1,18 @@
+Begin3
+Title:          ncpfs
+Version:        2.2.6
+Entered-date:   January 27, 2005
+Description:    With ncpfs you can mount volumes of your netware
+                server under Linux. You can also print to netware
+                print queues and spool netware print queues to the
+		Linux printing system.
+Keywords:       filesystem ncp novell netware printing
+Author:         vandrove@vc.cvut.cz (Petr Vandrovec)
+		lendecke@Math.Uni-Goettingen.de (Volker Lendecke)
+Maintained-by:  vandrove@vc.cvut.cz (Petr Vandrovec)
+Primary-site:   platan.vc.cvut.cz /pub/linux/ncpfs/ncpfs-2.2.6
+                  1464k ncpfs-2.2.6.tgz
+                     1k ncpfs.lsm
+Alternate-site: ftp.cvut.cz /ncpfs
+Copying-policy: GPL
+End

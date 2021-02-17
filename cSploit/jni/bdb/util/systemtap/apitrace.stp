@@ -1,0 +1,45 @@
+#!/usr/bin/stap
+/*
+ * Copyright (c) 2012, 2014 Oracle and/or its affiliates.  All rights reserved.
+ *
+ * apitrace - Display DB API calls and return values
+ *
+ * The path to the DB library is required to be the first argument.
+ *
+ * To limit tracing to a particular process use one of the stap options:
+ *	-x <pid> or
+ *	-c "<program> [<program arguments>..]"
+ *
+ */
+
+global tracecount, maxlimit;
+
+probe begin
+{
+	printf("DB API call trace of ");
+	if (target() == 0)
+		printf("processes using \"%s\"\n", @1);
+	else
+		printf("process %d\n", target());
+	printf("Interrupt to display summary\n");
+	maxlimit = -1;
+	%( $# >= 2 %? maxlimit = $2 %)
+	tracecount = 0;
+}
+
+probe process(@1).function("db_*create").call,
+      process(@1).function("__*_*pp").call
+{
+	printf("%s -> %s called with (%s)\n",
+	    thread_indent(1), probefunc(), $$parms);
+
+}
+
+probe process(@1).function("db*_create").return,
+      process(@1).function("__*_*pp").return
+{
+	printf("%s <- %s returns %d\n", thread_indent(-1),
+		probefunc(), $return)
+	if (++tracecount == maxlimit)
+		exit();
+}

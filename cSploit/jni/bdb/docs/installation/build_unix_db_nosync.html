@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_NOSYNC Flag to Flush Files</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_11gr2_toc.html" title="Chapter 13.  Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0" />
+    <link rel="prev" href="build_unix_encrypt.html" title="Cryptography Support" />
+    <link rel="next" href="upgrade_11gr2_remsupp.html" title="Dropped Support" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_NOSYNC Flag to Flush Files</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="build_unix_encrypt.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 13. 
+        Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="upgrade_11gr2_remsupp.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="build_unix_db_nosync"></a>DB_NOSYNC Flag to Flush Files</h2>
+          </div>
+        </div>
+      </div>
+      <p>Applications must now pass the DB_NOSYNC flag to the methods - <code class="literal">DB-&gt;remove</code>, <code class="literal">DB-&gt;rename</code>, <code class="literal">DB_ENV-&gt;dbremove</code>, and <code class="literal">DB_ENV-&gt;dbrename</code>, to avoid a multi-database file to be flushed from cache.
+This flag is applicable if you have created the database handle in a non-transactional environment. 
+</p>
+      <p>By default,  all non-transactional database remove/rename operations cause data to be synced to disk.
+This can now be overridden using the DB_NOSYNC flag so that files can be accessed outside the environment after the database handles are closed.
+</p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="build_unix_encrypt.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_11gr2_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="upgrade_11gr2_remsupp.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Cryptography Support </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Dropped Support</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

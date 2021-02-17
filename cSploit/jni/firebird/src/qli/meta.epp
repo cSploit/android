@@ -1,0 +1,3726 @@
+/*
+ *	PROGRAM:	JRD Command Oriented Query Language
+ *	MODULE:		meta.epp
+ *	DESCRIPTION:	Meta-data interface
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+#include "firebird.h"
+#include "dyn_consts.h"
+#include <stdio.h>
+#include <string.h>
+#include "../qli/dtr.h"
+#include "../qli/compile.h"
+#include "../qli/exe.h"
+//#include "../jrd/license.h"
+#include "../jrd/flags.h"
+#include "../jrd/ibase.h"
+#include "../qli/reqs.h"
+#include "../qli/all_proto.h"
+#include "../qli/err_proto.h"
+#include "../qli/gener_proto.h"
+#include "../qli/hsh_proto.h"
+#include "../qli/meta_proto.h"
+#include "../common/prett_proto.h"
+#include "../yvalve/gds_proto.h"
+#include "../common/isc_f_proto.h"
+#include "../yvalve/utl_proto.h"
+#include "../common/utils_proto.h"
+#include "../common/classes/ClumpletWriter.h"
+#include "../common/classes/UserBlob.h"
+
+using MsgFormat::SafeArg;
+
+
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+
+DATABASE DB = FILENAME "yachts.lnk";
+DATABASE DB1 = FILENAME "yachts.lnk";
+
+static void add_field(qli_rel*, qli_fld*, USHORT);
+static void add_sql_field(qli_rel*, qli_fld*, USHORT, qli_rlb*);
+static void blob_copy(qli_rlb*, qli_rel*, ISC_QUAD&);
+static void change_field(qli_rel*, qli_fld*);
+static bool check_global_field(qli_dbb*, qli_fld*, const TEXT*);
+static bool check_relation(qli_rel*);
+static void clone_fields(qli_rel*, qli_rel*);
+static void clone_global_fields(qli_rel*, qli_rel*);
+static void define_global_field(qli_dbb*, qli_fld*, qli_symbol*);
+static void delete_fields(qli_rel*);
+static ISC_STATUS detach(ISC_STATUS *, qli_dbb*);
+static void execute_dynamic_ddl(qli_dbb*, qli_rlb*);
+static int field_length(USHORT, USHORT);
+static void get_database_type(qli_dbb*);
+static TEXT* get_query_header(qli_dbb*, ISC_QUAD&);
+static void install(qli_dbb*);
+static qli_syntax* make_node(nod_t, USHORT);
+static TEXT* make_string(TEXT*, SSHORT);
+static qli_symbol* make_symbol(TEXT*, SSHORT);
+static qli_const* missing_value(ISC_QUAD&, qli_symbol*);
+static qli_syntax* parse_blr(UCHAR**, qli_symbol*);
+static qli_syntax* parse_blr_blob(ISC_QUAD&, qli_symbol*);
+static void purge_relation(qli_rel*);
+static void put_dyn_string(qli_rlb*, const TEXT*);
+static void release_request(qli_dbb* db, FB_API_HANDLE& request_handle);
+static void rollback_update(qli_dbb*);
+static void set_capabilities(qli_dbb*);
+static qli_dbb* setup_update(qli_dbb*);
+static void sql_grant_revoke(qli_syntax*, USHORT);
+static void stuff_priv(qli_rlb*, USHORT, const TEXT*, USHORT, const TEXT*, const TEXT*);
+static int truncate_string(TEXT*);
+
+static const UCHAR tpb[] = { isc_tpb_version1, isc_tpb_write };
+static const UCHAR db_info[] = { isc_info_implementation, isc_info_end };
+static UCHAR global_parm_buffer[256];
+
+// static const UCHAR	dpb_trace [] =	{ isc_dpb_version1, isc_dpb_trace, 1, 1 };
+// static const UCHAR	dpb_num_buffers [ ] = { isc_dpb_version1, isc_dpb_num_buffers, 1, 1 };
+
+
+#define STUFF_STRING(str)	put_dyn_string (rlb, str)
+#define BLR_BYTE	*blr++
+
+static const USHORT blr_dtypes[] =
+{
+	0,
+	blr_text,
+	blr_text,
+	blr_varying,
+	0,
+	0,
+	0,
+	0,
+	blr_short,
+	blr_long,
+	blr_quad,
+	blr_float,
+	blr_double,
+	blr_double,
+	blr_sql_date,
+	blr_sql_time,
+	blr_timestamp,
+	blr_blob,
+	0,
+	blr_int64
+};
+
+
+// table used to determine capabilities, checking for specific
+// fields in system relations
+
+struct rfr_tab_t
+{
+	const TEXT* relation;
+	const TEXT* field;
+	int bit_mask;
+};
+
+static const rfr_tab_t rfr_table[] =
+{
+	{ "RDB$INDICES", "RDB$INDEX_INACTIVE", DBB_cap_idx_inactive },
+	// OBSOLETE - 1996-Aug-06 David Schnepper
+	//{ "RDB$RELATIONS",	"RDB$STORE_TRIGGER",	DBB_cap_triggers },
+	{ "RDB$RELATIONS", "RDB$EXTERNAL_FILE", DBB_cap_extern_file },
+	{ "RDB$SECURITY_CLASSES", "RDB$SECURITY_CLASS", DBB_cap_security },
+	{ "RDB$FILES", "RDB$FILE_NAME", DBB_cap_files },
+	{ "RDB$FUNCTIONS", "RDB$FUNCTION_NAME", DBB_cap_functions },
+	{ "RDB$TRIGGERS", "RDB$TRIGGER_BLR", DBB_cap_new_triggers },
+	{ "RDB$CONSTRAINTS", "RDB$CONSTRAINT_NAME", DBB_cap_single_trans },
+	{ "RDB$FILES", "RDB$SHADOW_NUMBER", DBB_cap_shadowing },
+	{ "RDB$TYPES", "RDB$TYPE_NAME", DBB_cap_types },
+	{ "RDB$FIELDS", "RDB$DIMENSIONS", DBB_cap_dimensions },
+//	{ "RDB$FIELDS", "RDB$EXTERNAL_TYPE", DBB_cap_external_type }, Unused
+	{ "RDB$RELATION_FIELDS", "RDB$SYSTEM_FLAG", DBB_cap_rfr_sys_flag },
+	{ "RDB$FILTERS", "RDB$FUNCTION_NAME", DBB_cap_filters },
+	{ "RDB$INDICES", "RDB$INDEX_TYPE", DBB_cap_index_type },
+	{ "RDB$PROCEDURES", "RDB$ENGINE_NAME", DBB_cap_nodyn },		// FB3.0
+	{ 0, 0, 0 }
+};
+
+
+bool MET_declare( qli_dbb* database, qli_fld* variable, const qli_name* field_name)
+{
+/**************************************
+ *
+ *	M E T _ d e c l a r e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Find a global field referenced in a DECLARE.
+ *
+ **************************************/
+
+	if (!database)
+		database = QLI_databases;
+
+	for (; database; database = database->dbb_next)
+	{
+		MET_meta_transaction(database, false);
+		if (check_global_field(database, variable, field_name->nam_string))
+			return true;
+	}
+
+	return false;
+}
+
+
+void MET_define_field( qli_dbb* database, qli_fld* field)
+{
+/**************************************
+ *
+ *	M E T _ d e f i n e _ f i e l d
+ *
+ **************************************
+ *
+ * Functional description
+ *	Define a new global field.
+ *
+ **************************************/
+
+	database = setup_update(database);
+
+	if (check_global_field(database, NULL, field->fld_name->sym_string))
+	{
+		rollback_update(database);
+		ERRQ_print_error(233, field->fld_name->sym_string);
+		// Msg233 global field %s already exists
+	}
+
+	define_global_field(database, field, field->fld_name);
+
+	MET_meta_commit(database);
+}
+
+
+void MET_define_index( qli_syntax* node)
+{
+/**************************************
+ *
+ *	M E T _ d e f i n e _ i n d e x
+ *
+ **************************************
+ *
+ * Functional description
+ *	Define a new index.
+ *
+ **************************************/
+	qli_symbol* symbol = (qli_symbol*) node->syn_arg[s_dfi_name];
+	qli_rel* relation = (qli_rel*) node->syn_arg[s_dfi_relation];
+	qli_syntax* fields = node->syn_arg[s_dfi_fields];
+	qli_dbb* database = setup_update(relation->rel_database);
+
+	if (relation->rel_flags & REL_view)
+		IBERROR(234);			// Msg234 Can't define an index in a view
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_def_index1])
+		X IN DB.RDB$INDICES WITH X.RDB$INDEX_NAME EQ symbol->sym_string
+			ERRQ_print_error(235, symbol->sym_string);
+			// Msg235 Index %s already exists
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	STORE(REQUEST_HANDLE database->dbb_requests[REQ_def_index2])
+		X IN DB.RDB$INDICES
+
+		strcpy(X.RDB$RELATION_NAME, relation->rel_symbol->sym_string);
+		strcpy(X.RDB$INDEX_NAME, symbol->sym_string);
+		X.RDB$UNIQUE_FLAG = (node->syn_flags & s_dfi_flag_unique);
+		X.RDB$INDEX_INACTIVE = (node->syn_flags & s_dfi_flag_inactive) ? TRUE : FALSE;
+		X.RDB$SEGMENT_COUNT = fields->syn_count;
+		X.RDB$INDEX_TYPE = (node->syn_flags & s_dfi_flag_descending) ? TRUE : FALSE;
+	END_STORE
+	ON_ERROR
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	// at this point force garbage collection of any index segments left over
+	// from previous failures.  The system transaction (which might notice them
+	// later does NOT recognize rolled back stuff!  Should someone have actually
+	// left an orphanned segment around, kill that too.
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_scan_index])
+		X IN DB.RDB$INDEX_SEGMENTS WITH X.RDB$INDEX_NAME = symbol->sym_string
+			ERASE X
+		ON_ERROR
+			rollback_update(database);
+			ERRQ_database_error(database, gds_status);
+		END_ERROR;
+	END_FOR
+	ON_ERROR
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	qli_name** ptr = (qli_name**) fields->syn_arg;
+	for (int position = 0; position < fields->syn_count; ptr++, position++)
+	{
+		MET_fields(relation);
+
+		bool present = false;
+		for (qli_fld* field = relation->rel_fields; field; field = field->fld_next)
+		{
+			if (!(strcmp((*ptr)->nam_string, field->fld_name->sym_string)))
+			{
+				present = true;
+				break;
+			}
+		}
+
+		if (!present)
+		{
+			rollback_update(database);
+			ERRQ_print_error(236, SafeArg() << (*ptr)->nam_string <<
+								relation->rel_symbol->sym_string);
+			// Msg236 Field %s does not occur in relation %s
+		}
+
+		setup_update(database);
+
+		STORE(REQUEST_HANDLE database->dbb_requests[REQ_def_index3])
+			X IN DB.RDB$INDEX_SEGMENTS
+
+			strcpy(X.RDB$INDEX_NAME, symbol->sym_string);
+			strcpy(X.RDB$FIELD_NAME, (*ptr)->nam_string);
+			X.RDB$FIELD_POSITION = position;
+		END_STORE
+		ON_ERROR
+			rollback_update(database);
+			ERRQ_database_error(database, gds_status);
+		END_ERROR;
+	}
+
+	MET_meta_commit(database);
+}
+
+
+void MET_define_relation( qli_rel* relation, qli_rel* source)
+{
+/**************************************
+ *
+ *	M E T _ d e f i n e _ r e l a t i o n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Define a new relation.   There may
+ *	be field definitions here or we may
+ *	copy the field definitions from somebody
+ *	else.
+ *
+ **************************************/
+	qli_symbol* symbol = relation->rel_symbol;
+
+	if (source)
+	{
+		source->rel_database = setup_update(source->rel_database);
+		if (!(check_relation(source)))
+			ERRQ_print_error(483, source->rel_symbol->sym_string);
+			// Msg 483 Relation %s does not exist
+	}
+
+	qli_dbb* database = setup_update(relation->rel_database);
+	relation->rel_database = database;
+
+	if (check_relation(relation))
+		ERRQ_print_error(237, symbol->sym_string);	// Msg237 Relation %s already exists
+
+	STORE(REQUEST_HANDLE database->dbb_requests[REQ_store_relation])
+		X IN DB.RDB$RELATIONS
+		strcpy(X.RDB$RELATION_NAME, symbol->sym_string);
+	END_STORE
+	ON_ERROR
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	if (source)
+		clone_fields(relation, source);
+	else
+	{
+		USHORT position = 1;
+		for (qli_fld* field = relation->rel_fields; field; field = field->fld_next, position++)
+		{
+			add_field(relation, field, position);
+		}
+	}
+
+	MET_meta_commit(database);
+
+	relation = (qli_rel*) ALLOCP(type_rel);
+	relation->rel_next = database->dbb_relations;
+	database->dbb_relations = relation;
+	relation->rel_database = database;
+
+	// Go back and pick up relation id
+
+	setup_update(database);
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_relation_id])
+		X IN DB.RDB$RELATIONS WITH X.RDB$RELATION_NAME EQ symbol->sym_string
+		relation->rel_id = X.RDB$RELATION_ID;
+		symbol = make_symbol(X.RDB$RELATION_NAME, sizeof(X.RDB$RELATION_NAME));
+		symbol->sym_type = SYM_relation;
+		symbol->sym_object = (BLK) relation;
+		relation->rel_symbol = symbol;
+		HSH_insert(symbol);
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	delete_fields(relation);
+	MET_fields(relation);
+}
+
+
+void MET_define_sql_relation( qli_rel* relation)
+{
+/**************************************
+ *
+ *	M E T _ d e f i n e _ s q l _ r e l a t i o n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Define a new SQL relation, using dynamic ddl.
+ *
+ **************************************/
+	qli_symbol* symbol = relation->rel_symbol;
+	qli_dbb* database = setup_update(relation->rel_database);
+	relation->rel_database = database;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_relation_def])
+		X IN DB.RDB$RELATIONS WITH X.RDB$RELATION_NAME EQ symbol->sym_string
+			ERRQ_print_error(237, symbol->sym_string);
+			// Msg237 Relation %s already exists
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	qli_rlb* rlb = NULL;
+	CHECK_RLB(rlb);
+
+	STUFF(isc_dyn_version_1);
+	STUFF(isc_dyn_begin);
+	STUFF(isc_dyn_def_rel);
+	STUFF_STRING(symbol->sym_string);
+	STUFF(isc_dyn_rel_sql_protection);
+	STUFF_WORD(2);
+	STUFF_WORD(1);
+
+    USHORT position = 1;
+	for (qli_fld* field = relation->rel_fields; field; field = field->fld_next, position++)
+	{
+		add_sql_field(relation, field, position, rlb);
+	}
+
+	STUFF(isc_dyn_end);
+	STUFF(isc_dyn_end);
+	STUFF(isc_dyn_eoc);
+
+	execute_dynamic_ddl(database, rlb);
+	MET_meta_commit(database);
+
+	relation = (qli_rel*) ALLOCP(type_rel);
+	relation->rel_next = database->dbb_relations;
+	database->dbb_relations = relation;
+	relation->rel_database = database;
+
+	// Go back and pick up relation id
+
+	setup_update(database);
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_relation_id])
+		X IN DB.RDB$RELATIONS WITH X.RDB$RELATION_NAME EQ symbol->sym_string
+		relation->rel_id = X.RDB$RELATION_ID;
+		symbol = make_symbol(X.RDB$RELATION_NAME, sizeof(X.RDB$RELATION_NAME));
+		symbol->sym_type = SYM_relation;
+		symbol->sym_object = (BLK) relation;
+		relation->rel_symbol = symbol;
+		HSH_insert(symbol);
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	delete_fields(relation);
+	MET_fields(relation);
+}
+
+
+void MET_delete_database( qli_dbb* dbb)
+{
+/**************************************
+ *
+ *	M E T _ d e l e t e _ d a t a b a s e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Drop an existing database, and all its files,
+ *	and finish any copies we have active.
+ *
+ **************************************/
+
+	// generate a database parameter block to include the user/password, if necessary
+
+	const TEXT* user;
+	USHORT user_length;
+	if (dbb->dbb_user)
+	{
+		user = (TEXT*) dbb->dbb_user->con_data;
+		user_length = dbb->dbb_user->con_desc.dsc_length;
+	}
+	else
+	{
+		user = QLI_default_user;
+		user_length = strlen(QLI_default_user);
+	}
+
+	const TEXT* password;
+	USHORT password_length;
+	if (dbb->dbb_password)
+	{
+		password = (TEXT*) dbb->dbb_password->con_data;
+		password_length = dbb->dbb_user->con_desc.dsc_length;
+	}
+	else
+	{
+		password = QLI_default_password;
+		password_length = strlen(QLI_default_password);
+	}
+
+	Firebird::ClumpletWriter dpb(Firebird::ClumpletReader::Tagged, MAX_DPB_SIZE, isc_dpb_version1);
+	if (user_length)
+	{
+		dpb.insertString(isc_dpb_user_name, user, user_length);
+	}
+	if (password_length)
+	{
+		dpb.insertString(isc_dpb_password, password, password_length);
+	}
+
+	ISC_STATUS_ARRAY status_vector;
+	if (isc_attach_database(status_vector, 0, dbb->dbb_filename,
+							&dbb->dbb_handle, dpb.getBufferLength(),
+							reinterpret_cast<const char*>(dpb.getBuffer())))
+	{
+		ERRQ_database_error(dbb, status_vector);
+	}
+
+	qli_lls* stack = NULL;
+
+	gds_trans = MET_transaction(nod_start_trans, dbb);
+	DB = dbb->dbb_handle;
+
+	FOR F IN DB.RDB$FILES SORTED BY F.RDB$FILE_START
+		qli_str* astring = (qli_str*) ALLOCDV(type_str, strlen(F.RDB$FILE_NAME));
+		strcpy(astring->str_data, F.RDB$FILE_NAME);
+		ALLQ_push((blk*) astring, &stack);
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(dbb, gds_status);
+	END_ERROR;
+
+	MET_transaction(nod_commit, dbb);
+
+	if (isc_detach_database(gds_status, &dbb->dbb_handle))
+		isc_print_status(gds_status);
+
+	qli_dbb* next = NULL;
+	for (qli_dbb* database = QLI_databases; database; database = next)
+	{
+		next = database->dbb_next;
+		if (!strcmp(database->dbb_filename, dbb->dbb_filename))
+			MET_finish(database);
+	}
+
+	while (stack)
+	{
+		qli_str* sstring = (qli_str*) ALLQ_pop(&stack);
+		if (unlink(sstring->str_data))
+			ERRQ_print_error(431, sstring->str_data);
+			// Msg431 Could not drop database file "%s"
+	}
+
+	if (unlink(dbb->dbb_filename))
+		ERRQ_print_error(431, dbb->dbb_filename);
+		// Msg431 Could not drop database file "%s"
+}
+
+
+void MET_delete_field( qli_dbb* database, qli_name* name)
+{
+/**************************************
+ *
+ *	M E T _ d e l e t e _ f i e l d
+ *
+ **************************************
+ *
+ * Functional description
+ *	Delete a global field.
+ *
+ **************************************/
+	database = setup_update(database);
+	USHORT count = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_check_fld])
+		RFR IN DB.RDB$RELATION_FIELDS
+		WITH RFR.RDB$FIELD_SOURCE EQ name->nam_string
+		REDUCED TO RFR.RDB$RELATION_NAME
+		if (!count)
+			ERRQ_msg_put(238, name->nam_string);	// Msg238 Field %s is in use in the following relations:
+		printf("\t%s\n", RFR.RDB$RELATION_NAME);
+		count++;
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	if (count)
+		ERRQ_print_error(239, SafeArg() << name->nam_string << database->dbb_filename);
+		// Msg239 Field %s is in use in database %s
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_erase_fld])
+		FLD IN DB.RDB$FIELDS WITH FLD.RDB$FIELD_NAME EQ name->nam_string
+
+		qli_rlb* rlb = NULL;
+		CHECK_RLB(rlb);
+		STUFF(isc_dyn_version_1);
+		STUFF(isc_dyn_delete_dimensions);
+		STUFF_STRING(FLD.RDB$FIELD_NAME);
+		STUFF(isc_dyn_end);
+		STUFF(isc_dyn_eoc);
+		execute_dynamic_ddl(database, rlb);
+		ERASE FLD
+		ON_ERROR
+			rollback_update(database);
+			ERRQ_database_error(database, gds_status);
+		END_ERROR;
+		count++;
+	END_FOR
+	ON_ERROR
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	if (!count)
+		ERRQ_print_error(240, SafeArg() << name->nam_string << database->dbb_filename);
+		// Msg240 Field %s is not defined in database %s
+
+	MET_meta_commit(database);
+}
+
+
+void MET_delete_index( qli_dbb* database, qli_name* name)
+{
+/**************************************
+ *
+ *	M E T _ d e l e t e _ i n d e x
+ *
+ **************************************
+ *
+ * Functional description
+ *	Delete an index.
+ *
+ **************************************/
+	database = setup_update(database);
+	USHORT count = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_erase_index])
+		IDX IN DB.RDB$INDICES WITH IDX.RDB$INDEX_NAME EQ name->nam_string
+			count++;
+		ERASE IDX
+		ON_ERROR
+			rollback_update(database);
+			ERRQ_database_error(database, gds_status);
+		END_ERROR;
+	END_FOR
+	ON_ERROR
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	if (!count)
+		ERRQ_print_error(241, SafeArg() << name->nam_string << database->dbb_filename);
+		// Msg241 Index %s is not defined in database %s
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_erase_segments])
+		SEG IN DB.RDB$INDEX_SEGMENTS WITH SEG.RDB$INDEX_NAME EQ name->nam_string
+		ERASE SEG
+		ON_ERROR
+			rollback_update(database);
+			ERRQ_database_error(database, gds_status);
+		END_ERROR;
+	END_FOR
+	ON_ERROR
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	MET_meta_commit(database);
+}
+
+
+void MET_delete_relation( qli_rel* relation)
+{
+/**************************************
+ *
+ *	M E T _ d e l e t e _ r e l a t i o n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Delete a relation.
+ *
+ **************************************/
+	// Pass the mess off to dynamic DDL and let it worry
+
+	qli_symbol* symbol = relation->rel_symbol;
+	qli_rlb* rlb = NULL;
+	CHECK_RLB(rlb);
+	STUFF(isc_dyn_version_1);
+	STUFF(isc_dyn_delete_rel);
+	STUFF_STRING(symbol->sym_string);
+	STUFF(isc_dyn_end);
+	STUFF(isc_dyn_eoc);
+	setup_update(relation->rel_database);
+
+	execute_dynamic_ddl(relation->rel_database, rlb);
+	MET_meta_commit(relation->rel_database);
+
+	// Unlink and release various blocks
+
+	purge_relation(relation);
+}
+
+
+int MET_dimensions( qli_dbb* database, const TEXT* field_name)
+{
+/**************************************
+ *
+ *	M E T _ d i m e n s i o n s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Determine if the field has any dimensions.
+ *
+ **************************************/
+	if (!(database->dbb_capabilities & DBB_cap_dimensions))
+		return 0;
+
+	USHORT dimensions = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_fld_dimensions])
+		F IN DB.RDB$FIELDS WITH F.RDB$FIELD_NAME = field_name
+			dimensions = F.RDB$DIMENSIONS;
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	return dimensions;
+}
+
+
+void MET_fields( qli_rel* relation)
+{
+/**************************************
+ *
+ *	M E T _ f i e l d s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Get all fields for a relation.
+ *
+ **************************************/
+
+	// If we already have fetched the fields for the relation, don't do it again.
+
+	if (relation->rel_flags & REL_fields)
+		return;
+
+	qli_dbb* database = relation->rel_database;
+	MET_meta_transaction(database, false);
+	relation->rel_flags |= REL_fields;
+	qli_fld** ptr = &relation->rel_fields;
+
+	FOR(REQUEST_HANDLE database->dbb_field_request)
+		RFR IN DB.RDB$RELATION_FIELDS CROSS
+			RFL IN DB.RDB$FIELDS WITH
+			RFR.RDB$FIELD_SOURCE EQ RFL.RDB$FIELD_NAME AND
+			RFR.RDB$RELATION_NAME EQ relation->rel_symbol->sym_string
+			SORTED BY RFR.RDB$FIELD_POSITION, RFR.RDB$FIELD_NAME;
+
+		if (RFR.RDB$FIELD_POSITION > relation->rel_max_field_pos)
+			relation->rel_max_field_pos = RFR.RDB$FIELD_POSITION;
+		qli_fld* field = (qli_fld*) ALLOCPV(type_fld, 0);
+		*ptr = field;
+		ptr = &field->fld_next;
+		field->fld_relation = relation;
+		qli_symbol* symbol = make_symbol(RFR.RDB$FIELD_NAME, sizeof(RFR.RDB$FIELD_NAME));
+		if (symbol)
+		{
+			symbol->sym_object = (BLK) field;
+			symbol->sym_type = SYM_field;
+			field->fld_name = symbol;
+		}
+		if ((symbol = make_symbol(RFR.RDB$QUERY_NAME, sizeof(RFR.RDB$QUERY_NAME))) ||
+			(symbol = make_symbol(RFL.RDB$QUERY_NAME, sizeof(RFL.RDB$QUERY_NAME))))
+		{
+			symbol->sym_object = (BLK) field;
+			symbol->sym_type = SYM_field;
+			field->fld_query_name = symbol;
+		}
+		field->fld_scale = RFL.RDB$FIELD_SCALE;
+		field->fld_id = RFR.RDB$FIELD_ID;
+
+		if (RFL.RDB$SEGMENT_LENGTH.NULL)
+			field->fld_segment_length = 80;
+		else
+		{
+			field->fld_segment_length =
+				((RFL.RDB$SEGMENT_LENGTH) < 256 && (RFL.RDB$SEGMENT_LENGTH > 0)) ?
+					RFL.RDB$SEGMENT_LENGTH : 255;
+		}
+
+		ISC_QUAD* blob = & RFR.RDB$QUERY_HEADER;
+		if (UserBlob::blobIsNull(*blob))
+			blob = & RFL.RDB$QUERY_HEADER;
+		if (!UserBlob::blobIsNull(*blob))
+			field->fld_query_header = get_query_header(database, *blob);
+
+		blob = & RFL.RDB$COMPUTED_BLR;
+		if (!UserBlob::blobIsNull(*blob))
+			field->fld_flags |= FLD_computed;
+
+		field->fld_dtype = MET_get_datatype(RFL.RDB$FIELD_TYPE);
+		field->fld_length = field_length(field->fld_dtype, RFL.RDB$FIELD_LENGTH);
+		if (field->fld_dtype == dtype_varying)
+			field->fld_length += sizeof(SSHORT);
+		field->fld_sub_type = RFL.RDB$FIELD_SUB_TYPE;
+		field->fld_sub_type_missing = RFL.RDB$FIELD_SUB_TYPE.NULL;
+
+		if (!RFL.RDB$MISSING_VALUE.NULL)
+			field->fld_missing = missing_value(RFL.RDB$MISSING_VALUE, field->fld_name);
+
+		if (!(field->fld_edit_string =
+			make_string(RFR.RDB$EDIT_STRING, sizeof(RFR.RDB$EDIT_STRING))))
+		{
+			field->fld_edit_string = make_string(RFL.RDB$EDIT_STRING, sizeof(RFL.RDB$EDIT_STRING));
+		}
+		field->fld_validation = parse_blr_blob(RFL.RDB$VALIDATION_BLR, field->fld_name);
+		if (MET_dimensions(database, RFL.RDB$FIELD_NAME) > 0)
+			field->fld_flags |= FLD_array;
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+}
+
+
+void MET_finish( qli_dbb* dbb)
+{
+/**************************************
+ *
+ *	M E T _ f i n i s h
+ *
+ **************************************
+ *
+ * Functional description
+ *	Finish a database and release all associated blocks.
+ *
+ **************************************/
+	// Get rid of relation and field blocks.
+
+	qli_rel* relation;
+	while (relation = dbb->dbb_relations)
+	{
+		purge_relation(relation);
+	}
+
+	// Get rid of any functions
+
+	qli_fun* function;
+	while (function = dbb->dbb_functions)
+	{
+		dbb->dbb_functions = function->fun_next;
+		HSH_remove(function->fun_symbol);
+		ALLQ_release((qli_frb*) function->fun_symbol);
+		ALLQ_release((qli_frb*) function);
+	}
+
+	// Finally, actually close down database connection.
+
+	ISC_STATUS_ARRAY status_vector;
+	detach(status_vector, dbb);
+
+	if (dbb->dbb_symbol)
+	{
+		HSH_remove(dbb->dbb_symbol);
+		ALLQ_release((qli_frb*) dbb->dbb_symbol);
+	}
+
+	int count = 0;
+	for (qli_dbb** ptr = &QLI_databases; *ptr; ptr = &(*ptr)->dbb_next)
+	{
+		if (*ptr == dbb)
+		{
+			*ptr = dbb->dbb_next;
+			ALLQ_release((qli_frb*) dbb);
+			count++;
+			if (!*ptr) {
+				break;
+			}
+		}
+	}
+
+	if (!count)
+		ERRQ_bugcheck(231);			// Msg231 database block not found for removal
+
+	if (status_vector[1])
+		ERRQ_database_error(NULL, status_vector);
+}
+
+
+int MET_get_datatype( USHORT blr_datatype)
+{
+/**************************************
+ *
+ *	M E T _ g e t _ d a t a t y p e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Convert a blr datatype to a QLI dtype.
+ *
+ **************************************/
+	USHORT retvalue;
+
+	switch (blr_datatype)
+	{
+	case blr_text:
+		retvalue = dtype_text;
+		break;
+	case blr_varying:
+		retvalue = dtype_varying;
+		break;
+	case blr_cstring:
+		retvalue = dtype_cstring;
+		break;
+	case blr_short:
+		retvalue = dtype_short;
+		break;
+	case blr_long:
+		retvalue = dtype_long;
+		break;
+	case blr_quad:
+		retvalue = dtype_quad;
+		break;
+	case blr_float:
+		retvalue = dtype_real;
+		break;
+	case blr_double:
+		retvalue = dtype_double;
+		break;
+	case blr_timestamp:
+		retvalue = dtype_timestamp;
+		break;
+	case blr_sql_date:
+		retvalue = dtype_sql_date;
+		break;
+	case blr_sql_time:
+		retvalue = dtype_sql_time;
+		break;
+	case blr_blob:
+		retvalue = dtype_blob;
+		break;
+	case blr_int64:
+		retvalue = dtype_int64;
+		break;
+	default:
+		retvalue = dtype_unknown;
+		break;
+	}
+
+	return retvalue;
+}
+
+
+
+#ifdef DEV_BUILD
+void MET_index_info(qli_dbb* db,
+					const SCHAR* relation_name,
+					const SCHAR* index_name,
+					SCHAR* const buffer,
+					size_t bufsize)
+{
+/**************************************
+ *
+ *	M E T _ i n d e x _ i n f o
+ *
+ **************************************
+ *
+ * Functional description
+ *	Get info about a particular index.
+ *
+ **************************************/
+	FB_API_HANDLE request_handle = 0;
+
+	SCHAR* b = buffer;
+	FOR(REQUEST_HANDLE request_handle)
+		IDX IN DB.RDB$INDICES CROSS
+			SEG IN DB.RDB$INDEX_SEGMENTS OVER
+			RDB$INDEX_NAME WITH
+			IDX.RDB$INDEX_NAME EQ index_name AND
+			IDX.RDB$RELATION_NAME EQ relation_name
+			SORTED BY SEG.RDB$FIELD_POSITION
+
+		const SCHAR* p;
+		if (b == buffer)
+		{
+			for (p = fb_utils::exact_name(IDX.RDB$INDEX_NAME); *p;) {
+				*b++ = *p++;
+			}
+			*b++ = ' ';
+			*b++ = '(';
+		}
+
+		p = fb_utils::exact_name(SEG.RDB$FIELD_NAME);
+		if (p + strlen(p) + 2 > buffer + bufsize)
+			break;
+
+		while (*p) {
+			*b++ = *p++;
+		}
+
+		*b++ = ' ';
+
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(NULL, gds_status);
+	END_ERROR;
+
+	release_request(db, request_handle);
+
+	// back up over the last space and finish off
+
+	b--;
+	*b++ = ')';
+	*b++ = 0;
+}
+#endif
+
+
+void MET_meta_commit( qli_dbb* database)
+{
+/**************************************
+ *
+ *	M E T _ m e t a _ c o m m i t
+ *
+ **************************************
+ *
+ * Functional description
+ *	Commit the meta data lookup & update
+ *	transaction.
+ *
+ **************************************/
+	if (database->dbb_capabilities & DBB_cap_multi_trans)
+	{
+		ISC_STATUS_ARRAY status_vector;
+		if (isc_commit_transaction(status_vector, &database->dbb_meta_trans))
+		{
+			rollback_update(database);
+			ERRQ_database_error(database, status_vector);
+		}
+	}
+}
+
+
+void MET_meta_rollback( qli_dbb* database)
+{
+/**************************************
+ *
+ *	M E T _ m e t a _ r o l l b a c k
+ *
+ **************************************
+ *
+ * Functional description
+ *	Rollback the metadata transaction,
+ *	if there is one.
+ *
+ **************************************/
+
+	if (database->dbb_capabilities & DBB_cap_multi_trans)
+		rollback_update(database);
+}
+
+
+FB_API_HANDLE MET_meta_transaction(qli_dbb* database, bool update_flag)
+{
+/**************************************
+ *
+ *	M E T _ m e t a _ t r a n s a c t i o n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Setup transaction for meta-data operation.  Set up
+ *	DB and gds_trans, and return meta-data transaction
+ *	handle for yucks.  If we're doing metadata updates,
+ *	and lookups we'll use the metadat date transaction,
+ *	unless this is an rdb database or gateway in which
+ *	case, we'll use the only transacti.
+ *
+ *	In any event, we will set up the met_transaction because
+ *	it's widely used and somebody is going to forget to test
+ *	that the database is multi_transaction before using it.
+ *	This means that we have to be very careful about committing
+ *	or rolling back, because this could affect user data.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+	if (!database)
+		IBERROR(243);			// Msg243 no active database for operation
+
+	FB_API_HANDLE transaction = (database->dbb_capabilities & DBB_cap_multi_trans) ?
+		database->dbb_meta_trans : 0;
+
+	DB = database->dbb_handle;
+
+	// If we don't know whether or not the database can handle
+	// multiple transactions, find out now
+
+	if (!transaction &&
+		((database->dbb_capabilities & DBB_cap_multi_trans) ||
+		!(database->dbb_capabilities & DBB_cap_single_trans)))
+	{
+		if (isc_start_transaction(status_vector, &transaction, 1,
+								   &database->dbb_handle, sizeof(tpb), tpb))
+		{
+			database->dbb_capabilities |= DBB_cap_single_trans;
+		}
+		else
+		{
+			database->dbb_capabilities |= DBB_cap_multi_trans;
+		}
+	}
+
+	// If we already have a meta-data transaction, there's more nothing to do
+
+	gds_trans = transaction;
+
+	// If we only support a single transaction, use the data transaction
+
+	if (!gds_trans && (database->dbb_capabilities & DBB_cap_single_trans))
+	{
+		if (update_flag)
+			IBERROR(244);		// Msg244 Interactive metadata updates are not available on Rdb
+		if (!(gds_trans = database->dbb_transaction))
+			gds_trans = MET_transaction(nod_start_trans, database);
+	}
+	else if (!gds_trans)
+	{
+		// otherwise make one more effort to start the transaction
+		START_TRANSACTION
+		ON_ERROR
+			ERRQ_database_error(database, status_vector);
+		END_ERROR;
+	}
+
+	database->dbb_meta_trans = gds_trans;
+	return gds_trans;
+}
+
+
+void MET_modify_field( qli_dbb* database, qli_fld* field)
+{
+/**************************************
+ *
+ *	M E T _ m o d i f y _ f i e l d
+ *
+ **************************************
+ *
+ * Functional description
+ *	Modify an existing global field.
+ *
+ **************************************/
+	database = setup_update(database);
+	qli_symbol* field_name = field->fld_name;
+	SSHORT flag = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_modify_fld])
+		X IN DB.RDB$FIELDS WITH X.RDB$FIELD_NAME EQ field_name->sym_string
+		if (field->fld_dtype &&
+			(X.RDB$FIELD_TYPE == blr_blob || blr_dtypes[field->fld_dtype] == blr_blob) &&
+			 X.RDB$FIELD_TYPE != blr_dtypes[field->fld_dtype])
+		{
+			flag = -1;
+		}
+		else
+		{
+			flag = 1;
+			MODIFY X USING
+				if (field->fld_dtype)
+				{
+					X.RDB$FIELD_TYPE = blr_dtypes[field->fld_dtype];
+					X.RDB$FIELD_SCALE = field->fld_scale;
+					X.RDB$FIELD_LENGTH = (field->fld_dtype == dtype_varying) ?
+						field->fld_length - sizeof(SSHORT) : field->fld_length;
+				}
+				if (!field->fld_sub_type_missing)
+				{
+					X.RDB$FIELD_SUB_TYPE.NULL = FALSE;
+					X.RDB$FIELD_SUB_TYPE = field->fld_sub_type;
+				}
+				qli_symbol* asymbol = field->fld_query_name;
+				if (asymbol)
+				{
+					X.RDB$QUERY_NAME.NULL = FALSE;
+					strcpy(X.RDB$QUERY_NAME, asymbol->sym_string);
+				}
+				if (field->fld_edit_string)
+				{
+					X.RDB$EDIT_STRING.NULL = FALSE;
+					strcpy(X.RDB$EDIT_STRING, field->fld_edit_string);
+				}
+			END_MODIFY
+			ON_ERROR
+				rollback_update(database);
+				ERRQ_database_error(database, gds_status);
+			END_ERROR;
+		}
+	END_FOR
+	ON_ERROR
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	if (flag <= 0)
+	{
+		rollback_update(database);
+		// Msg245 global field %s is not defined
+		// Msg468 Datatype of field %s may not be changed to or from blob
+		const USHORT nErr = flag ? 468 : 245;
+		ERRQ_print_error(nErr, field_name->sym_string);
+	}
+
+	MET_meta_commit(database);
+
+	// Now go back and re-fetch fields for affected databases
+
+	setup_update(database);
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_update_fld])
+		X IN DB.RDB$RELATION_FIELDS WITH X.RDB$FIELD_SOURCE EQ
+			field_name->sym_string REDUCED TO X.RDB$RELATION_NAME
+
+		const TEXT* p = X.RDB$RELATION_NAME;
+		while (*p && *p != ' ') {
+			p++;
+		}
+
+		qli_symbol* symbol = HSH_lookup(X.RDB$RELATION_NAME, p - X.RDB$RELATION_NAME);
+		for (; symbol; symbol = symbol->sym_homonym)
+		{
+			qli_rel* relation;
+			if (symbol->sym_type == SYM_relation &&
+				(relation = (qli_rel*) symbol->sym_object) && relation->rel_database == database)
+			{
+				delete_fields(relation);
+				MET_fields(relation);
+			}
+		}
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+}
+
+
+void MET_modify_index( qli_syntax* node)
+{
+/**************************************
+ *
+ *	M E T _ m o d i f y _ i n d e x
+ *
+ **************************************
+ *
+ * Functional description
+ *	Change the changeable options
+ *	of an index.
+ *
+ **************************************/
+	qli_name* name = (qli_name*) node->syn_arg[s_mfi_name];
+	qli_dbb* database = (qli_dbb*) node->syn_arg[s_mfi_database];
+	database = setup_update(database);
+
+	USHORT count = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_mdf_index])
+		X IN DB.RDB$INDICES WITH X.RDB$INDEX_NAME = name->nam_string
+		MODIFY X USING
+			if (node->syn_flags & s_dfi_flag_selectivity)
+				X.RDB$UNIQUE_FLAG = (node->syn_flags & s_dfi_flag_unique);
+			if (node->syn_flags & s_dfi_flag_activity)
+				X.RDB$INDEX_INACTIVE = (node->syn_flags & s_dfi_flag_inactive) ? TRUE : FALSE;
+			if (node->syn_flags & s_dfi_flag_order)
+				X.RDB$INDEX_TYPE = (node->syn_flags & s_dfi_flag_descending) ? TRUE : FALSE;
+			if (node->syn_flags & s_dfi_flag_statistics)
+				X.RDB$STATISTICS = -1.0;
+		END_MODIFY
+		ON_ERROR
+			rollback_update(database);
+			ERRQ_database_error(database, gds_status);
+		END_ERROR;
+		count++;
+	END_FOR
+	ON_ERROR
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	if (!count)
+		ERRQ_print_error(246, SafeArg() << name->nam_string << database->dbb_filename);
+		// Msg246 Index %s does not exist
+
+	MET_meta_commit(database);
+}
+
+
+void MET_modify_relation( qli_rel* relation, qli_fld* fields)
+{
+/**************************************
+ *
+ *	M E T _ m o d i f y _ r e l a t i o n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Modify an existing relation.
+ *
+ **************************************/
+	qli_dbb* database = setup_update(relation->rel_database);
+	relation->rel_database = database;
+	qli_symbol* relation_name = relation->rel_symbol;
+
+	for (qli_fld* field = fields; field; field = field->fld_next)
+	{
+		if (field->fld_flags & FLD_drop)
+		{
+			USHORT count = 0;
+			qli_symbol* field_name = field->fld_name;
+			FOR(REQUEST_HANDLE database->dbb_requests[REQ_modify_rel])
+				X IN DB.RDB$RELATION_FIELDS WITH
+					X.RDB$FIELD_NAME EQ field_name->sym_string AND
+					X.RDB$RELATION_NAME EQ relation_name->sym_string
+				count++;
+				ERASE X
+				ON_ERROR
+					rollback_update(database);
+					ERRQ_database_error(database, gds_status);
+				END_ERROR;
+			END_FOR
+			ON_ERROR
+				rollback_update(database);
+				ERRQ_database_error(database, gds_status);
+			END_ERROR;
+			if (!count)
+			{
+				rollback_update(database);
+				ERRQ_print_error(247, field_name->sym_string);	// Msg247 field %s doesn't exist
+			}
+		}
+		else if (field->fld_flags & FLD_modify)
+			change_field(relation, field);
+		else
+			add_field(relation, field, 0);
+	}
+
+	MET_meta_commit(database);
+	setup_update(database);
+	delete_fields(relation);
+	MET_fields(relation);
+}
+
+
+void MET_ready( qli_syntax* node, const bool create_flag)
+{
+/**************************************
+ *
+ *	M E T _ r e a d y
+ *
+ **************************************
+ *
+ * Functional description
+ *	Create or Ready one or more databases.  If any
+ *	fail, all fail.  Fair enough?
+ *
+ **************************************/
+	Firebird::ClumpletWriter dpb(Firebird::ClumpletReader::Tagged, MAX_DPB_SIZE, isc_dpb_version1);
+
+	qli_dbb* temp = (qli_dbb*) node->syn_arg[0];
+
+	// Only a SQL CREATE DATABASE will have a pagesize parameter,
+	// so only looking at the first pointer is justified.
+
+	SSHORT length;
+	const TEXT* lc_ctype = QLI_charset;
+	if (lc_ctype && (length = strlen(lc_ctype))) {
+		dpb.insertString(isc_dpb_lc_ctype, lc_ctype, length);
+	}
+
+	// It does absolutely nothing inside the engine these days: ignored.
+	if (QLI_trace) {
+		dpb.insertByte(isc_dpb_trace, 1);
+	}
+
+	if (sw_buffers) {
+		dpb.insertInt(isc_dpb_num_buffers, ULONG(sw_buffers));
+	}
+
+	if (temp->dbb_pagesize) {
+		dpb.insertInt(isc_dpb_page_size, ULONG(temp->dbb_pagesize));
+	}
+
+	// get a username, if specified globally or on the command line
+
+	const TEXT* q;
+	if (temp->dbb_user)
+	{
+		q = (TEXT*) temp->dbb_user->con_data;
+		length = temp->dbb_user->con_desc.dsc_length;
+	}
+	else
+	{
+		q = QLI_default_user;
+		length = strlen(QLI_default_user);
+	}
+	if (length) {
+		dpb.insertString(isc_dpb_user_name, q, length);
+	}
+
+	// get a password, if specified
+
+	if (temp->dbb_password)
+	{
+		q = (TEXT*) temp->dbb_password->con_data;
+		length = temp->dbb_password->con_desc.dsc_length;
+	}
+	else
+	{
+		q = QLI_default_password;
+		length = strlen(QLI_default_password);
+	}
+	if (length) {
+		dpb.insertString(isc_dpb_password, q, length);
+	}
+
+#ifdef TRUSTED_AUTH
+	if (QLI_trusted) {
+		dpb.insertTag(isc_dpb_trusted_auth);
+	}
+#endif
+
+	if (QLI_nodb_triggers)
+		dpb.insertInt(isc_dpb_no_db_triggers, 1);
+
+	const qli_syntax* const* const end = node->syn_arg + node->syn_count;
+
+	// Start by attaching all databases
+	ISC_STATUS_ARRAY status_vector;
+	qli_syntax** ptr;
+	qli_dbb* dbb = NULL;
+
+	for (ptr = node->syn_arg; ptr < end; ptr++)
+	{
+		dbb = (qli_dbb*) *ptr;
+		if (create_flag)
+			isc_create_database(status_vector, 0, dbb->dbb_filename,
+								&dbb->dbb_handle, dpb.getBufferLength(),
+								reinterpret_cast<const char*>(dpb.getBuffer()), 0);
+		else
+			isc_attach_database(status_vector, 0, dbb->dbb_filename,
+								&dbb->dbb_handle, dpb.getBufferLength(),
+								reinterpret_cast<const char*>(dpb.getBuffer()));
+		if (status_vector[1])
+			break;
+	}
+
+	// If any attach failed, cleanup and give up
+
+	if (ptr < end)
+	{
+		for (qli_syntax** ptr2 = node->syn_arg; ptr2 < ptr; ptr2++)
+			detach(gds_status, (qli_dbb*) *ptr2);
+		ERRQ_database_error(dbb, status_vector);
+	}
+
+
+	// Databases are up and running.  Install each.
+
+	for (ptr = node->syn_arg; ptr < end; ptr++)
+		install((qli_dbb*) *ptr);
+}
+
+
+void MET_shutdown()
+{
+/**************************************
+ *
+ *	M E T _ s h u t d o w n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Shut down all attached databases.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+	for (qli_dbb* dbb = QLI_databases; dbb; dbb = dbb->dbb_next)
+	{
+		if (detach(status_vector, dbb))
+			isc_print_status(status_vector);
+	}
+}
+
+
+void MET_sql_alter_table( qli_rel* relation, qli_fld* fields)
+{
+/**************************************
+ *
+ *	M E T _ s q l _ a l t e r _ t a b l e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Alter table data based on a SQL metadata request
+ *
+ **************************************/
+	qli_symbol* symbol = relation->rel_symbol;
+	qli_dbb* database = setup_update(relation->rel_database);
+	relation->rel_database = database;
+	USHORT count = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_relation_def])
+		X IN DB.RDB$RELATIONS WITH X.RDB$RELATION_NAME EQ symbol->sym_string
+			count++;
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+	if (!count)
+		ERRQ_print_error(414, symbol->sym_string);	// Msg237 Relation %s is lost
+
+	qli_rlb* rlb = NULL;
+	CHECK_RLB(rlb);
+
+	STUFF(isc_dyn_version_1);
+	STUFF(isc_dyn_begin);
+	STUFF(isc_dyn_mod_rel);
+	STUFF_STRING(symbol->sym_string);
+
+	for (qli_fld* field = fields; field; field = field->fld_next)
+	{
+		if (field->fld_flags & FLD_add)
+			add_sql_field(relation, field, 0, rlb);
+		else if (field->fld_flags & FLD_drop)
+		{
+			STUFF(isc_dyn_delete_local_fld);
+			STUFF_STRING(field->fld_name->sym_string);
+			STUFF(isc_dyn_end);
+		}
+	}
+
+	STUFF(isc_dyn_end);
+	STUFF(isc_dyn_end);
+	STUFF(isc_dyn_eoc);
+
+	execute_dynamic_ddl(database, rlb);
+	MET_meta_commit(database);
+
+	setup_update(database);
+	delete_fields(relation);
+	MET_fields(relation);
+}
+
+
+void MET_sql_cr_view( qli_syntax* node)
+{
+/**************************************
+ *
+ *	M E T _ s q l _ c r _ v i e w
+ *
+ **************************************
+ *
+ * Functional description
+ *	Create a view from a SQL metadata request
+ *
+ **************************************/
+	qli_rel* relation = (qli_rel*) node->syn_arg[s_crv_name];
+	qli_dbb* database = setup_update(relation->rel_database);
+	relation->rel_database = database;
+	qli_symbol* symbol = relation->rel_symbol;
+
+	qli_rlb* rlb = NULL;
+	CHECK_RLB(rlb);
+	STUFF(isc_dyn_version_1);
+	STUFF(isc_dyn_begin);
+
+	STUFF(isc_dyn_def_view);
+	STUFF_STRING(symbol->sym_string);
+
+	// The meat of the blr generation will go here
+
+	STUFF(isc_dyn_end);
+	STUFF(isc_dyn_eoc);
+
+	execute_dynamic_ddl(database, rlb);
+	MET_meta_commit(database);
+}
+
+
+void MET_sql_grant( qli_syntax* node)
+{
+/**************************************
+ *
+ *	M E T _ s q l _ g r a n t
+ *
+ **************************************
+ *
+ * Functional description
+ *	Grant access privilege(s) on a SQL table
+ *
+ **************************************/
+
+	sql_grant_revoke(node, isc_dyn_grant);
+}
+
+
+void MET_sql_revoke( qli_syntax* node)
+{
+/**************************************
+ *
+ *	M E T _ s q l _ r e v o k e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Revoke access privilege(s) on a SQL table
+ *
+ **************************************/
+
+	sql_grant_revoke(node, isc_dyn_revoke);
+}
+
+
+FB_API_HANDLE MET_transaction( nod_t node_type, qli_dbb* database)
+{
+/**************************************
+ *
+ *	M E T _ t r a n s a c t i o n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Finish off a transaction with a commit, prepare, or rollback.
+ *	For commit and rollback, start a new transaction.
+ *
+ *	Multiple transaction coordination is handled
+ *	by the caller.  This is a singleminded routine.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+
+	switch (node_type)
+	{
+	case nod_commit:
+		isc_commit_transaction(status_vector, &database->dbb_transaction);
+		break;
+
+	case nod_rollback:
+		isc_rollback_transaction(status_vector, &database->dbb_transaction);
+		break;
+
+	case nod_prepare:
+		isc_prepare_transaction(status_vector, &database->dbb_transaction);
+		break;
+
+	case nod_start_trans:
+		isc_start_transaction(status_vector, &database->dbb_transaction, 1,
+							   &database->dbb_handle, sizeof(tpb), tpb);
+		database->dbb_flags &= ~DBB_updates & ~DBB_prepared;
+		break;
+	}
+
+	if (status_vector[1])
+		ERRQ_database_error(database, status_vector);
+
+	return database->dbb_transaction;
+}
+
+
+static void add_field( qli_rel* relation, qli_fld* field, USHORT position)
+{
+/**************************************
+ *
+ *	a d d _ f i e l d
+ *
+ **************************************
+ *
+ * Functional description
+ *	Add a field to a relation.  Do all sorts of sanity checks.
+ *
+ **************************************/
+	qli_dbb* database = relation->rel_database;
+	qli_symbol* relation_name = relation->rel_symbol;
+	qli_symbol* field_name = field->fld_name;
+	qli_symbol* global_field = field->fld_based;
+	if (!global_field)
+		global_field = field_name;
+
+	// Check to see if it already exits in relation
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_rfr_def])
+		X IN DB.RDB$RELATION_FIELDS WITH
+			X.RDB$RELATION_NAME EQ relation_name->sym_string AND
+			X.RDB$FIELD_NAME EQ field_name->sym_string
+		rollback_update(relation->rel_database);
+		ERRQ_print_error(251, SafeArg() << field_name->sym_string << relation_name->sym_string);
+		// Msg251 Field %s already exists in relation %s
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	// Check global field.  Define it if it doesn't exist.
+
+	bool global_flag = false;
+	if (!check_global_field(database, field, global_field->sym_string))
+	{
+		global_flag = true;
+		define_global_field(database, field, global_field);
+	}
+
+	// Finally, store into RFR.  If we defined a global field, assume that
+	// the query name and edit string will be inherited from there, otherwise
+	// include them here
+
+	STORE(REQUEST_HANDLE database->dbb_requests[REQ_store_rfr])
+		X IN DB.RDB$RELATION_FIELDS
+
+		strcpy(X.RDB$RELATION_NAME, relation_name->sym_string);
+		strcpy(X.RDB$FIELD_NAME, field_name->sym_string);
+		strcpy(X.RDB$FIELD_SOURCE, global_field->sym_string);
+		if (position)
+		{
+			X.RDB$FIELD_POSITION.NULL = FALSE;
+			X.RDB$FIELD_POSITION = position;
+		}
+		else
+			X.RDB$FIELD_POSITION.NULL = TRUE;
+		const qli_symbol* symbol;
+		if (!global_flag && (symbol = field->fld_query_name))
+		{
+			X.RDB$QUERY_NAME.NULL = FALSE;
+			strcpy(X.RDB$QUERY_NAME, symbol->sym_string);
+		}
+		else
+			X.RDB$QUERY_NAME.NULL = TRUE;
+		if (!global_flag && (field->fld_edit_string))
+		{
+			X.RDB$EDIT_STRING.NULL = FALSE;
+			strcpy(X.RDB$EDIT_STRING, field->fld_edit_string);
+		}
+		else
+			X.RDB$EDIT_STRING.NULL = TRUE;
+
+	END_STORE
+	ON_ERROR
+		rollback_update(relation->rel_database);
+		ERRQ_database_error(relation->rel_database, gds_status);
+	END_ERROR;
+}
+
+
+static void add_sql_field( qli_rel* relation, qli_fld* field, USHORT position, qli_rlb* rlb)
+{
+/**************************************
+ *
+ *	a d d _ s q l _ f i e l d
+ *
+ **************************************
+ *
+ * Functional description
+ *	Add a SQL field to a relation via dyn.
+ *
+ **************************************/
+	CHECK_RLB(rlb);
+	qli_dbb* database = relation->rel_database;
+	const qli_symbol* relation_name = relation->rel_symbol;
+	const qli_symbol* field_name = field->fld_name;
+
+	// Check to see if it already exists in relation
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_rfr_def])
+		X IN DB.RDB$RELATION_FIELDS WITH
+			X.RDB$RELATION_NAME EQ relation_name->sym_string AND
+			X.RDB$FIELD_NAME EQ field_name->sym_string
+		rollback_update(relation->rel_database);
+		ERRQ_print_error(251, SafeArg() << field_name->sym_string << relation_name->sym_string);
+		// Msg251 Field %s already exists in relation %s
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+
+	STUFF(isc_dyn_def_sql_fld);
+	STUFF_STRING(field->fld_name->sym_string);
+
+	STUFF(isc_dyn_fld_type);
+	STUFF_WORD(2);
+	STUFF_WORD(blr_dtypes[field->fld_dtype]);
+
+	STUFF(isc_dyn_fld_length);
+	STUFF_WORD(2);
+	const USHORT l = (field->fld_dtype == dtype_varying) ?
+						field->fld_length - sizeof(SSHORT) : field->fld_length;
+	STUFF_WORD(l);
+
+	STUFF(isc_dyn_fld_scale);
+	STUFF_WORD(2);
+	STUFF_WORD(field->fld_scale);
+
+	if (DTYPE_IS_EXACT(field->fld_dtype))
+	{
+		STUFF(isc_dyn_fld_precision);
+		STUFF_WORD(2);
+		STUFF_WORD(field->fld_precision);
+		STUFF(isc_dyn_fld_sub_type);
+		STUFF_WORD(2);
+		STUFF_WORD(field->fld_sub_type);
+	}
+
+	if (position)
+	{
+		STUFF(isc_dyn_fld_position);
+		STUFF_WORD(2);
+		STUFF_WORD(position);
+	}
+
+	CHECK_RLB(rlb);
+
+	if (field->fld_flags & FLD_not_null)
+	{
+		STUFF(isc_dyn_fld_validation_blr);
+		STUFF_WORD(8);
+		STUFF(blr_version4);
+		STUFF(blr_not);
+		STUFF(blr_missing);
+		STUFF(blr_fid);
+		STUFF(0);
+		STUFF(0);
+		STUFF(0);
+		STUFF(blr_eoc);
+	}
+
+	STUFF(isc_dyn_end);
+}
+
+
+static void blob_copy( qli_rlb* rlb, qli_rel* source, ISC_QUAD& source_blob_id)
+{
+/**************************************
+ *
+ *	b l o b _ c o p y
+ *
+ **************************************
+ *
+ * Functional description
+ *	Copy information from one blob to a request
+ *	language block to stick it into a new definition.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+	qli_dbb* source_dbb = source->rel_database ? source->rel_database : QLI_databases;
+	DB = source_dbb->dbb_handle;
+	UserBlob source_blob(status_vector);
+
+	if (!source_blob.open(DB, source_dbb->dbb_meta_trans, source_blob_id))
+	{
+		rollback_update(source_dbb);
+		ERRQ_database_error(source_dbb, status_vector);
+	}
+
+	SLONG size, segment_count, max_segment;
+	if (!getBlobSize(source_blob, &size, &segment_count, &max_segment))
+	{
+		rollback_update(source_dbb);
+		ERRQ_database_error(source_dbb, status_vector);
+	}
+
+    TEXT fixed_buffer[4096];
+	TEXT* buffer;
+    USHORT buffer_length;
+	if (max_segment < static_cast<SLONG>(sizeof(fixed_buffer)))
+	{
+		buffer_length = sizeof(fixed_buffer);
+		buffer = fixed_buffer;
+	}
+	else
+	{
+		buffer_length = max_segment;
+		buffer = (TEXT*) gds__alloc((SLONG) buffer_length);
+	}
+
+	STUFF_WORD((USHORT) size);
+
+	size_t length;
+	while (source_blob.getSegment(buffer_length, buffer, length) && !source_blob.getCode())
+	{
+		while (rlb->rlb_data + length > rlb->rlb_limit)
+			rlb = GEN_rlb_extend(rlb);
+		const TEXT* p = buffer;
+		while (length--)
+			STUFF(*p++);
+	}
+
+	if (status_vector[1] != isc_segstr_eof)
+	{
+		rollback_update(source_dbb);
+		if (buffer != fixed_buffer)
+			gds__free(buffer);
+		ERRQ_database_error(source_dbb, status_vector);
+	}
+
+	if (buffer != fixed_buffer)
+		gds__free(buffer);
+
+	if (!source_blob.close())
+	{
+		rollback_update(source_dbb);
+		ERRQ_database_error(source_dbb, status_vector);
+	}
+
+	//return TRUE;
+}
+
+
+static void change_field( qli_rel* relation, qli_fld* field)
+{
+/**************************************
+ *
+ *	c h a n g e  _ f i e l d
+ *
+ **************************************
+ *
+ * Functional description
+ *	Change optional attributes of a field.
+ *
+ **************************************/
+	qli_dbb* database = relation->rel_database;
+	const qli_symbol* relation_name = relation->rel_symbol;
+	const qli_symbol* field_name = field->fld_name;
+	const qli_symbol* global_field = field->fld_based;
+
+	if (field->fld_dtype)
+	{
+		rollback_update(database);
+		ERRQ_print_error(252);
+		// Msg252 datatype can not be changed locally
+	}
+
+	if (global_field && !(check_global_field(database, NULL, global_field->sym_string)))
+	{
+		rollback_update(database);
+		ERRQ_print_error(253, global_field->sym_string);
+		// Msg253 global field %s does not exist
+	}
+
+	// Modify  RFR
+	USHORT count = 0;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_mdf_rfr])
+		X IN DB.RDB$RELATION_FIELDS WITH
+			X.RDB$RELATION_NAME = relation_name->sym_string AND
+			X.RDB$FIELD_NAME = field_name->sym_string
+		count++;
+		MODIFY X USING
+			if (global_field)
+				strcpy(X.RDB$FIELD_SOURCE, global_field->sym_string);
+			const qli_symbol* symbol = field->fld_query_name;
+			if (symbol)
+				strcpy(X.RDB$QUERY_NAME, symbol->sym_string);
+			if (field->fld_edit_string)
+				strcpy(X.RDB$EDIT_STRING, field->fld_edit_string);
+		END_MODIFY
+		ON_ERROR
+			rollback_update(relation->rel_database);
+			ERRQ_database_error(relation->rel_database, gds_status);
+		END_ERROR;
+	END_FOR
+	ON_ERROR
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	if (!count)
+	{
+		rollback_update(database);
+		ERRQ_print_error(254, SafeArg() << field_name->sym_string << relation_name->sym_string);
+		// Msg254 field %s not found in relation %s
+	}
+}
+
+
+static bool check_global_field(qli_dbb* database, qli_fld* field, const TEXT* name)
+{
+/**************************************
+ *
+ *	c h e c k _ g l o b a l _ f i e l d
+ *
+ **************************************
+ *
+ * Functional description
+ *	Given a name, check for the existence of a global field
+ *	by that name.  If a qli_fld block is supplied,
+ *		check its characteristics against the global.
+ *	If it is not fully defined, flesh it out from the global.
+ *
+ **************************************/
+	bool previously_defined = false;
+
+	FOR(REQUEST_HANDLE database->dbb_requests[REQ_field_def])
+		X IN DB.RDB$FIELDS WITH X.RDB$FIELD_NAME EQ name
+
+		if (field)
+		{
+			if (field->fld_dtype &&
+				(X.RDB$FIELD_TYPE != blr_dtypes[field->fld_dtype] ||
+				 X.RDB$FIELD_LENGTH != static_cast<SLONG>(
+					((field->fld_dtype == dtype_varying) ?
+						field->fld_length - sizeof(SSHORT) : field->fld_length)) ||
+				 X.RDB$FIELD_SCALE != field->fld_scale))
+			{
+				rollback_update(database);
+				ERRQ_print_error(255, name);
+				// Msg255 Datatype conflict with existing global field %s
+			}
+			field->fld_dtype = MET_get_datatype(X.RDB$FIELD_TYPE);
+			field->fld_length = field_length(field->fld_dtype, X.RDB$FIELD_LENGTH);
+			if (field->fld_dtype == dtype_varying) {
+				field->fld_length += sizeof(SSHORT);
+			}
+			field->fld_scale = X.RDB$FIELD_SCALE;
+			field->fld_sub_type = X.RDB$FIELD_SUB_TYPE;
+			field->fld_sub_type_missing = X.RDB$FIELD_SUB_TYPE.NULL;
+			if (!field->fld_edit_string)
+			{
+				field->fld_edit_string = make_string(X.RDB$EDIT_STRING, sizeof(X.RDB$EDIT_STRING));
+			}
+			if (!field->fld_query_name)
+			{
+				field->fld_query_name = make_symbol(X.RDB$QUERY_NAME, sizeof(X.RDB$QUERY_NAME));
+			}
+			if (!field->fld_query_header)
+			{
+				ISC_QUAD& blob = X.RDB$QUERY_HEADER;
+				if (!UserBlob::blobIsNull(blob))
+				{
+					field->fld_query_header = get_query_header(database, blob);
+				}
+			}
+		}
+		previously_defined = true;
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+
+	return previously_defined;
+}
+
+
+static bool check_relation( qli_rel* relation)
+{
+/**************************************
+ *
+ *	c h e c k _ r e l a t i o n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Check the existence of the named relation.
+ *
+ **************************************/
+	bool previously_defined = false;
+	FB_API_HANDLE spare = DB;
+	DB = relation->rel_database->dbb_handle;
+
+	FOR(REQUEST_HANDLE relation->rel_database->dbb_requests[REQ_relation_def]
+		TRANSACTION_HANDLE relation->rel_database->dbb_meta_trans)
+			X IN DB.RDB$RELATIONS
+			WITH X.RDB$RELATION_NAME EQ relation->rel_symbol->sym_string
+		previously_defined = true;
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(relation->rel_database, gds_status);
+	END_ERROR;
+
+	DB = spare;
+	return previously_defined;
+}
+
+
+static void clone_fields( qli_rel* target, qli_rel* source)
+{
+/**************************************
+ *
+ *	c l o n e _ f i e l d s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Copy the RFR records for one relation
+ *	into another.  The target database is already
+ *	setup for updates.  If there is a different source
+ *	database, get it ready too.  Then make sure that
+ *	the source relation actually exists.
+ *
+ *	If it's two different databases, create the global
+ *	fields that are missing in the target (except those
+ *	that support computed fields), then create the local
+ *	fields and during that pass create the computed
+ *	fields and the SQL fields.
+ *
+ **************************************/
+	FB_API_HANDLE req1, req2;
+
+	req1 = req2 = 0;
+	FB_API_HANDLE s_trans = gds_trans;
+	DB = DB1 = target->rel_database->dbb_handle;
+
+	if (target->rel_database != source->rel_database)
+	{
+		MET_meta_transaction(source->rel_database, false);
+		s_trans = gds_trans;
+	}
+
+	if (target->rel_database != source->rel_database)
+		clone_global_fields(target, source);
+
+	qli_rlb* rlb = NULL;
+	CHECK_RLB(rlb);
+
+	STUFF(isc_dyn_version_1);
+	STUFF(isc_dyn_begin);
+
+	FOR(REQUEST_HANDLE req1 TRANSACTION_HANDLE s_trans)
+		Y IN DB.RDB$RELATION_FIELDS
+			CROSS F IN DB.RDB$FIELDS
+			WITH Y.RDB$RELATION_NAME = source->rel_symbol->sym_string
+			AND Y.RDB$FIELD_SOURCE = F.RDB$FIELD_NAME
+			// If SQL made this field, create a new global field for it
+		if (F.RDB$COMPUTED_BLR.NULL &&
+			!fb_utils::implicit_domain(Y.RDB$FIELD_NAME) &&
+			fb_utils::implicit_domain(F.RDB$FIELD_NAME))
+		{
+			STUFF(isc_dyn_def_sql_fld);
+			STUFF_STRING(Y.RDB$FIELD_NAME);
+			STUFF(isc_dyn_fld_type);
+			STUFF_WORD(2);
+			STUFF_WORD(F.RDB$FIELD_TYPE);
+
+			STUFF(isc_dyn_fld_length);
+			STUFF_WORD(2);
+			STUFF_WORD(F.RDB$FIELD_LENGTH);
+
+			STUFF(isc_dyn_fld_scale);
+			STUFF_WORD(2);
+			STUFF_WORD(F.RDB$FIELD_SCALE);
+
+			if (!F.RDB$VALIDATION_BLR.NULL)
+			{
+				STUFF(isc_dyn_fld_validation_blr);
+				blob_copy(rlb, source, F.RDB$VALIDATION_BLR);
+			}
+		}
+		else
+		{
+			STUFF(isc_dyn_def_local_fld);
+			STUFF_STRING(Y.RDB$FIELD_NAME);
+			STUFF(isc_dyn_fld_source);
+			STUFF_STRING(Y.RDB$FIELD_SOURCE);
+		}
+
+		STUFF(isc_dyn_rel_name);
+		STUFF_STRING(target->rel_symbol->sym_string);
+
+		if (!Y.RDB$FIELD_POSITION.NULL)
+		{
+			STUFF(isc_dyn_fld_position);
+			STUFF_WORD(2);
+			STUFF_WORD(Y.RDB$FIELD_POSITION);
+		}
+
+		if (!Y.RDB$QUERY_NAME.NULL)
+		{
+			STUFF(isc_dyn_fld_query_name);
+			STUFF_STRING(Y.RDB$QUERY_NAME);
+		}
+
+		if (!Y.RDB$EDIT_STRING.NULL)
+		{
+
+			STUFF(isc_dyn_fld_edit_string);
+			STUFF_STRING(Y.RDB$EDIT_STRING);
+		}
+		if (!Y.RDB$UPDATE_FLAG.NULL)
+		{
+			STUFF(isc_dyn_update_flag);
+			STUFF_WORD(2);
+			STUFF_WORD(Y.RDB$UPDATE_FLAG);
+		}
+
+		if (!Y.RDB$QUERY_HEADER.NULL)
+		{
+			STUFF(isc_dyn_fld_query_header);
+			blob_copy(rlb, source, Y.RDB$QUERY_HEADER);
+		}
+
+		if (!Y.RDB$DESCRIPTION.NULL)
+		{
+			STUFF(isc_dyn_description);
+			blob_copy(rlb, source, Y.RDB$DESCRIPTION);
+		}
+
+		if (!Y.RDB$DEFAULT_VALUE.NULL)
+		{
+			STUFF(isc_dyn_fld_default_value);
+			blob_copy(rlb, source, Y.RDB$DEFAULT_VALUE);
+		}
+
+		if ((source->rel_database->dbb_capabilities & DBB_cap_rfr_sys_flag) &&
+			(target->rel_database->dbb_capabilities & DBB_cap_rfr_sys_flag))
+		{
+			FOR(REQUEST_HANDLE req2 TRANSACTION_HANDLE s_trans)
+				S_RFR IN DB.RDB$RELATION_FIELDS WITH
+				S_RFR.RDB$FIELD_NAME = Y.RDB$FIELD_NAME AND
+				S_RFR.RDB$RELATION_NAME = Y.RDB$RELATION_NAME
+	            if (!S_RFR.RDB$SYSTEM_FLAG.NULL)
+	            {
+	                STUFF(isc_dyn_system_flag);
+	                STUFF_WORD(2);
+	                STUFF_WORD(S_RFR.RDB$SYSTEM_FLAG);
+	            }
+			END_FOR
+			ON_ERROR
+				rollback_update(target->rel_database);
+				ERRQ_database_error(source->rel_database, gds_status);
+			END_ERROR;
+		}
+
+		if (!F.RDB$COMPUTED_BLR.NULL)
+		{
+			STUFF(isc_dyn_fld_computed_blr);
+			blob_copy(rlb, source, F.RDB$COMPUTED_BLR);
+			STUFF(isc_dyn_fld_computed_source);
+			blob_copy(rlb, source, F.RDB$COMPUTED_SOURCE);
+
+			STUFF(isc_dyn_fld_type);
+			STUFF_WORD(2);
+			STUFF_WORD(F.RDB$FIELD_TYPE);
+
+			STUFF(isc_dyn_fld_length);
+			STUFF_WORD(2);
+			STUFF_WORD(F.RDB$FIELD_LENGTH);
+
+			if (!F.RDB$FIELD_SCALE.NULL)
+			{
+				STUFF(isc_dyn_fld_scale);
+				STUFF_WORD(2);
+				STUFF_WORD(F.RDB$FIELD_SCALE);
+			}
+
+			if (!F.RDB$FIELD_SUB_TYPE.NULL)
+			{
+				STUFF(isc_dyn_fld_sub_type);
+				STUFF_WORD(2);
+				STUFF_WORD(F.RDB$FIELD_SUB_TYPE);
+			}
+		}
+		STUFF(isc_dyn_end);
+	END_FOR
+	ON_ERROR
+		rollback_update(source->rel_database);
+		ERRQ_database_error(source->rel_database, gds_status);
+	END_ERROR;
+
+	STUFF(isc_dyn_end);
+	STUFF(isc_dyn_eoc);
+
+	execute_dynamic_ddl(target->rel_database, rlb);
+
+	release_request(source->rel_database, req1);
+	release_request(source->rel_database, req2);
+}
+
+
+static void clone_global_fields( qli_rel* target, qli_rel* source)
+{
+/**************************************
+ *
+ *	c l o n e _ g l o b a l _ f i e l d s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Copy the global field definitions required by a relation
+ *      from one database into another.  Both databases are
+ *	setup correctly.  (Set up the handles again just because
+ *	we're compulsive.)
+ *
+ *	In this routine, as in clone fields, be careful to probe
+ *	for our extensions rather than just using them so we
+ *	can copy relations from V2 and from Rdb.
+ *
+ *	Don't clone fields that already exist and have the
+ *	correct datatype and length.
+ *
+ *	Don't clone computed fields since they will be cloned
+ *	later with the local field definitions.   Don't clone
+ *	SQL defined fields for the same reason.
+ *
+ **************************************/
+	FB_API_HANDLE req1, req2, req3;
+	req1 = req2 = req3 = 0;
+
+	FB_API_HANDLE s_trans = source->rel_database->dbb_meta_trans;
+	FB_API_HANDLE t_trans = target->rel_database->dbb_meta_trans;
+	DB = source->rel_database->dbb_handle;
+	DB1 = target->rel_database->dbb_handle;
+
+	qli_rlb* rlb = NULL;
+	bool first_field = true;
+
+	FOR(REQUEST_HANDLE req1 TRANSACTION_HANDLE s_trans)
+		RFR IN DB.RDB$RELATION_FIELDS CROSS
+		Y IN DB.RDB$FIELDS
+		WITH RFR.RDB$RELATION_NAME = source->rel_symbol->sym_string AND
+		Y.RDB$FIELD_NAME = RFR.RDB$FIELD_SOURCE REDUCED TO Y.RDB$FIELD_NAME
+		if (!Y.RDB$COMPUTED_BLR.NULL ||
+			(!fb_utils::implicit_domain(RFR.RDB$FIELD_NAME) &&
+			fb_utils::implicit_domain(Y.RDB$FIELD_NAME)))
+		{
+			continue;
+		}
+
+		bool predefined = false;
+
+		FOR(REQUEST_HANDLE req2 TRANSACTION_HANDLE t_trans)
+			A IN DB1.RDB$FIELDS WITH A.RDB$FIELD_NAME = Y.RDB$FIELD_NAME
+			if ((A.RDB$FIELD_TYPE != Y.RDB$FIELD_TYPE) ||
+				(A.RDB$FIELD_LENGTH != Y.RDB$FIELD_LENGTH) ||
+				(A.RDB$FIELD_SCALE.NULL != Y.RDB$FIELD_SCALE.NULL) ||
+				((!Y.RDB$FIELD_SCALE.NULL) && (A.RDB$FIELD_SCALE != Y.RDB$FIELD_SCALE)) ||
+				(A.RDB$FIELD_SUB_TYPE.NULL != Y.RDB$FIELD_SUB_TYPE.NULL) ||
+				((!Y.RDB$FIELD_SUB_TYPE.NULL) && (A.RDB$FIELD_SUB_TYPE != Y.RDB$FIELD_SUB_TYPE)))
+			{
+				TEXT* name = ALLQ_malloc((SLONG) sizeof(Y.RDB$FIELD_NAME));
+				strcpy(name, Y.RDB$FIELD_NAME);
+				rollback_update(target->rel_database);
+				// CVC: When is this memory deallocated?
+				ERRQ_error(413, name);
+				// conflicting previous definition
+			}
+			else
+				predefined = true;
+		END_FOR
+		ON_ERROR
+			ERRQ_database_error(target->rel_database, gds_status);
+		END_ERROR;
+
+		if (predefined)
+			continue;
+
+		if (first_field)
+		{
+			CHECK_RLB(rlb);
+			STUFF(isc_dyn_version_1);
+			STUFF(isc_dyn_begin);
+			first_field = false;
+		}
+		STUFF(isc_dyn_def_global_fld);
+		STUFF_STRING(Y.RDB$FIELD_NAME);
+
+		STUFF(isc_dyn_fld_type);
+		STUFF_WORD(2);
+		STUFF_WORD(Y.RDB$FIELD_TYPE);
+
+		STUFF(isc_dyn_fld_length);
+		STUFF_WORD(2);
+		STUFF_WORD(Y.RDB$FIELD_LENGTH);
+
+		if (!Y.RDB$FIELD_SCALE.NULL)
+		{
+			STUFF(isc_dyn_fld_scale);
+			STUFF_WORD(2);
+			STUFF_WORD(Y.RDB$FIELD_SCALE);
+		}
+
+		if (!Y.RDB$FIELD_SUB_TYPE.NULL)
+		{
+			STUFF(isc_dyn_fld_sub_type);
+			STUFF_WORD(2);
+			STUFF_WORD(Y.RDB$FIELD_SUB_TYPE);
+		}
+
+		if (!Y.RDB$SEGMENT_LENGTH.NULL)
+		{
+			STUFF(isc_dyn_fld_segment_length);
+			STUFF_WORD(2);
+			STUFF_WORD(Y.RDB$SEGMENT_LENGTH);
+		}
+
+		if (!Y.RDB$SYSTEM_FLAG.NULL)
+		{
+			STUFF(isc_dyn_system_flag);
+			STUFF_WORD(2);
+			STUFF_WORD(Y.RDB$SYSTEM_FLAG);
+		}
+
+		if (!Y.RDB$QUERY_NAME.NULL)
+		{
+			STUFF(isc_dyn_fld_query_name);
+			STUFF_STRING(Y.RDB$QUERY_NAME);
+		}
+
+		if (!Y.RDB$EDIT_STRING.NULL)
+		{
+			STUFF(isc_dyn_fld_edit_string);
+			STUFF_STRING(Y.RDB$EDIT_STRING);
+		}
+
+		if (!Y.RDB$MISSING_VALUE.NULL)
+		{
+			STUFF(isc_dyn_fld_missing_value);
+			blob_copy(rlb, source, Y.RDB$MISSING_VALUE);
+		}
+
+		if (!Y.RDB$DEFAULT_VALUE.NULL)
+		{
+			STUFF(isc_dyn_fld_default_value);
+			blob_copy(rlb, source, Y.RDB$DEFAULT_VALUE);
+		}
+
+		if (!Y.RDB$QUERY_HEADER.NULL)
+		{
+			STUFF(isc_dyn_fld_query_header);
+			blob_copy(rlb, source, Y.RDB$QUERY_HEADER);
+		}
+
+		if (!Y.RDB$DESCRIPTION.NULL)
+		{
+			STUFF(isc_dyn_description);
+			blob_copy(rlb, source, Y.RDB$DESCRIPTION);
+		}
+
+		if (!Y.RDB$VALIDATION_BLR.NULL)
+		{
+			STUFF(isc_dyn_fld_validation_blr);
+			blob_copy(rlb, source, Y.RDB$VALIDATION_BLR);
+		}
+
+		if (!Y.RDB$VALIDATION_SOURCE.NULL)
+		{
+			STUFF(isc_dyn_fld_validation_source);
+			blob_copy(rlb, source, Y.RDB$VALIDATION_SOURCE);
+		}
+
+		if ((target->rel_database->dbb_capabilities & DBB_cap_dimensions) &&
+			(source->rel_database->dbb_capabilities & DBB_cap_dimensions))
+		{
+			bool first_dimension = true;
+			FOR(REQUEST_HANDLE req3 TRANSACTION_HANDLE s_trans)
+				F IN DB.RDB$FIELDS CROSS
+					D IN DB.RDB$FIELD_DIMENSIONS
+					WITH F.RDB$FIELD_NAME = D.RDB$FIELD_NAME AND
+					F.RDB$FIELD_NAME = Y.RDB$FIELD_NAME
+
+				if (first_dimension)
+				{
+					first_dimension = false;
+					STUFF(isc_dyn_fld_dimensions);
+					STUFF_WORD(2);
+					STUFF_WORD(F.RDB$DIMENSIONS);
+				}
+
+				STUFF(isc_dyn_def_dimension);
+				STUFF_WORD(2);
+				STUFF_WORD(D.RDB$DIMENSION);
+
+				if (!D.RDB$LOWER_BOUND.NULL)
+				{
+					STUFF(isc_dyn_dim_lower);
+					STUFF_WORD(2);
+					STUFF_WORD(D.RDB$LOWER_BOUND);
+				}
+
+				if (!D.RDB$UPPER_BOUND.NULL)
+				{
+					STUFF(isc_dyn_dim_upper);
+					STUFF_WORD(2);
+					STUFF_WORD(D.RDB$UPPER_BOUND);
+				}
+				STUFF(isc_dyn_end);
+			END_FOR
+			ON_ERROR
+				if (target->rel_database->dbb_meta_trans)
+					rollback_update(target->rel_database);
+				rollback_update(source->rel_database);
+				ERRQ_database_error(source->rel_database, gds_status);
+			END_ERROR;
+		}
+		STUFF(isc_dyn_end);
+	END_FOR
+	ON_ERROR
+		rollback_update(source->rel_database);
+		if (target->rel_database->dbb_meta_trans)
+			rollback_update(target->rel_database);
+		ERRQ_database_error(source->rel_database, gds_status);
+	END_ERROR;
+
+	if (rlb)
+	{
+		STUFF(isc_dyn_end);
+		STUFF(isc_dyn_eoc);
+		execute_dynamic_ddl(target->rel_database, rlb);
+	}
+
+	release_request(source->rel_database, req1);
+	release_request(target->rel_database, req2);
+	release_request(source->rel_database, req3);
+}
+
+
+static void define_global_field( qli_dbb* database, qli_fld* field, qli_symbol* name)
+{
+/**************************************
+ *
+ *	d e f i n e _ g l o b a l _ f i e l d
+ *
+ **************************************
+ *
+ * Functional description
+ *
+ *	Define a global field if we've got enough
+ *	information.
+ *
+ **************************************/
+	if (!field->fld_dtype)
+	{
+		rollback_update(database);
+		ERRQ_print_error(256, name->sym_string);	// Msg256 No datatype specified for field %s
+	}
+
+	STORE(REQUEST_HANDLE database->dbb_requests[REQ_store_field])
+		X IN DB.RDB$FIELDS
+        strcpy(X.RDB$FIELD_NAME, name->sym_string);
+		X.RDB$FIELD_TYPE = blr_dtypes[field->fld_dtype];
+		X.RDB$FIELD_SCALE = field->fld_scale;
+		X.RDB$FIELD_LENGTH = (field->fld_dtype == dtype_varying) ?
+			field->fld_length - sizeof(SSHORT) : field->fld_length;
+		if (!field->fld_sub_type_missing)
+		{
+			X.RDB$FIELD_SUB_TYPE.NULL = FALSE;
+			X.RDB$FIELD_SUB_TYPE = field->fld_sub_type;
+		}
+		else
+			X.RDB$FIELD_SUB_TYPE.NULL = TRUE;
+		const qli_symbol* symbol = field->fld_query_name;
+		if (symbol)
+		{
+			X.RDB$QUERY_NAME.NULL = FALSE;
+			strcpy(X.RDB$QUERY_NAME, symbol->sym_string);
+		}
+		else
+			X.RDB$QUERY_NAME.NULL = TRUE;
+		if (field->fld_edit_string)
+		{
+			X.RDB$EDIT_STRING.NULL = FALSE;
+			strcpy(X.RDB$EDIT_STRING, field->fld_edit_string);
+		}
+		else
+			X.RDB$EDIT_STRING.NULL = TRUE;
+	END_STORE
+	ON_ERROR
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	END_ERROR;
+}
+
+
+static void delete_fields( qli_rel* relation)
+{
+/**************************************
+ *
+ *	d e l e t e _ f i e l d s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Delete field definitions.
+ *
+ **************************************/
+	while (qli_fld* field = relation->rel_fields)
+	{
+		relation->rel_fields = field->fld_next;
+		ALLQ_release((qli_frb*) field->fld_name);
+		if (field->fld_query_name)
+			ALLQ_release((qli_frb*) field->fld_query_name);
+		ALLQ_release((qli_frb*) field);
+	}
+
+	relation->rel_flags &= ~REL_fields;
+}
+
+
+static ISC_STATUS detach(ISC_STATUS* status_vector, qli_dbb* dbb)
+{
+/**************************************
+ *
+ *	d e t a c h
+ *
+ **************************************
+ *
+ * Functional description
+ *	Shut down a database.  Return the status of the
+ *	first failing call, if any.
+ *
+ **************************************/
+	if (!dbb->dbb_handle)
+		return FB_SUCCESS;
+
+	ISC_STATUS_ARRAY alt_vector;
+	ISC_STATUS* status = status_vector;
+
+	if (dbb->dbb_transaction)
+		if (isc_commit_transaction(status, &dbb->dbb_transaction))
+			status = alt_vector;
+
+	if (dbb->dbb_proc_trans && (dbb->dbb_capabilities & DBB_cap_multi_trans))
+		if (isc_commit_transaction(status, &dbb->dbb_proc_trans))
+			status = alt_vector;
+
+	if (dbb->dbb_meta_trans && (dbb->dbb_capabilities & DBB_cap_multi_trans))
+		if (isc_commit_transaction(status, &dbb->dbb_meta_trans))
+			status = alt_vector;
+
+	isc_detach_database(status, &dbb->dbb_handle);
+
+	return status_vector[1];
+}
+
+
+static void execute_dynamic_ddl( qli_dbb* database, qli_rlb* rlb)
+{
+/**************************************
+ *
+ *	e x e c u t e _ d y n a m i c _ d d l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Execute a ddl command, for better or for worse.
+ *
+ **************************************/
+	const USHORT length = rlb->rlb_data - rlb->rlb_base;
+
+	if (QLI_blr)
+		PRETTY_print_dyn(rlb->rlb_base, NULL, NULL, 0);
+
+	if (isc_ddl(gds_status, &database->dbb_handle, &database->dbb_meta_trans,
+				 length, (const char*) rlb->rlb_base))
+	{
+		rollback_update(database);
+		ERRQ_database_error(database, gds_status);
+	}
+
+	GEN_rlb_release (rlb);
+
+}
+
+
+static int field_length( USHORT dtype, USHORT length)
+{
+/**************************************
+ *
+ *	f i e l d _ l e n g t h
+ *
+ **************************************
+ *
+ * Functional description
+ *	Return implementation specific length for field.
+ *
+ **************************************/
+
+	switch (dtype)
+	{
+	case dtype_short:
+		return sizeof(SSHORT);
+	case dtype_long:
+		return sizeof(SLONG);
+	case dtype_real:
+		return sizeof(float);
+	case dtype_double:
+		return sizeof(double);
+	case dtype_int64:
+		return sizeof(SINT64);
+
+	case dtype_sql_time:
+	case dtype_sql_date:
+		return sizeof(SLONG);
+
+	case dtype_timestamp:
+	case dtype_blob:
+	case dtype_quad:
+		return sizeof(ISC_QUAD);
+	}
+
+	return length;
+}
+
+
+static void get_database_type( qli_dbb* new_dbb)
+{
+/**************************************
+ *
+ *	g e t _ d a t a b a s e _ t y p e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Ask what type of database this is.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+	UCHAR buffer[1024];
+
+	isc_database_info(status_vector, &new_dbb->dbb_handle, sizeof(db_info),
+					   reinterpret_cast<const char*>(db_info),
+					   sizeof(buffer), (char*) buffer);
+
+	if (status_vector[1])
+		ERRQ_database_error(new_dbb, gds_status);
+
+	const UCHAR* p = buffer;
+
+	while (*p != isc_info_end && p < buffer + sizeof(buffer))
+	{
+		UCHAR item = *p++;
+		const USHORT l = gds__vax_integer(p, 2);
+		p += 2;
+		switch (item)
+		{
+		case isc_info_implementation:
+			{
+				const UCHAR* q = p;
+				int count = *q++;
+				while (count--)
+				{
+					//new_dbb->dbb_type = *q; // Not used
+					++q;
+					if (*q++ == isc_info_db_class_access)
+						break;
+				}
+			}
+			break;
+
+		default:
+			ERRQ_error(257);
+			// Msg257 database info call failed
+		}
+		p += l;
+	}
+}
+
+
+static TEXT* get_query_header( qli_dbb* database, ISC_QUAD& blob_id)
+{
+/**************************************
+ *
+ *	g e t _ q u e r y _ h e a d e r
+ *
+ **************************************
+ *
+ * Functional description
+ *	Pick up a query header for a field.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+	TEXT header[1024], buffer[1024];
+	UserBlob blob(status_vector);
+
+	if (!blob.open(database->dbb_handle, gds_trans, blob_id))
+	{
+		ERRQ_database_error(database, status_vector);
+	}
+
+	TEXT* p = header;
+	const char* const end = header + sizeof(header) - 3;
+
+	// CVC: No bounds check here: it's assumed that 1024 is enough, but "p"
+	// might overflow "header" eventually.
+	for (;;)
+	{
+		if (p >= end)
+			break;
+		size_t length;
+		if (!blob.getSegment(sizeof(buffer), buffer, length))
+			break;
+		if (length && buffer[length - 1] == '\n')
+			--length;
+		buffer[length] = 0;
+		const TEXT* q = buffer;
+		if (*q == '"')
+			do {
+				*p++ = *q++;
+			} while (*q && p < end);
+		else
+		{
+			*p++ = '"';
+			while (*q && p < end)
+				*p++ = *q++;
+			*p++ = '"';
+		}
+	}
+
+	if (!blob.close())
+		ERRQ_database_error(database, gds_status);
+
+	*p = 0;
+	if (!strcmp(header, "\" \""))
+	{
+		header[0] = '-';
+		header[1] = 0;
+		p = header + 1;
+	}
+
+	const USHORT len = p - header;
+	if (len)
+		return make_string(header, len);
+
+	return NULL;
+}
+
+
+static void install( qli_dbb* old_dbb)
+{
+/**************************************
+ *
+ *	i n s t a l l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Install a database.  Scan relations, etc., make up relation
+ *	blocks, etc, and copy the database block to someplace more
+ *	permanent.
+ *
+ **************************************/
+
+	// Copy the database block to one out of the permanent pool
+
+	const SSHORT l = old_dbb->dbb_filename_length;
+	qli_dbb* new_dbb = (qli_dbb*) ALLOCPV(type_dbb, l);
+	new_dbb->dbb_filename_length = l;
+	memcpy(new_dbb->dbb_filename, old_dbb->dbb_filename, l);
+	DB = new_dbb->dbb_handle = old_dbb->dbb_handle;
+	new_dbb->dbb_capabilities = old_dbb->dbb_capabilities;
+
+	new_dbb->dbb_next = QLI_databases;
+	QLI_databases = new_dbb;
+
+	// If a name was given, make up a symbol for the database.
+
+	qli_name* name = (qli_name*) old_dbb->dbb_symbol;
+	if (name)
+	{
+		qli_symbol* asymbol = make_symbol(name->nam_string, name->nam_length);
+		new_dbb->dbb_symbol = asymbol;
+		asymbol->sym_type = SYM_database;
+		asymbol->sym_object = (BLK) new_dbb;
+		HSH_insert(asymbol, true);
+	}
+
+	gds_trans = MET_transaction(nod_start_trans, new_dbb);
+
+	// Find out whose database this is so later we don't ask Rdb/VMS
+	// or its pals to do any unnatural acts.  While we're at it get
+	// general capabilities
+
+	get_database_type(new_dbb);
+	set_capabilities(new_dbb);
+#ifndef DEV_BUILD
+	if (new_dbb->dbb_capabilities & DBB_cap_nodyn)
+	{
+		const char* str = new_dbb->dbb_filename;
+		if (name && strncmp(name->nam_string, "QLI_", 4))
+			str = name->nam_string;
+		ERRQ_msg_put(530, str);
+	}
+#endif
+
+	// Get all relations in database.  For each relation make up a
+	// relation block, make up a symbol block, and insert the symbol
+	// into the hash table.
+
+	FB_API_HANDLE request = 0;
+
+	FOR(REQUEST_HANDLE request) X IN DB.RDB$RELATIONS
+		SORTED BY DESCENDING X.RDB$RELATION_NAME
+
+		qli_rel* relation = (qli_rel*) ALLOCP(type_rel);
+		relation->rel_next = new_dbb->dbb_relations;
+		new_dbb->dbb_relations = relation;
+		relation->rel_database = new_dbb;
+		relation->rel_id = X.RDB$RELATION_ID;
+		qli_symbol* rsymbol = make_symbol(X.RDB$RELATION_NAME, sizeof(X.RDB$RELATION_NAME));
+		rsymbol->sym_type = SYM_relation;
+		rsymbol->sym_object = (BLK) relation;
+		relation->rel_symbol = rsymbol;
+		HSH_insert(rsymbol);
+		if (strcmp(rsymbol->sym_string, "QLI$PROCEDURES") == 0)
+			new_dbb->dbb_flags |= DBB_procedures;
+		if (relation->rel_system_flag = X.RDB$SYSTEM_FLAG)
+			relation->rel_flags |= REL_system;
+		if (!X.RDB$VIEW_BLR.NULL)
+			relation->rel_flags |= REL_view;
+	END_FOR
+	ON_ERROR
+		ERRQ_database_error(new_dbb, gds_status);
+	END_ERROR;
+
+	release_request(new_dbb, request);
+
+	// Pick up functions, if appropriate
+
+	if (new_dbb->dbb_capabilities & DBB_cap_functions)
+	{
+		FB_API_HANDLE request2 = 0;
+		FOR(REQUEST_HANDLE request) X IN DB.RDB$FUNCTIONS
+		    qli_symbol* fsymbol = make_symbol(X.RDB$FUNCTION_NAME, sizeof(X.RDB$FUNCTION_NAME));
+			if (!fsymbol)
+                continue;
+			//qli_fun* function = (qli_fun*) ALLOCPV(type_fun, 0);
+			qli_fun* function = (qli_fun*) ALLOCP(type_fun);
+			function->fun_next = new_dbb->dbb_functions;
+			new_dbb->dbb_functions = function;
+			function->fun_symbol = fsymbol;
+			function->fun_database = new_dbb;
+			FOR(REQUEST_HANDLE request2) Y IN DB.RDB$FUNCTION_ARGUMENTS WITH
+				Y.RDB$FUNCTION_NAME EQ X.RDB$FUNCTION_NAME AND
+					Y.RDB$ARGUMENT_POSITION EQ X.RDB$RETURN_ARGUMENT
+				function->fun_return.dsc_dtype = MET_get_datatype(Y.RDB$FIELD_TYPE);
+				function->fun_return.dsc_length =
+					field_length(function->fun_return.dsc_dtype, Y.RDB$FIELD_LENGTH);
+				function->fun_return.dsc_scale = Y.RDB$FIELD_SCALE;
+			END_FOR
+			ON_ERROR
+				ERRQ_database_error(new_dbb, gds_status);
+			END_ERROR;
+			if (!function->fun_return.dsc_dtype)
+			{
+				function->fun_return.dsc_dtype = dtype_text;
+				function->fun_return.dsc_length = 20;
+			}
+			fsymbol->sym_type = SYM_function;
+			fsymbol->sym_object = (BLK) function;
+			HSH_insert(fsymbol);
+
+			// Insert another symbol if there is a function query name
+
+            qli_symbol* symbol2 = make_symbol(X.RDB$QUERY_NAME, sizeof(X.RDB$QUERY_NAME));
+			if (symbol2)
+			{
+				function->fun_query_name = symbol2;
+				symbol2->sym_type = SYM_function;
+				symbol2->sym_object = (BLK) function;
+				HSH_insert(symbol2, true);
+			}
+		END_FOR
+		ON_ERROR
+			ERRQ_database_error(new_dbb, gds_status);
+		END_ERROR;
+		release_request(new_dbb, request);
+		release_request(new_dbb, request2);
+	}
+}
+
+
+static qli_syntax* make_node( nod_t type, USHORT count)
+{
+/**************************************
+ *
+ *	m a k e _ n o d e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Generate a syntax node.
+ *
+ **************************************/
+	qli_syntax* node = (qli_syntax*) ALLOCPV(type_syn, count);
+	node->syn_count = count;
+	node->syn_type = type;
+
+	return node;
+}
+
+
+static TEXT* make_string( TEXT* string, SSHORT length)
+{
+/**************************************
+ *
+ *	m a k e _ s t r i n g
+ *
+ **************************************
+ *
+ * Functional description
+ *	Make up a permanent string from a large string.  Chop off
+ *	trailing blanks.  If there's nothing left, return NULL.
+ *
+ **************************************/
+	fb_assert(length > 0);
+
+	string[length] = 0;
+
+	if (!(length = truncate_string(string)))
+		return NULL;
+
+	qli_str* str = (qli_str*) ALLOCPV(type_str, length + 1);
+	TEXT* p = str->str_data;
+	do {
+		*p++ = *string++;
+	} while (--length);
+	*p = 0;
+
+	return str->str_data;
+}
+
+
+static qli_symbol* make_symbol( TEXT* string, SSHORT length)
+{
+/**************************************
+ *
+ *	m a k e _ s y m b o l
+ *
+ **************************************
+ *
+ * Functional description
+ *	Make up a symbol from a string.  If the string is all blanks,
+ *	don't make up a symbol.  Phooey.
+ *
+ **************************************/
+	if (!(length = truncate_string(string)))
+		return NULL;
+
+	qli_symbol* symbol = (qli_symbol*) ALLOCPV(type_sym, length);
+	symbol->sym_type = SYM_relation;
+	symbol->sym_length = length;
+	TEXT* p = symbol->sym_name;
+	symbol->sym_string = p;
+	memcpy(p, string, length);
+	return symbol;
+}
+
+
+static qli_const* missing_value( ISC_QUAD& blob_id, qli_symbol* symbol)
+{
+/**************************************
+ *
+ *	m i s s i n g _ v a l u e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Get a missing value into a constant
+ *	block for later reference.
+ *
+ **************************************/
+	qli_syntax* element = parse_blr_blob(blob_id, symbol);
+	if (element)
+		return ((qli_const*) element->syn_arg[0]);
+
+	return NULL;
+}
+
+
+static qli_syntax* parse_blr( UCHAR** ptr, qli_symbol* symbol)
+{
+/**************************************
+ *
+ *	p a r s e _ b l r
+ *
+ **************************************
+ *
+ * Functional description
+ *	Parse a BLR expression.
+ *
+ **************************************/
+	qli_syntax** arg;
+	qli_const* constant;
+	nod_t operatr;
+	qli_name* name;
+	UCHAR* p;
+	SSHORT dtype, scale, length, l, op;
+
+	UCHAR* blr = *ptr;
+	SSHORT args = 2;
+	qli_syntax* node = NULL;
+
+	switch (op = BLR_BYTE)
+	{
+	case blr_any:
+	case blr_unique:
+	case blr_eoc:
+		return NULL;
+
+	case blr_eql:
+		operatr = nod_eql;
+		break;
+	case blr_neq:
+		operatr = nod_neq;
+		break;
+	case blr_gtr:
+		operatr = nod_gtr;
+		break;
+	case blr_geq:
+		operatr = nod_geq;
+		break;
+	case blr_lss:
+		operatr = nod_lss;
+		break;
+	case blr_leq:
+		operatr = nod_leq;
+		break;
+	case blr_containing:
+		operatr = nod_containing;
+		break;
+	case blr_starting:
+		operatr = nod_starts;
+		break;
+	case blr_matching:
+		operatr = nod_matches;
+		break;
+	case blr_matching2:
+		operatr = nod_sleuth;
+		break;
+	case blr_like:
+		operatr = nod_like;
+		break;
+	case blr_and:
+		operatr = nod_and;
+		break;
+	case blr_or:
+		operatr = nod_or;
+		break;
+	case blr_add:
+		operatr = nod_add;
+		break;
+	case blr_subtract:
+		operatr = nod_subtract;
+		break;
+	case blr_multiply:
+		operatr = nod_multiply;
+		break;
+	case blr_divide:
+		operatr = nod_divide;
+		break;
+	case blr_upcase:
+		operatr = nod_upcase;
+		break;
+	case blr_lowcase:
+		operatr = nod_lowcase;
+		break;
+	case blr_null:
+		operatr = nod_null;
+		break;
+
+	case blr_between:
+		operatr = nod_between;
+		args = 3;
+		break;
+
+	case blr_not:
+		operatr = nod_not;
+		args = 1;
+		break;
+
+	case blr_negate:
+		operatr = nod_negate;
+		args = 1;
+		break;
+
+	case blr_missing:
+		operatr = nod_missing;
+		args = 1;
+		break;
+
+	case blr_fid:
+		(void) BLR_BYTE;
+		blr += 2;
+		node = make_node(nod_field, 1);
+		name = (qli_name*) ALLOCPV(type_nam, symbol->sym_length);
+		node->syn_arg[0] = (qli_syntax*) name;
+		name->nam_length = symbol->sym_length;
+		strcpy(name->nam_string, symbol->sym_string);
+		break;
+
+	case blr_field:
+		(void) BLR_BYTE;
+		length = BLR_BYTE;
+		node = make_node(nod_field, 1);
+		name = (qli_name*) ALLOCPV(type_nam, length);
+		node->syn_arg[0] = (qli_syntax*) name;
+		name->nam_length = length;
+		p = (UCHAR*) name->nam_string;
+		do {
+			*p++ = BLR_BYTE;
+		} while (--length);
+		break;
+
+	case blr_function:
+		length = BLR_BYTE;
+		node = make_node(nod_function, s_fun_count);
+		node->syn_arg[s_fun_function] = (qli_syntax*) HSH_lookup((SCHAR*) blr, length);
+		blr += length;
+		args = BLR_BYTE;
+		node->syn_arg[s_fun_args] = make_node(nod_list, args);
+		arg = node->syn_arg[s_fun_args]->syn_arg;
+		while (--args >= 0)
+		{
+			if (!(*arg++ = parse_blr(&blr, symbol)))
+				return NULL;
+		}
+		break;
+
+	case blr_literal:
+		scale = 0;
+		switch (BLR_BYTE)
+		{
+		case blr_text:
+			dtype = dtype_text;
+			length = l = gds__vax_integer(blr, 2);
+			blr += 2;
+			break;
+
+		case blr_text2:
+			dtype = dtype_text;
+			scale = gds__vax_integer(blr, 2);
+			blr += 2;
+			length = l = gds__vax_integer(blr, 2);
+			blr += 2;
+			break;
+
+		case blr_varying:
+			dtype = dtype_varying;
+			length = l = gds__vax_integer(blr, 2) + sizeof(USHORT);
+			blr += 2;
+			break;
+
+		case blr_varying2:
+			dtype = dtype_varying;
+			scale = gds__vax_integer(blr, 2);
+			blr += 2;
+			length = l = gds__vax_integer(blr, 2) + sizeof(USHORT);
+			blr += 2;
+			break;
+
+		case blr_short:
+			dtype = dtype_short;
+			l = 2;
+			length = sizeof(SSHORT);
+			scale = (int) BLR_BYTE;
+			break;
+
+		case blr_long:
+			dtype = dtype_long;
+			length = sizeof(SLONG);
+			l = 4;
+			scale = (int) BLR_BYTE;
+			break;
+
+		case blr_quad:
+			dtype = dtype_quad;
+			l = 8;
+			length = sizeof(ISC_QUAD);
+			scale = (int) BLR_BYTE;
+			break;
+
+		case blr_int64:
+			dtype = dtype_int64;
+			l = 8;
+			length = sizeof(SINT64);
+			scale = (int) BLR_BYTE;
+			break;
+
+		case blr_timestamp:
+			dtype = dtype_timestamp;
+			l = 8;
+			length = sizeof(ISC_QUAD);
+			break;
+
+		case blr_sql_date:
+			dtype = dtype_sql_date;
+			l = 4;
+			length = sizeof(SLONG);
+			break;
+
+		case blr_sql_time:
+			dtype = dtype_sql_time;
+			l = 4;
+			length = sizeof(ULONG);
+			break;
+		}
+		constant = (qli_const*) ALLOCPV(type_con, length);
+		constant->con_desc.dsc_dtype = dtype;
+		constant->con_desc.dsc_scale = scale;
+		constant->con_desc.dsc_length = length;
+		constant->con_desc.dsc_address = p = constant->con_data;
+		QLI_validate_desc(constant->con_desc);
+		switch (dtype)
+		{
+		case dtype_text:
+			while (l--)
+				*p++ = BLR_BYTE;
+			break;
+		case dtype_short:
+			*(SSHORT*) p = gds__vax_integer(blr, l);
+			blr += l;
+			break;
+		case dtype_long:
+			*(SLONG*) p = gds__vax_integer(blr, l);
+			blr += l;
+			break;
+		}
+		node = make_node(nod_constant, 1);
+		node->syn_count = 0;
+		node->syn_arg[0] = (qli_syntax*) constant;
+		break;
+
+	default:
+		ERRQ_print_error(258, SafeArg() << op);	// Msg258 don't understand BLR operatr %d
+	}
+
+	if (!node)
+	{
+		node = make_node(operatr, args);
+		arg = node->syn_arg;
+		while (--args >= 0)
+		{
+			if (!(*arg++ = parse_blr(&blr, symbol)))
+				return NULL;
+		}
+	}
+
+	*ptr = blr;
+
+	return node;
+}
+
+
+static qli_syntax* parse_blr_blob(ISC_QUAD& blob_id, qli_symbol* symbol)
+{
+/**************************************
+ *
+ *	p a r s e _ b l r _ b l o b
+ *
+ **************************************
+ *
+ * Functional description
+ *	Gobble up a BLR blob, if possible.
+ *
+ **************************************/
+	ISC_STATUS_ARRAY status_vector;
+
+	if (UserBlob::blobIsNull(blob_id))
+		return NULL;
+
+	UserBlob handle(status_vector);
+
+	if (!handle.open(DB, gds_trans, blob_id))
+		return NULL;
+
+	UCHAR buffer[1024];
+	UCHAR* ptr = buffer;
+
+	for (;;)
+	{
+		size_t length = buffer + sizeof(buffer) - ptr;
+		if (!length)
+			break;
+		// The old code considered getting a portion of a segment a bug.
+		// Anyway, 1024 is not much to contain the BLR stream, even for validation.
+		if (!handle.getSegment(length, ptr, length) || handle.getCode())
+			break;
+		ptr += length;
+	}
+
+	if (!handle.close())
+		return NULL;
+
+	if (ptr == buffer)
+		return NULL;
+
+	ptr = buffer;
+
+	if (*ptr++ != blr_version4)
+		return NULL;
+
+	qli_syntax* node = parse_blr(&ptr, symbol);
+
+	if (*ptr != blr_eoc)
+		return NULL;
+
+	return node;
+}
+
+
+static void purge_relation(qli_rel* relation)
+{
+/**************************************
+ *
+ *	p u r g e _ r e l a t i o n
+ *
+ **************************************
+ *
+ * Functional description
+ *	Purge a relation out of internal data structures.
+ *
+ **************************************/
+	qli_symbol* symbol = relation->rel_symbol;
+	qli_dbb* database = relation->rel_database;
+	HSH_remove(symbol);
+
+	for (qli_rel** ptr = &database->dbb_relations; *ptr; ptr = &(*ptr)->rel_next)
+	{
+		if (*ptr == relation)
+		{
+			*ptr = relation->rel_next;
+			break;
+		}
+	}
+
+	qli_fld* field;
+	while (field = relation->rel_fields)
+	{
+		relation->rel_fields = field->fld_next;
+		ALLQ_release((qli_frb*) field->fld_name);
+		if (symbol = field->fld_query_name) {
+			ALLQ_release((qli_frb*) symbol);
+		}
+		ALLQ_release((qli_frb*) field);
+	}
+
+	ALLQ_release((qli_frb*) relation);
+}
+
+
+static void put_dyn_string( qli_rlb* rlb, const TEXT* string)
+{
+/**************************************
+ *
+ *	p u t _ d y n _ s t r i n g
+ *
+ **************************************
+ *
+ * Functional description
+ *	Move a string to a dynamic DDL command block.
+ *
+ **************************************/
+
+	const SSHORT l = strlen(string);
+
+	while ((SSHORT) (rlb->rlb_limit - rlb->rlb_data) < l) {
+		rlb = GEN_rlb_extend(rlb);
+	}
+
+	STUFF_WORD(l);
+
+	while (*string) {
+		STUFF(*string++);
+	}
+	CHECK_RLB(rlb);
+}
+
+
+static void release_request(qli_dbb* db, FB_API_HANDLE& request_handle)
+{
+	if (request_handle)
+	{
+		if (isc_release_request(gds_status, &request_handle))
+			ERRQ_database_error(db, gds_status);
+	}
+}
+
+
+static void rollback_update( qli_dbb* database)
+{
+/**************************************
+ *
+ *	 r o l l b a c k _ u p d a t e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Roll back  a meta-data update.
+ *
+ **************************************/
+	if (gds_trans == database->dbb_meta_trans &&
+		(database->dbb_capabilities & DBB_cap_multi_trans))
+	{
+	    ISC_STATUS_ARRAY alt_vector;
+		isc_rollback_transaction(alt_vector, &database->dbb_meta_trans);
+		// Note: No message given if rollback fails
+	}
+
+	gds_trans = 0;
+}
+
+
+static void set_capabilities( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s e t _ c a p a b i l i t i e s
+ *
+ **************************************
+ *
+ * Functional description
+ *	Probe the database to determine
+ *	what metadata capabilities it has.
+ *	The table, rfr_table, in the static
+ *	data declarations has the relation
+ *	and field names, together with the
+ *	capabilities bits.
+ *
+ **************************************/
+	FB_API_HANDLE req = 0;
+
+	// Look for desireable fields in system relations
+
+	for (const rfr_tab_t* rel_field_table = rfr_table; rel_field_table->relation; rel_field_table++)
+	{
+		FOR(REQUEST_HANDLE req) x IN DB.RDB$RELATION_FIELDS
+			WITH x.RDB$RELATION_NAME = rel_field_table->relation
+				AND x.RDB$FIELD_NAME = rel_field_table->field
+
+            database->dbb_capabilities |= rel_field_table->bit_mask;
+		END_FOR
+		ON_ERROR
+			ERRQ_database_error(database, gds_status);
+		END_ERROR;
+	}
+
+	release_request(database, req);
+}
+
+
+static qli_dbb* setup_update( qli_dbb* database)
+{
+/**************************************
+ *
+ *	s e t u p _ u p d a t e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Get ready to do a meta data update.
+ *	If no database was specified, use the
+ *	most recently readied one.
+ *
+ **************************************/
+
+	if (!database)
+		database = QLI_databases;
+
+	MET_meta_transaction(database, true);
+
+	return database;
+}
+
+
+static void sql_grant_revoke( qli_syntax* node, USHORT type)
+{
+/*****************************************************
+ *
+ *	s q l _ g r a n t _ r e v o k e
+ *
+ *****************************************************
+ *
+ *	Build a DYN string for a SQL GRANT or REVOKE statement
+ *
+ *****************************************************/
+	const USHORT privileges = (IPTR) node->syn_arg[s_grant_privileges];
+	qli_rel* relation = (qli_rel*) node->syn_arg[s_grant_relation];
+	qli_dbb* database = setup_update(relation->rel_database);
+	relation->rel_database = database;
+	const TEXT* relation_name = relation->rel_symbol->sym_string;
+
+	qli_rlb* rlb = NULL;
+	CHECK_RLB(rlb);
+
+	STUFF(isc_dyn_version_1);
+	STUFF(isc_dyn_begin);
+
+	// For each user create a separate grant string
+	//      For each specified field create a separate grant string
+
+	qli_syntax* names = node->syn_arg[s_grant_users];
+	qli_syntax* fields = node->syn_arg[s_grant_fields];
+
+	qli_name** name = (qli_name**) names->syn_arg;
+	for (qli_name** const end = name + names->syn_count; name < end; name++)
+	{
+		if (fields->syn_count)
+		{
+		    qli_name** field = (qli_name**) fields->syn_arg;
+		    qli_name** const end_field = field + fields->syn_count;
+			for (; field < end_field; field++)
+			{
+				stuff_priv(rlb, type, relation_name, privileges,
+						   (*name)->nam_string, (*field)->nam_string);
+			}
+		}
+		else
+			stuff_priv(rlb, type, relation_name, privileges, (*name)->nam_string, NULL);
+	}
+
+	STUFF(isc_dyn_end);
+	STUFF(isc_dyn_eoc);
+
+	execute_dynamic_ddl(database, rlb);
+	MET_meta_commit(database);
+}
+
+
+static int truncate_string( TEXT* string)
+{
+/**************************************
+ *
+ *	t r u n c a t e _ s t r i n g
+ *
+ **************************************
+ *
+ * Functional description
+ *	Convert a blank filled string to
+ *	a null terminated string without
+ *	trailing blanks.  Because some
+ *	strings contain embedded blanks
+ *	(e.g. query headers & edit strings)
+ *	truncate from the back forward.
+ *	Return the number of characters found,
+ *	not including the terminating null.
+ *
+ **************************************/
+	const int len = fb_utils::name_length(string);
+	string[len] = 0;
+	return len;
+}
+
+
+static void stuff_priv(qli_rlb* rlb, USHORT type,
+					   const TEXT* relation, USHORT privileges, const TEXT* user, const TEXT* field)
+{
+/**************************************
+ *
+ *	s t u f f _ p r i v
+ *
+ **************************************
+ *
+ * Functional description
+ *	Stuff a privilege for grant/revoke.
+ *
+ **************************************/
+	CHECK_RLB(rlb);
+	STUFF(type);
+
+	// Stuff privileges first
+
+	USHORT priv_count = 0;
+	if (privileges & PRV_select)
+		priv_count++;
+	if (privileges & PRV_insert)
+		priv_count++;
+	if (privileges & PRV_delete)
+		priv_count++;
+	if (privileges & PRV_update)
+		priv_count++;
+
+	STUFF_WORD(priv_count);
+
+	if (privileges & PRV_select)
+		STUFF('S');
+
+	if (privileges & PRV_insert)
+		STUFF('I');
+
+	if (privileges & PRV_delete)
+		STUFF('D');
+
+	if (privileges & PRV_update)
+		STUFF('U');
+
+	STUFF(isc_dyn_rel_name);
+	STUFF_STRING(relation);
+
+	STUFF(isc_dyn_grant_user);
+	STUFF_STRING(user);
+
+	if (field)
+	{
+		STUFF(isc_dyn_fld_name);
+		STUFF_STRING(field);
+	}
+
+	if (privileges & PRV_grant_option)
+	{
+		STUFF(isc_dyn_grant_options);
+		STUFF_WORD(2);
+		STUFF_WORD(TRUE);
+	}
+
+	STUFF(isc_dyn_end);
+}
+

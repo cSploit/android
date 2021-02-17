@@ -1,0 +1,178 @@
+.TH SLAPINDEX 8C "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapindex \- Reindex entries in a SLAPD database
+.SH SYNOPSIS
+.B SBINDIR/slapindex
+[\c
+.BI \-b \ suffix\fR]
+[\c
+.BR \-c ]
+[\c
+.BI \-d \ debug-level\fR]
+[\c
+.BI \-f \ slapd.conf\fR]
+[\c
+.BI \-F \ confdir\fR]
+[\c
+.BR \-g ]
+[\c
+.BI \-n \ dbnum\fR]
+[\c
+.BI \-o \ option\fR[ = value\fR]]
+[\c
+.BR \-q ]
+[\c
+.BR \-t ]
+[\c
+.BR \-v ]
+[\c
+.IR attr [ ... ]]
+.B 
+.LP
+.SH DESCRIPTION
+.LP
+.B Slapindex
+is used to regenerate
+.BR slapd (8)
+indices based upon the current contents of a database.
+It opens the given database determined by the database number or
+suffix and updates the indices for all values of all attributes
+of all entries. If a list of specific attributes is provided
+on the command line, only the indices for those attributes will
+be regenerated.
+Databases configured as
+.B subordinate
+of this one are also re-indexed, unless \fB\-g\fP is specified.
+
+All files eventually created by
+.BR slapindex
+will belong to the identity
+.BR slapindex
+is run as, so make sure you either run
+.BR slapindex
+with the same identity
+.BR slapd (8)
+will be run as (see option
+.B \-u
+in
+.BR slapd (8)),
+or change file ownership before running
+.BR slapd (8).
+.SH OPTIONS
+.TP
+.BI \-b \ suffix
+Use the specified \fIsuffix\fR to determine which database to
+generate output for.  The \fB\-b\fP cannot be used in conjunction
+with the
+.B \-n
+option.
+.TP
+.B \-c
+enable continue (ignore errors) mode.
+.TP
+.BI \-d \ debug-level
+enable debugging messages as defined by the specified
+.IR debug-level ;
+see
+.BR slapd (8)
+for details.
+.TP
+.BI \-f \ slapd.conf
+specify an alternative
+.BR slapd.conf (5)
+file.
+.TP
+.BI \-F \ confdir
+specify a config directory.
+If both
+.B \-f
+and
+.B \-F
+are specified, the config file will be read and converted to
+config directory format and written to the specified directory.
+If neither option is specified, an attempt to read the
+default config directory will be made before trying to use the default
+config file. If a valid config directory exists then the
+default config file is ignored.
+.TP
+.B \-g
+disable subordinate gluing.  Only the specified database will be
+processed, and not its glued subordinates (if any).
+.TP
+.BI \-n \ dbnum
+Generate output for the \fIdbnum\fR-th database listed in the
+configuration file. The config database
+.BR slapd\-config (5),
+is always the first database, so use
+.B \-n 0
+
+The
+.B \-n
+cannot be used in conjunction with the
+.B \-b
+option.
+.TP
+.BI \-o \ option\fR[ = value\fR]
+Specify an
+.I option
+with a(n optional)
+.IR value .
+Possible generic options/values are:
+.LP
+.nf
+              syslog=<subsystems>  (see `\-s' in slapd(8))
+              syslog\-level=<level> (see `\-S' in slapd(8))
+              syslog\-user=<user>   (see `\-l' in slapd(8))
+
+.fi
+.TP
+.B \-q
+enable quick (fewer integrity checks) mode. Performs no consistency checks
+when writing the database. Improves indexing time,
+.B however
+the database will most likely be unusable if any errors or
+interruptions occur.
+.TP
+.B \-t
+enable truncate mode. Truncates (empties) an index database before indexing
+any entries. May only be used with Quick mode.
+.TP
+.B \-v
+enable verbose mode.
+.SH LIMITATIONS
+Your
+.BR slapd (8)
+should not be running (at least, not in read-write
+mode) when you do this to ensure consistency of the database.
+.LP
+This command provides ample opportunity for the user to obtain
+and drink their favorite beverage.
+.SH EXAMPLES
+To reindex your SLAPD database, give the command:
+.LP
+.nf
+.ft tt
+	SBINDIR/slapindex
+.ft
+.fi
+To regenerate the index for only a specific attribute, e.g. "uid",
+give the command:
+.LP
+.nf
+.ft tt
+	SBINDIR/slapindex uid
+.ft
+.fi
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR ldif (5),
+.BR slapadd (8),
+.BR ldapadd (1),
+.BR slapd (8)
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

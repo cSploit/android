@@ -1,0 +1,78 @@
+--- src/sqliteInt.h
++++ src/sqliteInt.h
+@@ -1460,7 +1460,6 @@
+   KeyInfo *pKeyInfo;  /* Collation and sort-order information */
+   u16 nField;         /* Number of entries in apMem[] */
+   u8 flags;           /* Boolean settings.  UNPACKED_... below */
+-  i64 rowid;          /* Used by UNPACKED_PREFIX_SEARCH */
+   Mem *aMem;          /* Values */
+ };
+ 
+@@ -1469,7 +1468,6 @@
+ */
+ #define UNPACKED_INCRKEY       0x01  /* Make this key an epsilon larger */
+ #define UNPACKED_PREFIX_MATCH  0x02  /* A prefix match is considered OK */
+-#define UNPACKED_PREFIX_SEARCH 0x04  /* Ignore final (rowid) field */
+ 
+ /*
+ ** Each SQL index is represented in memory by an
+--- src/vdbe.c
++++ src/vdbe.c
+@@ -3721,6 +3721,7 @@
+   Mem *aMx;
+   UnpackedRecord r;                  /* B-Tree index search key */
+   i64 R;                             /* Rowid stored in register P3 */
++  i64 rowid;                         /* Rowid found */
+ 
+   pIn3 = &aMem[pOp->p3];
+   aMx = &aMem[pOp->p4.i];
+@@ -3750,8 +3751,8 @@
+   if( pCrsr!=0 ){
+     /* Populate the index search key. */
+     r.pKeyInfo = pCx->pKeyInfo;
+-    r.nField = nField + 1;
+-    r.flags = UNPACKED_PREFIX_SEARCH;
++    r.nField = nField;
++    r.flags = UNPACKED_PREFIX_MATCH;
+     r.aMem = aMx;
+ #ifdef SQLITE_DEBUG
+     { int i; for(i=0; i<r.nField; i++) assert( memIsValid(&r.aMem[i]) ); }
+@@ -3765,10 +3766,14 @@
+     ** to P2. Otherwise, copy the rowid of the conflicting record to
+     ** register P3 and fall through to the next instruction.  */
+     rc = sqlite3BtreeMovetoUnpacked(pCrsr, &r, 0, 0, &pCx->seekResult);
+-    if( (r.flags & UNPACKED_PREFIX_SEARCH) || r.rowid==R ){
++    if( rc != SQLITE_OK || pCx->seekResult != 0 ){
+       pc = pOp->p2 - 1;
+-    }else{
+-      pIn3->u.i = r.rowid;
++    }else{ 
++      rc = sqlite3VdbeIdxRowid(db, pCrsr, &rowid);
++      if (rc == SQLITE_OK && rowid == R)
++        pc = pOp->p2 - 1;
++      else
++        pIn3->u.i = rowid;
+     }
+   }
+   break;
+--- src/vdbeaux.c
++++ src/vdbeaux.c
+@@ -3008,18 +3008,6 @@
+         rc = -rc;
+       }
+     
+-      /* If the PREFIX_SEARCH flag is set and all fields except the final
+-      ** rowid field were equal, then clear the PREFIX_SEARCH flag and set 
+-      ** pPKey2->rowid to the value of the rowid field in (pKey1, nKey1).
+-      ** This is used by the OP_IsUnique opcode.
+-      */
+-      if( (pPKey2->flags & UNPACKED_PREFIX_SEARCH) && i==(pPKey2->nField-1) ){
+-        assert( idx1==szHdr1 && rc );
+-        assert( mem1.flags & MEM_Int );
+-        pPKey2->flags &= ~UNPACKED_PREFIX_SEARCH;
+-        pPKey2->rowid = mem1.u.i;
+-      }
+-    
+       return rc;
+     }
+     i++;

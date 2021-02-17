@@ -1,0 +1,144 @@
+#! /bin/sh
+#
+# Test XA support.
+
+func_clean()
+{
+	rm -rf run
+	mkdir -p run/bin run/config run/data
+}
+
+# Debug the shell script.
+# set -x
+
+# Check to make sure we have a Tuxedo build we understand.
+test -z "$TUXDIR" && {
+	echo "FAIL: the TUXDIR environment variable NOT set"
+	echo \
+    "FAIL: TUXDIR must be set to the absolute path of the Tuxedo install"
+	echo "FAIL: immediately above the subdirectories bin, include and lib"
+	exit 1
+}
+dlist="include lib"
+for i in $dlist; do
+	test -d $TUXDIR/$i || {
+		echo "FAIL: check the Tuxedo install"
+		echo "FAIL: the required directory $TUXDIR/$i does not exist"
+		exit 1
+	}
+done
+flist="bin/buildclient bin/buildserver bin/buildtms bin/tmadmin bin/tmboot
+       bin/tmloadcf bin/tmshutdown udataobj/RM"
+for i in $flist; do
+	test -f $TUXDIR/$i || {
+		echo "FAIL: check the Tuxedo install"
+		echo "FAIL: the required file $TUXDIR/$i does not exist"
+		exit 1
+	}
+done
+
+# Set the location of the Berkeley DB libraries -- allow the user to override.
+# Check to make sure we have a Berkeley DB installation.  (I'd like to use the
+# local DB installation, but I've never been able to make Tuxedo load shared
+# libraries from the .libs directory.)
+REL=../../dist/RELEASE
+test -z "$DB_INSTALL" && test -f $REL && {
+	. $REL
+	DB_INSTALL=/usr/local/BerkeleyDB.${DB_VERSION_MAJOR}.${DB_VERSION_MINOR}
+	export DB_INSTALL
+}
+if test -f "$DB_INSTALL/lib/libdb.so"; then
+	echo "Using Berkeley DB $DB_INSTALL/lib/ installation"
+else
+	echo "FAIL: $DB_INSTALL/lib/libdb.so not found"
+	echo \
+  "FAIL: DB_INSTALL must be set to the absolute path of the Berkeley DB install"
+	exit 1
+fi
+
+# You may need to update the Tuxedo resource manager file.  It should be in:
+#
+#	$TUXDIR/udataobj/RM
+#
+# Solaris requires a line something like the following:
+#
+#	BERKELEY-DB:db_xa_switch:-L${DB_INSTALL}/lib -ldb
+#
+# where DB_INSTALL is a Berkeley DB install, and /lib contains DB libraries.
+egrep "^BERKELEY-DB:db_xa_switch:" $TUXDIR/udataobj/RM > /dev/null || {
+	echo "FAIL: $TUXDIR/udataobj/RM does not list DB as one of its RMs"
+	echo "FAIL: Try adding:"
+	echo "FAIL:	BERKELEY-DB:db_xa_switch:-L\${DB_INSTALL}/lib -ldb"
+	exit 1
+}
+
+RUN=`pwd`/run; export RUN
+
+FIELDTBLS32=datafml.fml;	export FIELDTBLS32
+FLDTBLDIR32=$RUN/config;	export FLDTBLDIR32
+TLOGDEVICE=$RUN/data/dlog;	export TLOGDEVICE
+TUXCONFIG=$RUN/config/tuxconfig;export TUXCONFIG
+APPDIR="$RUN/bin";		export APPDIR
+MACHINE_NAME=`uname -n`;	export MACHINE_NAME
+TLOGNAME="TLOG";		export TLOGNAME
+# Causes the TMS to call close before calling open
+#TUXWA4ORACLE=1;                        export TUXWA4ORACLE
+# TMTRACE will print each call done by the txn manager
+#TMTRACE=*:ulog:dye;            export TMTRACE
+# DVERBOSE will enable verbose output when set to 1
+#DVERBOSE=1;			export DVERBOSE	
+
+PATH="$RUN/bin:$TUXDIR/bin:$PATH"
+LD_LIBRARY_PATH=$DB_INSTALL/lib:$TUXDIR/lib:$LD_LIBRARY_PATH;
+export LD_LIBRARY_PATH PATH
+
+echo "TEST 1"
+func_clean 
+utilities/tuxconfig.sh 200103
+src1/run.sh
+if test "$?" -ne 0; then
+	exit 1
+fi
+echo "TEST 2"
+func_clean
+src2/tuxconfig.sh
+src2/run.sh
+if test "$?" -ne 0; then
+	exit 1
+fi
+echo "TEST 3"
+# multi threaded test
+func_clean
+utilities/multi_tuxconfig.sh 200104
+src3/run.sh 0
+if test "$?" -ne 0; then
+	exit 1
+fi
+# multi threaded test where one thread dies
+func_clean
+utilities/tuxconfig.sh 200105
+src3/run.sh 1
+if test "$?" -ne 0; then
+	exit 1
+fi
+echo "TEST 4"
+# multi threaded test
+func_clean 
+utilities/multi_tuxconfig.sh 200103
+src4/run.sh 0
+if test "$?" -ne 0; then
+	exit 1
+fi
+echo "TEST 5"
+# MVCC tests.
+for i in {0..2}
+do
+    func_clean 
+    utilities/multi_1thr_tuxconfig.sh $((200106 + $i))
+    src5/run.sh $i
+    if test "$?" -ne 0; then
+	exit 1
+    fi
+done
+
+exit 0

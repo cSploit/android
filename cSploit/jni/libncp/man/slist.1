@@ -1,0 +1,47 @@
+.TH SLIST 1 01/07/1996 slist slist
+.SH NAME
+slist \- Lists available NetWare Servers
+.SH SYNOPSIS
+.B slist
+[
+.I pattern
+]
+.SH DESCRIPTION
+.B slist
+lists all NetWare Servers available in your network.
+
+If slist does not print to a tty, the decorative header line is not
+printed, so that you can count the servers on your network by doing 
+
+slist | wc -l
+
+
+.SH OPTIONS
+.B pattern
+.RS 3
+.B pattern
+is used to list only servers whose names match the specified pattern. For a
+server to be listed, the pattern must match the full server name. You can use
+wildcards for the pattern, but you must protect these wildcards from any
+command line expansion by quoting. Case doesn't matter.
+.RE
+
+.SH EXAMPLE
+.TP
+slist "I*"
+.TP
+or
+.TP
+slist "i*"
+List all available Netware servers on your Network, that begin with an "I".
+
+
+.SH SEE ALSO
+.B ncpmount(8), ncpumount(8), pqlist(1), nprint(1) 
+
+.SH CREDITS
+slist was written by Volker Lendecke (lendecke@math.uni-goettingen.de)
+
+.SH BUGS
+\fBslist\fP works only in \fIIPX\fP environment, as it uses \fISAP\fP to
+find first server and then \fIBindery\fP to get list of servers.

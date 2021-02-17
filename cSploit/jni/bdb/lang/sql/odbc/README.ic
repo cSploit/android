@@ -1,0 +1,51 @@
+------------------------------------------------------------------
+ How to compile Win32 SQLite3 ODBC driver with the Intel-Compiler
+------------------------------------------------------------------
+
+This HOWTO was written by Gunter Hinrichsen <frontier.user@gmx.net>
+
+
+Read first the README section "Build instructions for MS Visual C++ 6.0:".
+Some easy changes have to be made to compile SQLite3 ODBC driver under Intel-
+Compiler environment. You have to replace some options in the two make files.
+Of course you can add at advanced Intel-Compiler optimize options, too.
+
+sqlite3.mak:
+------------
+- Replace in "BCC" the "cl" by "icl".
+Old: "BCC = cl -Gs -GX -D_WIN32 -nologo -Zi"
+New: "BCC = icl -Gs -GX -D_WIN32 -nologo -Zi"
+
+- Replace in "TCC" the "cl" by "icl".
+Old: "TCC = cl -Gs -GX -D_WIN32 -DOS_WIN=1 -nologo -Zi"
+New: "TCC = icl -Gs -GX -D_WIN32 -DOS_WIN=1 -nologo -Zi"
+
+- Replace in the "sqlite3.dll:" section "link" by "xilink".
+Old: "xilink -release -nodefaultlib -dll msvcrt.lib kernel32.lib \"
+New: "link -release -nodefaultlib -dll msvcrt.lib kernel32.lib \"
+
+- Add in the "xilink" comando line the lib "libircmt.lib".
+Old: "xilink -release -nodefaultlib -dll msvcrt.lib kernel32.lib \"
+New: "link -release -nodefaultlib -dll msvcrt.lib kernel32.lib libircmt.lib \"
+
+sqlite3odbc.mak:
+----------------
+- Replace in "CC" the "cl" by "icl".
+Old: "CC=cl"
+New: "CC=icl"
+
+- Replace in "LN" the "link" by "xilink".
+Old: "LN=link"
+New: "LN=xilink"
+
+- Add in "DLLLIBS" the lib "libircmt.lib".
+Old: "DLLLIBS=	msvcrt.lib odbccp32.lib kernel32.lib \"
+New: "DLLLIBS=	msvcrt.lib odbccp32.lib kernel32.lib libircmt.lib \"
+
+
+
+-------------------------------------
+Start the Intel Environment. You can find the Environment in the start-menu:
+"Intel(R) Software Development Tools/Intel(R) C++ Compiler 9.1/Build Environment for IA-32 applications"
+Now compile with: 
+nmake -f sqlite3odbc.mak

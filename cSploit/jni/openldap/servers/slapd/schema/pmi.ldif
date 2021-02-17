@@ -1,0 +1,123 @@
+# OpenLDAP X.509 PMI schema
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+## Portions Copyright (C) The Internet Society (1997-2006).
+## All Rights Reserved.
+#
+# Includes LDAPv3 schema items from:
+# ITU X.509 (08/2005)
+#
+# This file was automatically generated from pmi.schema; see that file
+# for complete references.
+#
+dn: cn=pmi,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: pmi
+olcObjectIdentifier: {0}id-oc-pmiUser 2.5.6.24
+olcObjectIdentifier: {1}id-oc-pmiAA 2.5.6.25
+olcObjectIdentifier: {2}id-oc-pmiSOA 2.5.6.26
+olcObjectIdentifier: {3}id-oc-attCertCRLDistributionPts 2.5.6.27
+olcObjectIdentifier: {4}id-oc-privilegePolicy 2.5.6.32
+olcObjectIdentifier: {5}id-oc-pmiDelegationPath 2.5.6.33
+olcObjectIdentifier: {6}id-oc-protectedPrivilegePolicy 2.5.6.34
+olcObjectIdentifier: {7}id-at-attributeCertificate 2.5.4.58
+olcObjectIdentifier: {8}id-at-attributeCertificateRevocationList 2.5.4.59
+olcObjectIdentifier: {9}id-at-aACertificate 2.5.4.61
+olcObjectIdentifier: {10}id-at-attributeDescriptorCertificate 2.5.4.62
+olcObjectIdentifier: {11}id-at-attributeAuthorityRevocationList 2.5.4.63
+olcObjectIdentifier: {12}id-at-privPolicy 2.5.4.71
+olcObjectIdentifier: {13}id-at-role 2.5.4.72
+olcObjectIdentifier: {14}id-at-delegationPath 2.5.4.73
+olcObjectIdentifier: {15}id-at-protPrivPolicy 2.5.4.74
+olcObjectIdentifier: {16}id-at-xMLPrivilegeInfo 2.5.4.75
+olcObjectIdentifier: {17}id-at-xMLPprotPrivPolicy 2.5.4.76
+olcObjectIdentifier: {18}id-mr 2.5.13
+olcObjectIdentifier: {19}id-mr-attributeCertificateMatch id-mr:42
+olcObjectIdentifier: {20}id-mr-attributeCertificateExactMatch id-mr:45
+olcObjectIdentifier: {21}id-mr-holderIssuerMatch id-mr:46
+olcObjectIdentifier: {22}id-mr-authAttIdMatch id-mr:53
+olcObjectIdentifier: {23}id-mr-roleSpecCertIdMatch id-mr:54
+olcObjectIdentifier: {24}id-mr-basicAttConstraintsMatch id-mr:55
+olcObjectIdentifier: {25}id-mr-delegatedNameConstraintsMatch id-mr:56
+olcObjectIdentifier: {26}id-mr-timeSpecMatch id-mr:57
+olcObjectIdentifier: {27}id-mr-attDescriptorMatch id-mr:58
+olcObjectIdentifier: {28}id-mr-acceptableCertPoliciesMatch id-mr:59
+olcObjectIdentifier: {29}id-mr-delegationPathMatch id-mr:61
+olcObjectIdentifier: {30}id-mr-sOAIdentifierMatch id-mr:66
+olcObjectIdentifier: {31}id-mr-indirectIssuerMatch id-mr:67
+olcObjectIdentifier: {32}AttributeCertificate 1.3.6.1.4.1.4203.666.11.10.2.1
+olcObjectIdentifier: {33}CertificateList 1.3.6.1.4.1.1466.115.121.1.9
+olcObjectIdentifier: {34}AttCertPath 1.3.6.1.4.1.4203.666.11.10.2.4
+olcObjectIdentifier: {35}PolicySyntax 1.3.6.1.4.1.4203.666.11.10.2.5
+olcObjectIdentifier: {36}RoleSyntax 1.3.6.1.4.1.4203.666.11.10.2.6
+olcLdapSyntaxes: {0}( 1.3.6.1.4.1.4203.666.11.10.2.4 DESC 'X.509 PMI attribute
+  cartificate path: SEQUENCE OF AttributeCertificate' X-SUBST '1.3.6.1.4.1.146
+ 6.115.121.1.15' )
+olcLdapSyntaxes: {1}( 1.3.6.1.4.1.4203.666.11.10.2.5 DESC 'X.509 PMI policy sy
+ ntax' X-SUBST '1.3.6.1.4.1.1466.115.121.1.15' )
+olcLdapSyntaxes: {2}( 1.3.6.1.4.1.4203.666.11.10.2.6 DESC 'X.509 PMI role synt
+ ax' X-SUBST '1.3.6.1.4.1.1466.115.121.1.15' )
+olcAttributeTypes: {0}( id-at-role NAME 'role' DESC 'X.509 Role attribute, use
+  ;binary' SYNTAX RoleSyntax )
+olcAttributeTypes: {1}( id-at-xMLPrivilegeInfo NAME 'xmlPrivilegeInfo' DESC 'X
+ .509 XML privilege information attribute' SYNTAX 1.3.6.1.4.1.1466.115.121.1.1
+ 5 )
+olcAttributeTypes: {2}( id-at-attributeCertificate NAME 'attributeCertificateA
+ ttribute' DESC 'X.509 Attribute certificate attribute, use ;binary' EQUALITY 
+ attributeCertificateExactMatch SYNTAX AttributeCertificate )
+olcAttributeTypes: {3}( id-at-aACertificate NAME 'aACertificate' DESC 'X.509 A
+ A certificate attribute, use ;binary' EQUALITY attributeCertificateExactMatch
+  SYNTAX AttributeCertificate )
+olcAttributeTypes: {4}( id-at-attributeDescriptorCertificate NAME 'attributeDe
+ scriptorCertificate' DESC 'X.509 Attribute descriptor certificate attribute, 
+ use ;binary' EQUALITY attributeCertificateExactMatch SYNTAX AttributeCertific
+ ate )
+olcAttributeTypes: {5}( id-at-attributeCertificateRevocationList NAME 'attribu
+ teCertificateRevocationList' DESC 'X.509 Attribute certificate revocation lis
+ t attribute, use ;binary' SYNTAX CertificateList X-EQUALITY 'certificateListE
+ xactMatch, not implemented yet' )
+olcAttributeTypes: {6}( id-at-attributeAuthorityRevocationList NAME 'attribute
+ AuthorityRevocationList' DESC 'X.509 AA certificate revocation list attribute
+ , use ;binary' SYNTAX CertificateList X-EQUALITY 'certificateListExactMatch, 
+ not implemented yet' )
+olcAttributeTypes: {7}( id-at-delegationPath NAME 'delegationPath' DESC 'X.509
+  Delegation path attribute, use ;binary' SYNTAX AttCertPath )
+olcAttributeTypes: {8}( id-at-privPolicy NAME 'privPolicy' DESC 'X.509 Privile
+ ge policy attribute, use ;binary' SYNTAX PolicySyntax )
+olcAttributeTypes: {9}( id-at-protPrivPolicy NAME 'protPrivPolicy' DESC 'X.509
+  Protected privilege policy attribute, use ;binary' EQUALITY attributeCertifi
+ cateExactMatch SYNTAX AttributeCertificate )
+olcAttributeTypes: {10}( id-at-xMLPprotPrivPolicy NAME 'xmlPrivPolicy' DESC 'X
+ .509 XML Protected privilege policy attribute' SYNTAX 1.3.6.1.4.1.1466.115.12
+ 1.1.15 )
+olcObjectClasses: {0}( id-oc-pmiUser NAME 'pmiUser' DESC 'X.509 PMI user objec
+ t class' SUP top AUXILIARY MAY attributeCertificateAttribute )
+olcObjectClasses: {1}( id-oc-pmiAA NAME 'pmiAA' DESC 'X.509 PMI AA object clas
+ s' SUP top AUXILIARY MAY ( aACertificate $ attributeCertificateRevocationList
+  $ attributeAuthorityRevocationList ) )
+olcObjectClasses: {2}( id-oc-pmiSOA NAME 'pmiSOA' DESC 'X.509 PMI SOA object c
+ lass' SUP top AUXILIARY MAY ( attributeCertificateRevocationList $ attributeA
+ uthorityRevocationList $ attributeDescriptorCertificate ) )
+olcObjectClasses: {3}( id-oc-attCertCRLDistributionPts NAME 'attCertCRLDistrib
+ utionPt' DESC 'X.509 Attribute certificate CRL distribution point object clas
+ s' SUP top AUXILIARY MAY ( attributeCertificateRevocationList $ attributeAuth
+ orityRevocationList ) )
+olcObjectClasses: {4}( id-oc-pmiDelegationPath NAME 'pmiDelegationPath' DESC '
+ X.509 PMI delegation path' SUP top AUXILIARY MAY delegationPath )
+olcObjectClasses: {5}( id-oc-privilegePolicy NAME 'privilegePolicy' DESC 'X.50
+ 9 Privilege policy object class' SUP top AUXILIARY MAY privPolicy )
+olcObjectClasses: {6}( id-oc-protectedPrivilegePolicy NAME 'protectedPrivilege
+ Policy' DESC 'X.509 Protected privilege policy object class' SUP top AUXILIAR
+ Y MAY protPrivPolicy )

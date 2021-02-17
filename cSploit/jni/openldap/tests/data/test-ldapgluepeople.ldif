@@ -1,0 +1,28 @@
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: uid=bjorn,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Bjorn Jensen
+sn: Jensen
+uid: bjorn
+userPassword:: Ympvcm4=
+mail: bjorn@example.com
+
+dn: uid=bjensen,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Barbara Jensen
+sn: Jensen
+uid: bjensen
+userPassword:: YmplbnNlbg==
+mail: bjensen@example.com
+
+dn: uid=proxy,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Proxy
+sn: Proxy
+uid: proxy
+userPassword:: cHJveHk=
+authzTo: dn:*
+

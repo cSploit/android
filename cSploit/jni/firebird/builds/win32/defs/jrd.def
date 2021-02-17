@@ -1,0 +1,137 @@
+;  The contents of this file are subject to the Interbase Public
+;  License Version 1.0 (the "License"); you may not use this file
+;  except in compliance with the License. You may obtain a copy
+;  of the License at http://www.Inprise.com/IPL.html
+; 
+;  Software distributed under the License is distributed on an
+;  "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+;  or implied. See the License for the specific language governing
+;  rights and limitations under the License.
+; 
+;  The Original Code was created by Inprise Corporation
+;  and its predecessors. Portions created by Inprise Corporation are
+;  Copyright (C) Inprise Corporation.
+; 
+;  All Rights Reserved.
+;  Contributor(s): ______________________________________.
+;------------------------------------------------------------
+;  JRD DLL MODULE DEFINITION FILE
+;------------------------------------------------------------
+
+LIBRARY     JRD
+
+DESCRIPTION 'JRD INTERBASE MODULE'
+CODE MOVEABLE
+DATA MOVEABLE
+SEGMENTS
+        _TEXT           DISCARDABLE
+        AIL_TEXT        DISCARDABLE
+        ALL_TEXT        DISCARDABLE
+        BKM_TEXT        DISCARDABLE
+        BLB_TEXT        DISCARDABLE
+        BTR_TEXT        DISCARDABLE
+        BUILTIN_TEXT    DISCARDABLE
+        BLF_TEXT        DISCARDABLE
+        CCH_TEXT        DISCARDABLE
+        CMP_TEXT        DISCARDABLE
+        CVT_TEXT        DISCARDABLE
+        CVT2_TEXT       DISCARDABLE
+        DFW_TEXT        DISCARDABLE
+        DPM_TEXT        DISCARDABLE
+        DYN_TEXT        DISCARDABLE
+        DYN_DEF_TEXT    DISCARDABLE
+        DYN_DEL_TEXT    DISCARDABLE
+        DYN_MOD_TEXT    DISCARDABLE
+        ERR_TEXT        DISCARDABLE
+        EVL_TEXT        DISCARDABLE
+        EXE_TEXT        DISCARDABLE
+        EXT_TEXT        DISCARDABLE
+        FILTERS_TEXT    DISCARDABLE
+        FLU_TEXT        PRELOAD
+        FUN_TEXT        DISCARDABLE
+        GRANT_TEXT      DISCARDABLE
+        IBERR_TEXT      DISCARDABLE
+        IDX_TEXT        DISCARDABLE
+        INF_TEXT        DISCARDABLE
+        INI_TEXT        DISCARDABLE
+        INTL_TEXT       DISCARDABLE
+        INUSE_TEXT      DISCARDABLE
+        JRD_TEXT        DISCARDABLE
+        JRDWEP_TEXT     PRELOAD
+        LCK_TEXT        DISCARDABLE
+        LOG_TEXT        DISCARDABLE
+        MET_TEXT        DISCARDABLE
+        MISC_TEXT       DISCARDABLE
+        MOV_TEXT        DISCARDABLE
+        NAV_TEXT        DISCARDABLE
+        OPT_TEXT        DISCARDABLE
+        PAG_TEXT        DISCARDABLE
+        PAR_TEXT        DISCARDABLE
+        PCMET_TEXT      DISCARDABLE
+        PCSLEEP_TEXT    DISCARDABLE
+        PWD_TEXT        DISCARDABLE
+        QATEST_TEXT     DISCARDABLE
+        RLCK_TEXT       DISCARDABLE
+        RNG_TEXT        DISCARDABLE
+        RSE_TEXT        DISCARDABLE
+        SBM_TEXT        DISCARDABLE
+        SCH_TEXT        DISCARDABLE
+        SCL_TEXT        DISCARDABLE
+        SDW_TEXT        DISCARDABLE
+        SHUT_TEXT       DISCARDABLE
+        SORT_TEXT       DISCARDABLE
+        SQZ_TEXT        DISCARDABLE
+        SVC_TEXT        DISCARDABLE
+        SYM_TEXT        DISCARDABLE
+        TPC_TEXT        DISCARDABLE
+        TRA_TEXT        DISCARDABLE
+        VAL_TEXT        DISCARDABLE
+        VIO_TEXT        DISCARDABLE
+        WINDOWS_TEXT    DISCARDABLE
+        FILESERV_TEXT   PRELOAD
+        DLLSHELL_TEXT   PRELOAD
+        LOCK_TEXT       DISCARDABLE
+EXPORTS
+; JRD.C
+		_jrd8_unwind_request            @302
+		_jrd8_transaction_info          @303
+		_jrd8_start_transaction         @304
+		_jrd8_start_request             @305
+		_jrd8_start_and_send            @306
+		_jrd8_send                      @307
+		_jrd8_seek_blob                 @308
+		_jrd8_rollback_transaction      @309
+		_jrd8_request_info              @310
+		_jrd8_release_request           @311
+		_jrd8_reconnect_transaction     @312
+		_jrd8_receive                   @313
+		_jrd8_que_events                @314
+		_jrd8_put_slice                 @315
+		_jrd8_put_segment               @316
+		_jrd8_prepare_transaction       @317
+		_jrd8_open_blob2                @318
+		_jrd8_get_slice                 @319
+		_jrd8_get_segment               @320
+		_jrd8_detach_database           @321
+		_jrd8_ddl                       @322
+		_jrd8_database_info             @323
+		_jrd8_create_database           @324
+		_jrd8_create_blob2              @325
+		_jrd8_compile_request           @326
+		_jrd8_commit_retaining          @327
+		_jrd8_commit_transaction        @328
+		_jrd8_close_blob                @329
+		_jrd8_cancel_events             @330
+		_jrd8_cancel_blob               @331
+		_jrd8_blob_info                 @332
+		_jrd8_attach_database           @333
+		_jrd8_query_service             @334
+		_jrd8_detach_service            @335
+		_jrd8_attach_service            @336
+		_jrd8_drop_database             @337
+		_jrd8_transact_request          @338
+		_jrd8_start_multiple            @339
+
+;-------------------------------------------
+		WEP                            @1   RESIDENTNAME
+

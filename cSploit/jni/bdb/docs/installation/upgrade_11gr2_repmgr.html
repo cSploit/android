@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Support for Multiple Client-to-Client Peers</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_11gr2_toc.html" title="Chapter 13.  Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0" />
+    <link rel="prev" href="upgrade_11gr2_autoinit.html" title="DB_REP_CONF_NOAUTOINIT Replaced" />
+    <link rel="next" href="build_unix_encrypt.html" title="Cryptography Support" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Support for Multiple Client-to-Client Peers</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="upgrade_11gr2_autoinit.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 13. 
+        Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="build_unix_encrypt.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="upgrade_11gr2_repmgr"></a>Support for Multiple Client-to-Client Peers</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+A Berkeley DB Replication Manager application can now designate one or more
+remote sites (called its "peers") to receive client-to-client requests.
+</p>
+      <p>
+In previous releases, there could be only one peer at a time. If you
+called the <code class="literal">DB_ENV-&gt;repmgr_add_remote_site</code> method specifying
+site "A" as a peer and you made another call specifying site "B" as a peer,
+site "B" would become the only peer, and site "A" would no longer be a peer.
+</p>
+      <p>
+Starting with Berkeley DB 11gR2, the same sequence of calls results in both
+site "A" and site "B" being possible peers. Replication Manager may select
+any of a site's possible peers to use for client-to-client requests. If the
+first peer that the Replication Manager selects cannot be used (for example, it is
+unavailable or it is the current master), Replication Manager attempts to
+use a different peer if there is more than one peer.
+</p>
+      <p>
+To get the pre-11gR2 peer behavior in this example, you must
+make an additional call to the <code class="literal">DB_ENV-&gt;repmgr_add_remote_site</code> method,
+specifying site "A" and a flag value that excludes the <code class="literal">DB_REPMGR_PEER</code>
+bit value to remove site "A" as a possible peer.
+</p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="upgrade_11gr2_autoinit.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_11gr2_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="build_unix_encrypt.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_REP_CONF_NOAUTOINIT Replaced </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Cryptography Support</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Repmgr Message Channels</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_52_toc.html" title="Chapter 11.  Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2" />
+    <link rel="prev" href="upgrade_11gr2_52_rep_sql.html" title="Enabling Replication in the SQL Layer" />
+    <link rel="next" href="upgrade_11gr2_52_seq_sql.html" title="Sequence Support in the SQL Layer" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Repmgr Message Channels </th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="upgrade_11gr2_52_rep_sql.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 11. 
+        Upgrading Berkeley DB 11.2.5.1 applications to Berkeley DB 11.2.5.2
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="upgrade_11gr2_52_seq_sql.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="upgrade_11gr2_52_repmgr_channels"></a>Repmgr Message Channels </h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="upgrade_11gr2_52_repmgr_channels.html#idp51165040">New Functions</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        Application components running at various sites within a
+        replication group can now use the Replication Manager's existing
+        TCP/IP communications infrastructure to send and process messages
+        among themselves, using the <code class="literal">DB_CHANNEL</code> handle.
+        <a href="../api_reference/C/repmgr_channel.html" class="olink">DB_ENV-&gt;repmgr_channel()</a> is used to create the
+        <code class="literal">DB_CHANNEL</code> handle.  <a href="../api_reference/C/dbchannel_send_msg.html" class="olink">DB_CHANNEL-&gt;send_msg()</a> and
+        <a href="../api_reference/C/dbchannel_send_request.html" class="olink">DB_CHANNEL-&gt;send_request()</a> are used to send sychronous and
+        asychronous messages that are handled by the function set by
+        <a href="../api_reference/C/repmgr_msg_dispatch.html" class="olink">DB_ENV-&gt;repmgr_msg_dispatch()</a>.  <a href="../api_reference/C/dbchannel_set_timeout.html" class="olink">DB_CHANNEL-&gt;set_timeout()</a> is used to
+        configure channel time out, and <a href="../api_reference/C/dbchannel_close.html" class="olink">DB_CHANNEL-&gt;close()</a> closes the
+        channel and frees resources held by it.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp51165040"></a>New Functions</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <a href="../api_reference/C/repmgr_msg_dispatch.html" class="olink">DB_ENV-&gt;repmgr_msg_dispatch()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/repmgr_channel.html" class="olink">DB_ENV-&gt;repmgr_channel()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/dbchannel_send_msg.html" class="olink">DB_CHANNEL-&gt;send_msg()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/dbchannel_send_request.html" class="olink">DB_CHANNEL-&gt;send_request()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/dbchannel_set_timeout.html" class="olink">DB_CHANNEL-&gt;set_timeout()</a>
+            </li>
+            <li>
+              <a href="../api_reference/C/dbchannel_close.html" class="olink">DB_CHANNEL-&gt;close()</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="upgrade_11gr2_52_rep_sql.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_52_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="upgrade_11gr2_52_seq_sql.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Enabling Replication in the SQL Layer  </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Sequence Support in the SQL Layer</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

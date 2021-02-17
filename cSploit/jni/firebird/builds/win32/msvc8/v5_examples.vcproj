@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding = "Windows-1252"?>
+<VisualStudioProject
+	ProjectType="Visual C++"
+	Version="7.00"
+	Name="v5_examples"
+	SccProjectName=""
+	SccLocalPath="">
+	<Platforms>
+		<Platform
+			Name="Win32"/>
+	</Platforms>
+	<Configurations>
+		<Configuration
+			Name="Release|Win32"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/EHc- "
+				Optimization="4"
+				GlobalOptimizations="TRUE"
+				InlineFunctionExpansion="1"
+				EnableIntrinsicFunctions="TRUE"
+				FavorSizeOrSpeed="1"
+				AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen,../../../src/jrd"
+				PreprocessorDefinitions="GPRE_FORTRAN,GPRE_PASCAL,GPRE_COBOL,GPRE_ADA,NDEBUG,_CONSOLE,SUPERCLIENT,WIN32"
+				BrowseInformation="1"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies="odbc32.lib odbccp32.lib"
+				LinkIncremental="1"
+				SubSystem="1"/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="3082"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+		<Configuration
+			Name="Debug|Win32"
+			ConfigurationType="1"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="FALSE"
+			CharacterSet="2">
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="0"
+				AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen,../../../src/jrd"
+				PreprocessorDefinitions="GPRE_FORTRAN,GPRE_PASCAL,GPRE_COBOL,GPRE_ADA,_DEBUG,_CONSOLE,SUPERCLIENT,WIN32,DEV_BUILD"
+				BrowseInformation="1"/>
+			<Tool
+				Name="VCCustomBuildTool"/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies="odbc32.lib odbccp32.lib"
+				LinkIncremental="2"
+				SubSystem="1"/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\..\..\..\temp\debug\v5_examples/v5_examples.tlb"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"/>
+			<Tool
+				Name="VCPreBuildEventTool"/>
+			<Tool
+				Name="VCPreLinkEventTool"/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="3082"/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
+		</Configuration>
+	</Configurations>
+	<Files>
+		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+			<File
+				RelativePath="..\..\..\gen\$(PlatformName)\v5_examples\empbuild.c">
+			</File>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl">
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
+		</Filter>
+	</Files>
+	<Globals>
+	</Globals>
+</VisualStudioProject>

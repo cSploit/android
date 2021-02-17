@@ -1,0 +1,395 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+echo "Using $RELAY backend..."
+echo ""
+
+echo "Starting slapd on TCP/IP port $PORT1..."
+echo "======== Starting slapd with $RELAY backend ========" >> $LOG1
+. $CONFFILTER $BACKEND $MONITORDB < $RELAYCONF > $CONF1
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING >> $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID"
+
+sleep 1
+
+echo "Using ldapsearch to check that slapd is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT1 \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapadd to populate the database..."
+$LDAPADD -D "$MANAGERDN" -h $LOCALHOST -p $PORT1 -w $PASSWD < \
+	$LDIFORDERED > $TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+cat /dev/null > $SEARCHOUT
+
+BASEDN="dc=example,dc=com"
+echo "Searching base=\"$BASEDN\"..."
+echo "# searching base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+BASEDN="o=Example,c=US"
+echo "Searching base=\"$BASEDN\"..."
+echo "# searching base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+BASEDN="o=Esempio,c=IT"
+echo "Searching base=\"$BASEDN\"..."
+echo "# searching base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+BASEDN="o=Beispiel,c=DE"
+echo "Searching base=\"$BASEDN\"..."
+echo "# searching base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#
+# Do some modifications
+#
+
+BASEDN="o=Beispiel,c=DE"
+echo "Modifying database \"$BASEDN\"..."
+$LDAPMODIFY -v -D "cn=Manager,$BASEDN" -h $LOCALHOST -p $PORT1 -w $PASSWD \
+	-M >> $TESTOUT 2>&1 << EOMODS
+dn: cn=Added User,ou=Alumni Association,ou=People,$BASEDN
+changetype: add
+objectClass: OpenLDAPperson
+cn: Added User
+sn: User
+uid: auser
+seealso: cn=All Staff,ou=Groups,$BASEDN
+homephone: +49 1234567890
+drink: Beer
+mail: auser@mail.alumni.example.com
+telephonenumber: +49 1234-567-890
+description: Just added in o=Beispiel,c=DE naming context
+
+dn: cn=Ursula Hampster,ou=Alumni Association,ou=People,$BASEDN
+changetype: modify
+add: seeAlso
+seeAlso: cn=Ursula Hampster,ou=Alumni Association,ou=People,$BASEDN
+-
+add: description
+description: Just added self to seeAlso in $BASEDN virtual naming context
+-
+
+dn: cn=Mark Elliot,ou=Alumni Association,ou=People,$BASEDN
+changetype: delete
+
+dn: cn=John Doe,ou=Information Technology Division,ou=People,$BASEDN
+changetype: modrdn
+newrdn: cn=John P. Doe
+deleteoldrdn: 1
+
+dn: cn=Jane Doe,ou=Alumni Association,ou=People,$BASEDN
+changetype: modrdn
+newrdn: cn=Jane Q. Doe
+deleteoldrdn: 1
+newsuperior: ou=Information Technology Division,ou=People,$BASEDN
+
+dn: cn=Jane Q. Doe,ou=Information Technology Division,ou=People,$BASEDN
+changetype: modify
+add: cn
+cn: Jane Qissapaolo Doe
+-
+# This operation (delete of DN-valued attribute) triggered ITS#3498
+delete: seeAlso
+-
+
+dn: cn=Jane Q. Doe,ou=Information Technology Division,ou=People,$BASEDN
+changetype: modify
+add: seeAlso
+seeAlso: cn=All Staff,ou=Groups,$BASEDN
+-
+
+dn: ou=Referrals,$BASEDN
+changetype: add
+objectclass: referral
+objectclass: extensibleObject
+ou: Referrals
+ref: ldap://localhost.localdomain/ou=Referrals,$BASEDN
+description: Just added as ldap://localhost.localdomain:389/ou=Referrals,$BASEDN
+
+dn: ou=Referrals,$BASEDN
+changetype: modify
+replace: ref
+ref: ldap://localhost:9012/ou=Referrals,$BASEDN
+-
+add: description
+description: ...and modified as ldap://localhost:9012/ou=Referrals,$BASEDN
+-
+EOMODS
+
+RC=$?
+if test $RC != 0 ; then
+	echo "Modify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+BASEDN="o=Example,c=US"
+echo "Modifying database \"$BASEDN\"..."
+$LDAPMODIFY -v -D "cn=Manager,$BASEDN" -h $LOCALHOST -p $PORT1 -w $PASSWD \
+	-M >> $TESTOUT 2>&1 << EOMODS
+# These operations (updates with objectClass mapping) triggered ITS#3499
+dn: cn=Added Group,ou=Groups,$BASEDN
+changetype: add
+objectClass: groupOfNames
+objectClass: uidObject
+cn: Added Group
+member: cn=Added Group,ou=Groups,$BASEDN
+uid: added
+
+dn: cn=Another Added Group,ou=Groups,$BASEDN
+changetype: add
+objectClass: groupOfNames
+cn: Another Added Group
+member: cn=Added Group,ou=Groups,$BASEDN
+member: cn=Another Added Group,ou=Groups,$BASEDN
+
+dn: cn=Another Added Group,ou=Groups,$BASEDN
+changetype: modify
+add: objectClass
+objectClass: uidObject
+-
+add: uid
+uid: added
+-
+
+dn: cn=Added Group,ou=Groups,$BASEDN
+changetype: modify
+delete: objectClass
+objectClass: uidObject
+-
+delete: uid
+-
+EOMODS
+
+RC=$?
+if test $RC != 0 ; then
+	echo "Modify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Searching base=\"$BASEDN\"..."
+echo "# searching base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+BASEDN="o=Esempio,c=IT"
+echo "Searching base=\"$BASEDN\"..."
+echo "# searching base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+FILTER="(objectClass=referral)"
+echo "Searching filter=\"$FILTER\""
+echo "	attrs=\"'*' ref\""
+echo "# searching filter=\"$FILTER\"" >> $SEARCHOUT
+echo "# 	attrs=\"'*' ref\"" >> $SEARCHOUT
+
+BASEDN="dc=example,dc=com"
+echo "	base=\"$BASEDN\"..."
+echo "# 	base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" -M "$FILTER" '*' ref \
+	>> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+BASEDN="o=Example,c=US"
+echo "	base=\"$BASEDN\"..."
+echo "# 	base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" -M "$FILTER" '*' ref \
+	>> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+BASEDN="o=Esempio,c=IT"
+echo "	base=\"$BASEDN\"..."
+echo "# 	base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" -M "$FILTER" '*' ref \
+	>> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+BASEDN="o=Example,c=US"
+FILTER="(seeAlso=cn=all staff,ou=Groups,$BASEDN)"
+echo "Searching filter=\"$FILTER\""
+echo "	attrs=\"seeAlso\""
+echo "	base=\"$BASEDN\"..."
+echo "# searching filter=\"$FILTER\"" >> $SEARCHOUT
+echo "# 	attrs=\"seeAlso\"" >> $SEARCHOUT
+echo "# 	base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" "$FILTER" seeAlso \
+	>> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+FILTER="(uid=example)"
+echo "Searching filter=\"$FILTER\""
+echo "	attrs=\"uid\""
+echo "	base=\"$BASEDN\"..."
+echo "# searching filter=\"$FILTER\"" >> $SEARCHOUT
+echo "# 	attrs=\"uid\"" >> $SEARCHOUT
+echo "# 	base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" "$FILTER" uid \
+	>> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+FILTER="(member=cn=Another Added Group,ou=Groups,$BASEDN)"
+echo "Searching filter=\"$FILTER\""
+echo "	attrs=\"member\""
+echo "	base=\"$BASEDN\"..."
+echo "# searching filter=\"$FILTER\"" >> $SEARCHOUT
+echo "# 	attrs=\"member\"" >> $SEARCHOUT
+echo "# 	base=\"$BASEDN\"..." >> $SEARCHOUT
+$LDAPSEARCH -S '' -h $LOCALHOST -p $PORT1 -b "$BASEDN" "$FILTER" member \
+	>> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Search failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Filtering ldapsearch results..."
+$LDIFFILTER < $SEARCHOUT > $SEARCHFLT
+echo "Filtering original ldif used to create database..."
+$LDIFFILTER < $RELAYOUT > $LDIFFLT
+echo "Comparing filter output..."
+$CMP $SEARCHFLT $LDIFFLT > $CMPOUT
+	
+if test $? != 0 ; then
+	echo "comparison failed - relay search/modification didn't succeed"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+BASEDN="o=Example,c=US"
+echo "Changing password to database \"$BASEDN\"..."
+$LDAPPASSWD -h $LOCALHOST -p $PORT1 -D "cn=Manager,$BASEDN" -w $PASSWD \
+	-s $PASSWD "cn=Added User,ou=Alumni Association,ou=People,$BASEDN" \
+	>> $TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "Passwd ExOp failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+BASEDN="o=Beispiel,c=DE"
+echo "Binding with newly changed password to database \"$BASEDN\"..."
+$LDAPWHOAMI -h $LOCALHOST -p $PORT1 \
+	-D "cn=Added User,ou=Alumni Association,ou=People,$BASEDN" \
+	-w $PASSWD >> $TESTOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "WhoAmI failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+BASEDN="o=Esempio,c=IT"
+echo "Comparing to database \"$BASEDN\"..."
+$LDAPCOMPARE -h $LOCALHOST -p $PORT1 \
+	"cn=Added User,ou=Alumni Association,ou=People,$BASEDN" \
+	"seeAlso:cn=All Staff,ou=Groups,$BASEDN" >> $TESTOUT 2>&1
+RC=$?
+if test $RC != 6 && test $RC,$BACKEND != 5,null ; then
+	echo "Compare failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS

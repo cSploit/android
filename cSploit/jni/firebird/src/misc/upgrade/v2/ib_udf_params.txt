@@ -1,0 +1,106 @@
+CVC:
+This is how v1's ib_udf parameters look in system tables.
+Comparing this file against ib_udf2_params.txt we get ib_udf_upgrade.sql
+that will take us from v1's ib_udf to v2's ib_udf.
+
+RDB$FUNCTION_NAME               RDB$ARGUMENT_POSITION RDB$MECHANISM 
+=============================== ===================== ============= 
+
+ABS                                                 0             0 
+ABS                                                 1             1 
+ACOS                                                0             0 
+ACOS                                                1             1 
+ASCII_CHAR                                          0            -1 
+ASCII_CHAR                                          1             1 
+ASCII_VAL                                           0             0 
+ASCII_VAL                                           1             1 
+ASIN                                                0             0 
+ASIN                                                1             1 
+ATAN                                                0             0 
+ATAN                                                1             1 
+ATAN2                                               0             0 
+ATAN2                                               1             1 
+ATAN2                                               2             1 
+BIN_AND                                             0             0 
+BIN_AND                                             1             1 
+BIN_AND                                             2             1 
+BIN_OR                                              0             0 
+BIN_OR                                              1             1 
+
+RDB$FUNCTION_NAME               RDB$ARGUMENT_POSITION RDB$MECHANISM 
+=============================== ===================== ============= 
+BIN_OR                                              2             1 
+BIN_XOR                                             0             0 
+BIN_XOR                                             1             1 
+BIN_XOR                                             2             1 
+CEILING                                             0             0 
+CEILING                                             1             1 
+COS                                                 0             0 
+COS                                                 1             1 
+COSH                                                0             0 
+COSH                                                1             1 
+COT                                                 0             0 
+COT                                                 1             1 
+DIV                                                 0             0 
+DIV                                                 1             1 
+DIV                                                 2             1 
+FLOOR                                               0             0 
+FLOOR                                               1             1 
+LN                                                  0             0 
+LN                                                  1             1 
+LOG                                                 0             0 
+
+RDB$FUNCTION_NAME               RDB$ARGUMENT_POSITION RDB$MECHANISM 
+=============================== ===================== ============= 
+LOG                                                 1             1 
+LOG                                                 2             1 
+LOG10                                               0             0 
+LOG10                                               1             1 
+LOWER                                               0            -1 
+LOWER                                               1             1 
+LPAD                                                0            -1 
+LPAD                                                1             1 
+LPAD                                                2             1 
+LPAD                                                3             1 
+LTRIM                                               0            -1 
+LTRIM                                               1             1 
+MOD                                                 0             0 
+MOD                                                 1             1 
+MOD                                                 2             1 
+PI                                                  0             0 
+RAND                                                0             0 
+RPAD                                                0            -1 
+RPAD                                                1             1 
+RPAD                                                2             1 
+
+RDB$FUNCTION_NAME               RDB$ARGUMENT_POSITION RDB$MECHANISM 
+=============================== ===================== ============= 
+RPAD                                                3             1 
+RTRIM                                               0            -1 
+RTRIM                                               1             1 
+SIGN                                                0             0 
+SIGN                                                1             1 
+SIN                                                 0             0 
+SIN                                                 1             1 
+SINH                                                0             0 
+SINH                                                1             1 
+SQRT                                                0             0 
+SQRT                                                1             1 
+STRLEN                                              0             0 
+STRLEN                                              1             1 
+SUBSTR                                              0            -1 
+SUBSTR                                              1             1 
+SUBSTR                                              2             1 
+SUBSTR                                              3             1 
+SUBSTRLEN                                           0            -1 
+SUBSTRLEN                                           1             1 
+SUBSTRLEN                                           2             1 
+
+RDB$FUNCTION_NAME               RDB$ARGUMENT_POSITION RDB$MECHANISM 
+=============================== ===================== ============= 
+SUBSTRLEN                                           3             1 
+TAN                                                 0             0 
+TAN                                                 1             1 
+TANH                                                0             0 
+TANH                                                1             1 
+

@@ -1,0 +1,174 @@
+===============================================================================
+
+TOPIC:      plugins
+
+ABSTRACT:   this file describes how to write a plugin for ettercap NG
+
+NOTE:       the plugin system has been modified since ettercap NG 0.7.0, all
+            plugins coded for the 0.6.x series must be ported to the new api.
+            
+===============================================================================
+
+
+ We believe that an example tells much more than thousand words. So we wrote
+ a plugin templates to demonstrate how to write a simple plugin.
+ The template is called "dummy". Look at its source code (well commented).
+
+ However here there are some directive you have to respect.
+
+ 1) THE INCLUDES
+
+      #include <ec.h>                     /* required for global variables */
+      #include <ec_plugins.h>             /* required for plugin ops */
+
+      these are required, but you can include as many includes as you want.
+
+ 2) PLUGIN OPERATION
+
+      struct plugin_ops ops = {
+         ettercap_version: EC_VERSION,
+         name:             "plugin name",
+         info:             "description of the plugin",
+         version:          "x.y",
+         init:             &init_function,
+         fini:             &fini_function,
+      };
+
+      for every plugin you have to fill this structure with the appropriate
+      fields. This structure MUST be passed to plugin_register() in the
+      plugin_load() function. (see below)
+
+      ettercap_version: MUST be the global EC_VERSION. this variable is used 
+                        for internal check to prevent that a plugin compiled
+                        for an ettercap version will be used with a different
+                        api version.
+
+      name:             is a string containing the name of the plugin
+
+      info:             is a string with the description of the plugin
+
+      version:          is a string with the version of the plugin
+
+      init:             is a pointer to the function ettercap has to call on
+                        when the user select the plugin
+
+      fini:             is a pointer to the function to be executed to
+                        deactivate the plugin
+
+
+ 3) INITIALIZATION AND FINALIZATION
+
+      Every plugin MUST contain a function called plugin_load(). This function
+      is called by ettercap when the plugin is loaded by lt_dlopen(). It is
+      used to register the plugin in the plugin list. To do this, it MUST
+      return to value returned by plugin_register().
+      The plugin_register() wants two parameter, the handle passed to
+      plugin_load and the plugin_ops described above.
+      
+
+      int plugin_load(void *handle)
+      {
+         . . . 
+         
+         return plugin_register(handle, &ops);
+      }
+
+      
+      When the user activate the plugin, etteracp calls the function registered
+      in the plugin_ops as 'init'. If the user wants to deactivate the plugins,
+      ettercap calls the registered 'fini' function.
+      You can do whatever you want in this functions, the only thing to be
+      respected is the return value.
+      There are two different return value:
+         
+         PLUGIN_FINISHED:  the plugin has finished its execution. The fini
+                           function will never be called.
+                           This is usually used if the plugin perform an
+                           operation and exit (as for the old external plugins)
+         
+
+         PLUGIN_RUNNING:   the plugin is still running and will be deactivated
+                           with the fini function.
+                           This is used if the plugin spawns a thread or it has
+                           hooked to an ettercap hookpoint. In case the plugin
+                           has created a thread, it must be killed in the
+                           'fini' function.
+         
+
+ 4) HOOKING POINTS
+
+      An hooking function must be declared as: 
+      
+         void func(struct packet_object *po)
+
+      Every hook point recall the function passing the packet object as the
+      parameter.
+
+
+      HOOK_RECEIVED     the raw packet, the L* structures are not filled. you
+                        can modify the packet before the protocol analysis 
+                        starts.
+      
+      HOOK_DECODED      all the packet after the protocol stack parsing and
+                        after the dissectors. here you can find interesting
+                        informations such as passwords and fingerprints.
+      
+      HOOK_PRE_FORWARD  right before the forward point. the hook is executed
+                        only if it has to be forwarded.
+      
+      HOOK_HANDLED      top of the protocol stack but before the dissectors.
+                        you can set/unset the PO_IGNORE flag to decide to not
+                        pass the packet to the top_half
+      
+      HOOK_FILTER       the content filtering point. the hook point is right
+                        after the filtering engine.
+      
+      HOOK_DISPATCHER   in the top_half (the packet is a copy). if you modify
+                        the packet here there is no change to see the
+                        modification on the wire :)
+                        You can use this hook for operations that requires much
+                        time but don't modify the packet. Since the capture
+                        thread must be fast (to forward all the packets) the
+                        cpu consuming task (such as connection tracking and
+                        profiles management) are performed in the top_half.
+
+      HOOK_PACKET_*     Every packet type as a different hook point. If you
+                        want to receive only tcp packet, hook to the 
+                        HOOK_PACKET_TCP, if you want ppp packet, hook to 
+                        HOOK_PACKET_PPP and so on...
+                        This hooks are declared in the protocol decoder
+                        (./src/protocols/*.c)
+
+      HOOK_PROTO_*      Some protocols declare an hookpoint. Look in
+                        ./src/dissectors/*.c to have a list of hooks.
+      
+
+      refer to the 'capture' document in order to have a complete view of the 
+      hooking system.
+
+
+ 5) ETTERCAP API
+
+      + USER_MSG()         same as printf(), but required in order to output to
+                           the user interface. use this function if the plugin 
+                           has to communicate with the user.
+
+      + INSTANT_USER_MSG() same as USER_MSG but without buffering. the buffer
+                           flush is called immediately. usually is the GUI that
+                           call the flush periodically (every 10 msec).
+
+
+      + ui_input()         if the plugin needs some input from the user.
+                           you can provide a callback or not, depending of what
+                           the function does.
+
+
+      Obviously a plugin can use all the ettercap function and its global
+      variables. They are not described here because it is out of the document
+      scope.
+      
+
+feel free to write an email to the developer to have further informations.
+
+
+EOF

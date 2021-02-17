@@ -1,0 +1,1466 @@
+# $OpenLDAP$
+# Copyright 2007-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Overlays
+
+Overlays are software components that provide hooks to functions analogous to 
+those provided by backends, which can be stacked on top of the backend calls 
+and as callbacks on top of backend responses to alter their behavior. 
+
+Overlays may be compiled statically into {{slapd}}, or when module support
+is enabled, they may be dynamically loaded. Most of the overlays
+are only allowed to be configured on individual databases.
+
+Some can be stacked on the {{EX:frontend}} as well, for global use. This means that
+they can be executed after a request is parsed and validated, but right before the 
+appropriate database is selected. The main purpose is to affect operations 
+regardless of the database they will be handled by, and, in some cases, 
+to influence the selection of the database by massaging the request DN. 
+
+Essentially, overlays represent a means to:
+
+    * customize the behavior of existing backends without changing the backend 
+      code and without requiring one to write a new custom backend with 
+      complete functionality
+    * write functionality of general usefulness that can be applied to 
+      different backend types
+
+When using {{slapd.conf}}(5), overlays that are configured before any other
+databases are considered global, as mentioned above. In fact they are implicitly
+stacked on top of the {{EX:frontend}} database. They can also be explicitly
+configured as such:
+
+>        database frontend
+>        overlay <overlay name>
+
+Overlays are usually documented by separate specific man pages in section 5; 
+the naming convention is
+
+>        slapo-<overlay name>
+
+All distributed core overlays have a man page. Feel free to contribute to any, 
+if you think there is anything missing in describing the behavior of the component 
+and the implications of all the related configuration directives.
+
+Official overlays are located in
+
+>        servers/slapd/overlays/
+
+That directory also contains the file slapover.txt, which describes the 
+rationale of the overlay implementation, and may serve as a guideline for the 
+development of custom overlays.
+
+Contribware overlays are located in
+
+>        contrib/slapd-modules/<overlay name>/
+
+along with other types of run-time loadable components; they are officially 
+distributed, but not maintained by the project.
+
+All the current overlays in OpenLDAP are listed and described in detail in the 
+following sections.
+
+
+H2: Access Logging
+
+
+H3: Overview
+
+This overlay can record accesses to a given backend database on another
+database.
+
+This allows all of the activity on a given database to be reviewed using arbitrary 
+LDAP queries, instead of just logging to local flat text files. Configuration 
+options are available for selecting a subset of operation types to log, and to 
+automatically prune older log records from the logging database. Log records 
+are stored with audit schema to assure their readability whether viewed as LDIF 
+or in raw form.
+
+It is also used for {{SECT:delta-syncrepl replication}}
+
+H3: Access Logging Configuration
+
+The following is a basic example that implements Access Logging:
+
+>        database bdb
+>        suffix dc=example,dc=com
+>        ...
+>        overlay accesslog
+>        logdb cn=log
+>        logops writes reads
+>        logold (objectclass=person)
+>        
+>        database bdb
+>        suffix cn=log
+>        ...
+>        index reqStart eq
+>        access to *
+>          by dn.base="cn=admin,dc=example,dc=com" read
+
+The following is an example used for {{SECT:delta-syncrepl replication}}:
+
+>        database hdb
+>        suffix cn=accesslog
+>        directory /usr/local/var/openldap-accesslog
+>        rootdn cn=accesslog
+>        index default eq
+>        index entryCSN,objectClass,reqEnd,reqResult,reqStart
+
+Accesslog overlay definitions for the primary db
+
+>        database bdb
+>        suffix dc=example,dc=com
+>        ...
+>        overlay accesslog
+>        logdb cn=accesslog
+>        logops writes
+>        logsuccess TRUE
+>        # scan the accesslog DB every day, and purge entries older than 7 days
+>        logpurge 07+00:00 01+00:00
+
+An example search result against {{B:cn=accesslog}} might look like:
+
+>        [ghenry@suretec ghenry]# ldapsearch -x -b cn=accesslog
+>        # extended LDIF
+>        #
+>        # LDAPv3
+>        # base <cn=accesslog> with scope subtree
+>        # filter: (objectclass=*)
+>        # requesting: ALL
+>        #
+>        
+>        # accesslog
+>        dn: cn=accesslog
+>        objectClass: auditContainer
+>        cn: accesslog
+>        
+>        # 20080110163829.000004Z, accesslog
+>        dn: reqStart=20080110163829.000004Z,cn=accesslog
+>        objectClass: auditModify
+>        reqStart: 20080110163829.000004Z
+>        reqEnd: 20080110163829.000005Z
+>        reqType: modify
+>        reqSession: 196696
+>        reqAuthzID: cn=admin,dc=suretecsystems,dc=com
+>        reqDN: uid=suretec-46022f8$,ou=Users,dc=suretecsystems,dc=com
+>        reqResult: 0
+>        reqMod: sambaPwdCanChange:- ###CENSORED###
+>        reqMod: sambaPwdCanChange:+ ###CENSORED###
+>        reqMod: sambaNTPassword:- ###CENSORED###
+>        reqMod: sambaNTPassword:+ ###CENSORED###
+>        reqMod: sambaPwdLastSet:- ###CENSORED###
+>        reqMod: sambaPwdLastSet:+ ###CENSORED###
+>        reqMod: entryCSN:= 20080110163829.095157Z#000000#000#000000
+>        reqMod: modifiersName:= cn=admin,dc=suretecsystems,dc=com
+>        reqMod: modifyTimestamp:= 20080110163829Z
+>        
+>        # search result
+>        search: 2
+>        result: 0 Success
+>        
+>        # numResponses: 3
+>        # numEntries: 2
+
+
+H3: Further Information
+
+{{slapo-accesslog(5)}} and the {{SECT:delta-syncrepl replication}} section.
+
+
+H2: Audit Logging
+
+The Audit Logging overlay can be used to record all changes on a given backend database to a specified log file.
+
+H3: Overview
+
+If the need arises whereby changes need to be logged as standard LDIF, then the auditlog overlay {{B:slapo-auditlog (5)}}
+can be used. Full examples are available in the man page {{B:slapo-auditlog (5)}}
+
+H3: Audit Logging Configuration
+
+If the directory is running vi {{F:slapd.d}}, then the following LDIF could be used to add the overlay to the overlay list 
+in {{B:cn=config}} and set what file the {{TERM:LDIF}} gets logged to (adjust to suit)
+
+>       dn: olcOverlay=auditlog,olcDatabase={1}hdb,cn=config
+>       changetype: add
+>       objectClass: olcOverlayConfig
+>       objectClass: olcAuditLogConfig
+>       olcOverlay: auditlog
+>       olcAuditlogFile: /tmp/auditlog.ldif
+
+
+In this example for testing, we are logging changes to {{F:/tmp/auditlog.ldif}}
+
+A typical {{TERM:LDIF}} file created by {{B:slapo-auditlog(5)}} would look like:
+
+>       # add 1196797576 dc=suretecsystems,dc=com cn=admin,dc=suretecsystems,dc=com
+>       dn: dc=suretecsystems,dc=com
+>       changetype: add
+>       objectClass: dcObject
+>       objectClass: organization
+>       dc: suretecsystems
+>       o: Suretec Systems Ltd.
+>       structuralObjectClass: organization
+>       entryUUID: 1606f8f8-f06e-1029-8289-f0cc9d81e81a
+>       creatorsName: cn=admin,dc=suretecsystems,dc=com
+>       modifiersName: cn=admin,dc=suretecsystems,dc=com
+>       createTimestamp: 20051123130912Z
+>       modifyTimestamp: 20051123130912Z
+>       entryCSN: 20051123130912.000000Z#000001#000#000000
+>       auditContext: cn=accesslog
+>       # end add 1196797576
+>       
+>       # add 1196797577 dc=suretecsystems,dc=com cn=admin,dc=suretecsystems,dc=com
+>       dn: ou=Groups,dc=suretecsystems,dc=com
+>       changetype: add
+>       objectClass: top
+>       objectClass: organizationalUnit
+>       ou: Groups
+>       structuralObjectClass: organizationalUnit
+>       entryUUID: 160aaa2a-f06e-1029-828a-f0cc9d81e81a
+>       creatorsName: cn=admin,dc=suretecsystems,dc=com
+>       modifiersName: cn=admin,dc=suretecsystems,dc=com
+>       createTimestamp: 20051123130912Z
+>       modifyTimestamp: 20051123130912Z
+>       entryCSN: 20051123130912.000000Z#000002#000#000000
+>       # end add 1196797577
+
+
+H3: Further Information
+
+{{:slapo-auditlog(5)}}
+
+
+H2: Chaining
+
+
+H3: Overview
+
+The chain overlay provides basic chaining capability to the underlying 
+database.
+
+What is chaining? It indicates the capability of a DSA to follow referrals on 
+behalf of the client, so that distributed systems are viewed as a single 
+virtual DSA by clients that are otherwise unable to "chase" (i.e. follow) 
+referrals by themselves.
+
+The chain overlay is built on top of the ldap backend; it is compiled by 
+default when {{B:--enable-ldap}}.
+
+
+H3: Chaining Configuration
+
+In order to demonstrate how this overlay works, we shall discuss a typical 
+scenario which might be one master server and three Syncrepl slaves. 
+
+On each replica, add this near the top of the {{slapd.conf}}(5) file
+(global), before any database definitions:
+
+>        overlay                    chain
+>        chain-uri                  "ldap://ldapmaster.example.com"
+>        chain-idassert-bind        bindmethod="simple"
+>                                   binddn="cn=Manager,dc=example,dc=com"
+>                                   credentials="<secret>" 
+>                                   mode="self"
+>        chain-tls                  start
+>        chain-return-error         TRUE 
+
+Add this below your {{syncrepl}} statement:
+
+>        updateref                  "ldap://ldapmaster.example.com/"
+
+The {{B:chain-tls}} statement enables TLS from the slave to the ldap master. 
+The DITs are exactly the same between these machines, therefore whatever user 
+bound to the slave will also exist on the master. If that DN does not have 
+update privileges on the master, nothing will happen.
+
+You will need to restart the slave after these {{slapd.conf}} changes.
+Then, if you are using {{loglevel stats}} (256), you can monitor an
+{{ldapmodify}} on the slave and the master. (If you're using {{cn=config}}
+no restart is required.)
+
+Now start an {{ldapmodify}} on the slave and watch the logs. You should expect 
+something like:
+
+>        Sep  6 09:27:25 slave1 slapd[29274]: conn=11 fd=31 ACCEPT from IP=143.199.102.216:45181 (IP=143.199.102.216:389)
+>        Sep  6 09:27:25 slave1 slapd[29274]: conn=11 op=0 STARTTLS
+>        Sep  6 09:27:25 slave1 slapd[29274]: conn=11 op=0 RESULT oid= err=0 text=
+>        Sep  6 09:27:25 slave1 slapd[29274]: conn=11 fd=31 TLS established tls_ssf=256 ssf=256
+>        Sep  6 09:27:28 slave1 slapd[29274]: conn=11 op=1 BIND dn="uid=user1,ou=people,dc=example,dc=com" method=128
+>        Sep  6 09:27:28 slave1 slapd[29274]: conn=11 op=1 BIND dn="uid=user1,ou=People,dc=example,dc=com" mech=SIMPLE ssf=0
+>        Sep  6 09:27:28 slave1 slapd[29274]: conn=11 op=1 RESULT tag=97 err=0 text=
+>        Sep  6 09:27:28 slave1 slapd[29274]: conn=11 op=2 MOD dn="uid=user1,ou=People,dc=example,dc=com"
+>        Sep  6 09:27:28 slave1 slapd[29274]: conn=11 op=2 MOD attr=mail
+>        Sep  6 09:27:28 slave1 slapd[29274]: conn=11 op=2 RESULT tag=103 err=0 text=
+>        Sep  6 09:27:28 slave1 slapd[29274]: conn=11 op=3 UNBIND
+>        Sep  6 09:27:28 slave1 slapd[29274]: conn=11 fd=31 closed
+>        Sep  6 09:27:28 slave1 slapd[29274]: syncrepl_entry: LDAP_RES_SEARCH_ENTRY(LDAP_SYNC_MODIFY)
+>        Sep  6 09:27:28 slave1 slapd[29274]: syncrepl_entry: be_search (0)
+>        Sep  6 09:27:28 slave1 slapd[29274]: syncrepl_entry: uid=user1,ou=People,dc=example,dc=com
+>        Sep  6 09:27:28 slave1 slapd[29274]: syncrepl_entry: be_modify (0)
+
+And on the master you will see this:
+
+>        Sep  6 09:23:57 ldapmaster slapd[2961]: conn=55902 op=3 PROXYAUTHZ dn="uid=user1,ou=people,dc=example,dc=com"
+>        Sep  6 09:23:57 ldapmaster slapd[2961]: conn=55902 op=3 MOD dn="uid=user1,ou=People,dc=example,dc=com"
+>        Sep  6 09:23:57 ldapmaster slapd[2961]: conn=55902 op=3 MOD attr=mail
+>        Sep  6 09:23:57 ldapmaster slapd[2961]: conn=55902 op=3 RESULT tag=103 err=0 text=
+
+Note: You can clearly see the PROXYAUTHZ line on the master, indicating the 
+proper identity assertion for the update on the master. Also note the slave 
+immediately receiving the Syncrepl update from the master.
+
+H3: Handling Chaining Errors
+
+By default, if chaining fails, the original referral is returned to the client
+under the assumption that the client might want to try and follow the referral.
+
+With the following directive however, if the chaining fails at the provider 
+side, the actual error is returned to the client.
+
+>        chain-return-error TRUE
+
+
+H3: Read-Back of Chained Modifications
+
+Occasionally, applications want to read back the data that they just wrote.
+If a modification requested to a shadow server was silently chained to its 
+provider, an immediate read could result in receiving data not yet synchronized.  
+In those cases, clients should use the {{B:dontusecopy}} control to ensure 
+they are directed to the authoritative source for that piece of data.
+
+This control usually causes a referral to the actual source of the data
+to be returned.  However, when the {{slapo-chain(5)}} overlay is used,
+it intercepts the referral being returned in response to the
+{{B:dontusecopy}} control, and tries to fetch the requested data.
+
+
+H3: Further Information
+
+{{:slapo-chain(5)}}
+
+
+H2: Constraints
+
+
+H3: Overview
+
+This overlay enforces a regular expression constraint on all values
+of specified attributes during an LDAP modify request that contains add or modify
+commands. It is used to enforce a more rigorous syntax when the underlying attribute 
+syntax is too general.
+
+
+H3: Constraint Configuration
+
+Configuration via {{slapd.conf}}(5) would look like:
+
+>        overlay constraint
+>        constraint_attribute mail regex ^[[:alnum:]]+@mydomain.com$
+>        constraint_attribute title uri
+>        ldap:///dc=catalog,dc=example,dc=com?title?sub?(objectClass=titleCatalog)
+
+A specification like the above would reject any {{mail}} attribute which did not
+look like {{<alpha-numeric string>@mydomain.com}}.
+
+It would also reject any title attribute whose values were not listed in the 
+title attribute of any {{titleCatalog}} entries in the given scope.   
+
+An example for use with {{cn=config}}:
+
+>       dn: olcOverlay=constraint,olcDatabase={1}hdb,cn=config
+>       changetype: add
+>       objectClass: olcOverlayConfig
+>       objectClass: olcConstraintConfig
+>       olcOverlay: constraint
+>       olcConstraintAttribute: mail regex ^[[:alnum:]]+@mydomain.com$
+>       olcConstraintAttribute: title uri ldap:///dc=catalog,dc=example,dc=com?title?sub?(objectClass=titleCatalog)
+
+
+H3: Further Information
+
+{{:slapo-constraint(5)}}
+
+   
+H2: Dynamic Directory Services
+
+
+H3: Overview
+
+The {{dds}} overlay to {{slapd}}(8) implements dynamic objects as per {{REF:RFC2589}}.
+The name {{dds}} stands for Dynamic Directory Services. It allows to define 
+dynamic objects, characterized by the {{dynamicObject}} objectClass.
+
+Dynamic objects have a limited lifetime, determined by a time-to-live (TTL) 
+that can be refreshed by means of a specific refresh extended operation. This 
+operation allows to set the Client Refresh Period (CRP), namely the period 
+between refreshes that is required to preserve the dynamic object from expiration. 
+The expiration time is computed by adding the requested TTL to the current time.
+When dynamic objects reach the end of their lifetime without being further 
+refreshed, they are automatically {{deleted}}. There is no guarantee of immediate 
+deletion, so clients should not count on it.
+
+H3: Dynamic Directory Service Configuration
+
+A usage of dynamic objects might be to implement dynamic meetings; in this case, 
+all the participants to the meeting are allowed to refresh the meeting object, 
+but only the creator can delete it (otherwise it will be deleted when the TTL expires).
+
+If we add the overlay to an example database, specifying a Max TTL of 1 day, a 
+min of 10 seconds, with a default TTL of 1 hour. We'll also specify an interval
+of 120 (less than 60s might be too small) seconds between expiration checks and a 
+tolerance of 5 second (lifetime of a dynamic object will be {{entryTtl + tolerance}}).
+
+>       overlay dds
+>       dds-max-ttl     1d
+>       dds-min-ttl     10s
+>       dds-default-ttl 1h
+>       dds-interval    120s
+>       dds-tolerance   5s
+
+and add an index:
+
+>       entryExpireTimestamp
+
+Creating a meeting is as simple as adding the following:
+
+>       dn: cn=OpenLDAP Documentation Meeting,ou=Meetings,dc=example,dc=com
+>       objectClass: groupOfNames
+>       objectClass: dynamicObject
+>       cn: OpenLDAP Documentation Meeting
+>       member: uid=ghenry,ou=People,dc=example,dc=com
+>       member: uid=hyc,ou=People,dc=example,dc=com
+
+H4: Dynamic Directory Service ACLs
+
+Allow users to start a meeting and to join it; restrict refresh to the {{member}}; 
+restrict delete to the creator:
+
+>       access to attrs=userPassword
+>          by self write
+>          by * read
+>       
+>       access to dn.base="ou=Meetings,dc=example,dc=com"
+>                 attrs=children
+>            by users write
+>       
+>       access to dn.onelevel="ou=Meetings,dc=example,dc=com"
+>                 attrs=entry
+>            by dnattr=creatorsName write
+>            by * read
+>       
+>       access to dn.onelevel="ou=Meetings,dc=example,dc=com"
+>                 attrs=participant
+>            by dnattr=creatorsName write
+>            by users selfwrite
+>            by * read
+>       
+>       access to dn.onelevel="ou=Meetings,dc=example,dc=com"
+>                 attrs=entryTtl
+>            by dnattr=member manage
+>            by * read
+
+In simple terms, the user who created the {{OpenLDAP Documentation Meeting}} can add new attendees, 
+refresh the meeting using (basically complete control):
+
+>       ldapexop -x -H ldap://ldaphost "refresh" "cn=OpenLDAP Documentation Meeting,ou=Meetings,dc=example,dc=com" "120" -D "uid=ghenry,ou=People,dc=example,dc=com" -W
+
+Any user can join the meeting, but not add another attendee, but they can refresh the meeting. The ACLs above are quite straight forward to understand.
+
+
+H3: Further Information
+
+{{:slapo-dds(5)}}
+
+
+H2: Dynamic Groups
+
+
+H3: Overview
+
+This overlay extends the Compare operation to detect
+members of a dynamic group. This overlay is now deprecated
+as all of its functions are available using the
+{{SECT:Dynamic Lists}} overlay.
+
+
+H3: Dynamic Group Configuration
+
+
+H2: Dynamic Lists
+   
+   
+H3: Overview
+
+This overlay allows expansion of dynamic groups and lists. Instead of having the
+group members or list attributes hard coded, this overlay allows us to define
+an LDAP search whose results will make up the group or list.
+
+H3: Dynamic List Configuration
+
+This module can behave both as a dynamic list and dynamic group, depending on
+the configuration. The syntax is as follows:
+
+>       overlay dynlist
+>       dynlist-attrset <group-oc> <URL-ad> [member-ad]
+
+The parameters to the {{F:dynlist-attrset}} directive have the following meaning:
+* {{F:<group-oc>}}: specifies which object class triggers the subsequent LDAP search.
+Whenever an entry with this object class is retrieved, the search is performed.
+* {{F:<URL-ad>}}: is the name of the attribute which holds the search URI. It
+has to be a subtype of {{F:labeledURI}}. The attributes and values present in
+the search result are added to the entry unless {{F:member-ad}} is used (see
+below).
+* {{F:member-ad}}: if present, changes the overlay behavior into a dynamic group.
+Instead of inserting the results of the search in the entry, the distinguished name
+of the results are added as values of this attribute.
+
+Here is an example which will allow us to have an email alias which automatically
+expands to all user's emails according to our LDAP filter:
+
+In {{slapd.conf}}(5):
+
+>       overlay dynlist
+>       dynlist-attrset nisMailAlias labeledURI
+
+This means that whenever an entry which has the {{F:nisMailAlias}} object class is
+retrieved, the search specified in the {{F:labeledURI}} attribute is performed.
+
+Let's say we have this entry in our directory:
+
+>       cn=all,ou=aliases,dc=example,dc=com
+>       cn: all
+>       objectClass: nisMailAlias
+>       labeledURI: ldap:///ou=People,dc=example,dc=com?mail?one?(objectClass=inetOrgPerson)
+
+If this entry is retrieved, the search specified in {{F:labeledURI}} will be
+performed and the results will be added to the entry just as if they have always
+been there. In this case, the search filter selects all entries directly
+under {{F:ou=People}} that have the {{F:inetOrgPerson}} object class and retrieves
+the {{F:mail}} attribute, if it exists.
+
+This is what gets added to the entry when we have two users under {{F:ou=People}}
+that match the filter:
+!import "allmail-en.png"; align="center"; title="Dynamic list for email aliases"
+FT[align="Center"] Figure X.Y: Dynamic List for all emails
+
+The configuration for a dynamic group is similar. Let's see an example which would
+automatically populate an {{F:allusers}} group with all the user accounts in the
+directory.
+
+In {{F:slapd.conf}}(5):
+
+>       include /path/to/dyngroup.schema
+>       ...
+>       overlay dynlist
+>       dynlist-attrset groupOfURLs labeledURI member
++
++Note: We must include the {{F:dyngroup.schema}} file that defines the
++{{F:groupOfURLs}} objectClass used in this example.
+
+Let's apply it to the following entry:
+
+>       cn=allusers,ou=group,dc=example,dc=com
+>       cn: all
+>       objectClass: groupOfURLs
+>       labeledURI: ldap:///ou=people,dc=example,dc=com??one?(objectClass=inetOrgPerson)
+
+The behavior is similar to the dynamic list configuration we had before:
+whenever an entry with the {{F:groupOfURLs}} object class is retrieved, the
+search specified in the {{F:labeledURI}} attribute is performed. But this time,
+only the distinguished names of the results are added, and as values of the
+{{F:member}} attribute.
+
+This is what we get:
+!import "allusersgroup-en.png"; align="center"; title="Dynamic group for all users"
+FT[align="Center"] Figure X.Y: Dynamic Group for all users
+
+Note that a side effect of this scheme of dynamic groups is that the members
+need to be specified as full DNs. So, if you are planning in using this for
+{{F:posixGroup}}s, be sure to use RFC2307bis and some attribute which can hold
+distinguished names. The {{F:memberUid}} attribute used in the {{F:posixGroup}}
+object class can hold only names, not DNs, and is therefore not suitable for
+dynamic groups.
+
+
+H3: Further Information
+
+{{:slapo-dynlist(5)}}
+
+
+H2: Reverse Group Membership Maintenance
+
+H3: Overview
+
+In some scenarios, it may be desirable for a client to be able to determine
+which groups an entry is a member of, without performing an additional search.
+Examples of this are applications using the {{TERM:DIT}} for access control
+based on group authorization.
+
+The {{B:memberof}} overlay updates an attribute (by default {{B:memberOf}}) whenever
+changes occur to the membership attribute (by default {{B:member}}) of entries of the
+objectclass (by default {{B:groupOfNames}}) configured to trigger updates.
+
+Thus, it provides maintenance of the list of groups an entry is a member of,
+when usual maintenance of groups is done by modifying the members on the group
+entry.
+
+H3: Member Of Configuration
+
+The typical use of this overlay requires just enabling the overlay for a
+specific database. For example, with the following minimal slapd.conf:
+
+>        include /usr/share/openldap/schema/core.schema
+>        include /usr/share/openldap/schema/cosine.schema
+>
+>        authz-regexp "gidNumber=0\\\+uidNumber=0,cn=peercred,cn=external,cn=auth"
+>                "cn=Manager,dc=example,dc=com"
+>        database        bdb
+>        suffix          "dc=example,dc=com"
+>        rootdn          "cn=Manager,dc=example,dc=com"
+>        rootpw          secret
+>        directory       /var/lib/ldap2.4
+>        checkpoint 256 5
+>        index   objectClass   eq
+>        index   uid           eq,sub
+>        
+>        overlay memberof
+
+adding the following ldif:
+
+>        cat memberof.ldif
+>        dn: dc=example,dc=com
+>        objectclass: domain
+>        dc: example
+>        
+>        dn: ou=Group,dc=example,dc=com
+>        objectclass: organizationalUnit
+>        ou: Group
+>        
+>        dn: ou=People,dc=example,dc=com
+>        objectclass: organizationalUnit
+>        ou: People
+>        
+>        dn: uid=test1,ou=People,dc=example,dc=com
+>        objectclass: account
+>        uid: test1
+>        
+>        dn: cn=testgroup,ou=Group,dc=example,dc=com
+>        objectclass: groupOfNames
+>        cn: testgroup
+>        member: uid=test1,ou=People,dc=example,dc=com
+
+Results in the following output from a search on the test1 user:
+
+> # ldapsearch -LL -Y EXTERNAL -H ldapi:/// "(uid=test1)" -b dc=example,dc=com memberOf
+> SASL/EXTERNAL authentication started
+> SASL username: gidNumber=0+uidNumber=0,cn=peercred,cn=external,cn=auth
+> SASL SSF: 0
+> version: 1
+> 
+> dn: uid=test1,ou=People,dc=example,dc=com
+> memberOf: cn=testgroup,ou=Group,dc=example,dc=com
+
+Note that the {{B:memberOf}} attribute is an operational attribute, so it must be
+requested explicitly.
+
+
+H3: Further Information
+
+{{:slapo-memberof(5)}}
+
+
+H2: The Proxy Cache Engine
+
+{{TERM:LDAP}} servers typically hold one or more subtrees of a
+{{TERM:DIT}}. Replica (or shadow) servers hold shadow copies of
+entries held by one or more master servers.  Changes are propagated
+from the master server to replica (slave) servers using LDAP Sync
+replication.  An LDAP cache is a special type of replica which holds
+entries corresponding to search filters instead of subtrees.
+
+H3: Overview
+
+The proxy cache extension of slapd is designed to improve the
+responsiveness of the ldap and meta backends. It handles a search
+request (query)
+by first determining whether it is contained in any cached search
+filter. Contained requests are answered from the proxy cache's local
+database. Other requests are passed on to the underlying ldap or
+meta backend and processed as usual.
+
+E.g. {{EX:(shoesize>=9)}} is contained in {{EX:(shoesize>=8)}} and
+{{EX:(sn=Richardson)}} is contained in {{EX:(sn=Richards*)}}
+
+Correct matching rules and syntaxes are used while comparing
+assertions for query containment. To simplify the query containment
+problem, a list of cacheable "templates" (defined below) is specified
+at configuration time. A query is cached or answered only if it
+belongs to one of these templates. The entries corresponding to
+cached queries are stored in the proxy cache local database while
+its associated meta information (filter, scope, base, attributes)
+is stored in main memory. 
+
+A template is a prototype for generating LDAP search requests.
+Templates are described by a prototype search filter and a list of
+attributes which are required in queries generated from the template.
+The representation for prototype filter is similar to {{REF:RFC4515}},
+except that the assertion values are missing. Examples of prototype
+filters are: (sn=),(&(sn=)(givenname=)) which are instantiated by
+search filters (sn=Doe) and (&(sn=Doe)(givenname=John)) respectively.
+
+The cache replacement policy removes the least recently used (LRU)
+query and entries belonging to only that query. Queries are allowed
+a maximum time to live (TTL) in the cache thus providing weak
+consistency. A background task periodically checks the cache for
+expired queries and removes them.
+
+The Proxy Cache paper
+({{URL:http://www.openldap.org/pub/kapurva/proxycaching.pdf}}) provides
+design and implementation details.
+
+
+H3: Proxy Cache Configuration
+
+The cache configuration specific directives described below must
+appear after a {{EX:overlay pcache}} directive within a
+{{EX:"database meta"}} or {{EX:"database ldap"}} section of
+the server's {{slapd.conf}}(5) file.
+
+H4: Setting cache parameters
+
+> pcache <DB> <maxentries> <nattrsets> <entrylimit> <period>
+
+This directive enables proxy caching and sets general cache
+parameters.  The <DB> parameter specifies which underlying database
+is to be used to hold cached entries.  It should be set to
+{{EX:bdb}} or {{EX:hdb}}.  The <maxentries> parameter specifies the
+total number of entries which may be held in the cache.  The
+<nattrsets> parameter specifies the total number of attribute sets
+(as specified by the {{EX:pcacheAttrset}} directive) that may be
+defined.  The <entrylimit> parameter specifies the maximum number of
+entries in a cacheable query.  The <period> specifies the consistency
+check period (in seconds).  In each period, queries with expired
+TTLs are removed.
+
+H4: Defining attribute sets
+
+> pcacheAttrset <index> <attrs...>
+
+Used to associate a set of attributes to an index. Each attribute
+set is associated with an index number from 0 to <numattrsets>-1.
+These indices are used by the pcacheTemplate directive to define
+cacheable templates.
+
+H4: Specifying cacheable templates 
+
+> pcacheTemplate <prototype_string> <attrset_index> <TTL>
+
+Specifies a cacheable template and the "time to live" (in sec) <TTL>
+for queries belonging to the template. A template is described by
+its prototype filter string and set of required attributes identified
+by <attrset_index>.
+
+
+H4: Example for slapd.conf
+
+An example {{slapd.conf}}(5) database section for a caching server
+which proxies for the {{EX:"dc=example,dc=com"}} subtree held
+at server {{EX:ldap.example.com}}.
+ 
+>	database 	ldap
+>	suffix 		"dc=example,dc=com" 
+>	rootdn 		"dc=example,dc=com" 
+>	uri    		ldap://ldap.example.com/
+>	overlay pcache
+>	pcache         hdb 100000 1 1000 100
+>	pcacheAttrset  0 mail postaladdress telephonenumber 
+>	pcacheTemplate (sn=) 0 3600
+>	pcacheTemplate (&(sn=)(givenName=)) 0 3600
+>	pcacheTemplate (&(departmentNumber=)(secretary=*)) 0 3600
+>
+>	cachesize 20
+>	directory ./testrun/db.2.a
+>	index       objectClass eq
+>	index       cn,sn,uid,mail  pres,eq,sub
+
+H4: Example for slapd-config
+
+The same example as a LDIF file for back-config for a caching server
+which proxies for the {{EX:"dc=example,dc=com"}} subtree held
+at server {{EX:ldap.example.com}}.
+
+>   dn: olcDatabase={2}ldap,cn=config
+>   objectClass: olcDatabaseConfig
+>   objectClass: olcLDAPConfig
+>   olcDatabase: {2}ldap
+>   olcSuffix: dc=example,dc=com
+>   olcRootDN: dc=example,dc=com
+>   olcDbURI: "ldap://ldap.example.com"
+>   
+>   dn: olcOverlay={0}pcache,olcDatabase={2}ldap,cn=config
+>   objectClass: olcOverlayConfig
+>   objectClass: olcPcacheConfig
+>   olcOverlay: {0}pcache
+>   olcPcache: hdb 100000 1 1000 100
+>   olcPcacheAttrset: 0 mail postalAddress telephoneNumber
+>   olcPcacheTemplate: "(sn=)" 0 3600 0 0 0
+>   olcPcacheTemplate: "(&(sn=)(givenName=))" 0 3600 0 0 0
+>   olcPcacheTemplate: "(&(departmentNumber=)(secretary=))" 0 3600
+>   
+>   dn: olcDatabase={0}hdb,olcOverlay={0}pcache,olcDatabase={2}ldap,cn=config
+>   objectClass: olcHdbConfig
+>   objectClass: olcPcacheDatabase
+>   olcDatabase: {0}hdb
+>   olcDbDirectory: ./testrun/db.2.a
+>   olcDbCacheSize: 20
+>   olcDbIndex: objectClass eq
+>   olcDbIndex: cn,sn,uid,mail  pres,eq,sub
+
+
+H5: Cacheable Queries
+
+A LDAP search query is cacheable when its filter matches one of the
+templates as defined in the "pcacheTemplate" statements and when it references
+only the attributes specified in the corresponding attribute set. 
+In the example above the attribute set number 0 defines that only the
+attributes: {{EX:mail postaladdress telephonenumber}} are cached for the following
+pcacheTemplates.
+
+H5: Examples:
+
+>	Filter: (&(sn=Richard*)(givenName=jack)) 
+>	Attrs: mail telephoneNumber
+
+    is cacheable, because it matches the template {{EX:(&(sn=)(givenName=))}} and its
+    attributes are contained in pcacheAttrset 0.
+
+>	Filter: (&(sn=Richard*)(telephoneNumber))
+>	Attrs: givenName 
+
+    is not cacheable, because the filter does not match the template,
+    nor is the attribute givenName stored in the cache
+
+>	Filter: (|(sn=Richard*)(givenName=jack))
+>	Attrs: mail telephoneNumber
+
+    is not cacheable, because the filter does not match the template ( logical
+    OR "|" condition instead of logical AND "&" )
+
+
+H3: Further Information
+
+{{:slapo-pcache(5)}}
+                           
+                           
+H2: Password Policies
+
+
+H3: Overview
+
+This overlay follows the specifications contained in the draft RFC titled 
+draft-behera-ldap-password-policy-09. While the draft itself is expired, it has 
+been implemented in several directory servers, including slapd. Nonetheless, 
+it is important to note that it is a draft, meaning that it is subject to change 
+and is a work-in-progress.
+
+The key abilities of the password policy overlay are as follows:
+
+* Enforce a minimum length for new passwords
+* Make sure passwords are not changed too frequently
+* Cause passwords to expire, provide warnings before they need to be changed, and allow a fixed number of 'grace' logins to allow them to be changed after they have expired
+* Maintain a history of passwords to prevent password re-use
+* Prevent password guessing by locking a password for a specified period of time after repeated authentication failures
+* Force a password to be changed at the next authentication
+* Set an administrative lock on an account
+* Support multiple password policies on a default or a per-object basis.
+* Perform arbitrary quality checks using an external loadable module. This is a non-standard extension of the draft RFC.
+
+
+H3: Password Policy Configuration
+
+Instantiate the module in the database where it will be used, after adding the 
+new ppolicy schema and loading the ppolicy module. The following example shows 
+the ppolicy module being added to the database that handles the naming 
+context "dc=example,dc=com". In this example we are also specifying the DN of 
+a policy object to use if none other is specified in a user's object.
+
+>       database bdb
+>       suffix "dc=example,dc=com"
+>       [...additional database configuration directives go here...]
+>       
+>       overlay ppolicy
+>       ppolicy_default "cn=default,ou=policies,dc=example,dc=com"
+
+
+Now we need a container for the policy objects. In our example the password 
+policy objects are going to be placed in a section of the tree called 
+"ou=policies,dc=example,dc=com":
+
+>       dn: ou=policies,dc=example,dc=com
+>       objectClass: organizationalUnit
+>       objectClass: top
+>       ou: policies
+
+
+The default policy object that we are creating defines the following policies:
+
+* The user is allowed to change his own password. Note that the directory ACLs for this attribute can also affect this ability (pwdAllowUserChange: TRUE).
+* The name of the password attribute is "userPassword" (pwdAttribute: userPassword). Note that this is the only value that is accepted by OpenLDAP for this attribute.
+* The server will check the syntax of the password. If the server is unable to check the syntax (i.e., it was hashed or otherwise encoded by the client) it will return an error refusing the password (pwdCheckQuality: 2).
+* When a client includes the Password Policy Request control with a bind request, the server will respond with a password expiration warning if it is going to expire in ten minutes or less (pwdExpireWarning: 600). The warnings themselves are returned in a Password Policy Response control.
+* When the password for a DN has expired, the server will allow five additional "grace" logins (pwdGraceAuthNLimit: 5).
+* The server will maintain a history of the last five passwords that were used for a DN (pwdInHistory: 5).
+* The server will lock the account after the maximum number of failed bind attempts has been exceeded (pwdLockout: TRUE).
+* When the server has locked an account, the server will keep it locked until an administrator unlocks it (pwdLockoutDuration: 0)
+* The server will reset its failed bind count after a period of 30 seconds.
+* Passwords will not expire (pwdMaxAge: 0).
+* Passwords can be changed as often as desired (pwdMinAge: 0).
+* Passwords must be at least 5 characters in length (pwdMinLength: 5).
+* The password does not need to be changed at the first bind or when the administrator has reset the password (pwdMustChange: FALSE)
+* The current password does not need to be included with password change requests (pwdSafeModify: FALSE)
+* The server will only allow five failed binds in a row for a particular DN (pwdMaxFailure: 5).
+
+
+The actual policy would be:
+
+>       dn: cn=default,ou=policies,dc=example,dc=com
+>       cn: default
+>       objectClass: pwdPolicy
+>       objectClass: person
+>       objectClass: top
+>       pwdAllowUserChange: TRUE
+>       pwdAttribute: userPassword
+>       pwdCheckQuality: 2
+>       pwdExpireWarning: 600
+>       pwdFailureCountInterval: 30
+>       pwdGraceAuthNLimit: 5
+>       pwdInHistory: 5
+>       pwdLockout: TRUE
+>       pwdLockoutDuration: 0
+>       pwdMaxAge: 0
+>       pwdMaxFailure: 5
+>       pwdMinAge: 0
+>       pwdMinLength: 5
+>       pwdMustChange: FALSE
+>       pwdSafeModify: FALSE
+>       sn: dummy value
+
+You can create additional policy objects as needed. 
+
+
+There are two ways password policy can be applied to individual objects:
+
+1. The pwdPolicySubentry in a user's object - If a user's object has a
+pwdPolicySubEntry attribute specifying the DN of a policy object, then 
+the policy defined by that object is applied.
+
+2. Default password policy - If there is no specific pwdPolicySubentry set
+for an object, and the password policy module was configured with the DN of a
+default policy object and if that object exists, then the policy defined in
+that object is applied.
+
+Please see {{slapo-ppolicy(5)}} for complete explanations of features and discussion of
+ "Password Management Issues" at {{URL:http://www.symas.com/blog/?page_id=66}}
+
+
+H3: Further Information
+
+{{:slapo-ppolicy(5)}}
+
+
+H2: Referential Integrity
+
+
+H3: Overview
+
+This overlay can be used with a backend database such as slapd-bdb(5)
+to maintain the cohesiveness of a schema which utilizes reference
+attributes.
+
+Whenever a {{modrdn}} or {{delete}} is performed, that is, when an entry's DN
+is renamed or an entry is removed, the server will search the directory for
+references to this DN (in selected attributes: see below) and update them
+accordingly. If it was a {{delete}} operation, the reference is deleted. If it
+was a {{modrdn}} operation, then the reference is updated with the new DN.
+
+For example, a very common administration task is to maintain group membership
+lists, specially when users are removed from the directory. When an
+user account is deleted or renamed, all groups this user is a member of have to be
+updated. LDAP administrators usually have scripts for that. But we can use the
+{{F:refint}} overlay to automate this task. In this example, if the user is
+removed from the directory, the overlay will take care to remove the user from
+all the groups he/she was a member of. No more scripting for this.
+
+H3: Referential Integrity Configuration
+
+The configuration for this overlay is as follows:
+
+>       overlay refint
+>       refint_attributes <attribute [attribute ...]>
+>       refint_nothing <string>
+
+* {{F:refint_attributes}}: this parameter specifies a space separated list of
+attributes which will have the referential integrity maintained. When an entry is
+removed or has its DN renamed, the server will do an internal search for any of the
+{{F:refint_attributes}} that point to the affected DN and update them accordingly. IMPORTANT:
+the attributes listed here must have the {{F:distinguishedName}} syntax, that is,
+hold DNs as values.
+* {{F:refint_nothing}}: some times, while trying to maintain the referential
+integrity, the server has to remove the last attribute of its kind from an
+entry. This may be prohibited by the schema: for example, the
+{{F:groupOfNames}} object class requires at least one member. In these cases,
+the server will add the attribute value specified in {{F:refint_nothing}}
+to the entry.
+
+To illustrate this overlay, we will use the group membership scenario.
+
+In {{F:slapd.conf}}:
+
+>       overlay refint
+>       refint_attributes member
+>       refint_nothing "cn=admin,dc=example,dc=com"
+
+This configuration tells the overlay to maintain the referential integrity of the {{F:member}}
+attribute. This attribute is used in the {{F:groupOfNames}} object class which always needs
+a member, so we add the {{F:refint_nothing}} directive to fill in the group with a standard
+member should all the members vanish.
+
+If we have the following group membership, the refint overlay will
+automatically remove {{F:john}} from the group if his entry is removed from the
+directory:
+
+!import "refint.png"; align="center"; title="Group membership"
+FT[align="Center"] Figure X.Y: Maintaining referential integrity in groups
+
+Notice that if we rename ({{F:modrdn}}) the {{F:john}} entry to, say, {{F:jsmith}}, the refint
+overlay will also rename the reference in the {{F:member}} attribute, so the group membership
+stays correct.
+
+If we removed all users from the directory who are a member of this group, then the end result
+would be a single member in the group: {{F:cn=admin,dc=example,dc=com}}. This is the
+{{F:refint_nothing}} parameter kicking into action so that the schema is not violated.
+
+The {{rootdn}} must be set for the database as refint runs as the {{rootdn}} to gain access to
+make its updates.  The {{rootpw}} does not need to be set.
+
+H3: Further Information
+
+{{:slapo-refint(5)}}
+
+
+H2: Return Code
+
+
+H3: Overview
+
+This overlay is useful to test the behavior of clients when
+server-generated erroneous and/or unusual responses occur,
+for example; error codes, referrals, excessive response times and so on.
+
+This would be classed as a debugging tool whilst developing client software
+or additional Overlays.
+
+For detailed information, please see the {{slapo-retcode(5)}} man page.
+
+
+H3: Return Code Configuration
+
+The retcode overlay utilizes the "return code" schema described in the man page.  
+This schema is specifically designed for use with this overlay and is not intended 
+to be used otherwise. 
+
+Note: The necessary schema is loaded automatically by the overlay.
+
+An example configuration might be:
+
+>       overlay         retcode
+>       retcode-parent  "ou=RetCodes,dc=example,dc=com"
+>       include         ./retcode.conf
+>       
+>       retcode-item    "cn=Unsolicited"                0x00 unsolicited="0"
+>       retcode-item    "cn=Notice of Disconnect"       0x00 unsolicited="1.3.6.1.4.1.1466.20036"
+>       retcode-item    "cn=Pre-disconnect"             0x34 flags="pre-disconnect"
+>       retcode-item    "cn=Post-disconnect"            0x34 flags="post-disconnect"
+
+Note: {{retcode.conf}} can be found in the openldap source at: {{F:tests/data/retcode.conf}}
+
+An excerpt of a {{F:retcode.conf}} would be something like:
+
+>       retcode-item    "cn=success"                            0x00
+>       
+>       retcode-item    "cn=success w/ delay"                   0x00    sleeptime=2
+>       
+>       retcode-item    "cn=operationsError"                    0x01
+>       retcode-item    "cn=protocolError"                      0x02
+>       retcode-item    "cn=timeLimitExceeded"                  0x03    op=search
+>       retcode-item    "cn=sizeLimitExceeded"                  0x04    op=search
+>       retcode-item    "cn=compareFalse"                       0x05    op=compare
+>       retcode-item    "cn=compareTrue"                        0x06    op=compare
+>       retcode-item    "cn=authMethodNotSupported"             0x07
+>       retcode-item    "cn=strongAuthNotSupported"             0x07    text="same as authMethodNotSupported"
+>       retcode-item    "cn=strongAuthRequired"                 0x08
+>       retcode-item    "cn=strongerAuthRequired"               0x08    text="same as strongAuthRequired"
+
+Please see {{F:tests/data/retcode.conf}} for a complete {{F:retcode.conf}}
+
+
+H3: Further Information
+
+{{:slapo-retcode(5)}}
+
+
+H2: Rewrite/Remap
+            
+            
+H3: Overview
+
+It performs basic DN/data rewrite and objectClass/attributeType mapping. Its 
+usage is mostly intended to provide virtual views of existing data either 
+remotely, in conjunction with the proxy backend described in {{slapd-ldap(5)}}, 
+or locally, in conjunction with the relay backend described in {{slapd-relay(5)}}.
+
+This overlay is extremely configurable and advanced, therefore recommended 
+reading is the {{slapo-rwm(5)}} man page.
+
+
+H3: Rewrite/Remap Configuration
+
+
+H3: Further Information
+
+{{:slapo-rwm(5)}}
+
+
+H2: Sync Provider
+
+
+H3: Overview
+
+This overlay implements the provider-side support for the LDAP Content Synchronization 
+({{REF:RFC4533}}) as well as syncrepl replication support, including persistent search functionality.
+
+H3: Sync Provider Configuration
+
+There is very little configuration needed for this overlay, in fact for many situations merely loading 
+the overlay will suffice.
+
+However, because the overlay creates a contextCSN attribute in the root entry of the database which is
+updated for every write operation performed against the database and only updated in memory, it is 
+recommended to configure a checkpoint so that the contextCSN is written into the underlying database to 
+minimize recovery time after an unclean shutdown:
+
+>       overlay syncprov
+>       syncprov-checkpoint 100 10
+
+For every 100 operations or 10 minutes, which ever is sooner, the contextCSN will be checkpointed.
+
+The four configuration directives available are {{B:syncprov-checkpoint}}, {{B:syncprov-sessionlog}},
+{{B:syncprov-nopresent}} and {{B:syncprov-reloadhint}} which are covered in the man page discussing
+various other scenarios where this overlay can be used. 
+
+H3: Further Information
+
+The {{:slapo-syncprov(5)}} man page and the {{SECT:Configuring the different replication types}} section
+
+
+H2: Translucent Proxy
+
+
+H3: Overview
+
+This overlay can be used with a backend database such as {{:slapd-bdb}}(5)
+to create a "translucent proxy".
+
+Entries retrieved from a remote LDAP server may have some or all attributes 
+overridden, or new attributes added, by entries in the local database before 
+being presented to the client.
+
+A search operation is first populated with entries from the remote LDAP server, 
+the attributes of which are then overridden with any attributes defined in the
+local database. Local overrides may be populated with the add, modify, and 
+modrdn operations, the use of which is restricted to the root user of the 
+translucent local database.
+
+A compare operation will perform a comparison with attributes defined in the
+local database record (if any) before any comparison is made with data in the 
+remote database.
+
+
+H3: Translucent Proxy Configuration
+
+There are various options available with this overlay, but for this example we
+will demonstrate adding new attributes to a remote entry and also searching 
+against these newly added local attributes. For more information about overriding remote
+entries and search configuration, please see {{:slapo-translucent(5)}}
+
+Note: The Translucent Proxy overlay will disable schema checking in the local
+database, so that an entry consisting of overlay attributes need not adhere
+ to the complete schema.
+
+First we configure the overlay in the normal manner:
+
+>       include     /usr/local/etc/openldap/schema/core.schema
+>       include     /usr/local/etc/openldap/schema/cosine.schema
+>       include     /usr/local/etc/openldap/schema/nis.schema
+>       include     /usr/local/etc/openldap/schema/inetorgperson.schema
+>       
+>       pidfile     ./slapd.pid
+>       argsfile    ./slapd.args
+>       
+>       database    bdb
+>       suffix      "dc=suretecsystems,dc=com"
+>       rootdn      "cn=trans,dc=suretecsystems,dc=com"
+>       rootpw      secret
+>       directory   ./openldap-data
+>       
+>       index       objectClass eq
+>       
+>       overlay     translucent
+>       translucent_local carLicense
+>       
+>       uri         ldap://192.168.X.X:389
+>       lastmod     off
+>       acl-bind    binddn="cn=admin,dc=suretecsystems,dc=com" credentials="blahblah"
+
+You will notice the overlay directive and a directive to say what attribute we 
+want to be able to search against in the local database. We must also load the 
+ldap backend which will connect to the remote directory server.
+
+Now we take an example LDAP group:
+
+>       # itsupport, Groups, suretecsystems.com
+>       dn: cn=itsupport,ou=Groups,dc=suretecsystems,dc=com
+>       objectClass: posixGroup
+>       objectClass: sambaGroupMapping
+>       cn: itsupport
+>       gidNumber: 1000
+>       sambaSID: S-1-5-21-XXX
+>       sambaGroupType: 2
+>       displayName: itsupport
+>       memberUid: ghenry
+>       memberUid: joebloggs
+
+and create an LDIF file we can use to add our data to the local database, using
+ some pretty strange choices of new attributes for demonstration purposes:
+
+>       [ghenry@suretec test_configs]$ cat test-translucent-add.ldif 
+>       dn: cn=itsupport,ou=Groups,dc=suretecsystems,dc=com
+>       businessCategory: frontend-override
+>       carLicense: LIVID
+>       employeeType: special
+>       departmentNumber: 9999999
+>       roomNumber: 41L-535
+
+Searching against the proxy gives:
+
+>       [ghenry@suretec test_configs]$ ldapsearch -x -H ldap://127.0.0.1:9001 "(cn=itsupport)"
+>       # itsupport, Groups, OxObjects, suretecsystems.com
+>       dn: cn=itsupport,ou=Groups,ou=OxObjects,dc=suretecsystems,dc=com
+>       objectClass: posixGroup
+>       objectClass: sambaGroupMapping
+>       cn: itsupport
+>       gidNumber: 1003
+>       SAMBASID: S-1-5-21-XXX
+>       SAMBAGROUPTYPE: 2
+>       displayName: itsupport
+>       memberUid: ghenry
+>       memberUid: joebloggs
+>       roomNumber: 41L-535
+>       departmentNumber: 9999999
+>       employeeType: special
+>       carLicense: LIVID
+>       businessCategory: frontend-override
+
+Here we can see that the 5 new attributes are added to the remote entry before 
+being returned to the our client.
+
+Because we have configured a local attribute to search against:
+
+>       overlay     translucent
+>       translucent_local carLicense
+
+we can also search for that to return the completely fabricated entry:
+
+>       ldapsearch -x -H ldap://127.0.0.1:9001 (carLicense=LIVID)
+
+This is an extremely feature because you can then extend a remote directory server
+locally and also search against the local entries.
+
+Note: Because the translucent overlay does not perform any DN rewrites, the local
+ and remote database instances must have the same suffix. Other configurations 
+will probably fail with No Such Object and other errors
+
+H3: Further Information
+
+{{:slapo-translucent(5)}}
+
+
+H2: Attribute Uniqueness
+
+
+H3: Overview
+
+This overlay can be used with a backend database such as {{slapd-bdb(5)}}
+to enforce the uniqueness of some or all attributes within a subtree.
+
+
+H3: Attribute Uniqueness Configuration
+
+This overlay is only effective on new data from the point the overlay is enabled. To
+check uniqueness for existing data, you can export and import your data again via the
+LDAP Add operation, which will not be suitable for large amounts of data, unlike {{B:slapcat}}.
+
+For the following example, if uniqueness were enforced for the {{B:mail}} attribute, 
+the subtree would be searched for any other records which also have a {{B:mail}} attribute 
+containing the same value presented with an {{B:add}}, {{B:modify}} or {{B:modrdn}} operation 
+which are unique within the configured scope. If any are found, the request is rejected.
+
+Note:  If no attributes are specified, for example {{B:ldap:///??sub?}}, then the URI applies to all non-operational attributes. However,
+the keyword {{B:ignore}} can be specified to exclude certain non-operational attributes. 
+
+To search at the base dn of the current backend database ensuring uniqueness of the {{B:mail}}
+attribute, we simply add the following configuration:
+
+>       overlay unique
+>       unique_uri ldap:///?mail?sub?
+
+For an existing entry of:
+
+>       dn: cn=gavin,dc=suretecsystems,dc=com
+>       objectClass: top
+>       objectClass: inetorgperson
+>       cn: gavin
+>       sn: henry
+>       mail: ghenry@suretecsystems.com
+
+and we then try to add a new entry of:
+
+>       dn: cn=robert,dc=suretecsystems,dc=com
+>       objectClass: top
+>       objectClass: inetorgperson
+>       cn: robert
+>       sn: jones
+>       mail: ghenry@suretecsystems.com
+
+would result in an error like so:
+
+>       adding new entry "cn=robert,dc=example,dc=com"
+>       ldap_add: Constraint violation (19)
+>               additional info: some attributes not unique
+
+The overlay can have multiple URIs specified within a domain, allowing complex
+selections of objects and also have multiple {{B:unique_uri}} statements or 
+{{B:olcUniqueURI}} attributes which will create independent domains.
+
+For more information and details about the {{B:strict}} and {{B:ignore}} keywords,
+please see the {{:slapo-unique(5)}} man page.
+
+H3: Further Information
+
+{{:slapo-unique(5)}}
+
+
+H2: Value Sorting
+
+
+H3: Overview
+
+The Value Sorting overlay can be used with a backend database to sort the 
+values of specific multi-valued attributes within a subtree. The sorting occurs 
+whenever the attributes are returned in a search response.
+
+H3: Value Sorting Configuration
+
+Sorting can be specified in ascending or descending order, using either numeric 
+or alphanumeric sort methods. Additionally, a "weighted" sort can be specified,
+ which uses a numeric weight prepended to the attribute values. 
+
+The weighted sort is always performed in ascending order, but may be combined 
+with the other methods for values that all have equal weights. The weight is 
+specified by prepending an integer weight {<weight>} in front of each value 
+of the attribute for which weighted sorting is desired. This weighting factor 
+is stripped off and never returned in search results.
+
+Here are a few examples:
+
+>       loglevel    sync stats
+>       
+>       database    hdb
+>       suffix      "dc=suretecsystems,dc=com"
+>       directory   /usr/local/var/openldap-data
+>       
+>       ......
+>       
+>       overlay valsort
+>       valsort-attr memberUid ou=Groups,dc=suretecsystems,dc=com alpha-ascend
+
+For example, ascend:
+
+>       # sharedemail, Groups, suretecsystems.com
+>       dn: cn=sharedemail,ou=Groups,dc=suretecsystems,dc=com
+>       objectClass: posixGroup
+>       objectClass: top
+>       cn: sharedemail
+>       gidNumber: 517
+>       memberUid: admin
+>       memberUid: dovecot
+>       memberUid: laura
+>       memberUid: suretec
+
+For weighted, we change our data to:
+
+>       # sharedemail, Groups, suretecsystems.com
+>       dn: cn=sharedemail,ou=Groups,dc=suretecsystems,dc=com
+>       objectClass: posixGroup
+>       objectClass: top
+>       cn: sharedemail
+>       gidNumber: 517
+>       memberUid: {4}admin
+>       memberUid: {2}dovecot
+>       memberUid: {1}laura
+>       memberUid: {3}suretec
+
+and change the config to:
+
+>       overlay valsort
+>       valsort-attr memberUid ou=Groups,dc=suretecsystems,dc=com weighted
+
+Searching now results in:
+
+>       # sharedemail, Groups, OxObjects, suretecsystems.com
+>       dn: cn=sharedemail,ou=Groups,ou=OxObjects,dc=suretecsystems,dc=com
+>       objectClass: posixGroup
+>       objectClass: top
+>       cn: sharedemail
+>       gidNumber: 517
+>       memberUid: laura
+>       memberUid: dovecot
+>       memberUid: suretec
+>       memberUid: admin
+
+
+H3: Further Information
+
+{{:slapo-valsort(5)}}
+
+
+H2: Overlay Stacking
+
+
+H3: Overview
+
+Overlays can be stacked, which means that more than one overlay
+can be instantiated for each database, or for the {{EX:frontend}}.
+As a consequence, each overlays function is called, if defined,
+when overlay execution is invoked.
+Multiple overlays are executed in reverse order (as a stack)
+with respect to their definition in slapd.conf (5), or with respect
+to their ordering in the config database, as documented in slapd-config (5).
+
+
+H3: Example Scenarios
+
+
+H4: Samba

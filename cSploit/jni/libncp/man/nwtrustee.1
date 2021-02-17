@@ -1,0 +1,127 @@
+.TH NWTRUSTEE 8 7/9/1996 nwtrustee nwtrustee
+.SH NAME
+nwtrustee \- List an object's trustee directory assignments
+.SH SYNOPSIS
+.B nwtrustee
+[
+.B -h
+] [
+.B -S
+.I server
+] [
+.B -U
+.I user name
+] [
+.B -P
+.I password
+|
+.B -n
+] [
+.B -C
+] [
+.B -l
+.I volume number
+] [
+.B -L
+.I volume name
+] [
+.B -O
+.I object id
+] [
+.B -o
+.I object name
+] [
+.B -t
+.I object type
+] [
+.B -v
+]
+
+.SH DESCRIPTION
+.B nwtrustee
+lists the trustee directory assignments a user has on a specific volume.
+
+.B nwtrustee
+looks up the file
+.I $HOME/.nwclient
+to find a file server, a user name and possibly a password. See
+nwclient(5) for more information. Please note that the access
+permissions of $HOME/.nwclient MUST be 600 for security reasons.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user
+.RS 3
+.B user
+is the user name to use for login.
+.RE
+
+.B -P
+.I password
+.RS 3
+.B password
+is the password to use for login. If neither
+.B -n
+nor
+.B -P
+are given, and the user has no open connection to the server, nwtrustee
+prompts for a password.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given if no password is required for the login.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.B -O
+.I object id
+.RS 3
+The bindery object id of the user whose assignments should be listed.
+Alternatively, use -o object name.
+.RE
+
+.B -o
+.I object name
+.RS 3
+The name of the user whose assignments should be listed.
+.RE
+
+.B -t
+.I object type
+.RS 3
+The type of object whose assignments should be listed. This defaults to 1,
+which means user. Another sensible value is 2, which means group.
+.RE
+
+.B -v
+.RS 3
+Verbose listing. Also list the specific rights that are assigned to the
+user.
+.RE
+
+.SH AUTHORS
+nwtrustee was written by Jacek Stepniewski <cunio@gazeta.pl>.
+This manual page was written by Volker Lendecke.

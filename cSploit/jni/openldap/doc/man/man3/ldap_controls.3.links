@@ -1,0 +1,6 @@
+ldap_control_create.3
+ldap_control_find.3
+ldap_control_dup.3
+ldap_controls_dup.3
+ldap_control_free.3
+ldap_controls_free.3

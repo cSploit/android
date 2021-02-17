@@ -1,0 +1,31 @@
+This directory contains a slapd module proxyOld that provides support
+for the obsolete draft-weltman-ldapb3-proxy-05 revision of the LDAP
+Proxy Authorization control. It is merely intended to provide compatibility
+in environments where other servers only recognize this old control.
+New installations should not use this code.
+
+To use the module, add:
+
+	moduleload <path to>proxyOld.so
+	...
+
+to your slapd configuration file. Since this is an obsolete feature,
+the control is registered with the SLAP_CTRL_HIDE flag so that it will
+not be advertised in the rootDSE's supportedControls attribute.
+
+This code only works as a dynamically loaded module.
+
+---
+This work is part of OpenLDAP Software <http://www.openldap.org/>.
+
+Copyright 1998-2014 The OpenLDAP Foundation.
+Portions Copyright 2005 Howard Chu, Symas Corp. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+
+A copy of this license is available in the file LICENSE in the
+top-level directory of the distribution or, alternatively, at
+<http://www.OpenLDAP.org/license.html>.
+

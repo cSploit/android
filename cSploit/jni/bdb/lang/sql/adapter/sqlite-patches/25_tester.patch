@@ -1,0 +1,281 @@
+--- test/tester.tcl
++++ test/tester.tcl
+@@ -31,7 +31,6 @@
+ # Test the capability of the SQLite version built into the interpreter to
+ # determine if a specific test can be run:
+ #
+-#      capable                EXPR
+ #      ifcapable              EXPR
+ #
+ # Calulate checksums based on database contents:
+@@ -136,7 +135,7 @@
+     # NOTE: Return the default number of retries for [file] operations.  A
+     #       value of zero or less here means "disabled".
+     #
+-    return [expr {$::tcl_platform(platform) eq "windows" ? 50 : 0}]
++    return [expr {$::tcl_platform(platform) eq "windows" ? 10 : 0}]
+   }
+   return $::G(file-retries)
+ }
+@@ -438,6 +437,9 @@
+   forcedelete test.db-journal
+   forcedelete test.db-wal
+   sqlite3 db ./test.db
++  if {[ array names ::env BDB_BLOB_SETTING ] != "" } {
++    db eval "pragma large_record_opt=$::env(BDB_BLOB_SETTING)"
++  }
+   set ::DB [sqlite3_connection_pointer db]
+   if {[info exists ::SETUP_SQL]} {
+     db eval $::SETUP_SQL
+@@ -552,19 +554,16 @@
+     } else {
+       if {[regexp {^~?/.*/$} $expected]} {
+         if {[string index $expected 0]=="~"} {
+-          set re [string map {# {[-0-9.]+}} [string range $expected 2 end-1]]
++          set re [string range $expected 2 end-1]
+           set ok [expr {![regexp $re $result]}]
+         } else {
+-          set re [string map {# {[-0-9.]+}} [string range $expected 1 end-1]]
++          set re [string range $expected 1 end-1]
+           set ok [regexp $re $result]
+         }
+       } else {
+         set ok [expr {[string compare $result $expected]==0}]
+       }
+       if {!$ok} {
+-        # if {![info exists ::testprefix] || $::testprefix eq ""} {
+-        #   error "no test prefix"
+-        # }
+         set ignore 0
+         foreach pattern $IGNORE_CASES {
+             if {[string match $pattern $name]} {
+@@ -999,7 +998,6 @@
+   do_test $name [list sqlite3_extended_errcode $db] $expected
+ }
+ 
+-
+ # Return true if the SQL statement passed as the second argument uses a
+ # statement transaction.
+ #
+@@ -1029,12 +1027,6 @@
+   return $ret
+ }
+ 
+-# Returns non-zero if the capabilities are present; zero otherwise.
+-#
+-proc capable {expr} {
+-  set e [fix_ifcapable_expr $expr]; return [expr ($e)]
+-}
+-
+ # Evaluate a boolean expression of capabilities.  If true, execute the
+ # code.  Omit the code if false.
+ #
+@@ -1061,7 +1053,7 @@
+ # boolean, indicating whether or not the process actually crashed or
+ # reported some other error. The second element in the returned list is the
+ # error message. This is "child process exited abnormally" if the crash
+-# occurred.
++# occured.
+ #
+ #   crashsql -delay CRASHDELAY -file CRASHFILE ?-blocksize BLOCKSIZE? $sql
+ #
+@@ -1142,25 +1134,6 @@
+   lappend r $msg
+ }
+ 
+-proc run_ioerr_prep {} {
+-  set ::sqlite_io_error_pending 0
+-  catch {db close}
+-  catch {db2 close}
+-  catch {forcedelete test.db}
+-  catch {forcedelete test.db-journal}
+-  catch {forcedelete test2.db}
+-  catch {forcedelete test2.db-journal}
+-  set ::DB [sqlite3 db test.db; sqlite3_connection_pointer db]
+-  sqlite3_extended_result_codes $::DB $::ioerropts(-erc)
+-  if {[info exists ::ioerropts(-tclprep)]} {
+-    eval $::ioerropts(-tclprep)
+-  }
+-  if {[info exists ::ioerropts(-sqlprep)]} {
+-    execsql $::ioerropts(-sqlprep)
+-  }
+-  expr 0
+-}
+-
+ # Usage: do_ioerr_test <test number> <options...>
+ #
+ # This proc is used to implement test cases that check that IO errors
+@@ -1193,26 +1166,10 @@
+   # TEMPORARY: For 3.5.9, disable testing of extended result codes. There are
+   # a couple of obscure IO errors that do not return them.
+   set ::ioerropts(-erc) 0
+-  
+-  # Create a single TCL script from the TCL and SQL specified
+-  # as the body of the test.
+-  set ::ioerrorbody {}
+-  if {[info exists ::ioerropts(-tclbody)]} {
+-    append ::ioerrorbody "$::ioerropts(-tclbody)\n"
+-  }
+-  if {[info exists ::ioerropts(-sqlbody)]} {
+-    append ::ioerrorbody "db eval {$::ioerropts(-sqlbody)}"
+-  }
+-
+-  save_prng_state
+-  if {$::ioerropts(-cksum)} {
+-    run_ioerr_prep
+-    eval $::ioerrorbody
+-    set ::goodcksum [cksum]
+-  }
+ 
+   set ::go 1
+   #reset_prng_state
++  save_prng_state
+   for {set n $::ioerropts(-start)} {$::go} {incr n} {
+     set ::TN $n
+     incr ::ioerropts(-count) -1
+@@ -1229,12 +1186,27 @@
+     # Delete the files test.db and test2.db, then execute the TCL and 
+     # SQL (in that order) to prepare for the test case.
+     do_test $testname.$n.1 {
+-      run_ioerr_prep
++      set ::sqlite_io_error_pending 0
++      catch {db close}
++      catch {db2 close}
++      catch {forcedelete test.db}
++      catch {forcedelete test.db-journal}
++      catch {forcedelete test2.db}
++      catch {forcedelete test2.db-journal}
++      set ::DB [sqlite3 db test.db; sqlite3_connection_pointer db]
++      sqlite3_extended_result_codes $::DB $::ioerropts(-erc)
++      if {[info exists ::ioerropts(-tclprep)]} {
++        eval $::ioerropts(-tclprep)
++      }
++      if {[info exists ::ioerropts(-sqlprep)]} {
++        execsql $::ioerropts(-sqlprep)
++      }
++      expr 0
+     } {0}
+ 
+     # Read the 'checksum' of the database.
+     if {$::ioerropts(-cksum)} {
+-      set ::checksum [cksum]
++      set checksum [cksum]
+     }
+ 
+     # Set the Nth IO error to fail.
+@@ -1242,10 +1214,20 @@
+       set ::sqlite_io_error_persist $::ioerropts(-persist)
+       set ::sqlite_io_error_pending $n
+     }] $n
++  
++    # Create a single TCL script from the TCL and SQL specified
++    # as the body of the test.
++    set ::ioerrorbody {}
++    if {[info exists ::ioerropts(-tclbody)]} {
++      append ::ioerrorbody "$::ioerropts(-tclbody)\n"
++    }
++    if {[info exists ::ioerropts(-sqlbody)]} {
++      append ::ioerrorbody "db eval {$::ioerropts(-sqlbody)}"
++    }
+ 
+-    # Execute the TCL script created for the body of this test. If
+-    # at least N IO operations performed by SQLite as a result of 
+-    # the script, the Nth will fail.
++    # Execute the TCL Script created in the above block. If
++    # there are at least N IO operations performed by SQLite as
++    # a result of the script, the Nth will fail.
+     do_test $testname.$n.3 {
+       set ::sqlite_io_error_hit 0
+       set ::sqlite_io_error_hardhit 0
+@@ -1341,7 +1323,7 @@
+       }
+     }
+ 
+-    # If an IO error occurred, then the checksum of the database should
++    # If an IO error occured, then the checksum of the database should
+     # be the same as before the script that caused the IO error was run.
+     #
+     if {$::go && $::sqlite_io_error_hardhit && $::ioerropts(-cksum)} {
+@@ -1349,15 +1331,8 @@
+         catch {db close}
+         catch {db2 close}
+         set ::DB [sqlite3 db test.db; sqlite3_connection_pointer db]
+-        set nowcksum [cksum]
+-        set res [expr {$nowcksum==$::checksum || $nowcksum==$::goodcksum}]
+-        if {$res==0} {
+-          puts "now=$nowcksum"
+-          puts "the=$::checksum"
+-          puts "fwd=$::goodcksum"
+-        }
+-        set res
+-      } 1
++        cksum
++      } $checksum
+     }
+ 
+     set ::sqlite_io_error_hardhit 0
+@@ -1513,6 +1488,7 @@
+   ifcapable trigger&&foreignkey {
+     $db eval "PRAGMA foreign_keys = $pk"
+   }
++  forcedelete test.db-journal/__db.register
+ }
+ 
+ #-------------------------------------------------------------------------
+@@ -1549,6 +1525,7 @@
+     $db eval { SELECT * FROM sqlite_master }
+     do_test $testname [list $db eval "PRAGMA main.journal_mode"] {wal}
+   }
++  forcedelete test.db-journal/__db.register
+ }
+ 
+ proc permutation {} {
+@@ -1686,6 +1663,7 @@
+     set f [string range $f2 3 end]
+     forcecopy $f2 $f
+   }
++  forcedelete test.db-journal/__db.register
+ }
+ proc db_restore_and_reopen {{dbfile test.db}} {
+   catch { db close }
+--- test/permutations.test
++++ test/permutations.test
+@@ -170,6 +170,11 @@
+   thread004.test thread005.test walthread.test
+ }
+ 
++# We exlcude below fts3 tests:
++#  fts3defer.test, fts3defer2.test
++#  --  Known difference of zeroblob between SQLite and BDBSQL. #19764
++#  fts3fault.test
++#  --  Known difference: DBSQL testfixture does't support sqlite_io_error tests.
+ test_suite "fts3" -prefix "" -description {
+   All FTS3 tests except fts3rnd.test.
+ } -files {
+@@ -177,13 +182,13 @@
+   fts3af.test fts3ag.test fts3ah.test fts3ai.test fts3aj.test
+   fts3ak.test fts3al.test fts3am.test fts3an.test fts3ao.test
+   fts3atoken.test fts3b.test fts3c.test fts3cov.test fts3d.test
+-  fts3defer.test fts3defer2.test fts3e.test fts3expr.test fts3expr2.test 
++  fts3e.test fts3expr.test fts3expr2.test 
+   fts3near.test fts3query.test fts3shared.test fts3snippet.test 
+   fts3sort.test
+-  fts3fault.test fts3malloc.test fts3matchinfo.test
++  fts3malloc.test fts3matchinfo.test
+   fts3aux1.test fts3comp1.test fts3auto.test
+   fts4aa.test fts4content.test
+-  fts3conf.test fts3prefix.test fts3fault2.test fts3corrupt.test
++  fts3conf.test fts3prefix.test fts3corrupt.test
+   fts3corrupt2.test fts3first.test fts4langid.test fts4merge.test
+   fts4check.test fts4unicode.test
+ }
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -430,7 +430,6 @@
+   $(TOP)/ext/fts3/fts3.c \
+   $(TOP)/ext/fts3/fts3_aux.c \
+   $(TOP)/ext/fts3/fts3_expr.c \
+-  $(TOP)/ext/fts3/fts3_term.c \
+   $(TOP)/ext/fts3/fts3_tokenizer.c \
+   $(TOP)/ext/fts3/fts3_write.c \
+   $(TOP)/ext/async/sqlite3async.c

@@ -1,0 +1,40 @@
+BEGIN { havesection = 0;
+	nsec = 0;
+	printf  "/*\n** This file generated automatically from %s\n*/\n\n",
+		FILENAME; 
+	printf "#include \"defs.h\"\n";
+      }
+/^%%/ { if (havesection) {
+	    printf "    0\n};\n\n";
+	}
+	if (NF >= 2) {
+	    havesection = 1;
+	    section = $2;
+	    seclist[nsec] = section;
+	    nsec = nsec + 1;
+	    printf "char *%s[] =\n{\n", $2;
+	    printf "    \"#line %d \\\"%s\\\"\",\n", FNR+1, FILENAME; 
+	} else {
+	    havesection = 0;
+	}
+	next; 
+      }
+      { if (havesection) {
+	    gsub(/\\/, "\\\\");
+	    gsub(/\t/, "\\t");
+	    gsub(/\"/, "\\\"");
+	    printf "    \"%s\",\n", $0; 
+        } else {
+	    print $0; 
+        }
+      }
+END   { if (havesection) {
+            printf "    0\n};\n\n"; 
+	}
+	if (nsec > 0) {
+	    printf "struct section section_list[] = {\n";
+	    for (i=0; i<nsec; i++)
+		printf "\t{ \"%s\", &%s[0] },\n", seclist[i], seclist[i];
+	    printf "\t{ 0, 0 } };\n"
+	}
+      }

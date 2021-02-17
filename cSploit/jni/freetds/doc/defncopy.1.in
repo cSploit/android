@@ -1,0 +1,110 @@
+.\" cf. groff_mdoc
+.Dd April 26, 2012
+.Os FreeTDS @VERSION@
+.Dt DEFNCOPY FreeTDS "FreeTDS Reference Manual"
+.\"
+.Sh NAME
+.Nm defncopy
+.Nd extract procedures and views from a Microsoft server.
+.\"
+.Sh SYNOPSIS
+.Pp
+.Nm
+.Op Fl v
+.Op Fl U Ar username
+.Op Fl P Ar password
+.Op Fl S Ar server
+.Op Fl D Ar database
+.Op Fl i Ar input_file
+.Op Fl o Ar output_file
+.Bo
+.Ar owner.object_name
+.\" Elipsis according to Werner Lemberg:
+.\" http://www.mail-archive.com/groff@gnu.org/msg03122.html
+.Op Ar owner.object_name .\|.\|.\&
+.Bc
+.\"
+.Sh DESCRIPTION
+.Pp
+.Nm
+is a utility program distributed with FreeTDS. It replaces
+a similar program of the same name distributed by Sybase.
+.Pp
+.Nm
+reads the text of a stored procedure or view, and writes a script
+suitable for recreating the procedure or view. For tables, it reads
+the output of sp_help and constructs a
+.Ql CREATE TABLE
+statement, complete
+with
+.Ql CREATE INDEX Ns ,
+too.
+.\"
+.Ar owner
+is optional if you or the database owner is the owner
+of the procedure/view being copied.
+.Ar object_name
+is the name of the system object you wish to extract.
+.\"
+.Sh OPTIONS
+.Bl -tag -width indent
+.It Fl U Ar username
+database server login name.
+.It Fl P Ar password
+database server password.
+.It Fl S Ar server
+database server to which to connect.
+.It Fl D Ar database
+database to use. Optional if the procedure/view being extracted is in your
+default database.
+.It Fl i Ar input_file
+a script to apply to the database. Not currently implemented.
+.It Fl o Ar output_file
+a file to hold the script, defaults to standard output.
+.It Fl v
+Show version information and copyright notice.
+.El
+.\"
+.Sh NOTES
+.Nm
+is a filter; it reads from standard input, writes to standard output,
+and writes errors to standard error. The
+.Fl i ,
+.Fl o ,
+and
+.Fl e
+options override these defaults.
+.Pp
+.Nm
+makes use of the db-lib API provided by FreeTDS. This
+API is of course also available to application developers.
+.Sh EXIT STATUS
+.Pp
+.Nm
+exits 0 on success, and >0 if the server cannot process the query.
+.Pp
+.Nm
+will report any errors returned by the server, but will continue
+processing.
+.\"
+.Sh HISTORY
+.Pp
+.Nm
+first appeared in FreeTDS 0.63.
+.\"
+.Sh AUTHORS
+The
+.Nm
+utility was written by
+.An James K. Lowden Aq jklowden@schemamania.org.
+.\"
+.Sh BUGS
+Works only with Microsoft servers and ancient Sybase servers.
+Does not create primary keys.
+Many options are defined by Sybase that this version does not implement. Feel
+free to correct this situation.
+In theory,
+.Nm
+could apply/produce DDL for any system object,
+but at present only tables, procedures and views are supported,
+and only for extraction.

@@ -1,0 +1,601 @@
+AC_INIT(native/sqlite_jni.c)
+AC_DISABLE_STATIC
+AM_PROG_LIBTOOL
+AC_PROG_INSTALL
+CC=${CC:-cc}
+AC_SUBST(CC)
+HOSTCC=${HOSTCC:-cc}
+AC_SUBST(HOSTCC)
+AC_SUBST(CFLAGS)
+AC_SUBST(HOST_CFLAGS)
+AC_CANONICAL_TARGET
+
+##########
+# Handle the --prefix option
+#
+if test "${prefix}" = "NONE" ; then
+  prefix=/usr/local
+fi
+if test "${exec_prefix}" = "NONE" ; then
+  exec_prefix=$prefix
+fi
+eval libdir="$libdir"
+
+##########
+# Where to place the .jar file(s)
+#
+AC_ARG_WITH(jardir, [  --with-jardir=DIR       where to place .jar files],
+  JAR_DIR=$withval)
+if test "x$JAR_DIR" = "x" ; then
+  JAR_DIR_UNSPEC=yes
+  JAR_DIR=$prefix/share/java
+fi
+
+##########
+# Find SQLite header file and library
+#
+AC_ARG_WITH(sqlite, [  --with-sqlite=DIR       use SQLite header/lib from DIR],
+  SQLITE_DIR=$withval)
+if test ! -n "$SQLITE_DIR" -a -d "$SQLITE_DIR" ; then
+  AC_MSG_WARN([SQLite2 directory $SQLITE_DIR does not exist])
+fi
+
+SQLITE_INC=""
+SQLITE_LIB=""
+HAVE_SQLITE2=0
+
+if test "$with_sqlite" != "no" ; then
+  if test -z "$SQLITE_DIR" ; then
+    SQLITE_DIR="../sqlite /usr /usr/local /opt"
+  fi
+  AC_MSG_CHECKING([for SQLite header and library])
+  SQLITE_INC=UNKNOWN
+  SQLITE_LIB=UNKNOWN
+  for i in $SQLITE_DIR ; do
+    if test -r $i/sqlite.h ; then
+      if test -r $i/libsqlite.la ; then
+        SQLITE_INC="-I$i"
+        SQLITE_LIB="$i/libsqlite.la"
+        SQLITE_LIBDIR="-L$i"
+        break
+      elif test -r $i/libsqlite.a ; then
+        SQLITE_INC="-I$i"
+        SQLITE_LIB="$i/libsqlite.a"
+        SQLITE_LIBDIR="-L$i"
+        break
+      fi
+    elif test -r $i/include/sqlite.h ; then
+      for lib in lib64 lib ; do
+        if test -r $i/$lib/libsqlite.la ; then
+          SQLITE_INC="-I$i/include"
+          SQLITE_LIB="$i/$lib/libsqlite.la"
+          SQLITE_LIBDIR="-L$i/$lib"
+          break
+        elif test -r $i/$lib/libsqlite.a ; then
+          SQLITE_INC="-I$i/include"
+          SQLITE_LIB="$i/$lib/libsqlite.a"
+          SQLITE_LIBDIR="-L$i/$lib"
+          break
+        elif test -r $i/$lib/libsqlite.so ; then
+          SQLITE_INC="-I$i/include"
+          SQLITE_LIB="-lsqlite"
+          SQLITE_LIBDIR="-L$i/$lib"
+          break
+        fi
+      done
+      if test "$SQLITE_LIB" != "UNKNOWN" ; then
+        break
+      fi
+    fi
+  done
+  if test "$SQLITE_LIB" = "UNKNOWN" ; then
+    lib=`pkg-config sqlite --libs 2>/dev/null`
+    if test -n "$lib" ; then
+      SQLITE_INC=`pkg-config sqlite --cflags-only-I`
+      SQLITE_LIB="$lib"
+      SQLITE_LIBDIR=`pkg-config sqlite --libs-only-L`
+    fi
+  fi
+  if test "$SQLITE_INC" = "UNKNOWN" -o "$SQLITE_LIB" = "UNKNOWN" ; then
+    AC_MSG_RESULT(no)
+    AC_MSG_WARN(SQLite2 header files and/or library not found)
+    SQLITE_INC=""
+    SQLITE_LIB=""
+    HAVE_SQLITE2=0
+  else
+    HAVE_SQLITE2=1
+    AC_MSG_RESULT(yes)
+  fi
+fi
+AC_SUBST(SQLITE_INC)
+AC_SUBST(SQLITE_LIB)
+AC_SUBST(HAVE_SQLITE2)
+
+##########
+# Check SQLite features
+#
+HAVE_SQLITE_FUNCTION_TYPE=0
+HAVE_SQLITE_OPEN_AUX_FILE=0
+HAVE_SQLITE_SET_AUTHORIZER=0
+HAVE_SQLITE_TRACE=0
+HAVE_SQLITE_COMPILE=0
+HAVE_SQLITE_PROGRESS_HANDLER=0
+if test "$HAVE_SQLITE2" = 1 ; then
+  saved_CFLAGS=$CFLAGS
+  CFLAGS="$CFLAGS $SQLITE_INC"
+  saved_LIBS=$LIBS
+  LIBS="$LIBS $SQLITE_LIBDIR"
+  AC_CHECK_LIB(sqlite,sqlite_function_type,
+	       HAVE_SQLITE_FUNCTION_TYPE=1,HAVE_SQLITE_FUNCTION_TYPE=0)
+  AC_CHECK_LIB(sqlite,sqlite_open_aux_file,
+	       HAVE_SQLITE_OPEN_AUX_FILE=1,HAVE_SQLITE_OPEN_AUX_FILE=0)
+  AC_CHECK_LIB(sqlite,sqlite_set_authorizer,
+	       HAVE_SQLITE_SET_AUTHORIZER=1,HAVE_SQLITE_SET_AUTHORIZER=0)
+  AC_CHECK_LIB(sqlite,sqlite_trace,
+	       HAVE_SQLITE_TRACE=1,HAVE_SQLITE_TRACE=0)
+  AC_CHECK_LIB(sqlite,sqlite_compile,
+	       HAVE_SQLITE_COMPILE=1,HAVE_SQLITE_COMPILE=0)
+  AC_CHECK_LIB(sqlite,sqlite_progress_handler,
+	       HAVE_SQLITE_PROGRESS_HANDLER=1,HAVE_SQLITE_PROGRESS_HANDLER=0)
+  LIBS=$saved_LIBS
+  CFLAGS=$saved_CFLAGS
+fi
+AC_SUBST(HAVE_SQLITE_FUNCTION_TYPE)
+AC_SUBST(HAVE_SQLITE_OPEN_AUX_FILE)
+AC_SUBST(HAVE_SQLITE_SET_AUTHORIZER)
+AC_SUBST(HAVE_SQLITE_TRACE)
+AC_SUBST(HAVE_SQLITE_COMPILE)
+AC_SUBST(HAVE_SQLITE_PROGRESS_HANDLER)
+
+HAVE_SQLITE3_MALLOC=0
+HAVE_SQLITE3_PREPARE_V2=0
+HAVE_SQLITE3_PREPARE16_V2=0
+HAVE_SQLITE3_BIND_ZEROBLOB=0
+HAVE_SQLITE3_CLEAR_BINDINGS=0
+HAVE_SQLITE3_COLUMN_TABLE_NAME16=0
+HAVE_SQLITE3_COLUMN_DATABASE_NAME16=0
+HAVE_SQLITE3_COLUMN_ORIGIN_NAME16=0
+HAVE_SQLITE3_BIND_PARAMETER_COUNT=0
+HAVE_SQLITE3_BIND_PARAMETER_NAME=0
+HAVE_SQLITE3_BIND_PARAMETER_INDEX=0
+HAVE_SQLITE3_RESULT_ZEROBLOB=0
+HAVE_SQLITE3_INCRBLOBIO=0
+HAVE_SQLITE3_KEY="${HAVE_SQLITE3_KEY:-0}"
+HAVE_SQLITE3_SHARED_CACHE=0
+HAVE_SQLITE3_OPEN_V2=0
+HAVE_SQLITE3_LOAD_EXTENSION=0
+HAVE_SQLITE3_BACKUPAPI=0
+HAVE_SQLITE3_PROFILE=0
+HAVE_SQLITE3_STATUS=0
+HAVE_SQLITE3_DB_STATUS=0
+HAVE_SQLITE3_STMT_STATUS=0
+
+##########
+# Find SQLite3 header file and library
+#
+AC_ARG_WITH(sqlite3,
+  [  --with-sqlite3=DIR      use SQLite3 header/lib from DIR],
+  SQLITE3_DIR=$withval)
+if test ! -n "$SQLITE3_DIR" -a -d "$SQLITE3_DIR" ; then
+  AC_MSG_WARN([SQLite3 directory $SQLITE3_DIR does not exist])
+fi
+
+if test -z "$SQLITE3_DIR" ; then
+  SQLITE3_DIR="../sqlite /usr /usr/local /opt"
+fi
+
+AC_MSG_CHECKING([for SQLite3 header and library])
+SQLITE3_INC=UNKNOWN
+SQLITE3_LIB=UNKNOWN
+for i in $SQLITE3_DIR ; do
+  if test -r $i/sqlite3.h ; then
+    if test -r $i/sqlite3.c ; then
+      SQLITE3_INC="-I$i"
+      SQLITE3_LIB="unknown"
+      SQLITE3_LIBDIR=""
+      SQLITE3_A10N_C="$i/sqlite3.c"
+      SQLITE3_A10N_O="sqlite3.lo"
+      break 
+    elif test -r $i/libsqlite3.la ; then
+      SQLITE3_INC="-I$i"
+      SQLITE3_LIB="$i/libsqlite3.la"
+      SQLITE3_LIBDIR="-L$i"
+      break
+    elif test -r $i/libsqlite3.a ; then
+      SQLITE3_INC="-I$i"
+      SQLITE3_LIB="$i/libsqlite3.a"
+      SQLITE3_LIBDIR="-L$i"
+      break
+    elif test -r $i/see-sqlite3.c ; then
+      SQLITE3_INC="-I$i"
+      SQLITE3_LIB="unknown"
+      SQLITE3_LIBDIR=""
+      SQLITE3_A10N_C="$i/see-sqlite3.c"
+      SQLITE3_A10N_O="see-sqlite3.lo"
+      SQLITE3_IS_BUILD_WITH_SEE="yes"
+      HAVE_SQLITE3_KEY=1
+      break
+    fi
+  elif test -r $i/include/sqlite3.h ; then
+    for lib in lib64 lib ; do
+      if test -r $i/$lib/libsqlite3.la ; then
+        SQLITE3_INC="-I$i/include"
+        SQLITE3_LIB="$i/$lib/libsqlite3.la"
+        SQLITE3_LIBDIR="-L$i/$lib"
+        break
+      elif test -r $i/$lib/libsqlite3.a ; then
+        SQLITE3_INC="-I$i/include"
+        SQLITE3_LIB="$i/$lib/libsqlite3.a"
+        SQLITE3_LIBDIR="-L$i/$lib"
+        break
+      elif test -r $i/$lib/libsqlite3.so ; then
+        SQLITE3_INC="-I$i/include"
+        SQLITE3_LIB="-lsqlite3"
+        SQLITE3_LIBDIR="-L$i/$lib"
+        break
+      fi
+    done
+    if test "$SQLITE3_LIB" != "UNKNOWN" ; then
+      break
+    fi
+  fi
+done
+if test "$SQLITE3_LIB" = "UNKNOWN" ; then
+  lib=`pkg-config sqlite3 --libs 2>/dev/null`
+  if test -n "$lib" ; then
+    SQLITE3_INC=`pkg-config sqlite3 --cflags-only-I`
+    SQLITE3_LIB="$lib"
+    SQLITE3_LIBDIR=`pkg-config sqlite3 --libs-only-L`
+  fi
+fi
+if test "$SQLITE3_INC" = "UNKNOWN" -o "$SQLITE3_LIB" = "UNKNOWN" ; then
+  AC_MSG_RESULT(no)
+  AC_MSG_WARN(SQLite3 header files and/or library not found)
+  SQLITE3_INC=""
+  SQLITE3_LIB=""
+  HAVE_SQLITE3=0
+elif test -n "$SQLITE3_A10N_C" ; then
+  SQLITE3_LIB=""
+  SQLITE3_A10N_FLAGS="$SQLITE3_A10N_FLAGS -DSQLITE_ENABLE_COLUMN_METADATA=1"
+  SQLITE3_A10N_FLAGS="$SQLITE3_A10N_FLAGS -DSQLITE_DLL=1"
+  HAVE_SQLITE3=1
+  if test "$SQLITE3_IS_BUILT_WITH_SEE" = "yes" ; then
+    SQLITE3_A10N_FLAGS="$SQLITE3_A10N_FLAGS -DSQLITE_HAS_CODEC=1"
+    AC_MSG_RESULT([yes, using SEE])
+  else
+    AC_MSG_RESULT(yes)
+  fi
+else
+  HAVE_SQLITE3=1
+  AC_MSG_RESULT(yes)
+fi
+AC_SUBST(SQLITE3_INC)
+AC_SUBST(SQLITE3_LIB)
+AC_SUBST(HAVE_SQLITE3)
+
+##########
+# Check SQLite3 features
+#
+AC_ARG_ENABLE(load-extension,
+  [  --enable-load-extension support for loading SQLite 3.x extensions.
+     ***** WARNING *** WARNING *** WARNING *** WARNING *** WARNING *****
+     ***  Note that the --enable-load-extension option makes it      ***
+     ***  possible for library users to load arbitrary native code   ***
+     ***  into the JVM bypassing its security manager checks, and    ***
+     ***  thus should be enabled only if you know what you're doing. ***
+     *******************************************************************])
+test "x$enable_load_extension" = "xyes" || enable_load_extension=no
+if test "$HAVE_SQLITE3" = 1 -a -n "$SQLITE3_A10N_C" ; then
+  HAVE_SQLITE3_MALLOC=1
+  HAVE_SQLITE3_PREPARE_V2=1
+  HAVE_SQLITE3_PREPARE16_V2=1
+  HAVE_SQLITE3_BIND_ZEROBLOB=1
+  HAVE_SQLITE3_CLEAR_BINDINGS=1
+  HAVE_SQLITE3_COLUMN_TABLE_NAME16=1
+  HAVE_SQLITE3_COLUMN_DATABASE_NAME16=1
+  HAVE_SQLITE3_COLUMN_ORIGIN_NAME16=1
+  HAVE_SQLITE3_BIND_PARAMETER_COUNT=1
+  HAVE_SQLITE3_BIND_PARAMETER_NAME=1
+  HAVE_SQLITE3_BIND_PARAMETER_INDEX=1
+  HAVE_SQLITE3_RESULT_ZEROBLOB=1
+  HAVE_SQLITE3_INCRBLOBIO=1
+  HAVE_SQLITE3_SHARED_CACHE=1
+  HAVE_SQLITE3_OPEN_V2=1
+  if test "$enable_load_extension" = "yes" ; then
+    HAVE_SQLITE3_LOAD_EXTENSION=1
+  fi
+  HAVE_SQLITE3_BACKUPAPI=1
+  HAVE_SQLITE3_PROFILE=1
+  HAVE_SQLITE3_STATUS=1
+  HAVE_SQLITE3_DB_STATUS=1
+  HAVE_SQLITE3_STMT_STATUS=1
+fi
+if test "$HAVE_SQLITE3" = 1 -a -z "$SQLITE3_A10N_C" ; then
+  saved_CFLAGS=$CFLAGS
+  CFLAGS="$CFLAGS $SQLITE3_INC"
+  saved_LIBS=$LIBS
+  LIBS="$LIBS $SQLITE3_LIBDIR"
+  AC_CHECK_LIB(sqlite3,sqlite3_malloc,
+	       HAVE_SQLITE3_MALLOC=1,HAVE_SQLITE3_MALLOC=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_prepare_v2,
+	       HAVE_SQLITE3_PREPARE_V2=1,HAVE_SQLITE3_PREPARE_V2=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_prepare16_v2,
+	       HAVE_SQLITE3_PREPARE16_V2=1,HAVE_SQLITE3_PREPARE16_V2=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_bind_zeroblob,
+	       HAVE_SQLITE3_BIND_ZEROBLOB=1,HAVE_SQLITE3_BIND_ZEROBLOB=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_clear_bindings,
+	       HAVE_SQLITE3_CLEAR_BINDINGS=1,HAVE_SQLITE3_CLEAR_BINDINGS=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_column_table_name16,
+	       HAVE_SQLITE3_COLUMN_TABLE_NAME16=1,
+	       HAVE_SQLITE3_COLUMN_TABLE_NAME16=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_column_database_name16,
+	       HAVE_SQLITE3_COLUMN_DATABASE_NAME16=1,
+	       HAVE_SQLITE3_COLUMN_DATABASE_NAME16=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_column_origin_name16,
+	       HAVE_SQLITE3_COLUMN_ORIGIN_NAME16=1,
+	       HAVE_SQLITE3_COLUMN_ORIGIN_NAME16=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_bind_parameter_count,
+	       HAVE_SQLITE3_BIND_PARAMETER_COUNT=1,
+	       HAVE_SQLITE3_BIND_PARAMETER_COUNT=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_bind_parameter_name,
+	       HAVE_SQLITE3_BIND_PARAMETER_NAME=1,
+	       HAVE_SQLITE3_BIND_PARAMETER_NAME=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_bind_parameter_index,
+	       HAVE_SQLITE3_BIND_PARAMETER_INDEX=1,
+	       HAVE_SQLITE3_BIND_PARAMETER_INDEX=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_result_zeroblob,
+	       HAVE_SQLITE3_RESULT_ZEROBLOB=1,HAVE_SQLITE3_RESULT_ZEROBLOB=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_blob_open,
+	       HAVE_SQLITE3_INCRBLOBIO=1,HAVE_SQLITE3_INCRBLOBIO=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_key,
+	       HAVE_SQLITE3_KEY=1,HAVE_SQLITE3_KEY=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_rekey,
+	       ,HAVE_SQLITE3_KEY=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_enable_shared_cache,
+	       HAVE_SQLITE3_SHARED_CACHE=1,HAVE_SQLITE3_SHARED_CACHE=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_open_v2,
+	       HAVE_SQLITE3_OPEN_V2=1,HAVE_SQLITE3_OPEN_V2=0)
+  if test "$enable_load_extension" = "yes" ; then
+    AC_CHECK_LIB(sqlite3,sqlite3_load_extension,
+		 HAVE_SQLITE3_LOAD_EXTENSION=1,HAVE_SQLITE3_LOAD_EXTENSION=0)
+  fi
+  AC_CHECK_LIB(sqlite3,sqlite3_backup_init,
+	       HAVE_SQLITE3_BACKUPAPI=1,HAVE_SQLITE3_BACKUPAPI=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_profile,
+	       HAVE_SQLITE3_PROFILE=1,HAVE_SQLITE3_PROFILE=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_status,
+	       HAVE_SQLITE3_STATUS=1,HAVE_SQLITE3_STATUS=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_db_status,
+	       HAVE_SQLITE3_DB_STATUS=1,HAVE_SQLITE3_DB_STATUS=0)
+  AC_CHECK_LIB(sqlite3,sqlite3_stmt_status,
+	       HAVE_SQLITE3_STMT_STATUS=1,HAVE_SQLITE3_STMT_STATUS=0)
+  LIBS=$saved_LIBS
+  CFLAGS=$saved_CFLAGS
+fi
+AC_SUBST(HAVE_SQLITE3_MALLOC)
+AC_SUBST(HAVE_SQLITE3_PREPARE_V2)
+AC_SUBST(HAVE_SQLITE3_PREPARE16_V2)
+AC_SUBST(HAVE_SQLITE3_BIND_ZEROBLOB)
+AC_SUBST(HAVE_SQLITE3_CLEAR_BINDINGS)
+AC_SUBST(HAVE_SQLITE3_COLUMN_TABLE_NAME16)
+AC_SUBST(HAVE_SQLITE3_COLUMN_DATABASE_NAME16)
+AC_SUBST(HAVE_SQLITE3_COLUMN_ORIGIN_NAME16)
+AC_SUBST(HAVE_SQLITE3_BIND_PARAMETER_COUNT)
+AC_SUBST(HAVE_SQLITE3_BIND_PARAMETER_NAME)
+AC_SUBST(HAVE_SQLITE3_BIND_PARAMETER_INDEX)
+AC_SUBST(HAVE_SQLITE3_RESULT_ZEROBLOB)
+AC_SUBST(HAVE_SQLITE3_INCRBLOBIO)
+AC_SUBST(HAVE_SQLITE3_KEY)
+AC_SUBST(HAVE_SQLITE3_SHARED_CACHE)
+AC_SUBST(HAVE_SQLITE3_OPEN_V2)
+AC_SUBST(HAVE_SQLITE3_LOAD_EXTENSION)
+AC_SUBST(HAVE_SQLITE3_BACKUPAPI)
+AC_SUBST(HAVE_SQLITE3_PROFILE)
+AC_SUBST(HAVE_SQLITE3_STATUS)
+AC_SUBST(HAVE_SQLITE3_DB_STATUS)
+AC_SUBST(HAVE_SQLITE3_STMT_STATUS)
+
+if test -z "$SQLITE3_A10N_C" ; then
+  SQLITE3_A10N_C="native/dummy.c"
+  SQLITE3_A10N_O="dummy.lo"
+fi
+AC_SUBST(SQLITE3_A10N_C)
+AC_SUBST(SQLITE3_A10N_O)
+AC_SUBST(SQLITE3_A10N_FLAGS)
+
+##########
+# Any usable SQLite found ?
+#
+AC_MSG_CHECKING([for usable SQLite])
+if test "$HAVE_SQLITE2" != "1" -a "$HAVE_SQLITE3" != "1" ; then
+  AC_MSG_ERROR([No SQLite found, please try --with-sqlite/--with-sqlite3])
+fi
+AC_MSG_RESULT(yes)
+
+##########
+# Find out if char ptr array can be passed in place of
+# a va_list (needed for sqlite_exec_vprintf() and
+# sqlite_vmprintf())
+#
+AC_MSG_CHECKING([va_list usage])
+AC_TRY_RUN([
+#include <stdarg.h>
+#include <stdio.h>
+
+static int
+vatest(char **x, ...)
+{
+   va_list ap;
+   char *y;
+   int ret;
+
+   va_start(ap, x);
+   y = va_arg(ap, char *);
+   x = (char **) &x + 1;
+   ret = (y != *x);
+   va_end(ap);
+   return ret;
+}
+
+static int vatest2(va_list ap) {
+	return 0;
+}
+
+int
+main(int argc, char **argv)
+{
+   vatest2((va_list)argv); /* Check whether we can convert "char *" to va_list */
+   exit(vatest(NULL, vatest, 0.0, 0, NULL));
+}
+],[USE_VFUNCS=1],[USE_VFUNCS=0],[USE_VFUNCS=0])
+
+if test "$USE_VFUNCS" = "1" ; then
+   AC_MSG_RESULT(using sqlite_exec_vprintf/sqlite_vmprintf)
+   VALIST_FLAGS=""
+else
+   AC_MSG_RESULT(NOT using sqlite_exec_vprintf/sqlite_vmprintf)
+   VALIST_FLAGS="-DCANT_PASS_VALIST_AS_CHARPTR=1"
+fi
+AC_SUBST(VALIST_FLAGS)
+
+##########
+# Find JRE/JDK things
+#
+AC_CHECK_PROG([READLINK], [readlink], [readlink], [])
+AC_ARG_WITH(jdk, [  --with-jdk=DIR          use Java top directory DIR],
+  JAVA_HOME=$withval)
+if test -z "$JAVA_HOME" ; then
+  JAVA_HOME=`which javac`
+  if test -z "$JAVA_HOME" ; then
+    AC_MSG_ERROR([JAVA_HOME directory not found, please use --with-jdk=DIR])
+  fi
+  if test -n "$READLINK" ; then
+    while test -L $JAVA_HOME ; do
+      JAVA_HOME=`$READLINK $JAVA_HOME`
+    done
+  fi
+  JAVA_HOME=`dirname $JAVA_HOME`
+  JAVA_HOME=`dirname $JAVA_HOME`
+  if test "x$JAR_DIR_UNSPEC" = "xyes" ; then
+    JAR_DIR=$JAVA_HOME/jre/lib/ext
+    AC_MSG_RESULT([will install sqlite.jar into $JAR_DIR])
+  fi
+  if test "x$NATIVE_LIB_DIR" = "x" ; then
+    if test "$prefix" = "/usr/local" ; then
+      case "$target_cpu" in
+	[i[3-6]86*])
+	  NATIVE_LIB_DIR=$JAVA_HOME/jre/lib/i386
+	  ;;
+	x86_64)
+	  if test -d $JAVA_HOME/jre/lib/amd64 ; then
+	    NATIVE_LIB_DIR=$JAVA_HOME/jre/lib/amd64
+	  else
+	    NATIVE_LIB_DIR=$JAVA_HOME/jre/lib/$target_cpu
+	  fi
+	  ;;
+	*)
+	  NATIVE_LIB_DIR=$JAVA_HOME/jre/lib/$target_cpu
+	  ;;
+      esac
+    fi
+    AC_MSG_RESULT([will install libsqlite_jni into $NATIVE_LIB_DIR])
+  fi
+fi
+if test ! -d "$JAVA_HOME" ; then
+  AC_MSG_ERROR([JAVA_HOME directory not found, please use --with-jdk=DIR])
+fi
+
+if test -n "$JAVA_HOME" ; then
+  if test "x$JAVA_RUN" = "x"; then
+    JAVA_RUN=$JAVA_HOME/bin/java
+  else
+    AC_MSG_WARN([Overriding JAVA command with: $JAVA_RUN])
+  fi
+  JAVAC=$JAVA_HOME/bin/javac
+  JAVAH="$JAVA_HOME/bin/javah -jni"
+  JAR=$JAVA_HOME/bin/jar
+  JAVADOC=$JAVA_HOME/bin/javadoc
+else
+  if test "x$JAVA_RUN" = "x"; then
+    JAVA_RUN=`which java`
+  else
+    AC_MSG_WARN([Overriding JAVA command with: $JAVA_RUN])
+  fi
+  JAVAC=`which javac`
+  JAVAH="`which javah` -jni"
+  JAR=`which jar`
+  JAVADOC=`which javadoc`
+  JAVA_HOME=`dirname $JAVAC`
+  JAVA_HOME=`dirname $JAVA_HOME`
+fi
+
+AC_SUBST(JAVAH)
+AC_SUBST(JAVA_RUN)
+AC_SUBST(JAVA_FLAGS)
+AC_SUBST(JAVAC)
+AC_SUBST(JAVAC_FLAGS)
+AC_SUBST(JAR)
+AC_SUBST(JAVADOC)
+
+# Set up the JNI include directory specification
+case $build_os in
+  solaris*)
+    JNIINCLUDE="-I$JAVA_HOME/include -I$JAVA_HOME/include/solaris"
+    ;;
+  linux*)
+    JNIINCLUDE="-I$JAVA_HOME/include -I$JAVA_HOME/include/linux"
+    ;;
+  freebsd*)
+    JNIINCLUDE="-I$JAVA_HOME/include -I$JAVA_HOME/include/freebsd"
+    ;;
+  *)
+    JNIINCLUDE="-I${JAVA_HOME}/include -I${JAVA_HOME}/include/${build_os}"
+    AC_MSG_WARN([setting generic JNI include file directives!])
+    ;;
+esac
+AC_MSG_RESULT([setting JNI include file directives: $JNIINCLUDE])
+
+# Figure out JDK version
+if test "x$JDBCVER"  = "x" ; then
+  JDBCVER=JDBC2
+  $JAVA_RUN -version 2>&1 | grep 'version "1.1' >/dev/null && JDBCVER=JDBC1
+  $JAVA_RUN -version 2>&1 | grep 'version "1.4' >/dev/null && JDBCVER=JDBC2x
+  $JAVA_RUN -version 2>&1 | grep 'version "1.5' >/dev/null && JDBCVER=JDBC2y
+  $JAVA_RUN -version 2>&1 | grep 'version "1.6' >/dev/null && JDBCVER=JDBC2z
+  $JAVA_RUN -version 2>&1 | grep 'version "1.7' >/dev/null && JDBCVER=JDBC2z1
+  $JAVA_RUN -version 2>&1 | grep 'JSR169' >/dev/null && JDBCVER=JDBC0
+else
+  AC_MSG_WARN([overriding JDBC driver: $JDBCVER])
+fi
+AC_MSG_RESULT([using JDBC driver from $JDBCVER directory])
+
+# default to pre 1.7 source
+cp SQLite/JDBCDriver.java16 SQLite/JDBCDriver.java
+cp SQLite/JDBCDataSource.javajsr169 SQLite/JDBCDataSource.java
+
+if test "$JDBCVER" = "JDBC2y" ; then
+  # 1.5 gives one unchecked warning on SQLite/TableResult.java
+  JAVAC="$JAVAC -nowarn"
+fi
+if test "$JDBCVER" = "JDBC2z" ; then
+  # 1.6 gives some unchecked warnings, e.g. on SQLite/TableResult.java
+  JAVAC="$JAVAC -nowarn"
+fi
+if test "$JDBCVER" = "JDBC2z1" ; then
+  # 1.7 gives some unchecked warnings, e.g. on SQLite/TableResult.java
+  JAVAC="$JAVAC -nowarn"
+  cp SQLite/JDBCDriver.java17 SQLite/JDBCDriver.java
+  cp SQLite/JDBCDataSource.java17 SQLite/JDBCDataSource.java
+fi
+
+if test "x$NATIVE_LIB_DIR" = "x" ; then
+  NATIVE_LIB_DIR=$libdir
+fi
+
+AC_SUBST(JNIINCLUDE)
+AC_SUBST(JAR_DIR)
+AC_SUBST(JDBCVER)
+AC_SUBST(NATIVE_LIB_DIR)
+
+AC_OUTPUT(Makefile)
+

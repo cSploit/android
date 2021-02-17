@@ -1,0 +1,41 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 8e4a7212-d56e-11df-8ee9-37196cd04bc1
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2010-10-11T19:34:25.487865Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 114
+Content-length: 114
+
+K 10
+svn:author
+V 8
+cmpilato
+K 8
+svn:date
+V 27
+2010-10-11T19:55:50.912266Z
+K 7
+svn:log
+V 11
+Create dir1
+PROPS-END
+
+Node-path: dir1
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+

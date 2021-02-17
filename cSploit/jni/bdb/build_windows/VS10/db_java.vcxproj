@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build" ToolsVersion="4.0">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+  <ProjectGuid>{0052E828-5F10-4973-8729-50B0C5598702}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+    </ImportGroup>
+  <ImportGroup>
+    <Import Project="library.props"/>
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros"/>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>DB_CREATE_DLL;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libdb60d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>
+echo compiling Berkeley DB Java classes 
+mkdir "./$(OutDir)/classes/" 
+javac -g -target 1.5 -d "$(OutDir)\classes" -classpath "$(OutDir)\classes" ..\..\lang\java\src\com\sleepycat\db\*.java ..\..\lang\java\src\com\sleepycat\db\internal\*.java ..\..\lang\java\src\com\sleepycat\asm\*.java ..\..\lang\java\src\com\sleepycat\bind\*.java ..\..\lang\java\src\com\sleepycat\bind\serial\*.java ..\..\lang\java\src\com\sleepycat\bind\tuple\*.java ..\..\lang\java\src\com\sleepycat\collections\*.java ..\..\lang\java\src\com\sleepycat\compat\*.java ..\..\lang\java\src\com\sleepycat\persist\*.java ..\..\lang\java\src\com\sleepycat\persist\evolve\*.java ..\..\lang\java\src\com\sleepycat\persist\impl\*.java ..\..\lang\java\src\com\sleepycat\persist\model\*.java ..\..\lang\java\src\com\sleepycat\persist\raw\*.java ..\..\lang\java\src\com\sleepycat\util\*.java ..\..\lang\java\src\com\sleepycat\util\keyrange\*.java
+java -classpath $(OutDir)\classes com.sleepycat.persist.model.ClassEnhancer $(OutDir)\classes
+echo compiling examples
+mkdir "$(OutDir)\classes.ex"
+javac -g -target 1.5 -d "$(OutDir)\classes.ex" -classpath "$(OutDir)\classes;$(OutDir)\classes.ex" ..\..\examples/java\src\db\*.java ..\..\examples/java\src\db\GettingStarted\*.java ..\..\examples/java\src\db\repquote\*.java ..\..\examples/java\src\db\repquote_gsg\*.java ..\..\examples/java\src\db\txn\*.java ..\..\examples/java\src\collections\access\*.java ..\..\examples/java\src\collections\hello\*.java ..\..\examples/java\src\collections\ship\basic\*.java ..\..\examples/java\src\collections\ship\entity\*.java ..\..\examples/java\src\collections\ship\factory\*.java ..\..\examples/java\src\collections\ship\index\*.java ..\..\examples/java\src\collections\ship\marshal\*.java ..\..\examples/java\src\collections\ship\sentity\*.java ..\..\examples/java\src\collections\ship\tuple\*.java ..\..\examples/java\src\persist\*.java ..\..\examples/java\src\persist\gettingStarted\*.java ..\..\examples/java\src\persist\txn\*.java
+echo creating jar files
+jar cfm "$(OutDir)/db.jar" ../..\lang/java/jarManifestEntries -C "$(OutDir)\classes" .
+jar cf "$(OutDir)/dbexamples.jar" -C "$(OutDir)\classes.ex" .
+echo Java build finished</Command>
+      <Outputs>force_compilation.txt;%(Outputs)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>DB_CREATE_DLL;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libdb60.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>
+echo compiling Berkeley DB Java classes 
+mkdir "./$(OutDir)/classes/" 
+javac -g -target 1.5 -d "$(OutDir)\classes" -classpath "$(OutDir)\classes" ..\..\lang\java\src\com\sleepycat\db\*.java ..\..\lang\java\src\com\sleepycat\db\internal\*.java ..\..\lang\java\src\com\sleepycat\asm\*.java ..\..\lang\java\src\com\sleepycat\bind\*.java ..\..\lang\java\src\com\sleepycat\bind\serial\*.java ..\..\lang\java\src\com\sleepycat\bind\tuple\*.java ..\..\lang\java\src\com\sleepycat\collections\*.java ..\..\lang\java\src\com\sleepycat\compat\*.java ..\..\lang\java\src\com\sleepycat\persist\*.java ..\..\lang\java\src\com\sleepycat\persist\evolve\*.java ..\..\lang\java\src\com\sleepycat\persist\impl\*.java ..\..\lang\java\src\com\sleepycat\persist\model\*.java ..\..\lang\java\src\com\sleepycat\persist\raw\*.java ..\..\lang\java\src\com\sleepycat\util\*.java ..\..\lang\java\src\com\sleepycat\util\keyrange\*.java
+java -classpath $(OutDir)\classes com.sleepycat.persist.model.ClassEnhancer $(OutDir)\classes
+echo compiling examples
+mkdir "$(OutDir)\classes.ex"
+javac -g -target 1.5 -d "$(OutDir)\classes.ex" -classpath "$(OutDir)\classes;$(OutDir)\classes.ex" ..\..\examples/java\src\db\*.java ..\..\examples/java\src\db\GettingStarted\*.java ..\..\examples/java\src\db\repquote\*.java ..\..\examples/java\src\db\repquote_gsg\*.java ..\..\examples/java\src\db\txn\*.java ..\..\examples/java\src\collections\access\*.java ..\..\examples/java\src\collections\hello\*.java ..\..\examples/java\src\collections\ship\basic\*.java ..\..\examples/java\src\collections\ship\entity\*.java ..\..\examples/java\src\collections\ship\factory\*.java ..\..\examples/java\src\collections\ship\index\*.java ..\..\examples/java\src\collections\ship\marshal\*.java ..\..\examples/java\src\collections\ship\sentity\*.java ..\..\examples/java\src\collections\ship\tuple\*.java ..\..\examples/java\src\persist\*.java ..\..\examples/java\src\persist\gettingStarted\*.java ..\..\examples/java\src\persist\txn\*.java
+echo creating jar files
+jar cfm "$(OutDir)/db.jar" ../..\lang/java/jarManifestEntries -C "$(OutDir)\classes" .
+jar cf "$(OutDir)/dbexamples.jar" -C "$(OutDir)\classes.ex" .
+echo Java build finished</Command>
+      <Outputs>force_compilation.txt;%(Outputs)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>DB_CREATE_DLL;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libdb60d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>
+echo compiling Berkeley DB Java classes 
+mkdir "./$(OutDir)/classes/" 
+javac -g -target 1.5 -d "$(OutDir)\classes" -classpath "$(OutDir)\classes" ..\..\lang\java\src\com\sleepycat\db\*.java ..\..\lang\java\src\com\sleepycat\db\internal\*.java ..\..\lang\java\src\com\sleepycat\asm\*.java ..\..\lang\java\src\com\sleepycat\bind\*.java ..\..\lang\java\src\com\sleepycat\bind\serial\*.java ..\..\lang\java\src\com\sleepycat\bind\tuple\*.java ..\..\lang\java\src\com\sleepycat\collections\*.java ..\..\lang\java\src\com\sleepycat\compat\*.java ..\..\lang\java\src\com\sleepycat\persist\*.java ..\..\lang\java\src\com\sleepycat\persist\evolve\*.java ..\..\lang\java\src\com\sleepycat\persist\impl\*.java ..\..\lang\java\src\com\sleepycat\persist\model\*.java ..\..\lang\java\src\com\sleepycat\persist\raw\*.java ..\..\lang\java\src\com\sleepycat\util\*.java ..\..\lang\java\src\com\sleepycat\util\keyrange\*.java
+java -classpath $(OutDir)\classes com.sleepycat.persist.model.ClassEnhancer $(OutDir)\classes
+echo compiling examples
+mkdir "$(OutDir)\classes.ex"
+javac -g -target 1.5 -d "$(OutDir)\classes.ex" -classpath "$(OutDir)\classes;$(OutDir)\classes.ex" ..\..\examples/java\src\db\*.java ..\..\examples/java\src\db\GettingStarted\*.java ..\..\examples/java\src\db\repquote\*.java ..\..\examples/java\src\db\repquote_gsg\*.java ..\..\examples/java\src\db\txn\*.java ..\..\examples/java\src\collections\access\*.java ..\..\examples/java\src\collections\hello\*.java ..\..\examples/java\src\collections\ship\basic\*.java ..\..\examples/java\src\collections\ship\entity\*.java ..\..\examples/java\src\collections\ship\factory\*.java ..\..\examples/java\src\collections\ship\index\*.java ..\..\examples/java\src\collections\ship\marshal\*.java ..\..\examples/java\src\collections\ship\sentity\*.java ..\..\examples/java\src\collections\ship\tuple\*.java ..\..\examples/java\src\persist\*.java ..\..\examples/java\src\persist\gettingStarted\*.java ..\..\examples/java\src\persist\txn\*.java
+echo creating jar files
+jar cfm "$(OutDir)/db.jar" ../..\lang/java/jarManifestEntries -C "$(OutDir)\classes" .
+jar cf "$(OutDir)/dbexamples.jar" -C "$(OutDir)\classes.ex" .
+echo Java build finished</Command>
+      <Outputs>force_compilation.txt;%(Outputs)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>DB_CREATE_DLL;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>libdb60.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>
+echo compiling Berkeley DB Java classes 
+mkdir "./$(OutDir)/classes/" 
+javac -g -target 1.5 -d "$(OutDir)\classes" -classpath "$(OutDir)\classes" ..\..\lang\java\src\com\sleepycat\db\*.java ..\..\lang\java\src\com\sleepycat\db\internal\*.java ..\..\lang\java\src\com\sleepycat\asm\*.java ..\..\lang\java\src\com\sleepycat\bind\*.java ..\..\lang\java\src\com\sleepycat\bind\serial\*.java ..\..\lang\java\src\com\sleepycat\bind\tuple\*.java ..\..\lang\java\src\com\sleepycat\collections\*.java ..\..\lang\java\src\com\sleepycat\compat\*.java ..\..\lang\java\src\com\sleepycat\persist\*.java ..\..\lang\java\src\com\sleepycat\persist\evolve\*.java ..\..\lang\java\src\com\sleepycat\persist\impl\*.java ..\..\lang\java\src\com\sleepycat\persist\model\*.java ..\..\lang\java\src\com\sleepycat\persist\raw\*.java ..\..\lang\java\src\com\sleepycat\util\*.java ..\..\lang\java\src\com\sleepycat\util\keyrange\*.java
+java -classpath $(OutDir)\classes com.sleepycat.persist.model.ClassEnhancer $(OutDir)\classes
+echo compiling examples
+mkdir "$(OutDir)\classes.ex"
+javac -g -target 1.5 -d "$(OutDir)\classes.ex" -classpath "$(OutDir)\classes;$(OutDir)\classes.ex" ..\..\examples/java\src\db\*.java ..\..\examples/java\src\db\GettingStarted\*.java ..\..\examples/java\src\db\repquote\*.java ..\..\examples/java\src\db\repquote_gsg\*.java ..\..\examples/java\src\db\txn\*.java ..\..\examples/java\src\collections\access\*.java ..\..\examples/java\src\collections\hello\*.java ..\..\examples/java\src\collections\ship\basic\*.java ..\..\examples/java\src\collections\ship\entity\*.java ..\..\examples/java\src\collections\ship\factory\*.java ..\..\examples/java\src\collections\ship\index\*.java ..\..\examples/java\src\collections\ship\marshal\*.java ..\..\examples/java\src\collections\ship\sentity\*.java ..\..\examples/java\src\collections\ship\tuple\*.java ..\..\examples/java\src\persist\*.java ..\..\examples/java\src\persist\gettingStarted\*.java ..\..\examples/java\src\persist\txn\*.java
+echo creating jar files
+jar cfm "$(OutDir)/db.jar" ../..\lang/java/jarManifestEntries -C "$(OutDir)\classes" .
+jar cf "$(OutDir)/dbexamples.jar" -C "$(OutDir)\classes.ex" .
+echo Java build finished</Command>
+      <Outputs>force_compilation.txt;%(Outputs)</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\lang\java\libdb_java\db_java_wrap.c"/>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ItemGroup>
+    <ProjectReference Condition="exists('db.vcxproj')" Include="db.vcxproj">
+      <Project>{fd045d60-abad-4a6c-9794-9bfb085fc3e7}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,123 @@
+#!/usr/bin/stap
+/*
+ * Copyright (c) 2012, 2014 Oracle and/or its affiliates.  All rights reserved.
+ * 
+ * lockstimesid.d - Display lock wait times grouped by fileid.
+ *
+ * Graphs the time spent in DB lock waits
+ *
+ * The result times in nanoseconds/cycles? are grouped by
+ *		(fileid, pgno, lock_mode)
+ *
+ * Markers used:
+ *	lock__suspend(struct __db_dbt *, db_lockmode_t lock_ mode)
+ *	lock__resume(struct __db_dbt *, db_lockmode_t lock_ mode)
+ */
+
+global lockcount, locktimes, maxcount, modes, suspend, top;
+
+function getns()
+{
+	t = gettimeofday_ns();
+	/*
+	 * On some virtual machine monitors gettimeofday_ns() returns 0. When
+	 * that happens approximate it as if this has a 2 Ghz processor.
+	 */
+	if (t == 0)
+		t = get_cycles() / 2;
+	return (t);
+}
+
+
+function fileidstr:string(fileid)
+{
+	return sprintf("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x",
+		    user_char(fileid + 0) & 0xff,
+		    user_char(fileid + 1) & 0xff,
+		    user_char(fileid + 2) & 0xff,
+		    user_char(fileid + 3) & 0xff,
+		    user_char(fileid + 4) & 0xff,
+		    user_char(fileid + 5) & 0xff,
+		    user_char(fileid + 6) & 0xff,
+		    user_char(fileid + 7) & 0xff,
+		    user_char(fileid + 8) & 0xff,
+		    user_char(fileid + 9) & 0xff,
+		    user_char(fileid + 10) & 0xff,
+		    user_char(fileid + 11) & 0xff,
+		    user_char(fileid + 12) & 0xff,
+		    user_char(fileid + 13) & 0xff,
+		    user_char(fileid + 14) & 0xff,
+		    user_char(fileid + 15) & 0xff,
+		    user_char(fileid + 16) & 0xff,
+		    user_char(fileid + 17) & 0xff,
+		    user_char(fileid + 18) & 0xff,
+		    user_char(fileid + 19) & 0xff)
+}
+
+probe begin
+{
+	maxcount = 0;
+	lockcount = 0;
+	%( $# >= 2 %? maxcount = $2; %)
+	top = 0;
+	topdesc = "";
+	%( $# >= 3 %? top = $3; topdesc = sprintf("top %d ", top) %)
+	printf("Tracing %sDB lock wait times grouped by ", topdesc);
+	printf("(binary fileid, pgno, lock_mode)\n^C to display summary\n");
+	modes[0] = "NOTGRANTED";
+	modes[1] = "READ";
+	modes[2] = "WRITE";
+	modes[3] = "WAIT";
+	modes[4] = "INTENT_WRITE";
+	modes[5] = "INTENT_READ";
+	modes[6] = "INTENT_WR";
+	modes[7] = "READ_UNCOMMITTED";
+	modes[8] = "WAS_WRITE";
+}
+
+probe process(@1).mark("lock__suspend")
+{
+	/* printf("%s\n", pp()); */
+	suspend[tid()] = getns();
+
+}
+
+/* lock__resume(DBT *lockobj, db_lockmode_t lock_mode) */
+probe process(@1).mark("lock__resume")
+{
+	start = suspend[tid()];
+	if (start != 0) {
+		ilock = @cast($arg1, "DBT", "<db.h>")->data;
+		idstr = fileidstr(@cast(ilock, "DB_LOCK_ILOCK", "<db.h>")->fileid);
+		duration = getns() - start;
+		locktimes[idstr,
+		    @cast(ilock, "DB_LOCK_ILOCK", "<db.h>")->pgno, $arg2] <<< duration;
+		suspend[tid()] = 0;
+		/* Stop if we've reached the request sample size. */
+		if (maxcount != 0 && ++lockcount >= maxcount)
+			exit();
+	}
+}
+
+function printstats(fileid, pgno, lock_mode)
+{
+	printf("Wait time for fileid %s %s pgno %u; %d waits totalling %d\n",
+	    fileid, modes[lock_mode], pgno,
+	    @count(locktimes[fileid, pgno, lock_mode]),
+	    @sum(locktimes[fileid, pgno, lock_mode]));
+	print(@hist_log(locktimes[fileid, pgno, lock_mode]))
+}
+
+probe end
+{
+	/*
+	 * Order results by lock wait count if top <n> results were requested,
+	 * otherwise order by fileid.
+	 */
+	if (top != 0)
+		foreach ([fileid, pgno, lock_mode] in locktimes- limit top)
+			printstats(fileid, pgno, lock_mode)
+	else
+		foreach ([fileid+, pgno, lock_mode] in locktimes)
+			printstats(fileid, pgno, lock_mode)
+}

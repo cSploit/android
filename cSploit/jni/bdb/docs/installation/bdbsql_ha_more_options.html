@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Enhanced BDB SQL Replication Options</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_60_toc.html" title="Chapter 9.  Upgrading Berkeley DB 11.2.5.3 applications to Berkeley DB 12.1.6.0" />
+    <link rel="prev" href="rep_views.html" title="Replication Views" />
+    <link rel="next" href="rep_auto_takeover.html" title="Replication Manager Automatic Takeover" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Enhanced BDB SQL Replication Options</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="rep_views.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 9. 
+        Upgrading Berkeley DB 11.2.5.3 applications to Berkeley DB 12.1.6.0
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="rep_auto_takeover.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="bdbsql_ha_more_options"></a>Enhanced BDB SQL Replication Options</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="bdbsql_ha_more_options.html#idp50968144">New Pragmas</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        Berkeley DB SQL replicated applications now support multiprocess
+        access. Also, there are several new replication pragmas. The
+        <code class="literal">replication_ack_policy</code>,
+        <code class="literal">replication_ack_timeout</code> and
+        <code class="literal">replication_priority</code> pragmas provide ways
+        to configure a site's acknowledgement criteria and election
+        priority. The other new pragmas provide additional information
+        about the current state of the replication group or the local site.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50968144"></a>New Pragmas</h3>
+            </div>
+          </div>
+        </div>
+        <div class="itemizedlist">
+          <ul type="disc">
+            <li>
+              <code class="literal">PRAGMA replication_ack_policy[=all|all_available|none|one|quorum]</code>
+            </li>
+            <li>
+              <code class="literal">PRAGMA replication_ack_timeout[=n]</code>
+            </li>
+            <li>
+              <code class="literal">PRAGMA replication_priority[=n]</code>
+            </li>
+            <li>
+              <code class="literal">PRAGMA replication_get_master</code>
+            </li>
+            <li>
+              <code class="literal">PRAGMA replication_num_sites</code>
+            </li>
+            <li>
+              <code class="literal">PRAGMA replication_perm_failed</code>
+            </li>
+            <li>
+              <code class="literal">PRAGMA replication_site_status</code>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="rep_views.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_60_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="rep_auto_takeover.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Replication Views </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Replication Manager Automatic Takeover</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

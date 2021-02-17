@@ -1,0 +1,88 @@
+<VisualStudioProject ProjectType="Visual C++" Version="8.00" Name="db_recover" ProjectGUID="{9E03FD51-E387-4EEF-9EEA-E71707A56212}">
+  <Platforms>
+    <Platform Name="Pocket PC 2003 (ARMV4)"/>
+    <Platform Name="Smartphone 2003 (ARMV4)"/>
+    <Platform Name="Windows Mobile 6.5.3 Professional DTK (ARMV4I)"/>
+  </Platforms>
+  <Configurations>
+    <Configuration Name="Debug|Pocket PC 2003 (ARMV4)" OutputDirectory="..\..\build_wince\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_recover" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;DEBUG;POCKETPC2003_UI_MODEL" StringPooling="TRUE" RuntimeLibrary="1" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_recover.pch" AssemblerListingLocation="$(OutDir)/db_recover/" ObjectFile="$(OutDir)/db_recover/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalDependencies="" AdditionalLibraryDirectories="../../lib" OutputFile="$(OutDir)/db_recover.exe" ProgramDatabaseFile="$(OutDir)/db_recover.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="3" SubSystem="9" EntryPointSymbol="mainACRTStartup"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/>
+      <DeploymentTool/></Configuration>
+    <Configuration Name="Release|Pocket PC 2003 (ARMV4)" OutputDirectory="..\..\build_wince\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_recover" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;NDEBUG;POCKETPC2003_UI_MODEL" StringPooling="TRUE" RuntimeLibrary="0" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_recover.pch" AssemblerListingLocation="$(OutDir)/db_recover/" ObjectFile="$(OutDir)/db_recover/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalDependencies="" AdditionalLibraryDirectories="../../lib" OutputFile="$(OutDir)/db_recover.exe" ProgramDatabaseFile="$(OutDir)/db_recover.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="3" SubSystem="9" EntryPointSymbol="mainACRTStartup"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/>
+      <DeploymentTool/></Configuration>
+    <Configuration Name="Debug|Smartphone 2003 (ARMV4)" OutputDirectory="..\..\build_wince\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_recover" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;DEBUG;POCKETPC2003_UI_MODEL" StringPooling="TRUE" RuntimeLibrary="1" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_recover.pch" AssemblerListingLocation="$(OutDir)/db_recover/" ObjectFile="$(OutDir)/db_recover/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalDependencies="" AdditionalLibraryDirectories="../../lib" OutputFile="$(OutDir)/db_recover.exe" ProgramDatabaseFile="$(OutDir)/db_recover.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="3" SubSystem="9" EntryPointSymbol="mainACRTStartup"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/>
+      <DeploymentTool/></Configuration>
+    <Configuration Name="Release|Smartphone 2003 (ARMV4)" OutputDirectory="..\..\build_wince\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_recover" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;NDEBUG;POCKETPC2003_UI_MODEL" StringPooling="TRUE" RuntimeLibrary="0" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_recover.pch" AssemblerListingLocation="$(OutDir)/db_recover/" ObjectFile="$(OutDir)/db_recover/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalDependencies="" AdditionalLibraryDirectories="../../lib" OutputFile="$(OutDir)/db_recover.exe" ProgramDatabaseFile="$(OutDir)/db_recover.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="3" SubSystem="9" EntryPointSymbol="mainACRTStartup"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/>
+      <DeploymentTool/></Configuration>
+    <Configuration Name="Debug|Windows Mobile 6.5.3 Professional DTK (ARMV4I)" OutputDirectory="..\..\build_wince\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_recover" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;DEBUG;POCKETPC2003_UI_MODEL" StringPooling="TRUE" RuntimeLibrary="1" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_recover.pch" AssemblerListingLocation="$(OutDir)/db_recover/" ObjectFile="$(OutDir)/db_recover/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalDependencies="" AdditionalLibraryDirectories="../../lib" OutputFile="$(OutDir)/db_recover.exe" ProgramDatabaseFile="$(OutDir)/db_recover.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="0" SubSystem="9" EntryPointSymbol="mainACRTStartup"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/>
+      <DeploymentTool/></Configuration>
+    <Configuration Name="Release|Windows Mobile 6.5.3 Professional DTK (ARMV4I)" OutputDirectory="..\..\build_wince\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_recover" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;NDEBUG;POCKETPC2003_UI_MODEL" StringPooling="TRUE" RuntimeLibrary="0" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_recover.pch" AssemblerListingLocation="$(OutDir)/db_recover/" ObjectFile="$(OutDir)/db_recover/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalDependencies="" AdditionalLibraryDirectories="../../lib" OutputFile="$(OutDir)/db_recover.exe" ProgramDatabaseFile="$(OutDir)/db_recover.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="0" SubSystem="9" EntryPointSymbol="mainACRTStartup"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/>
+      <DeploymentTool/></Configuration>
+  </Configurations>
+  <References/>
+  <Files>
+    <File RelativePath="..\..\util\db_recover.c"/>
+    <File RelativePath="..\..\src\clib\getopt.c"/>
+    <File RelativePath="..\..\src\os_windows\ce_localtime.c"/>
+  </Files>
+  <Globals/>
+</VisualStudioProject>

@@ -1,0 +1,108 @@
+.TH SLAPDN 8C "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2004-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapdn \- Check a list of string-represented LDAP DNs based on schema syntax
+.SH SYNOPSIS
+.B SBINDIR/slapdn
+[\c
+.BI \-d \ debug-level\fR]
+[\c
+.BI \-f \ slapd.conf\fR]
+[\c
+.BI \-F \ confdir\fR]
+[\c
+.BR \-N | \-P ]
+[\c
+.BI \-o \ option\fR[ = value\fR]]
+[\c
+.BR \-v ]
+.IR DN \ [...]
+.LP
+.SH DESCRIPTION
+.LP
+.B Slapdn
+is used to check the conformance of a DN based on the schema
+defined in
+.BR slapd (8)
+and that loaded via 
+.BR slapd.conf (5).
+It opens the
+.BR slapd.conf (5)
+configuration file or the slapd\-config (5) backend, reads in the schema definitions, and then
+parses the 
+.I DN
+list given on the command-line.
+.LP
+.SH OPTIONS
+.TP
+.BI \-d \ debug-level
+enable debugging messages as defined by the specified
+.IR debug-level ;
+see
+.BR slapd (8)
+for details.
+.TP
+.BI \-f \ slapd.conf
+specify an alternative
+.BR slapd.conf (5)
+file.
+.TP
+.BI \-F \ confdir
+specify a config directory.
+If both
+.B \-f
+and
+.B \-F
+are specified, the config file will be read and converted to
+config directory format and written to the specified directory.
+If neither option is specified, an attempt to read the
+default config directory will be made before trying to use the default
+config file. If a valid config directory exists then the
+default config file is ignored.
+.TP
+.BI \-N
+only output a normalized form of the \fIDN\fP, suitable to be used
+in a normalization tool; incompatible with
+.BR \-P .
+.TP
+.BI \-o \ option\fR[ = value\fR]
+Specify an
+.I option
+with a(n optional)
+.IR value .
+Possible generic options/values are:
+.LP
+.nf
+              syslog=<subsystems>  (see `\-s' in slapd(8))
+              syslog\-level=<level> (see `\-S' in slapd(8))
+              syslog\-user=<user>   (see `\-l' in slapd(8))
+
+.fi
+.TP
+.BI \-P
+only output a prettified form of the \fIDN\fP, suitable to be used
+in a check and beautification tool; incompatible with
+.BR \-N .
+.TP
+.B \-v
+enable verbose mode.
+.SH EXAMPLES
+To check a
+.B DN
+give the command:
+.LP
+.nf
+.ft tt
+	SBINDIR/slapdn \-f /ETCDIR/slapd.conf \-v DN
+.ft
+.fi
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR slapd (8),
+.BR slaptest (8)
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

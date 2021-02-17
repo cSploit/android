@@ -1,0 +1,63 @@
+
+top_srcdir = @top_srcdir@
+top_builddir = ..
+
+include ${top_builddir}/Make.rules
+
+EXEC= ipxdump ipxparse
+
+ncp_if_ether_support = @ncp_if_ether_support@
+
+OBJECTS= ipxutil.o
+
+ALL_OBJECTS := $(EXEC:%=%.o) $(OBJECTS)
+
+.PHONY : all install dep clean mrproper distclean
+.PHONY : dist tgz
+
+all:	$(EXEC)
+
+install: $(EXEC)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL) $(EXEC) $(DESTDIR)$(bindir)
+
+ifeq ($(ncp_if_ether_support),yes)
+
+$(EXEC): %: %.o $(OBJECTS)
+	$(CC) $(CFLAGS) -o $@ $(addsuffix .o,$@) $(OBJECTS)
+
+else
+.PHONY ipxdump ipxparse
+$(EXEC):
+	echo "Sorry, cannot build $@ on this system"
+endif
+
+
+clean:
+	rm -f *.o $(EXEC) *~
+
+modules:
+
+$(ALL_OBJECTS): %.o: %.c
+	$(CC) $(CFLAGS) $(CCFLAGS) $(CFLAGS_$@) -o $@ -c $<
+
+%.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+SRCPATH=$(shell pwd)
+SRCDIR=$(shell basename $(SRCPATH))
+DISTFILE=$(SRCDIR).tgz
+
+mrproper: clean
+	rm -f $(DISTFILE) *.d
+	
+distclean: mrproper
+
+dep:
+
+ifeq ($(NEED_DEP),yes)
+include $(ALL_OBJECTS:%.o=%.d)
+endif
+

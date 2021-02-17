@@ -1,0 +1,18 @@
+  You can't use pre-2.0 security database in firebird 2.0 or higher directly.
+  If you try to put old security.fdb into firebird's new home directory with 
+new (security2.fdb) name, you will get a message - cannot attach to password 
+database. That's OK and is by design. In order to be able to use old database, 
+you must run appropriate upgrade script - security_database.sql. To do so:
+  1. Put your old security database in some known to you place (not new home
+directory). Always have a copy of it!
+  2. Start firebird using it's new, native security2.fdb.
+  3. Convert your old security database to ODS11 (i.e. backup and restore it 
+using gbak from firebird 2.0). Without this step you will get failure running 
+security_database.sql!
+  4. Connect to restored database as SYSDBA and run the script.
+  5. Stop firebird.
+  6. Copy upgraded database to firebird's home directory (as security2.fdb).
+  7. Start firebird.
+
+  Now you should be able to connect to firebird 2.0 server using your old 
+logins and passwords. 

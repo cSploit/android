@@ -1,0 +1,34 @@
+#!/bin/sh
+
+# Check all exported PostgreSQL include files for C++ compatibility.
+# Run this from the top-level source directory after performing a build.
+# No output if everything is OK, else compiler errors.
+
+me=`basename $0`
+
+tmp=`mktemp -d /tmp/$me.XXXXXX`
+
+trap 'rm -rf $tmp' 0 1 2 3 15
+
+# Omit src/include/port/, because it's platform specific, and c.h includes
+# the relevant file anyway.
+# rusagestub.h is also platform-specific, and will be included by
+# utils/pg_rusage.h if necessary.
+# regex/regerrs.h is not meant to be included standalone.
+# parser/gram.h will be included by parser/gramparse.h.
+# parser/kwlist.h is not meant to be included standalone.
+
+for f in `find src/include src/interfaces/libpq/libpq-fe.h src/interfaces/libpq/libpq-events.h -name '*.h' -print | \
+    grep -v -e ^src/include/port/ \
+	-e ^src/include/rusagestub.h -e ^src/include/regex/regerrs.h \
+	-e ^src/include/parser/gram.h -e ^src/include/parser/kwlist.h`
+do
+	{
+	    echo ' extern "C" {'
+	    echo '#include "postgres.h"'
+	    echo "#include \"$f\""
+	    echo '};'
+	} >$tmp/test.cpp
+
+	${CXX:-g++} -I . -I src/include -fsyntax-only -Wall -c $tmp/test.cpp
+done

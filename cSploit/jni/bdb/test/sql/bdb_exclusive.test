@@ -1,0 +1,188 @@
+#
+#    May you do good and not evil.
+#    May you find forgiveness for yourself and forgive others.
+#    May you share freely, never taking more than you give.
+#
+#***********************************************************************
+# This file implements regression tests for exclusive transactions.  In
+# BDB exclusive transactions do not block the entire database, but force
+# non-exclusive transactions to abort if there is ever deadlock.  If two
+# exclusive transactions are created at the same time then one will block
+# the other until it completes.
+#
+
+set testdir [file dirname $argv0]/../../lang/sql/sqlite/test
+
+source $testdir/../../../../test/sql/bdb_util.tcl
+if {[run_thread_tests]==0} { finish_test ; return }
+
+sqlite3 db test.db -fullmutex 1
+
+do_test bdb_exclusive.1.0 {
+   db eval { 
+   CREATE TABLE t1(a);
+   CREATE TABLE t2(a);
+  }
+} {}
+
+do_test bdb_exclusive.1.1 {
+   db eval {
+   BEGIN EXCLUSIVE;
+   ROLLBACK;
+   select * from t1;
+  }
+} {} 
+
+# Create deadlock between an exclusive and non-exclusive 
+# transactions
+set exclusive_test2 {
+  set key ""
+  if {[sqlite -has-codec]} {
+    set key "xyzzy"
+  }
+  set ::DB [sqlthread open test.db $key]
+  set rc [
+    for {set i 0} {$i < 100} {incr i} {
+      do_test e1.$i {
+        execsql { BEGIN EXCLUSIVE }
+      } {SQLITE_OK}
+      do_test e2.$i {
+        execsql { INSERT INTO t2 VALUES(2) }
+      } {SQLITE_OK}
+      do_test e3.$i {
+        execsql { INSERT INTO t1 VALUES(2) } 
+      } {SQLITE_OK}
+      do_test e4.$i {
+        execsql { COMMIT } 
+      } {SQLITE_OK}
+    } 
+  ]
+  sqlite3_close $::DB
+  set rc
+}
+
+set nonexclusive_test2 {
+  set key ""
+  if {[sqlite -has-codec]} {
+    set key "xyzzy"
+  }
+  set ::DB [sqlthread open test.db $key]
+  set rc [
+    for {set i 0} {$i < 100} {incr i} {
+      do_test n1.$i {
+        execsql { BEGIN } 
+      } {SQLITE_OK}
+      do_test n2.$i {
+        set res [ execsql {INSERT INTO t1 VALUES(2) } ] 
+        if {$res eq "SQLITE_LOCKED" || $res eq "SQLITE_BUSY"} {
+          execsql { ROLLBACK } 
+          execsql { BEGIN }
+          set res SQLITE_OK
+        }
+        set res
+      } {SQLITE_OK}
+      do_test n3.$i {
+        set res [ execsql {INSERT INTO t2 VALUES(2) } ] 
+        if {$res eq "SQLITE_LOCKED" || $res eq "SQLITE_BUSY"} {
+          execsql { ROLLBACK } 
+          execsql { BEGIN }
+          set res SQLITE_OK
+        }
+        set res
+      } {SQLITE_OK}
+      do_test n4.$i {
+        execsql { ROLLBACK } 
+      } {SQLITE_OK}
+    }
+  ]
+  sqlite3_close $::DB
+  set rc
+}
+
+# Check that deadlock cannot occur between two exclusive
+# transactions
+set exclusive1_test3 {
+  set key ""
+  if {[sqlite -has-codec]} {
+    set key "xyzzy"
+  }
+  set ::DB [sqlthread open test.db $key]
+  set rc [
+    for {set i 0} {$i < 100} {incr i} {
+      do_test 1e1.$i {
+        execsql { BEGIN EXCLUSIVE }
+      } {SQLITE_OK}
+      do_test 1e2.$i {
+        execsql { INSERT INTO t2 VALUES(2) }
+      } {SQLITE_OK}
+      do_test 1e3.$i {
+        execsql { INSERT INTO t1 VALUES(2) } 
+      } {SQLITE_OK}
+      do_test 1e4.$i {
+        execsql { COMMIT } 
+      } {SQLITE_OK}
+    } 
+  ]
+  sqlite3_close $::DB
+  set rc
+}
+
+set exclusive2_test3 {
+  set key ""
+  if {[sqlite -has-codec]} {
+    set key "xyzzy"
+  }
+  set ::DB [sqlthread open test.db $key]
+  set rc [
+    for {set i 0} {$i < 100} {incr i} {
+      do_test 2e1.$i {
+        execsql { BEGIN EXCLUSIVE }
+      } {SQLITE_OK}
+      do_test 2e2.$i {
+        execsql { INSERT INTO t1 VALUES(2) }
+      } {SQLITE_OK}
+      do_test 2e3.$i {
+        execsql { INSERT INTO t2 VALUES(2) } 
+      } {SQLITE_OK}
+      do_test 2e4.$i {
+        execsql { COMMIT } 
+      } {SQLITE_OK}
+    } 
+  ]
+  sqlite3_close $::DB
+  set rc
+}
+  
+# Start the exclusive and non-exclusive threads
+#
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive_test2
+thread_spawn finished(1) "" $bdb_thread_procs $nonexclusive_test2
+  
+for {set i 0} {$i < 2} {incr i} {
+  if {![info exists finished($i)]} {
+    vwait finished($i)
+  }
+  do_test exclusive_nonexclusive.2.$i {
+    set ::finished($i)
+  } {}
+}
+
+# Start the two exclusive threads
+#
+array unset finished
+thread_spawn finished(0) "" $bdb_thread_procs $exclusive1_test3
+thread_spawn finished(1) "" $bdb_thread_procs $exclusive2_test3
+  
+for {set i 0} {$i < 2} {incr i} {
+  if {![info exists finished($i)]} {
+    vwait finished($i)
+  }
+  do_test exclusive_exclusive.3.$i {
+    set ::finished($i)
+  } {}
+}
+
+db close
+
+finish_test

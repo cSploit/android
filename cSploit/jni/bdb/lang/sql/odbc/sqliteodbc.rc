@@ -1,0 +1,144 @@
+#include <winresrc.h>
+#include <winver.h>
+#include "resource.h"
+#include "sqlite.h"
+
+#ifndef SQLITE_VERSION
+#define SQLITE_VERSION "?.?.?"
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+DRIVERCONNECT DIALOG DISCARDABLE  65, 43, 287, 111
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION |
+    WS_SYSMENU
+#ifdef SQLITE_UTF8
+CAPTION "SQLite ODBC (UTF-8) Driver Connect"
+#else
+CAPTION "SQLite ODBC Driver Connect"
+#endif
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_DSNAME,82,20,140,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_DBNAME,82,36,140,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,225,35,40,14
+    EDITTEXT        IDC_TONAME,82,51,53,12,ES_AUTOHSCROLL
+    CONTROL         "Step API",IDC_STEPAPI,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,165,50,50,15
+    CONTROL         "No TXN",IDC_NOTXN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    225,50,45,15
+#ifdef SQLITE_UTF8
+    CONTROL         "No WCHAR",IDC_NOWCHAR,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,85,65,50,15
+#endif
+    CONTROL         "Long Column Names",IDC_LONGNAM,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,165,65,95,15
+    DEFPUSHBUTTON   "OK",IDOK,175,90,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,225,90,40,14
+    CTEXT           "Enter options for connect",1003,95,5,80,8
+    RTEXT           "Data Source Name:",IDC_DSNAMETEXT,6,22,73,9,NOT WS_GROUP
+    RTEXT           "Database Name:",IDC_DBNAMETEXT,7,38,71,9,NOT WS_GROUP
+    RTEXT           "Lock Timeout [ms]:",IDC_TONAMETEXT,6,53,73,9,NOT WS_GROUP
+END
+
+CONFIGDSN DIALOG DISCARDABLE  65, 43, 287, 111
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_VISIBLE | WS_CAPTION |
+    WS_SYSMENU
+#ifdef SQLITE_UTF8
+CAPTION "SQLite ODBC (UTF-8) DSN Configuration"
+#else
+CAPTION "SQLite ODBC DSN Configuration"
+#endif
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_DSNAME,82,20,140,12,ES_AUTOHSCROLL | WS_GROUP
+    EDITTEXT        IDC_DBNAME,82,36,140,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse...",IDC_BROWSE,225,35,40,14
+    EDITTEXT        IDC_TONAME,82,51,53,12,ES_AUTOHSCROLL
+    CONTROL         "Step API",IDC_STEPAPI,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,165,50,50,15
+    CONTROL         "No TXN",IDC_NOTXN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    225,50,45,15
+#ifdef SQLITE_UTF8
+    CONTROL         "No WCHAR",IDC_NOWCHAR,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,85,65,50,15
+#endif
+    CONTROL         "Long Column Names",IDC_LONGNAM,"Button",BS_AUTOCHECKBOX |
+                    WS_TABSTOP,165,65,95,15
+    DEFPUSHBUTTON   "OK",IDOK,175,90,40,14
+    PUSHBUTTON      "Cancel",IDCANCEL,225,90,40,14
+    CTEXT           "Enter options for connect",1003,95,5,80,8
+    RTEXT           "Data Source Name:",IDC_DSNAMETEXT,6,22,73,9,NOT WS_GROUP
+    RTEXT           "Database Name:",IDC_DBNAMETEXT,7,38,71,9,NOT WS_GROUP
+    RTEXT           "Lock Timeout [ms]:",IDC_TONAMETEXT,6,53,73,9,NOT WS_GROUP
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION VERSION_C,0,0
+ PRODUCTVERSION VERSION_C,0,0
+ FILEFLAGSMASK (3)
+ FILEFLAGS (0)
+ FILEOS VOS__WINDOWS32
+ FILETYPE VFT_DLL
+ FILESUBTYPE (0)
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Christian Werner Software & Consulting\0"
+#ifdef SQLITE_UTF8
+            VALUE "FileDescription", "SQLite ODBC (UTF-8) Driver\0"
+#else
+            VALUE "FileDescription", "SQLite ODBC Driver\0"
+#endif
+            VALUE "FileVersion", VERSION "\0"
+            VALUE "InternalName", "SQLITEODBC\0"
+            VALUE "LegalCopyright", "Copyright © 2001-2013 <chw@ch-werner.de>\0"
+            VALUE "LegalTrademarks", "\0"
+#ifdef SQLITE_UTF8
+            VALUE "OriginalFilename", "SQLITEODBCU.DLL\0"
+#else
+            VALUE "OriginalFilename", "SQLITEODBC.DLL\0"
+#endif
+            VALUE "PrivateBuild", "\0"
+            VALUE "ProductName", "ODBC Driver for SQLite " SQLITE_VERSION "\0"
+            VALUE "ProductVersion", VERSION "\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+#ifdef SQLITE_UTF8
+    IDS_MSGTITLE            "SQLite ODBC (UTF-8) Setup"
+#else
+    IDS_MSGTITLE            "SQLite ODBC Setup"
+#endif
+    IDS_BADDSN              "%s cannot be used as a data source name."
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+ico1 ICON "sqliteodbc.ico"

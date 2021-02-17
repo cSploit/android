@@ -1,0 +1,15 @@
+dn: cn=John Doe,ou=users,dc=example,dc=com
+changetype: modify
+replace: mail
+mail: a@example.com
+mail: b@example.com
+mail: c@example.com
+mail: d@example.com
+-
+delete: mail
+-
+add: mail
+mail: w@example.com
+mail: x@example.com
+mail: y@example.com
+mail: z@example.com

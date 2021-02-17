@@ -1,0 +1,13 @@
+#! /bin/sh
+# $OpenLDAP$
+#
+# Copyright 2008-2014 The OpenLDAP Foundation. All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT file
+
+ol_cpp_api_rel_major=0
+ol_cpp_api_rel_minor=0
+ol_cpp_api_rel_patch=0
+
+ol_cpp_api_current=0
+ol_cpp_api_revision=0
+ol_cpp_api_age=0

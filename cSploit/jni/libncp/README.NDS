@@ -1,0 +1,10 @@
+The mpilib.c, mpilib.h, platform.h, and usuals.h in the lib/ directory are
+taken from the PGP 2.3 source distribution (Copyright 1986-92 by Philip
+Zimmermann), which is distributed under the GPL, as stated below.
+
+Excerpt from pgpdoc2.txt (contained in pgp23src.zip):
+"All the source code for PGP is available for free under the "Copyleft" 
+General Public License from the Free Software Foundation (FSF)."
+
+Arne de Bruijn
+arne@knoware.nl

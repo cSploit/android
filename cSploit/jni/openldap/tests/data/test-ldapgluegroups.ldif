@@ -1,0 +1,23 @@
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=All,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: All
+member: uid=bjorn,ou=People,dc=example,dc=com
+member: uid=bjensen,ou=People,dc=example,dc=com
+
+dn: cn=ITD,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: ITD
+member: uid=bjorn,ou=People,dc=example,dc=com
+
+dn: uid=proxy,ou=Groups,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Proxy
+sn: Proxy
+uid: proxy
+userPassword:: cHJveHk=
+authzTo: dn:*
+

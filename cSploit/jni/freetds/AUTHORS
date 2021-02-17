@@ -1,0 +1,106 @@
+Brian Bruns <brian@bruns.com>
+Started this crazy thing
+
+James K. Lowden <jklowden@speakeasy.org>
+Documentation, maintainer since 2003.
+
+Marc Abramowitz <msabramo@gmail.com>
+Testing and patches, Travis CI tests.
+
+Koscheev Andrey <andrey@eller.cz>
+Negative money patch
+
+Craig A. Berry <craigberry@mac.com>
+VMS support
+
+James Cameron <james.cameron@compaq.com>
+GNU standards compliance and minor fixes
+
+Peter Deacon <peterd@iea-software.com>
+Lots of help, testing and patches.
+
+John F. Dumas <jdumas@locutus.kingwoodcable.com>
+Patch to fix memory leaks.
+
+David Fraser <david@abelon.com>
+Testing and patches (NO-DM support)
+
+Scott Gray <gray@voicenet.com>
+TDS 7.0 numeric support and bug fixes
+
+Alex Hornby <alex@anvil.com>
+Testing and patches 
+
+Mihai Ibanescu <misa@dntis.ro>
+GNUified the packet
+
+Gregg Jensen <greggj@savvis.com>
+Message handlers and extra datatype support and some sybperl stuff?
+
+Viktar Klimkovitch <vklimk@yahoo.com>
+ODBC fixes to get libodbc++ working
+
+Bob Kline <bkline@rksystems.com>
+NTEXT support
+
+Lothar Krauss <lkrauss@wbs-blank.de>
+ODBC fixes
+
+Steve Langasek <vorlon@dodds.net>
+Off by one fixes and autoconf byte size thing. Debian package maintainer. 
+
+Mark J. Lilback <mark@lilback.com>
+Implementation of dbstrlen and dbstrcpy
+
+Kevin Lyons <kevin@nol.org>
+Various TDS bug fixes
+
+Steve Murphree <smurph@smcomp.com>
+Contributed a huge ODBC patch 
+
+Dennis Nicklaus <nicklaus@crusher.fnal.gov>
+vxWorks port and fixes for dbdata() and SYBVARBINARY
+
+Arno Pedusaar <psaar@fenar.ee>
+Donated his TDS4.2 code to the cause
+
+Brandon M. Reynolds <breynolds@comtime.com>
+Fix for arbitrarily large queries under dblib.
+
+Thomas Rogers <tom.rogers@ccur.com>
+Testing and patches
+
+Mark Schaal <mark@champ.tstonramp.com>
+Cleaned up message handling, bug fixes, ctlib unittests
+
+Ken Seymour <KenASeymour@yahoo.com>
+ODBC Driver Fixes
+
+Craig Spannring <cts@internetcds.com>
+JDBC driver and CVS repository.
+
+Martin Spott <mas@plesnik.de>
+Testing and patches
+
+Sam Tetherow<tetherow@nol.org>
+Various TDS bug fixes
+
+Bill Thompson <ThompBil@exchange.uk.ml.com>
+BCP patches and datetime fixes
+
+Patrick van Kleef <pkleef@openlinksw.com>
+Various bug fixes, dbcanquery() and odbc version checks.
+
+Geoff Winkless <geoff@farmline.com>
+Lost connection stuff
+
+Nicholas S. Castellano <entropy@freetds.org>
+Many bug fixes and improvements, contributor of fisql application.
+
+Special thanks to Michael Peppler <mpeppler@peppler.org>, 
+author of the DBD::Sybase Perl module. 
+
+Thanks go to the folks at A2i, Inc. (http://www.a2i.com) for funding the 
+development of dblib host file bulk copy and writetext support, and to Dave 
+Poyourow there for helping with the debugging.
+

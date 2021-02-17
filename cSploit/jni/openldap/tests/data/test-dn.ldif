@@ -1,0 +1,362 @@
+# Tree Structure
+dn: dc=example,dc=com
+objectClass: domain
+objectClass: domainRelatedObject
+dc: example
+associatedDomain: example.com
+
+dn: ou=LDAPv3,dc=example,dc=com
+objectClass: organizationalUnit
+ou: LDAPv3
+description: RFC 2253 compliant DN string representation
+
+dn: cn=Must Succeed,ou=LDAPv3,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Succeed
+# at least one member must be present; thus we use the entry's DN
+member: cn=Must Succeed,ou=LDAPv3,dc=example,dc=com
+# specific DN forms
+member: 
+member: UID=jsmith,DC=example,DC=net
+member: OU=Sales+CN=J. Smith,DC=example,DC=net
+member: CN=John Smith\, III,DC=example,DC=net
+member: OU=Sales\; Data\+Algorithms,DC=example,DC=net
+member: CN=Before\0dAfter,DC=example,DC=net
+member: CN=\23John Smith\20,DC=example,DC=net
+member: CN=Lu\C4\8Di\C4\87
+member: testUUID=597ae2f6-16a6-1027-98f4-abcdefABCDEF,DC=Example
+# DN forms already defined as "member" in a different string representation
+seeAlso: CN=John Smith\2C III,DC=example,DC=net
+seeAlso: OU=Sales\3B Data\2BAlgorithms,DC=example,DC=net
+seeAlso: CN=\#John Smith\ ,DC=example,DC=net
+# comment
+description: "member" values contain specific DN forms;
+description: "seeAlso" values contain DN forms already defined as "member",
+description: but in a different string representation;
+description: the following "description" values contain the "member" and
+description: "seeAlso" DN string representations used above.
+# list here all string representations used above in "member" and "seeAlso"
+description: ""
+description: UID=jsmith,DC=example,DC=net
+description: OU=Sales+CN=J. Smith,DC=example,DC=net
+description: CN=John Smith\, III,DC=example,DC=net
+description: CN=John Smith\2C III,DC=example,DC=net
+description: OU=Sales\; Data\+Algorithms,DC=example,DC=net
+description: OU=Sales\3B Data\2BAlgorithms,DC=example,DC=net
+description: CN=Before\0dAfter,DC=example,DC=net
+description: CN=\23John Smith\20,DC=example,DC=net
+description: CN=\#John Smith\ ,DC=example,DC=net
+description: CN=Lu\C4\8Di\C4\87
+description: testUUID=597ae2f6-16a6-1027-98f4-abcdefABCDEF,DC=Example
+
+dn: cn=Should Succeed,ou=LDAPv3,dc=example,dc=com
+objectClass: groupOfNames
+cn: Should Succeed
+member: cn=Should Succeed,ou=LDAPv3,dc=example,dc=com
+member: 1.3.6.1.4.1.1466.0=#04024869,DC=example,DC=com
+member: 1.1.1=
+description: 1.3.6.1.4.1.1466.0=#04024869,DC=example,DC=com
+description: 1.1.1=
+
+dn: cn=Unescaped Equals,ou=LDAPv3,dc=example,dc=com
+objectClass: groupOfNames
+cn: Unescaped Equals
+member: cn=Unescaped Equals,ou=LDAPv3,dc=example,dc=com
+member: cn=A*x=b is a linear algebra problem,ou=LDAPv3,dc=example,dc=com
+description: cn=A*x=b is a linear algebra problem,ou=LDAPv3,dc=example,dc=com // unescaped EQUALS
+
+dn: cn=Must Fail 1,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 1
+member: uid;x-option=jsmith
+description: uid;x-option=jsmith // option
+
+dn: cn=Must Fail 2,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 2
+member: at_tr=jsmith
+description: at_tr=jsmith // invalid attribute type name
+
+dn: cn=Must Fail 3,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 3
+member: -attr=jsmith
+description: -attr=jsmith // invalid attribute type name
+
+dn: cn=Must Fail 4,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 4
+
+dn: cn=Must Fail 5,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 5
+member: 1..1=jsmith
+description: 1..1=jsmith // invalid numeric OID
+
+dn: cn=Must Fail 6,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 6
+member: 1.1.=jsmith
+description: 1.1.=jsmith // invalid numeric OID
+
+dn: cn=Must Fail 7,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 7
+member: 01.1=jsmith
+description: 01.1=jsmith // invalid numeric OID
+
+dn: cn=Must Fail 8,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 8
+member: 1.ff=jsmith
+description: 1.ff=jsmith // invalid numeric OID
+
+dn: cn=Must Fail 9,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 9
+member: 1.1.1=#GG
+description: 1.1.1=#GG // invalid HEX form
+
+dn: cn=Must Fail 10,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 10
+member: 1.1.1=#000
+description: 1.1.1=#000 // invalid HEX form
+
+dn: cn=Must Fail 11,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 11
+member: 1.1.1=#F
+description: 1.1.1=#F // invalid HEX form
+
+dn: cn=Must Fail 12,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 12
+member: 1.1.1=#
+description: 1.1.1=# // invalid HEX form
+
+dn: cn=Must Fail 13,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 13
+member: UID=jsmith,,DC=example,DC=net
+description: UID=jsmith,,DC=example,DC=net // extra comma
+
+dn: cn=Must Fail 14,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 14
+member: UID=john,smith
+description: UID=john,smith // unescaped ,
+
+dn: cn=Must Fail 15,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 15
+member: UID=john+smith
+description: UID=john+smith // unescaped +
+
+dn: cn=Must Fail 16,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 16
+member: UID=john\?smith
+description: UID=john\?smith // invalid escape of ? or unescaped \
+
+dn: cn=Must Fail 17,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 17
+member: UID=john\Fsmith
+description: UID=john\Fsmith // invalid HEX escape
+
+dn: cn=Must Fail 18,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Must Fail 18
+member: UID=john\GGsmith
+description: UID=john\GGsmith // invalid HEX escape
+
+# String representations we should accept for compatibility with RFC1779
+dn: ou=LDAPv2,dc=example,dc=com
+objectClass: organizationalUnit
+ou: LDAPv2
+description: RFC 1779 compliant DN string representation
+
+dn: cn=May Succeed 1,ou=LDAPv2,dc=example,dc=com
+objectClass: groupOfNames
+cn: May Succeed 1
+member:  
+description: " " // space, quote characters (") are not part of the string
+
+dn: cn=May Succeed 2,ou=LDAPv2,dc=example,dc=com
+objectClass: groupOfNames
+cn: May Succeed 2
+member: OID.0.9.2342.19200300.100.1.1=jsmith
+description: OID.0.9.2342.19200300.100.1.1=jsmith // invalid attribute type name
+
+dn: cn=May Succeed 3,ou=LDAPv2,dc=example,dc=com
+objectClass: groupOfNames
+cn: May Succeed 3
+member: UID=jsmith, O=example, C=US
+description: UID=jsmith, O=example, C=US // spaces
+
+dn: cn=May Succeed 4,ou=LDAPv2,dc=example,dc=com
+objectClass: groupOfNames
+cn: May Succeed 4
+member: UID=jsmith;O=example;C=US
+description: UID=jsmith;O=example;C=US // semi-colons
+
+dn: cn=May Succeed 5,ou=LDAPv2,dc=example,dc=com
+objectClass: groupOfNames
+cn: May Succeed 5
+member: <UID=jsmith,O=example,C=US>
+description: <UID=jsmith,O=example,C=US> // brackets
+
+dn: cn=May Succeed 6,ou=LDAPv2,dc=example,dc=com
+objectClass: groupOfNames
+cn: May Succeed 6
+member: CN="John Smith",O=example,C=US
+description: CN="John Smith",O=example,C=US // quotes
+
+# Other DN-related syntaxes
+dn: ou=Related Syntaxes,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Related Syntaxes
+
+# Name and Optional UID
+dn: cn=Name and Optional UID,ou=Related Syntaxes,dc=example,dc=com
+objectClass: groupOfUniqueNames
+cn: Name and Optional UID
+uniqueMember: cn=Name and Optional UID,ou=Related Syntaxes,dc=example,dc=com
+uniqueMember: #'1'B
+uniqueMember: #'0010'B
+uniqueMember: dc=example,dc=com#'1000'B
+uniqueMember: dc=example,dc=com#''B
+description: cn=Name and Optional UID,ou=Related Syntaxes,dc=example,dc=com // only DN portion
+description: #'1'B // empty "" DN
+description: #'0010'B // empty "" DN with leading '0's
+description: dc=example,dc=com#'1000'B // with DN portion
+description: dc=example,dc=com#''B // with DN portion + bitstring with no bits
+
+dn: cn=Should Fail 1,cn=Name and Optional UID,ou=Related Syntaxes,dc=example,dc=com
+objectClass: groupOfUniqueNames
+cn: Should Fail 1
+uniqueMember: #'1234'B
+description: #'1234'B // illegal digits other than '0' and '1'
+
+dn: cn=Should Fail 2,cn=Name and Optional UID,ou=Related Syntaxes,dc=example,dc=com
+objectClass: groupOfUniqueNames
+cn: Should Fail 2
+uniqueMember: #'12ABCD'B
+description: #'12ABCD'B // illegal digits and chars other than '0' and '1'
+
+dn: cn=Should Parse as DN,cn=Name and Optional UID,ou=Related Syntaxes,dc=example,dc=com
+objectClass: groupOfUniqueNames
+cn: Should Parse as DN
+uniqueMember: dc=example,dc=com#0'B
+uniqueMember: dc=example,dc=com#'0B
+uniqueMember: dc=example,dc=com '0'B
+description: dc=example,dc=com#0'B // malformed UID?
+description: dc=example,dc=com#'0B // malformed UID?
+description: dc=example,dc=com '0'B // malformed UID?
+
+#  UID=jsmith,DC=example,DC=net                          [AoOn]
+#  304631133011060A0992268993F22C64011916036E657431      [AoO]
+#  173015060A0992268993F22C64011916076578616D706C65
+#  31163014060A0992268993F22C64010113066A736D697468
+#
+#  OU=Sales+CN=J. Smith,DC=example,DC=net                [AoOn]
+#  304F31133011060A0992268993F22C64011916036E657431      [AoO]
+#  173015060A0992268993F22C64011916076578616D706C65
+#  311F300C060355040B130553616C6573300F060355040313
+#  084A2E20536D697468
+#
+#  CN=John Smith\, III,DC=example,DC=net                 [AoOn]
+#  304831133011060A0992268993F22C64011916036E657431      [AoO]
+#  173015060A0992268993F22C64011916076578616D706C65
+#  311830160603550403130F4A6F686E20536D6974682C2049
+#  4949
+#
+#  CN=John Smith\2C III,DC=example,DC=net                [AoOn]
+#  304831133011060A0992268993F22C64011916036E657431      [AoO]
+#  173015060A0992268993F22C64011916076578616D706C65
+#  311830160603550403130F4A6F686E20536D6974682C2049
+#  4949
+#
+#  CN=Before\0dAfter,DC=example,DC=net                   [AoOn]
+#  304531133011060A0992268993F22C64011916036E657431      [AoO]
+#  173015060A0992268993F22C64011916076578616D706C65
+#  3115301306035504030C0C4265666F72650D4166746572
+#
+#  CN=\23John Smith\20,DC=example,DC=net                 [AoOn]
+#  304531133011060A0992268993F22C64011916036E657431      [AoO]
+#  173015060A0992268993F22C64011916076578616D706C65
+#  311530130603550403140C234A6F686E20536D69746820
+#
+#  CN=\#John Smith\ ,DC=example,DC=net                   [AoOn]
+#  304531133011060A0992268993F22C64011916036E657431      [AoO]
+#  173015060A0992268993F22C64011916076578616D706C65
+#  311530130603550403140C234A6F686E20536D69746820
+#
+#  FIXME: currently doesn't work
+#  1.3.6.1.4.1.1466.0=#04024869,DC=example,DC=com        [AoOn]
+#  304031133011060A0992268993F22C64011916036E657431      [AoO]
+#  173015060A0992268993F22C64011916076578616D706C65
+#  3110300E06082B060104018B3A0004024869
+#
+#  CN=Lu\C4\8Di\C4\87                                    [AoOn]
+#  30123110300E06035504030C074C75C48D69C487              [AoO]
+#
+#  FIXME: currently doesn't work
+#  1.1.1=    // empty value                              [AoO]
+#  300A31083006060229011300                              [AoO]
+#
+#Invalid DNs
+#  // some implementations may be liberal in what they accept
+#  // but should strict in what they produce.
+#
+#  uid;x-option=jsmith   // option                       [oOn]
+#
+#  at_tr=jsmith          // invalid attribute type name  [AoOn]
+#
+#  -attr=jsmith          // invalid attribute type name  [AoOn]
+#
+#  1..1=jsmith           // invalid numeric OID          [AoO]
+#
+#  1.1.=jsmith           // invalid numeric OID          [AoO]
+#
+#  01.1=jsmith           // invalid numeric OID          [oO]
+#
+#  1.ff=jsmith           // invalid numeric OID          [AoOn]
+#
+#  1.1.1=#GG             // invalid HEX form             [AoOn]
+#
+#  1.1.1=#000            // invalid HEX form             [AoO]
+#
+#  1.1.1=#F              // invalid HEX form             [AoO]
+#
+#  1.1.1=#               // invalid HEX form             [AoO]
+#
+#  UID=jsmith,,DC=example,DC=net  // extra comma         [AoOn]
+#
+#  UID=john,smith        // unescaped ,                  [AoOn]
+#
+#  UID=john+smith        // unescaped +                  [AoOn]
+#
+#  UID=john\?smith       // invalid escape of ? or unescaped \ [oOn]
+#
+#  UID=john\Fsmith       // invalid hex escape           [AoOn]
+#
+#  UID=john\GGsmith      // invalid hex escape           [oOn]
+#
+#The following strings are invalid for use in LDAPv3, but were
+#legal in LDAPv2 (RFC 1779).  Some LDAPv3 implementations are
+#liberal in accepting these but should not generate them.
+#
+#  " " // space, quote characters (") are not part of the string
+#
+#  OID.1.1=jsmith                    // invalid attribute type name
+#
+#  UID=jsmith, O=example, C=US       // spaces
+#
+#  UID=jsmith;O=example;C=US         // semi-colons
+#
+#  <UID=jsmith,O=example,C=US>       // brackets         [AoOn]
+#
+#  CN="John Smith",O=example,C=US    // quotes
+

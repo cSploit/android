@@ -1,0 +1,64 @@
+
+top_srcdir = @top_srcdir@
+top_builddir = ..
+this_srcdir = ${top_srcdir}/ipx-1.0
+
+include $(top_builddir)/Make.rules
+
+vpath %.c ${this_srcdir}
+vpath %.8 ${this_srcdir}
+
+LIBS = @INTLLIBS@ @LIBS@
+
+O_UTILS = ipx_configure.o ipx_cmd.o
+O_UTIIPX = ipx_interface.o ipx_internal_net.o ipx_route.o
+UTILS = $(O_UTILS:%.o=%)
+UTIIPX = $(O_UTIIPX:%.o=%)
+MAN8 := $(UTILS) $(UTIIPX)
+MAN8SRC := $(MAN8:%=%.8)
+MAN8GZ := $(MAN8SRC:%=%.gz)
+
+ALL_OBJECTS := $(O_UTIIPX) $(O_UTILS) ipxutil.o
+
+.PHONY : all install install-dev dep clean mrproper distclean
+
+all: $(UTILS) $(UTIIPX) $(MAN8GZ)
+
+$(ALL_OBJECTS): %.o: %.c
+	$(CC) $(CFLAGS) $(CCFLAGS) $(CFLAGS_$@) -o $@ -c $<
+
+%.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+$(UTIIPX): %: %.o ipxutil.o
+	$(CC) $(CFLAGS) -o $@ $(addsuffix .o,$@) ipxutil.o ${LIBS}
+
+$(UTILS): %: %.o
+	$(CC) $(CFLAGS) -o $@ $(addsuffix .o,$@) ${LIBS}
+
+$(MAN8GZ): %.gz: %
+	gzip -9 -c $< >$@
+
+dep:
+
+clean:
+	rm -f $(UTILS) $(UTIIPX) $(MAN8GZ) *.o *~
+
+mrproper: clean
+	rm -f *.d
+
+distclean: mrproper
+
+install: $(UTILS) $(MAN8GZ) $(UTIIPX)
+	$(INSTALL) -d $(DESTDIR)$(bindir)
+	$(INSTALL) $(UTILS) $(UTIIPX) $(DESTDIR)$(bindir)
+	$(INSTALL) -d $(DESTDIR)$(mandir)/man8
+	$(INSTALL_DATA) $(MAN8GZ) $(DESTDIR)$(mandir)/man8
+
+install-dev:
+
+ifeq ($(NEED_DEP),yes)
+include $(ALL_OBJECTS:%.o=%.d)
+endif

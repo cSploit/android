@@ -1,0 +1,362 @@
+.TH SLAPD 8C "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd \- Stand-alone LDAP Daemon
+.SH SYNOPSIS
+.B LIBEXECDIR/slapd 
+[\c
+.BR \-4 | \-6 ]
+[\c
+.BR \-T \ { acl \||\| a [ dd ]\||\| auth \||\| c [ at ]\||\|
+.BR d [ n ]\||\| i [ ndex ]\||\| p [ asswd ]\||\| s [ chema ]\||\| t [ est ]}]
+[\c
+.BI \-d \ debug-level\fR]
+[\c
+.BI \-f \ slapd-config-file\fR]
+[\c
+.BI \-F \ slapd-config-directory\fR]
+[\c
+.BI \-h \ URLs\fR]
+[\c
+.BI \-n \ service-name\fR]
+[\c
+.BI \-s \ syslog-level\fR]
+[\c
+.BI \-l \ syslog-local-user\fR]
+[\c
+.BI \-o \ option\fR[ = value\fR]]
+[\c
+.BI \-r \ directory\fR]
+[\c
+.BI \-u \ user\fR]
+[\c
+.BI \-g \ group\fR]
+[\c
+.BI \-c \ cookie\fR]
+.SH DESCRIPTION
+.LP
+.B Slapd
+is the stand-alone LDAP daemon. It listens for LDAP connections on
+any number of ports (default \fB389\fP), responding
+to the LDAP operations it receives over these connections.
+.B slapd
+is typically invoked at boot time, usually out of
+.BR  /etc/rc.local .
+Upon startup,
+.B slapd
+normally forks and disassociates itself from the invoking tty.
+If configured in the config file (or config directory),
+the
+.B slapd
+process will print its process ID (see
+.BR getpid (2))
+to a 
+.B .pid
+file, as well as the command line options during invocation to an
+.B .args
+file (see 
+.BR slapd.conf (5)).
+If the
+.B \-d
+flag is given, even with a zero argument,
+.B slapd
+will not fork and disassociate from the invoking tty.
+.LP
+See the "OpenLDAP Administrator's Guide" for more details on
+.BR slapd .
+.SH OPTIONS
+.TP
+.B \-4
+Listen on IPv4 addresses only.
+.TP
+.B \-6
+Listen on IPv6 addresses only.
+.TP
+.BI \-T \ tool
+Run in Tool mode. The \fItool\fP argument selects whether to run as
+.IR slapadd ,
+.IR slapcat ,
+.IR slapdn ,
+.IR slapindex ,
+.IR slappasswd ,
+.IR slapschema ,
+or
+.I slaptest
+(\fIslapacl\fP and \fIslapauth\fP need the entire \fBacl\fP and \fBauth\fP
+option value to be spelled out, as \fBa\fP is reserved to
+.IR slapadd ).
+This option should be the first option specified when it is used;
+any remaining options will be interpreted by the corresponding 
+slap tool program, according to the respective man pages.
+Note that these tool programs will usually be symbolic links to
+.BR slapd .
+This option is provided for situations where symbolic links 
+are not provided or not usable.
+.TP
+.BI \-d \ debug-level
+Turn on debugging as defined by
+.IR debug-level .
+If this option is specified, even with a zero argument,
+.B slapd
+will not fork or disassociate from the invoking terminal.  Some general
+operation and status messages are printed for any value of \fIdebug-level\fP.
+\fIdebug-level\fP is taken as a bit string, with each bit corresponding to a
+different kind of debugging information.  See <ldap_log.h> for details.
+Comma-separated arrays of friendly names can be specified to select
+debugging output of the corresponding debugging information.
+All the names recognized by the \fIloglevel\fP directive 
+described in \fBslapd.conf\fP(5) are supported.
+If \fIdebug-level\fP is \fB?\fP, a list of installed debug-levels is printed,
+and slapd exits.
+
+Remember that if you turn on packet logging, packets containing bind passwords
+will be output, so if you redirect the log to a logfile, that file should
+be read-protected.
+.TP
+.BI \-s \ syslog-level
+This option tells
+.B slapd
+at what debug-level debugging statements should be logged to the
+.BR syslog (8)
+facility.
+The value \fIsyslog-level\fP can be set to any value or combination
+allowed by the \fB\-d\fP switch.
+Slapd logs all messages selected by \fIsyslog-leveli\fP 
+at the
+.BR syslog (3)
+severity debug-level \fBDEBUG\fP,
+on the unit specified with \fB\-l\fP.
+.TP
+.BI \-n \ service-name
+Specifies the service name for logging and other purposes.  Defaults
+to basename of argv[0], i.e.: "slapd".
+.TP
+.BI \-l \ syslog-local-user
+Selects the local user of the
+.BR syslog (8)
+facility. Value can be 
+.BR LOCAL0 , 
+through
+.BR LOCAL7 ,
+as well as
+.B USER
+and
+.BR DAEMON .
+The default is
+.BR LOCAL4 .
+However, this option is only permitted on systems that support
+local users with the 
+.BR syslog (8)
+facility.
+Logging to syslog(8) occurs at the "DEBUG" severity debug-level.
+.TP
+.BI \-f \ slapd-config-file
+Specifies the slapd configuration file. The default is
+.BR ETCDIR/slapd.conf .
+.TP
+.BI \-F \ slapd-config-directory
+Specifies the slapd configuration directory. The default is
+.BR ETCDIR/slapd.d .
+If both
+.B \-f
+and
+.B \-F
+are specified, the config file will be read and converted to
+config directory format and written to the specified directory.
+If neither option is specified, slapd will attempt to read the
+default config directory before trying to use the default
+config file. If a valid config directory exists then the
+default config file is ignored. All of the slap tools that
+use the config options observe this same behavior.
+.TP
+.BI \-h \ URLlist
+.B slapd
+will by default serve
+.B ldap:///
+(LDAP over TCP on all interfaces on default LDAP port).  That is, 
+it will bind using INADDR_ANY and port \fB389\fP.
+The
+.B \-h
+option may be used to specify LDAP (and other scheme) URLs to serve.
+For example, if slapd is given
+.BR "\-h \(dqldap://127.0.0.1:9009/ ldaps:/// ldapi:///\(dq" , 
+it will listen on 127.0.0.1:9009 for LDAP, 0.0.0.0:636 for LDAP over TLS,
+and LDAP over IPC (Unix domain sockets).  Host 0.0.0.0 represents
+INADDR_ANY (any interface).
+A space separated list of URLs is expected.  The URLs should be of
+the LDAP, LDAPS, or LDAPI schemes, and generally
+without a DN or other optional parameters (excepting as discussed below).
+Support for the latter two schemes depends on selected configuration 
+options.  Hosts may be specified by name or IPv4 and IPv6 address formats.
+Ports, if specified, must be numeric.  The default ldap:// port is \fB389\fP
+and the default ldaps:// port is \fB636\fP.
+
+For LDAP over IPC,
+.B name 
+is the name of the socket, and no
+.B port
+is required, nor allowed; note that directory separators must be 
+URL-encoded, like any other characters that are special to URLs; 
+so the socket
+
+        /usr/local/var/ldapi
+
+must be specified as
+
+        ldapi://%2Fusr%2Flocal%2Fvar%2Fldapi
+
+The default location for the IPC socket is LOCALSTATEDIR/run/ldapi
+
+The listener permissions are indicated by
+"x\-mod=\-rwxrwxrwx", "x\-mod=0777" or "x\-mod=777", where any 
+of the "rwx" can be "\-" to suppress the related permission, while any 
+of the "7" can be any legal octal digit, according to chmod(1).
+The listeners can take advantage of the "x\-mod"
+extension to apply rough limitations to operations, e.g. allow read operations
+("r", which applies to search and compare), write operations ("w", 
+which applies to add, delete, modify and modrdn), and execute operations
+("x", which means bind is required).
+"User" permissions apply to authenticated users, while "other" apply
+to anonymous users; "group" permissions are ignored.
+For example, "ldap:///????x\-mod=\-rw\-\-\-\-\-\-\-" means that read and write is only allowed
+for authenticated connections, and bind is required for all operations.
+This feature is experimental, and requires to be manually enabled
+at configure time.
+.TP
+.BI \-r \ directory
+Specifies a directory to become the root directory.  slapd will
+change the current working directory to this directory and
+then
+.BR chroot (2)
+to this directory.  This is done after opening listeners but before
+reading any configuration file or initializing any backend.  When
+used as a security mechanism, it should be used in conjunction with
+.B \-u
+and
+.B \-g
+options.
+.TP
+.BI \-u \ user
+.B slapd
+will run slapd with the specified user name or id, and that user's
+supplementary group access list as set with initgroups(3).  The group ID
+is also changed to this user's gid, unless the \fB\-g\fP option is used to
+override.  Note when used with
+.BR \-r ,
+slapd will use the user database in the change root environment.
+
+Note that on some systems, running as a non-privileged user will prevent
+passwd back-ends from accessing the encrypted passwords.  Note also that
+any shell back-ends will run as the specified non-privileged user.
+.TP
+.BI \-g \ group
+.B slapd
+will run with the specified group name or id.  Note when used with
+.BR \-r ,
+slapd will use the group database in the change root environment.
+.TP
+.BI \-c \ cookie
+This option provides a cookie for the syncrepl replication consumer.
+The cookie is a comma separated list of \fIname=value\fP pairs.
+Currently supported syncrepl cookie fields are
+.BR rid ,
+.BR sid ,
+and
+.BR csn .
+.B rid
+identifies a replication thread within the consumer server
+and is used to find the syncrepl specification in 
+.BR slapd.conf (5)
+or
+.BR slapd\-config (5)
+having the matching replication identifier in its definition. The
+.B rid
+must be provided in order for any other specified values to be used.
+.B sid
+is the server id in a multi-master/mirror-mode configuration.
+.B csn
+is the commit sequence number received by a previous synchronization
+and represents the state of the consumer replica content which the
+syncrepl engine will synchronize to the current provider content.
+In case of \fImirror-mode\fP or \fImulti-master\fP replication agreement,
+multiple
+.B csn
+values, semicolon separated, can appear.
+Use only the 
+.B rid
+part to force a full reload.
+.TP
+.BI \-o \ option\fR[ = value\fR]
+This option provides a generic means to specify options without the need to reserve
+a separate letter for them.
+
+It supports the following options:
+.RS
+.TP
+.BR slp= { on \||\| off \||\| \fIslp-attrs\fP }
+When SLP support is compiled into slapd, disable it (\fBoff\fP),
+ enable it by registering at SLP DAs without specific SLP attributes (\fBon\fP),
+or with specific SLP attributes
+.I slp-attrs
+that must be an SLP attribute list definition according to the SLP standard.
+
+For example, \fB"slp=(tree=production),(server-type=OpenLDAP),(server\-version=2.4.15)"\fP
+registers at SLP DAs with the three SLP attributes tree, server-type and server-version
+that have the values given above.
+This allows to specifically query the SLP DAs for LDAP servers holding the
+.I production
+tree in case multiple trees are available.
+.RE
+.SH EXAMPLES
+To start 
+.I slapd
+and have it fork and detach from the terminal and start serving
+the LDAP databases defined in the default config file, just type:
+.LP
+.nf
+.ft tt
+	LIBEXECDIR/slapd
+.ft
+.fi
+.LP
+To start 
+.B slapd
+with an alternate configuration file, and turn
+on voluminous debugging which will be printed on standard error, type:
+.LP
+.nf
+.ft tt
+	LIBEXECDIR/slapd \-f /var/tmp/slapd.conf \-d 255
+.ft
+.fi
+.LP
+To test whether the configuration file is correct or not, type:
+.LP
+.nf
+.ft tt
+	LIBEXECDIR/slapd \-Tt
+.ft
+.fi
+.LP
+.SH "SEE ALSO"
+.BR ldap (3),
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd.access (5),
+.BR slapacl (8),
+.BR slapadd (8),
+.BR slapauth (8),
+.BR slapcat (8),
+.BR slapdn (8),
+.BR slapindex (8),
+.BR slappasswd (8),
+.BR slapschema (8),
+.BR slaptest (8).
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.SH BUGS
+See http://www.openldap.org/its/
+.SH ACKNOWLEDGEMENTS
+.so ../Project

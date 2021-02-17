@@ -1,0 +1,35 @@
+# ------------------------------
+# List of known databases
+# ------------------------------
+
+#
+# Makes it possible to specify per-database configuration parameters.
+# See the list of them and description on file firebird.conf.
+# To place that parameters in this file add them in curly braces
+# after "alias = /path/to/database.fdb" line. Example:
+#	big = /databases/bigdb.fdb
+#	{
+#		LockMemSize = 32M		# We know that bigdb needs a lot of locks
+#		LockHashSlots = 19927	#	and big enough hash table for them
+#	}
+#
+
+#
+# Example Database:
+#
+employee.fdb = $(dir_sampleDb)/employee.fdb
+employee = $(dir_sampleDb)/employee.fdb
+
+#
+# Master security database specific setup.
+# Do not remove it until you understand well what are you doing!
+#
+security.db = $(dir_secDb)/security3.fdb
+{
+	RemoteAccess = false
+	DefaultDbCachePages = 50
+}
+
+#
+# Live Databases:
+#

@@ -1,0 +1,11 @@
+ber_alloc_t.3
+ber_flush.3
+ber_printf.3
+ber_put_int.3
+ber_put_ostring.3
+ber_put_string.3
+ber_put_null.3
+ber_put_enum.3
+ber_start_set.3
+ber_put_seq.3
+ber_put_set.3

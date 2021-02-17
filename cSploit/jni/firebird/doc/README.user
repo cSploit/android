@@ -1,0 +1,18 @@
+Firebird
+
+Welcome to Firebird.
+
+Firebird is a relational database offering many ANSI SQL-92 features that 
+runs on Linux, Windows, and a variety of Unix platforms. Firebird offers 
+excellent concurrency, high performance, and powerful language support for 
+stored procedures and triggers. It has been used in production systems, under 
+a variety of names since 1981.
+
+Firebird is an open source project developing and enhancing a multi-platform 
+relational database management system based on the source code released by 
+Inprise Corp (now known again as Borland Software Corp).
+
+More information about Firebird can be found in the 'doc' 
+subdirectory or at:
+
+http://www.firebirdsql.org

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -x
+
+git clean -x -d
+
+(cd /usr/local/stow && sudo stow -D libnet)
+

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>set_lg_max</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="configuration_reference.html" title="Appendix B. DB_CONFIG Parameter Reference" />
+    <link rel="prev" href="set_lg_filemode_parameter.html" title="set_lg_filemode" />
+    <link rel="next" href="set_lg_regionmax_parameter.html" title="set_lg_regionmax" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">set_lg_max</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="set_lg_filemode_parameter.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix B. DB_CONFIG Parameter Reference</th>
+          <td width="20%" align="right"> <a accesskey="n" href="set_lg_regionmax_parameter.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="set_lg_max_parameter"></a>set_lg_max</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                 Sets the maximum size of a single file in the log, in bytes.  
+                 The value set for this parameter may not be larger than the
+                 maximum unsigned four-byte value.
+            </p>
+      <p>
+                 When the logging subsystem is configured for on-disk logging, the
+                 default size of a log file is 10MB.
+            </p>
+      <p>
+                 When the logging subsystem is configured for in-memory logging, the
+                 default size of a log file is 256KB.  In addition, the configured log
+                 buffer size must be larger than the log file size.  (The logging
+                 subsystem divides memory configured for in-memory log records into
+                 "files", as database environments configured for in-memory log records
+                 may exchange log records with other members of a replication group,
+                 and those members may be configured to store log records on-disk.)
+                 When choosing log buffer and file sizes for in-memory logs,
+                 applications should ensure the in-memory log buffer size is large
+                 enough that no transaction will ever span the entire buffer, and avoid
+                 a state where the in-memory buffer is full and no space can be freed
+                 because a transaction that started in the first log "file" is still
+                 active.
+            </p>
+      <p>
+                 The syntax of this parameter in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file is a
+                 single line with the string <code class="literal">set_lg_max</code>,
+                 one or more whitespace characters, and the maximum log
+                 file size in bytes.
+            </p>
+      <p>
+                 If the database environment already exists when this parameter is
+                 changed, it is ignored. To change this value after the environment
+                 has been created, re-create your environment.
+            </p>
+      <p>For more information, see <a class="xref" href="envset_lg_max.html" title="DbEnv::set_lg_max()">DbEnv::set_lg_max()</a>. </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="set_lg_filemode_parameter.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="configuration_reference.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="set_lg_regionmax_parameter.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">set_lg_filemode </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> set_lg_regionmax</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

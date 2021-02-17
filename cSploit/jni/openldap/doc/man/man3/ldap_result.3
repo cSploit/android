@@ -1,0 +1,136 @@
+.TH LDAP_RESULT 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_result \- Wait for the result of an LDAP operation
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_result( LDAP *ld, int msgid, int all,
+	struct timeval *timeout, LDAPMessage **result );
+
+int ldap_msgfree( LDAPMessage *msg );
+
+int ldap_msgtype( LDAPMessage *msg );
+
+int ldap_msgid( LDAPMessage *msg );
+.ft
+.SH DESCRIPTION
+The
+.B ldap_result()
+routine is used to wait for and return the result of
+an operation previously initiated by one of the LDAP asynchronous
+operation routines (e.g.,
+.BR ldap_search_ext (3),
+.BR ldap_modify_ext (3),
+etc.).  Those routines all return \-1 in case of error, and an
+invocation identifier upon successful initiation of the operation. The
+invocation identifier is picked by the library and is guaranteed to be
+unique across the LDAP session.  It can be used to request the result
+of a specific operation from
+.B ldap_result()
+through the \fImsgid\fP parameter.
+.LP
+The
+.B ldap_result()
+routine will block or not, depending upon the setting
+of the \fItimeout\fP parameter.
+If timeout is not a NULL pointer,  it  specifies  a  maximum
+interval  to wait for the selection to complete.  If timeout
+is a NULL  pointer, the LDAP_OPT_TIMEOUT value set by
+.BR ldap_set_option (3)
+is used. With the default setting,
+the  select  blocks  indefinitely.   To
+effect  a  poll,  the  timeout argument should be a non-NULL
+pointer, pointing to a zero-valued timeval structure.
+To obtain the behavior of the default setting, bypassing any value set by 
+.BR ldap_set_option (3),
+set to -1 the \fItv_sec\fP field of the \fItimeout\fP parameter.
+See
+.BR select (2)
+for further details.
+.LP
+If the result of a specific operation is required, \fImsgid\fP should
+be set to the invocation identifier returned when the operation was
+initiated, otherwise LDAP_RES_ANY or LDAP_RES_UNSOLICITED should be
+supplied to wait for any or unsolicited response.
+.LP
+The \fIall\fP parameter, if non-zero, causes
+.B ldap_result()
+to return all responses with msgid, otherwise only the
+next response is returned.  This is commonly used to obtain all
+the responses of a search operation.
+.LP
+A search response is made up of zero or
+more search entries, zero or more search references, and zero or
+more extended partial responses followed by a search result.  If
+\fIall\fP is set to 0, search entries will be returned one at a
+time as they come in, via separate calls to
+.BR ldap_result() .
+If it's set to 1, the search
+response will only be returned in its entirety, i.e., after all entries,
+all references, all extended partial responses, and the final search
+result have been received.
+.SH RETURN VALUE
+Upon success, the type of the result received is returned and the
+\fIresult\fP parameter will contain the result of the operation;
+otherwise, the \fIresult\fP parameter is undefined.  This
+result should be passed to the LDAP parsing routines,
+.BR ldap_first_message (3)
+and friends, for interpretation.
+.LP
+The possible result types returned are:
+.LP
+.nf
+	LDAP_RES_BIND (0x61)
+	LDAP_RES_SEARCH_ENTRY (0x64)
+	LDAP_RES_SEARCH_REFERENCE (0x73)
+	LDAP_RES_SEARCH_RESULT (0x65)
+	LDAP_RES_MODIFY (0x67)
+	LDAP_RES_ADD (0x69)
+	LDAP_RES_DELETE (0x6b)
+	LDAP_RES_MODDN (0x6d)
+	LDAP_RES_COMPARE (0x6f)
+	LDAP_RES_EXTENDED (0x78)
+	LDAP_RES_INTERMEDIATE (0x79)
+.fi
+.LP
+The
+.B ldap_msgfree()
+routine is used to free the memory allocated for
+result(s) by
+.B ldap_result()
+or
+.BR ldap_search_ext_s (3)
+and friends.
+It takes a pointer to the result or result chain to be freed and returns
+the type of the last message in the chain.
+If the parameter is NULL, the function does nothing and returns zero.
+.LP
+The
+.B ldap_msgtype()
+routine returns the type of a message.
+.LP
+The
+.B ldap_msgid()
+routine returns the message id of a message.
+.SH ERRORS
+.B ldap_result()
+returns \-1 if something bad happens, and zero if the
+timeout specified was exceeded.
+.B ldap_msgtype()
+and
+.B ldap_msgid()
+return \-1 on error.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_first_message (3),
+.BR select (2)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

@@ -1,0 +1,54 @@
+This snapin uses the real Unix properties of DS8 and above
+with the following names and syntaxes
+
+"UNIX:UID"
+"UNIX:Primary GroupName"
+"UNIX:Primary GroupID"
+"UNIX:GID"
+"UNIX:Login Shell"
+"UNIX:Comments"
+"UNIX:Home Directory"
+
+You can use it on  non DS8 schémas in that case, you must stuff
+Unix properties in the L attribute ( Location string under thhe
+Identification page of NWAdmin32).
+
+ Either way , the snapin will always try to get *missing* data
+ from the L attribute
+ Of course NDS8 (real or dummy) attributes have priority, that is
+ if both exists NDS8 attribut will keep their values and the
+ L attribute value will be erased when saving the NDS.
+
+ User:
+	 U:nnn       Unix UID
+	 G:nnn       Unix GID
+	 S:/.../...  Unix Shell
+	 H:/.../.... Unix Home
+  Group:
+	  G:nnn      Unix GID
+
+ Currently the following attributes recognized by the PAM module
+ are NOT modifiable by this snapin. You should modify them
+ using the "built-in" string editor of NWADmin under the Identification Page
+  ( Location attribute):
+  User:
+	  O: Unix or NDS name of other group ( if that group is a NDS name
+			and has a N:nnnn attribute, this value will be used for
+			 translation to Unix name, otherwise, a "proper Unix name"
+			 will be made from the NDS one ( remove context part,
+			 skip all spaces and illegal chars and prepend a Z if its
+			 starts by a digit (  this is required by useradd/usermod
+			 that misbehave with a group name starting with a digit)
+		C: Unix comment, added to the Gecos field after the full name
+		(-comma separator added)
+		P: Primary group name. So far the snapin works with the numeric
+			  Primary Group ID for user's. It may change in the next release.
+
+ Of course any other L (location) strings is left untouched by the snapin
+  ( no error message)!
+
+Patrick Pollet  
+Feb 05/02/2001
+
+
+

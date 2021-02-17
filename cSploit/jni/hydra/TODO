@@ -1,0 +1,40 @@
+
+./configure:
+ - add test for -march=native
+
+--- this is old ---
+
+Prio 1:
+* add cookie support to hydra-http.c
+* hydra-smb more than 1 connection?
+* add help hints?
+* test teamspeak, icq
+* check all modules to ensure no check is lost because of a timeout, buf == NULL etc.
+* optimize smtp module
+* optimize ssl performance
+* add snmpv3 privacy support
+* http: option to specify an url for testing if the login was right or wrong
+* does hydra-oracle work with service names? (often SIDs do not work anymore)
+* fix crash for -R on x64
+* IPv6 addresses in txt file does not work
+* prot://ipv6addr:port does not have []
+
+
+Prio 2:
+* add support for IPv6 Link Local Addresses like fe80::1%eth0 for Solaris and *BSD
+* add crack info when key is pressed
+* hydra-smb support NTLMv2 (when its fixed)
+* support for 802.1x EAP via libpcap
+* TN3270, and TN3270 user enumeration
+* Support nmap -o and -oM output files
+
+
+Prio 3:
+* Specify user-agent for http-form module as extra optional option
+* IPv6 support for sip
+* add RIP, OSPF, BGP, PIM
+* add diameter support
+* round robin proxy support ?
+* add tn5250 support
+* Add Sybase support, using freetds lib (can be used for ms-sql)
+* Add Informix ?

@@ -1,0 +1,31 @@
+dn: cn=Connection 1001,cn=Connections,cn=Monitor
+structuralObjectClass: monitorConnection
+monitorConnectionProtocol: 3
+monitorConnectionOpsReceived: 2
+monitorConnectionOpsExecuting: 1
+monitorConnectionOpsPending: 0
+monitorConnectionOpsCompleted: 1
+monitorConnectionGet: 2
+monitorConnectionRead: 2
+monitorConnectionWrite: 0
+monitorConnectionMask: rx
+monitorConnectionListener: ldap://localhost:@PORT1@/
+monitorConnectionLocalAddress: IP=127.0.0.1:@PORT1@
+entryDN: cn=Connection 1001,cn=Connections,cn=Monitor
+
+dn: cn=Connections,cn=Monitor
+structuralObjectClass: monitorContainer
+entryDN: cn=Connections,cn=Monitor
+
+dn: cn=Current,cn=Connections,cn=Monitor
+structuralObjectClass: monitorCounterObject
+entryDN: cn=Current,cn=Connections,cn=Monitor
+
+dn: cn=Max File Descriptors,cn=Connections,cn=Monitor
+structuralObjectClass: monitorCounterObject
+entryDN: cn=Max File Descriptors,cn=Connections,cn=Monitor
+
+dn: cn=Total,cn=Connections,cn=Monitor
+structuralObjectClass: monitorCounterObject
+entryDN: cn=Total,cn=Connections,cn=Monitor
+

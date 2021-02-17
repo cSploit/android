@@ -1,0 +1,107 @@
+.TH NWBPSET 1 8/7/1996 nwbpset nwbpset
+.SH NAME
+nwbpset \- Create a bindery property or set its value
+.SH SYNOPSIS
+.B nwbpset
+[
+.B -h
+] [
+.B -S
+.I server
+] [
+.B -U
+.I user name
+] [
+.B -P
+.I password
+|
+.B -n
+] [
+.B -C
+] 
+
+.SH DESCRIPTION
+.B nwbpset
+Reads a property specification from the standard input and creates and
+sets the corresponding property. The format is determined by the
+output of 'nwbpvalues -c'. nwbpset will hopefully become an important
+part of the bindery management suite of ncpfs, together with
+'nwbpvalues -c'. See util/nwbpsecurity for an example.
+
+As another example, look at the following command line:
+
+  nwbpvalues -t 1 -o supervisor -p user_defaults -c |\\ 
+  sed '2s/.*/ME/'|\\
+  sed '3s/.*/LOGIN_CONTROL/'|\\
+  nwbpset
+
+With this command, the property user_defaults of the user object
+\'supervisor\' is copied into the property login_control of the user
+object \'me\'.
+
+  nwbpvalues -t 1 -o me -p login_control -c |\\
+  sed '9s/.*/ff/'|\\
+  nwbpset
+
+This command disables the user object me.
+
+Feel free to contribute other examples!
+
+.B nwbpset
+looks up the file
+.I $HOME/.nwclient
+to find a file server, a user name and possibly a password. See
+nwclient(5) for more information. Please note that the access
+permissions of $HOME/.nwclient MUST be 600 for security reasons.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user
+.RS 3
+.B user
+is the user name to use for login.
+.RE
+
+.B -P
+.I password
+.RS 3
+.B password
+is the password to use for login. If neither
+.B -n
+nor
+.B -P
+are given, and the user has no open connection to the server, nwbpset
+prompts for a password.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given if no password is required for the login.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.SH AUTHORS
+nwbpset was written by Volker Lendecke. See the Changes file of ncpfs
+for other contributors.

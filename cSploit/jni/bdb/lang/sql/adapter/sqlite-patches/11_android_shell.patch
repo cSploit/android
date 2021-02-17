@@ -1,0 +1,29 @@
+--- src/shell.c
++++ src/shell.c
+@@ -36,6 +36,12 @@
+ #include "config.h"
+ #endif
+ 
++#ifdef ANDROID
++#ifndef NO_ANDROID_FUNCS
++#include<sqlite3_android.h>
++#endif
++#endif
++
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdio.h>
+@@ -1480,6 +1486,13 @@
+       sqlite3_create_function(db, "shellstatic", 0, SQLITE_UTF8, 0,
+           shellstaticFunc, 0, 0);
+     }
++#ifdef ANDROID
++#ifndef NO_ANDROID_FUNCS
++    register_android_functions(db, 0);
++    register_localized_collators(db, "", 0);
++#endif
++#endif
++
+     if( db==0 || SQLITE_OK!=sqlite3_errcode(db) ){
+       fprintf(stderr,"Error: unable to open database \"%s\": %s\n", 
+           p->zDbFilename, sqlite3_errmsg(db));

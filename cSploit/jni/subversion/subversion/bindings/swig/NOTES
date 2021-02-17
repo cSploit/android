@@ -1,0 +1,107 @@
+                                                                -*-text-*-
+
+
+==> For instructions on how to get swig bindings working, read the
+     INSTALL file in this directory.
+
+
+SVN HEADER -> SWIG MODULE
+-------------------------
+
+Subversion has a bunch of include files, some which are interesting for
+wrapping with language bindings, and others which are simple type
+declarations and constants. Below is the table which maps each header
+to its disposition:
+
+INCLUDE           SWIG MODULE NAME
+svn_auth.h        _core (some symbols)
+svn_base64.h      (1)
+svn_client.h      _client
+svn_cmdline.h     (2)
+svn_config.h      _core (some symbols)
+svn_ctype.h       (1)
+svn_dav.h         (2)
+svn_delta.h       _delta
+svn_diff.h        _diff
+svn_error.h       (2)
+svn_error_codes.h _core
+svn_fs.h          _fs
+svn_hash.h        (1)
+svn_io.h          _core (only stream functions)
+svn_md5.h         (1)
+svn_opt.h         _core (some symbols)
+svn_path.h        _core (some symbols, 1)
+svn_pools.h       _core (only pool manipulation)
+svn_props.h       _core (some symbols)
+svn_quoprint.h    (1)
+svn_ra.h          _ra
+svn_ra_svn.h      (2)
+svn_repos.h       _repos
+svn_sorts.h       (1)
+svn_string.h      (3)
+svn_subst.h       (2)
+svn_test.h        (2)
+svn_time.h        _core (some symbols)
+svn_types.h       (3)
+svn_utf.h         (1)
+svn_version.h     _core (some symbols)
+svn_wc.h          _wc
+svn_xml.h         (1)
+
+apr*.h            (3)
+
+(1) It is assumed that the binding languages will provide this
+    functionality separately.
+    ### HELP: Java does not provide base-64 natively.  Should we wrap
+    ### SVN's with SWIG, or include a stand-alone ASF implementation
+    ### (such as from Jakarta Commons Codec)?
+
+(2) No significant/interesting functionality to export.
+
+(3) A SWIG interface file exists, but only to export types used by other
+    modules.  No binding module is actually constructed from this
+    header.
+
+
+SWIG MODULES
+------------
+
+We will produce a number of modules/classes, expecting the binding
+languages to organize these into a package, and present the Subversion
+libraries' API in a manner familiar to programmers of a given
+language.  For instance, the Python bindings are handled as follows:
+
+svn.core
+svn.client
+svn.delta
+svn.fs
+svn.ra
+svn.repos
+svn.wc
+
+
+
+
+THUNK EDITORS
+-------------
+
+"Thunk" is Windows programming term describing a "go between."  Our
+SWIG bindings generally implement editors in C which delegate to the
+language-specific extension API (e.g. its C API for Python, JNI for
+Java, etc.).  This transitional object implements a Subversion editor
+interface, allowing it to be passed between its native library code
+and the runtime of the language which the bindings were written for.
+
+
+
+
+SWIG INTERFACE FILE CODING NOTES
+--------------------------------
+
+Always place %{ #include "foo.h" ... %} sections above any code which
+will actually cause SWIG to generate wrappers.  This is because those
+wrappers may need declarations from the headers to be valid C.
+Practically, this means that the %{ ... %} block should be above any
+"%include *.h" statements (%includes of *.i files are fine, since they
+should be self-sufficient).
+

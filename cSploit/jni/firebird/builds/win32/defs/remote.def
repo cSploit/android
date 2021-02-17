@@ -1,0 +1,111 @@
+;  The contents of this file are subject to the Interbase Public
+;  License Version 1.0 (the "License"); you may not use this file
+;  except in compliance with the License. You may obtain a copy
+;  of the License at http://www.Inprise.com/IPL.html
+; 
+;  Software distributed under the License is distributed on an
+;  "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+;  or implied. See the License for the specific language governing
+;  rights and limitations under the License.
+; 
+;  The Original Code was created by Inprise Corporation
+;  and its predecessors. Portions created by Inprise Corporation are
+;  Copyright (C) Inprise Corporation.
+; 
+;  All Rights Reserved.
+;  Contributor(s): ______________________________________.
+;------------------------------------------------------------
+;  REMOTE DLL MODULE DEFINITION FILE
+;------------------------------------------------------------
+; 2002.10.29 Sean Leyne - Removed support for obsolete IPX/SPX Protocol
+;
+
+LIBRARY     REMOTE                        
+
+DESCRIPTION 'REMOTE.DLL                  '
+CODE MOVEABLE
+DATA MOVEABLE
+SEGMENTS
+        _TEXT           DISCARDABLE
+        ALLR_TEXT       DISCARDABLE
+        INET_TEXT       PRELOAD
+        INTERFAC_TEXT   DISCARDABLE 
+        MERGE_TEXT      DISCARDABLE
+        PARSER_TEXT     DISCARDABLE
+        PROTOCOL_TEXT   DISCARDABLE
+        REMOTE_TEXT     DISCARDABLE
+        XDR_TEXT        DISCARDABLE
+        NTOH_TEXT       DISCARDABLE
+        CVT_TEXT        DISCARDABLE
+        DLLSHELL_TEXT   PRELOAD
+        WNET_TEXT       DISCARDABLE
+        WFWNP_TEXT      PRELOAD
+EXPORTS
+            _REM_unwind_request            @2   
+            _REM_transaction_info          @3   
+            _REM_start_transaction         @4   
+            _REM_start_request             @5   
+            _REM_start_and_send            @6   
+            _REM_send                      @7   
+	    _REM_seek_blob                 @8
+            _REM_rollback_transaction      @9   
+            _REM_request_info              @10  
+            _REM_release_request           @11  
+	    _REM_reconnect_transaction     @12
+            _REM_receive                   @13  
+            _REM_que_events                @14  
+            _REM_put_slice                 @15  
+            _REM_put_segment               @16  
+            _REM_prepare_transaction       @17  
+            _REM_open_blob2                @18  
+	    _REM_get_slice                 @19
+            _REM_get_segment               @20  
+            _REM_sql_info                  @21  
+            _REM_set_cursor_name           @22  
+            _REM_prepare                   @23  
+            _REM_free_statement            @24  
+            _REM_fetch                     @25  
+            _REM_execute_immediate         @26  
+            _REM_execute                   @27  
+            _REM_allocate_statement        @28  
+            _REM_detach_database           @29  
+            _REM_ddl                       @30  
+            _REM_database_info             @31  
+            _REM_create_database           @32  
+            _REM_create_blob2              @33  
+            _REM_compile_request           @34  
+            _REM_commit_retaining          @35  
+            _REM_commit_transaction        @36  
+	    _REM_close_blob                @37
+            _REM_cancel_events             @38  
+	    _REM_cancel_blob               @39
+            _REM_blob_info                 @40  
+	    _REM_attach_database           @41
+            _REM_query_service             @42
+            _REM_detach_service            @43
+            _REM_attach_service            @44
+            _REM_insert                    @45
+            _REM_execute2                  @47
+            _REM_execute_immediate2        @48
+	    _REM_drop_database             @49
+            _REM_transact_request          @50
+            _REMOTE_release_messages       @51
+            _REMOTE_free_packet            @52
+            _REMOTE_make_string            @53
+            _REMOTE_cleanup_transaction    @54
+            _REMOTE_reset_statement        @55
+            _REMOTE_set_object             @56
+            _REMOTE_find_request           @57
+            _REMOTE_release_request        @58
+	    _REMOTE_reset_request          @59
+
+	    _ALLR_free                     @60
+	    _ALLR_alloc                    @61
+	    _ALLR_block                    @62
+	    _ALLR_release                  @63
+	    _PARSE_messages                @64
+   	    _MERGE_database_info           @65
+	    _INET_server                   @66
+	    _INET_connect                  @67
+
+	    WEP                            @1	RESIDENTNAME

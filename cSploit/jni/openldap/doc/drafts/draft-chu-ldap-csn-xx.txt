@@ -1,0 +1,424 @@
+
+
+
+
+
+
+INTERNET-DRAFT                                      Howard Y. Chu
+Intended Category: Standard Track                   Symas Corporation
+Expires in six months                               1 December 2004
+
+
+                     Change Sequence Numbers for LDAP
+                       <draft-chu-ldap-csn-00.txt>
+
+
+Status of this Memo
+
+  This document is an Internet-Draft and is in full conformance with all
+  provisions of Section 10 of RFC2026.
+
+  This document is intended to be, after appropriate review and
+  revision, submitted to the RFC Editor as an Standard Track document.
+  Distribution of this memo is unlimited.  Technical discussion of this
+  document will take place on the IETF LDAP Extensions mailing list
+  <ldapext@ietf.org>.  Please send editorial comments directly to the
+  author <Kurt@OpenLDAP.org>.
+
+  Internet-Drafts are working documents of the Internet Engineering Task
+  Force (IETF), its areas, and its working groups.  Note that other
+  groups may also distribute working documents as Internet-Drafts.
+  Internet-Drafts are draft documents valid for a maximum of six months
+  and may be updated, replaced, or obsoleted by other documents at any
+  time.  It is inappropriate to use Internet-Drafts as reference
+  material or to cite them other than as ``work in progress.''
+
+  The list of current Internet-Drafts can be accessed at
+  <http://www.ietf.org/ietf/1id-abstracts.txt>. The list of
+  Internet-Draft Shadow Directories can be accessed at
+  <http://www.ietf.org/shadow.html>.
+
+  Copyright (C) The Internet Society (2004).  All Rights Reserved.
+
+  Please see the Full Copyright section near the end of this document
+  for more information.
+
+
+Abstract
+
+  This document describes the LDAP/X.500 Change Sequence Number 'CSN'
+  syntax and matching rules and associated attributes. CSNs are used
+  to impose a total ordering upon the sequence of updates applied
+  to a directory.
+
+
+
+
+Chu               draft-chu-ldap-csn-00              [Page 1]
+
+INTERNET-DRAFT               LDAP CSN                    1 December 2004
+
+
+1. Background and Intended Use
+
+  In X.500 Directory Services [X.501], updates to a directory may need
+  to be distributed to multiple servers. The 'modifyTimeStamp' is already
+  defined for recording the time of an update, but it may be inadequate in
+  an environment where multiple servers with loosely synchronized clocks
+  are interoperating.
+
+  This document describes the 'CSN' syntax which augments a timestamp with
+  additional information to assist in coordinating updates among multiple
+  directory servers. This document describes the 'entryCSN' operational
+  attribute which carries the CSN of the last update applied to an entry
+  and also the 'contextCSN' operational attribute which carries the
+  greatest CSN of all updates applied to a directory context. Directory
+  clients and servers may use these attributes to assist in synchronizing
+  shadowed copies of directory information.
+
+  This document describes the 'csnMatch' and 'csnOrderingMatch' matching
+  rules corresponding to the 'CSN' syntax. 
+
+  The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+  "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+  document are to be interpreted as described in BCP 14 [RFC2119].
+
+  Schema definitions are provided using LDAP description formats
+  [RFC2252].  Definitions provided here are formatted (line wrapped) for
+  readability.
+
+
+2. CSN Schema Elements
+
+2.1 CSN Syntax
+
+  Values in this syntax are encoded according to the following BNF:
+
+  CSN = timestamp '#' operation-counter '#' replica-id 
+
+  timestamp = <generalizedTimeString as specified in 6.14 of [RFC2252]>
+
+  operation-counter = 6hex-digit
+
+  replica-id = 2hex-digit
+
+  The timestamp SHALL use GMT and SHALL NOT include fractional seconds.
+
+  The operation-counter is set to zero at the start of each second, and
+  incremented by one for each update operation that occurs within that
+  second.
+
+  The replica-id is an identifier that represents a specific Replica in
+  a collection of cooperating servers.
+
+  The following is a LDAP syntax description [RFC2252] suitable for
+  publication in the subschema.
+
+      ( IANA-ASSIGNED-OID.1 DESC 'CSN' )
+
+
+
+
+
+Chu               draft-chu-ldap-csn-00              [Page 2]
+
+INTERNET-DRAFT               LDAP CSN                    1 December 2004
+
+
+2.2 'csnMatch' Matching Rule
+
+  The 'csnMatch' matching rule compares an asserted CSN with a stored
+  CSN for equality.  Its semantics are same as the octetStringMatch
+  [X.520][RFC2252] matching rule.
+
+  The following is a LDAP matching rule description [RFC2252] suitable
+  for publication in the subschema.
+
+      ( IANA-ASSIGNED-OID.2 NAME 'csnMatch'
+          SYNTAX IANA-ASSIGNED-OID.1 )
+
+
+2.3 'csnOrderingMatch' Matching Rule
+
+  The 'csnOrderingMatch' matching rule compares an asserted CSN
+  with a stored CSN for ordering.  Its semantics are the same as the
+  octetStringOrderingMatch [X.520][RFC2252] matching rule.
+
+  The following is a LDAP matching rule description [RFC2252] suitable
+  for publication in the subschema.
+
+      ( IANA-ASSIGNED-OID.3 NAME 'csnOrderingMatch'
+          SYNTAX IANA-ASSIGNED-OID.1 )
+
+
+2.4. 'entryCSN' attribute
+
+  The 'entryCSN' operational attribute provides the CSN of the last
+  update applied to the entry.
+
+  The following is a LDAP attribute type description [RFC2252] suitable
+  for publication in the subschema.
+
+      ( IANA-ASSIGNED-OID.4 NAME 'entryCSN'
+          DESC 'CSN of the entry content'
+          EQUALITY csnMatch
+          ORDERING csnOrderingMatch
+
+
+
+Chu               draft-chu-ldap-csn-00              [Page 3]
+
+INTERNET-DRAFT               LDAP CSN                    1 December 2004
+
+
+          SYNTAX IANA-ASSIGNED-OID.1
+          SINGLE-VALUE
+          NO-USER-MODIFICATION
+          USAGE directoryOperation )
+
+  Servers SHALL assign a CSN to each entry upon its addition to the
+  directory  and provide the entry's CSN as the value of the
+  'entryCSN' operational attribute.  The entryCSN attribute SHOULD be
+  updated upon every update of the entry.
+
+2.5. 'contextCSN' attribute
+
+  The 'contextCSN' operational attribute provides the greatest CSN of
+  all the updates applied to a context.
+
+  The following is a LDAP attribute type description [RFC2252] suitable
+  for publication in the subschema.
+
+     ( IANA-ASSIGNED-OID.5 NAME 'contextCSN'
+         DESC 'the largest committed CSN of a context'
+         EQUALITY csnMatch
+         ORDERING csnOrderingMatch
+         SYNTAX IANA-ASSIGNED-OID.1
+         SINGLE-VALUE
+         NO-USER-MODIFICATION
+         USAGE directoryOperation )
+
+  Servers SHALL record the greatest CSN of all updates applied to a
+  context in the root entry of the context.
+
+
+3. Security Considerations
+
+
+  General LDAP security considerations [RFC3377] apply.
+
+
+4. IANA Considerations
+
+4.1. Object Identifier Registration
+
+  It is requested that IANA register upon Standards Action an LDAP
+  Object Identifier for use in this technical specification.
+
+      Subject: Request for LDAP OID Registration
+      Person & email address to contact for further information:
+          Howard Chu <hyc@symas.com>
+      Specification: RFC XXXX
+      Author/Change Controller: IESG
+      Comments:
+          Identifies the CSN schema elements
+
+
+4.2. Registration of the csnMatch descriptor
+
+  It is requested that IANA register upon Standards Action the LDAP
+  'csnMatch' descriptor.
+
+      Subject: Request for LDAP Descriptor Registration
+      Descriptor (short name): csnMatch
+      Object Identifier: IANA-ASSIGNED-OID.2
+      Person & email address to contact for further information:
+          Howard Chu <hyc@symas.com>
+      Usage: Matching Rule
+      Specification: RFC XXXX
+      Author/Change Controller: IESG
+
+
+
+
+Chu               draft-chu-ldap-csn-00              [Page 4]
+
+INTERNET-DRAFT               LDAP CSN                    1 December 2004
+
+
+4.3. Registration of the csnOrderingMatch descriptor
+
+  It is requested that IANA register upon Standards Action the LDAP
+  'csnOrderingMatch' descriptor.
+
+      Subject: Request for LDAP Descriptor Registration
+      Descriptor (short name): csnOrderingMatch
+      Object Identifier: IANA-ASSIGNED-OID.3
+      Person & email address to contact for further information:
+          Howard Chu <hyc@symas.com>
+      Usage: Matching Rule
+      Specification: RFC XXXX
+      Author/Change Controller: IESG
+
+
+4.4. Registration of the entryCSN descriptor
+
+  It is requested that IANA register upon Standards Action the LDAP
+  'entryCSN' descriptor.
+
+      Subject: Request for LDAP Descriptor Registration
+      Descriptor (short name): entryCSN
+      Object Identifier: IANA-ASSIGNED-OID.4
+      Person & email address to contact for further information:
+          Howard Chu <hyc@symas.com>
+      Usage: Attribute Type
+      Specification: RFC XXXX
+      Author/Change Controller: IESG
+
+
+4.5. Registration of the contextCSN descriptor
+
+  It is requested that IANA register upon Standards Action the LDAP
+  'contextCSN' descriptor.
+
+      Subject: Request for LDAP Descriptor Registration
+      Descriptor (short name): contextCSN
+      Object Identifier: IANA-ASSIGNED-OID.5
+      Person & email address to contact for further information:
+          Howard Chu <hyc@symas.com>
+      Usage: Attribute Type
+      Specification: RFC XXXX
+      Author/Change Controller: IESG
+
+
+5. Acknowledgments
+
+  This document is based on prior work from the IETF LDUP working
+  group including the LDAP Replication Architecture [LDUPMODEL]
+  and the LDAP Content Synchronization Operation [LDUPSYNC].
+
+
+6. Author's Addresses
+
+  Howard Y. Chu
+  Symas Corporation
+  <hyc@symas.com>
+
+  Kurt D. Zeilenga
+  OpenLDAP Foundation
+  <Kurt@OpenLDAP.org>
+
+
+7. Normative References
+
+  [RFC2119]     Bradner, S., "Key words for use in RFCs to Indicate
+                Requirement Levels", BCP 14 (also RFC 2119), March 1997.
+
+
+
+Chu               draft-chu-ldap-csn-00              [Page 5]
+
+INTERNET-DRAFT               LDAP CSN                    1 December 2004
+
+
+  [RFC2252]     Wahl, M., A. Coulbeck, T. Howes, and S. Kille,
+                "Lightweight Directory Access Protocol (v3):  Attribute
+                Syntax Definitions", RFC 2252, December 1997.
+
+  [RFC3377]     Hodges, J. and R. Morgan, "Lightweight Directory Access
+                Protocol (v3): Technical Specification", RFC 3377,
+                September 2002.
+
+  [X.501]       International Telecommunication Union -
+                Telecommunication Standardization Sector, "The Directory
+                -- Models," X.501(1993) (also ISO/IEC 9594-2:1994).
+
+  [X.520]       International Telecommunication Union -
+                Telecommunication Standardization Sector, "The
+                Directory: Selected Attribute Types", X.520(1993) (also
+                ISO/IEC 9594-6:1994).
+
+  [X.680]       International Telecommunication Union -
+                Telecommunication Standardization Sector, "Abstract
+                Syntax Notation One (ASN.1) - Specification of Basic
+                Notation", X.680(1997) (also ISO/IEC 8824-1:1998).
+
+  [LDUPSYNC]    Zeilenga, K. and Choi, J-H "LDAP Content Synchronization
+                Operation", draft-zeilenga-ldup-sync-05.txt, a work in
+                progress.
+
+
+8. Informative References
+
+  [RFC3383]     Zeilenga, K., "IANA Considerations for LDAP", BCP 64
+                (also RFC 3383), September 2002.
+
+  [LDUPMODEL]   Merrellls, J., Srinivasan, U., and Reed, E., "LDAP
+                Replication Architecture", draft-ietf-ldup-model-09.txt.
+
+
+
+Intellectual Property Rights
+
+  The IETF takes no position regarding the validity or scope of any
+
+
+
+Chu               draft-chu-ldap-csn-00              [Page 6]
+
+INTERNET-DRAFT               LDAP CSN                    1 December 2004
+
+
+  intellectual property or other rights that might be claimed to pertain
+  to the implementation or use of the technology described in this
+  document or the extent to which any license under such rights might or
+  might not be available; neither does it represent that it has made any
+  effort to identify any such rights.  Information on the IETF's
+  procedures with respect to rights in standards-track and
+  standards-related documentation can be found in BCP-11.  Copies of
+  claims of rights made available for publication and any assurances of
+  licenses to be made available, or the result of an attempt made to
+  obtain a general license or permission for the use of such proprietary
+  rights by implementors or users of this specification can be obtained
+  from the IETF Secretariat.
+
+  The IETF invites any interested party to bring to its attention any
+  copyrights, patents or patent applications, or other proprietary
+  rights which may cover technology that may be required to practice
+  this standard.  Please address the information to the IETF Executive
+  Director.
+
+
+
+Full Copyright
+
+  Copyright (C) The Internet Society (2004). All Rights Reserved.
+
+  This document and translations of it may be copied and furnished to
+  others, and derivative works that comment on or otherwise explain it
+  or assist in its implmentation may be prepared, copied, published and
+  distributed, in whole or in part, without restriction of any kind,
+  provided that the above copyright notice and this paragraph are
+  included on all such copies and derivative works.  However, this
+  document itself may not be modified in any way, such as by removing
+  the copyright notice or references to the Internet Society or other
+  Internet organizations, except as needed for the  purpose of
+  developing Internet standards in which case the procedures for
+  copyrights defined in the Internet Standards process must be followed,
+  or as required to translate it into languages other than English.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Chu               draft-chu-ldap-csn-00              [Page 7]
+

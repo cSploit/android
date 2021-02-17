@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Berkeley DB XA Implementation</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="xa.html" title="Chapter 13.  Distributed Transactions" />
+    <link rel="prev" href="xa.html" title="Chapter 13.  Distributed Transactions" />
+    <link rel="next" href="xa_build.html" title="Building a Global Transaction Manager" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Berkeley DB XA Implementation</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="xa.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 13. 
+		Distributed Transactions
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="xa_build.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="idp2187304"></a>Berkeley DB XA Implementation</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+Berkeley DB provides support for distributed transactions using the two-phase commit protocol
+ via its <a href="../api_reference/C/txnprepare.html" class="olink">DB_TXN-&gt;prepare()</a> interfaces.
+ The <a href="../api_reference/C/txnprepare.html" class="olink">DB_TXN-&gt;prepare()</a> method performs the first phase of a
+two-phase commit, flushing the log to disk, and associating a global
+transaction ID with the underlying Berkeley DB transaction.
+ This global transaction ID is used by the global transaction manager to
+identify the Berkeley DB transaction, and will be returned by the
+<a href="../api_reference/C/txnrecover.html" class="olink">DB_ENV-&gt;txn_recover()</a> method when it is called during recovery.
+ </p>
+      <p>  
+However, Berkeley DB does not perform distributed deadlock detection. 
+Instead, when being used as an XA resource manager, Berkeley DB acquires all locks 
+in a non-blocking mode. This results in pre-emptive abort of transactions that have the potential to deadlock.  
+While this can lead to more transactions being aborted than is strictly necessary, 
+it avoids system-wide hanging due to distributed deadlocks.
+</p>
+      <p>When using distributed transactions, there is no way to perform
+hot backups of multiple environments and guarantee that the backups
+are globally transaction-consistent across these multiple environments.
+If backups are desired, then all write transactions should be suspended;
+that is, active write transactions must be allowed to complete and no
+new write transactions should be begun.  Once there are no active write
+transactions, the logs may be copied for backup purposes and the backup
+will be consistent across the multiple environments.</p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="xa.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="xa.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="xa_build.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 13. 
+		Distributed Transactions
+         </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Building a Global Transaction Manager</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

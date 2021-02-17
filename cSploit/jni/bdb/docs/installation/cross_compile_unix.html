@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Cross-Compiling on Unix</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="build_unix.html" title="Chapter 7.  Building Berkeley DB for UNIX/POSIX" />
+    <link rel="prev" href="build_unix_flags.html" title="Changing compile or load options" />
+    <link rel="next" href="build_unix_install.html" title="Installing Berkeley DB" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Cross-Compiling on Unix</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="build_unix_flags.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 7. 
+		Building Berkeley DB for UNIX/POSIX
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="build_unix_install.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="cross_compile_unix"></a>Cross-Compiling on Unix</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+        The purpose of cross-compiling is to build a Berkeley DB library on
+        one platform that is to be used on a different platform. This
+        section demonstrates how to build a library compatible with the ARM
+        platform from a 32-bit x86 Linux platform. You will need to adjust
+        the build tools and options to match your particular platforms.
+    </p>
+      <div class="orderedlist">
+        <ol type="1">
+          <li>
+            <p>
+                Download, install, and test a toolchain that can build the
+                desired target binaries. In this example, we use the
+                <code class="literal">arm-linux-gnueabi-gcc</code> package.
+            </p>
+          </li>
+          <li>
+            <p>
+                Decide on your configuration options, and set up your
+                environment to use the appropriate compiler and compiler
+                tools.  It is often easiest to set this up as a small shell
+                script.  For example:
+            </p>
+            <pre class="programlisting">#!/bin/sh -f
+env \
+CC=/usr/bin/arm-linux-gnueabi-gcc \
+STRIP=/usr/bin/arm-linux-gnueabi-strip \
+../dist/configure \
+--build=i686-pc-linux-gnu \
+--host=arm-linux-gnueabi \
+--enable-java \
+--enable-sql \
+--enable-jdbc \
+--enable-smallbuild \
+--enable-shared \
+--enable-stripped_messages \
+--prefix=$HOME/ARM-linux/install \
+$* </pre>
+            <p>
+                The <code class="literal">--build</code> flag indicates the system on
+                which you are compiling and the <code class="literal">--host</code>
+                flag indicates the target platform.  Adjust or omit the
+                <code class="literal">--enable</code> and <code class="literal">--prefix</code>
+                flag settings as dictated by your own needs.
+            </p>
+          </li>
+          <li>
+            <p>
+                Unpack your Berkeley DB distribution and go to the
+                <code class="literal">build_unix</code> directory. Alternatively, you
+                may create a more appropriately-named directory at the same
+                level and build in it. For example,
+                <code class="literal">build_arm</code>.
+            </p>
+          </li>
+          <li>
+            <p>
+                In your build directory, configure by executing your
+                script, then <code class="literal">make</code> and 
+                <code class="literal">make install</code>. Review any compiler
+                warnings and fix if necessary, repeating the
+                <code class="literal">configure</code> and <code class="literal">make</code>
+                steps until you are satisfied. The resulting libraries and
+                executables can then be transferred to your target system.
+            </p>
+          </li>
+        </ol>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="build_unix_flags.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="build_unix.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="build_unix_install.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Changing compile or load options </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Installing Berkeley DB</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

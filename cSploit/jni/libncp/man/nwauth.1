@@ -1,0 +1,64 @@
+.TH NWAUTH 1 10/27/1996 nwauth nwauth
+.SH NAME
+nwauth \- Verify username/password
+.SH SYNOPSIS
+.B nwauth
+[ \fB-h\fP ] [ \fB-S\fP \fIserver\fP ] [ \fB-U\fP \fIuser name\fP ] [ \fB-P\fP \fIpassword\fP | \fB-n\fP ] [ \fB-D\fP ]
+.SH DESCRIPTION
+\fBnwauth\fP 
+does nothing but logging into a NetWare server. If the login was
+successful, an error code of 0 is returned. If the login was not
+successful, an error code of 1 is returned. It was designed for
+use by other programs who want authenticate users via a NetWare
+server.
+
+If there is no \fB-P\fP or \fB-n\fP option specified on command line,
+nwauth \fBalways\fP expects a password on stdin. If the stdin is a tty, 
+then the user is prompted for a password. Otherwise nwauth simply reads 
+stdin for a password.
+
+.B nwauth
+looks up the file \fI$HOME/.nwclient\fP to find a file server and 
+a user name if they are not specified on command line. See nwclient(5) 
+for more information. Please note that the access permissions of \fI.nwclient\fP
+MUST be 600, for security reasons.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+.B -h
+is used to print a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user name
+.RS 3
+If the user name your NetWare administrator gave to you differs
+from your unix user-id, you should use
+.B -U
+to tell the server about your NetWare user name.
+.RE
+
+.B -D
+.RS 3
+\fBnwauth\fP says that your password is correct if you have existing
+connection to \fIserver\fP with name \fIuser name\fP. This is handy
+for some shell scripts, but it is unacceptable for authorization
+modules, such as PAM, PHP or Apache. It was pointed to me that
+this behavior was not well known, and there exist at least one PAM
+module which does not know that (this module is not part of ncpfs; you
+should use PAM module which comes with ncpfs instead anyway).
+.RE
+.SH SEE ALSO
+.B nwclient(5)
+
+.SH CREDITS
+nwauth was written by Volker Lendecke (lendecke@math.uni-goettingen.de)

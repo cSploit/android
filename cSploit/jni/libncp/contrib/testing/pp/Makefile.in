@@ -1,0 +1,47 @@
+top_srcdir = @top_srcdir@
+top_builddir = ../../..
+this_srcdir = ${top_srcdir}/contrib/testing
+
+include ${top_builddir}/Make.rules
+
+vpath %.c ${this_srcdir}
+
+LIBS = @INTLLIBS@ @LIBS@
+
+O_UTILS1 = getsynt.o nwwhoami.o treelist.o \
+	   open_conn_by_name.o scantree.o \
+	   semaphor.o volres.o \
+	   scanvolr.o getconn_addr.o \
+	   nwc_next_object.o return_block_of_tree.o \
+	   readsdef.o readsynt.o \
+	   nwgetconnlist.o bcastmd.o\
+	   vlist.o \
+	   #
+UTILS1 = $(O_UTILS1:%.o=%)
+
+.PHONY : all clean distclean mrproper
+
+all: $(UTILS1)
+
+%.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+
+$(O_UTILS1) $(O_TMP1): %.o: %.c
+	$(CC) $(CFLAGS) $(CCFLAGS) $(CFLAGS_$@) -o $@ -c $<
+
+$(UTILS1):: %: %.o $(O_TMP1)
+	$(CC) $(LDFLAGS) $(CFLAGS) -o $@ $(addsuffix .o,$@) $(OBJS_$@) -L${top_builddir}/lib -lncp $(LDFLAGS_$@) ${LIBS}
+
+clean:
+	-rm -f $(UTILS1) $(O_UTILS1) *.d *~
+
+distclean: clean
+
+mrproper: clean
+
+ifeq ($(NEED_DEP),yes)
+include $(O_UTILS1:%.o=%.d) $(O_TMP1:%.o=%.d)
+endif

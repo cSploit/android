@@ -1,0 +1,127 @@
+Copyright 2004 Sang Seok Lim, IBM . All rights reserved.
+
+Redistribution and use in source and binary forms, with
+or without modification, are permitted only as authorized
+by the OpenLDAP Public License.
+
+A copy of this license is available in the file LICENSE in
+the top-level directory of the distribution or, alternatively,
+at <http://www.OpenLDAP.org/license.html>.
+
+This directory contains a Component Matching module and
+a X.509 Certificate example.  In order to understand Component
+Matching, see RFC 3687 and
+http://www.openldap.org/conf/odd-sandiego-2004/Sangseok.pdf
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+A) Brief introduction about files in this directory
+%%%%%%%%%%55%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+1) init.c
+module_init() and functions which are dynamically linked
+into the main slapd codes.
+
+2) componentlib.c and componentlib.h
+GSER and BER decoder library of each primitive ASN.1 type.
+They use component representation to store ASN.1 values.
+
+3) certificate.c/.h authorityKeyIdentifier.c/.h
+eSNACC generated BER and GSER decoder routines of the X.509
+certificate specification and one of its extensions,
+authorityKeyIdentifier.
+
+4) asn_to_syn_mr.c asn.h
+An mapping table from ASN.1 types to corresponding Syntaxes,
+matching rules, and component description in slapd.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+B) How to use Component Matching on X.509 certificates
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+1) be sure to configure slapd with enable-modules on.
+2) install the GSER-support eSNACC compiler. You can find
+only in www.openldap.org. At least, you need the library
+(libcasn1.a) and header files for compiling this module.
+3) modify Makefile accordingly. then run make.
+you will get compmatch.la and other necessary files in ./libs
+4) modify slapd.conf to include the following module command
+	moduleload <path to>compmatch.la
+5) run slapd and perform search operations against
+the attribute, userCertificate. You need to read through
+RFC 3687 in order to understand how to compose component
+filters.
+Ex) component search filter examples
+"(userCertificate:componentFilterMatch:=item:{ component
+\"toBeSigned.serialNumber\", rule integerMatch, value 2 })"
+You can find more examples in "test031-component-filter"
+in the OpenLDAP source directory.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+C) How to add a new ASN.1 syntax
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+1) download and install the eSNACC compiler supporting
+Component Matching. You can find the compiler only in
+www.openldap.org.  Before compiling, be sure to define
+the "LDAP_COMPONENT" macro to obtain component
+supported version of C library and back-ends of eSNACC.
+Otherwise compiled library will fail to be linked to
+the module.
+2) using eSNACC, compile your ASN.1 specifications and
+copy the generated .c and .h files to this directory
+Ex)
+$ esnacc -E BER_COMP -E GSER -t -d -f example.asn 
+For Component Matching, set BOTH BER_COMP and GSER on.
+After compiling, you will get example.c and example.h
+3) modify example.c accordingly, seeing certificate.c
+and certificate.asn as a reference.
+- add init_module_xxx() located in generated .c file
+into init_module() in init.c.
+- modify the arguments of InstallOidDecoderMapping(...)
+accordingly
+- in the generated .c file, you need to write
+"DecComponentxxxTop(...)" function for yourself.
+You can copy BDecComponentCertificateTop in the 
+generated .c file and modify it accordingly.
+4) register a new attribute syntax with a new OID
+in a schema file
+5) then goto 3) of B) section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+D) How to configure Component Indexing
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+You can generate indices on each component of
+a given attribute whose values are in either GSER or
+BER. Currently primitive ASN.1 types, DN, and RDN
+can be indexed for equality matching in BDB.
+In order to generate indices, put following line
+in the slapd configuration file, slapd.conf.
+
+index [attribute name].[component reference] eq
+
+Ex)
+index userCertificate eq
+index userCertificate.toBeSigned.issuer.rdnSequence eq
+index userCertificate.toBeSigned.serialNumber eq
+index userCertificate.toBeSigned.version eq
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+D) How to configure Attribute Alias
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+If your client is unable to use component filters,
+attribute aliasing can be used instead. Attribute
+Alias maps a virtual attribute type to an attribute
+component and a component matching rule.
+You can create your own aliases by following steps.
+
+1) register aliasing attributes in the schema file.
+Sample aliasing attributes are in test.schema.
+2) compose component filters for aliasing attributes
+and put them in "preprocessed_comp_filter" array
+in "init.c".
+3) add "add_aa_entry" function calls in
+"init_attribute_aliasing_table()" in "init.c"
+4) perform searching against the aliasing attribute
+Ex)
+"(x509CertificateIssuer:distinguishedNameMatch=
+cn=ray,L=yorktown,o=ibm,c=us)"

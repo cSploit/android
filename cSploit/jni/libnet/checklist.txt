@@ -1,0 +1,35 @@
+Release Checklist
+=================
+
+Pre-release:
+
+- doc/CHANGELOG
+
+Use ../ChangeLog to update changelog.
+
+- README.txt, libnet/README
+
+Sync these.
+
+- configure.ac
+
+Update version.
+
+- src/Makefile.am
+
+Update LDFLAGS' version-info.
+
+- tag it, with -rc#
+
+> git tag -a libnet-x.y.z -m libnet-x.y.z
+> git push --tags
+
+- Build it, ../Build
+
+- Push it, ../Push
+
+- Announce release-candidate on libnet-dev-announce and to people in doc/CONTRIB
+
+
+- Announce release on libnet-dev-announce
+

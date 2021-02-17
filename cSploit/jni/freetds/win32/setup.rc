@@ -1,0 +1,154 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifdef _MSC_VER
+# include "winres.h"
+#else
+# include "windows.h"
+# ifndef IDC_STATIC
+#  define IDC_STATIC -1
+# endif
+#endif
+
+#include "version.rc"
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DSN DIALOG DISCARDABLE  0, 0, 202, 140
+STYLE DS_SYSMODAL | DS_MODALFRAME | DS_SETFOREGROUND | DS_3DLOOK | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION
+CAPTION "FreeTDS DSN Configuration"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "DSN Name",IDC_STATIC,23,16,37,8
+    EDITTEXT        IDC_DSNNAME,74,13,60,14,ES_AUTOHSCROLL
+    LTEXT           "Protocol Version",IDC_STATIC,8,34,52,8
+    COMBOBOX        IDC_PROTOCOL,74,32,73,61,CBS_DROPDOWNLIST | CBS_SORT | 
+                    WS_TABSTOP
+    LTEXT           "Server Address",IDC_STATIC,11,52,49,8
+    EDITTEXT        IDC_ADDRESS,74,49,121,14,ES_AUTOHSCROLL
+    LTEXT           "Server Port",IDC_STATIC,24,71,36,8
+    EDITTEXT        IDC_PORT,74,68,60,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Database",IDC_STATIC,28,90,32,8
+    EDITTEXT        IDC_DATABASE,74,87,121,14,ES_AUTOHSCROLL
+    LTEXT           "www.freetds.org",IDC_STATIC,7,123,52,8
+    CTEXT           "",IDC_HINT,7,105,188,8
+    PUSHBUTTON      "OK",IDOK,92,117,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,144,117,50,14
+END
+
+IDD_LOGIN DIALOG DISCARDABLE  0, 0, 164, 117
+STYLE DS_MODALFRAME | DS_3DLOOK | WS_CAPTION | WS_VISIBLE
+CAPTION "FreeTDS Login"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Server",IDC_STATIC,23,17,22,8
+    LTEXT           "Server Name",IDC_LOGINSERVER,51,13,106,16,
+                    SS_CENTERIMAGE | SS_SUNKEN
+    LTEXT           "User Name",IDC_STATIC,9,38,36,8
+    EDITTEXT        IDC_LOGINUID,51,36,106,14,ES_AUTOHSCROLL
+    LTEXT           "Password",IDC_STATIC,13,60,32,8
+    EDITTEXT        IDC_LOGINPWD,51,57,106,14,ES_PASSWORD | ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,52,96,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,107,96,50,14
+    LTEXT           "Log File",IDC_STATIC,19,79,26,8
+    CONTROL         """FreeTDS.log"" on desktop",IDC_LOGINDUMP,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,51,78,106,10
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#ifdef _MSC_VER\r\n"
+    "# include ""winres.h""\r\n"
+    "#else\r\n"
+    "# include ""windows.h""\r\n"
+    "# ifndef IDC_STATIC\r\n"
+    "#  define IDC_STATIC -1\r\n"
+    "# endif\r\n"
+    "#endif\r\n"
+    "\r\n"
+    "#include ""version.rc""\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_DSN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 195
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 131
+    END
+
+    IDD_LOGIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 157
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 110
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

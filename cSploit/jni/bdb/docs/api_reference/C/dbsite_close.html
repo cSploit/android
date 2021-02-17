@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_SITE-&gt;close()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 10.  Replication Methods" />
+    <link rel="prev" href="repmgrstat_print.html" title="DB_ENV-&gt;repmgr_stat_print()" />
+    <link rel="next" href="envtxn_applied.html" title="DB_ENV-&gt;txn_applied()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_SITE-&gt;close()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="repmgrstat_print.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 10. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envtxn_applied.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbsite_close"></a>DB_SITE-&gt;close()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB_SITE-&gt;close(DB_SITE *site); </pre>
+      <p>
+         The <code class="methodname">DB_SITE-&gt;close()</code> method 
+         deallocates the DB_SITE handle. The handle must not be accessed
+         again after this method is called, regardless of the return value.
+    </p>
+      <p>
+        Use of this method does not in any way affect the configuration of
+        the site to which the handle refers, or of the replication group in
+        general.
+    </p>
+      <p>
+        All DB_SITE handles must be closed before the owning DB_ENV handle
+        is closed.
+     </p>
+      <p>
+         The <code class="methodname">DB_SITE-&gt;close()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+     </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp54593400"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="db_site.html" title="The DB_SITE Handle">DB_SITE</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp54598512"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="xref" href="rep.html#replist" title="Replication and Related Methods">Replication and Related Methods</a>
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="repmgrstat_print.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envtxn_applied.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_ENV-&gt;repmgr_stat_print() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_ENV-&gt;txn_applied()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

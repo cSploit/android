@@ -1,0 +1,20 @@
+//
+// FBCONTROL.RC2 - resources Microsoft Visual C++ does not edit directly
+//
+
+#ifdef APSTUDIO_INVOKED
+	#error this file is not editable by Microsoft Visual C++
+#endif //APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Add manually edited resources here...
+
+/////////////////////////////////////////////////////////////////////////////
+
+#define USER_ACCOUNT_IN_USE "Service is controlled by non-LocalSystem User Account. Server Configuration is disabled."
+#define CONFIG_OUT_OF_SYNC	"The installed configuration is out of sync with reality. Use this applet to reset."
+#define INSUFFICIENT_USER_RIGHTS "You do not have sufficient user rights. Server Configuration is disabled."
+
+
+

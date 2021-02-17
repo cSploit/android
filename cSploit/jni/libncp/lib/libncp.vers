@@ -1,0 +1,619 @@
+NCPFS.INTERNAL {
+	global:
+		bindery_only;
+		com_err;
+		NWDSResolveName2;
+		NWDSResolveNameInt;
+		NWDSAddConnection;
+		__NWDSCompare;
+		NWDSGetKeys;
+		NWDSSetKeys;
+		__NWTimeGetVersion;
+	local:
+		__NWULocalInit;
+		__NWUInternalToLocal;
+		__NWUInternalToUnicode;
+		__NWULocalToInternal;
+		__NWUUnicodeToInternal;
+		NWDSCreateBuf;
+		NWDSSetupBuf;
+
+		ncp_add_pstring;
+		ncp_init_request;
+		ncp_init_request_s;
+		ncp_sign_start;
+		ncp_lock_conn;
+		ncp_unlock_conn;
+
+		ncp_set_private_key;
+		ncp_get_private_key;
+
+		nwcryptinit;
+		nwdecrypt;
+		nwdecryptblock;
+		nwencrypt;
+		nwencryptblock;
+		nwhash1;
+		nwhash2;
+		nwhash2block;
+		nwhash2end;
+		put_req_size_unsigned;
+		rsa_crypt;
+		rsa_crypt2;
+		shuffle;
+		sign_init;
+		sign_packet;
+		__sign_packet;
+		sign_verify_reply;
+		
+		__NWEncryptWithSK;
+		__NWGenerateKeyPair;
+		
+		__NWDSBeginAuthenticationV0;
+		__NWDSBeginLoginV0;
+		__NWDSCloseIterationV0;
+		__NWDSFinishAuthenticationV0;
+		__NWDSFinishLoginV2;
+		__NWDSGetObjectDN;
+		__NWDSGetObjectDNUnicode;
+		__NWDSGetPrivateKey;
+		__NWDSGetPublicKeyFromConnection;
+		__NWDSGetServerDN;
+		__NWDSReadV1;
+		__NWDSReadObjectInfo;
+		__NWDSReadObjectDSIInfo;
+		__NWDSResolveName2p;
+		__NWDSResolveName2u;
+		__NWDSResolveName2w;
+		NWDSResolveName2DR;
+
+		__NWDSCreateRDN;
+		__NWDSDestroyRDN;
+		
+		NWDSBufPutBuffer;
+		NWDSBufSetInfoType;
+		NWDSBufSkipBuffer;
+
+		NWDSPutAttrVal_XX_STRING;
+		NWDSPutAttrVal_TIMESTAMP;
+		
+		NWDSGetCanonicalizedName;
+
+		NWDSPtrDN;
+		NWDSBufDN;
+		NWDSBufCtxDN;
+		NWDSCtxBufDN;
+		NWDSBufCtxString;
+		NWDSCtxBufString;
+		__NWDSGetConnection;
+		
+		__NWDSIHCreate;
+		__NWDSIHDelete;
+		__NWDSIHInit;
+		__NWDSIHLookup;
+		__NWDSIHPut;
+		__NWDSIHUpdate;
+
+		NWDSDuplicateContextHandleInt;
+		
+		# 2.2.0.19 
+
+		__NWCCGetConnAddressInt;
+		cfgGetItem;
+		printConn;
+		ncp_next_conn;
+		docopy_multistring;
+		NWDSXlateToCtx;
+		NWDSXlateFromCtx;
+		#NWDSSpyConns;
+		NWCIsPermanentConnection;
+		NWDSWhoAmI_Not_So_Good;
+		__NWDisableBroadcasts;
+		__NWEnableBroadcasts;
+		cfgGetItemW;
+		iconv_external_to_wchar_t;
+		iconv_wchar_t_to_external;
+		nds_ring_lock;
+		ncp_put_req_size_unsigned;
+		
+		# 2.2.1
+		
+		ipx_make_reachable_rip;
+		x_recvfrom;
+		__NWReadFileServerInfo;
+};
+
+# no version
+#		unirev;
+#		unilen;
+#		wcsrev;
+
+
+NCPFS.MPILIB {
+		copyright_notice;
+		countbits;
+		global_precision;
+		mp_addc;
+		mp_compare;
+		mp_dec;
+		mp_div;
+		mp_dmul;
+		mp_inc;
+		mp_init;
+		mp_mod;
+		mp_modexp;
+		mp_modexp_crt;
+		mp_move_and_shift_left_bits;
+		mp_mult;
+		mp_neg;
+		mp_recip;
+		mp_rotate_left;
+		mp_shift_right_bits;
+		mp_shortdiv;
+		mp_shortmod;
+		mp_smul;
+		mp_subb;
+		mp_udiv;
+		munit_prec;
+		significance;
+		stage_upton_modulus;
+		upton_burn;
+		upton_modmult;
+};
+
+NCPFS.2.2.0.17 {
+		NWCCCloseConn;
+		NWCCGetConnInfo;
+		NWCCOpenConnByAddr;
+		NWCCOpenConnBySockAddr;
+		NWCallsInit;
+		NWClearConnectionNumber;
+		NWCloseBindery;
+		NWDisableFileServerLogin;
+		NWDisableTTS;
+		NWDownFileServer;
+		NWEnableFileServerLogin;
+		NWEnableTTS;
+		NWGetConnListFromObject;
+		NWGetConnectionNumber;
+		NWGetFileServerName;
+		NWGetFileServerVersion;
+		NWGetNSEntryInfo;
+		NWGetNSLoadedList;
+		NWGetObjectConnectionNumbers;
+		NWGetObjectID;
+		NWGetObjectName;
+		NWGetVolumeName;
+		NWOpenBindery;
+		NWParsePath;
+		NWRemoveJobFromQueue2;
+		NWRequest;
+		NWRequestSimple;
+		NWSendBroadcastMessage;
+		NWVerifyObjectPassword;
+		
+		NWSMDismountVolumeByName;
+		NWSMDismountVolumeByNumber;
+		NWSMExecuteNCFFile;
+		NWSMLoadNLM;
+		NWSMMountVolume;
+		NWSMSetDynamicCmdIntValue;
+		NWSMSetDynamicCmdStrValue;
+		NWSMUnloadNLM;
+		
+		NWDSAbbreviateName;
+		NWDSAbbreviateNameW;
+		NWDSAllocBuf;
+		NWDSCanonicalizeName;
+		NWDSCanonicalizeNameW;
+		NWDSComputeAttrValSize;
+		NWDSCreateContext;
+		NWDSCreateContextHandle;
+		NWDSFreeBuf;
+		NWDSFreeContext;
+		NWDSGetAttrVal;
+		NWDSGetContext;
+		NWDSGetContext2;
+		NWDSGetServerAddress;
+		NWDSGetServerAddress2;
+		NWDSGetServerDN;
+		NWDSInitRequester;
+		NWDSMapIDToName;
+		NWDSMapNameToID;
+		NWDSRemoveAllTypes;
+		NWDSRemoveAllTypesW;
+		NWDSResolveName;
+		NWDSSetContext;
+		NWDSSetTransport;
+		
+		in_options;
+		
+		ipx_assign_node;
+		ipx_fprint_network;
+		ipx_fprint_node;
+		ipx_fprint_port;
+		ipx_fprint_saddr;
+		ipx_node_equal;
+		ipx_print_network;
+		ipx_print_node;
+		ipx_print_port;
+		ipx_print_saddr;
+		ipx_sscanf_node;
+		ipx_sscanf_saddr;
+		
+		my_iconv;
+		my_iconv_close;
+		my_iconv_open;
+		
+		ncp_abort_servicing_job;
+		ncp_add_object_to_set;
+		ncp_add_trustee;
+		ncp_add_trustee_set;
+		ncp_alloc_short_dir_handle;
+		ncp_alloc_short_dir_handle2;
+		ncp_attach_by_addr;
+		ncp_attach_to_queue;
+		ncp_change_conn_state;
+		ncp_change_login_passwd;
+		ncp_change_property_security;
+		ncp_close;
+		ncp_close_file;
+		ncp_close_file_and_start_job;
+		ncp_conn_release;
+		ncp_copy_file;
+		ncp_create_bindery_object;
+		ncp_create_directory;
+		ncp_create_file;
+		ncp_create_newfile;
+		ncp_create_property;
+		ncp_create_queue_job_and_file;
+		ncp_dealloc_dir_handle;
+		ncp_del_file_or_subdir;
+		ncp_delete_bindery_object;
+		ncp_delete_directory;
+		ncp_delete_object_from_set;
+		ncp_delete_property;
+		ncp_delete_trustee;
+		ncp_detach_from_queue;
+		ncp_do_lookup;
+		ncp_do_lookup2;
+		ncp_erase_file;
+		ncp_file_search_continue;
+		ncp_file_search_init;
+		ncp_find_conn_spec;
+		ncp_find_conn_spec2;
+		ncp_find_fileserver;
+		ncp_find_permanent;
+		ncp_find_server;
+		ncp_finish_servicing_job;
+		ncp_fopen_nwc;
+		ncp_get_big_ncp_max_packet_size;
+		ncp_get_bindery_object_id;
+		ncp_get_bindery_object_name;
+		ncp_get_broadcast_message;
+		ncp_get_conn_ent;
+		ncp_get_conn_number;
+		ncp_get_conn_type;
+		ncp_get_connlist;
+		ncp_get_eff_directory_rights;
+		ncp_get_encryption_key;
+		ncp_get_fid;
+		ncp_get_file_server_description_strings;
+		ncp_get_file_server_information;
+		ncp_get_file_server_time;
+		ncp_get_finfo;
+		ncp_get_internet_address;
+		ncp_get_mount_uid;
+		ncp_get_queue_job_ids;
+		ncp_get_queue_job_info;
+		ncp_get_queue_length;
+		ncp_get_stations_logged_info;
+		ncp_get_trustee;
+		ncp_get_volume_info_with_number;
+		ncp_get_volume_name;
+		ncp_get_volume_number;
+		ncp_initialize;
+		ncp_initialize_2;
+		ncp_initialize_as;
+		ncp_initialize_search;
+		ncp_login_encrypted;
+		ncp_login_unencrypted;
+		ncp_login_user;
+		ncp_modify_file_or_subdir_dos_info;
+		ncp_ns_alloc_short_dir_handle;
+		ncp_ns_get_full_name;
+		ncp_ns_get_namespace_info_element;
+		ncp_ns_modify_entry_dos_info;
+		ncp_ns_modify_entry_namespace_info;
+		ncp_ns_obtain_entry_info;
+		ncp_ns_obtain_entry_namespace_info;
+		ncp_ns_obtain_namespace_info_format;
+		ncp_ns_open_create_entry;
+		ncp_ns_purge_file;
+		ncp_ns_scan_salvageable_file;
+		ncp_ns_trustee_add;
+		ncp_ns_trustee_del;
+		ncp_ns_trustee_scan;
+		ncp_obtain_file_or_subdir_info;
+		ncp_obtain_file_or_subdir_info2;
+		ncp_open;
+		ncp_open_addr;
+		ncp_open_create_file_or_subdir;
+		ncp_open_fd;
+		ncp_open_file;
+		ncp_open_mount;
+		ncp_path_to_NW_format;
+		ncp_read;
+		ncp_read_property_value;
+		ncp_ren_or_mov_file_or_subdir;
+		ncp_rename_directory;
+		ncp_rename_file;
+		ncp_renegotiate_connparam;
+		ncp_request;
+		ncp_scan_bindery_object;
+		ncp_scan_property;
+		ncp_search_for_file_or_subdir;
+		ncp_search_for_file_or_subdir2;
+		ncp_send_broadcast;
+		ncp_send_broadcast2;
+		ncp_send_nds;
+		ncp_send_nds_frag;
+		ncp_service_queue_job;
+		ncp_set_file_server_time;
+		ncp_write;
+		ncp_write_property_value;
+
+		ncp_get_dentry_ttl;
+		ncp_set_dentry_ttl;
+		
+		ncp_volume_list_init;
+		ncp_volume_list_next;
+		ncp_volume_list_end;
+		
+		ncp_ns_search_init;
+		ncp_ns_search_next;
+		ncp_ns_search_end;
+		
+		nds_authenticate;
+		nds_beginauth;
+		nds_get_server_name;
+		nds_get_tree_name;
+		nds_login;
+		nds_login_auth;
+		nds_read;
+		nds_readentryname;
+		nds_resolve_name;
+
+		str_upper;
+
+		getchr_u;
+		strcpy_cu;
+		strcpy_uc;
+		strlen_u;
+
+		strnwerror;
+};
+
+NCPFS.2.2.0.18 {
+		ncp_get_file_size;
+		ncp_initialize_search2;
+
+		NWCFragmentRequest;
+		NWGetBinderyAccessLevel;
+		NWGetFileServerUTCTime;
+		NWIsDSServer;
+		NWLogoutFromFileServer;
+
+		NWDSAddObject;
+		NWDSAuthenticateConn;
+		NWDSChangeObjectPassword;
+		NWDSCloseIteration;
+		NWDSCompare;
+		NWDSExtSyncList;
+		NWDSExtSyncRead;
+		NWDSExtSyncSearch;
+		NWDSGenerateObjectKeyPair;
+		NWDSGenerateObjectKeyPair2;
+		NWDSGetCountByClassAndName;
+		NWDSGetEffectiveRights;
+		NWDSGetObjectHostServerAddress;
+		NWDSList;
+		NWDSListAttrsEffectiveRights;
+		NWDSListByClassAndName;
+		NWDSListContainers;
+		NWDSModifyDN;
+		NWDSModifyObject;
+		NWDSModifyRDN;
+		NWDSMoveObject;
+		NWDSRead;
+		NWDSReadObjectDSIInfo;
+		NWDSReadObjectInfo;
+		NWDSRemoveObject;
+		NWDSSearch;
+		NWDSVerifyObjectPassword;
+		
+		NWDSClearFreeBuf;
+		NWDSDuplicateContextHandle;
+		NWDSGetBinderyContext;
+		NWDSGetDSVerInfo;
+		NWDSGetNDSStatistics;
+		NWDSInitBuf;
+		NWDSOpenConnToNDSServer;
+		NWDSReloadDS;
+		NWDSResetNDSStatistics;
+		
+		NWDSGetAttrCount;
+		NWDSGetAttrName;
+		NWDSGetAttrValFlags;
+		NWDSGetAttrValModTime;
+		NWDSGetDSIInfo;
+		NWDSGetObjectCount;
+		NWDSGetObjectName;
+		NWDSGetObjectNameAndInfo;
+		NWDSPutAttrName;
+		NWDSPutAttrNameAndVal;
+		NWDSPutAttrVal;
+		NWDSPutChange;
+		NWDSPutChangeAndVal;
+		
+		NWDSAddFilterToken;
+		NWDSAllocFilter;
+		NWDSDelFilterToken;
+		NWDSFreeFilter;
+		NWDSPutFilter;
+		
+		NWDSBeginClassItem;
+		NWDSDefineAttr;
+		NWDSDefineClass;
+		NWDSGetAttrDef;
+		NWDSGetClassDef;
+		NWDSGetClassDefCount;
+		NWDSGetClassItem;
+		NWDSGetClassItemCount;
+		NWDSListContainableClasses;
+		NWDSModifyClassDef;
+		NWDSPutClassItem;
+		NWDSReadAttrDef;
+		NWDSReadClassDef;
+		NWDSRemoveAttrDef;
+		NWDSRemoveClassDef;
+		NWDSSyncSchema;
+		
+		NWDSAbortPartitionOperation;
+		NWDSAddReplica;
+		NWDSChangeReplicaType;
+		NWDSGetPartitionExtInfo;
+		NWDSGetPartitionExtInfoPtr;
+		NWDSGetPartitionInfo;
+		NWDSGetPartitionRoot;
+		NWDSGetServerName;
+		NWDSJoinPartitions;
+		NWDSListPartitions;
+		NWDSListPartitionsExtInfo;
+		NWDSPartitionReceiveAllUpdates;
+		NWDSPartitionSendAllUpdates;
+		NWDSRemovePartition;
+		NWDSRemoveReplica;
+		NWDSRepairTimeStamps;
+		NWDSSplitPartition;
+		NWDSSyncPartition;
+};
+
+NCPFS_2.2.0.19 {
+		NWGetNumberNCPExtensions;
+		NWScanNCPExtensions;
+
+		NWCCGetConnAddressLength;
+		NWCCGetConnAddress;
+		NWCCOpenConnByName;
+
+		NWCloseSemaphore;
+		NWExamineSemaphore;
+		NWOpenSemaphore;
+		NWScanSemaphoresByConn;
+		NWSignalSemaphore;
+		NWWaitOnSemaphore;
+
+		NWDSDuplicateContext;
+		NWDSReturnBlockOfAvailableTrees;
+		NWDSScanConnsForTrees;
+		NWDSScanForAvailableTrees;
+
+		ncp_ea_close;
+		ncp_ea_duplicate;
+		ncp_ea_enumerate;
+		ncp_ea_extract_info_level1;
+		ncp_ea_extract_info_level6;
+		ncp_ea_extract_info_level7;
+		ncp_ea_read;
+		ncp_ea_write;
+		ncp_namespace_to_str;
+		ncp_ns_scan_physical_locks_by_file;
+		ncp_ns_scan_connections_using_file;
+		ncp_ns_extract_info_field;
+		ncp_ns_extract_info_field_size;
+		ncp_ns_delete_entry;
+		ncp_perms_to_str;
+		ncp_str_to_perms;
+		ncp_change_object_security;
+		ncp_get_directory_info;
+		NWGetObjDiskRestrictions;
+		NWIsObjectInSet;
+		NWRemoveObjectDiskRestrictions;
+		NWScanOpenFilesByConn2;
+		NWScanVolDiskRestrictions2;
+		NWSetObjectVolSpaceLimit;
+
+		NWCXAttachToTreeByName;
+		NWCXGetAttributeValueAsString;
+		NWCXGetDefaultNameContext;
+		NWCXGetDefaultPassword;
+		NWCXGetDefaultUserName;
+		NWCXGetContextLoginScript;
+		NWCXGetIntAttributeValue;
+		NWCXGetMultiStringAttributeValue;
+		NWCXGetNDSVolumeServerAndResourceName;
+		NWCXGetObjectHomeDirectory;
+		NWCXGetObjectLastLoginTime;
+		NWCXGetObjectLoginScript;
+		NWCXGetObjectMessageServer;
+		NWCXGetPermConnListByTreeName;
+		NWCXGetPermConnList;
+		NWCXGetPreferredDSTree;
+		NWCXGetPreferredServer;
+		NWCXGetPermConnInfo;
+		NWCXGetPermConnListByServerName;
+		NWCXGetProfileLoginScript;
+		NWCXGetStringAttributeValue;
+		NWCXIsDSAuthenticated;
+		NWCXIsDSServer;
+		NWCXIsSameServer;
+		NWCXIsSameTree;
+		NWCXSplitNameAndContext;
+
+		NWGetVolumeNumber;
+		NWScanVolDiskRestrictions;
+		NWGetDirSpaceLimitList;
+		NWGetDirSpaceLimitList2;
+
+		NWDisableBroadcasts;
+		NWEnableBroadcasts;
+		NWGetBroadcastMode;
+		NWSetBroadcastMode;
+
+		NWDSGetSyntaxCount;
+		NWDSGetSyntaxDef;
+		NWDSGetSyntaxID;
+		NWDSReadSyntaxes;
+		NWDSWhoAmI;
+		NWDSCreateContextHandleMnt;
+		NWDSPutSyntaxName;
+		NWDSReadSyntaxDef;
+
+		__NWGetFileServerUTCTime;
+		__NWDSOpenStream;
+
+		NWIsDSServerW;
+};
+
+NCPFS_2.2.1 {
+		ncp_get_file_server_information_2;
+		ncp_find_server_addr;
+		ncp_read64;
+		ncp_write64;
+		ncp_log_physical_record;
+		ncp_release_physical_record;
+		ncp_clear_physical_record;
+		ncp_login_conn;
+		ncp_find_conn_spec3;
+		ncp_renegotiate_siglevel;
+		NWScanObject;
+		NWReadPropertyValue;
+		NWGetUserInfo;
+		NWGetNLMLoadedList;
+		NWCancelWait;
+};
+
+NCPFS_2.2.4 {
+		ncp_change_job_position;
+};

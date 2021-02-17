@@ -1,0 +1,8 @@
+dn: cn=John Doe,ou=users,dc=example,dc=com
+changetype: modify
+delete: description
+description: desc1
+-
+add: description
+description: desc1-mod
+

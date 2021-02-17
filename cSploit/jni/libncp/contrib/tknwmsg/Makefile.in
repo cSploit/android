@@ -1,0 +1,79 @@
+#
+# Makefile for the linux ncp-filesystem routines.
+#
+
+top_srcdir = @top_srcdir@
+top_builddir = ../..
+
+include $(top_builddir)/Make.rules
+
+MOUNT2 = @MOUNT2@
+
+O_USERUTILS = 
+ifdef MOUNT2
+O_SBINUTILS = nwmsg.o
+endif
+
+USERUTILS = $(O_USERUTILS:%.o=%)
+SBINUTILS = $(O_SBINUTILS:%.o=%)
+
+UTILS = $(USERUTILS) $(SBINUTILS)
+
+ifeq ($(HAVE_ELF),yes)
+NCP_LIB = libncp.so
+NCPLIB_DIR = ../../lib
+LIBDEP = $(NCPLIB_DIR)/$(NCP_LIB)
+else
+NCP_LIB = libncp.a
+NCPLIB_DIR = ../../lib
+LIBDEP = $(NCPLIB_DIR)/$(NCP_LIB)
+endif
+
+.PHONY : all install install-dev dep clean mrproper distclean
+.PHONY : default
+
+default: all
+
+all: $(UTILS)
+
+install: all
+	$(INSTALL) -d $(DESTDIR)$(BINDIR)
+	for i in $(USERUTILS); \
+	do $(INSTALL) $$i $(DESTDIR)$(BINDIR); done
+	$(INSTALL) -d $(DESTDIR)$(SBINDIR)
+	for i in $(SBINUTILS); \
+	do $(INSTALL) $$i $(DESTDIR)$(SBINDIR); done
+
+install-dev:
+
+../../lib/libncp.a:
+	make -C ../../lib libncp.a
+
+../../lib/libncp.so:
+	make -C ../../lib libncp.so
+
+$(O_USERUTILS) $(O_SBINUTILS): %.o: %.c
+	$(CC) $(CFLAGS) $(CCFLAGS) -o $@ -c $<
+
+$(UTILS): %: %.o $(LIBDEP)
+	$(CC) $(CFLAGS) -o $@ $(addsuffix .o,$@) -L$(NCPLIB_DIR) -lncp 
+
+dep:
+
+clean:
+	rm -f *.o *~ $(UTILS) ipx_probe
+
+mrproper: clean
+	rm -f *.d
+
+distclean: clean
+
+%.d: %.c
+	set -e; $(CC) -M $(CFLAGS) $(CCFLAGS) $(CFLAGS_$(@:.d=.o)) $< \
+		| sed 's,\($*\)\.o[ :]*,\1.o \1.do \1.to $@ : ,g' > $@; \
+		[ -s $@ ] || rm -f $@
+
+ifeq ($(NEED_DEP),yes)
+include $(UTILS:%=%.d)
+endif
+

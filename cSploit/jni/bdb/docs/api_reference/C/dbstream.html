@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DBC-&gt;db_stream()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="blob.html" title="Chapter 13.  Binary Large Objects" />
+    <link rel="prev" href="set_blob_threshold.html" title="DB-&gt;set_blob_threshold()" />
+    <link rel="next" href="dbstream_close.html" title="DB_STREAM-&gt;close()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DBC-&gt;db_stream()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="set_blob_threshold.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 13. 
+                Binary Large Objects
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbstream_close.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbstream"></a>DBC-&gt;db_stream()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DBC-&gt;db_stream(DBC *dbc, DB_STREAM **dbs, u_int32_t flags);  </pre>
+      <p>
+         The <code class="methodname">DBcursor-&gt;db_stream()</code> method points to a
+         key/value pair where the data item is a binary large object
+         (BLOB). Use the <span class="bold"><strong>flags</strong></span> parameter
+         to indicate whether the stream is to be opened for reading, or for
+         reading and writing.
+     </p>
+      <p>
+         Once the stream is opened, you read it using <a class="xref" href="dbstream_read.html" title="DB_STREAM-&gt;read()">DB_STREAM-&gt;read()</a>, and
+         you write to it using <a class="xref" href="dbstream_write.html" title="DB_STREAM-&gt;write()">DB_STREAM-&gt;write()</a>. 
+     </p>
+      <p>
+         Close this stream using <a class="xref" href="dbstream_close.html" title="DB_STREAM-&gt;close()">DB_STREAM-&gt;close()</a>.
+     </p>
+      <p>
+         If the data item is not a BLOB, this method returns an error.
+     </p>
+      <p>
+         Unless otherwise specified, the
+         <code class="methodname">DBcursor-&gt;db_stream()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp55140576"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp55148416"></a>dbs</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 The <span class="bold"><strong>dbs</strong></span>
+                 parameter references memory into which is copied the newly
+                 opened stream.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp55144248"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>flags</strong></span> parameter 
+                  must be set by bitwise inclusively 
+                  <span class="bold"><strong>OR</strong></span>'ing together one or more of
+                  the following values:
+             </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p><a id="blobs_DB_STREAM_READ"></a>
+                          <code class="literal">DB_STREAM_READ</code>
+                     </p>
+                <p>
+                         Indicates that the stream is to be opened for
+                         read-only access.
+                    </p>
+              </li>
+              <li>
+                <p><a id="blobs_DB_STREAM_WRITE"></a>
+                          <code class="literal">DB_STREAM_WRITE</code>
+                     </p>
+                <p>
+                         Indicates that the stream is to be opened for
+                         read write access. The stream is sync'd to disc when
+                         the stream is closed.
+                    </p>
+              </li>
+              <li>
+                <p><a id="blobs_DB_STREAM_SYNC_WRITE"></a>
+                          <code class="literal">DB_STREAM_SYNC_WRITE</code>
+                     </p>
+                <p>
+                         Indicates that the stream is to be opened for
+                         read and write access. The stream is sync'd to disc after
+                         each write, instead of when the stream is closed.
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp55164928"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DBcursor-&gt;db_stream()</code> <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp55170464"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If the data item is not a BLOB; or if an invalid flag or
+                parameter is specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp55169136"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="dbc.html" title="Chapter 3.  The DBcursor Handle">DBcursor</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp55166112"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="blob.html#bloblist" title="BLOBs and Related Methods">BLOBs and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="set_blob_threshold.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="blob.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbstream_close.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB-&gt;set_blob_threshold() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_STREAM-&gt;close()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

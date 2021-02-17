@@ -1,0 +1,172 @@
+#!/bin/sh
+#
+#  The contents of this file are subject to the Initial
+#  Developer's Public License Version 1.0 (the "License");
+#  you may not use this file except in compliance with the
+#  License. You may obtain a copy of the License at
+#  http://www.ibphoenix.com/main.nfs?a=ibphoenix&page=ibp_idpl.
+#
+#  Software distributed under the License is distributed AS IS,
+#  WITHOUT WARRANTY OF ANY KIND, either express or implied.
+#  See the License for the specific language governing rights
+#  and limitations under the License.
+#
+#  The Original Code was created by Paul Beach 
+#  based on the original Posix script created by Alex Peshkov
+#  for the Firebird Open Source RDBMS project.
+#
+#  Copyright (c) 2009 Paul Beach <pbeach@ibphoenix.com>
+#                     Alex Peshkov <peshkov@mail.ru>
+#  and all contributors signed below.
+#
+#  All Rights Reserved.
+#  Contributor(s): ______________________________________.
+#
+
+FB_FW=/Library/Frameworks/Firebird.framework/
+FB_RES=@prefix@/Versions/A/Resources
+
+cat <<EOF
+There are now two ways to support multiple connections 
+to the Firebird Classic Server.
+multiprocess (traditional and default) and multithreaded.
+This script allows you to switch between the two modes. 
+Choose process for normal Classic, and thread for SuperClassic.
+
+EOF
+
+read -p  "Option: Multi-(process|thread) " multianswer
+
+case $multianswer in
+process)
+# Check mode...
+if [ !  -f "$FB_FW/Versions/A/Resources/.SuperServer" ]; then
+echo "You are already in Classic mode"
+else
+# Check if SuperClassic is running
+echo "Check if SuperClassic is running"
+if ps -axe | grep "fb_smp_server" | grep -v grep
+	then
+	echo "An instance of the Firebird SuperClassic Server seems to be running."
+	echo "Please exit all Firebird applications and shut down the server before continuing."
+	exit 1
+fi
+# Remove SuperClassic
+echo "Removing SuperClassic"
+	rm -fr /Library/StartupItems/Firebird
+	rm $FB_FW/Versions/A/Resources/.SuperServer
+
+# Install and Start Classic 	
+echo "Install and start Classic"
+
+#inetd
+	if [ -f /var/run/inetd.pid -a -d /etc/inetd.d ]; then
+       	if [ -f /etc/inetd.conf ]; then
+        	echo "gds_db stream  tcp     nowait  root $FB_FW/Resources/bin/fb_smp_server fb_smp_server" > /etc/.fb.inetd.conf.entry
+        	cat /etc/inetd.conf /etc/.fb.inetd.conf.entry > /etc/.firebird.temp.install.inetd.conf
+        	mv /etc/.firebird.temp.install.inetd.conf /etc/inetd.conf
+        	rm -f /etc/.fb.inetd.conf.entry
+        	HUPNEEDED='y'
+        	fi
+	fi
+
+#xinetd
+	if [ -f /etc/xinet.d ]; then
+	cat > /etc/xinetd.d/firebird <<EOF
+service gds_db
+{
+        disable         = no
+        socket_type     = stream
+        wait            = no
+        user            = firebird
+EOF
+                echo "server          = $FB_FW/Resources/bin/fb_smp_server" >> /etc/xinetd.d/firebird
+                cat >> /etc/xinetd.d/firebird << EOF
+        groups          = yes
+}
+EOF
+            HUPNEEDED='y'
+	fi
+
+#launchd
+	cp $FB_FW/Resources/org.firebird.gds.plist /Library/LaunchDaemons/org.firebird.gds.plist
+	launchctl load /Library/LaunchDaemons/org.firebird.gds.plist
+
+# Tell inetd/xinetd to reload their configuration files.
+echo "hupneeded"
+	if [ "$HUPNEEDED" = 'y' ]; then
+		if [ -f /var/run/inetd.pid ]; then
+        	kill -HUP `cat /var/run/inetd.pid`
+        	fi
+        	if [ -f /var/run/xinetd.pid ]; then
+        	kill -HUP `cat /var/run/xinetd.pid`
+        	fi
+	fi	
+fi
+	;;
+
+thread)
+if [ -f "$FB_FW/Versions/A/Resources/.SuperServer" ]; then
+echo "You are already in SuperClassic mode"
+else
+# Check if Classic is running
+echo "Check if Classic is running"
+if ps -axe | grep "fb_smp_server" | grep -v grep
+	then
+	echo "An instance of the Firebird Classic Server seems to be running."
+	echo "Please exit all Firebird applications before continuing."
+fi
+# Remove the Classic installation
+echo "Removing the Classic installation"
+
+#inetd (old)
+echo "inetd"
+	if [ -f /etc/inetd.conf ]; then
+        	grep -s gds_db /etc/inetd.conf  > /dev/null 2>&1
+        	if test $? != 0 ; then
+              cat /etc/inetd.conf | grep -v gds_db > /etc/.firebird.temp.install.inetd.conf
+              mv /etc/.firebird.temp.install.inetd.conf /etc/inetd.conf
+		HUPNEEDED='y'
+		fi
+	fi
+
+#xinetd (pre 10.5)
+echo "xinetd"
+	if [ -f /etc/xinetd.d/firebird ]; then
+       rm /etc/xinetd.d/firebird
+	HUPNEEDED='y'
+	fi
+
+# Tell inetd/xinetd to reload their configuration files.
+echo "hupneeded"
+	if [ "$HUPNEEDED" = 'y' ]; then
+		if [ -f /var/run/inetd.pid ]; then
+        	kill -HUP `cat /var/run/inetd.pid`
+        	fi
+        	if [ -f /var/run/xinetd.pid ]; then
+        	kill -HUP `cat /var/run/xinetd.pid`
+        	fi
+	fi
+
+#launchd
+echo "launchd"
+	if [ -f /Library/LaunchDaemons/org.firebird.gds.plist ]; then
+	launchctl unload /Library/LaunchDaemons/org.firebird.gds.plist
+	rm /Library/LaunchDaemons/org.firebird.gds.plist
+	fi
+
+# Install and start SuperClassic
+echo "install and start SuperClassic"
+	touch $FB_FW/Versions/A/Resources/.SuperServer
+	cp -r $FB_FW/Resources/FirebirdSS /Library/StartupItems/Firebird
+	if [ -f "$FB_FW/Versions/A/Resources/.SuperServer" ]; then
+	chmod u+xg+xo+x /Library/StartupItems/Firebird/Firebird
+	/Library/StartupItems/Firebird/Firebird start
+	fi
+fi
+	;;
+*)
+	echo "unknown option $multianswer chosen"
+	exit 1
+	;;
+esac

@@ -1,0 +1,116 @@
+# $OpenLDAP$
+# Copyright 2007-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: OpenLDAP Software Contributions
+
+The following sections attempt to summarize the various contributions in OpenLDAP
+software, as found in {{F:openldap_src/contrib}}
+
+H2: Client APIs
+
+Intro and discuss
+
+H3: ldapc++
+
+Intro and discuss
+
+H3: ldaptcl
+
+Intro and discuss
+
+H2: Overlays
+
+H3: acl
+
+Plugins that implement access rules.  Currently only posixGroup,
+which implements access control based on posixGroup membership.
+
+
+H3: addpartial
+
+Treat Add requests as Modify requests if the entry exists.
+
+
+H3: allop
+
+Return operational attributes for root DSE even when not
+requested, since some clients expect this.
+
+
+H3: autogroup
+
+Automated updates of group memberships.
+
+
+H3: comp_match
+
+Component Matching rules (RFC 3687).
+
+
+H3: denyop
+
+Deny selected operations, returning {{unwillingToPerform}}.
+
+
+H3: dsaschema
+
+Permit loading DSA-specific schema, including operational attrs.
+
+
+H3: lastmod
+
+Track the time of the last write operation to a database.
+
+
+H3: nops
+
+Remove null operations, e.g. changing a value to same as before.
+
+
+H3: nssov
+
+Handle NSS lookup requests through a local Unix Domain socket.
+
+
+H3: passwd
+
+Support additional password mechanisms.
+
+
+H3: proxyOld
+
+Proxy Authorization compatibility with obsolete internet-draft.
+
+
+H3: smbk5pwd
+
+Make the PasswordModify Extended Operation update Kerberos
+keys and Samba password hashes as well as {{userPassword}}.
+
+
+H3: trace
+
+Trace overlay invocation.
+
+
+H3: usn
+
+Maintain {{usnCreated}} and {{usnChanged}} attrs similar to Microsoft AD.
+
+
+H2: Tools
+
+Intro and discuss
+
+H3: Statistic Logging
+
+statslog
+
+H2: SLAPI Plugins
+
+Intro and discuss
+
+H3: addrdnvalues
+
+More

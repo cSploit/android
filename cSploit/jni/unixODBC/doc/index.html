@@ -1,0 +1,201 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<HTML XMLNS="http://www.w3.org/1999/xhtml">
+<HEAD >
+  <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+  <TITLE>unixODBC</TITLE>
+  <META NAME="generator" CONTENT="SlickEdit">
+  <!-- leave this for stats -->
+  <LINK REL="stylesheet"
+  HREF="style.css"
+  TYPE="text/css" MEDIA="screen">
+  <STYLE TYPE="text/css" MEDIA="screen">
+  body { background: url("background.jpg"); }
+  #page { background: url("body.jpg") repeat-y top; border: none; }
+  #header { background: url("header.gif") no-repeat bottom center; }
+  #footer { background: url("footer.jpg") no-repeat bottom; border: none;}
+  #header { padding: 22px 30px 0px 30px; height: 56px; width: 690px; }
+  </STYLE>
+</HEAD>
+  <BODY>
+  <DIV ID="page">
+    <DIV ID="header">
+      <A HREF="http://www.unixodbc.org/"><IMG
+                                                                  SRC="icon64.png"
+                                                                  ALIGN="right"
+                                                                  BORDER="0" HSPACE="0" VSPACE="0"></A> <H1>unixODBC</H1>
+      <DIV CLASS="description">
+        Standards compliant, open source, database connectivity for everyone.
+      </DIV>
+    </DIV>
+    <DIV ID="content" CLASS="widecolumn">
+      <DIV STYLE="text-align: center;">
+        <SPAN
+         STYLE="font-weight: bold;">
+        Home
+        </SPAN>
+        | <A HREF="News.html">News</A> | <A
+                                      HREF="Documentation.html">Documentation</A> | <A
+                                      HREF="Drivers.html">Drivers</A> | <A
+                                      HREF="Support.html">Support</A> | <A
+                                      HREF="Downloads.html">Downloads</A>
+      </DIV>
+      <DIV CLASS="post" ID="post-68">
+        <DIV CLASS="entrytext">
+          <TABLE>
+            <TR>
+              <TD><H2>unixODBC is...</H2></TD>
+              <TD><H2>News</H2></TD>
+            </TR>
+            <TR>
+              <TD><BR>unixODBC is an implementation of the ODBC standard which is;
+                <UL>
+                  <LI>
+                    open source
+                  </LI>
+                  <LI>
+                    licensed under LGPL/GPL
+                  </LI>
+                  <LI>
+                    community developed and community supported
+                  </LI>
+                  <LI>
+                    proven with over a decade of active use/development
+                  </LI>
+                </UL>
+              </TD>
+              <TD>
+                <HR STYLE="width: 100%; height: 2px;">
+                <SPAN STYLE="color: rgb(192, 192, 192);">
+                March 15th 2007
+                </SPAN>
+                <BR>
+                <DIV STYLE="margin-left: 40px;">
+                  New look for unixodbc.org
+                <DIV STYLE="margin-left: 40px;">
+                  The old web site was serving the project fine but it seemed 
+                  like it was about time to make it all 'fresh'. We hope you 
+                  find it more pleasing to use.
+                </DIV>
+                </DIV>
+                <SPAN
+                STYLE="color: rgb(192, 192, 192);">
+                October 13th 2006
+                </SPAN>
+                <BR>
+                <DIV STYLE="margin-left: 40px;">
+                  2.2.12 Released<BR>
+                </DIV>
+                <A HREF="News.html"><SMALL>More...</A></TD>
+            </TR>
+            <TR>
+              <TD><H2>Key features...</H2></TD>
+              <TD><H2>Architecture</H2></TD>
+            </TR>
+            <TR>
+              <TD STYLE="vertical-align: top;"><BR>
+                <SPAN STYLE="font-weight: bold;">
+                Software Development Kit
+                </SPAN>
+                (SDK) - Develop ODBC applications and drivers using the C 
+                language and the unixODBC SDK.<BR> <BR>
+                <SPAN STYLE="font-weight: bold;">
+                Driver Manager
+                </SPAN>
+                (DM)&nbsp; - The unixODBC DM allows the end-User to switch data 
+                sources without recompiling/linking application source code. The
+                application does not have to be linked to a specific vendors 
+                product.<BR> <BR>
+                <SPAN STYLE="font-weight: bold;">
+                Tools
+                </SPAN>
+                - unixODBC includes CrossPlatform command-line and GUI tools to 
+                make working with ODBC easy.<BR>
+              </TD>
+              <TD STYLE="vertical-align: top;"><IMG ALIGN="LEFT"
+                                                STYLE="width: 200px; height: 175px;" ALT="" SRC="Splash.png">
+                <P>Applications typically 
+                                                link with the unixODBC 
+                                                Driver Manager (DM) which then 
+                                                uses the appropriate Driver to 
+                                                communicate with the data 
+                                                source. The DM understands ODBC
+                                                but relies on the Driver to 
+                                                understand specifics of the data
+                                                source.</P>
+                <P>The Driver is typically provided by the data source 
+                  Vendor. The Driver understands ODBC and the specifics of the
+                  data source.</P>
+              </TD>
+            </TR>
+          </TABLE>
+          <BR>
+          <TABLE CLASS =codebox>
+            <TR>
+              <TD
+              STYLE="vertical-align: top; background-color: rgb(102, 102, 102); width: 33%;">
+                <SPAN STYLE="font-weight: bold;">
+                CrossPlatform<BR>
+                <BR>
+                </SPAN>
+                Applications built using unixODBC are compatible with the 
+                Microsoft implementation of ODBC. unixODBC is provided with all 
+                majour Linux distributions. unixODBC has been ported to all 
+                majour UNIX and UNIX-like platforms;<BR>
+                
+                <DIV STYLE="margin-left: 40px;">
+                  - Linux, Solaris, SGI, etc<BR> 
+                  - VMS, OS/2, etc<BR>
+                </DIV>
+              </TD>
+              <TD
+              STYLE="vertical-align: top; background-color: rgb(102, 102, 102); width: 33%;">
+                <SPAN STYLE="font-weight: bold;">
+                CrossDatabase
+                </SPAN>
+                <BR>
+                <BR>
+                unixODBC supports drivers from all majour database vendors including;<BR>
+                <DIV STYLE="margin-left: 40px;">
+                  - Oracle<BR>
+                  - DB2<BR>
+                  - Interbase<BR>
+                  - Mimer<BR>
+                  - MySQL<BR>
+                  - others<BR>
+                </DIV>
+              </TD>
+              <TD
+              STYLE="vertical-align: top; background-color: rgb(102, 102, 102); width: 33%;">
+                <SPAN STYLE="font-weight: bold;">
+                License
+                </SPAN>
+                <BR>
+                <BR>
+                unixODBC was developed by the open source community and is provided under the LGPL and GPL licenses. Commercial applications can be developed using unixODBC without paying for a license or royalty. Free support is provided by the community. 
+                </TD>
+            </TR>
+            <TR>
+              <TD STYLE="vertical-align: top;"><A
+                                                HREF="CrossPlatform.html">More...</A></TD>
+              <TD STYLE="vertical-align: top;"><A
+                                                HREF="CrossDatabase.html">More...</A></TD>
+              <TD STYLE="vertical-align: top;"><A HREF="License.html">More...</A></TD>
+            </TR>
+          </TABLE>
+          </TD>
+          </TR>
+          </TABLE>
+          </P>
+        </DIV>
+      </DIV>
+    </DIV>
+    <DIV ID="footer">
+      <P>
+      --<BR>
+      <A HREF=mailto:pharvey@peterharvey.org>Peter Harvey</A>
+      </P>
+    </DIV>
+  </DIV>
+  </BODY>
+</HTML>
+

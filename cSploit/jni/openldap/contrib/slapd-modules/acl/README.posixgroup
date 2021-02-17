@@ -1,0 +1,35 @@
+This directory contains native slapd plugins that implement access rules.
+
+posixgroup.c contains a simple example that implements access control
+based on posixGroup membership, loosely inspired by ITS#3849.  It should
+be made clear that this access control policy does not reflect any
+standard track model of handling access control, and should be 
+essentially viewed as an illustration of the use of the dynamic 
+extension of access control within slapd.
+
+To use the acl-posixgroup plugin, add:
+
+moduleload acl-posixgroup.so
+
+to your slapd configuration file; it requires "nis.schema" to be loaded.
+It is configured using
+
+access to <what>
+	by dynacl/posixGroup[.{exact,expand}]=<dnpat> {<level>|<priv(s)}
+
+The default is "exact"; in case of "expand", "<dnpat>" results from
+the expansion of submatches in the "<what>" portion.  "<level>|<priv(s)>"
+describe the level of privilege this rule can assume.
+
+Use Makefile to compile this plugin or use a command line similar to:
+
+gcc -shared -I../../../include -I../../../servers/slapd -Wall -g \
+	-o acl-posixgroup.so posixgroup.c
+
+---
+Copyright 2005-2014 The OpenLDAP Foundation. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the OpenLDAP
+Public License.
+

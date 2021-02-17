@@ -1,0 +1,243 @@
+MONITOR BACKEND
+
+	NAME: 	back-monitor
+
+	Backend for monitoring the server's activity.
+
+
+
+COMPILE AND CONFIGURATION OPTIONS
+
+It must be explicitly enabled by configuring with 
+
+	--enable-monitor
+
+set; then it must be activated by placing in slapd.conf the database
+configure directive
+
+	database	monitor
+
+The suffix "cn=Monitor" is implicitly activated (it cannot be given
+as a suffix of the database as usually done for conventional backends).
+Note that the "cn=Monitor" naming context appears in the rootDSE
+in the attribute monitorContext
+
+A bind operation is provided; at present it allows to bind as the
+backend rootdn.  As a result, the backend supports the rootdn/rootpw 
+directives (only simple bind at present).
+
+
+
+NAMING CONTEXT AND TREE STRUCTURE
+
+The backend naming context is "cn=Monitor"; the first level entries 
+represent the monitored subsystems.  It is implemented in a modular way,
+to ease the addition of new subsystems.
+
+
+
+SCHEMA
+
+All the subsystems get a default "cn" attribute, represented by the
+subsystem's name, and they all have "top", "monitor" and "extensibleObject"
+objectclasses.
+"extensibleObject" is used, and the "description" attribute 
+is used to hold the monitor information of each entry.
+
+
+
+FUNCTIONALITY
+
+Most of the sybsystems contain an additional depth level, represented
+by detailed item monitoring.
+All the entries undergo an update operation, if a related method is
+defined, prior to being returned.  Moreover, there's a mechanism to
+allow volatile entries to be defined, and generated on the fly when
+requested.  As an instance, the connection statistics are updated
+at each request, while each active connection data is created on the
+fly.
+
+One nice feature of this solution is that granular ACLs can be applied 
+to each entry.
+
+
+
+OPERATIONS
+
+The backend currently supports:
+
+	bind
+	compare
+	modify
+	search
+
+
+
+SUBSYSTEMS
+
+Currently some subsystems are partially supported.  "Partially"
+means their entries are correctly generated, but sometimes only 
+partially useful information is provided.
+
+The subsystems are:
+
+	Backends
+	Connections
+	Databases
+	Listener
+	Log
+	Operations
+	Overlays
+	SASL
+	Statistics
+	Threads
+	Time
+	TLS
+	Read/Write Waiters
+
+
+
+BACKENDS SUBSYSTEMS
+
+The main entry contains the type of backends enabled at compile time;
+the subentries, for each backend, contain the type of the backend.
+It should also contain the modules that have been loaded if dynamic 
+backends are enabled.
+
+
+
+CONNECTIONS
+
+The main entry is empty; it should contain some statistics on the number 
+of connections.
+Dynamic subentries are created for each open connection, with stats on
+the activity on that connection (the format will be detailed later).
+There are two special subentries that show the number of total and
+current connections respectively.
+
+
+
+DATABASES SUBSYSTEM
+
+The main entry contains the naming context of each configured database; 
+the subentries contain, for each database, the type and the naming
+context.
+
+
+
+LISTENER SUBSYSTEM
+
+It contains the description of the devices the server is currently 
+listening on
+
+
+
+LOG SUBSYSTEM
+
+It contains the currently active log items.  The "Log" subsystem allows 
+user modify operations on the "description" attribute, whose values MUST 
+be in the list of admittable log switches:
+
+	Trace
+	Packets
+	Args
+	Conns
+	BER
+	Filter
+	Config		(useless)
+	ACL
+	Stats
+	Stats2
+	Shell
+	Parse
+	Cache		(deprecated)
+	Index
+
+These values can be added, replaced or deleted; they affect what 
+messages are sent to the syslog device.
+
+
+
+OPERATIONS SUBSYSTEM
+
+It shows some statistics on the operations performed by the server:
+
+	Initiated
+	Completed
+
+and for each operation type, i.e.:
+
+	Bind
+        Unbind
+        Add
+        Delete
+        Modrdn
+        Modify
+        Compare
+        Search
+        Abandon
+        Extended
+
+
+
+OVERLAYS SUBSYSTEM
+
+The main entry contains the type of overlays available at run-time;
+the subentries, for each overlay, contain the type of the overlay.
+It should also contain the modules that have been loaded if dynamic 
+overlays are enabled.
+
+
+
+SASL
+
+Currently empty.
+
+
+
+STATISTICS SUBSYSTEM
+
+It shows some statistics on the data sent by the server:
+
+	Bytes
+	PDU
+	Entries
+	Referrals
+
+
+
+THREADS SUBSYSTEM
+
+It contains the maximum number of threads enabled at startup and the 
+current backload.
+
+
+
+TIME SUBSYSTEM
+
+It contains two subentries with the start time and the current time 
+of the server.
+
+
+
+TLS
+
+Currently empty.
+
+
+
+READ/WRITE WAITERS SUBSYSTEM
+
+It contains the number of current read waiters.
+
+
+
+NOTES
+
+This document is in a very early stage of maturity and will 
+probably be rewritten many times before the monitor backend is released.
+
+
+
+AUTHOR:	Pierangelo Masarati <ando@OpenLDAP.org>
+

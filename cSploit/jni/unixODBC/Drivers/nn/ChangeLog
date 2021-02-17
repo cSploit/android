@@ -1,0 +1,12 @@
+1999-05-15  Peter Harvey <pharvey@codebydesign.com>
+
+	* All: Started code resconstruction to unixODBC framework.
+	
+1999-05-13  Peter Harvey <pharvey@codebydesign.com>
+
+	* All: adapted Ke Jin's NN ODBC driver for unixODBC (1st clean compile and successfull query)
+	* ChangeLog: Started ChangeLog
+	
+	
+
+

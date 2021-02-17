@@ -1,0 +1,550 @@
+#!/bin/sh
+#
+#  The contents of this file are subject to the Initial
+#  Developer's Public License Version 1.0 (the "License");
+#  you may not use this file except in compliance with the
+#  License. You may obtain a copy of the License at
+#  http://www.ibphoenix.com/main.nfs?a=ibphoenix&page=ibp_idpl.
+#
+#  Software distributed under the License is distributed AS IS,
+#  WITHOUT WARRANTY OF ANY KIND, either express or implied.
+#  See the License for the specific language governing rights
+#  and limitations under the License.
+#
+#  The Original Code was created by Mark O'Donohue
+#  for the Firebird Open Source RDBMS project.
+#
+#  Copyright (c) Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#  and all contributors signed below.
+#
+#  All Rights Reserved.
+#  Contributor(s): ______________________________________.
+#		Alex Peshkoff
+#
+
+RunUser=firebird
+export RunUser
+RunGroup=firebird
+export RunGroup
+PidDir=/var/run/firebird
+export PidDir
+
+# Additional OS settings
+OS_Has_Specific_Classic_Startup=yes
+
+#------------------------------------------------------------------------
+# Get correct options & misc.
+
+psOptions=-efaww
+export psOptions
+mktOptions=-q
+export mktOptions
+tarOptions=z
+export tarOptions
+tarExt=tar.gz
+export tarExt
+
+#------------------------------------------------------------------------
+#  Add new user and group
+
+TryAddGroup() {
+
+	AdditionalParameter=$1
+	testStr=`grep firebird /etc/group`
+
+    if [ -z "$testStr" ]
+      then
+        groupadd $AdditionalParameter firebird
+    fi
+
+}
+
+
+TryAddUser() {
+
+	AdditionalParameter=$1
+	testStr=`grep firebird /etc/passwd`
+
+    if [ -z "$testStr" ]
+      then
+        useradd $AdditionalParameter -d @FB_CONFDIR@ -s /sbin/nologin \
+            -c "Firebird Database Owner" -g firebird firebird
+    fi
+
+}
+
+
+addFirebirdUser() {
+
+	TryAddGroup "-g 84 -r" >/dev/null 2>/dev/null
+	TryAddGroup "-g 84" >/dev/null 2>/dev/null
+	TryAddGroup "-r" >/dev/null 2>/dev/null
+	TryAddGroup " "
+
+	TryAddUser "-u 84 -r -M" >/dev/null 2>/dev/null
+	TryAddUser "-u 84 -M" >/dev/null 2>/dev/null
+	TryAddUser "-r -M" >/dev/null 2>/dev/null
+	TryAddUser "-M" >/dev/null 2>/dev/null
+	TryAddUser "-u 84 -r" >/dev/null 2>/dev/null
+	TryAddUser "-u 84" >/dev/null 2>/dev/null
+	TryAddUser "-r" >/dev/null 2>/dev/null
+	TryAddUser " "
+
+}
+
+
+#------------------------------------------------------------------------
+#  Detect Distribution.
+#	AP: very beautiful, but unused. Let's keep alive for a while. (2005)
+
+detectDistro() {
+
+    # it's not provided...
+    if [ -z "$linuxDistro"  ]
+    then
+	if [ -e /etc/SuSE-release  ]
+	then
+	    # SuSE
+	    linuxDistro="SuSE"
+	elif [ -e /etc/mandrake-release ]
+	then
+	    # Mandrake
+	    linuxDistro="MDK"
+	elif [ -e /etc/debian_version ]
+	then
+	    # Debian
+	    linuxDistro="Debian"
+	elif [ -e /etc/gentoo-release ]
+	then
+	    # Gentoo
+	    linuxDistro="Gentoo"
+	elif [ -e /etc/rc.d/init.d/functions ]
+	then
+	    # very likely Red Hat
+	    linuxDistro="RH"
+	elif [ -d /etc/rc.d/init.d ]
+	then
+	    # generic Red Hat
+	    linuxDistro="G-RH"
+	elif [ -d /etc/init.d ]
+	then
+	    # generic SuSE
+	    linuxDistro="G-SuSE"
+	fi
+    fi
+}
+
+
+#------------------------------------------------------------------------
+#  print location of init script
+
+getInitScriptLocation() {
+    if [ -f /etc/rc.d/init.d/firebird ]
+	then
+		echo -n /etc/rc.d/init.d/firebird
+    elif [ -f /etc/rc.d/rc.firebird ]
+	then
+		echo -n /etc/rc.d/rc.firebird
+    elif [ -f /etc/init.d/firebird ]
+	then
+		echo -n /etc/init.d/firebird
+    fi
+}
+
+
+#------------------------------------------------------------------------
+#  register/start/stop server using systemd
+
+SYSTEMCTL=systemctl
+CLASSIC_CTRL=firebird-classic.socket
+SUPER_CTRL=firebird-superserver.service
+SYSTEMD_DIR=/usr/lib/systemd/system
+TMPFILE_CONF=/usr/lib/tmpfiles.d/firebird.conf
+
+systemdPresent() {
+	proc1=`ps -p 1 -o comm=`
+
+	[ "${proc1}" = systemd ] && return 0
+	return 1
+}
+
+systemdError() {
+	echo Fatal systemctl error - exiting
+	exit 1
+}
+
+installSystemdCtrlFiles() {
+	if systemdPresent
+	then
+		cp @FB_MISCDIR@/*.service @FB_MISCDIR@/*.socket ${SYSTEMD_DIR}
+		tempdir=/var/run/firebird
+		mkdir -p ${tempdir}
+		chown firebird:firebird ${tempdir}
+		chmod 0775 ${tempdir}
+		echo "d ${tempdir} 0775 firebird firebird -" >${TMPFILE_CONF}
+	fi
+}
+
+osRemoveStartupFiles() {
+	rm -f ${SYSTEMD_DIR}/firebird-*
+	rm -f ${TMPFILE_CONF}
+}
+
+systemdSrv() {
+	op=${1}
+	ctrl=${2}
+
+	if systemdPresent
+	then
+		if [ "${op}" = "stop" -o "${op}" = "disable" ]
+		then
+			if [ ! -f ${SYSTEMD_DIR}/${ctrl} ]
+			then
+				return 0
+			fi
+		fi
+
+		${SYSTEMCTL} --quiet ${op} ${ctrl} || systemdError
+		return 0
+	fi
+	return 1
+}
+
+classicSrv() {
+	op=${1}
+
+	systemdSrv ${op} ${CLASSIC_CTRL}
+}
+
+superSrv() {
+	op=${1}
+
+	systemdSrv ${op} ${SUPER_CTRL}
+}
+
+osRegisterClassicServer() {
+	installSystemdCtrlFiles
+	classicSrv enable
+}
+
+osUnregisterClassicServer() {
+	classicSrv disable
+}
+
+osStartClassicServer() {
+	classicSrv start
+}
+
+osStopClassicServer() {
+	classicSrv stop
+}
+
+registerSuperServer() {
+	installSystemdCtrlFiles
+	superSrv enable && return 0
+}
+
+unregisterSuperServer() {
+	superSrv disable && return 0
+}
+
+startSuperServer() {
+	superSrv start && return 0
+}
+
+stopSuperServer() {
+	superSrv stop && return 0
+
+	init_d=`getInitScriptLocation`
+	if [ -x "$init_d" ]
+	then
+		$init_d stop
+		return 0
+	fi
+
+	return 1
+}
+
+
+#------------------------------------------------------------------------
+#  stop super server if it is running
+
+stopSuperServerIfRunning() {
+	checkString=`grepProcess "fbserver|fbguard|fb_smp_server|firebird"`
+
+    if [ ! -z "$checkString" ]
+    then
+		i=1
+		while [ $i -le 20 ]
+		do
+   	    	stopSuperServer || return	# silently giveup
+			sleep 1
+			checkString=`grepProcess "fbserver|fbguard|fb_smp_server|firebird"`
+			if [ -z "$checkString" ]
+			then
+				return
+			fi
+			i=$((i+1))
+		done
+    fi
+}
+
+#------------------------------------------------------------------------
+#  Create new password string - this routine is used only in
+#  silent mode of the install script.
+
+createNewPassword() {
+    # openssl generates random data.
+	openssl </dev/null >/dev/null 2>/dev/null
+    if [ $? -eq 0 ]
+    then
+        # We generate 40 random chars, strip any '/''s and get the first 20
+        NewPasswd=`openssl rand -base64 40 | tr -d '/' | cut -c1-20`
+    fi
+
+	# If openssl is missing...
+	if [ -z "$NewPasswd" ]
+	then
+		NewPasswd=`dd if=/dev/urandom bs=10 count=1 2>/dev/null | od -x | head -n 1 | tr -d ' ' | cut -c8-27`
+	fi
+
+	# On some systems even this routines may be missing. So if
+	# the specific one isn't available then keep the original password.
+    if [ -z "$NewPasswd" ]
+    then
+        NewPasswd="masterkey"
+    fi
+
+	echo "$NewPasswd"
+}
+
+#------------------------------------------------------------------------
+# installInitdScript
+# Everbody stores this one in a seperate location, so there is a bit of
+# running around to actually get it for each packager.
+# Update rcX.d with Firebird initd entries
+# initd script for SuSE >= 7.2 is a part of RPM package
+
+installInitdScript() {
+	# systemd case
+	registerSuperServer && return 0		# systemd's service file takes care about PidDir
+
+	srcScript=""
+	initScript=
+
+# This is for RH and MDK specific
+
+    if [ -e /etc/rc.d/init.d/functions ]
+    then
+        srcScript=firebird.init.d.mandrake
+        initScript=/etc/rc.d/init.d/firebird
+
+# SuSE specific
+
+    elif [ -r /etc/SuSE-release ]
+    then
+        srcScript=firebird.init.d.suse
+        initScript=/etc/init.d/firebird
+        rm -f /usr/sbin/rcfirebird
+        ln -s ../../etc/init.d/firebird /usr/sbin/rcfirebird
+
+# Debian specific
+
+    elif [ -r /etc/debian_version ]
+    then
+        srcScript=firebird.init.d.debian
+        initScript=/etc/init.d/firebird
+        rm -f /usr/sbin/rcfirebird
+        ln -s ../../etc/init.d/firebird /usr/sbin/rcfirebird
+
+# Slackware specific
+
+    elif [ -r /etc/slackware-version ]
+    then
+        srcScript=firebird.init.d.slackware
+        initScript=/etc/rc.d/rc.firebird
+		rclocal=/etc/rc.d/rc.local
+		if ! grep -q "$initScript" $rclocal
+		then
+			cat >>$rclocal <<EOF
+if [ -x $initScript ] ; then
+	$initScript start
+fi
+EOF
+		fi
+
+# Gentoo specific
+
+    elif [ -r /etc/gentoo-release ]
+    then
+        srcScript=firebird.init.d.gentoo
+        initScript=/etc/init.d/firebird
+
+# Generic...
+
+    elif [ -d /etc/rc.d/init.d ]
+    then
+        srcScript=firebird.init.d.generic
+        initScript=/etc/rc.d/init.d/firebird
+    fi
+
+
+	if [ "$initScript" ]
+	then
+	    # Install the firebird init.d script
+    	cp @FB_MISCDIR@/$srcScript $initScript
+	    chown root:root $initScript
+    	chmod u=rwx,g=rx,o=r $initScript
+
+
+	    # RedHat and Mandrake specific 
+    	if [ -x /sbin/chkconfig ]
+	    then
+    	    /sbin/chkconfig --add firebird
+
+	    # Gentoo specific 
+    	elif [ -x /sbin/rc-update ]
+	    then
+			/sbin/rc-update add firebird default
+
+	    # Suse specific 
+    	elif [ -x /sbin/insserv ]
+	    then
+    	    /sbin/insserv /etc/init.d/firebird
+
+		# One more way to register service - used in Debian 
+    	elif [ -x /usr/sbin/update-rc.d ]
+	    then
+		    /usr/sbin/update-rc.d -f firebird remove	
+		    /usr/sbin/update-rc.d -f firebird defaults
+	    fi
+
+    	# More SuSE - rc.config fillup
+	    if [ -f /etc/rc.config ]
+    	then
+      		if [ -x /bin/fillup ]
+	        then
+    	      /bin/fillup -q -d = /etc/rc.config @FB_MISCDIR@/rc.config.firebird
+        	fi
+	    elif [ -d /etc/sysconfig ]
+    	then
+        	cp @FB_MISCDIR@/rc.config.firebird /etc/sysconfig/firebird
+	    fi
+
+	else
+		echo "Couldn't autodetect linux type. You must select"
+		echo "the most appropriate startup script in @FB_MISCDIR@"
+		echo "and manually register it in your OS."
+	fi
+
+    # Create directory to store pidfile
+	if [ ! -d $PidDir ] 
+	then
+		[ -e $PidDir ] && rm -rf $PidDir
+		mkdir $PidDir
+	fi
+    chown $RunUser:$RunGroup $PidDir
+}
+
+
+#------------------------------------------------------------------------
+#  start init.d service
+
+startService() {
+	# systemd case
+	startSuperServer && return 0
+
+    InitFile=`getInitScriptLocation`
+    if [ -f "$InitFile" ]; then
+		"$InitFile" start
+
+		checkString=`grepProcess "firebird"`
+		if [ -z "$checkString" ]
+		then
+			# server didn't start - wait a bit and recheck
+			sleep 2
+			"$InitFile" start
+
+			checkString=`grepProcess "firebird"`
+			if [ -z "$checkString" ]
+			then
+				echo "Looks like standalone server failed to start"
+				echo "Trying to continue anyway..."
+			fi
+		fi
+	fi
+}
+
+
+#------------------------------------------------------------------------
+# If we have right systems remove the service autostart stuff.
+
+removeServiceAutostart() {
+	if standaloneServerInstalled
+	then
+		# systemd case
+		unregisterSuperServer && return 0
+
+		# Unregister using OS command
+		if [ -x /sbin/insserv ]; then
+			/sbin/insserv /etc/init.d/
+		fi
+
+		if [ -x /sbin/chkconfig ]; then
+			/sbin/chkconfig --del firebird
+		fi
+
+		if [ -x /sbin/rc-update ]; then
+			/sbin/rc-update del firebird
+		fi
+
+		# Remove /usr/sbin/rcfirebird symlink
+		if [ -e /usr/sbin/rcfirebird ]
+		then
+			rm -f /usr/sbin/rcfirebird
+		fi
+
+		# Remove initd script
+		rm -f $InitFile
+	fi
+}
+
+
+#------------------------------------------------------------------------
+# Returns TRUE if SA server is installed
+
+standaloneServerInstalled() {
+	if systemdPresent; then
+		${SYSTEMCTL} --quiet is-enabled ${SUPER_CTRL} && return 0
+		return 1
+	fi
+
+	InitFile=`getInitScriptLocation`
+	if [ -f "$InitFile" ]; then
+		return 0
+	fi
+	return 1
+}
+
+
+#------------------------------------------------------------------------
+# Corrects build-time "libdir" value
+
+CorrectLibDir() {
+	ld=${1}
+	l=/usr/lib
+	l64=/usr/lib64
+
+	if [ "$ld" = "$l64" ]
+	then
+		if [ -d "$l" ]
+		then
+			if [ ! -d "$l64" ]
+			then
+				ld="$l"
+			fi
+		fi
+	fi
+
+	echo "$ld"
+}

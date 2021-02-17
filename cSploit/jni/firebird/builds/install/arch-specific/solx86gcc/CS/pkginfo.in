@@ -1,0 +1,9 @@
+PKG="FB2SI"
+NAME="Firebird2 Relational Database Server"
+ARCH="i386"
+VERSION="@FIREBIRD_VERSION@"
+LOAD="@FIREBIRD_PACKAGE_VERSION@"
+CATEGORY="application"
+VENDOR="WWW.FireBirdSQL.org"
+BASEDIR=/usr/local
+EMAIL=kkuznetsov@users.sf.net

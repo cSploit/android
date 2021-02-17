@@ -1,0 +1,246 @@
+.TH LDAP_GET_DN 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_get_dn, ldap_explode_dn, ldap_explode_rdn, ldap_dn2ufn \- LDAP DN handling routines
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+char *ldap_get_dn( LDAP *ld, LDAPMessage *entry )
+.LP
+.ft B
+int ldap_str2dn( const char *str, LDAPDN *dn, unsigned flags )
+.LP
+.ft B
+void ldap_dnfree( LDAPDN dn )
+.LP
+.ft B
+int ldap_dn2str( LDAPDN dn, char **str, unsigned flags )
+.LP
+.ft B
+char **ldap_explode_dn( const char *dn, int notypes )
+.LP
+.ft B
+char **ldap_explode_rdn( const char *rdn, int notypes )
+.LP
+.ft B
+char *ldap_dn2ufn( const char * dn )
+.LP
+.ft B
+char *ldap_dn2dcedn( const char * dn )
+.LP
+.ft B
+char *ldap_dcedn2dn( const char * dn )
+.LP
+.ft B
+char *ldap_dn2ad_canonical( const char * dn )
+.SH DESCRIPTION
+These routines allow LDAP entry names (Distinguished Names, or DNs)
+to be obtained, parsed, converted to a user-friendly form, and tested.
+A DN has the form described in
+RFC 4414 "Lightweight Directory Access Protocol (LDAP):
+String Representation of Distinguished Names".
+.LP
+The
+.B ldap_get_dn()
+routine takes an \fIentry\fP as returned by
+.BR ldap_first_entry (3)
+or
+.BR ldap_next_entry (3)
+and returns a copy of
+the entry's DN.  Space for the DN will be obtained dynamically
+and should be freed by the caller using 
+.BR ldap_memfree (3).
+.LP
+.B ldap_str2dn()
+parses a string representation of a distinguished name contained in
+.B str
+into its components,
+which are stored in 
+.B dn
+as
+.B ldap_ava 
+structures, arranged in
+.B LDAPAVA,
+.B LDAPRDN,
+and 
+.B LDAPDN
+terms.  Space for
+.B dn
+will be obtained dynamically and should be freed by the caller using
+.BR ldap_dnfree (3).
+The
+.B LDAPDN
+is defined as:
+.nf
+.ft B
+
+typedef struct ldap_ava {
+    char *la_attr;
+    struct berval *la_value;
+    unsigned la_flags;
+} LDAPAVA;
+
+typedef LDAPAVA** LDAPRDN;
+typedef LDAPRDN* LDAPDN;
+
+.ft
+.fi
+The attribute types and the attribute values are not normalized.
+The
+.B la_flags
+can be either
+.B LDAP_AVA_STRING
+or
+.B LDAP_AVA_BINARY,
+the latter meaning that the value is BER/DER encoded and thus must
+be represented as, quoting from RFC 4514, " ... an
+octothorpe character ('#' ASCII 35) followed by the hexadecimal
+representation of each of the bytes of the BER encoding of the X.500
+AttributeValue."
+The
+.B flags
+parameter to
+.B ldap_str2dn()
+can be
+.LP
+.nf
+	LDAP_DN_FORMAT_LDAPV3
+	LDAP_DN_FORMAT_LDAPV2
+	LDAP_DN_FORMAT_DCE
+
+.fi
+which defines what DN syntax is expected (according to RFC 4514, 
+RFC 1779 and DCE, respectively).
+The format can be \fIOR\fPed to the flags
+.LP
+.nf
+	LDAP_DN_P_NO_SPACES
+	LDAP_DN_P_NO_SPACE_AFTER_RDN
+	...
+	LDAP_DN_PEDANTIC
+
+.fi
+The latter is a shortcut for all the previous limitations.
+.LP
+.B LDAP_DN_P_NO_SPACES
+does not allow extra spaces in the dn; the default is to silently
+eliminate spaces around AVA separators ('='), RDN component separators
+('+' for LDAPv3/LDAPv2 or ',' for DCE) and RDN separators 
+(',' LDAPv3/LDAPv2 or '/' for DCE).
+.LP
+.B LDAP_DN_P_NO_SPACE_AFTER_RDN
+does not allow a single space after RDN separators.
+.LP
+.B ldap_dn2str()
+performs the inverse operation, yielding in 
+.B str
+a string representation of 
+.B dn.
+It allows the same values for
+.B flags 
+as
+.B ldap_str2dn(),
+plus
+.LP
+.nf
+	LDAP_DN_FORMAT_UFN
+	LDAP_DN_FORMAT_AD_CANONICAL
+
+.fi
+for user-friendly naming (RFC 1781) and AD canonical.
+.LP
+The following routines are viewed as deprecated in favor of
+.B ldap_str2dn()
+and
+.BR ldap_dn2str().
+They are provided to support legacy applications.
+.LP
+The
+.B ldap_explode_dn()
+routine takes a DN as returned by
+.B ldap_get_dn()
+and breaks it up into its component parts.  Each part is known as a
+Relative Distinguished Name, or RDN.
+.B ldap_explode_dn()
+returns a
+NULL-terminated array, each component of which contains an RDN from the
+DN.  The \fInotypes\fP parameter is used to request that only the RDN
+values be returned, not their types.  For example, the DN "cn=Bob,
+c=US" would return as either { "cn=Bob", "c=US", NULL } or { "Bob",
+"US", NULL }, depending on whether notypes was 0 or 1, respectively.
+Assertion values in RDN strings may included escaped characters.
+The result can be freed by calling
+.BR ldap_value_free (3).
+.LP
+Similarly, the
+.B ldap_explode_rdn()
+routine takes an RDN as returned by
+.B ldap_explode_dn(dn,0)
+and breaks it up into its "type=value" component parts (or just "value",
+if the \fInotypes\fP parameter is set).  Note the value is not
+unescaped.  The result can be freed by calling
+.BR ldap_value_free (3).
+.LP
+.B ldap_dn2ufn()
+is used to turn a DN as returned by
+.BR ldap_get_dn (3)
+into a more user-friendly form, stripping off all type names.  See
+"Using the Directory to Achieve User Friendly Naming" (RFC 1781)
+for more details on the UFN format.  Due to the ambiguous nature
+of the format, it is generally only used for display purposes.
+The space for the UFN returned is obtained dynamically and the user
+is responsible for freeing it via a call to
+.BR ldap_memfree (3).
+.LP
+.B ldap_dn2dcedn()
+is used to turn a DN as returned by
+.BR ldap_get_dn (3)
+into a DCE-style DN, e.g. a string with most-significant to least 
+significant rdns separated by slashes ('/'); rdn components
+are separated by commas (',').
+Only printable chars (e.g. LDAPv2 printable string) are allowed,
+at least in this implementation.
+.B ldap_dcedn2dn()
+performs the opposite operation.
+.B ldap_dn2ad_canonical()
+turns a DN into a AD canonical name, which is basically a DCE dn
+with attribute types omitted.
+The trailing domain, if present, is turned in a DNS-like domain.
+The space for the returned value is obtained dynamically and the user
+is responsible for freeing it via a call to
+.BR ldap_memfree (3).
+.SH ERRORS
+If an error occurs in
+.BR ldap_get_dn() ,
+NULL is returned and the
+.B ld_errno
+field in the \fIld\fP parameter is set to indicate the error.  See
+.BR ldap_error (3)
+for a description of possible error codes.
+.BR ldap_explode_dn() ,
+.BR ldap_explode_rdn() ,
+.B ldap_dn2ufn(),
+.B ldap_dn2dcedn(),
+.B ldap_dcedn2dn(),
+and
+.B ldap_dn2ad_canonical()
+will return NULL with
+.BR errno (3)
+set appropriately in case of trouble.
+.SH NOTES
+These routines dynamically allocate memory that the caller must free.
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_error (3),
+.BR ldap_first_entry (3),
+.BR ldap_memfree (3),
+.BR ldap_value_free (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

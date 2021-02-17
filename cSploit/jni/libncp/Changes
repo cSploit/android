@@ -1,0 +1,802 @@
+ChangeSet@1.306, 2005-01-27 18:25:25+01:00
+  Fix CAN-2005-0013 and CAN-2005-0014.  
+  
+  Fix CAN-2005-0013: Run with euid == uid for most of time, and switch 
+  to euid == 0 only when really needed.
+  
+  And although previous change decreases impact of CAN-2005-0014, let's 
+  fix random small static character arrays too.
+  
+  And when modprobe is spawned (on 2.0.x kernel), start it with empty
+  environment.
+
+ChangeSet@1.305, 2005-01-27 18:16:38+01:00
+  Move nds_login_auth prototype where it belongs.
+
+ChangeSet@1.304, 2005-01-13 23:35:33+01:00
+  Kill strcpy_cw function, it has no right to survive.
+
+ChangeSet@1.303, 2005-01-13 21:54:08+01:00
+  Obviously when I added nds_login_auth() to nwnet.h header, I should 
+  have removed it from "obsolete" headers...
+
+ChangeSet@1.302, 2005-01-13 20:57:58+01:00
+  Well, I hoped that nds_login_auth will die before it will become part 
+  of API, but as I did not get to write NWDSLogin()-like function for
+  about 5 years, it is probably time to finally accept this patch.
+  
+  Add nds_login_auth to ncpfs headers.
+  
+  From Novell/SUSE via Olaf Hering.
+
+ChangeSet@1.301, 2005-01-13 20:56:22+01:00
+  Add missing <string.h> includes here and there.
+  
+  From Novell/SUSE via Olaf Hering.
+
+ChangeSet@1.300, 2005-01-13 20:55:36+01:00
+  Create ${DESTDIR}/sbin directory when it does not exist, instead of
+  failing install.
+  
+  From Novell/SUSE via Olaf Hering.
+
+ChangeSet@1.299, 2005-01-13 20:54:42+01:00
+  Disable unused function in pam_ncp_auth.
+  
+  From Novell/SUSE via Olaf Hering.
+
+ChangeSet@1.298, 2005-01-13 20:46:55+01:00
+  Regenerate .gmos.
+
+ChangeSet@1.297, 2005-01-13 20:45:55+01:00
+  Add couple of new translations, update existing ones, and switch
+  everything to UTF8.  Hopefully older gettexts will not break.
+  
+  From Novell/SUSE via Olaf Hering.
+
+ChangeSet@1.296, 2004-11-30 16:51:35+01:00
+  Update version to 2.2.5 and regenerate autoconf things.
+  TAG: ncpfs-2.2.5
+
+ChangeSet@1.295, 2004-11-30 16:43:28+01:00
+  Oops, this should have been checked before NWDSCreateContextHandleMnt 
+  changes.
+
+ChangeSet@1.294, 2004-11-30 16:42:25+01:00
+  Fix bad buffer overflow in NWDSCreateContextHandleMnt.  Plus fix
+  bogus interpretation of treeName.  And split 
+  NWDSCreateContextHandleMnt into two functions, anything taking string
+  as argument must take context, as string's encoding is defined by 
+  context settings...
+
+ChangeSet@1.293, 2004-11-30 16:40:03+01:00
+  NCP extensions support.  First version.
+
+ChangeSet@1.292, 2004-11-30 16:39:01+01:00
+  Use 'GetNearestServer' while looking for connection for bindery resolver.
+
+ChangeSet@1.291, 2004-06-07 20:11:24+02:00
+  Correct ncpmount manpage: both ncp and ncpfs are allowed filesystem types.
+
+ChangeSet@1.290, 2004-05-30 00:05:33+02:00
+  Fix php_auth_nds build.
+
+ChangeSet@1.289, 2004-05-30 00:04:58+02:00
+  Regenerate autotools files.
+
+ChangeSet@1.288, 2004-05-30 00:03:04+02:00
+  Make code compatible with gcc-3.4 (mainly lvalue casts).
+  Get rid of all warnings messages.
+
+ChangeSet@1.287, 2004-05-29 19:38:43+02:00
+  Update PHP module with Patrick's changes.
+
+ChangeSet@1.286, 2004-05-29 19:37:36+02:00
+  Update PAM module with about two years old changes from Patrick. Sorry
+  for the delay.
+
+ChangeSet@1.285, 2004-03-15 15:53:18+01:00
+  Replace tabs with spaces in printed out messages in readattr.
+  Properly parse NWDSRead output when request type 4 is specified in readattr.
+
+ChangeSet@1.284, 2004-03-15 10:32:26+00:00, aia21@cantab.net
+  Apply patch (originally written by Ben Harris <bjh21@cam.ac.uk>) to
+  contrib/testing/readattr.c implementing the -n option to only print
+  the attribute value to stdout and improving the output formatting of
+  various things.
+
+ChangeSet@1.283, 2004-02-10 19:27:19+01:00
+  ncpfs-2.2.4
+  TAG: ncpfs-2.2.4
+
+ChangeSet@1.282, 2004-02-10 19:15:10+01:00
+  Fix ncp_path_to_NW_format for some boundary cases.
+  TAG: ncpfs-2.2.4
+
+ChangeSet@1.281, 2004-02-10 19:13:01+01:00
+  Force nodev & nosuid when non-root mounts filesystem.
+
+ChangeSet@1.280, 2004-02-02 01:19:30+01:00
+  Fix out-of-array indexing. RedHat bug 110897.
+
+ChangeSet@1.279, 2003-12-19 16:10:14+01:00
+  Missed this one in last checkin.
+
+ChangeSet@1.278, 2003-12-19 16:03:50+01:00
+  Rerun autoconf & phpize. 
+  
+  Fixes autoconf 2.5 vs. 2.13 mismatch between main configure and 
+  code in contrib/php discovered by Robin Cook.
+
+ChangeSet@1.277, 2003-12-10 12:21:04+01:00, esr@thyrsus.com
+  There was an unbalanced option group in nwpasswd synopsis.
+
+ChangeSet@1.276, 2003-07-20 01:52:32+02:00, vana@evon.vc.cvut.cz
+  Update perl interface for swig-1.3.20.
+
+ChangeSet@1.275, 2003-07-20 01:17:52+02:00, vana@evon.vc.cvut.cz
+  Move perl interface from contrib/swig to contrib/perl/ncpfs. MakeMaker 
+  requires directory name identical to .pm.
+
+ChangeSet@1.274, 2003-07-17 00:29:26+02:00
+  Updated autoconf to the latest code.
+
+ChangeSet@1.273, 2003-07-17 00:27:41+02:00
+  Rename pqrm to nwpqjob, and add support for resuming held print jobs (resuming code
+  was contributed by Zdenek Roub).
+
+ChangeSet@1.272, 2003-07-17 00:23:39+02:00, zroub@spss.zcu.cz
+  Add NWChangeQueueJobEntry to the library.
+
+ChangeSet@1.271, 2003-07-16 23:08:22+02:00, stk@ahs.hist.no
+  NWDSReadAttrDef request buffers should be filled with NWDSPutAttrName, not with
+  NWDSPutClassItem.
+
+ChangeSet@1.270, 2003-06-27 21:32:14+02:00
+  Disable logging questions.
+  Set default behavior for checkins to do get on modified files automatically.
+
+ChangeSet@1.269, 2003-06-27 21:26:25+02:00
+  Add support for generating slackware src packages.
+
+ChangeSet@1.268, 2003-06-14 22:37:35+02:00
+  Wait until ncpd exits when closing NCP connection. Otherwise ncpd can still run while
+  we are trying to open new connection (which fails due to local address still in use).
+
+ChangeSet@1.267, 2003-06-14 17:05:13+02:00
+  Add '-a /auth/src' option to the ncpmount. 
+  Originally by Petr Janecek <janecek@ucw.cz>.
+
+ChangeSet@1.266, 2003-06-14 14:59:50+02:00
+  Fix syslog format string in nwpjmv.
+
+ChangeSet@1.265, 2003-06-14 14:58:49+02:00
+  Fix changelog entry format for last commit.
+
+ChangeSet@1.264, 2003-06-14 14:55:04+02:00, patrick.pollet@cipcinsa.insa-lyon.fr
+  Allow '-S /mount/point' in all utilities.
+
+ChangeSet@1.263, 2003-04-23 22:18:08+02:00
+  Add error code to the nprint error messages.
+
+ChangeSet@1.262, 2003-04-23 22:12:10+02:00
+  Fix nprint on big endian machines. Reported by Quinten Steenhuis.
+
+ChangeSet@1.261, 2003-04-06 04:11:43+02:00
+  ignore:
+    added man/nwpjmv.1.gz util/nwpjmv
+
+ChangeSet@1.260, 2003-04-06 04:09:49+02:00
+  Use closing of pipe instead of sending signal for signalling watchdog process.
+  Caller can do set*euid() between ncp_open() and ncp_close(), and it can happen
+  that caller at ncp_close() time has no rights to send signals to process created
+  at ncp_open() time :-(
+  
+  Use doublefork for watchdog process so caller does not see this child...
+
+ChangeSet@1.259, 2003-03-31 21:50:14+02:00
+  Switch pqstat to getopt() parser.
+
+ChangeSet@1.258, 2003-03-31 21:35:04+02:00
+  Add version to the ncp_change_job_position symbol.
+
+ChangeSet@1.257, 2003-03-31 21:33:56+02:00
+  Add -B option to pqstat.
+
+ChangeSet@1.256, 2003-03-31 21:20:58+02:00
+  Add nwpjmv tool & ncp_change_job_position function. From Bruno Browning.
+
+ChangeSet@1.255, 2003-03-31 21:11:39+02:00
+  ncpfs 2.2.3 changelog
+
+ChangeSet@1.254, 2003-03-13 15:54:06+01:00
+  ncpfs-2.2.3
+  TAG: ncpfs-2.2.3
+
+ChangeSet@1.253, 2003-03-13 15:37:42+01:00
+  When user presents name with context to login prompt, it is not good idea
+  to append context once more to the username...
+  
+  Also add leading dot to the FQDN so that ncpmount works even if /etc/ncpfs.conf
+  is not empty.
+
+ChangeSet@1.252, 2003-03-13 15:10:12+01:00
+  Add -L option to pam_ncp_auth to ignore services restrictions based on access point.
+
+ChangeSet@1.251, 2003-03-13 15:00:45+01:00
+  Fix typo in logged ncpmount command line in pam_ncp_auth.
+
+ChangeSet@1.250, 2003-03-13 14:50:52+01:00
+  Ignore failure in initgroups(). Spotted by Mikael.
+
+ChangeSet@1.249, 2003-03-13 14:31:55+01:00
+  Ignore prefix "/dev/" in tty name. Spotted by Mikael.
+
+ChangeSet@1.248, 2003-02-25 22:56:17+01:00
+  Allow short -p/-i variants for --auto_primary/--auto_interface. Also allow
+  --auto-primary/--auto-interface.
+  
+  Allow 0/1 as OFF/ON equivalent.
+
+ChangeSet@1.247, 2003-02-25 21:57:38+01:00
+  Fix signed/unsigned char problems on arm, ppc and s390. Fixes Debian bug #182162.
+
+ChangeSet@1.246, 2003-02-15 10:29:01+01:00
+  ncpfs-2.2.2
+  TAG: ncpfs-2.2.2
+
+ChangeSet@1.245, 2003-02-15 10:14:01+01:00
+  Update Czech translations.
+
+ChangeSet@1.244, 2003-02-15 09:59:55+01:00
+  Honor default name context setting in ncpmount, and in file and
+  print utilities.
+
+ChangeSet@1.243, 2003-02-14 10:58:30+01:00
+  Teach nds_login to honor character encoding specified in context.
+  Teach nds_login_auth to use default name context specified in
+  configuration file.
+
+ChangeSet@1.242, 2003-02-14 10:25:31+01:00
+  Fix few compile warnings...
+
+ChangeSet@1.241, 2003-02-14 10:21:06+01:00
+  Make authenticators user configurable, some people may want to
+  disable bindery (or NDS) authentication.
+
+ChangeSet@1.240, 2003-02-14 09:28:28+01:00
+  Learn pqlist to use default name context from /etc/ncpfs.conf.
+
+ChangeSet@1.239, 2003-02-14 09:27:26+01:00
+  Do not store compiled ipxdump and ipxparse in BitKeeper...
+
+ChangeSet@1.238, 2003-02-14 09:26:02+01:00
+  Update /etc/ncpfs.conf format to allow unquoted values with embeded 
+  spaces. We'll need that in future for 'NDS BIND' without quotes...
+
+ChangeSet@1.237, 2003-02-13 10:20:37+01:00
+  Store session key also for temporary connections, so NDS aware utilities
+  as for example pqstat or nprint can do what they promise. 
+  
+  Please note bindery authentication is tried first, and if you are 
+  bindery authenticated then there is no session key, and thus no background
+  authentication. So you may want to use FQDN instead of short name for
+  pqstat or nprint.
+
+ChangeSet@1.236, 2003-02-13 10:16:18+01:00
+  Retrieve queue name and job owner in pqstat from NDS. Reported by 
+  Jimmy Kaplowitz.
+
+ChangeSet@1.235, 2003-02-13 09:03:01+01:00
+  Remove references to RSA patent #4,405,829 from README.NDS. Patent expired
+  more than two years ago... Reported by Ken Conrad.
+
+ChangeSet@1.234, 2003-02-11 10:36:50+01:00
+  Add GIVEN_NAME to the list of known text properties.
+
+ChangeSet@1.233, 2003-02-09 04:59:37+01:00
+  Learn BitKeeper to ignore temporary products of --with-included-gettext.
+
+ChangeSet@1.232, 2003-02-09 04:57:06+01:00
+  Fix dependencies for --with-included-gettext build. Spotted 
+  by David Walser.
+
+ChangeSet@1.231, 2003-02-09 04:38:09+01:00
+  Create directory for pam_ncp module during install. Spotted and fixed
+  by David Walser.
+
+ChangeSet@1.230, 2003-02-08 11:30:40+01:00
+  ncpfs-2.2.1 released
+  TAG: ncpfs-2.2.1
+
+ChangeSet@1.229, 2003-02-08 11:06:50+01:00
+  Ignore editor backup files *~
+
+ChangeSet@1.228, 2003-02-08 11:06:15+01:00
+  Fix problems in ncpfs-nwuid area.
+
+ChangeSet@1.227, 2003-02-08 10:56:50+01:00
+  Add proper version to new library symbols.
+
+ChangeSet@1.226, 2003-02-08 10:32:45+01:00
+  Sanitize ncp_open_2 calling convention...
+
+ChangeSet@1.225, 2003-02-08 10:24:39+01:00
+  Pass API errors through in ncp_login_conn, instead of always
+  returning EACCES.
+  Make password optional for nwfsinfo.
+
+ChangeSet@1.224, 2003-02-08 09:52:31+01:00
+  Update PHP's autoconf and libtool environment.
+
+ChangeSet@1.223, 2003-02-08 09:28:27+01:00
+  Debian's lintian prefers relative symlinks over absolute...
+
+ChangeSet@1.222, 2003-02-08 09:27:27+01:00
+  Debian's lintian complains that manpages are not gzip -9 ed...
+
+ChangeSet@1.221, 2003-02-08 09:26:42+01:00
+  Add ncp_find_conn_spec3: ncp_find_conn_spec2 with sane calling convention.
+  Change ncp_find_conn_spec* users to use ncp_find_conn_spec3.
+  Change calling convention for ncp_fopen_nwc.
+  Fix ncp_find_conn_spec* error reporting when stdin/stdout are not 
+  terminal. Spotted by Andre Holzhey.
+
+ChangeSet@1.220, 2003-01-27 09:45:09+01:00
+  Add NDS support to nwdir.
+
+ChangeSet@1.219, 2003-01-27 09:20:19+01:00
+  Add basic NWDSSearch demo to contrib/testing.
+
+ChangeSet@1.218, 2003-01-27 09:18:46+01:00
+  Regenerate autoconf system.
+
+ChangeSet@1.217, 2003-01-27 09:15:36+01:00
+  Update configure.ac for autoconf2.57.
+
+ChangeSet@1.216, 2003-01-27 08:49:01+01:00
+  Make PHP module compilable even if ncpfs is not installed. Found by
+  jukka.huhta@helsinki.fi.
+
+ChangeSet@1.215, 2003-01-11 21:45:09+01:00
+  Fix wcsrev() to do string reverse instead of core dump.
+
+ChangeSet@1.214, 2003-01-11 21:43:53+01:00
+  Print correct number of leaked connections. Spotted by Patrick Pollet.
+
+ChangeSet@1.213, 2003-01-11 21:41:59+01:00
+  Simplify DS iteration handle library.
+  Do not leak connection in NWDSSearch. Found and tracked down by Patrick Pollet.
+
+ChangeSet@1.212, 2003-01-11 17:53:37+01:00
+  Enable ncp-debug in "sample" configuration.
+
+ChangeSet@1.211, 2003-01-11 17:52:42+01:00
+  Add NWGetNLMLoadedList function and use it in nwfsinfo.
+
+ChangeSet@1.210, 2002-11-25 23:39:53+01:00
+  Make pqlist/pqstat/pqrm/nprint really working with NDS queues. It did not
+  work correctly if queue was on different server than one you specified with
+  -S option.
+
+ChangeSet@1.209, 2002-11-25 19:35:42+01:00
+  Use "Unknown user" instead of "Unknown server". Pointed out by Radovan Garabik.
+  Fixes Debian bug #170694.
+
+ChangeSet@1.208, 2002-11-19 22:59:52+01:00
+  Add -o pass-fd=X option to ncpmount and ncplogin. It is
+  simplest way how to pass password to these commands.
+
+ChangeSet@1.207, 2002-11-19 18:11:39+01:00
+  Install nwmsg always as sbin/nwmsg, even if sbin does not exist.
+
+ChangeSet@1.206, 2002-11-18 23:22:05+01:00
+  Remove unneeded includes from ncplogin/ncpmount.
+
+ChangeSet@1.205, 2002-11-18 23:15:21+01:00
+  More merging of ncplogin and ncpmount.
+
+ChangeSet@1.204, 2002-11-18 22:50:20+01:00
+  Move common code from ncplogin.c and ncpmount.c to mount_login.c.
+  Reindent ncplogin.c.
+
+ChangeSet@1.203, 2002-11-18 21:15:48+01:00
+  2.5.x kernels have /proc/net/ipx/interface instead of /proc/net/ipx_interface.
+
+ChangeSet@1.202, 2002-10-19 01:28:20+02:00
+  pam_ncp_auth: Fix doublefree when using bindery authentication and user's home directory
+  is found.
+
+ChangeSet@1.201, 2002-10-19 01:13:39+02:00
+  pam_ncp_auth: Reindent.
+
+ChangeSet@1.200, 2002-10-19 00:00:15+02:00
+  pam_ncp_auth: Close connection to server immediately after opening session or
+  changing password. Currently there is no need to keep connection open.
+  
+  Originally by Patrick Pollet.
+
+ChangeSet@1.199, 2002-10-18 23:42:26+02:00
+  pam_ncp_auth: Do not return errors from close session...
+
+ChangeSet@1.198, 2002-10-18 23:16:53+02:00
+  pam_ncp_auth: Return correct error code when code detects buffer overflow attack.
+
+ChangeSet@1.197, 2002-10-18 23:07:39+02:00
+  pam_ncp_auth: Consume whole option string passed to -z/-Z.
+
+ChangeSet@1.196, 2002-10-18 22:58:56+02:00
+  Fix typo in pam_ncp_auth.c. By Patrick Pollet.
+
+ChangeSet@1.195, 2002-10-18 22:19:23+02:00
+  Emit value separators also between NWDSRead, not only between
+  values read by NWDSRead in ncpreadprops tcl helper. By Patrick Pollet.
+
+ChangeSet@1.194, 2002-10-06 02:29:50+02:00
+  Include missing stdarg.h in ncpm_common.h.
+  By Roy Bixler.
+
+ChangeSet@1.193, 2002-09-19 22:37:15+02:00
+  Oops, use NCP_DIRSTYLE_DIRBASE and not NCP_DIRSTYLE_NOHANDLE in nwpurge tool and 
+  in dirlist2 demo program.
+
+ChangeSet@1.192, 2002-09-19 22:36:29+02:00
+  NCP search for file set always returns filename, even if we did not asked for one.
+  Let's always ask for name, so there is no surprise with some other/future server 
+  implementations.
+
+ChangeSet@1.191, 2002-09-15 00:27:15+02:00
+  Fix big-endian problems by using nw_info_struct2 instead of nw_info_struct. 
+  
+  API always returned nw_info_struct in "NCP" (little-endian) byte order, but when structure 
+  was passed to API, it expected volume and directory entry numbers to be in native byte order.
+  
+  In addition to the problem above, nobody except nwdir get byte order completely right - some
+  forgot to byteswap volume number, and some both.
+
+ChangeSet@1.190, 2002-09-15 00:18:14+02:00
+  Allow for passing "human readable" paths to ncp_ns_* API.
+
+ChangeSet@1.189, 2002-09-09 22:01:03+02:00
+  More bigendian fixes. From Roy Bixler...
+
+ChangeSet@1.188, 2002-09-09 21:48:50+02:00
+  Few big-endian fixes. Found by Roy Bixler.
+
+ChangeSet@1.187, 2002-09-09 21:30:08+02:00
+  Upgrade for (patched) SWIG 1.3.14
+
+ChangeSet@1.186, 2002-08-31 15:16:44+02:00
+  Use aTHX_ instead of aTHX when needed. Discovered by perl 5.8.
+
+ChangeSet@1.185, 2002-08-31 13:40:29+02:00
+  Really add support for NCP_DEBUG=all.
+
+ChangeSet@1.184, 2002-08-30 21:48:10+02:00
+  Fix few compile warnings introduced in last changeset.
+
+ChangeSet@1.183, 2002-08-30 21:44:23+02:00
+  Add code which prints connections not closed on library shutdown. Build ncpfs with
+  --enable-ncp-debug, and then set environment variable NCP_DEBUG to cleanup.
+
+ChangeSet@1.182, 2002-08-30 21:29:22+02:00
+  There is no install-dev in Makefile generated in contrib/php.
+
+ChangeSet@1.181, 2002-08-30 21:19:35+02:00
+  Regenerate .gmo files.
+
+ChangeSet@1.180, 2002-08-30 21:19:08+02:00
+  Fix complaints in german translation: %s do not match in one pair of c-format strings.
+
+ChangeSet@1.179, 2002-08-30 21:17:52+02:00
+  Update Czech translation.
+
+ChangeSet@1.178, 2002-08-30 21:17:04+02:00
+  Update gettext to 0.11.5 + regenerate autoconf.
+
+ChangeSet@1.177, 2002-08-30 14:42:33+02:00
+  Fix builds on hosts without locale.h/libintl.h, when using --disable-nls.
+
+ChangeSet@1.176, 2002-08-23 00:12:28+02:00
+  Update ncpmount/ncplogin/ncpmap for mount version 5. Main change is that
+  we now handle Netware messages in IP environment - of course only if you
+  have appropriate kernel...
+
+ChangeSet@1.175, 2002-08-23 00:01:59+02:00
+  Add NWCancelWait - NCP 112.
+
+ChangeSet@1.174, 2002-08-22 17:14:53+02:00
+  Simplify mount protocol version handling.
+
+ChangeSet@1.173, 2002-08-22 16:16:15+02:00
+  Add new, text based, mount option format.
+
+ChangeSet@1.172, 2002-08-21 21:55:02+02:00
+  Kill now unused variable in nwsfind.
+
+ChangeSet@1.171, 2002-08-21 21:48:15+02:00
+  Kill libncpsu. Only difference between libncp and libncpsu was ipx_make_reachable. Now
+  library contains both suid and non-suid versions, and appropriate one is selected at
+  runtime.
+  Modify nwsfind to always call suid version, even if nwsfind is not installed suid.
+
+ChangeSet@1.170, 2002-08-21 19:52:15+02:00
+  Split reply buffer from request buffer. Since we verify signatures on replies we must be
+  able to retry requests after we receive reply (with wrong signature), and so we cannot
+  receive reply into request's buffer.
+  Create NCP request header in the do_ncp_call, and not in its callers, so callers do not have
+  to touch sequence numbers, connection numbers, and so on.
+
+ChangeSet@1.169, 2002-08-21 19:42:29+02:00
+  Change x_recv/x_recvfrom to return err and pass length through additional parameter,
+  instead of returning length and passing err indirectly.
+
+ChangeSet@1.168, 2002-08-20 23:39:58+02:00
+  NCP/UDP signs replies differently than NCP/IPX, it does not sign error code
+  and connection status. Oops.
+
+ChangeSet@1.167, 2002-08-20 21:40:17+02:00
+  Verify packet signatures on replies received from server.
+
+ChangeSet@1.166, 2002-08-20 19:21:09+02:00
+  Kill few warnings here and there:
+  Add missing prototypes.
+  Remove < 0 compares on unsigned values.
+  Explicitly cast int to size_t in comparsions.
+
+ChangeSet@1.165, 2002-08-20 18:50:13+02:00
+  Packet signatures for NCP/TCP. Length in the signed data is in big-endian format,
+  while NCP/UDP and NCP/IPX use little-endian and I oversight this difference...
+
+ChangeSet@1.164, 2002-08-19 01:42:44+02:00
+  Fix ncp signatures negotiation code. NCP/TCP signatures still do not work.
+
+ChangeSet@1.163, 2002-08-19 01:40:06+02:00
+  Use NCP_OBSOLETE for obsolete APIs.
+
+ChangeSet@1.162, 2002-08-06 20:15:37+02:00
+  Exit from pserver when broken connection is detected. 
+  Helps a lot if you are running pserver with -d from inittab as a respawn task.
+
+ChangeSet@1.161, 2002-08-06 18:48:44+02:00
+  Make sure that we round all keys up to the unitsize boundary. Otherwise modmult endlessly loops.
+
+ChangeSet@1.160, 2002-07-28 02:16:29+02:00
+  Ignore user and nouser mount options.
+
+ChangeSet@1.159, 2002-07-28 00:54:55+02:00
+  Add NWGetUserInfo function.
+  Extend nwuserlist to print information obtained by NWGetUserInfo.
+
+ChangeSet@1.158, 2002-07-12 23:48:25+02:00
+  Allow setting of file offset in large filesize demo. BTW, abend
+  when writting to large files is fixed internally at Novell.
+
+ChangeSet@1.157, 2002-07-06 18:28:31+02:00
+  Update czech translation.
+  Regenerate i18n files.
+
+ChangeSet@1.156, 2002-07-06 18:26:32+02:00
+  Mark "yes" and "no" strings in nwfsinfo eligible for i18n.
+
+ChangeSet@1.155, 2002-07-06 18:25:05+02:00
+  stuil/ncpm_common.c contains i18n strings too.
+
+ChangeSet@1.154, 2002-07-06 18:05:33+02:00
+  Fix coredump in nwmsg when mountpoint is not listed in /etc/mtab.
+  Clean up nwmsg code.
+  Refresh tknwmsg.
+
+ChangeSet@1.153, 2002-07-06 16:33:34+02:00
+  Exclusive locking is NCP_PHYSREC_EX... (in physlock.c demo)
+
+ChangeSet@1.152, 2002-07-06 16:32:11+02:00
+  Added demo for NW*Semaphore API.
+
+ChangeSet@1.151, 2002-07-05 00:30:26+02:00
+  Ignore generated contrib/testing/physlock.
+
+ChangeSet@1.150, 2002-07-05 00:25:44+02:00
+  Add physical records locking API.
+  Add test program for physical records locks.
+  Tests for locking above 4GB fails on my beta NW6SP2 test server. I believe it is server bug, because of same API suceeds with offsets < 4GB...
+
+ChangeSet@1.149, 2002-07-03 23:37:44+02:00
+  Welcome, 64bit NCPs... Tested with nw6nss1c. Test it only in test environment, 
+  read+get file length works fine, but write abends server when UDP or TCP transport is used.
+  Only IPX works correctly...
+
+ChangeSet@1.148, 2002-07-03 01:36:29+02:00
+  Update config.guess and config.sub from autotools-dev 20020621.1
+
+ChangeSet@1.147, 2002-07-03 01:34:57+02:00
+  Add ncp_get_file_server_information_2 API. 
+  Extend nwfsinfo to print NW5+ information.
+
+ChangeSet@1.146, 2002-06-25 23:19:12+02:00
+  pam_ncp_auth: Strip leading dot from generated context when doing contextless login.
+
+ChangeSet@1.145, 2002-06-25 15:17:22+02:00
+  pam_ncp_auth: Fix buffer overflow I created in last changeset. We store string plus comma, so we have to count comma too.
+
+ChangeSet@1.144, 2002-06-24 01:17:36+02:00
+  Bind and SAP resolver are case insensitive.
+
+ChangeSet@1.143, 2002-06-23 21:36:44+02:00
+  Clean all files generated in contrib/php.
+
+ChangeSet@1.142, 2002-06-23 00:58:05+02:00
+  pam_ncp_auth: Fix couple of warnings and make contextless code faster.
+
+ChangeSet@1.141, 2002-06-23 00:42:21+02:00
+  pam_ncp_auth: By Patrick Pollet.
+  Extended -Z option to allow some zenflags to be turned OFF on that workstation:
+    with -Z all zenflags are off, but with -ZABCD, only flags ABCD are off.
+
+ChangeSet@1.140, 2002-06-23 00:23:22+02:00
+  pam_ncp_auth: Contextless login and IP support. By Jean-François Burdet.
+
+ChangeSet@1.139, 2002-06-23 00:18:43+02:00
+  Make parameter "value" to NWDSAddFilterToken() constant.
+
+ChangeSet@1.138, 2002-06-22 23:51:37+02:00
+  pam_ncp_auth: By Patrick Pollet
+  Add create homedir/do not create homedir option.
+  Add mount Netware in homedir or somewhere else option.
+
+ChangeSet@1.137, 2002-06-22 23:23:21+02:00
+  pam_ncp_auth fixes. By Patrick Pollet.
+  Fixed possible buffer overflow in mount_nwhome in verbose mode.
+  Fixed remote access granting table for samba >= 2.07 (pam_tty=samba and 
+  pam_rhost=hostname, was null, null in samba 2.06).
+
+ChangeSet@1.136, 2002-06-22 23:13:29+02:00
+  tcl: Parse /etc/ndsclient.conf in all programs, pass -l to ncpmap when requested.
+
+ChangeSet@1.135, 2002-06-22 22:55:11+02:00
+  Allow ncpmap mountpoint relocation by -l option. By Patrick Pollet.
+
+ChangeSet@1.134, 2002-06-22 21:24:57+02:00
+  Use all supported namespaces when parsing ncpmount/ncpmap -V option.
+
+ChangeSet@1.133, 2002-06-22 18:51:08+02:00
+  Pass username from ndsspace.tcl to ncpvrest explicitly. By Patrick Pollet.
+
+ChangeSet@1.132, 2002-06-22 18:48:10+02:00
+  Bug in reading password expiration date. Fixed context problem. By Patrick Pollet.
+
+ChangeSet@1.131, 2002-06-22 18:39:57+02:00
+  Added ndsexporter.pl into tcl-utils. By Patrick Pollet.
+
+ChangeSet@1.130, 2002-06-22 18:38:53+02:00
+  Fix nwwhoami's -fc/-fD behavior. By Patrick Pollet.
+
+ChangeSet@1.129, 2002-06-22 18:26:41+02:00
+  Emit value separator between multiple values. By Patrick Pollet.
+
+ChangeSet@1.128, 2002-06-22 03:59:24+02:00
+  Fix "make distclean" failure in contrib/php.
+
+ChangeSet@1.127, 2002-06-21 23:46:07+02:00
+  Fix ncpmount -o tcp brokeness.
+
+ChangeSet@1.126, 2002-06-20 22:34:04+02:00
+  Check for php-config correctly
+
+ChangeSet@1.125, 2002-06-18 19:46:49+02:00
+  Fix bug that all commands without -A option worked on
+  nearest server instead of on one specified by -S.
+
+ChangeSet@1.124, 2002-06-18 19:44:46+02:00
+  tracencp requires -ldl
+
+ChangeSet@1.123, 2002-06-16 00:25:12+02:00
+  Put code common to ncpmount/ncplogin/ncpmap into ncpm_common.
+  Add ncp_find_server_addr.
+
+ChangeSet@1.122, 2002-06-05 22:51:51+02:00
+  Give descriptive names to _StartNLM arguments.
+
+ChangeSet@1.121, 2002-05-28 22:00:35+02:00
+  Add autodetection to PHP module configuration
+
+ChangeSet@1.120, 2002-05-28 20:09:04+02:00
+  contrib/php/Makefile.in is now autogenerated.
+  contrib/php/config_vars.mk and contrib/php/libs.mk are autogenerated, I commited them by mistake.
+
+ChangeSet@1.119, 2002-05-28 19:33:02+02:00
+  Fix char*/const char* in ipxdump
+
+ChangeSet@1.118, 2002-05-28 19:31:56+02:00
+  Use NCPFS_PACKAGE instead of PACKAGE
+  Remove config.h where not needed
+  Build PHP module through phpize
+
+ChangeSet@1.117, 2002-05-09 02:42:38+02:00
+  Create unified name resolving functions and use them.
+
+ChangeSet@1.116, 2002-05-09 02:32:06+02:00
+  NWScanObject and NWReadPropertyValue added.
+
+ChangeSet@1.115, 2002-05-09 02:29:03+02:00
+  Use poll() instead of select().
+  Specify timeout in miliseconds and not in microseconds.
+
+ChangeSet@1.114, 2002-05-09 02:22:33+02:00
+  Ignore all *.o and *.do object files.
+
+ChangeSet@1.113, 2002-05-09 02:21:13+02:00
+  Use u_int64_t instead of long long.
+
+ChangeSet@1.112, 2002-04-26 18:28:04+02:00
+  NDS print queue names can be very long... (from Jean-Francois.Burdet@adm.unige.ch)
+
+ChangeSet@1.111, 2002-04-26 17:56:18+02:00
+  Updated german translation (from Wolfram Pienkoss <wp@bszh.de>)
+
+ChangeSet@1.110, 2002-04-25 19:22:30+02:00
+  Enable logging, we are going multiuser...
+
+ChangeSet@1.109, 2002-04-21 00:07:02+02:00
+  Use gcc to create proper dependencies
+
+ChangeSet@1.108, 2002-04-20 00:39:21+02:00
+  Update PHP module for post sep-2001 API.
+
+ChangeSet@1.107, 2002-04-19 12:37:10+02:00
+  Fix iconv_wchar_t_to_external issues.
+  Add -A option to the ncpmount and ncplogin help text.
+
+ChangeSet@1.106, 2002-02-27 19:11:44+01:00
+  Erase password from command line. Better process name change code.
+
+ChangeSet@1.105, 2002-02-27 19:05:36+01:00
+  Fix core dump when no username is specified to ncplogin.
+
+ChangeSet@1.104, 2002-02-27 17:36:20+01:00
+  Update configure stuff with 2002-02-25 updates
+
+ChangeSet@1.103, 2002-02-22 00:01:49+01:00
+  Ignore files built by make process
+
+ChangeSet@1.102, 2002-02-17 03:07:49+01:00
+  nwdir.c:
+    Do not dump core on files without locks, change date/id format.
+
+ChangeSet@1.101, 2002-02-17 03:04:33+01:00
+  Fix volume number handling.
+
+ChangeSet@1.100, 2002-02-17 02:57:44+01:00
+  PAM update - possible buffer overflows.
+
+ChangeSet@1.99, 2002-02-16 04:16:09+01:00
+  Update version numbers.
+  TAG: ncpfs-2.2.0.19.1
+
+ChangeSet@1.98, 2002-02-16 04:11:36+01:00
+  PAM and DS stream updates from Patrick Pollet.
+
+ChangeSet@1.97, 2002-02-16 04:07:55+01:00
+  Show LastAccess time on directories, NSS supports that.
+
+ChangeSet@1.96, 2002-02-16 04:06:48+01:00
+  Do not allow attribute names longer than MAX_SCHEMA_NAME_BYTES.
+
+ChangeSet@1.95, 2002-02-16 04:05:17+01:00
+  Inline x_recv.
+
+ChangeSet@1.94, 2002-02-16 04:04:03+01:00
+  Handle connection abort from ncpd gracefully
+
+ChangeSet@1.93, 2002-02-16 04:02:08+01:00
+  Require writeable replica for DS streams
+
+ChangeSet@1.92, 2002-02-16 04:00:38+01:00
+  Clean make error message
+
+ChangeSet@1.91, 2002-02-16 03:48:15+01:00
+  Many files:
+    Import patch ncpfs-2.2.0.18-to-2.2.0.19
+  TAG: ncpfs-2.2.0.19
+
+For older entries please see Changes.old

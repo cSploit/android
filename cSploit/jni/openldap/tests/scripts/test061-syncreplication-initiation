@@ -1,0 +1,668 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+# This script tests race conditions related to setting up the syncrepl
+# refresh phase, especially when the provider is itself a consumer
+# refreshing from its provider again.
+
+# The configuration used is a provider->forwarder->consumer chain, where
+# the forwarder is restarted between add/delete of entries on the provider.
+
+echo "Running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+test "x$INITIATION_RACE_TESTS" = "x" && INITIATION_RACE_TESTS=1
+
+if test $SYNCPROV = syncprovno; then
+	echo "Syncrepl provider overlay not available, test skipped"
+	exit 0
+fi
+
+RETRY="1 +"
+
+PROV_DIR=$TESTDIR/prov
+CONS_DIR=$TESTDIR/cons
+FWD1_DIR=$TESTDIR/fwd1
+FWD2_DIR=$TESTDIR/fwd2
+
+PROV_URI=$URI1
+CONS_URI=$URI2
+FWD1_URI=$URI3
+
+PROV_LOG=$LOG1
+CONS_LOG=$LOG2
+FWD1_LOG=$LOG3
+
+DIRS="$PROV_DIR $CONS_DIR $FWD1_DIR"
+URIS="$PROV_URI $CONS_URI $FWD1_URI"
+
+noObj=32
+nullExclude="" nullOK=""
+test $BACKEND = null && nullExclude="# " nullOK="OK" noObj=0
+
+mkdir -p $TESTDIR
+
+for dir in $DIRS; do
+	mkdir -p $dir $dir/slapd.d $dir/db
+done
+
+KILLPIDS=
+
+$SLAPPASSWD -g -n >$CONFIGPWF
+
+case "$BACKEND" in
+	bdb|hdb)	olcDbCheckpoint="olcDbCheckpoint";;
+	*)		olcDbCheckpoint="# olcDbCheckpoint";;
+esac
+
+echo "Initializing server configurations"
+for dir in $DIRS; do
+	$SLAPADD -F $dir/slapd.d -n 0 <<EOF
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+olcServerID: 1 $PROV_URI
+olcServerID: 2 $CONS_URI
+olcServerID: 3 $FWD1_URI
+
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcRootPW:< file://$CONFIGPWF
+
+EOF
+done
+
+echo "Starting provider slapd on $PROV_URI"
+cd $PROV_DIR
+$SLAPD -F slapd.d -h $PROV_URI -d $LVL $TIMING >> $PROV_LOG 2>&1 &
+PROV_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $PROV_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $PROV_PID"
+cd $TESTWD
+sleep 1
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $PROV_URI \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting forward1 slapd on $FWD1_URI"
+cd $FWD1_DIR
+$SLAPD -F slapd.d -h $FWD1_URI -d $LVL $TIMING >> $FWD1_LOG 2>&1 &
+FWD1_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $FWD1_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $FWD1_PID"
+cd $TESTWD
+sleep 1
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $FWD1_URI \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting consumer slapd on $CONS_URI"
+cd $CONS_DIR
+$SLAPD -F slapd.d -h $CONS_URI -d $LVL $TIMING >> $CONS_LOG 2>&1 &
+CONS_PID=$!
+if test $WAIT != 0 ; then
+	echo PID $CONS_PID
+	read foo
+fi
+KILLPIDS="$KILLPIDS $CONS_PID"
+cd $TESTWD
+sleep 1
+for i in 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "" -H $CONS_URI \
+		'objectclass=*' > /dev/null 2>&1
+	RC=$?
+	test $RC = 0 && break
+	echo "Waiting $i seconds for slapd to start..."
+	sleep $i
+done
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+for uri in $URIS; do
+	echo "Adding schema on $uri"
+	$LDAPADD -D cn=config -H $uri -y $CONFIGPWF <<EOF > $TESTOUT 2>&1
+include: file://$ABS_SCHEMADIR/core.ldif
+
+include: file://$ABS_SCHEMADIR/cosine.ldif
+
+include: file://$ABS_SCHEMADIR/inetorgperson.ldif
+
+include: file://$ABS_SCHEMADIR/openldap.ldif
+
+include: file://$ABS_SCHEMADIR/nis.ldif
+
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	[ "$BACKENDTYPE" = mod ] || continue
+
+	echo "Adding backend module on $uri..."
+	$LDAPADD -D cn=config -H $uri -y $CONFIGPWF <<EOF >>$TESTOUT 2>&1
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/back-$BACKEND
+olcModuleLoad: back_$BACKEND.la
+
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed for backend module ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+done
+
+syncprov_module=''
+[ "$AC_syncprov" = syncprovmod ] && syncprov_module="
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulePath: $TESTWD/../servers/slapd/overlays
+olcModuleLoad: syncprov.la"
+
+for uri in $PROV_URI; do
+	echo "Adding database configuration on $uri"
+	$LDAPADD -D cn=config -H $uri -y $CONFIGPWF <<EOF > $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: ./db
+$olcDbCheckpoint: 1024 5
+olcSuffix: $BASEDN
+olcRootDN: $MANAGERDN
+olcRootPW: $PASSWD
+
+$syncprov_module
+
+dn: olcOverlay={0}syncprov,olcDatabase={1}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: {0}syncprov
+olcSpCheckpoint: 1 1
+
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	echo "Populating provider on $uri"
+	$LDAPADD -D "$MANAGERDN" -H $PROV_URI -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: $BASEDN
+objectClass: top
+objectClass: organization
+objectClass: dcObject
+dc: example
+o: Example, Inc
+
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+done
+
+for uri in $FWD1_URI; do
+	echo "Adding database configuration on $uri"
+	$LDAPADD -D cn=config -H $uri -y $CONFIGPWF <<EOF > $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: ./db
+$olcDbCheckpoint: 1024 5
+olcSuffix: $BASEDN
+olcRootDN: $MANAGERDN
+olcRootPW: $PASSWD
+olcSyncRepl: rid=1 provider=$PROV_URI searchbase="$BASEDN"
+  binddn="$MANAGERDN" bindmethod=simple credentials=$PASSWD
+  type=refreshAndPersist retry="$RETRY" timeout=1
+
+$syncprov_module
+
+dn: olcOverlay={0}syncprov,olcDatabase={1}$BACKEND,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: {0}syncprov
+olcSpCheckpoint: 1 1
+
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+done
+
+for uri in $CONS_URI; do
+	echo "Adding database configuration on $uri"
+	$LDAPADD -D cn=config -H $uri -y $CONFIGPWF <<EOF > $TESTOUT 2>&1
+dn: olcDatabase={1}$BACKEND,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olc${BACKEND}Config
+olcDatabase: {1}$BACKEND
+${nullExclude}olcDbDirectory: ./db
+$olcDbCheckpoint: 1024 5
+olcSuffix: $BASEDN
+olcRootDN: $MANAGERDN
+olcRootPW: $PASSWD
+olcSyncRepl: rid=1 provider=$FWD1_URI searchbase="$BASEDN"
+  binddn="$MANAGERDN" bindmethod=simple credentials=$PASSWD
+  type=refreshAndPersist retry="$RETRY" timeout=1
+
+EOF
+	RC=$?
+	if test $RC != 0 ; then
+		echo "ldapadd failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+done
+
+for uri in $FWD1_URI $CONS_URI; do
+	echo "Using ldapsearch to check that $uri received database..."
+	for i in 1 2 3 4 5; do
+		$LDAPSEARCH -s base -b "$BASEDN" -H $uri \
+			'objectclass=*' > /dev/null 2>&1
+		RC=$?
+		test $RC = 0 && break
+		echo "Waiting $i seconds for slapd to receive database..."
+		sleep $i
+	done
+	if test $RC != 0 ; then
+		echo "ldapsearch failed ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+done
+
+RACE_NUM=0
+ERROR=0
+
+nEntries=10
+
+addEnd=1
+delEnd=1
+
+addIdx=1
+delIdx=1
+
+while test $ERROR -eq 0 -a $RACE_NUM -lt $INITIATION_RACE_TESTS ; do
+	RACE_NUM=`expr $RACE_NUM + 1`
+	echo "Running $RACE_NUM of $INITIATION_RACE_TESTS syncrepl initiation race tests..."
+
+	echo "Stopping forwarders for add test"
+	for pid in $FWD1_PID; do
+		kill -HUP $pid
+		wait $pid
+		KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $pid / /"`;
+	done
+
+	addStart=$addEnd
+	addEnd=`expr $addEnd + $nEntries`
+
+	echo "Using ldapadd to add $nEntries entries on provider"
+	while test $addIdx -lt $addEnd; do
+		$LDAPADD -D "$MANAGERDN" -H $PROV_URI -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=$addIdx,$BASEDN
+objectClass: top
+objectClass: organizationalUnit
+ou: $addIdx
+
+EOF
+		RC=$?
+		if test $RC != 0 ; then
+			echo "ldapadd failed for entry $addIdx ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+		addIdx=`expr $addIdx + 1`
+	done
+
+	echo "Starting forwarders again"
+	cd $FWD1_DIR
+	$SLAPD -F slapd.d -h $FWD1_URI -d $LVL $TIMING >> $FWD1_LOG 2>&1 &
+	FWD1_PID=$!
+	KILLPIDS="$KILLPIDS $FWD1_PID"
+	cd $TESTWD
+
+	addEnd=`expr $addEnd + $nEntries`
+
+	echo "Using ldapadd to add $nEntries more entries on provider"
+	while test $addIdx -lt $addEnd; do
+		$LDAPADD -D "$MANAGERDN" -H $PROV_URI -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=$addIdx,$BASEDN
+objectClass: top
+objectClass: organizationalUnit
+ou: $addIdx
+
+EOF
+		RC=$?
+		if test $RC != 0 ; then
+			echo "ldapadd failed for entry $addIdx ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+		addIdx=`expr $addIdx + 1`
+	done
+
+	for uri in $FWD1_URI $CONS_URI; do
+		echo "Checking replication to $uri"
+		RC=32
+		i=$addStart
+		while test $i -lt $addEnd; do
+			for j in 1 2 3 4 5; do
+				RESULT=`$LDAPSEARCH -H $uri -s base -b "ou=$i,$BASEDN" 2>&1 \
+					| awk '/^dn:/ {print "OK"}'`
+				if test "x$RESULT$nullOK" = "xOK" ; then
+					RC=0
+					break
+				fi
+				echo "Waiting $j seconds for $uri to receive entry $i..."
+				sleep $j
+			done
+			if test $RC != 0 ; then
+				echo "ERROR: Entry $i not replicated to $uri! ($RC)!"
+				ERROR=1
+				break
+			fi
+			i=`expr $i + 1`
+		done
+		if test $ERROR != 0; then break; fi
+	done
+	if test $ERROR != 0; then break; fi
+
+	echo "Stopping forwarders for add/delete test"
+	for pid in $FWD1_PID; do
+		kill -HUP $pid
+		wait $pid
+		KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $pid / /"`;
+	done
+
+	addStart=$addEnd
+	addEnd=`expr $addEnd + $nEntries`
+
+	echo "Using ldapadd to add $nEntries entries on provider"
+	while test $addIdx -lt $addEnd; do
+		$LDAPADD -D "$MANAGERDN" -H $PROV_URI -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=$addIdx,$BASEDN
+objectClass: top
+objectClass: organizationalUnit
+ou: $addIdx
+
+EOF
+		RC=$?
+		if test $RC != 0 ; then
+			echo "ldapadd failed for entry $addIdx ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+		addIdx=`expr $addIdx + 1`
+	done
+
+	delStart=$delEnd
+	delEnd=`expr $delEnd + $nEntries`
+
+	echo "Using ldapdelete to delete $nEntries entries on provider"
+	while test $delIdx -lt $delEnd; do
+		$LDAPDELETE -D "$MANAGERDN" -H $PROV_URI -w $PASSWD "ou=$delIdx,$BASEDN"
+		RC=$?
+		if test $RC != 0 ; then
+			echo "ldapdelete failed ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+		delIdx=`expr $delIdx + 1`
+	done
+
+	echo "Starting forwarders again"
+	cd $FWD1_DIR
+	$SLAPD -F slapd.d -h $FWD1_URI -d $LVL $TIMING >> $FWD1_LOG 2>&1 &
+	FWD1_PID=$!
+	KILLPIDS="$KILLPIDS $FWD1_PID"
+	cd $TESTWD
+
+	addEnd=`expr $addEnd + $nEntries`
+	delEnd=`expr $delEnd + $nEntries`
+
+	echo "Using ldapadd to add $nEntries more entries on provider"
+	while test $addIdx -lt $addEnd; do
+		$LDAPADD -D "$MANAGERDN" -H $PROV_URI -w $PASSWD <<EOF >> $TESTOUT 2>&1
+dn: ou=$addIdx,$BASEDN
+objectClass: top
+objectClass: organizationalUnit
+ou: $addIdx
+
+EOF
+		RC=$?
+		if test $RC != 0 ; then
+			echo "ldapadd failed for entry $addIdx ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit $RC
+		fi
+		addIdx=`expr $addIdx + 1`
+	done
+
+	echo "Using ldapdelete to delete $nEntries more entries on provider"
+	while test $delIdx -lt $delEnd; do
+		$LDAPDELETE -D "$MANAGERDN" -H $PROV_URI -w $PASSWD "ou=$delIdx,$BASEDN"
+		RC=$?
+		if test $RC != 0 ; then
+			echo "ldapdelete failed ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+		delIdx=`expr $delIdx + 1`
+	done
+
+	for uri in $FWD1_URI $CONS_URI; do
+		echo "Checking replication to $uri"
+		RC=32
+		i=$addStart
+		while test $i -lt $addEnd; do
+			for j in 1 2 3 4 5; do
+				RESULT=`$LDAPSEARCH -H $uri -s base -b "ou=$i,$BASEDN" 2>&1 \
+					| awk '/^dn:/ {print "OK"}'`
+				if test "x$RESULT$nullOK" = "xOK" ; then
+					RC=0
+					break
+				fi
+				echo "Waiting $j seconds for $uri to receive entry $i..."
+				sleep $j
+			done
+			if test $RC != 0 ; then
+				echo "ERROR: Entry $i not replicated to $uri! ($RC)!"
+				ERROR=1
+				break
+			fi
+			i=`expr $i + 1`
+		done
+		if test $ERROR != 0; then break; fi
+
+		i=$delStart
+		while test $i -lt $delEnd; do
+			for j in 1 2 3 4 5; do
+				$LDAPSEARCH -s base -b "ou=$i,$BASEDN" -H $uri > /dev/null 2>&1
+				RC=$?
+				if test $RC = $noObj; then break; fi
+				echo "Waiting $j seconds for $uri to delete entry $i..."
+				sleep $j
+			done
+			if test $RC != $noObj; then
+				echo "ERROR: Entry $i not removed on $uri! (RC=$RC)"
+				ERROR=1
+				break
+			fi
+			i=`expr $i + 1`
+		done	
+		if test $ERROR != 0; then break; fi
+	done
+	if test $ERROR != 0; then break; fi
+
+	echo "Stopping forwarders for delete test"
+	for pid in $FWD1_PID; do
+		kill -HUP $pid
+		wait $pid
+		KILLPIDS=`echo "$KILLPIDS " | sed -e "s/ $pid / /"`;
+	done
+
+	delStart=$delEnd
+	delEnd=`expr $delEnd + $nEntries`
+
+	echo "Using ldapdelete to delete entries on provider"
+	while test $delIdx -lt $delEnd; do
+		$LDAPDELETE -D "$MANAGERDN" -H $PROV_URI -w $PASSWD "ou=$delIdx,$BASEDN"
+		RC=$?
+		if test $RC != 0 ; then
+			echo "ldapdelete failed ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+		delIdx=`expr $delIdx + 1`
+	done
+
+	echo "Starting forwarders again"
+	cd $FWD1_DIR
+	$SLAPD -F slapd.d -h $FWD1_URI -d $LVL $TIMING >> $FWD1_LOG 2>&1 &
+	FWD1_PID=$!
+	KILLPIDS="$KILLPIDS $FWD1_PID"
+	cd $TESTWD
+
+	delEnd=`expr $delEnd + $nEntries`
+
+	echo "Using ldapdelete to delete $nEntries more entries on provider"
+	while test $delIdx -lt $delEnd; do
+		$LDAPDELETE -D "$MANAGERDN" -H $PROV_URI -w $PASSWD "ou=$delIdx,$BASEDN"
+		RC=$?
+		if test $RC != 0 ; then
+			echo "ldapdelete failed ($RC)!"
+			test $KILLSERVERS != no && kill -HUP $KILLPIDS
+			exit 1
+		fi
+		delIdx=`expr $delIdx + 1`
+	done
+
+	for uri in $FWD1_URI $CONS_URI; do
+		echo "Checking replication to $uri"
+		RC=0
+		i=$delStart
+		while test $i -lt $delEnd; do
+			for j in 1 2 3 4 5; do
+				$LDAPSEARCH -s base -b "ou=$i,$BASEDN" -H $uri > /dev/null 2>&1
+				RC=$?
+				if test $RC = $noObj; then break; fi
+				echo "Waiting $j seconds for $uri to delete entry $i..."
+				sleep $j
+			done
+			if test $RC != $noObj; then
+				echo "ERROR: Entry $i not removed on $uri! (RC=$RC)"
+				ERROR=1
+				break
+			fi
+			i=`expr $i + 1`
+		done	
+		if test $ERROR != 0; then break; fi
+	done
+	if test $ERROR != 0; then break; fi
+
+	echo "Checking contextCSN"
+	CSN_ERRORS=0
+	CSN1=`$LDAPSEARCH -H $URI1 -b $BASEDN -s base contextCSN | grep contextCSN`
+	CSN2=`$LDAPSEARCH -H $URI2 -b $BASEDN -s base contextCSN | grep contextCSN`
+	CSN3=`$LDAPSEARCH -H $URI3 -b $BASEDN -s base contextCSN | grep contextCSN`
+
+	if test -z "$CSN1" ; then
+		test $BACKEND = null && break
+		echo "ERROR: contextCSN empty on provider"
+		ERROR=1
+		break
+	fi
+	nCSN=`echo "$CSN1" | wc -l`
+	if test "$nCSN" -ne 1 ; then
+		echo "ERROR: Wrong contextCSN count on provder, should be 1"
+		echo "$CSN1"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+	if  test -z "$CSN2" -o "$CSN1" != "$CSN2" ; then
+		echo "ERROR: contextCSN mismatch between provider and consumer"
+		echo "contextCSN on provider: $CSN1"
+		echo "contextCSN on consumer: $CSN2"
+		ERROR=1
+		break
+	fi
+	if  test -z "$CSN3" -o "$CSN1" != "$CSN3" ; then
+		echo "ERROR: contextCSN mismatch between provider and forward1"
+		echo "contextCSN on provider: $CSN1"
+		echo "contextCSN on forward1: $CSN3"
+		ERROR=1
+		break
+	fi
+done
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+if test $ERROR != 0; then
+	echo "Error found after $RACE_NUM of $INITIATION_RACE_TESTS iterations"
+	exit 1
+else
+	echo "No race errors found after $INITIATION_RACE_TESTS iterations"
+fi
+
+echo ">>>>> Test succeeded"
+
+exit 0

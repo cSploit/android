@@ -1,0 +1,50 @@
+                                -*- text -*-
+
+TRANSLATING PARAMETER LISTS
+
+   The argument-reductions laws of the SWIG bindings something go like
+   this:
+   
+     - Python functions don't return errors.  They throw exceptions.
+       Which means that...
+   
+     - ...Python functions will return the "other" stuff that the C
+       functions "return" instead.  C functions which populate
+       pointers with new data (you know, values that are returned to
+       the caller, but not as "return values") will return those
+       values directly in Python.  So:
+   
+          error = foo (object **returned_obj, int blah);
+   
+       becomes:
+   
+          try:
+              returned_obj = foo (blah)
+          except:
+              # handle it
+   
+     - Callback function/baton pairs get reduced to just callback
+       functions, and the benefit you get from batons is gotten
+       instead through Python default arguments:
+   
+          error = foo (callback_t function, void *baton);
+   
+       becomes:
+   
+          try:
+              def function(callback_arg1, ..., userdata1=whatever, ...):
+                  # do stuff here
+              foo(function)
+          except:
+              # handle it
+
+
+RUNNING THE TESTS
+
+   $ cd subversion/bindings/swig/python
+   $ python ./tests/run_all.py --help
+   $ python ./tests/run_all.py [TEST...]
+
+   where TEST can be the name of a test suite ('core', 'mergeinfo',
+   'client', etc.), or see '--help' for other options.  The default is to
+   run the tests in all modules.

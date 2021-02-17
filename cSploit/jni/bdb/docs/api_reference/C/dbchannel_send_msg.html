@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_CHANNEL-&gt;send_msg()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 10.  Replication Methods" />
+    <link rel="prev" href="dbchannel_close.html" title="DB_CHANNEL-&gt;close()" />
+    <link rel="next" href="dbchannel_send_request.html" title="DB_CHANNEL-&gt;send_request()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_CHANNEL-&gt;send_msg()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbchannel_close.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 10. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbchannel_send_request.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbchannel_send_msg"></a>DB_CHANNEL-&gt;send_msg()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB_CHANNEL-&gt;send_msg(DB_CHANNEL *channel, DBT *msg, u_int32_t nmsg,
+                     u_int32_t flags);  </pre>
+      <p>
+        The <code class="methodname">DB_CHANNEL-&gt;send_msg()</code> method sends a
+        message on the message channel. The message is sent asynchronously;
+        the method does not wait for a response before returning. This
+        method usually completes quickly because it only waits for the
+        local TCP implementation to accept the bytes into its network data
+        buffer. However, this message could block briefly for longer
+        messages, and/or if the network data buffer is nearly full. This
+        method could even block indefinitely if the remote site is slow to
+        read.
+    </p>
+      <p>
+        If you want to block while waiting for a response from a remote
+        site, use the 
+        <a class="xref" href="dbchannel_send_request.html" title="DB_CHANNEL-&gt;send_request()">DB_CHANNEL-&gt;send_request()</a>
+        method instead of this method.
+    </p>
+      <p>
+        The message sent by this method is received and handled at 
+        remote sites using a message dispatch callback, which is configured
+        using the <a class="xref" href="repmgr_msg_dispatch.html" title="DB_ENV-&gt;repmgr_msg_dispatch()">DB_ENV-&gt;repmgr_msg_dispatch()</a>
+        method. Note that the DB_CHANNEL-&gt;send_msg() method may be used
+        within the message dispatch callback on the remote site to send
+        a response or acknowledgement for messages that it receives and is
+        handling.
+    </p>
+      <p>
+        This method may be used on channels opened to any destination (see
+        the <a class="xref" href="repmgr_channel.html" title="DB_ENV-&gt;repmgr_channel()">DB_ENV-&gt;repmgr_channel()</a> 
+        method for a list of potential destinations). 
+    </p>
+      <p>
+         The <code class="methodname">DB_CHANNEL-&gt;send_msg()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53900800"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp53901272"></a>msg</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 Refers to an array of DBT handles.  For more
+                 information, see
+                 <a class="xref" href="dbt.html" title="Chapter 4.  The DBT Handle">
+                The DBT Handle
+        </a>.
+             </p>
+          <p>
+                 Any flags provided to the DBT handles used in this
+                 array are ignored.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp53904288"></a>nmsg</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 Indicates how many elements are contained in the
+                 <code class="literal">msg</code> array.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp53896248"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  This parameter is currently unused, and must be
+                  set to 0.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53888128"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            The <code class="methodname">DB_CHANNEL-&gt;send_msg()</code>
+            <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp53901336"></a>DB_NOSERVER</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                A message was sent to a remote site that has not
+                configured a message dispatch callback function.
+                Use the
+                <a class="xref" href="repmgr_msg_dispatch.html" title="DB_ENV-&gt;repmgr_msg_dispatch()">DB_ENV-&gt;repmgr_msg_dispatch()</a>
+                method at every site belonging to the replication group to configure a 
+                message dispatch callback function.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp53911320"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If this method is called from a Base API application,
+                or if an invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53908968"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a>,  
+            <a class="link" href="db_channel.html" title="The DB_CHANNEL Handle">DB_CHANNEL</a>
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp53912400"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="rep.html#replist" title="Replication and Related Methods">Replication and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbchannel_close.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbchannel_send_request.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_CHANNEL-&gt;close() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_CHANNEL-&gt;send_request()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

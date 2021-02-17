@@ -1,0 +1,36 @@
+.TH NWSFIND 1 10/27/1996 nwsfind nwsfind
+.SH NAME
+nwsfind \- Find a NetWare Server
+.SH SYNOPSIS
+.B nwsfind
+[
+.B -t
+.I type
+] [
+.I name
+]
+.SH DESCRIPTION
+.B nwsfind
+searches for a NetWare server and finds a route to this
+server. nwsfind was written to be setuid root. It is called from
+within the ncp library, so that it is possible that normal users use
+the utilities.
+
+.SH OPTIONS
+.B name
+.RS 3
+If you look for a specific server, you should give nwsfind this
+argument. If you omit it, nwsfind looks for the server nearest to you.
+.RE
+
+.B -t
+.I type
+.RS 3
+By default nwsfind looks for file servers. In case you want to look up
+another server type, you have to specify its numerical type as
+.B type.
+.RE
+
+
+.SH CREDITS
+nwsfind was written by Volker Lendecke (lendecke@math.uni-goettingen.de)

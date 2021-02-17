@@ -1,0 +1,172 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <BDB_VERSION>60</BDB_VERSION>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>..\..\build_windows\$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>./$(OutDir)$(ProjectName)\</IntDir>
+	<LinkIncremental>false</LinkIncremental>
+	<TargetExt Condition="'$(Configuration)'=='Static Debug'or'$(Configuration)'=='Static Release'">.lib</TargetExt>
+	<TargetExt Condition="'$(Configuration)'=='Debug'or'$(Configuration)'=='Release'">.dll</TargetExt>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">lib$(ProjectName)$(BDB_VERSION)d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">lib$(ProjectName)$(BDB_VERSION)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Static Debug|Win32'">lib$(ProjectName)$(BDB_VERSION)sd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Static Release|Win32'">lib$(ProjectName)$(BDB_VERSION)s</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">lib$(ProjectName)$(BDB_VERSION)d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">lib$(ProjectName)$(BDB_VERSION)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Static Debug|x64'">lib$(ProjectName)$(BDB_VERSION)sd</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Static Release|x64'">lib$(ProjectName)$(BDB_VERSION)s</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <MinimalRebuild>true</MinimalRebuild>
+      <AdditionalIncludeDirectories>../../build_windows;../../src;../../src/dbinc;../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <StringPooling>true</StringPooling>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <PrecompiledHeaderOutputFile>./$(OutDir)$(ProjectName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerListingLocation>$(OutDir)$(ProjectName)/</AssemblerListingLocation>
+      <ObjectFileName>$(OutDir)$(ProjectName)/</ObjectFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>DIAGNOSTIC;_USRDLL;_DEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/machine:x86 /FIXED:NO %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>$(OutDir);../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <ProgramDatabaseFile>$(OutDir)lib$(ProjectName)$(BDB_VERSION)d.pdb</ProgramDatabaseFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ImportLibrary>$(OutDir)lib$(ProjectName)$(BDB_VERSION)d.lib</ImportLibrary>
+      <OptimizeReferences>true</OptimizeReferences>
+      <TargetMachine>NotSet</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Static Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>DIAGNOSTIC;_LIB;_DEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalOptions>/machine:x86 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>_USRDLL;NDEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/machine:x86 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>$(OutDir);../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <ProgramDatabaseFile>$(OutDir)lib$(ProjectName)$(BDB_VERSION).pdb</ProgramDatabaseFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ImportLibrary>$(OutDir)lib$(ProjectName)$(BDB_VERSION).lib</ImportLibrary>
+      <OptimizeReferences>true</OptimizeReferences>
+      <TargetMachine>NotSet</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Static Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>_LIB;NDEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalOptions>/machine:x86 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>DIAGNOSTIC;_USRDLL;_DEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/machine:x64 /FIXED:NO %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>$(OutDir);../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <ProgramDatabaseFile>$(OutDir)lib$(ProjectName)$(BDB_VERSION)d.pdb</ProgramDatabaseFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ImportLibrary>$(OutDir)lib$(ProjectName)$(BDB_VERSION)d.lib</ImportLibrary>
+      <OptimizeReferences>true</OptimizeReferences>
+      <TargetMachine>NotSet</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Static Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>DIAGNOSTIC;_LIB;_DEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalOptions>/machine:x64 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>_USRDLL;NDEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+    <Link>
+      <AdditionalOptions>/machine:x64 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalLibraryDirectories>$(OutDir);../../lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <ProgramDatabaseFile>$(OutDir)lib$(ProjectName)$(BDB_VERSION).pdb</ProgramDatabaseFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <ImportLibrary>$(OutDir)lib$(ProjectName)$(BDB_VERSION).lib</ImportLibrary>
+      <OptimizeReferences>true</OptimizeReferences>
+      <TargetMachine>NotSet</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Static Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <PreprocessorDefinitions>_LIB;NDEBUG;WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalOptions>/machine:x64 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="BDB_VERSION">
+      <Value>$(BDB_VERSION)</Value>
+      <EnvironmentVariable>true</EnvironmentVariable>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

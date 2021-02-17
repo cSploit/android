@@ -1,0 +1,8 @@
+PKG="FBLIBGCC"
+NAME="GNU C/C+ runtime for Firebird 2 IA"
+ARCH="i386"
+VERSION="3.3.3"
+CATEGORY="library"
+VENDOR="WWW.FireBirdSQL.org"
+BASEDIR=/usr/local/firebird/lib
+EMAIL=kkuznetsov@users.sf.net

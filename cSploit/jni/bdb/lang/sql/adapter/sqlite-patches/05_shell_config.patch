@@ -1,0 +1,17 @@
+--- src/shell.c
++++ src/shell.c
+@@ -28,6 +28,14 @@
+ # define _LARGEFILE_SOURCE 1
+ #endif
+ 
++/*
++** Include the configuration header output by 'configure' if we're using the
++** autoconf-based build
++*/
++#ifdef _HAVE_SQLITE_CONFIG_H
++#include "config.h"
++#endif
++
+ #include <stdlib.h>
+ #include <string.h>
+ #include <stdio.h>

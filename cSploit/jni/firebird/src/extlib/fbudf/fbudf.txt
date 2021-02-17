@@ -1,0 +1,47 @@
+FBUDF, a small project to enhance ibudf.
+
+The library ibudf that comes with IB5, IB6 and FB has some generic routines.
+However, it lacks others and it seems a good idea to enhance it with more
+functionality. The first test is to build a separate small library. When those
+functions have been tested, they may be included in ibudf. This way, it's possible
+to experiment with fbudf without mangling the established library.
+
+This is initially a MSVC project for Windows. It will be generalized later.
+It doesn't use ib_util because it relies on the engine providing return
+arguments when they are of type string.
+
+Originally, this library intends to offer:
+
+NVL => one for integers and the other for strings. This way, the overhead
+for strings can be avoided for integers.
+
+NULLIF => same idea than before.
+
+DOW (Day of Week) Monday, Tuesday, Wednesday ...
+SDOW(Short Day of Week)  Mon, Tue, Wed, Thu ....
+
+(
+The following two aren't necessary:
+SUBSTR: It has been superseded by internal SUBSTRING in Firebird.
+LEFT: You can use SUBSTRING(s from 1 for N) in Firebird
+)
+
+RIGHT: This will work only for 1-byte charsets.
+
+TRUNCATE / ROUND 
+
+(
+The following two are already in udflib:
+CEILING / FLOOR
+)
+
+Date manipulation stuff ...
+  Add a day, week, month, year to a date.
+
+String <-> BLOB
+  STRING2BLOB
+(Firebird already is capable of accepting a string to populate a blob on INSERT only.)
+
+---
+Claudio Valderrama - July 2001.
+

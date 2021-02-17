@@ -1,0 +1,237 @@
+.TH SLAPD-SHELL 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.\" $OpenLDAP$
+.SH NAME
+slapd\-shell \- Shell backend to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The Shell backend to
+.BR slapd (8)
+executes external programs to implement operations, and is designed to
+make it easy to tie an existing database to the
+.B slapd
+front-end.
+.LP
+This backend is primarily intended to be used in prototypes.
+.SH WARNING
+The
+.B abandon
+shell command has been removed since OpenLDAP 2.1.
+.SH CONFIGURATION
+These
+.B slapd.conf
+options apply to the SHELL backend database.
+That is, they must follow a "database shell" line and come before any
+subsequent "backend" or "database" lines.
+Other database options are described in the
+.BR slapd.conf (5)
+manual page.
+.LP
+These options specify the pathname and arguments of the program to
+execute in response to the given LDAP operation.
+Each option is followed by the input lines that the program receives:
+.TP
+.B add      <pathname> <argument>...
+.nf
+ADD
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+<entry in LDIF format>
+.fi
+.TP
+.B bind     <pathname> <argument>...
+.nf
+BIND
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <DN>
+method: <method number>
+credlen: <length of <credentials>>
+cred: <credentials>
+.fi
+.TP
+.B compare  <pathname> <argument>...
+.nf
+COMPARE
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <DN>
+<attribute>: <value>
+.fi
+.TP
+.B delete   <pathname> <argument>...
+.nf
+DELETE
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <DN>
+.fi
+.TP
+.B modify   <pathname> <argument>...
+.nf
+MODIFY
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <DN>
+<repeat {
+    <"add"/"delete"/"replace">: <attribute>
+    <repeat { <attribute>: <value> }>
+    \-
+}>
+.fi
+.TP
+.B modrdn   <pathname> <argument>...
+.nf
+MODRDN
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <DN>
+newrdn: <new RDN>
+deleteoldrdn: <0 or 1>
+<if new superior is specified: "newSuperior: <DN>">
+.fi
+.TP
+.B search   <pathname> <argument>...
+.nf
+SEARCH
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+base: <base DN>
+scope: <0-2, see ldap.h>
+deref: <0-3, see ldap.h>
+sizelimit: <size limit>
+timelimit: <time limit>
+filter: <filter>
+attrsonly: <0 or 1>
+attrs: <"all" or space-separated attribute list>
+.fi
+.TP
+.B unbind   <pathname> <argument>...
+.nf
+UNBIND
+msgid: <message id>
+<repeat { "suffix:" <database suffix DN> }>
+dn: <bound DN>
+.fi
+.LP
+Note that you need only supply configuration lines for those commands you
+want the backend to handle.
+Operations for which a command is not supplied will be refused with an
+"unwilling to perform" error.
+.LP
+The \fBsearch\fP command should output the entries in LDIF format,
+each entry followed by a blank line, and after these the RESULT below.
+.LP
+All commands except \fBunbind\fP should then output:
+.RS
+.nf
+RESULT
+code: <integer>
+matched: <matched DN>
+info: <text>
+.fi
+.RE
+where only the RESULT line is mandatory.
+Lines starting with `#' or `DEBUG:' are ignored.
+.SH ACCESS CONTROL
+The
+.B shell
+backend does not honor all ACL semantics as described in
+.BR slapd.access (5).
+In general, access to objects is checked by using a dummy object
+that contains only the DN, so access rules that rely on the contents
+of the object are not honored.
+In detail:
+.LP
+The
+.B add
+operation does not require
+.B write (=w)
+access to the 
+.B children
+pseudo-attribute of the parent entry.
+.LP
+The
+.B bind
+operation requires 
+.B auth (=x)
+access to the 
+.B entry
+pseudo-attribute of the entry whose identity is being assessed;
+.B auth (=x)
+access to the credentials is not checked, but rather delegated 
+to the underlying shell script.
+.LP
+The
+.B compare
+operation requires 
+.B read (=r)
+access (FIXME: wouldn't 
+.B compare (=c)
+be a more appropriate choice?)
+to the 
+.B entry
+pseudo-attribute
+of the object whose value is being asserted;
+.B compare (=c)
+access to the attribute whose value is being asserted is not checked.
+.LP
+The
+.B delete
+operation does not require
+.B write (=w)
+access to the 
+.B children
+pseudo-attribute of the parent entry.
+.LP
+The
+.B modify
+operation requires
+.B write (=w)
+access to the 
+.B entry 
+pseudo-attribute;
+.B write (=w)
+access to the specific attributes that are modified is not checked.
+.LP
+The
+.B modrdn
+operation does not require
+.B write (=w)
+access to the 
+.B children
+pseudo-attribute of the parent entry, nor to that of the new parent,
+if different;
+.B write (=w)
+access to the distinguished values of the naming attributes
+is not checked.
+.LP
+The
+.B search 
+operation does not require
+.B search (=s)
+access to the 
+.B entry
+pseudo_attribute of the searchBase;
+.B search (=s)
+access to the attributes and values used in the filter is not checked.
+
+.SH EXAMPLE
+There is an example search script in the slapd/back\-shell/ directory
+in the OpenLDAP source tree.
+.SH LIMITATIONS
+The shell backend does not support threaded environments.
+When using the shell backend, 
+.BR slapd (8)
+should be built
+.IR \-\-without\-threads .
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd (8),
+.BR sh (1).

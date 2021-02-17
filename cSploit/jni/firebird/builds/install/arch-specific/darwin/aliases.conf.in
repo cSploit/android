@@ -1,0 +1,13 @@
+# ------------------------------
+# List of known database aliases
+# ------------------------------
+
+#
+# Example Database:
+#
+employee.fdb = /Library/Frameworks/Firebird.framework/Resources/examples/empbuild/employee.fdb
+employee = /Library/Frameworks/Firebird.framework/Resources/examples/empbuild/employee.fdb
+
+#
+# Live Databases:
+#

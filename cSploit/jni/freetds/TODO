@@ -1,0 +1,138 @@
+This list is ordered top-to-bottom by priority.  
+Things that are broken and need mending are at the top, 
+followed by things that should work before the next release, 
+followed by features that should be added/fixed/reworked (grouped by library).  
+
+Everyone is encouraged to add to the list.  Developers can do it directly; 
+anyone else can post a patch to SourceForge.  
+In this way we can communicate with each
+other about the project's priorities and needs.  
+
+To Do List	$Id: TODO,v 1.176 2010-09-15 09:27:37 freddy77 Exp $
+------------
+
+Bug? ML 2007-05-30 "dbsqlexec() never returns" 
+	tds_send_cancel in tds_goodwrite (wrong??)
+BUG: sending ICONV charset name, not TDS name in 
+	5.0 login packet.  
+	
+Must be fixed:
+. ctlib parameters, handle all case even in tds7
+  . handle and test prepared query
+    (? and @ syntax should be supported)
+. cancellation
+  . ctlib seems to hang reading row while in IDLE state
+    (tds_peek if not in pending state hang... update)
+    Applied but could not test fix from ML 21 May 2008: 
+    	"Problem with FreeTDS validating SQL commands 
+         (actually a ct_cancel() error)" 
+
+Work in progress:
+
+. log and call error handler on problems with tds_iconv_init().
+. iconv
+  - support string conversions for Sybase
+. add doc/htdoc/Makefile with "publish" target to commit cvs and update
+  freetds.org
+. be able to disable iconv for BCP (see Sybase documentation)
+
+For future versions (in priority order within library):
+  All:
+. retain values used from freetds.conf, so we can report them.
+. add a way for tsql to report host, port, and TDS version for 
+  the connection it's attempting.  
+. create "TDSVER=auto": try 7.2, 7.1, 7.0, 5.0, 4.2 (in that order)?  Must support
+  instance names, too, and tsql should report progress in verbose mode.
+  Currently supported using TDSVER=0.0, check for instances, tsql do not say
+  nothing.
+  Also cache detection somewhere
+. move error message macro/prototype to tds.h.in; use in dblib.c.
+. conversion from ucs2 to utf8, provide for 2+ bytes/character
+. change numeric format to improve performance ??
+  . little/big endian based on platform
+  . already packet at word
+  . correctly aligned to read directly packetized
+. limit copy of data (now wire -> tds -> temp -> client)
+  use a method like zero-copy
+  In token.c getting row should write data even to client
+  (callback, new user types, see ctlib conversion functions)
+  In query.c writing data do the same (use additional column fields?)
+. review the way parameters are packed 
+  (too complicate, see ctlib bulk, cf "bulk copy and row buffer")
+. improve cursor support on dblib and ctlib
+. support for NT named pipe (requested long ago for mssql6.5 server, only
+  for completeness). If the reader knows a library to handle named pipes
+  compatible with LGPL please tell us.
+. read on partial packet, do not wait entire one
+. detect if realloc accepts NULL pointers (in configure.ac)
+. support for password longer than 30 characters under Sybase
+  (anybody know how ??)
+. under Sybase using prepared statements and BLOBs we shouldn't try to
+  prepare every time (cache failure preparing, see odbc unittests logs,
+  binary_test)
+  done in ODBC ??
+. Native bcp has no iconv support; character bcp files are assumed be encoded
+  with the client's charset.  More flexibility one both sides would be good.  
+. date/time on Sybase (from 12.5)
+. encrypted connection for Sybase
+. new mssql2005 protocol
+. new mssql2008 types
+
+  db-lib
+. add DBTEXTLIMIT (dbsetopt), PHP require it to support textlimit ini value
+
+  ct-lib
+. dynamic placeholders (DBD::Sybase)
+. ct_option() calls (CS_OPT_ROWCOUNT, CS_OPT_TEXTSIZE, among others)
+. async function, async calls (dbpoll() and friends)
+. support all type of bind in ct_bind (CS_VARBINARY_TYPE and other)
+  search "site:.sybase.com CS_VARBINARY ct_bind" on google for more info
+. complete sqlstate and other field in message (for Python)
+
+  odbc
+. Star Office complains that these TypeInfo constants are not implemented in SQLGetInfo:
+	47      SQL_USER_NAME
+  (handle environment callbacks)
+  do a "SELECT USER_NAME()". If data pending MS do another connection with 
+  same login.
+. SQLNativeSql and fill SQLGetInfo according (mssql7+ handle odbc escapes 
+  directly)
+. SQLDescribeParam (Sybase seems to require it)
+  A 100% success for DBD::ODBC require this
+. handle no termination on odbc_set_string*
+. handle async flags ??
+. it seems that if statement it's wrong and we issue SQLPrepare on SQLExecute
+  it try to send unprepared dynamic... state on dynamic??
+. odbc array binding
+  test large field (like image) have language queries some limits?
+  do we have to split large multiple queries?
+. report error just before returning SQL_ERROR from inner function?
+
+. test and fix: hidden fields (FOR BROWSE select, see flag test on tds)
+ - what happen if we bind to an hidden field??
+ - if we use SQLGetData??
+ - if we request informations with SQLDescribeCol/SQLColAttribute(s)/
+   SQLGetDescField??
+ - as you noted returning # columns hidden fields are not counted (there
+   is however a setting which is a mssql extension which threat hidden
+   columns as normal)
+ (cfr "SQLNumResultCols() is wrong (+1)" Jan 8 2008)
+. test: descriptors work
+  - what happen to SQL_DESC_DATETIME_INTERVAL_CODE and SQL_DESC_CONCISE_TYPE
+    changing only SQL_DESC_TYPE (with SQLSetDescField)
+. test: set SQL_C_DEFAULT and call SQLFetch (numeric, others)
+. test: SQLGetStmtAttr(SQL_ATTR_ROW_NUMBER)
+  - all binded parameters
+  - no bind and sqlgetdata
+  - before first fetch
+  - after last fetch
+
+
+  pool
+. get connection pooling working with all protocol versions
+. Make pool configuration a non-recompile process
+
+  server
+. Server API needs more work, especially for TDS 5.0/7.0
+
+Done

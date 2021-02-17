@@ -1,0 +1,71 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+#include <windows.h>
+#include "iscguard.rh"
+#include "windows.h"
+#include "../jrd/version.rc"
+
+STRINGTABLE 
+{
+ IDS_QUIT, "connections active; Are you sure you want to exit?"
+ IDS_REGERROR, "Error registering main window class"
+ IDS_ALREADYSTARTED, "The Firebird Guardian failed to startup\r\nbecause another instance of the guardian\r\nis already running."
+ IDS_INTRSVRPROPERTIES, "Firebird Properties..."
+ IDS_SVRPROPERTIES, "Firebird Properties..."
+ IDS_PROPERTIES, "P&roperties"
+ IDS_SHUTDOWN, "&Shutdown"
+ IDS_CANT_START_THREAD, "The guardian was unable to launch the server thread."
+ IDS_REGISTRY_INFO_MISSING, "The registry information is missing.\r\nPlease run the Firebird Configuration Utility"
+ IDS_STARTING_GUARD, "Guardian starting"
+ IDS_STARTUP_ERROR, "terminated because of startup errors"
+ IDS_ABNORMAL_TERM, "terminated abnormally"
+ IDS_NORMAL_TERM, "normal shutdown"
+ IDS_PROP_TITLE, "General"
+ IDS_ACTION, "Action"
+ IDS_DATE, "Date"
+ IDS_TIME, "Time"
+ IDS_LOG_START, "Server Started"
+ IDS_EVTLOG_START, "Server Started: %1"
+ IDS_LOG_STOP, "Server Shutdown"
+ IDS_EVTLOG_STOP, "Server Shutdown: %1"
+ IDS_LOG_RESTART,"Server Restarted"
+ IDS_EVTLOG_RESTART,"Server Restarted: %1"
+ IDS_LOG_TERM, "Abnormal Termination"
+ IDS_EVTLOG_TERM, "Abnormal Termination: %1"
+}
+
+IDD_PROPSHEET DIALOG 6, 15, 202, 191
+STYLE DS_MODALFRAME | 0x4L | WS_CHILD | WS_VISIBLE | WS_DLGFRAME
+FONT 8, "MS Sans Serif"
+{
+ ICON IDI_IBGUARD, -1, 12, 12, 18, 20
+ LTEXT "Firebird Guardian for Windows", -1, 46, 16, 144, 8
+ LTEXT "Location:", -1, 14, 49, 40, 12
+ LTEXT "Version:", -1, 14, 61, 40, 12
+ LTEXT "", IDC_LOCATION, 60, 49, 144, 8
+ LTEXT "", IDC_VERSION, 60, 61, 144, 8
+ LTEXT "Number of server restarts:", -1, 14, 83, 84, 8
+ LTEXT "", IDC_RESTARTS, 100, 83, 60, 8
+ CONTROL "", -1, "static", SS_GRAYRECT | SS_SUNKEN, 12, 41, 180, 1
+ CONTROL "", -1, "static", SS_GRAYRECT | SS_SUNKEN, 12, 75, 180, 1
+ CONTROL "", IDC_LOG, "SysListView32", LVS_REPORT | LVS_SINGLESEL | LVS_NOLABELWRAP | LVS_NOSORTHEADER | WS_BORDER, 12, 99, 184, 81
+}
+
+IDI_IBGUARD ICON "Sgard23i.ico"
+IDI_IBGUARDALRT	ICON "Salrt23i.ico"

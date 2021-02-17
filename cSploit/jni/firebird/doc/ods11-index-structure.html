@@ -1,0 +1,433 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="nl">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 4.0">
+<meta name="ProgId" content="FrontPage.Editor.Document">
+<title>proposal for Firebird Enhanched Index Structure</title>
+</head>
+
+<body>
+
+<p>&nbsp;</p>
+<p><font face="Tahoma" size="6"> Firebird Index Structure ODS11 and higher</font></p>
+<p><font face="Arial">The reason for a new structure is :<br>
+</font>- <font face="Arial">better support for deleting a index-key out of many
+duplicates (caused slow garbage collection)<br>
+- support bigger recordnumbers than 32-bits (40 bits)<br>
+- increase index-key size (1/4 page-size)</font></p>
+<p><font face="Arial"><b>Existing structure (ODS10 and lower):</b></font></p>
+<table border="0" width="100%" cellpadding="2" cellspacing="1">
+  <tr>
+    <td width="32%" colspan="4" bgcolor="#FFFF99"><font face="Arial">header</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="9%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="9%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+  </tr>
+  <tr>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">...</font></td>
+    <td width="9%" bgcolor="#FF99FF"><font face="Arial">end marker</font></td>
+    <td width="9%">&nbsp;</td>
+  </tr>
+</table>
+<p><font face="Arial">header =&nbsp;</font><br>
+<font face="Courier New"><font color="#0000FF">typedef struct</font> btr {<br>
+&nbsp;&nbsp;&nbsp; struct pag btr_header;<br>
+&nbsp;&nbsp;&nbsp; SLONG btr_sibling;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">// right sibling page</font><br>
+&nbsp;&nbsp;&nbsp; SLONG btr_left_sibling;&nbsp; <font color="#008000">// left sibling page</font><br>
+&nbsp;&nbsp;&nbsp; SLONG btr_prefix_total;&nbsp; <font color="#008000">// sum of all prefixes on page</font><br>
+&nbsp;&nbsp;&nbsp; USHORT btr_relation;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">// relation id for consistency</font><br>
+&nbsp;&nbsp;&nbsp; USHORT btr_length;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">// length of data in bucket</font><br>
+&nbsp;&nbsp;&nbsp; UCHAR btr_id;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<font color="#008000">// index id for consistency</font><br>
+&nbsp;&nbsp;&nbsp; UCHAR btr_level;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<font color="#008000">// index level (0 = leaf)</font><br>
+&nbsp;&nbsp;&nbsp; struct btn btr_nodes[1];<br>
+};</font></p>
+<p><font face="Arial">node =&nbsp;</font><br>
+<font face="Courier New"><font color="#0000FF"> struct btn</font> {<br>
+&nbsp;&nbsp;&nbsp; UCHAR btn_prefix;&nbsp;&nbsp;&nbsp; <font color="#008000">// size of compressed prefix</font><br>
+&nbsp;&nbsp;&nbsp; UCHAR btn_length;&nbsp;&nbsp;&nbsp; <font color="#008000">// length of data in node</font><br>
+&nbsp;&nbsp;&nbsp; UCHAR btn_number[4]; <font color="#008000">// page or record number</font><br>
+&nbsp;&nbsp;&nbsp; UCHAR btn_data[1];<br>
+};</font><br>
+<font face="Arial"><br>
+end marker = END_BUCKET or END_LEVEL&nbsp;<br>
+These are in place of record-number for leaf nodes and in place of page-number
+for non-leaf nodes.<br>
+If the node is a END_BUCKET marker then it should contain the same data as the
+first node on the next sibling page.<br>
+By a END_LEVEL marker prefix and length are zero, thus contains no data.<br>
+Also every first node on a level (except leaf pages) contains a degeneration
+zero-length node.</font></p>
+<p>&nbsp;</p>
+<p><font face="Arial"><b>New ODS11 structure:</b></font></p>
+<table border="0" width="100%" cellspacing="1" cellpadding="2">
+  <tr>
+    <td width="32%" colspan="4" bgcolor="#FFFF99"><font face="Arial">header</font></td>
+    <td width="8%" bgcolor="#FF9966"><font face="Arial">jump info</font></td>
+    <td width="8%" bgcolor="#99FF99"><font face="Arial">jump nodes</font></td>
+    <td width="8%" bgcolor="#99FF99"><font face="Arial">...</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node [*]</font></td>
+    <td width="9%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="9%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+  </tr>
+  <tr>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">node</font></td>
+    <td width="8%" bgcolor="#99CCFF"><font face="Arial">...</font></td>
+    <td width="9%" bgcolor="#FF99FF"><font face="Arial">end marker</font></td>
+    <td width="9%">&nbsp;</td>
+  </tr>
+</table>
+<p><font face="Arial">jump info =</font><br>
+<font face="Courier New"><font color="#0000FF">struct IndexJumpInfo</font> {<br>
+&nbsp;&nbsp;&nbsp; USHORT firstNodeOffset; <font color="#008000">// offset to
+first node in page [*]</font><br>
+&nbsp;&nbsp;&nbsp; USHORT jumpAreaSize;&nbsp;&nbsp;&nbsp; <font color="#008000">// size area before a new jumpnode is made</font><br>
+&nbsp;&nbsp;&nbsp; UCHAR  jumpers;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<font color="#008000">// nr of jump-nodes in page, with a maximum of 255</font><br>
+};</font></p>
+<p><font face="Arial">jump node =</font><br>
+<font face="Courier New"><font color="#0000FF">struct IndexJumpNode</font> {<br>
+&nbsp;&nbsp;&nbsp; UCHAR* nodePointer; <font color="#008000">	// pointer to where this node can be read from the page</font><br>
+&nbsp;&nbsp;&nbsp; USHORT prefix;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">// length of prefix against previous jump node</font><br>
+&nbsp;&nbsp;&nbsp; USHORT length;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">// length of data in jump node
+(together with prefix this<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+is prefix for pointing node)</font><br>
+&nbsp;&nbsp;&nbsp; USHORT offset;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">// offset to node in page</font>&nbsp;<br>
+&nbsp;&nbsp;&nbsp; UCHAR* data;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <font color="#008000">// Data can be read from here</font><br>
+};</font></p>
+<p><font face="Arial"><b>New flag for the new index structure:</b><br>
+New flags are added to the header-&gt;pag_flags.<br>
+The flag btr_large_keys (32) is for storing compressed length/prefix and
+record-number. This meant also that length and prefix can be up to 1/4 of
+page-size (1024 for 4096 page-size) and is easy extensible in the future without changing disk-structure
+again. Also the record-number can be easy extended to for example 40 bits. Those
+numbers are stored per 7-bits with 1 bit (highest) as marker (variable length
+encoding). Every new byte
+that needs to be stored is shifted by 7. Examples: 25 is stored as 1 byte 0x19,
+130 = 2 bytes 0x82&nbsp; 0x01, 65535 = 3 bytes 0xFF&nbsp; 0xFF&nbsp; 0x03.</font></p>
+<p><font face="Arial"><b>Duplicate nodes:</b><br>
+Also a new flag is added for storing record-number on every node (non-leaf
+pages). This speed up
+index-retrieval on many duplicates. The flag is&nbsp; btr_all_recordnumber (16).
+With this added information key-lookup on inserts/deletes with many duplicates (NULLs
+in foreign keys e.g.) become much faster (such as the garbage collection!). Beside that duplicate nodes (length =
+0) don't store
+their length information, 3 bits from first stored byte are used to
+determine if this nodes is a duplicate. Beside the ZERO_LENGTH (4)
+there is also END_LEVEL (1), END_BUCKET (2), ZERO_PREFIX_ZERO_LENGTH (3) and ONE_LENGTH (5)
+marker. Number 6 and 7 are reserved for future use.</font></p>
+<p><font face="Arial"><b>Jump nodes:</b><br>
+A jump node is a reference to a node somewhere in the page.<br>
+It contains offset information about the specific node and the prefix data from
+the referenced node, but on the jump-nodes self is also prefix compression done.<br>
+Ideally a new jump node is generated after the first node that is found after
+every jumpAreaSize, but that's only the case on deactivate/active a index or
+inserting nodes in the same order as they will be stored in the index. <br>
+If nodes are inserted between two jump node references only the offsets are
+updated, but only if the offsets don't exceed a specific threshold (+/-10 %).<br>
+When a node is deleted only offsets are updated or a jump node is removed. This
+means a little hole can exists between the last jump node and the first node, so
+we don't waste time on generating new jump-nodes.&nbsp;<br>
+The prefix and length are also stored by variable length encoding.</font><font face="Arial"><br>
+</font></p>
+<p><font face="Arial">Example data:</font></p>
+<p><font face="Arial">(x) = size in x bytes</font></p>
+<table border="0" width="100%" cellspacing="1" cellpadding="2">
+  <tr>
+    <td width="100%" bgcolor="#FFFF99" colspan="5" height="18"><font face="Courier New">header
+      (34)</font></td>
+  </tr>
+  <tr>
+    <td width="20%" bgcolor="#FF9966" height="16"><font face="Courier New">52 (2)</font></td>
+    <td width="20%" bgcolor="#FF9966" height="16"><font face="Courier New">256 (2)</font></td>
+    <td width="20%" bgcolor="#FF9966" height="16"><font face="Courier New">2 (1)</font></td>
+    <td width="20%" bgcolor="#FF9966" height="16"><font face="Courier New">30 (2)</font></td>
+    <td width="20%" bgcolor="#99FF99" height="16"><font face="Courier New">0 (1)</font></td>
+  </tr>
+  <tr>
+    <td width="20%" bgcolor="#99FF99" height="18"><font face="Courier New">2 (1)</font></td>
+    <td width="20%" bgcolor="#99FF99" height="18"><font face="Courier New">260 (2)</font></td>
+    <td width="20%" bgcolor="#99FF99" height="18"><font face="Courier New">FI (2)</font></td>
+    <td width="20%" bgcolor="#99FF99" height="18"><font face="Courier New">1 (1)</font></td>
+    <td width="20%" bgcolor="#99FF99" height="18"><font face="Courier New">1 (1)</font></td>
+  </tr>
+  <tr>
+    <td width="20%" bgcolor="#99FF99" height="18"><font face="Courier New">514 (2)</font></td>
+    <td width="20%" bgcolor="#99FF99" height="18"><font face="Courier New">U (1)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">0 (1)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">1 (1)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">0 (1)</font></td>
+  </tr>
+  <tr>
+    <td width="20%" bgcolor="#99CCFF" height="19"><font face="Courier New">A (1)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="19"><font face="Courier New">...</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="19">&nbsp;</td>
+    <td width="20%" bgcolor="#99CCFF" height="19">&nbsp;</td>
+    <td width="20%" bgcolor="#99CCFF" height="19">&nbsp;</td>
+  </tr>
+  <tr>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">2 (1)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">6 (1)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">21386
+      (3)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">REBIRD (6)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">...</font></td>
+  </tr>
+  <tr>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">2 (1)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">2 (1)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">1294
+      (2)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">EL (2)</font></td>
+    <td width="20%" bgcolor="#99CCFF" height="18"><font face="Courier New">...</font></td>
+  </tr>
+</table>
+<p><font face="Arial">Pointer after fixed header = 0x22<br>
+Pointer after jump info = 0x29<br>
+Pointer to first jump node = 0x29 + 6 (jump node 1) + 5 (jump node 2) = 0x34<br>
+Jump node 1 is referencing to the node that represents FIREBIRD as data, because
+this node has a prefix of 2 the first 2 characters FI are stored also on the
+jump node.<br>
+Our next jump node points to a node that represents FUEL with also a prefix of
+2. Thus jump node 2 should contain FU, but our previous node contained already
+the F so due prefix compression this one is ignored and only U is stored.</font></p>
+<p><font face="Arial"><b><a name="NULL"></a>NULL state:</b><br>
+The data that needs to be stored is determined in the procedure compress() in
+btr.cpp.<br>
+For ASC (ascending) indexes no data will be stored (key is zero length). This
+will automaticly put them as first entry in the index and thus correct order (For
+single field index node length and prefix is zero).<br>
+DESC (descending) indexes will store a single byte with the value 0xFF (255). To
+distinguish between a value (empty string can be 255) and an NULL state we
+insert a byte of 0xFE (254) at the front of the data. This is only done for
+values that begin with 0xFF (255) or 0xFE (254), so we keep the right order</font></p>
+<p><font face="Arial">Examples:</font></p>
+<table border="0" width="100%" cellspacing="1" cellpadding="2">
+  <tr>
+    <td width="92%" colspan="4" bgcolor="#99CCFF"><font face="Arial">nodes ASC index, 1 segment</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">prefix</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">length</font></td>
+    <td width="50%" bgcolor="#FFFFCC"><font face="Arial">stored data</font></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial">real value/state</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="50%" bgcolor="#FFFFCC"></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial" color="#0000FF">NULL</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="50%" bgcolor="#FFFFCC"></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial" color="#0000FF">NULL</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">1</font></td>
+    <td width="50%" bgcolor="#FFFFCC"><font face="Arial">x65 (A)</font></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial">A</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">1</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">1</font></td>
+    <td width="50%" bgcolor="#FFFFCC"><font face="Arial">x65 (A)</font></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial">AA</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">...</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">...</font></td>
+    <td width="50%" bgcolor="#FFFFCC"><font face="Arial">...</font></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial">...</font></td>
+  </tr>
+</table>
+<br>
+<table border="0" width="100%" cellspacing="1" cellpadding="2">
+  <tr>
+    <td width="92%" colspan="4" bgcolor="#99CCFF"><font face="Arial">nodes DESC index, 1 segment</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#99CCFF"><font face="Arial">prefix</font></td>
+    <td width="5%" bgcolor="#99CCFF"><font face="Arial">length</font></td>
+    <td width="50%" bgcolor="#99CCFF"><font face="Arial">stored data</font></td>
+    <td width="40%" bgcolor="#99CCFF"><font face="Arial">real value/state</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">...</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">...</font></td>
+    <td width="50%" bgcolor="#FFFFCC"><font color="#0000FF" face="Arial">...</font></td>
+    <td width="40%" bgcolor="#FFFFCC"><font color="#0000FF" face="Arial">...</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">2</font></td>
+    <td width="50%" bgcolor="#FFFFCC"><font face="Arial">xFE xFE (þ) x4A (J)</font></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial">0xFE 0x4A</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">1</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">1</font></td>
+    <td width="50%" bgcolor="#FFFFCC"><font face="Arial">xFF</font><font face="Arial"> (ÿ)</font></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial">0xFF</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">1</font></td>
+    <td width="50%" bgcolor="#FFFFCC"><font face="Arial">xFF</font></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial" color="#0000FF">NULL</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">1</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="50%" bgcolor="#FFFFCC"><font face="Arial">xFF</font></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial" color="#0000FF">NULL</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"></td>
+    <td width="5%" bgcolor="#FFFFCC"></td>
+    <td width="50%" bgcolor="#FFFFCC"></td>
+    <td width="40%" bgcolor="#FFFFCC"><font face="Arial">END_LEVEL</font></td>
+  </tr>
+</table>
+<br>
+<table border="0" width="100%" cellspacing="1" cellpadding="2">
+  <tr>
+    <td width="92%" colspan="4" bgcolor="#99CCFF"><font face="Arial">nodes ASC index, 3 segment</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#99CCFF"><font face="Arial">prefix</font></td>
+    <td width="5%" bgcolor="#99CCFF"><font face="Arial">length</font></td>
+    <td width="65%" bgcolor="#99CCFF"><font face="Arial">stored data</font></td>
+    <td width="25%" bgcolor="#99CCFF"><font face="Arial">real value/state</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="65%" bgcolor="#FFFFCC"></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial" color="#0000FF">NULL</font><font face="Arial">,</font><font face="Arial" color="#0000FF">
+      </font><font face="Arial" color="#0000FF">NULL</font><font face="Arial">,</font><font face="Arial" color="#0000FF">
+      NULL</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">10</font></td>
+    <td width="65%" bgcolor="#FFFFCC"><font face="Arial">x01(1) x70(F) x73(I) x82(R) x69(E) x01(1)
+      x66(B) x73(I) x82(R) x68(D)&nbsp;</font></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial" color="#0000FF">NULL</font><font face="Arial">,</font><font face="Arial" color="#0000FF">
+      NULL</font><font face="Arial">, FIREBIRD</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">10</font></td>
+    <td width="65%" bgcolor="#FFFFCC"><font face="Arial">x02(2) x70(F) x73(I) x82(R) x69(E) x02(2)
+      x66(B) x73(I) x82(R) x68(D)&nbsp;</font></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial" color="#0000FF">NULL</font><font face="Arial">,
+      FIREBIRD, </font><font face="Arial" color="#0000FF">NULL</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">10</font></td>
+    <td width="65%" bgcolor="#FFFFCC"><font face="Arial">x03(3) x70(F) x73(I) x82(R) x69(E) x03(3)
+      x66(B) x73(I) x82(R) x68(D)&nbsp;</font></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial">FIREBIRD, </font><font face="Arial" color="#0000FF">NULL</font><font face="Arial">,</font><font face="Arial" color="#0000FF">
+      NULL</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">3</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">9</font></td>
+    <td width="65%" bgcolor="#FFFFCC"><font face="Arial">x00(0) x00(0) x02(2) x65(A) x00(0) x00(0)
+      x00(0) x01(1) x66(B)</font></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial">FI, A, B</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">...</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">...</font></td>
+    <td width="65%" bgcolor="#FFFFCC"><font face="Arial">...</font></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial">...</font></td>
+  </tr>
+</table>
+&nbsp;
+<table border="0" width="100%" cellspacing="1" cellpadding="2">
+  <tr>
+    <td width="92%" colspan="4" bgcolor="#99CCFF"><font face="Arial">nodes DESC index, 3 segment</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#99CCFF"><font face="Arial">prefix</font></td>
+    <td width="5%" bgcolor="#99CCFF"><font face="Arial">length</font></td>
+    <td width="65%" bgcolor="#99CCFF"><font face="Arial">stored data</font></td>
+    <td width="25%" bgcolor="#99CCFF"><font face="Arial">real value/state</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">0</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">12</font></td>
+    <td width="65%" bgcolor="#FFFFCC"><font face="Arial">xFC xB9 xB6 xFF xFF xFD xBE xFF xFF xFF
+      xFE xBD</font></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial">FI, A, B</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">3</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">17</font></td>
+    <td width="65%" bgcolor="#FFFFCC"><font face="Arial">xAD xBA xFC xBD xB6 xAD xBB xFD xFF xFF
+      xFF xFF xFE xFF xFF xFF xFF</font></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial">FIREBIRD, </font><font face="Arial" color="#0000FF">NULL</font><font face="Arial">,</font><font face="Arial" color="#0000FF">
+      NULL</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">1</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">19</font></td>
+    <td width="65%" bgcolor="#FFFFCC"><font face="Arial">xFF xFF xFF xFF xFD xB9 xB6 xAD xBA xFD
+      xBD xB6 xAD xBB xFE xFF xFF xFF xFF</font></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial" color="#0000FF">NULL</font><font face="Arial">,
+      FIREBIRD, </font><font face="Arial" color="#0000FF">NULL</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">6</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">14</font></td>
+    <td width="65%" bgcolor="#FFFFCC"><font face="Arial">xFF xFF xFF xFF xFE xB9 xB6 xAD xBA xFE
+      xBD xB6 xAD xBB</font></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial" color="#0000FF">NULL</font><font face="Arial">,</font><font face="Arial" color="#0000FF">
+      NULL</font><font face="Arial">, FIREBIRD</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">11</font></td>
+    <td width="5%" bgcolor="#FFFFCC"><font face="Arial">4</font></td>
+    <td width="65%" bgcolor="#FFFFCC"><font face="Arial">xFF xFF xFF xFF</font></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial" color="#0000FF">NULL</font><font face="Arial">,</font><font face="Arial" color="#0000FF">
+      </font><font face="Arial" color="#0000FF">NULL</font><font face="Arial">,</font><font face="Arial" color="#0000FF">
+      NULL</font></td>
+  </tr>
+  <tr>
+    <td width="5%" bgcolor="#FFFFCC"></td>
+    <td width="5%" bgcolor="#FFFFCC"></td>
+    <td width="65%" bgcolor="#FFFFCC"></td>
+    <td width="25%" bgcolor="#FFFFCC"><font face="Arial">END_LEVEL</font></td>
+  </tr>
+</table>
+
+<p><font face="Arial">© ABVisie 2005, Arno Brinkman</font></p>
+
+</body>
+
+</html>

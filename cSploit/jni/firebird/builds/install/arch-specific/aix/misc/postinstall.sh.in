@@ -1,0 +1,83 @@
+#!/bin/sh
+#
+#  The contents of this file are subject to the Initial
+#  Developer's Public License Version 1.0 (the "License");
+#  you may not use this file except in compliance with the
+#  License. You may obtain a copy of the License at
+#  http://www.ibphoenix.com/main.nfs?a=ibphoenix&page=ibp_idpl.
+#
+#  Software distributed under the License is distributed AS IS,
+#  WITHOUT WARRANTY OF ANY KIND, either express or implied.
+#  See the License for the specific language governing rights
+#  and limitations under the License.
+#
+#  The Original Code was created by Mark O'Donohue
+#  for the Firebird Open Source RDBMS project.
+#
+#  Copyright (c) Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#  and all contributors signed below.
+#
+#  All Rights Reserved.
+#  Contributor(s): ______________________________________.
+#		Alex Peshkoff
+#
+
+# The post install script for Firebird Server
+
+
+# Make sure the links are in place 
+if  [ -z "$FirebirdInstallPrefix" ]; then
+	FirebirdInstallPrefix=@prefix@
+fi
+
+origDir=`pwd`
+
+if [ "$1" = "install-embedded" ]
+then
+	# remove server files not needed for embedded usage
+    rm -f @FB_SBINDIR@/fb_smp_server @FB_SBINDIR@/fb_smp_server
+    exit 0
+fi
+
+# Update /etc/services
+newLine="@FB_SERVICE_NAME@          @FB_SERVICE_PORT@/tcp  # Firebird SQL Database Remote Protocol"
+replaceLineInFile /etc/services "$newLine" "^@FB_SERVICE_NAME@"
+
+# add Firebird user
+if [ $RunUser = firebird ]; then
+	addFirebirdUser
+fi
+
+# Create the fbmgr shell script.
+if [ -x @FB_SBINDIR@/fbmgr.bin ]; then
+	cat > @FB_SBINDIR@/fbmgr <<EOF
+#!/bin/sh
+FIREBIRD=@FB_CONFDIR@
+export FIREBIRD
+exec @FB_SBINDIR@/fbmgr.bin \$@
+EOF
+fi
+
+# Update ownership and SUID bits for files.
+fixFilePermissions
+
+# Install script in /etc/init.d (exact location is distro dependent)
+installInitdScript
+
+# Create libgds.so links
+createLinksForBackCompatibility
+
+# Prepare for uninstall
+buildUninstallFile
+
+# Update the /etc/inetd.conf or xinetd entry
+updateInetdServiceEntry
+
+# Get inetd to reread new init files.
+resetInetdServer
+
+# start the db server so we can change the password
+startService
+
+# Change sysdba password
+changeDBAPassword

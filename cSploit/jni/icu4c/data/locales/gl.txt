@@ -1,0 +1,272 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/gl.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/gl.xml
+ */
+gl{
+    AuxExemplarCharacters{"[ª à â ä ã ç è ê ë ì î ï º ò ô ö õ ù û]"}
+    ExemplarCharacters{"[a á b c d e é f g h i í j k l m n ñ o ó p q r s t u ú ü v w x y z]"}
+    ExemplarCharactersCurrency{"[a b c d e f g h i j k l m n o p q r s t u v w x y z]"}
+    LocaleScript{
+        "Latn",
+    }
+    NumberElements{
+        ",",
+        ".",
+        ";",
+        "%",
+        "0",
+        "#",
+        "-",
+        "E",
+        "‰",
+        "∞",
+        "NaN",
+        "+",
+    }
+    NumberPatterns{
+        "#,##0.###",
+        "#,##0.00 ¤",
+        "#,##0%",
+        "#E0",
+    }
+    Version{"2.0.47.53"}
+    calendar{
+        gregorian{
+            DateTimePatterns{
+                "HH:mm:ss zzzz",
+                "HH:mm:ss z",
+                "HH:mm:ss",
+                "HH:mm",
+                "EEEE dd MMMM y",
+                "dd MMMM y",
+                "d MMM, y",
+                "dd/MM/yy",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            availableFormats{
+                Hm{"HH:mm"}
+                M{"L"}
+                MEd{"E, d-M"}
+                MMM{"LLL"}
+                MMMEd{"E d MMM"}
+                MMMMEd{"E d MMMM"}
+                MMMMd{"d MMMM"}
+                MMMMdd{"dd MMMM"}
+                MMMd{"d MMM"}
+                MMdd{"dd/MM"}
+                Md{"d-M"}
+                d{"d"}
+                ms{"mm:ss"}
+                y{"y"}
+                yM{"M-yyyy"}
+                yMEd{"EEE, d-M-yyyy"}
+                yMMM{"MMM y"}
+                yMMMEd{"EEE, d MMM y"}
+                yMMMM{"MMMM y"}
+                yQ{"Q yyyy"}
+                yQQQ{"QQQ y"}
+                yyMM{"MM/yy"}
+                yyQ{"Q yy"}
+                yyyyMMMM{"MMMM y"}
+            }
+            dayNames{
+                format{
+                    abbreviated{
+                        "Dom",
+                        "Lun",
+                        "Mar",
+                        "Mér",
+                        "Xov",
+                        "Ven",
+                        "Sáb",
+                    }
+                    wide{
+                        "Domingo",
+                        "Luns",
+                        "Martes",
+                        "Mércores",
+                        "Xoves",
+                        "Venres",
+                        "Sábado",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "D",
+                        "L",
+                        "M",
+                        "M",
+                        "X",
+                        "V",
+                        "S",
+                    }
+                }
+            }
+            eras{
+                abbreviated{
+                    "a.C.",
+                    "d.C.",
+                }
+                wide{
+                    "antes de Cristo",
+                    "despois de Cristo",
+                }
+            }
+            fields{
+                day{
+                    dn{"Día"}
+                    relative{
+                        "-1"{"onte"}
+                        "-2"{"antonte"}
+                        "-3"{"trasantonte"}
+                        "0"{"hoxe"}
+                        "1"{"mañá"}
+                        "2"{"pasadomañá"}
+                    }
+                }
+                era{
+                    dn{"Era"}
+                }
+                hour{
+                    dn{"Hora"}
+                }
+                minute{
+                    dn{"Minuto"}
+                }
+                month{
+                    dn{"Mes"}
+                }
+                second{
+                    dn{"Segundo"}
+                }
+                week{
+                    dn{"Semana"}
+                }
+                weekday{
+                    dn{"Día da semana"}
+                }
+                year{
+                    dn{"Ano"}
+                }
+                zone{
+                    dn{"Fuso horario"}
+                }
+            }
+            monthNames{
+                format{
+                    abbreviated{
+                        "Xan",
+                        "Feb",
+                        "Mar",
+                        "Abr",
+                        "Mai",
+                        "Xuñ",
+                        "Xul",
+                        "Ago",
+                        "Set",
+                        "Out",
+                        "Nov",
+                        "Dec",
+                    }
+                    wide{
+                        "Xaneiro",
+                        "Febreiro",
+                        "Marzo",
+                        "Abril",
+                        "Maio",
+                        "Xuño",
+                        "Xullo",
+                        "Agosto",
+                        "Setembro",
+                        "Outubro",
+                        "Novembro",
+                        "Decembro",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "X",
+                        "F",
+                        "M",
+                        "A",
+                        "M",
+                        "X",
+                        "X",
+                        "A",
+                        "S",
+                        "O",
+                        "N",
+                        "D",
+                    }
+                }
+            }
+            quarters{
+                format{
+                    abbreviated{
+                        "T1",
+                        "T2",
+                        "T3",
+                        "T4",
+                    }
+                    wide{
+                        "1o trimestre",
+                        "2o trimestre",
+                        "3o trimestre",
+                        "4o trimestre",
+                    }
+                }
+            }
+        }
+    }
+    delimiters{
+        alternateQuotationEnd{"’"}
+        alternateQuotationStart{"‘"}
+        quotationEnd{"”"}
+        quotationStart{"“"}
+    }
+    measurementSystemNames{
+        US{"americano"}
+        metric{"métrico decimal"}
+    }
+    units{
+        day{
+            one{"{0} día"}
+            other{"{0} días"}
+        }
+        hour{
+            one{"{0} hora"}
+            other{"{0} horas"}
+        }
+        minute{
+            one{"{0} minuto"}
+            other{"{0} minutos"}
+        }
+        month{
+            one{"{0} mes"}
+            other{"{0} meses"}
+        }
+        second{
+            one{"{0} segundo"}
+            other{"{0} segundos"}
+        }
+        week{
+            one{"{0} semana"}
+            other{"{0} semanas"}
+        }
+        year{
+            one{"{0} ano"}
+            other{"{0} anos"}
+        }
+    }
+}

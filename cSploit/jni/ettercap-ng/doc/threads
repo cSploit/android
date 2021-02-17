@@ -1,0 +1,60 @@
+===============================================================================
+
+TOPIC:      threads
+
+ABSTRACT:   this file describes how threads are managed by ettercap
+
+NOTE:       none
+            
+===============================================================================
+
+
+ ettercap uses the pthread library to manage internal threads.
+ the file ec_threads.c gives to the developer some wrapper to create ettercap
+ threads.
+
+ in the file ec_thread.h we find these functions:
+
+   char * ec_thread_getname(pthread_t id);
+
+      to get the name of a thread. this is only useful for debugging purpose.
+      the DEBUG_MSG macro prints the name of the thread and then the message,
+      so you can easily know which thread is doing what.
+
+
+   pthread_t ec_thread_getpid(char *name);
+
+      to get the pid of a given thread. it is used to kill a thread previously
+      created with a specific name.
+
+   
+   void ec_thread_register(pthread_t id, char *name, char *desc);
+
+      to give a name and a description to a thread.
+
+
+   pthread_t ec_thread_new(char *name, char *desc, void *(*function)(void *), void *args);
+
+      to create a thread. the third parameter is the function that will become
+      the main of the thread. the fourth parameter is used to pass a parameter
+      to the thread.
+
+   void ec_thread_init(void);
+
+      this function must be called by the newly created thread to synchronize
+      with the thread that has created it. it unlock a special mutex, so it is
+      mandatory to perform this action, else ettercap will lockup.
+
+   void ec_thread_destroy(pthread_t id);
+
+      to kill a thread. ettercap uses the pthread_join inside this function.
+      this is because we have to wait that the thread has finished its clean
+      up before continuing with other operations.
+
+   void ec_thread_kill_all(void);
+
+      to kill all the thread but the caller of the function itself :)
+
+   
+
+EOF

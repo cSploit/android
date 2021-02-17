@@ -1,0 +1,3 @@
+# Stub - required for configure.in. However gcc builds of 
+# Firebird for Solaris use the install information from the 
+# solaris directory

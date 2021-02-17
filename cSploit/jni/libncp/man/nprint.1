@@ -1,0 +1,165 @@
+.\" 1.01 Added -s and -B. Bruno Browning <bruno@lss.wisc.edu>
+.TH NPRINT 1 12/27/1995 nprint nprint
+.SH NAME
+nprint \- NetWare print client
+.SH SYNOPSIS
+.B nprint
+[ \fB-S\fP \fIserver\fP ] [ \fB-h\fP ] [ \fB-U\fP \fIusername\fP | \fB-n\fP ] 
+[ \fB-C\fP ] [ \fB-q\fP \fIqueuename\fP ] [ \fB-d\fP \fIjob-description\fP ]
+[ \fB-p\fP \fIpathname-in-banner\fP ] [ \fB-B\fP \fIusername-in-banner\fP ] [ \fB-s\fP ]
+[ \fB-f\fP \fIfilename-in-banner\fP ] [ \fB-l\fP \fIlines\fP ] 
+[ \fB-r\fP \fIrows\fP ] [ \fB-c\fP \fIcopies\fP ] [ \fB-t\fP \fItab size\fP ]
+[ \fB-T\fP ] [ \fB-N\fP ] [ \fB-F\fP \fIform-number\fP ] \fIfilename\fP
+
+.SH DESCRIPTION
+With \fBnprint\fP, you can print files on print queues of a NetWare file 
+server. 
+
+There are a lot of options, so you should probably wrap some default
+configurations into some shell scripts.
+
+\fBnprint\fP looks up the file \fI$HOME/.nwclient\fP to find a file server, 
+a user name and possibly a password. See nwclient(5) for more information. 
+Please note that the access permissions of \fB.nwclient\fP MUST be 600, for 
+security reasons.
+
+.SH OPTIONS
+.B filename
+.RS 3
+\fIfilename\fP is the name of the file you want to print. If file is '\fB\-\fP', 
+or no filename is given, standard input is used.
+.RE
+
+.B -h
+.RS 3
+\fB-h\fP is used to print out a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+\fIserver\fP is the name of the server you want to use.
+.RE
+
+.B -U
+.I username
+.RS 3
+\fIusername\fP is the user name to use for the print request at the server.
+.RE
+
+.B -P
+.I password
+.RS 3
+\fIpassword\fP is the password to use for the print request at the server. 
+If neither \fB-n\fP nor \fB-P\fP are given, and the user has no open 
+connection to the server, \fBnprint\fP prompts for a password.
+.RE
+
+.B -n
+.RS 3
+\fB-n\fP should be given if no password is required for the print request.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by \fB-C\fP.
+.RE
+
+.B -q
+.I queuename
+.RS 3
+\fIqueuename\fP is the name of the print queue to use at the print 
+server. At present, you must specify it in upper case characters.
+.RE
+
+.B -d
+.I job-description
+.RS 3
+\fIjob-description\fP is the string that appears in pconsole when you 
+list the jobs for the print queue. It will also appear in the "Description"
+field on the banner page.
+.RE
+
+.B -p
+.I pathname-in-banner
+.RS 3
+\fIpathname-in-banner\fP is the string (up to 79 characters) you want to 
+be printed in the "Directory" field on the banner page.
+.RE
+
+.B -B
+.I username-in-banner
+.RS 3
+\fIusername-in-banner\fP is the string (up to 12 characters) you want to 
+appear on the lower part of the banner page. It will also appear in 
+the "User name" field.
+.RE
+
+.B -s
+.RS 3
+Supress printing of banner page
+.RE
+
+.B -f
+.I filename-in-banner
+.RS 3
+\fIfilename-in-banner\fP is the string (up to 12 characters) you want to 
+appear in large letters on the lower part of the banner page. Default: the 
+name of the file that is printed, or '\fBstdin\fP'.
+.RE
+
+.B -l
+.I lines
+.RS 3
+\fIlines\fP is the number of lines to put on one page. Default: 66.
+.RE
+
+.B -r
+.I rows
+.RS 3
+\fIrows\fP is the number of rows to put on one page. Default: 80.
+.RE
+
+.B -c
+.I copies
+.RS 3
+\fIcopies\fP tells the print server to the specified number of copies. 
+Default: 1.
+.RE
+
+.B -t
+.I tabs
+.RS 3
+\fItabs\fP is the number of spaces to print for a Tab-Character. 
+Default: 8.
+.RE
+
+.B -T
+.RS 3
+tells the print server to expand Tab-Character and use 8 spaces
+.RE
+
+.B -N
+.RS 3
+tells the print server \fBnot\fP to use Form Feeds
+.RE
+
+.B -F
+.I form-number
+.RS 3
+\fIform-number\fP is the the number of the form to be put into the 
+printer. If it's different from the one currently in the printer, 
+your job is only printed if a printer operator has put in the correct form.
+.RE
+
+.SH NOTES
+The '\fB-B\fP' option was formerly '\fB-b\fP'. But it conflicted 
+with '\fIbindery only\fP' login option.
+
+.SH SEE ALSO
+.B nwclient(5), slist(1), pqlist(1), ncpmount(8), ncpumount(8)
+
+.SH CREDITS
+nprint was written by Volker Lendecke (lendecke@math.uni-goettingen.de)

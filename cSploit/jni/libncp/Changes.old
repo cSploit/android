@@ -1,0 +1,553 @@
+I only began this file with ncpfs-0.12. If you're interested in older
+versions, you can find them on ftp.gwdg.de:/pub/linux/misc/ncpfs/old.
+
+[Versions ncpfs-2.2.0.x are available at ftp://platan.vc.cvut.cz/pub/linux/ncpfs]
+
+ncpfs-2.2.0.18 -> ncpfs-2.2.0.19
+- VANA: Added -r, recursive, option to ncopy.
+- VANA: Started NCP/TCP implementation.
+- VANA: Dereference aliases during authentication.
+- VANA: Configuration is read from /etc/ncpfs.conf file.
+- VANA: Local codepage is read from /etc/ncpfs.conf file.
+- VANA: Added INSTALL document.
+- Wolfram Pienkoss <wp@bszh.de>: New de.po translations, changed email address.
+- Wolfram Pienkoss: SuSE startup/shutdown scripts.
+- Karl M. Hegbloom <karlheg@bittersweet.inetarena.com>: tags/TAGS make target 
+        added.
+- VANA: Added handling of DS names to nwgrant and nwrevoke.
+- VANA: Updated nwdir to print sizes of MAC resource forks.
+- VANA: Added handling of replicaless servers.
+- Bruno Browning <bruno@lss.wisc.edu>: Fixed nprint.
+- VANA: Enhandced NCP pam module.
+- VANA: PHP NCP authentication module.
+- Patrick Pollet: Enterprise PAM module.
+- Patrick Pollet: GTK wrappers around some utilities.
+- Patrick Pollet: Enhandcements in PHP module.
+- Patrick Pollet: Wrappers around some NDS and NCP calls.
+- VANA (+swig): Perl interface to most of NCP functions.
+- Hans Grobler: Contributed ncp_ns_delete_entry, pointed out problem in NWDSFilter*
+        API.
+- VANA, Patrick, others: See individual changelog entries in each file.
+
+ncpfs-2.2.0.17 -> ncpfs-2.2.0.18
+- VANA: Do not forget to do "make install-dev" if you want compile 3rd party
+        programs for ncpfs.
+- VANA: Added GPL license and revision history to all files. If you are not 
+        mentioned in some file, contact me.
+- RYP:  Couple of bugfixes, new options to ncptest.
+- VANA: Fixed daemonizing of printserver.
+- VANA: Fixed signal handling for temporary connections.
+- VANA: Enhandcements to pam module (NDS groups).
+- VANA: ncp_get_file_size added.
+- VANA: ncopy copies MAC resource forks too.
+- Wolfram Pienkoss: New de.po translations.
+- VANA: I hope that all names returned from nwnet functions fit into
+        array of MAX_DN_BYTES bytes (or error is returned).
+- VANA: Added NDS print queues support into nprint and pqlist. Needs more
+        polishing.
+- VANA: Support for 32-bit uids in kernels after 2.3.40.
+- VANA: NWDSAbortPartitionOperation, NWDSAddObject, NWDSAddReplica, 
+        NWDSAuthenticateConn, NWDSChangeObjectPassword, NWDSChangeReplicaType, 
+        NWDSCloseIteration, NWDSCompare, NWDSDuplicateContextHandle, 
+        NWDSExtSyncList, NWDSExtSyncRead, NWDSExtSyncSearch, 
+	NWDSGenerateObjectKeyPair, NWDSGenerateObjectKeyPair2, 
+	NWDSGetAttrCount, NWDSGetAttrName, NWDSGetAttrVal, NWDSGetAttrValFlags, 
+	NWDSGetAttrValModTime, NWDSGetBinderyContext, 
+	NWDSGetCountByClassAndName, NWDSGetDSIInfo, NWDSGetDSVerInfo, 
+	NWDSGetEffectiveRigths, NWDSGetObjectCount, NWDSGetObjectName, 
+	NWDSGetObjectNameAndInfo, NWDSGetNDSStatistics, 
+	NWDSGetPartitionExtInfo, NWDSGetPartitionExtInfoPtr, 
+	NWDSGetPartitionInfo, NWDSGetPartitionRoot, NWDSGetServerName, 
+	NWDSInitBuf, NWDSJoinPartitions, NWDSList, 
+	NWDSListAttrsEffectiveRights, NWDSListByClassAndName, 
+	NWDSListContainers, NWDSListPartitions, NWDSListPartitionsExtInfo, 
+	NWDSModifyDN, NWDSModifyObject, NWDSModifyRDN, NWDSMoveObject, 
+	NWDSPartitionReceiveAllUpdates, NWDSPartitionSendAllUpdates, 
+	NWDSPutAttrName, NWDSPutAttrNameAndVal, NWDSPutAttrVal, NWDSPutChange, 
+	NWDSPutChangeAndVal, NWDSRead, NWDSReadObjectDSIInfo, 
+	NWDSReadObjectInfo, NWDSReloadDS, NWDSRemoveObject, 
+	NWDSRemovePartition, NWDSRemoveReplica, NWDSRepairTimeStamps, 
+	NWDSResetNDSStatistics, NWDSSearch, NWDSSplitPartition, 
+	NWDSSyncPartition, NWDSVerifyObjectPassword added.
+	You must enable 'NDS authentication support' in kernel if you
+	want to fully utilize them.
+- VANA: NWGetFileServerUTCTime added.
+- Bruce Richardson <brichardson@lineone.net>: ncp_perms_to_str and ncp_str_to_perms
+        added. Modified nwgrant to use these.
+- VANA: Modified nwrights to use ncp_perms_to_str.
+- VANA: Changed pam module so that it works with bindery only if you specifically
+        asks.
+- VANA: Added chauttok method to pam module. Use with care.
+- VANA: All tools except ncpmount: If server specified by '-S' is not found 
+        through IPX, name is retried as DNS name.
+
+ncpfs-2.2.0.16 -> ncpfs-2.2.0.17
+- VANA: Add nwtrustee2; it lists also NDS trustees
+- RYP:  Change in library code for correct using of 'dir_style'.
+- RYP:  change options on nwtrustee '-o' to '-O' and '-O' to '-o', 
+        to use options like other utils.
+- RYP:  improved perfomance.
+- RYP:  fix bug in gettext macros.
+- Paul Rensing <paulr@dragonsys.com>: Fixed ncpmount signal handling
+- VANA: ncpmount now calls /sbin/nwmsg, as did 2.0.x kernel code
+- VANA: Fixes in directory scanning code
+- Philip R. Wilson <prw@home.com>: Added DCK_CONFIDENCE flag.
+- VANA: Some internal library changes
+- VANA: new ncp_ns_* function group
+- VANA: better ncopy, nwgrant, nwrevoke; NDS support next time
+- VANA: threading support for operations working on single connection; that
+        is, NWDS* group of function cannot be used in multithreaded environment
+        yet (unless you'll have separate connections for each thread).
+- VANA: versioned symbols
+- VANA: pam_ncp_auth enhandced with code & ideas I found in pam_nw_auth 1.0.0
+        created by Brian Hammond <hammond@cba.uga.edu> (multiple server=,
+        -d=debug, -v=verbose, -q=quiet (you really want -q if you have
+        multiple server= options, but I left verbose as default for backward
+        compatibility))
+
+ncpfs-2.2.0.15 -> ncpfs-2.2.0.16
+- VANA: NWVerifyObjectPassword, NWDSCanonicalizeName, NWDSAbbreviateName,
+        NWDSRemoveAllTypes, NWCCOpenConnByAddr added
+- VANA: ported to AIX (4.3.2). You have to use GNU make and GNU cc. There are
+        some warnings due to 64 bit environment, but it works (over UDP).
+        It caused couple of fixes and enhandcements (--disable-ipx now really
+        does not use any IPX header, --disable-kernel now really does not use
+        any linux-specific header)
+- VANA: added install-dev, this moves headers to /usr/include/ncp and installs
+        libncp.a and libncp.so symlink
+
+ncpfs-2.2.0.14 -> ncpfs-2.2.0.15
+- VANA: (reported by couple of peoples): fixed 'slist' when there are no 
+        connections
+- VANA: fixed packet signatures on big-endian machines (stupid kernel bug,
+        fortunately userspace workaround available, so I do not have to bother
+        Linus)
+- VANA: ipx_cmd added. You must have 'my' ipx in kernel or last, 2.2.8 kernel.
+        In older kernels ethertap is unusable for IPX (Rx is OK, but Tx does
+        not work). Do not forget to 'set Reply To Get Nearest Server = on'
+        on SCMD server... Otherwise you'll get 'No server' error :-(
+- VANA: nwdpvalues now does something reasonable (not too much, but does)       
+
+ncpfs-2.2.0.13 -> ncpfs-2.2.0.14
+- Philippe Anderson <philippe_anderson@ste.scitex.com>: nsend to groups,
+        'From ....' appended to message
+- VANA: when I was editing nsend, I did also:
+        handles connections > 255 (thus some new nwcalls stuff added)
+        sends to connection specified by number or object ID
+        handles wildcards in object name (see manpage)
+- VANA: nwauth accepts '-P' password option (per user request)
+- VANA: added some *.3ncp pages, installed by 'make install-dev'. I'm not
+        sure whether I write some formatted documentation in future, probably
+        only short paragraphs about each function will be enough? I wrote
+        code, so I do not know, what is unclear and so on...
+- VANA: libncp completely localized. If you are using libncp for 
+        programms outside ncpfs package, you must link your code with `-lintl' 
+        from now (make install installs it) if gettext is not in libc. 
+        Sorry. You can build ncpfs package with `--disable-nls', of course.
+        Shared version of libintl is not available.
+- VANA: kernel symlinks stuff splitted to two options:
+        symlink do symlinks
+        extras do shared files (world readable)
+    
+ncpfs-2.2.0.12 -> ncpfs-2.2.0.13
+- VANA: moved to 'configure' script
+- VANA: completely fixed for glibc2.1; I tested one libc5(linux-2.0.33) and 
+        one glibc2(linux-2.1.125) systems and it looks like that configure 
+	does its job well, but...
+- VANA: warning, library interface changed: com_err removed, ncp_request (and 
+        others) now always return error code:
+	  0..1023       : UNIX errno
+	  0x8700-0x87FF : ncplib specific error
+	  0x8800-0x88FF : local errors
+	  0x8900-0x89FF : server errors
+	  -256..-800    : NDS / UNICODE errors
+	  -1..-255      : if occurs, it is bug, they should be mapped
+	                  to range 0x8900-0x89FF
+	NCP library version number bumped from 2/2.2.0 to 2.3/2.3.0
+	    because of incompatible changes in function return values
+- VANA: added pam_ncp_auth into package (configure --enable-pam)
+- VANA: fixed NWParsePath and NWGetNSEntryInfo
+			  
+ncpfs-2.2.0.11 -> ncpfs-2.2.0.12
+- VANA: fixed debian bugreport #29006 - exit code for nprint
+- VANA: fixed debian bugreport #30293 - man pages update
+- VANA: fixed some bugreport about popen("nwsfind")
+- VANA: added nwfsctrl tool
+- VANA: fixed debian bugreport #33214 - missing NR_OPEN for glibc2.1
+
+ncpfs-2.2.0.10 -> ncpfs-2.2.0.11
+- VANA: mount.ncp, new option -o in ncpmount, updated manpage ncpmount(8)
+- VANA: manpages moved to /usr/man, compressed; it should fix problems
+        on standard distributions
+	
+ncpfs-2.2.0.9 -> ncpfs-2.2.0.10
+- Wolfram Pienkoss <wp@bszh.de>: NLS support
+
+ncpfs-2.2.0.8 -> ncpfs-2.2.0.9
+- Eloy A. Paris: reordered ncpmount initialization to suppress unneeded
+	ask for password
+
+ncpfs-2.2.0.7 -> ncpfs-2.2.0.8
+- VANA: nwfsctrl - down file server and/or open/close bindery
+
+ncpfs-2.2.0.6 -> ncpfs-2.2.0.7
+- VANA: Get connection from current directory if -S not specified on commandline.
+
+ncpfs-2.2.0.5 -> ncpfs-2.2.0.6
+- VANA: Bugfix. Username was limited to 48 chars. It is not true for NDS.
+        TODO: Review bindery code and limit outgoing usernames to
+        48 chars.
+
+ncpfs-2.2.0.4 -> ncpfs-2.2.0.5
+- VANA: it now compiles on libc5 again (undefined socklen_t in ncplib.h)
+- VANA: it works (with patched Makefiles*, added missing linux/* headers and
+       	without kernel support (i.e. only native IP and without ncpmount, 
+	ncpumount, nwdir and nwpurge) on SGI IRIX (IRIX64 sgi 6.2 03131016 
+	IP25). So I hope that it now works on Linux-SGI and Linux-Sparc too. 
+	Please test and report success/failure... NDS code and NCP signatures
+	should work, nwpurge and nwdir probably should not... But I cannot test
+	kernel code because of that machine is not mine and its owner is happy 
+	with IRIX. So I'm sorry.
+	* happy owner has not GNU Make on that machine... He has, fortunately,
+	  gcc... It is impossible to compile ncpfs with IRIX's CC...
+
+ncpfs-2.2.0.3 -> ncpfs-2.2.0.4
+- VANA: more Alpha changes (sizeof(size_t) != sizeof(u_int32_t) :-( )
+        Many thanks go to David Woodhouse and his Alpha CPU...
+- VANA: IPX support can be commented out
+
+ncpfs-2.2.0.2 -> ncpfs-2.2.0.3
+- VANA: now it works on Alpha
+- VANA: changes in DS encryption code (getting rid of error -669)
+
+ncpfs-2.2.0.1 -> ncpfs-2.2.0.2
+- Milan Vandrovec <vandr@fel.cvut.cz>: nwdir tool
+
+ncpfs-2.2.0 -> ncpfs-2.2.0.1
+- Dave & VANA: new shared library numbering
+- Dave & VANA: workarounds for RedHat's glibc-2.0.7
+
+ncpfs-2.0.12.10 -> ncpfs-2.2.0
+- VANA: minor cleanup
+
+ncpfs-2.0.12.9 -> ncpfs-2.0.12.10
+- VANA: you can now access NDS server without replica of its conteiner
+  (TODO: access to server if server has R/W replica of your account but
+  does not have replica of itself)
+- VANA: Alpha still no go :-(
+
+ncpfs-2.0.12.8 -> ncpfs-2.0.12.9
+- Eloy A. Paris: Fixes in library code
+
+ncpfs-2.0.12.7 -> ncpfs-2.0.12.8
+- VANA: bugfix, now it works again without ipxripd
+- VANA: still cleaning up, ncp_open() and NDS byte ordering
+
+ncpfs-2.0.12.6 -> ncpfs-2.0.12.7
+- VANA: bugfixes, nwpurge
+
+ncpfs-2.0.12.5 -> ncpfs-2.0.12.6
+- VANA: ncpmount supports NCP over IP (no incoming broadcast at this time)
+
+ncpfs-2.0.12.4 -> ncpfs-2.0.12.5
+- Eloy A. Paris: Makefile bugfix
+
+ncpfs-2.0.12.3 -> ncpfs-2.0.12.4
+- VANA: Bugfixes
+- VANA: Alpha stage of native NCP over IP support (no kernel at this time)
+
+ncpfs-2.0.12.2 -> ncpfs-2.0.12.3
+- VANA: Major makefile changes, compile warning cleanup
+
+ncpfs-2.0.12.1 -> ncpfs-2.0.12.2
+- Eloy A. Paris <peloy@ven.ra.rockwell.com>: Makefile cleanup
+- VANA: More merging sutil/ncplib.c and lib/ncplib.c, not fully functional yet
+
+ncpfs-2.0.12 -> ncpfs-2.0.12.1
+- Dave, VANA: Bindery logins for all utilities (-b)
+- VANA: Specify signature level for ncpmount (-i number)
+- VANA: Start of merging sutil/*lib* with lib/*lib*
+
+ncpfs-2.0.11.19 -> ncpfs-2.0.12
+- Polished for release 2.0.12
+- Dave: pserver fixes, including addition of %d flag.
+
+ncpfs-2.0.11.18 -> ncpfs-2.0.11.19
+- Dave, VANA: new userspace utilities - pqstat and pqrm
+
+ncpfs-2.0.11.17 -> ncpfs-2.0.11.18 (no userspace change)
+- Dave: getwd() did not work on 2.1.x
+- VANA: Volumes are now always listed lowercased on 2.1.x
+
+ncpfs-2.0.11.16 -> ncpfs-2.0.11.17
+- David Woodhouse <Dave@imladris.demon.co.uk>: Patch to pserver, 
+               ncp_get_broadcast_message
+- VANA & Dave: Cleanup for glibc, I hope that complete (xcpt. few warnings
+               about long int vs. u_int32_t)
+
+ncpfs-2.0.11.15 -> ncpfs-2.0.11.16
+- VANA: Removed symlink latest from archive :-)
+- VANA: Added ncp_send_broadcast2
+
+ncpfs-2.0.11.14 -> ncpfs-2.0.11.15
+- VANA: Fixed bug: wrong completion code returned when login to server without
+        r/w replica of logged-in user
+- VANA: It is possible to disable NFS and/or OS2 namespace support in mount
+
+ncpfs-2.0.11.13 -> ncpfs-2.0.11.14
+- VANA: One source for 2.0 and 2.1 kernels
+- Christian Groessler <cpg@aladdin.de>: Added strong mounts
+
+ncpfs-2.0.11.12 -> ncpfs-2.0.11.13
+- Arne: Signatures added to ncpfs-nds-0.06
+- VANA: Synchronized sources with Arne
+
+ncpfs-2.0.11.11 -> ncpfs-2.0.11.12
+- VANA: Fixed compilation error if compiled against kernel without signatures
+    even if SIGNATURES = 0 set
+
+ncpfs-2.0.11.10 -> ncpfs-2.0.11.11
+- VANA: Fixed segfault on invalid user name in NDS mode
+- VANA: Added locking features (through ncpfs-specific ioctl(2))
+
+ncpfs-2.0.11.9 -> ncpfs-2.0.11.10
+- VANA: Synchronized with nds-patches-0.05 from Arne de Bruijn <Arne@knoware.nl>
+
+ncpfs-2.0.11.8 -> ncpfs-2.0.11.9
+- VANA: Added call to lock connection (dropped in 2.0.11.7, sorry)
+
+ncpfs-2.0.11.7 -> ncpfs-2.0.11.8
+- VANA: Can be correctly compiled without signatures support in kernel (I hope)
+- VANA: Fix in kernel in setting task number
+
+ncpfs-2.0.11.6 -> ncpfs-2.0.11.7
+- VANA: Codebase synchronized with Arne de Bruijn <Arne@knoware.nl>
+- ARNE: Gracelogins on NDS
+- VANA: Removed some (one) compilation warnings
+
+ncpfs-2.0.11.5 -> ncpfs-2.0.11.6
+- VANA: Support for NDS login accross servers
+
+ncpfs-2.0.11.4 -> ncpfs-2.0.11.5
+- VANA: Cleanup in ndscrypt
+- VANA: Bugfix: empty password for NDS login is now allowed & works
+
+ncpfs-2.0.11.3 -> ncpfs-2.0.11.4
+- Enabled some buffer cleaning
+- Added parameter "-b" to ncpmount for bindery login to NDS server
+
+ncpfs-2.0.11.2 -> ncpfs-2.0.11.3
+- Added NDS support by Arne de Bruijn <Arne@knoware.nl>; small fixes in code; 
+  moved sections to do same things as DOS login does.
+
+ncpfs-2.0.11.1 -> ncpfs-2.0.11.2
+- VANA: Fixed that some error conditions in LOGIN should start packet signatures
+
+ncpfs-2.0.11 -> ncpfs-2.0.11.1
+- VANA: Added packet signatures by Arne de Bruijn <Arne@knoware.nl>
+ 
+ncpfs-2.0.10 -> ncpfs-2.0.11
+- Added Martin's patch to Linux 2.0.30 to get rid of the lockups.
+  MANY thanks to Martin Stover!
+
+ncpfs-2.0.9 -> ncpfs-2.0.10
+- Made nwtrustee hopefully work ;-)
+- Made the manpages a little bit prettier
+
+ncpfs-2.0.8 -> ncpfs-2.0.9
+- Added patches directory
+- Added nwvolinfo and nwtrustee. Thanks to Jacek Stepniewski <cunio@gazeta.pl>
+- nwpasswd can change other's passwords. Thanks to Martin Stover.
+
+ncpfs-2.0.7 -> ncpfs-2.0.8
+- Fixed util/Makefile for easier optimization handling. Thanks to Rik
+  Faith <faith@cs.unc.edu> for this one
+- added nwfstime. You can now set the file server date and time from Linux.
+- added the contrib directory. Feel free to add more!
+
+ncpfs-2.0.6 -> ncpfs-2.0.7
+- Hopefully removed one security problem in ncpumount.
+- Added command line flag to pserver.c
+- Heavily reconstructed ncpfs utils. Created the lib/ dir. 
+- Separated the uid utils in sutil
+- Add nwsfind to enable users to use ncpfs safely without setting
+  the utils setuid root.
+
+ncpfs-2.0.5 -> ncpfs-2.0.6
+- Added a short description of a problem that I need help with to the
+  file BUGS. If you know a bit of the linux networking code, please
+  take a look at it. Thanks a lot.
+- Added canonic output format to nwpbvalues and the command nwbpset. I
+  would like to invite you to help building capable bindery management
+  utilities. For little examples, look at the manual page of nwbpset.
+- Added some values to ipxparse. Those interested in NDS should take a
+  look at it. It's really not much, but maybe it's a beginning.
+
+ncpfs-2.0.4 -> ncpfs-2.0.5
+- Removed another bug in nwbpvalues.
+- Cleaned up man/Makefile
+- Some manpage typos fixed. Thanks to Jim Van Zandt
+  <jrv@mbunix.mitre.org>
+- added nwrights
+
+ncpfs-2.0.3 -> ncpfs-2.0.4
+- Changed name of npasswd to nwpasswd, as npasswd collides with
+  RedHat. Thanks to Mike Slater <mslater@nfinity.com> for pointing me
+  at this one.
+- Put '\r\n' into nwmsg, because sometimes it did not print
+  correctly. Thanks to Petr Vandrovec Ing. VTEI
+  <VANDROVE@vcnet.vc.cvut.cz> for this one.
+- Improved the ELF Makefile for ELF support. Thanks to Uwe Bonnes
+  <bon@elektron.ikp.physik.th-darmstadt.de>.
+- Removed a very embarassing bug in nwpvalues :-(.
+- Added a some routines to nwbpvalues.
+
+ncpfs-2.0.2 -> ncpfs-2.0.3
+- Removed the kernel-2.0 directory. Linus took the patch into 2.0.8.
+  So, if you want to use long file name support, upgrade to Linux
+  kernel version 2.0.8.
+- Applied the lfn patch to the kernel-1.2 module with some light
+  testing. If you experience problems, tell it to me, and use the
+  ncpfs-2.0.2 kernel module, or upgrade to Linux 2.0.8.
+- Added unencrypted login when no crypt key is returned.  
+- Hopefully improved error messages a bit
+- Added some values to ipxparse
+- For ELF systems, moved ncplib to /lib/libncp.so.1.x. This saves
+  about 1MB of disk space. As ncpfs grows, the saving will
+  increase. Please look at the Makefile to enable this.
+- Enhanced nwfsinfo a bit. (Even with a manpage!)
+- Added nwuserlist.
+
+ncpfs-2.0.1 -> ncpfs-2.0.2
+- Added some values to ipxparse.
+- Added a patch against 2.0.7 for long file names support. I did not
+  apply this change to the 1.2-module. Please upgrade to 2.0.7 if you
+  want to use long file names.
+- nwbpvalues can print ITEM properties
+
+ncpfs-2.0.0 -> ncpfs-2.0.1
+- Added some values to ipxparse.
+- Added the little bindery utilities. Maybe someone has the time to 
+  write a shellscript named 'nwadduser' ?
+- Fixed a bug that made the __255 message reappear. Many thanks to
+  Guntram Blom for his detailed bug report.
+- Fixed a bug that made ncpfs incompatible with W95's server
+  capabilities. Thanks to Tomasz Babczynski
+  <faster@dino.ict.pwr.wroc.pl> for this one.
+
+ncpfs-0.24 -> ncpfs-2.0.0
+- Changed the numbering scheme :-).
+- Added npasswd. Many thanks to Guntram Blom for his work!
+- Hopefully improved error messages a bit
+- Hopefully made slist a bit more robust
+
+ncpfs-0.23 -> ncpfs-0.24
+- Fixed a bug that made it impossible to umount a filesystem after you
+  tried 'mkdir .' or 'mkdir ..'.
+- Fixed a bad race condition when opening files.
+- Made the default timeout values more robust.
+
+ncpfs-0.22 -> ncpfs-0.23
+- Fixed a memory allocation problem in nwmsg.c. Thanks to 
+  Andrew Ross <anr1001@hermes.cam.ac.uk>
+- slist hopefully does not ask for a password anymore.
+- cleaned up error messages a bit.
+- ncpmount now calls modprobe instead of insmod.
+
+ncpfs-0.21 -> ncpfs-0.22
+- removed a bad race condition in kernel-1.2/src/dir.c.
+- handle 0x9999-responses from the ncp server correctly.
+- Bindery functions in ncplib.c by Brian G. Reid (breid@tim.com)
+- set blocksize to 512 to satisfy 'du -k'
+
+ncpfs-0.20 -> ncpfs-0.21
+- Included two bugfixes in ncplib.c found by Jeff Buhrt
+  <buhrt@iquest.net>.
+- Included a bugfix in kernel code that could only show for servers
+  that do not support namespace calls. I should have tried ncpfs
+  against lwared... Thanks to Neil Turton <ndt1001@chu.cam.ac.uk> for
+  this fix.
+
+ncpfs-0.19 -> ncpfs-0.20
+- Changed the home site for ncpfs from linux01.gwdg.de:/pub/ncpfs
+  to ftp.gwdg.de:/pub/linux/misc/ncpfs. linux01 will remain available,
+  but we would like to reduce the load on that machine. Sites
+  mirroring linux01 please redirect your mirror software to
+  ftp.gwdg.de. Thanks.
+- Removed a bug in ncplib.c that made slist require a full
+  login. Thanks to Neil Turton <ndt1001@chu.cam.ac.uk> for the hint.
+- The first real user contribution: ncopy by Brian G. Reid
+  (breid@tim.com) and Tom C. Henderson (thenderson@tim.com). Many
+  thanks to you! If you find bugs in ncopy, tell them, not me ;-)
+- Handle expired passwords. Thanks to "Mathew Lim" <M.Lim@sp.ac.sg>
+  for the hint.
+
+ncpfs-0.18 -> ncpfs-0.19
+
+- hacked around in ncplib.[ch] quite heavily.
+- SAP handling in ipxparse.c. Thanks to Jeff Buhrt <buhrt@iquest.net>
+- Changed error handling to use the com_err library. This should
+  eventually provide better error messages, because it's now much
+  easier to define nice messages.
+- If no server is active, report this correctly
+- added nsend
+
+ncpfs-0.17 -> ncpfs-0.18
+
+- Another attempt at solving the problem that -n is not working.
+- Forgot nprint in 0.17 util/Makefile.
+- nprint left connections open when it fails
+- added options -r and -t to ncpmount to tune ncpfs connections.
+
+ncpfs-0.16 -> ncpfs-0.17
+
+- Changed the name of fsinfo to nwfsinfo, to avoid a name clash with
+  the X windows utility. Thanks to Henning Brockfeld
+  <Henning.Brockfeld@lrz.uni-muenchen.de> for this hint. (still
+  waiting for your scripts.. :-))
+- made nwmsg available. This enables you to receive NetWare user
+  broadcast messages. Please note that you need at least kernel 1.3.68
+  for this feature.
+- pserver now prints debugging output via syslog().
+- Included ipxdump, a nice little utility, that has helped some
+  people.
+
+- And now the big one: you can re-export ncpfs-mounted directories
+  with nfsd! You have to mount single volumes by specifying -V volume
+  to ncpmount, and call nfsd and mountd with the option --re-export.  
+  See the manual page of ncpmount for more information. Please note
+  that I will send Linus the required patch on 1. March 1996, so you
+  will have to use kernel 1.2.13 or wait at least for 1.3.70.
+
+ncpfs-0.15 -> ncpfs-0.16
+
+- Included ipx-1.0, made available by Greg Page <greg@caldera.com>,
+  Caldera
+- Made -n work for password-less accounts. Thanks to Alexander Jolk
+  <jolk@ap-pc513b.physik.uni-karlsruhe.de>.
+- Fixed the kerneld support.
+- Fixed the NetWare 4.1 problem. Many thanks to
+  Chatchai JANTARAPRIM <chat@ratree.psu.ac.th> and 
+  hitesh.soneji@industry.net for their patience.
+
+ncpfs-0.14 -> ncpfs-0.15
+
+- A bug fixed that made normal mounting impossible. It was too late
+  yesterday. Sorry
+- Manpage for pserver.c
+
+ncpfs-0.13 -> ncpfs-0.14
+
+- Improvements of manual pages by B. Galliart <bgallia@luc.edu> and
+  Terry Dawson <terry@perf.no.itg.telecom.com.au>
+- fsinfo
+- pserver.c. Please see this as ALPHA software. There is no
+  documentation, and it is not tested enough. But it might be useful for
+  you. 
+
+ncpfs-0.12 -> ncpfs-0.13
+
+- support for automatic loading of ncpfs.o by kerneld.
+  Thanks to Steven N. Hirsch <hirsch@emba.uvm.edu>.
+- A subtle problem in the read routines has been removed by Uwe Bonnes
+  <bon@elektron.ikp.physik.th-darmstadt.de>. Thanks a lot.

@@ -1,0 +1,151 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>Build procedure for MSVC compiler</title>
+<meta name="Generator" content="Vim">
+<meta name="Author" content="">
+<meta name="Keywords" content="">
+<meta name="Description" content="">
+</head>
+
+<body>
+<h2>VisualStudio build Notes</h2>
+<hr/>
+Last Update: Aug 25 2010<br>
+Author: Blas Rodriguez Somoza <a href="">blas@puertareal.com</a><br>
+Updated by: Popa Adrian Marius (mapopa at gmail.com)
+
+<h3>0.-Introduction</h3>
+<blockquote>
+
+<p>There are three VisualStudio builds, msvc8, msvc9 and msvc10. The msvc8 build is used for the official build of Firebird in Windows.</p>
+<p>Under the directory where you put Firebird sources you will see the following directories</p>
+<ul>
+<li>builds</li>
+<ul>
+<li>mac_os_x (Mac os X build scripts)</li>
+<li>posix (Posix build scripts)</li>
+<li>win32 (Msvc build scripts)</li>
+<li>.....</li>
+</ul>
+<li>doc</li>
+<ul>
+<li>sql.extensions</li>
+</ul>
+<li>src</li>
+<ul>
+<li>....</li>
+</ul>
+<li>lang_helpers</li>
+<ul>
+<li>....</li>
+</ul>
+<li>examples</li>
+<ul>
+<li>....</li>
+</ul>
+</ul>
+<p>After you build Firebird you also will see the following temporary directories</p>
+<ul>
+<li>gen (cpp files generated from epp, exe and fdb's.)</li>
+<li>temp (compiler temporary)</li>
+<li>output_Win32 (build output)</li>
+</ul>
+</blockquote>
+<h3>1.-TODO</h3>
+<blockquote>
+
+</blockquote>
+<h3>2.-Prerrequisites</h3>
+<blockquote>
+
+<p>To prepare the standard msvc build of FB you need:</p>
+<ul>
+<li>Microsoft VisualStudio 8 (2005) or greater</li>
+<li>sed unix utility</li>
+</ul>
+
+<p>If you intend to prepare an installable build, you will need <a href=http://www.jrsoftware.org/isdl.php>innosetup 5</a></p>
+<p>To download the utilities use the following links</p>
+<ul>
+<li>Innosetup (Note: This is the classic version, not the new unicode version.) <a href=http://www.jrsoftware.org/download.php/is.exe>http://www.jrsoftware.org/download.php/is.exe</a></li>
+<li>Innosetup pack <a href="http://files.jrsoftware.org/ispack/ispack-5.3.10.exe">http://files.jrsoftware.org/ispack/ispack-5.3.10.exe</a></li>
+<li>Sed <a href="http://gnuwin32.sourceforge.net/packages/sed.htm">http://gnuwin32.sourceforge.net/packages/sed.htm</a></li>
+</ul>
+
+</blockquote>
+<h3>2.-Installing the utilities</h3>
+<blockquote>
+
+<h4>2.1.-Visual Studio</h4>
+<ol>
+<li>Install VisualStudio 20xx</li>
+<li>You can compile it with <a href=http://www.microsoft.com/express/downloads/#Visual_Studio_2008_Express_Downloads>Visual C++ 2008 Studio Express</a> but it will not be able to build the <a href=http://firebird.1100200.n4.nabble.com/building-head-with-visual-studio-2008-vc9-td1127168.html>control panel applet</a> but for the Firebird server and the rest of utilities building is ok<br>
+</li>
+</ol>
+
+<h4>2.2.-Sed</h4>
+<ol>
+<li class="level1"><div class="li"> Download <a href="http://sourceforge.net/projects/gnuwin32/files/sed/4.2-1/sed-4.2-1-setup.exe/download" class="urlextern" title="http://sourceforge.net/projects/gnuwin32/files/sed/4.2-1/sed-4.2-1-setup.exe/download"  rel="nofollow">Sed setup</a> from <a href="http://gnuwin32.sourceforge.net/packages/sed.htm" class="urlextern" title="http://gnuwin32.sourceforge.net/packages/sed.htm" rel="nofollow">GnuWin32 project</a> I had to run the setup and i extract into c:\gnuwin32 </div> 
+</li> 
+<li class="level1"><div class="li"> Add sed c:\gnuwin32\bin to the PATH environment variable , test it from a new console if it works by typing sed it should show you something abut gnu sed help</div> 
+</li> 
+</ol>
+<h4>2.3.-Inno setup</h4>
+<ol>
+<li>Run the Installer for Innosetup 5 that you downloaded from above 
+setup-5.3.xx.exe</li>
+<li>Run the Innosetup pack Installer ispack-5.3.10.exe 
+with the default options (next, next, next)</li>
+<ol>
+</blockquote>
+<h3>4.- Building</h3>
+<blockquote>
+
+<h4>4.1.-Standard build</h4>
+<ol>
+<li>Eliminate the fb2control from firebird3 solution if you are using Visual Studio Express (doesn't support MFC) and it's only the control pannel applet and try to build it, it should give you no errors when you build the solution.</li>
+<li>Open a command line window.</li>
+<li>Go to the builds\win32 directory.</li>
+<li>Run the following batches in order (your version of VisualStudio is detected automatically)</li>
+<ol>
+<li>make_icu.bat [DEBUG] [CLEAN]</li>
+<li>make_boot.bat [DEBUG] [CLEAN]</li>
+<li>make_all.bat [DEBUG] [CLEAN]</li>
+</ol>
+</ol>
+<ul>
+<p>After the build finish, an output directory with the binaries is created below your firebird3 directory.</p>
+<li>To make a clean build from scratch after making changes to the code use the clean_all.bat script</li>
+</ul>
+<h4>4.2.-Parser rebuild</h4>
+<p>If you change parser.y you will need to rebuild parser.cpp, to do so use parse.bat</p>
+<h4>4.3.-Examples build</h4>
+<p>The examples build prepare two databases that will be needed to compile the examples in a distribution. If you intend to prepare a distribution then run the examples batch before:</p>
+<ol>
+<li>make_examples.bat</li>
+</ol>
+<h4>4.4.-Installer build</h4>
+<p>Remember, you need sed and innosetup in the path to build the installer</p>
+<ul>
+<li>Open a command line window.</li>
+<li>Go to the builds\install\arch-specific\win32 directory.</li>
+<li>The batch to build the installer is<br>
+BuildExecutableInstall.bat [DEBUG] [CS]<br>
+Where DEBUG means if the build is a debug one or not and CS means classic server installer.</li>
+<li>After you start the batch, you will get a InnoSetup window. To build the install exe select the option compile, and a new exe will appear in builds/win32/install_image
+</ul>
+<h4>4.5.-Building samples</h4>
+<p>After the standard build is finished, an output directory with the same structure as the installed FB directory is created.</p>
+<p>If you want to build the examples just cd to firebird3\output\examples\build_win32 and run run_all.bat</p>
+<p>Run_all.bat calls four other bats to make the example sets. Any example set can be build independently with its make_XXX script.</p>
+<p>The example sets are:</p>
+<ul>
+<li>api (API Interface)</li>
+<li>dyn (embedded dynamic SQL)</li>
+<li>stat (embedded static SQL)</li>
+<li>udf (User defined functions)</li>
+</ul>
+</blockquote>
+</body>
+</html>

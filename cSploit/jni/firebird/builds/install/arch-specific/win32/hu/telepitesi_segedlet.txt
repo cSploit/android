@@ -1,0 +1,6 @@
+Firebird Adatbázis Szerver $MAJOR.$MINOR
+===================================================
+
+------------------------------------------------------
+Documentation for Firebird $MAJOR.$MINOR is not yet available.
+-------------------------------------------------------

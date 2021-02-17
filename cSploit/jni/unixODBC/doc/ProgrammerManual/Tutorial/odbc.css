@@ -1,0 +1,323 @@
+/* Style Sheet for odbc documentation
+    =20
+	 M.Rathmann
+
+
+*/
+BODY {background-color: white;
+      color:			black;
+	  font-family:		Arial;
+	  font-style:		normal;
+	  font-size:		medium;
+	  background-attachment: fixed;
+	  }
+
+/*=20
+  2. Die Verweise:
+
+     Standard: Text unterstrichen
+	            link: #008080=20
+				vlink=3D"#800000"
+				alink=3D"#008080"
+
+*/
+a:link {color:				#2222ff;
+        text-decoration:	none;
+	   }
+a:visited {color:			#3333ee;
+           text-decoration:	none;
+		  }
+a:active {color:			#4444dd;
+          text-decoration:	none;
+		 }
+
+
+TH {border-style:		none;
+	background-color:	#dddddd;
+	font-family:		Arial;
+	font-size:			normal;
+	color:				white;
+	vertical-align:		top;
+	text-align:			center;
+   }
+TD {border-style:		none;
+	background-color:	white;
+	font-family:		Arial;
+	font-size:			normal;
+	color:				black;
+	border-width:		3px;
+	border-color:		white;
+	vertical-align:		top;
+	text-align:			justify;
+   }
+
+TD.center {border-style:		none;
+	background-color:	#ddddff;
+	text-align:			center;
+	font-family:		Arial;
+	font-size:			medium;
+	color:				black;
+	border-width:		3px;
+	border-color:		white;
+	vertical-align:		top;
+   }
+TD.head {border-style:		none;
+	background-color:	#ddddff;
+	text-align:			left;
+	font-family:		Arial;
+	font-size:			medium;
+	color:				black;
+    font-weight:		bold;
+	vertical-align:		top;
+   }
+Th.head {border-style:		none;
+	background-color:	#dddddd;=09
+	text-align:		center;
+	font-family:		Arial;
+	font-size:			medium;
+	color:				black;
+    font-weight:		bold;
+	vertical-align:		top;
+   }
+TD.big  {
+    font-family: Arial;
+    font-size:   x-large;
+	}
+TD.small  {
+    font-family: Arial;
+    font-size:   x-small;
+	}
+
+/* 5. =DCberschriften immer in Rot, Zeichensatz Arial
+*/
+H4 { color:			black;
+     font-family:	Arial;
+	 font-size:		small;
+	 font-weight:	bold;
+   }
+H5 { color:			black;
+	 font-size:		x-small;
+	 font-family:   courier;
+   }
+
+/* 6. Blockquote
+      St=E4rkere Einr=FCckung=20
+
+*/
+Blockquote {margin-left:		10pt; }
+
+CODE.list {margin-left: 10 pt;
+	  font-size:	xx-small;
+      }
+           }
+
+/* 7. Listen
+*/
+UL {color:			black;
+    font-family:	Arial
+   }
+OL {color:				black;
+    list-style-type:	decimal}
+LI {color:	black}
+
+P  {font-family: Arial;
+    font-size:   normal;
+	}
+TD P  {font-family: Arial;
+    font-size:   normal;
+	}
+
+small {font-family: Arial;
+       font-size:   x-small
+	  }
+
+
+From - Sun Jun  6 14:11:04 1999
+Return-path: <M.Rathmann@ping.de>
+Envelope-to: pharvey@interlog.com
+Delivery-date: Sun, 6 Jun 1999 03:55:51 -0400
+Received: from plus.interlog.com ([207.34.202.21] ident=root)
+	by mailhub4.interlog.com with esmtp (Exim 2.05 #1)
+	id 10qXmY-0002kw-00
+	for pharvey@interlog.com; Sun, 6 Jun 1999 03:55:50 -0400
+Received: from lilly.ping.de (qmailr@lilly.ping.de [195.37.120.2])
+	by plus.interlog.com (8.9.3/8.9.3) with SMTP id DAA23367
+	for <pharvey@codebydesign.com>; Sun, 6 Jun 1999 03:55:48 -0400 (EDT)
+Received: (qmail 26070 invoked by alias); 6 Jun 1999 07:55:45 -0000
+Received: (qmail 26063 invoked from network); 6 Jun 1999 07:55:37 -0000
+Received: from suprimo-54.ping.de (HELO koala) (195.37.122.54)
+  by lilly.ping.de with SMTP; 6 Jun 1999 07:55:37 -0000
+Message-ID: <001a01beaff2$66b90320$030aa8c0@koala>
+From: "Markus Rathmann" <M.Rathmann@ping.de>
+To: "Peter Harvey" <pharvey@codebydesign.com>
+Subject: The newest docu, to be sure :)
+Date: Sun, 6 Jun 1999 09:58:43 +0200
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_NextPart_000_0017_01BEB003.29819060"
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 4.72.3110.1
+X-MimeOLE: Produced By Microsoft MimeOLE V4.72.3110.3
+X-Mozilla-Status: 8001
+X-Mozilla-Status2: 00000000
+X-UIDL: ea3859ca9b1d73dac919ee5e69391b0b
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0017_01BEB003.29819060
+Content-Type: text/plain;
+	charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+
+Hi Peter,
+
+I'm sorry, but I think that you haven't got the newest version. Therefore
+I'm sending it to you again. It has one more page (Obtaining Datasource
+names) and a few display glitches (mainly Netscape) solved.
+Furthermore I've added a link to the unixODBC Homepage, so that you may use
+the complete browser window (if you like).
+
+Bye
+Markus
+
+
+------=_NextPart_000_0017_01BEB003.29819060
+Content-Type: text/css;
+	name="ODBC.CSS"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="ODBC.CSS"
+
+/* Style Sheet for odbc documentation
+    =20
+	 M.Rathmann
+
+
+*/
+BODY {background-color: white;
+      color:			black;
+	  font-family:		Arial;
+	  font-style:		normal;
+	  font-size:		medium;
+	  background-attachment: fixed;
+	  }
+
+/*=20
+  2. Die Verweise:
+
+     Standard: Text unterstrichen
+	            link: #008080=20
+				vlink=3D"#800000"
+				alink=3D"#008080"
+
+*/
+a:link {color:				#2222ff;
+        text-decoration:	none;
+	   }
+a:visited {color:			#3333ee;
+           text-decoration:	none;
+		  }
+a:active {color:			#4444dd;
+          text-decoration:	none;
+		 }
+
+
+TH {border-style:		none;
+	background-color:	#dddddd;
+	font-family:		Arial;
+	font-size:			normal;
+	color:				white;
+	vertical-align:		top;
+	text-align:			center;
+   }
+TD {border-style:		none;
+	background-color:	white;
+	font-family:		Arial;
+	font-size:			normal;
+	color:				black;
+	border-width:		3px;
+	border-color:		white;
+	vertical-align:		top;
+	text-align:			justify;
+   }
+
+TD.center {border-style:		none;
+	background-color:	#ddddff;
+	text-align:			center;
+	font-family:		Arial;
+	font-size:			medium;
+	color:				black;
+	border-width:		3px;
+	border-color:		white;
+	vertical-align:		top;
+   }
+TD.head {border-style:		none;
+	background-color:	#ddddff;
+	text-align:			left;
+	font-family:		Arial;
+	font-size:			medium;
+	color:				black;
+    font-weight:		bold;
+	vertical-align:		top;
+   }
+Th.head {border-style:		none;
+	background-color:	#dddddd;=09
+	text-align:		center;
+	font-family:		Arial;
+	font-size:			medium;
+	color:				black;
+    font-weight:		bold;
+	vertical-align:		top;
+   }
+TD.big  {
+    font-family: Arial;
+    font-size:   x-large;
+	}
+TD.small  {
+    font-family: Arial;
+    font-size:   x-small;
+	}
+
+/* 5. =DCberschriften immer in Rot, Zeichensatz Arial
+*/
+H4 { color:			black;
+     font-family:	Arial;
+	 font-size:		small;
+	 font-weight:	bold;
+   }
+H5 { color:			black;
+	 font-size:		x-small;
+	 font-family:   courier;
+   }
+
+/* 6. Blockquote
+      St=E4rkere Einr=FCckung=20
+
+*/
+Blockquote {margin-left:		10pt; }
+
+CODE.list {margin-left: 10 pt;
+	  font-size:	xx-small;
+      }
+           }
+
+/* 7. Listen
+*/
+UL {color:			black;
+    font-family:	Arial
+   }
+OL {color:				black;
+    list-style-type:	decimal}
+LI {color:	black}
+
+P  {font-family: Arial;
+    font-size:   normal;
+	}
+TD P  {font-family: Arial;
+    font-size:   normal;
+	}
+
+small {font-family: Arial;
+       font-size:   x-small
+	  }

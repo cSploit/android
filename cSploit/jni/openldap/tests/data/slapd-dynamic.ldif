@@ -1,0 +1,8 @@
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcRootPW:< file://@TESTDIR@/configpw

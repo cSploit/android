@@ -1,0 +1,240 @@
+# $Id$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+# This contribution is derived from OpenLDAP Software.
+# All of the modifications to OpenLDAP Software represented in this contribution
+# were developed by Andrew Findlay <andrew.findlay@skills-1st.co.uk>.
+# I have not assigned rights and/or interest in this work to any party.
+#
+# Copyright 2008 Andrew Findlay
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted only as authorized by the OpenLDAP Public License.
+
+H1: Limits
+
+H2: Introduction
+
+It is usually desirable to limit the server resources that can be
+consumed by each LDAP client. OpenLDAP provides two sets of limits:
+a size limit, which can restrict the {{number}} of entries that a
+client can retrieve in a single operation, and a time limit
+which restricts the length of time that an operation may continue.
+Both types of limit can be given different values depending on who
+initiated the operation.
+
+H2: Soft and Hard limits
+
+The server administrator can specify both {{soft limits}} and
+{{hard limits}}. Soft limits can be thought of as being the
+default limit value. Hard limits cannot be exceeded by ordinary
+LDAP users.
+
+LDAP clients can specify their own
+size and time limits when issuing search operations.
+This feature has been present since the earliest version of X.500.
+
+If the client specifies a limit then the lower of the requested value
+and the {{hard limit}} will become the limit for the operation.
+
+If the client does not specify a limit then the server applies the
+{{soft limit}}.
+
+Soft and Hard limits are often referred to together as {{administrative
+limits}}. Thus, if an LDAP client requests a search that would return
+more results than the limits allow it will get an {{adminLimitExceeded}}
+error. Note that the server will usually return some results even if
+the limit has been exceeded: this feature is useful to clients that
+just want to check for the existence of some entries without needing
+to see them all.
+
+The {{rootdn}} is not subject to any limits.
+
+H2: Global Limits
+
+Limits specified in the global part of the server configuration act
+as defaults which are used if no database has more specific limits set.
+
+In a {{slapd.conf}}(5) configuration the keywords are {{EX:sizelimit}} and
+{{EX:timelimit}}. When using the {{slapd config}} backend, the corresponding
+attributes are {{EX:olcSizeLimit}} and {{EX:olcTimeLimit}}. The syntax of
+these values are the same in both cases.
+
+The simple form sets both soft and hard limits to the same value:
+
+>   sizelimit {<integer>|unlimited}
+>   timelimit {<integer>|unlimited}
+
+The default sizelimit is 500 entries and the default timelimit is
+3600 seconds.
+
+An extended form allows soft and hard limits to be set separately:
+
+>   sizelimit size[.{soft|hard|unchecked}]=<integer> [...]
+>   timelimit time[.{soft|hard}]=<integer> [...]
+
+Thus, to set a soft sizelimit of 10 entries and a hard limit of 75 entries:
+
+E:  sizelimit size.soft=10 size.hard=75
+
+The {{unchecked}} keyword sets a limit on how many entries the server
+will examine once it has created an initial set of candidate results by
+using indices. This can be very important in a large directory, as a
+search that cannot be satisfied from an index might cause the server to
+examine millions of entries, therefore always make sure the correct indexes
+are configured.
+
+H2: Per-Database Limits
+
+Each database can have its own set of limits that override the global
+ones. The syntax is more flexible, and it allows different limits to
+be applied to different entities. Note that an {{entity}} is different from
+an {{entry}}: the term {{entity}} is used here to indicate the ID of the
+person or process that has initiated the LDAP operation.
+
+In a {{slapd.conf}}(5) configuration the keyword is {{EX:limits}}.
+When using the {{slapd config}} backend, the corresponding
+attribute is {{EX:olcLimits}}. The syntax of
+the values is the same in both cases.
+
+>   limits <who> <limit> [<limit> [...]]
+
+The {{limits}} clause can be specified multiple times to apply different
+limits to different initiators. The server examines each clause in turn
+until it finds one that matches the ID that requested the operation.
+If no match is found, the global limits will be used.
+
+H3: Specify who the limits apply to
+
+The {{EX:<who>}} part of the {{limits}} clause can take any of these values:
+
+!block table; align=Center; coltags="EX,N"; \
+    title="Table ZZZ.ZZZ: Entity Specifiers"
+Specifier|Entities
+*|All, including anonymous and authenticated users
+anonymous|Anonymous (non-authenticated) users
+users|Authenticated users
+self|User associated with target entry
+dn[.<basic-style>]=<regex>|Users matching a regular expression
+dn.<scope-style>=<DN>|Users within scope of a DN
+group[/oc[/at]]=<pattern>|Members of a group
+!endblock
+
+The rules for specifying {{EX:<who>}} are the same as those used in
+access-control rules.
+
+H3: Specify time limits
+
+The syntax for time limits is 
+
+E:   time[.{soft|hard}]=<integer>
+
+where integer is the number of seconds slapd will spend
+answering a search request.
+
+If neither {{soft}} nor {{hard}} is specified, the value is used for both,
+e.g.:
+
+E:   limits anonymous time=27
+
+The value {{unlimited}} may be used to remove the hard time limit entirely,
+e.g.:
+
+E:   limits dn.exact="cn=anyuser,dc=example,dc=org" time.hard=unlimited
+
+H3: Specifying size limits
+
+The syntax for size limit is 
+
+E:   size[.{soft|hard|unchecked}]=<integer>
+
+where {{EX:<integer>}} is the maximum number of entries slapd will return
+when answering a search request.
+
+Soft, hard, and "unchecked" limits are available, with the same meanings
+described for the global limits configuration above.
+
+H3: Size limits and Paged Results
+
+If the LDAP client adds the {{pagedResultsControl}} to the search operation,
+the hard size limit is used by default, because the request for a specific
+page size is considered an explicit request for a limitation on the number
+of entries to be returned. However, the size limit applies to the total
+count of entries returned within the search, and not to a single page.
+
+Additional size limits may be enforced for paged searches.
+
+The {{EX:size.pr}} limit controls the maximum page size:
+
+>   size.pr={<integer>|noEstimate|unlimited}
+
+{{EX:<integer>}} is the maximum page size if no explicit size is set.
+{{EX:noEstimate}} has no effect in the current implementation as the
+server does not return an estimate of the result size anyway.
+{{EX:unlimited}} indicates that no limit is applied to the maximum
+page size.
+
+The {{EX:size.prtotal}} limit controls the total number of entries
+that can be returned by a paged search. By default the limit is the
+same as the normal {{EX:size.hard}} limit.
+
+>   size.prtotal={<integer>|unlimited|disabled}
+
+{{EX:unlimited}} removes the limit on the number of entries that can be
+returned by a paged search.
+{{EX:disabled}} can be used to selectively disable paged result searches.
+
+H2: Example Limit Configurations
+
+H3: Simple Global Limits
+
+This simple global configuration fragment applies size and time limits
+to all searches by all users except {{rootdn}}. It limits searches to
+50 results and sets an overall time limit of 10 seconds.
+
+E:   sizelimit 50
+E:   timelimit 10
+
+H3: Global Hard and Soft Limits
+
+It is sometimes useful to limit the size of result sets but to allow
+clients to request a higher limit where needed. This can be achieved
+by setting separate hard and soft limits.
+
+E:   sizelimit size.soft=5 size.hard=100
+
+To prevent clients from doing very inefficient non-indexed searches,
+add the {{unchecked}} limit:
+
+E:   sizelimit size.soft=5 size.hard=100 size.unchecked=100
+
+H3: Giving specific users larger limits
+
+Having set appropriate default limits in the global configuration,
+you may want to give certain users the ability to retrieve larger
+result sets. Here is a way to do that in the per-database configuration:
+
+E:   limits dn.exact="cn=anyuser,dc=example,dc=org" size=100000
+E:   limits dn.exact="cn=personnel,dc=example,dc=org" size=100000
+E:   limits dn.exact="cn=dirsync,dc=example,dc=org" size=100000
+
+It is generally best to avoid mentioning specific users in the server
+configuration. A better way is to give the higher limits to a group:
+
+E:   limits group/groupOfNames/member="cn=bigwigs,dc=example,dc=org" size=100000
+
+H3: Limiting who can do paged searches
+
+It may be required that certain applications need very large result sets that
+they retrieve using paged searches, but that you do not want ordinary
+LDAP users to use the pagedResults control. The {{pr}} and {{prtotal}}
+limits can help:
+
+E:   limits group/groupOfNames/member="cn=dirsync,dc=example,dc=org" size.prtotal=unlimited
+E:   limits users size.soft=5 size.hard=100 size.prtotal=disabled
+E:   limits anonymous size.soft=2 size.hard=5 size.prtotal=disabled
+
+H2: Further Information
+
+For further information please see {{slapd.conf}}(5), {{ldapsearch}}(1) and {{slapd.access}}(5)
+

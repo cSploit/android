@@ -1,0 +1,73 @@
+# src/makefiles/Makefile.win32
+
+# Use replacement include files for those missing on Win32
+override CPPFLAGS+="-I$(top_srcdir)/src/include/port/win32"
+
+ifdef PGXS
+BE_DLLLIBS= -L$(libdir) -lpostgres
+else
+BE_DLLLIBS= -L$(top_builddir)/src/backend -lpostgres
+endif
+
+AROPT = crs
+DLSUFFIX = .dll
+CFLAGS_SL =
+
+ifneq (,$(findstring backend,$(subdir)))
+ifeq (,$(findstring conversion_procs,$(subdir)))
+ifeq (,$(findstring snowball,$(subdir)))
+ifeq (,$(findstring libpqwalreceiver,$(subdir)))
+override CPPFLAGS+= -DBUILDING_DLL
+endif
+endif
+endif
+endif
+
+ifneq (,$(findstring timezone,$(subdir)))
+override CPPFLAGS+= -DBUILDING_DLL
+endif
+
+ifneq (,$(findstring ecpg/ecpglib,$(subdir)))
+override CPPFLAGS+= -DBUILDING_DLL
+endif
+
+# required by Python headers
+ifneq (,$(findstring src/pl/plpython,$(subdir)))
+override CPPFLAGS+= -DUSE_DL_IMPORT
+endif
+
+# special win32 headers are provided here
+ifdef PGXS
+override CPPFLAGS+= -I$(includedir_server)/port/win32
+endif
+
+# it is better to install shared-libraries anyway?
+# may be overriden with make MAKE_DLL=false install
+ifndef MAKE_DLL
+MAKE_DLL	= true
+endif
+
+
+# Build rules to add versioninfo resources to win32 binaries
+
+WIN32RES += win32ver.o
+ifeq ($(PGFILESHLIB),1)
+PGFTYPE = VFT_DLL
+else
+PGFTYPE = VFT_APP
+endif
+ifneq (,$(PGAPPICON))
+PGICOSTR = $(subst /,\/,IDI_ICON ICON \"$(top_builddir)/src/port/$(PGAPPICON).ico\")
+endif
+
+win32ver.rc: $(top_srcdir)/src/port/win32ver.rc
+	sed -e 's;FILEDESC;$(PGFILEDESC);' -e 's;VFT_APP;$(PGFTYPE);' -e 's;_ICO_;$(PGICOSTR);' -e 's;\(VERSION.*\),0 *$$;\1,'`date '+%y%j' | sed 's/^0*//'`';' $< >$@
+
+win32ver.o: win32ver.rc
+	$(WINDRES) -i $< -o $@ --include-dir=$(top_builddir)/src/include --include-dir=$(srcdir)
+
+# Rule for building a shared library from a single .o file
+%.dll: %.o
+	$(DLLTOOL) --export-all --output-def $*.def $<
+	$(DLLWRAP) -o $@ --def $*.def $< $(LDFLAGS) $(LDFLAGS_SL) $(BE_DLLLIBS)
+	rm -f $*.def

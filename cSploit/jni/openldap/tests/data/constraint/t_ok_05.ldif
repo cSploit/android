@@ -1,0 +1,5 @@
+dn: cn=John Doe,ou=users,dc=example,dc=com
+changetype: modify
+add: mail
+mail: a@example.com
+mail: b@example.com

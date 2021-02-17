@@ -1,0 +1,185 @@
+.\" Copyright 2004-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.TH SLAPO_LASTMOD 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.SH NAME
+slapo-lastmod \- Last Modification overlay
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+.LP
+The 
+.B lastmod
+overlay creates a service entry rooted at the suffix of the database
+it's stacked onto, which holds the DN, the modification type,
+the modifiersName and the modifyTimestamp of the last write operation
+performed on that database.
+The lastmod overlay cannot be used when the "lastmod" feature
+is disabled, i.e. "lastmod off" is used.
+.P
+All operations targeted at the DN of the lastmod entry are rejected,
+except reads, i.e. searches with 
+.B base
+scope.
+Regular operations are ignored, unless they result in writing; then,
+in case of success, the lastmod entry is updated accordingly,
+if possible.
+
+.SH CONFIGURATION
+These 
+.B slapd.conf
+configuration options apply to the lastmod overlay. They must appear
+after the
+.B overlay
+directive.
+.TP
+.B lastmod-rdnvalue <RDN value>
+Specify the value of the RDN used for the service entry.  By default
+.I Lastmod
+is used.
+.TP
+.B lastmod-enabled {yes|no}
+Specify whether the overlay must be enabled or not at startup.
+By default, the overlay is enabled; however, by changing the boolean
+value of the attribute
+.IR lastmodEnabled ,
+one can affect the status of the overlay.
+This is useful, for instance, to inhibit the overlay from keeping track
+of large bulk loads or deletions.
+
+.SH OBJECT CLASS
+The 
+.B lastmod
+overlay depends on the
+.B lastmod
+objectClass.  The definition of that class is as follows:
+.LP
+.RS 4
+( 1.3.6.1.4.1.4203.666.3.13 "
+    NAME 'lastmod'
+    DESC 'OpenLDAP per-database last modification monitoring'
+    STRUCTURAL
+    SUP top
+    MUST ( cn $ lastmodDN $ lastmodType )
+    MAY ( description $ seeAlso ) )
+.RE
+
+.SH ATTRIBUTES
+.P
+Each one of the sections below details the meaning and use of a particular
+attribute of this
+.B lastmod
+objectClass.
+Most of the attributes that are specific to the lastmod objectClass are
+operational, since they can logically be altered only by the DSA.
+The most notable exception is the
+.I lastmodEnabled
+attributeType, which can be altered via protocol to change the status
+of the overlay.
+.P
+
+.B lastmodEnabled
+.P
+This attribute contains a boolean flag that determines the status
+of the overlay.  It can be altered via protocol by issuing a modify
+operation that replaces the value of the attribute.
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.1.30
+   NAME 'lastmodEnabled'
+   DESC 'Lastmod overlay state'
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.7
+   EQUALITY booleanMatch
+   SINGLE-VALUE )
+.RE
+
+.SH OPERATIONAL ATTRIBUTES
+.P
+Each one of the sections below details the meaning and use of a particular
+attribute of this
+.B lastmod
+objectClass.
+Most of the attributes that are specific to the lastmod objectClass are
+operational, since they can logically be altered only by the DSA.
+.P
+
+.B lastmodDN
+.P
+This attribute contains the distinguished name of the entry
+that was last modified within the naming context of a database.
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.1.28
+   NAME 'lastmodDN'
+   DESC 'DN of last modification'
+   EQUALITY distinguishedNameMatch
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.12
+   NO-USER-MODIFICATION
+   USAGE directoryOperation )
+.RE
+
+.B lastmodType
+.P
+This attribute contains the type of the modification that occurred
+to the last modified entry.  Legal values are
+.BR add ,
+.BR delete ,
+.BR exop ,
+.BR modify ,
+.B modrdn
+and
+.BR unknown .
+The latter should only be used as a fall-thru in case of unhandled
+request types that are considered equivalent to a write operation.
+.LP
+.RS 4
+(  1.3.6.1.4.1.4203.666.1.29
+   NAME 'lastmodType'
+   DESC 'Type of last modification'
+   SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+   EQUALITY caseIgnoreMatch
+   SINGLE-VALUE
+   NO-USER-MODIFICATION
+   USAGE directoryOperation )
+.RE
+
+
+.SH EXAMPLES
+.LP
+.RS
+.nf
+database    mdb
+suffix      dc=example,dc=com
+\...
+overlay     lastmod
+lastmod-rdnvalue "Last Modification"
+.fi
+.RE
+
+.SH SEE ALSO
+.BR ldap (3),
+.BR slapd.conf (5),
+.LP
+"OpenLDAP Administrator's Guide" (http://www.OpenLDAP.org/doc/admin/)
+.LP
+
+.SH BUGS
+It is unclear whether this overlay can safely interoperate 
+with other overlays.
+If the underlying backend does not implement entry_get/entry_release
+handlers, modrdn update can become tricky.
+The code needs some cleanup and more consistent error handling.
+So far, the OIDs for the schema haven't been assigned yet.
+
+.SH ACKNOWLEDGEMENTS
+.P
+This module was written in 2004 by Pierangelo Masarati in fulfillment
+of requirements from SysNet s.n.c.; this man page has been copied
+from 
+.BR slapo-ppolicy (5),
+and most of the overlays ever written are copied from Howard Chu's
+first overlays.
+.P
+.B OpenLDAP
+is developed and maintained by The OpenLDAP Project (http://www.openldap.org/).
+.B OpenLDAP
+is derived from University of Michigan LDAP 3.3 Release.  

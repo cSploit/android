@@ -1,0 +1,68 @@
+.TH NWPASSWD 1 01/16/1997 nwpasswd nwpasswd
+.SH NAME
+nwpasswd \- Change a user's password
+.SH SYNOPSIS
+.B nwpasswd
+[
+.B -h
+] [
+.B -S
+.I server
+] [
+.B -U
+.I user name
+] [
+.B -O
+.I object name
+] [
+.B -t
+.I object type
+]
+
+.SH DESCRIPTION
+With
+.B nwpasswd,
+you can change your password on a NetWare server. 
+.B nwpasswd
+asks for the old password and twice for the new password. Then it
+changes the password on the server.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+With -h nwpasswd prints a little help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user name
+.RS 3
+is the name of the bindery object whose password is to be changed.
+.RE
+
+.B -O
+.I object name
+.RS 3
+If you have supervisor privileges, you can change other users'
+passwords. With
+.B -O
+you can tell nwpasswd the name of the user whose password should be
+changed.
+.RE
+
+.B -t
+.I object type
+.RS 3
+is the bindery object type of the object whose password is to be
+changed.
+.RE
+
+.SH CREDITS
+nwpasswd would not have been possible without the work of Guntram
+Blom. Look at nwcrypt.c for his work.

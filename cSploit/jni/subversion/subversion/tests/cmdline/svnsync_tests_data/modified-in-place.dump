@@ -1,0 +1,76 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 103a2b4e-2705-0410-8a58-ca61540ba721
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2005-11-09T19:58:00.162066Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 114
+Content-length: 114
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-09T19:58:23.561942Z
+K 7
+svn:log
+V 13
+Added a file
+
+PROPS-END
+
+Node-path: foo.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 15
+Text-content-md5: 26bb73556ceb32a5df30b733c5355ee5
+Text-content-sha1: 1c8c6df57252f0cc13dd2d763f4aef9affe1817c
+Content-length: 25
+
+PROPS-END
+this is a file
+
+
+Revision-number: 2
+Prop-content-length: 112
+Content-length: 112
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-09T19:58:38.412025Z
+K 7
+svn:log
+V 11
+modified it
+PROPS-END
+
+Node-path: foo.txt
+Node-kind: file
+Node-action: change
+Text-content-length: 38
+Text-content-md5: d9bf46ecc7a555936e5115241b93258b
+Text-content-sha1: 1586ddcffca1e5f724b0eea7bb9d6b41f67c7ba6
+Content-length: 38
+
+this is a file
+now it's been modified
+
+

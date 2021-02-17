@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB-&gt;sort_multiple()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="db.html" title="Chapter 2.  The DB Handle" />
+    <link rel="prev" href="dbset_re_source.html" title="DB-&gt;set_re_source()" />
+    <link rel="next" href="dbstat.html" title="DB-&gt;stat()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB-&gt;sort_multiple()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="dbset_re_source.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 2. 
+                The DB Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="dbstat.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="dbsort_multiple"></a>DB-&gt;sort_multiple()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB-&gt;sort_multiple(DB *db, DBT *key, DBT *data, u_int32_t flags); </pre>
+      <p>
+         The <code class="methodname">DB-&gt;sort_multiple()</code> method is used
+         to sort a set of <a class="link" href="dbt.html" title="Chapter 4.  The DBT Handle">DBT</a>s into
+         database insert order.
+    </p>
+      <p>
+         If specified the application specific btree comparison and
+         duplicate comparison functions will be used if they are
+         configured.
+    </p>
+      <p>
+         The key and data parameters must contain pairs of items. That is
+         the n-th entry in <span class="bold"><strong>key</strong></span> must
+         correspond to the n-th entry in 
+         <span class="bold"><strong>data</strong></span>.
+    </p>
+      <p>
+         The <code class="methodname">DB-&gt;sort_multiple()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50621520"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50594016"></a>key</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>key</strong></span> parameter must
+                  contain a set of <a class="link" href="dbt.html" title="Chapter 4.  The DBT Handle">DBT</a>
+                  entries in 
+                  <a class="link" href="dbcget.html#dbcget_DB_MULTIPLE">DB_MULTIPLE</a> 
+                  or
+                  <a class="link" href="dbcget.html#dbcget_DB_MULTIPLE_KEY">DB_MULTIPLE_KEY</a> 
+                  format.
+             </p>
+          <p>
+                 The sorted entries will be returned in the 
+                 <span class="bold"><strong>key</strong></span> parameter.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50604400"></a>data</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  If non-NULL, the <span class="bold"><strong>data</strong></span>
+                  parameter must contain a set of 
+                  <a class="link" href="dbt.html" title="Chapter 4.  The DBT Handle">DBT</a>s entries in 
+                  <a class="link" href="dbcget.html#dbcget_DB_MULTIPLE">DB_MULTIPLE</a> 
+                  format. Each entry must correspond to an entry in the 
+                  <span class="bold"><strong>key</strong></span> parameter.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50606896"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>flags</strong></span> parameter must
+                  be set to one of the following values:
+             </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p><a id="sort_multiple_DB_MULTIPLE"></a>
+		                DB_MULTIPLE
+                   </p>
+                <p>
+                        Sorts one or two 
+                        <a class="link" href="dbcget.html#dbcget_DB_MULTIPLE">DB_MULTIPLE</a>
+                        format <a class="link" href="dbt.html" title="Chapter 4.  The DBT Handle">DBT</a>s.
+                        Assumes that <span class="bold"><strong>key</strong></span>
+                        and <span class="bold"><strong>data</strong></span> specify
+                        pairs of key and data items to sort together. If
+                        the <span class="bold"><strong>data</strong></span> parameter
+                        is NULL the API will sort the key arrays according
+                        to the btree comparison function.
+                   </p>
+              </li>
+              <li>
+                <p><a id="sort_multiple_DB_MULTIPLE_KEY"></a>
+		                DB_MULTIPLE_KEY
+                   </p>
+                <p>
+                        Sorts a 
+                        <a class="link" href="dbcget.html#dbcget_DB_MULTIPLE_KEY">DB_MULTIPLE_KEY</a> 
+                        format <a class="link" href="dbt.html" title="Chapter 4.  The DBT Handle">DBT</a>.
+                   </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50629880"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DB-&gt;sort_multiple()</code> <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50637872"></a>EACCES</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                An attempt was made to modify a read-only database.
+            </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp50641056"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                An invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50604272"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="db.html" title="Chapter 2.  The DB Handle">DB</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50625680"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="db.html#dblist" title="Database and Related Methods">Database and Related Methods</a> 
+        </p>
+        <p>
+        </p>
+        <p>
+	         <a class="xref" href="dbt.html#dbtlist" title="DBT and Bulk Operations">DBT and Bulk Operations</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="dbset_re_source.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="db.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="dbstat.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB-&gt;set_re_source() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB-&gt;stat()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

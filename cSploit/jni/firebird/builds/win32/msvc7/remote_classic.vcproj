@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="remote_classic" ProjectGUID="{3C4993E4-946C-4029-97B8-1A111F32F4FC}">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Release|Win32" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="2" InlineFunctionExpansion="1" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" PreprocessorDefinitions="NDEBUG,_LIB,WIN32" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLinkerTool" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+    </Configuration>
+    <Configuration Name="Debug|Win32" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" PreprocessorDefinitions="_DEBUG,_LIB,WIN32,DEV_BUILD" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLinkerTool" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="REMOTE files" Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat">
+      <File RelativePath="..\..\..\src\auth\trusted\AuthSspi.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\os\win32\chop.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\os\win32\cntl.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\inet.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\interface.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\merge.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\parser.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\os\win32\property.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\protocol.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\remote.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\server.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\os\win32\srvr_w32.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\os\win32\window.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\os\win32\wnet.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\xdr.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\remote\xnet.cpp">
+      </File>
+    </Filter>
+    <Filter Name="Header files" Filter="h;hpp;hxx;hm;inl">
+      <File RelativePath="..\..\..\src\auth\trusted\AuthSspi.h">
+      </File>
+      <File RelativePath="..\..\..\src\remote\inet_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\remote\merge_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\remote\protocol.h">
+      </File>
+      <File RelativePath="..\..\..\src\remote\remote.h">
+      </File>
+      <File RelativePath="..\..\..\src\remote\serve_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\remote\os\win32\wnet_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\remote\xdr.h">
+      </File>
+      <File RelativePath="..\..\..\src\remote\xnet.h">
+      </File>
+      <File RelativePath="..\..\..\src\remote\xnet_proto.h">
+      </File>
+    </Filter>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

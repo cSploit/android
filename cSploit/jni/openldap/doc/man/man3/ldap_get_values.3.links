@@ -1,0 +1,5 @@
+ldap_get_values_len.3
+ldap_value_free.3
+ldap_value_free_len.3
+ldap_count_values.3
+ldap_count_values_len.3

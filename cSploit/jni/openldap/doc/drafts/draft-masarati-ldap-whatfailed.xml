@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+    <!ENTITY rfc2119 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+    <!ENTITY rfc4510 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4510.xml'>
+    <!ENTITY rfc4511 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4511.xml'>
+    <!ENTITY rfc4512 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4512.xml'>
+    <!ENTITY rfc4526 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4526.xml'>
+    <!ENTITY rfc4529 PUBLIC '' 
+      'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4529.xml'>
+]>
+
+<!-- $OpenLDAP$ -->
+
+<rfc category="std" ipr="full3978" docName="draft-masarati-ldap-whatfailed-00.txt">
+
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+
+<?rfc toc="yes" ?>
+<?rfc symrefs="yes" ?>
+<?rfc sortrefs="yes"?>
+<?rfc iprnotified="no" ?>
+<?rfc strict="yes" ?>
+
+    <front>
+        <title abbrev='LDAP WHATFAILED'>LDAP "What Failed?" Control</title>
+        <author initials='P.' surname="Masarati" fullname='Pierangelo Masarati'>
+            <organization abbrev='Politecnico di Milano'>
+                Politecnico di Milano
+            </organization>
+            <address>
+                <postal>
+                    <street>Dipartimento di Ingegneria Aerospaziale</street>
+                    <street>via La Masa 34</street>
+                    <city>Milano</city>
+                    <code>20156</code>
+                    <country>IT</country>
+                </postal>
+                <phone>+39 02 2399 8309</phone>
+                <facsimile>+39 02 2399 8334</facsimile>
+                <email>ando@OpenLDAP.org</email>
+                <uri>http://www.aero.polimi.it/masarati/</uri>
+            </address>
+        </author>
+        <date/>
+        <abstract>
+            <t>
+This document describes the LDAP "What Failed?" control.
+This control allows DUAs to request, in response to a failed operation
+request, the object identifier of those extensions that caused
+the operation to fail.
+            </t>
+        </abstract>
+    </front>
+
+    <middle>
+        <section title="Background and Intended Use">
+            <t>
+The LDAP Protocol <xref target="RFC4510" /> is extensible.
+Extensions include controls, extended requests and extensions related
+to other aspects of the protocol, for example those described in
+<xref target="RFC4526" />, <xref target="RFC4529" /> and more.
+            </t>
+
+            <t>
+Operations may fail for different reasons.
+The resultCode may help in determining the reason of a failure.
+The (optional) diagnosticsMessage fields of a LDAPResponse
+could also be of help.
+However, according to <xref target="RFC4511" />,
+implementations MUST NOT rely on the returned values,
+which are simply intended to be presented as are to human users.
+            </t>
+
+            <t>
+In case of failure related to the inability to process a control
+marked as critical in a request, the specific resultCode
+unavailableCriticalExtension is returned.
+In case of failure related to an unrecognized extendedReq, the generic
+resultCode protocolError is returned.
+Failures related to handling other extensions may result 
+in other generic resultCode values.
+            </t>
+
+            <t>
+As a consequence, DUAs may be unable to exactly determine
+what extension, if any, caused a failure.
+The "What Failed?" control represents a means for the DSA to inform
+DUAs about what specific extensions, if any, caused an error notified
+by the DSA.
+            </t>
+
+            <t>
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL",
+"SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY",
+and "OPTIONAL" in this document are to be interpreted as
+described in <xref target="RFC2119" />.
+            </t>
+        </section>
+
+        <section title='LDAP "What Failed?" Control'>
+            <section title="Control Semantics">
+                <t>
+The presence of the "What Failed?" LDAP control in a LDAP request
+indicates that the DUA, in case of error, wishes to receive detailed
+information about what extension, if any, caused the error.
+                </t>
+
+                <t>
+The criticality of the control in the request SHOULD be FALSE.
+According to the semantics of the criticality field as indicated
+in <xref target="RFC4511" />, this ensures that in case the control
+is not recognized by the DSA, it does not cause itself an error.
+                </t>
+
+                <t>
+The presence of this control in a request does not guarantee that the DSA
+will return detailed information about what extensions caused an error.
+Considering the requirement on the criticality of the control,
+the DSA MAY simply choose to ignore the control.
+The DSA MAY hide information about failure in handling an extension
+to prevent disclosure of other information.
+The DSA MAY choose to notify an error as soon as it is detected,
+instead of proceed checking its ability to handle any other extension
+present in a request.
+                </t>
+
+                <t>
+Implementations may choose to check the validity of extensions,
+including controls, as soon as they are parsed.
+As a consequence, a critical control might result in an error
+before thw "What Failed?" control request is parsed.
+Implementations SHOULD check anyway the presence of this control,
+unless they detect that the remaining part of the request
+is malformed.
+Clients SHOULD NOT rely on any specific ordering of controls handling
+when requesting the "What Failed?" control.
+                </t>
+
+                <t>
+Servers implementing this technical specification SHOULD publish
+the object identifier whatFailed-oid (IANA assigned;
+see <xref target="iana_considerations" />) as a value
+of the 'supportedControl' attribute <xref target="RFC4512" />
+in their root DSE.
+                </t>
+            </section>
+
+            <section title="Control Request">
+                <t>
+The controlType is whatFailed-oid (IANA assigned;
+see <xref target="iana_considerations" />);
+the controlValue MUST be absent;
+the criticality SHOULD be FALSE.
+                </t>
+            </section>
+
+            <section title="Control Response">
+                <figure>
+                    <preamble>
+The controlType is whatFailed-oid (IANA assigned;
+see <xref target="iana_considerations" />);
+the controlValue is:
+                    </preamble>
+                    <artwork>
+    controlValue ::= SET OF oid LDAPOID
+                    </artwork>
+                    <postamble>
+If the set of extension OID is empty, the control is omitted
+from the response.
+The criticality MUST be FALSE.
+                    </postamble>
+                </figure>
+            </section>
+        </section>
+
+        <section title="Implementation Notes">
+            <t>
+The "What Failed?" LDAP Control is implemented in OpenLDAP software
+using the temporary OID 1.3.6.1.4.1.4203.666.5.17 under OpenLDAP's
+experimental OID arc.
+            </t>
+        </section>
+
+        <section title="Security Considerations">
+            <t>
+Implementations MUST take measures to prevent the disclosure
+of sensible information whenever this may result from disclosing
+what extension caused an error.
+This can consist in excluding the OID of specific extensions from
+the controlValue in the response, or in entirely omitting the control
+in the response.
+            </t>
+        </section>
+
+        <section anchor="iana_considerations" title="IANA Considerations">
+            <section title="Object Identifier Registration">
+                <figure>
+                    <preamble>
+It is requested that IANA register upon Standards Action an LDAP
+Object Identifier for use in this technical specification.
+                    </preamble>
+                    <artwork>
+      Subject: Request for LDAP OID Registration
+      Person &amp; email address to contact for further information:
+          Pierangelo Masarati &lt;ando@OpenLDAP.org&gt;
+      Specification: (I-D)
+      Author/Change Controller: IESG
+      Comments:
+          Identifies the LDAP "What Failed?" Control request
+          and response
+                    </artwork>
+                </figure>
+            </section>
+        </section>
+
+        <section title="Acknowledgments">
+        </section>
+    </middle>
+
+    <back>
+        <references title='Normative References'>
+            &rfc2119;
+            &rfc4510;
+            &rfc4511;
+            &rfc4512;
+        </references>
+        <references title='Informative References'>
+            &rfc4526;
+            &rfc4529;
+        </references>
+    </back>
+
+</rfc>

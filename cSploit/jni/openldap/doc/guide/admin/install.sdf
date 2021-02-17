@@ -1,0 +1,266 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Building and Installing OpenLDAP Software
+
+This chapter details how to build and install the {{PRD:OpenLDAP}}
+Software package including {{slapd}}(8), the Standalone {{TERM:LDAP}}
+Daemon.  Building and installing OpenLDAP Software requires several
+steps: installing prerequisite software, configuring OpenLDAP
+Software itself, making, and finally installing.  The following
+sections describe this process in detail.
+
+
+H2: Obtaining and Extracting the Software
+
+You can obtain OpenLDAP Software from the project's download
+page at {{URL: http://www.openldap.org/software/download/}} or
+directly from the project's {{TERM:FTP}} service at
+{{URL: ftp://ftp.openldap.org/pub/OpenLDAP/}}.
+
+The project makes available two series of packages for {{general
+use}}.  The project makes {{releases}} as new features and bug fixes
+come available.  Though the project takes steps to improve stability
+of these releases, it is common for problems to arise only after
+{{release}}.  The {{stable}} release is the latest {{release}} which
+has demonstrated stability through general use.
+
+Users of OpenLDAP Software can choose, depending on their desire
+for the {{latest features}} versus {{demonstrated stability}}, the
+most appropriate series to install.
+
+After downloading OpenLDAP Software, you need to extract the
+distribution from the compressed archive file and change your working
+directory to the top directory of the distribution:
+
+.{{EX:gunzip -c openldap-VERSION.tgz | tar xf -}}
+.{{EX:cd openldap-VERSION}}
+
+You'll have to replace {{EX:VERSION}} with the version name of
+the release.
+
+You should now review the {{F:COPYRIGHT}}, {{F:LICENSE}}, {{F:README}}
+and {{F:INSTALL}} documents provided with the distribution.  The
+{{F:COPYRIGHT}} and {{F:LICENSE}} provide information on acceptable
+use, copying, and limitation of warranty of OpenLDAP Software. The
+{{F:README}} and {{F:INSTALL}} documents provide detailed information
+on prerequisite software and installation procedures.
+
+
+H2: Prerequisite software
+
+OpenLDAP Software relies upon a number of software packages distributed
+by third parties.  Depending on the features you intend to use, you
+may have to download and install a number of additional software
+packages.  This section details commonly needed third party software
+packages you might have to install.  However, for an up-to-date
+prerequisite information, the {{F:README}} document should be
+consulted.  Note that some of these third party packages may depend
+on additional software packages.  Install each package per the
+installation instructions provided with it.
+
+
+H3: {{TERM[expand]TLS}}
+
+OpenLDAP clients and servers require installation of {{PRD:OpenSSL}},
+ {{PRD:GnuTLS}}, or {{PRD:MozNSS}}
+{{TERM:TLS}} libraries to provide {{TERM[expand]TLS}} services.  Though
+some operating systems may provide these libraries as part of the
+base system or as an optional software component, OpenSSL, GnuTLS, and
+Mozilla NSS often require separate installation.
+
+OpenSSL is available from {{URL: http://www.openssl.org/}}.
+GnuTLS is available from {{URL: http://www.gnu.org/software/gnutls/}}.
+Mozilla NSS is available from {{URL: http://developer.mozilla.org/en/NSS}}.
+
+OpenLDAP Software will not be fully LDAPv3 compliant unless OpenLDAP's
+{{EX:configure}} detects a usable TLS library.
+
+
+H3: {{TERM[expand]SASL}}
+
+OpenLDAP clients and servers require installation of {{PRD:Cyrus SASL}} 
+libraries to provide {{TERM[expand]SASL}} services.  Though
+some operating systems may provide this library as part of the
+base system or as an optional software component, Cyrus SASL
+often requires separate installation.
+
+Cyrus SASL is available from
+{{URL:http://asg.web.cmu.edu/sasl/sasl-library.html}}.
+Cyrus SASL will make use of OpenSSL and Kerberos/GSSAPI libraries
+if preinstalled.
+
+OpenLDAP Software will not be fully LDAPv3 compliant unless OpenLDAP's
+configure detects a usable Cyrus SASL installation.
+
+
+H3: {{TERM[expand]Kerberos}}
+
+OpenLDAP clients and servers support {{TERM:Kerberos}} authentication
+services.  In particular, OpenLDAP supports the Kerberos V
+{{TERM:GSS-API}} {{TERM:SASL}} authentication mechanism known as
+the {{TERM:GSSAPI}} mechanism.  This feature requires, in addition to
+Cyrus SASL libraries, either {{PRD:Heimdal}} or {{PRD:MIT Kerberos}}
+V libraries.
+
+Heimdal Kerberos is available from {{URL:http://www.pdc.kth.se/heimdal/}}.
+MIT Kerberos is available from {{URL:http://web.mit.edu/kerberos/www/}}.
+
+Use of strong authentication services, such as those provided by
+Kerberos, is highly recommended.
+
+
+
+H3: Database Software
+
+OpenLDAP's {{slapd}}(8) {{TERM:MDB}} primary database backend uses the {{LMDB}}
+software included with the OpenLDAP source.  There is no need to download any
+additional software to have {{MDB}} support.
+
+OpenLDAP's {{slapd}}(8) {{TERM:BDB}} and {{TERM:HDB}} depricated database backends
+require {{ORG[expand]Oracle}} {{PRD:Berkeley DB}}.
+If not available at configure time, you will not be able to build
+{{slapd}}(8) with these primary database backends.
+
+Your operating system may provide a supported version of
+{{PRD:Berkeley DB}} in the base system or as an optional
+software component.  If not, you'll have to obtain and
+install it yourself.
+
+{{PRD:Berkeley DB}} is available from {{ORG[expand]Oracle}}'s Berkeley DB
+download page
+{{URL: http://www.oracle.com/technology/software/products/berkeley-db/index.html}}.  
+
+There are several versions available. Generally, the most recent
+release (with published patches) is recommended. This package is required
+if you wish to use the deprecated {{TERM:BDB}} or {{TERM:HDB}} database backends.
+
+Note: Please see {{SECT:Recommended OpenLDAP Software Dependency Versions}} for
+more information.
+
+
+H3: Threads
+
+OpenLDAP is designed to take advantage of threads.  OpenLDAP
+supports POSIX {{pthreads}}, Mach {{CThreads}}, and a number of
+other varieties.  {{EX:configure}} will complain if it cannot
+find a suitable thread subsystem.   If this occurs, please
+consult the {{F:Software|Installation|Platform Hints}} section
+of the OpenLDAP FAQ {{URL: http://www.openldap.org/faq/}}.
+
+
+H3: TCP Wrappers
+
+{{slapd}}(8) supports TCP Wrappers (IP level access control filters)
+if preinstalled.  Use of TCP Wrappers or other IP-level access
+filters (such as those provided by an IP-level firewall) is recommended
+for servers containing non-public information.
+
+
+H2: Running configure
+
+Now you should probably run the {{EX:configure}} script with the
+{{EX:--help}} option.
+This will give you a list of options that you can change when building
+OpenLDAP.  Many of the features of OpenLDAP can be enabled or disabled
+using this method.
+!if 0
+Please see the appendix for a more detailed list of configure options,
+and their usage.
+!endif
+>	./configure --help
+
+The {{EX:configure}} script also looks for certain variables
+on the command line and in the environment.  These include:
+
+!block table; align=Center; coltags="EX,N"; title="Table 4.1: Variables"
+Variable	Description
+CC      	Specify alternative C Compiler
+CFLAGS  	Specify additional compiler flags
+CPPFLAGS	Specify C Preprocessor flags
+LDFLAGS 	Specify linker flags
+LIBS    	Specify additional libraries
+!endblock
+
+Now run the configure script with any desired configuration options or
+variables.
+
+>	./configure [options] [variable=value ...]
+
+As an example, let's assume that we want to install OpenLDAP with
+MDB backend and TCP Wrappers support.  By default, MDB
+is enabled and TCP Wrappers is not.  So, we just need to specify
+{{EX:--enable-wrappers}} to include TCP Wrappers support:
+
+>	./configure --enable-wrappers
+
+However, this will fail to locate dependent software not
+installed in system directories.  For example, if TCP Wrappers
+headers and libraries are installed in {{F:/usr/local/include}}
+and {{F:/usr/local/lib}} respectively, the {{EX:configure}}
+script should typically be called as follows:
+
+>	./configure --enable-wrappers \
+>		CPPFLAGS="-I/usr/local/include" \
+>		LDFLAGS="-L/usr/local/lib -Wl,-rpath,/usr/local/lib"
+
+The {{EX:configure}} script will normally auto-detect appropriate
+settings.  If you have problems at this stage, consult any platform
+specific hints and check your {{EX:configure}} options, if any.
+
+
+H2: Building the Software
+
+Once you have run the {{EX:configure}} script the last line of output
+should be:
+>	Please "make depend" to build dependencies
+
+If the last line of output does not match, {{EX:configure}} has failed,
+and you will need to review its output to determine what went wrong.
+You should not proceed until {{EX:configure}} completes successfully.
+
+To build dependencies, run:
+>	make depend
+
+Now build the software, this step will actually compile OpenLDAP.
+>	make
+
+You should examine the output of this command carefully to make sure
+everything is built correctly.  Note that this command builds the LDAP
+libraries and associated clients as well as {{slapd}}(8).
+
+
+H2: Testing the Software
+
+Once the software has been properly configured and successfully
+made, you should run the test suite to verify the build.
+
+>	make test
+
+Tests which apply to your configuration will run and they should pass.
+Some tests, such as the replication test, may be skipped if not supported
+by your configuration.
+
+
+H2: Installing the Software
+
+Once you have successfully tested the software, you are ready to
+install it.  You will need to have write permission to the installation
+directories you specified when you ran configure.  By default
+OpenLDAP Software is installed in {{F:/usr/local}}.  If you changed
+this setting with the {{EX:--prefix}} configure option, it will be
+installed in the location you provided.
+
+Typically, the installation requires {{super-user}} privileges.
+From the top level OpenLDAP source directory, type:
+
+>	su root -c 'make install'
+
+and enter the appropriate password when requested.
+
+You should examine the output of this command carefully to make sure
+everything is installed correctly. You will find the configuration files
+for {{slapd}}(8) in {{F:/usr/local/etc/openldap}} by default.  See the
+chapter {{SECT:Configuring slapd}} for additional information.
+

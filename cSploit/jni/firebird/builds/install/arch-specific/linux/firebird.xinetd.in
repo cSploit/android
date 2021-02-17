@@ -1,0 +1,20 @@
+# default: on
+# description: FirebirdSQL server
+#
+# Be careful when commenting out entries in this file. Active key entry should
+# be the first as some scripts (CSchangeRunUser.sh in particular) use sed 
+# scripting to modify it.
+
+service @FB_SERVICE_NAME@
+{
+	disable = no
+	flags		= REUSE
+	socket_type	= stream
+	wait		= no
+	user		= root
+# These lines cause problems with Windows XP SP2 clients
+# using default firewall configuration (SF#1065511)
+#	log_on_success	+= USERID
+#	log_on_failure	+= USERID
+	server		= @FB_SBINDIR@/firebird
+}

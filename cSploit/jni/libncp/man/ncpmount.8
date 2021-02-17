@@ -1,0 +1,479 @@
+.TH NCPMOUNT 8 12/04/1998 ncpmount ncpmount
+.SH NAME
+ncpmount, mount.ncp, mount.ncpfs \- mount volume(s) from a specified NetWare fileserver.
+.SH SYNOPSIS
+.B ncpmount
+[ \fB-h\fP ] [ \fB-S\fP \fIserver\fP ] [ \fB-U\fP \fIuser name\fP ]
+[ \fB-P\fP \fIpassword\fP | \fB-n\fP ] [ \fB-C\fP ] 
+[ \fB-c\fP \fIclient name\fP ] [ \fB-u\fP \fIuid\fP ] [ \fB-g\fP \fIgid\fP ] 
+[ \fB-f\fP \fIfile mode\fP ] [ \fB-d\fP \fIdir mode\fP ]
+[ \fB-V\fP \fIvolume\fP ] [ \fB-t\fP \fItime_out\fP ]
+[ \fB-r\fP \fIretry_count\fP ] [ \fB-b\fP ] [ \fB-i\fP \fIlevel\fP ]
+[ \fB-v\fP ] [ \fB-m\fP ] [ \fB-y\fP \fIiocharset\fP ]
+[ \fB-p\fP \fIcodepage\fP ] [ \fB-N\fP \fIignored namespace\fP ]
+[ \fB-2\fP | \fB-3\fP | \fB-4\fP ] [ \fB-s\fP ] [ \fB-A\fP \fIdns name\fP ]
+mount-point
+
+.B mount.ncp
+remote-server-and-user
+mount-point
+[ \fB-n\fP ] [ \fB-v\fP ] [ \fB-o\fP \fImount_options\fP ]
+
+
+.SH DESCRIPTION
+This program is used to mount volumes of the specified NetWare Fileserver
+under the specified mount point.
+
+.B ncpfs
+is a linux filesystem which understands the NCP protocol. This is the
+protocol Novell NetWare clients use to talk to NetWare servers. ncpfs
+was inspired by \fBlwared\fP, a free NetWare emulator for Linux written
+by Ales Dryak. See ftp://klokan.sh.cvut.cz/pub/linux for this very 
+interesting program.
+
+\fBncpmount\fP, when invoked with all appropriate arguments, attaches and
+logs into specified server and mounts all volumes (or one volume or subtree)
+from server under the specified mount point.
+.B ncpmount
+when invoked without any arguments specifying the fileserver, user id and
+password checks the file
+.I $HOME/.nwclient
+to find a file server, a user name and possibly a password to use for the
+specified mount point. See nwclient(5) for more information. Please note
+that the access permissions of .nwclient MUST be 600, for security reasons.
+
+.SH OPTIONS
+.B mount-point
+.RS 3
+.B mount-point
+is the directory you want to mount the filesystem over. Its function is the
+the same as for a normal mount command.
+
+If the real uid of the caller is not root,
+.B ncpmount
+checks whether the user is allowed to mount a filesystem on the
+mount-point. So it should be safe to make 
+.B ncpmount
+setuid root. The filesystem stores the uid of the user who called
+ncpmount. So
+.B ncpumount
+can check whether the caller is allowed to unmount the filesystem.
+.RE
+
+.B -S
+.I server
+(mount option \fBserver=\fP or part before
+.B /
+in \fIremote-server-and-user\fP)
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B -C
+(mount option \fBnoupcasepasswd\fP)
+.RS 3
+By default passwords are converted to uppercase before they are sent
+to the server because most servers require this. This option disables this
+feature ensuring that passwords are sent without any case conversion.
+.RE
+
+.B -n
+(mount option \fBnopasswd\fP)
+.RS 3
+.B -n
+must be specified for logins that do not have a password configured.
+This option means do not update /etc/mtab if there is option
+.B -o
+on command line. You must use
+.B -o nopasswd
+in this case.
+.RE
+
+.B passwdfile=file
+(only mount option)
+.RS 3
+If you want specify password and you do not want store it into world readable
+/etc/fstab, you can use this option.
+.I file
+then contains lines in form SERVER/USER:PASSWORD:other_data (other_data are
+currently unused)
+.RE
+
+.B pass-fd=fd
+(only mount option)
+.RS 3
+If you want to pass password in secure way to ncpmount, you can pass it through
+specified \fIfd\fP.
+.RE
+
+.B -P
+.I password
+(mount option \fBpasswd=\fP)
+.RS 3
+specifies the password to use for the Netware user id.
+
+If neither
+.B -n
+nor the
+.B -P
+nor the
+.B passwdfile=
+nor the
+.B pass-fd=
+arguments are specified ncpmount will prompt for a password. This
+makes it difficult to use in scripts such as /etc/rc. If you want to
+have ncpmount work automatically from a script you must include the
+appropriate option and be very careful to ensure that appopriate file
+permissions are set for the script that includes your password to
+ensure that others can not read it.
+.RE
+
+.B -U
+.I user name
+(mount option \fBuser=\fP or rest of \fIremote-server-and-user\fP after 
+\fB/\fP)
+.RS 3
+Specifies the Netware user id to use when logging in to the fileserver. If
+this option is not specified then ncpmount will attempt to login to the
+fileserver using the Linux login id of the user invoking ncpmount.
+.RE
+
+.B -m
+(mount option \fBmultiple\fP)
+.RS 3
+Normally,
+.B ncpmount
+limits number of connections from client to server to one per unique user
+name. If you want mount more than one connection with same username and
+server, you must specify \fB-m\fP.
+.RE
+
+.B -u
+.I uid,
+.B -g
+.I gid
+(mount option \fBuid=\fP and \fBgid=\fP)
+.RS 3
+ncpmount does not yet implement a scheme for mapping NetWare users/groups
+to Linux users/groups. Linux requires that each file has an owner and group id.
+With
+.B -u
+and
+.B -g
+you can tell ncpmount which id's it should assign to the files in the
+mounted directory.
+
+The defaults for these values are the current uid and gid.
+.RE
+
+.B -c
+.I user name
+(mount option \fBowner=\fP)
+.RS 3
+.B -c
+names the user who is the 
+.I owner
+of the connection, where owner does not refer to file ownership (that
+"owner" is set by the -u argument), but the owner of the mount, ie: who
+is allowed to call ncpumount on this mount. The default owner of the
+connection and the mount is the user who called ncpmount. This option
+allows you to specify that some other user should be set as the owner.
+
+In this this way it is possible to mount a public read-only directory,
+but to allow the lp daemon to print on NetWare queues. This is
+possible because only users who have write permissions on a directory
+may issue ncp requests over a connection. The exception to this rule
+is the 'mount owner', who is also granted 'request permission'.
+.RE
+
+.B -f
+.I file mode,
+.B -d
+.I dir mode
+(mount option \fBmode=\fP (or \fBfilemode=\fP) and \fBdirmode=\fP)
+.RS 3
+Like 
+.B -u
+and \fB-g\fP,
+these options are used to determine what permissions should be assigned
+files and directories of the mounted volumes. The values must be specified
+as octal numbers. The default values are taken from the current umask, where
+the file mode is the current umask, and the dir mode adds execute permissions
+where the file mode gives read permissions.
+
+Note that these permissions can differ from the rights the server
+gives to us. If you do not have write permissions on the server, you
+can very well choose a file mode that tells that you have. This
+certainly cannot override the restrictions imposed by the server.
+.RE
+
+.B -V
+.I volume
+(mount option \fBvolume=\fP)
+.RS 3
+There are 2 general ways you can mount a NetWare server's disk space:
+Either you can mount all volumes under one directory, or you can mount
+only a single volume.
+
+When you choose to mount the complete disk space at once, you have the
+advantage that only one Linux mount point and only one
+NetWare connection is used for all the volumes of this server. Both of
+these are limited resources. (Although raising the number of Linux
+mount points is significantly cheaper than raising the number of
+available NetWare connections ;-))
+
+When you specify to mount a single volume by using the option
+.B -V
+.I volume,
+you have the big advantage that nfsd is able to re-export this mounted
+directory. You must invoke 
+.B nfsd
+and
+.B mountd
+with the option
+.I --re-export
+to make nfsd re-export ncpfs mounted directories. This uses one Linux
+mount point and one NetWare connection per mounted volume. Maybe
+sometime in the future I will make it possible to mount all volumes on
+different mount points, using only one connection.
+.RE
+
+.B -t
+.I time_out
+(mount option \fBtimeo=\fP or \fBtimeout=\fP)
+.RS 3
+With 
+.B -t
+you can adjust the time ncpfs waits for the server to answer a request
+it sent. Use the option to raise the timeout value when your ncpfs
+connections seem to be unstable although your servers are well
+up. This can happen when you have very busy servers, or servers that
+are very far away.
+
+.I time_out
+is specified in 1/100s, the current default value is 60.
+.RE
+
+.B -r
+.I retry_count
+(mount option \fBretry=\fP)
+.RS 3
+As \fB-t\fP, \fB-r\fP can be used to tune the ncpfs connection to the
+server. With \fIretry_count\fP you can specify how many times ncpfs 
+will attempt to send a packet to the server before it decides the 
+connection is dead. The current default value is 5.
+
+Currently ncpfs is not too clever when trying to find out that
+connections are dead. If anybody knows how to do that correctly, as it
+is done by commercial workstations, please tell me.
+.RE
+
+.B -y
+.I iocharset
+(mount option \fBiocharset=\fP)
+.RS 3
+You can specify character translation rules for converting names from
+unicode to your desktop (it works together with \fB-p\fP).
+.I iocharset
+is charset name, for example \fIiso-8859-1\fP.
+.RE
+
+.B -p
+.I codepage
+(mount option \fBcodepage=\fP)
+.RS 3
+You can specify character translation rules for converting names from
+Netware encoding to unicode (it works together with \fB-y\fP).
+.I codepage
+is codepage name, for example \fIcp437\fP.
+.RE
+
+\fB-b\fP (mount option \fBbindery\fP)
+.RS 3
+If you are connecting to NetWare 4 or NetWare 5 through bindery emulation
+instead of NDS, you must specify this option.
+.RE
+
+.B -i
+.I level
+(mount option \fBsignature=\fP\fIlevel\fP)
+.RS 3
+Enables packet signing. \fIlevel\fP is from 0 to 3: 0 means disable, 1 means
+sign if server needs it, 2 means sign if server allows it and 3 means sign
+packets always.
+.RE
+
+.B -v
+.RS 3
+Print ncpfs version number. It has another meaning (\fIverbose\fP) if you specify
+.B -o
+on command line. If you are interested in version, type
+.B ncpmount -v
+without another options.
+.RE
+
+\fB-A\fP \fIdns name\fP (mount option \fBipserver=\fP\fIdns name\fP)
+.RS 3
+When you are mounting volumes from NetWare 5 server over UDP, you must
+specify \fIdns name\fP of server here and \fIlogical server name\fP in
+\fB-S\fP (or in \fBserver=\fP). This name is used to switch \fBncpmount\fP
+into UDP mode and to specify server to connect. Currently, \fBDNS\fP is
+only supported \fBIP\fP name resolution protocol. There is currently no
+support for \fBSLP\fP.
+.RE
+
+\fB-N\fP \fIignored namespace\fP (mount option \fBnonfs\fP and \fBnolong\fP)
+.RS 3
+\fBncpfs\fP supports \fINFS\fP, \fILONG\fP (\fIOS/2\fP) and \fIDOS\fP namespace
+on NetWare volumes. If you do not want to use \fINFS\fP or \fILONG\fP namespace
+(because of bugs in (server) code or for backward compatibility), you must
+specify these ignored namespaces in mount parameters.
+.RE
+
+\fB-2\fP
+.RS 3
+If you have unusual \fBncpfs\fP code in kernel and \fBncpmount\fP is not
+able to autodetect it, use this option. It switches \fBncpmount\fP to 
+\fBncpfs\fP interface version 2. This interface was used in 2.0.x kernels,
+does not support NCP/UDP, does not have NDS authentication info storage
+and uses only 16bit uid/gid.
+.RE
+
+\fB-3\fP
+.RS 3
+If you have unusual \fBncpfs\fP code in kernel and \fBncpmount\fP is not
+able to autodetect it, use this option. It switches \fBncpmount\fP to
+\fBncpfs\fP interface version 3. This interface was used in kernels from
+2.1.30 to 2.3.40 (laters 2.3.x and 2.4.x still supports this interface
+to make transition easier). This interface supports NCP/UDP, does have
+NDS authentication info storage (if you uncomment it in kernel sources)
+and uses 16bit uid/gid.
+.RE
+
+\fB-4\fP
+.RS 3
+If you have unusual \fBncpfs\fP code in kernel and \fBncpmount\fP is not
+able to autodetect it, use this option. It switches \fBncpmount\fP to
+\fBncpfs\fP interface version 4. This interface is used in kernels after 
+2.3.40. This interface supports NCP/UDP, does have NDS authentication info
+storage and uses 32bit uid/gid.
+.RE
+
+\fB-s\fP (mount option \fBstrong\fP)
+.RS 3
+Normally, files marked \fIread-only\fP cannot be removed from NetWare volume
+because of they are marked \fIDelete Inhibit\fP and \fIRename Inhibit\fP. If
+you want to remove these files by simple \fIunlink\fP, you should mount
+volume with this option.
+.RE
+
+mount option \fBnostrong\fP
+.RS 3
+Refuse to remove \fIread-only\fP files. If you want remove such file, you
+must first remove \fIread-only\fP attribute. It is standard behavior of
+\fBncpfs\fP.
+.RE
+
+mount option \fBsymlinks\fP
+.RS 3
+Use special, normally unused, attributes combinations to express symlinks,
+executable attributes and files readable by world.
+.RE
+
+mount option \fBnosymlinks\fP
+.RS 3
+Do not allow special meaning of 'shareable' attribute. This is a default.
+.RE
+
+mount option \fBipx\fP
+.RS 3
+Use \fIIPX\fP for connection to server. Default if no \fBipserver\fP option
+specified on cmdline.
+.RE
+
+mount option \fBudp\fP
+.RS 3
+Use \fIUDP\fP for connection to server. Not available in 2.0.x kernels.
+Default if \fBipserver\fP is used.
+.RE
+
+mount option \fBtcp\fP
+.RS 3
+Use \fITCP\fP for connection to server. Available only with 2.4.0 and later 
+kernels.
+.RE
+
+mount option \fBnfsextras\fP
+.RS 3
+Use the meta-data provided by the NFS namespace to allow files' modes to 
+be changed, and to allow the creation of symlinks and named pipes.  This
+adds significant overhead to fetching file information.
+.RE
+
+mount option \fBnonfsextras\fP
+.RS 3
+Do not make use of meta-data provided by the NFS namespace.  This is
+the default.
+.RE
+
+.SH ENVIRONMENT VARIABLES
+.B USER / LOGNAME
+.RS 3
+The variables USER or LOGNAME may contain the username of the person
+using the client.  USER is tried first. If it's empty, LOGNAME is
+tried.
+.RE
+
+.SH DIAGNOSTICS
+
+Most diagnostics issued by ncpfs are logged by syslogd. Normally
+nothing is printed, only error situations are logged there.
+
+.SH EXAMPLES
+If you want to mount volume SYS as user DOWNLOAD from server MIRROR 
+into directory /home/pub/mirror, with files owner mirror.mirror and file mode
+-rw-r--r--, you can add
+
+.B MIRROR/DOWNLOAD   /home/pub/mirror  ncp  defaults,mode=644,uid=mirror,gid=mirror,owner=root,volume=SYS,nopasswd,multiple
+
+into \fI/etc/fstab\fP. You should always specify \fBmultiple\fP in 
+mount options, otherwise there can be only one connection to server with same name.
+
+.SH NOTES
+.B IPX
+.RS 3
+You must configure the IPX subsystem before ncpmount will work.
+It is especially important that there is a route to the internal network
+of your server.
+.RE
+
+.B IP
+.RS 3
+You must specify both \fB-S\fP \fIlogical_name\fP and \fB-A\fP \fIdns_name\fP.
+\fIlogical_name\fP is used for searching \fI.nwclient\fP, other 
+configuration files and is logged into \fI/etc/mtab\fP, \fIdns_name\fP
+is used for connecting to server. In future, logical_name will be read from server.
+.RE
+
+.SH SEE ALSO
+.B syslogd(8), ncpumount(8), nfsd(8), mountd(8), mount(8)
+
+.SH CREDITS
+ncpfs would not have been possible without lwared, written by Ales
+Dryak (A.Dryak@sh.cvut.cz).
+
+The encryption code was taken from Dr. Dobbs's Journal 11/93. There
+Pawel Szczerbina described it in an article on NCP.
+
+The ncpfs code was initially hacked from smbfs by Volker Lendecke
+(lendecke@math.uni-goettingen.de). smbfs was put together by Paal-Kr. Engstad
+(pke@engstad.ingok.hitos.no) and later polished by Volker.
+
+Code is currently maintained by Petr Vandrovec (vandrove@vc.cvut.cz).

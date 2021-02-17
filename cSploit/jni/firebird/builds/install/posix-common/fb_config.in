@@ -1,0 +1,117 @@
+#! /bin/sh
+#
+#  The contents of this file are subject to the Initial
+#  Developer's Public License Version 1.0 (the "License");
+#  you may not use this file except in compliance with the
+#  License. You may obtain a copy of the License at
+#  http://www.ibphoenix.com/main.nfs?a=ibphoenix&page=ibp_idpl.
+#
+#  Software distributed under the License is distributed AS IS,
+#  WITHOUT WARRANTY OF ANY KIND, either express or implied.
+#  See the License for the specific language governing rights
+#  and limitations under the License.
+#
+#  The Original Code was created by Mark O'Donohue
+#  for the Firebird Open Source RDBMS project.
+#
+#  Copyright (c) Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#  and all contributors signed below.
+#
+#  All Rights Reserved.
+#  Contributor(s): ______________________________________.
+#
+
+# stored configuration values
+
+fb_bindir=@FB_BINDIR@
+fb_libdir=@FB_LIBDIR@
+fb_incdir=@FB_INCDIR@
+fb_udfdir=@FB_UDFDIR@
+fb_sbindir=@FB_SBINDIR@
+fb_confdir=@FB_CONFDIR@
+fb_docdir=@FB_DOCDIR@
+fb_sampledir=@FB_SAMPLEDIR@
+fb_sampledbdir=@FB_SAMPLEDBDIR@
+fb_helpdir=@FB_HELPDIR@
+fb_intldir=@FB_INTLDIR@
+fb_miscdir=@FB_MISCDIR@
+fb_securedbdir=@FB_SECDBDIR@
+fb_msgdir=@FB_MSGDIR@
+fb_logdir=@FB_LOGDIR@
+fb_glockdir=@FB_GUARDDIR@
+fb_pluginsdir=@FB_PLUGDIR@
+
+fb_cflags="-I$fb_incdir"
+fb_libs="-L$fb_libdir -lfbclient"
+fb_embedlibs="-L$fb_libdir -lfbembed"
+
+BuildVersion=@FIREBIRD_VERSION@.@FB_BUILD_NUM@
+PackageVersion=@FIREBIRD_PACKAGE_VERSION@
+CpuType=@CPU_TYPE@
+
+Version="$BuildVersion-$PackageVersion.$CpuType"
+
+fb_version=$Version
+
+
+usage() {
+  cat <<EOF
+
+Usage $0 [Options]
+
+Where Options are:
+     --cflags
+     --libs
+     --embedlibs
+     --bindir
+     --udfdir
+     --sbindir
+     --confdir
+     --docdir
+     --sampledir
+     --sampledbdir
+     --helpdir
+     --intldir
+     --miscdir
+     --securedbdir
+     --msgdir
+     --logdir
+     --glockdir
+     --pluginsdir
+     --version
+EOF
+}
+
+if test "$#" -eq 0 ; then
+    usage
+    exit 1
+fi
+
+
+while test $# -gt 0
+  do
+    case "$1" in
+        --cflags) echo $fb_cflags ;;
+        --libs) echo $fb_libs ;;
+        --embedlibs) echo $fb_embedlibs ;;
+        --bindir) echo $fb_bindir ;;
+        --udfdir) echo $fb_udfdir ;;
+        --sbindir) echo $fb_sbindir ;;
+        --confdir) echo $fb_confdir ;;
+        --docdir) echo $fb_docdir ;;
+        --sampledir) echo $fb_sampledir ;;
+        --helpdir) echo $fb_helpdir ;;
+        --intldir) echo $fb_intldir ;;
+        --miscdir) echo $fb_miscdir ;;
+        --securedbdir) echo $fb_securedbdir ;;
+        --msgdir) echo $fb_msgdir ;;
+        --logdir) echo $fb_logdir ;;
+        --glockdir) echo $fb_glockdir ;;
+        --pluginsdir) echo $fb_pluginsdir ;;
+        --sampledbdir) echo $fb_sampledbdir ;;
+        --version) echo $fb_version ;;
+        --help) usage ;;
+        *) usage ;
+    esac
+    shift
+  done

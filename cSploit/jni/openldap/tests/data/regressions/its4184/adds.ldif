@@ -1,0 +1,83 @@
+dn: dc=example,dc=com
+objectClass: domain
+dc: example
+
+dn: cn=Manager,dc=example,dc=com
+objectClass: organizationalRole
+cn: Manager
+description: Directory Manager
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: uid=user1,ou=people,dc=example,dc=com
+objectClass: person
+objectClass: posixAccount
+cn: User 1
+sn: User 1
+uid: user1
+uidNumber: 500
+userPassword: abc
+homeDirectory: /home/user1
+gidNumber: 10
+gecos: User 1
+
+dn: cn=A Group,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: A Group
+member: uid=user1,ou=people,dc=example,dc=com
+
+dn: cn=Another Group,ou=Groups,dc=example,dc=com
+cn: Another Group
+objectClass: groupOfNames
+member: uid=user1,ou=People,dc=example,dc=com
+member: uid=user2,ou=People,dc=example,dc=com
+
+dn: uid=user3,ou=people,dc=example,dc=com
+objectClass: person
+objectClass: posixAccount
+uid: user3
+uidNumber: 5387
+homeDirectory: /home/user3
+loginShell: /bin/false
+gecos: Slave
+gidNumber: 100
+userPassword: abc
+cn: Slave
+sn: Slave
+
+dn: uid=user2,ou=people,dc=example,dc=com
+objectClass: person
+objectClass: posixAccount
+cn: User 2
+sn: User 2
+uid: user2
+uidNumber: 23071
+gecos: User 2
+loginShell: /bin/false
+homeDirectory: /home/user2
+gidNumber: 100
+userPassword: abc
+
+dn: ou=Special,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Special
+
+dn: uid=special1,ou=Special,dc=example,dc=com
+objectClass: person
+objectClass: posixAccount
+cn: Special 1
+sn: Special 1
+uid: special1
+uidNumber: 6319
+homeDirectory: /home/special1
+gecos: Special1
+loginShell: /bin/false
+userPassword: abc
+gidNumber: 100
+

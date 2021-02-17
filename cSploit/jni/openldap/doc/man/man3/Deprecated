@@ -1,0 +1,7 @@
+Deprecated interfaces generally remain in the library.  The macro
+LDAP_DEPRECATED can be defined to a non-zero value
+(e.g., -DLDAP_DEPRECATED=1) when compiling program designed to use
+deprecated interfaces.  It is recommended that developers writing new
+programs, or updating old programs, avoid use of deprecated interfaces.
+Over time, it is expected that documentation (and, eventually, support) for
+deprecated interfaces to be eliminated.

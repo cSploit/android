@@ -1,0 +1,181 @@
+SVN-fs-dump-format-version: 2
+
+UUID: c542f1c4-a005-0410-b9aa-b3fbdc38f810
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2005-11-15T20:52:43.894708Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 104
+Content-length: 104
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-15T20:53:08.484681Z
+K 7
+svn:log
+V 4
+ttb
+
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 119
+Content-length: 119
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-15T20:53:34.716301Z
+K 7
+svn:log
+V 18
+Add first version
+
+PROPS-END
+
+Node-path: trunk/file.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 22
+Text-content-md5: bb55f6530f359710b6e52f0d5a9f544f
+Text-content-sha1: df4f5675e945ac7f4a776cb068aeb3bc5fb5fd29
+Content-length: 32
+
+PROPS-END
+first version of file
+
+
+Revision-number: 3
+Prop-content-length: 120
+Content-length: 120
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-15T20:53:48.805239Z
+K 7
+svn:log
+V 19
+Add second version
+
+PROPS-END
+
+Node-path: trunk/file.txt
+Node-kind: file
+Node-action: change
+Text-content-length: 23
+Text-content-md5: d6e0e9fdc2cb38352eca81f093110f4b
+Text-content-sha1: 64f3eeab9a2fce6b19eec365bbb181561718b999
+Content-length: 23
+
+second version of file
+
+
+Revision-number: 4
+Prop-content-length: 149
+Content-length: 149
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-15T20:56:25.247172Z
+K 7
+svn:log
+V 48
+Add a new file to create an uninvolved revision
+
+PROPS-END
+
+Node-path: trunk/foo.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 0
+Text-content-md5: d41d8cd98f00b204e9800998ecf8427e
+Text-content-sha1: da39a3ee5e6b4b0d3255bfef95601890afd80709
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 5
+Prop-content-length: 131
+Content-length: 131
+
+K 10
+svn:author
+V 6
+rooneg
+K 8
+svn:date
+V 27
+2005-11-15T20:56:46.198327Z
+K 7
+svn:log
+V 30
+copy from a previous revision
+
+PROPS-END
+
+Node-path: trunk/copy-of-file.txt
+Node-kind: file
+Node-action: add
+Node-copyfrom-rev: 2
+Node-copyfrom-path: trunk/file.txt
+Text-copy-source-md5: bb55f6530f359710b6e52f0d5a9f544f
+Text-copy-source-sha1: df4f5675e945ac7f4a776cb068aeb3bc5fb5fd29
+
+

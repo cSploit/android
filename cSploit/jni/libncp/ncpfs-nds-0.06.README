@@ -1,0 +1,42 @@
+
+                         NDS support for ncpfs (linux)
+                                       
+   ncpfs is a NetWare client for the Linux operating system, maintained
+   by Volker Lendecke (lendecke@namu01.gwdg.de). I have written
+   support for NDS logins to NetWare 4 servers.
+   
+   Warning! NDS logins require the RSA public key algorithm, which is
+   patented in the U.S.A. and Canada, and possibly in other countries.
+   Because of this you may not be allowed to use this code. Check this
+   before you use NDS logins!
+   
+   Warning! The NDS support for ncpfs is in early beta stage, currently
+   I have only tested it on my own test NW 4.10 server. The NDS support
+   may not work for you, or even give problems like crashing your linux
+   box, or the NetWare server! Please apply the patch only if you know
+   what you are doing. Note that this version of the patch is not
+   little-endian free, so it won't work on big-endian architectures.
+   THIS PATCH IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+   EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+   WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+   THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS
+   WITH YOU. SHOULD THE PATCH PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+   NECESSARY SERVICING, REPAIR OR CORRECTION.
+   
+   This file contains a patch for the non-kernel part of ncpfs:
+   ncpfs-nds-0.05.patch. This is against ncpfs 2.0.11, but works the same
+   for ncpfs 2.0.10.
+   
+   Apply the patches by cd'ing into the appropriate source directory (e.g
+   /usr/local/src/ncpfs-2.0.11) and do:
+
+        patch < patch-file
+
+   You can disable NDS support after applying the patch by uncommenting
+   the line NDS_SUPPORT = 1 in the main Makefile from ncpfs.
+   
+   If you have comments or suggestinons about this patch please mail them
+   to me.
+
+Arne de Bruijn
+arne@knoware.nl

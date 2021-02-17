@@ -1,0 +1,644 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="engine_classic" ProjectGUID="{E029E4E2-0C3F-4F7D-BC4C-D9C20F40EB4E}">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Release|Win32" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="2" InlineFunctionExpansion="1" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" AdditionalIncludeDirectories="../../../src/include;../../../src/include/gen;../../../extern/icu/include;../../../src/vulcan;../../../src/include,../../../src/include/gen" PreprocessorDefinitions="WIN32,NDEBUG,_WINDOWS,_LIB,NAMESPACE=Vulcan" UsePrecompiledHeader="0" AdditionalOptions="/EHsc-" OmitFramePointers="true" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="NDEBUG" Culture="1049" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLinkerTool" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+    </Configuration>
+    <Configuration Name="Debug|Win32" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" AdditionalIncludeDirectories="../../../src/include;../../../src/include/gen;../../../extern/icu/include;../../../src/vulcan;../../../src/include,../../../src/include/gen" PreprocessorDefinitions="WIN32,_DEBUG,_WINDOWS,_LIB,DEV_BUILD,NAMESPACE=Vulcan" AdditionalOptions="/EHsc-" OmitFramePointers="true" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1049" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLinkerTool" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="JRD files">
+      <File RelativePath="..\..\..\src\jrd\alt.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\blb.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\blob_filter.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\btn.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\btr.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\builtin.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\cch.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\CharSet.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\cmp.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\Collation.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\cvt.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\cvt2.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\Database.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\DatabaseSnapshot.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\DataTypeUtil.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\DebugInterface.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\dfw.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\divorce.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\dpm.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dsc.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\dyn.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\dyn_def.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\dyn_del.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\dyn_mod.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\dyn_util.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\enc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\err.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\event.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\evl.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\exe.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ext.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\extds\ExtDS.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\filters.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\flu.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\fun.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\functions.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\gds.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\GlobalRWLock.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\grant.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\guid.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\idx.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\inf.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\ini.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\extds\InternalDS.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\intl.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\intl_builtin.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\IntlManager.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\IntlUtil.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_file.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\isc_ipc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_sync.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\extds\IscDS.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\jrd.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\lck.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\met.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\mov.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\nav.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\nbak.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\nodebug.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ods.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\opt.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\Optimizer.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\os_utils.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\pag.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\par.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\pcmet.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\PreparedStatement.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\pwd.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\RandomGenerator.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\RecordBuffer.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\Relation.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ResultSet.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\rlck.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\rpb_chain.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\rse.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\RuntimeStatistics.cpp">
+      </File>
+      <File RelativePath="..\..\..\gen\$(PlatformName)\jrd\scl.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sdl.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sdw.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sha.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\shut.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sort.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sqz.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\status.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\svc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\SysFunction.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\TempSpace.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\TextType.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\thd_priority.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ThreadData.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ThreadStart.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\tpc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\tra.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceConfigStorage.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceLog.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceManager.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceObjects.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\unicode_util.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\UserManagement.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\utl.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\validation.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\vio.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\VirtualTable.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\why.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\winnt.cpp">
+      </File>
+    </Filter>
+    <Filter Name="Header files">
+      <File RelativePath="..\..\..\src\jrd\acl.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\align.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\blb.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\blb_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\blf_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\blob_filter.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\blp.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\blr.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\BlrReader.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\btn.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\btr.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\btr_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\build_no.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\cch.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\cch_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\CharSet.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\cmp_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\include\gen\codetext.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\Collation.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\common.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\constants.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\CsConvert.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\cvt2_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\cvt_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\Database.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\DatabaseSnapshot.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\DataTypeUtil.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dbg.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dbg_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\DebugInterface.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dflt.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dfw_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\divorce.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dmp_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dpm_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\drq.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dsc.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dsc_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dsc_pub.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dyn.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dyn_df_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dyn_dl_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dyn_md_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dyn_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\dyn_ut_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\enc_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\entry.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\err_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\event.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\event_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\evl_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\exe.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\exe_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ext.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ext_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\extds\ExtDS.h">
+      </File>
+      <File RelativePath="..\..\..\src\include\fb_api_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\include\fb_blk.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\fields.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\fil.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\file_params.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\filte_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\flags.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\flu.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\flu_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\fun_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\gds_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\gdsassert.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\GlobalRWLock.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\grant_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\guid.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ibase.h">
+      </File>
+      <File RelativePath="..\..\..\src\include\gen\iberror.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ibsetjmp.h">
+      </File>
+      <File RelativePath="..\..\..\src\include\gen\ids.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\idx.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\idx_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\inf_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\inf_pub.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ini.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ini_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\extds\InternalDS.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\intl.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\intl_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\IntlManager.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\intlnames.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\intlobj_new.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\IntlUtil.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\irq.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_f_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\isc_i_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_s_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_signal.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\extds\IscDS.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\jrd.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\jrd_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\jrd_pwd.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\kanji.h">
+      </File>
+      <File RelativePath="..\..\..\src\intl\kanji_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\lck.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\lck_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\license.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\lls.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\met.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\met_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\misc_func_ids.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\mov_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\msg.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\msg_encode.h">
+      </File>
+      <File RelativePath="..\..\..\src\include\gen\msg_facs.h">
+      </File>
+      <File RelativePath="..\..\..\src\include\gen\msgs.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\names.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\nav_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\nbak.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\nod.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\obj.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ods.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ods_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\opt_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\Optimizer.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\pag.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\pag_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\par_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\pcmet_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\perf.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\perf_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\pio.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\pio_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\PreparedStatement.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\quad.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\quad_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\que.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\RandomGenerator.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\RecordBuffer.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\Relation.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\relations.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\req.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\ResultSet.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\rlck_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\rpb_chain.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\rse.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\rse_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\RuntimeStatistics.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sbm.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\scl.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\scl_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\scroll_cursors.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sdl.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sdl_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sdw.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sdw_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sha.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\shut_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sort.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sort_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\include\gen\sql_code.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sqz.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\sqz_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\svc.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\svc_undoc.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\SysFunction.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\TempSpace.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\TextType.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\tpc.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\tpc_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\tra.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\tra_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceConfigStorage.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceDSQLHelpers.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceJrdHelpers.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceLog.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceManager.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceObjects.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trace\TraceSession.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\trig.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\types.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\unicode_util.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\utl_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\val.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\val_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\vio_debug.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\vio_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\VirtualTable.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\why_proto.h">
+      </File>
+    </Filter>
+    <Filter Name="GPRE files">
+      <File RelativePath="..\..\..\src\gpre\pretty.cpp">
+      </File>
+    </Filter>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

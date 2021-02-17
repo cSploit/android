@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Restrictions on XA Transactions</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="xa.html" title="Chapter 13.  Distributed Transactions" />
+    <link rel="prev" href="xa_xa_config.html" title="Configuring Berkeley DB with the Tuxedo System" />
+    <link rel="next" href="xa_faq.html" title="XA: Frequently Asked Questions" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Restrictions on XA Transactions</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="xa_xa_config.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 13. 
+		Distributed Transactions
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="xa_faq.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="xa_xa_restrict"></a>Restrictions on XA Transactions</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+        When you are using Berkeley DB for XA transactions, there are a few
+        restrictions you should be aware of:
+    </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                Configure environment using the <a href="../api_reference/C/configuration_reference.html" class="olink">DB_CONFIG</a> file 
+            </p>
+            <p>
+                For most options, you must configure your environment via
+                the <a href="../api_reference/C/configuration_reference.html" class="olink">DB_CONFIG</a> file because an XA application or server cannot
+                control the environment creation. 
+            </p>
+          </li>
+          <li>
+            <p>
+                Snapshot isolation must be configured for the entire
+                environment.
+            </p>
+            <p>
+                Transactions managed by the Berkeley DB X/open compliant XA
+                resource manager can be configured for transaction
+                snapshots using either database open flags or the <a href="../api_reference/C/configuration_reference.html" class="olink">DB_CONFIG</a> file
+                file.  To configure using database open flags, open the XA
+                managed database with the flag <a href="../api_reference/C/dbopen.html#dbopen_DB_MULTIVERSION" class="olink">DB_MULTIVERSION</a>.  When using
+                DB_CONFIG, include both of the following lines: 
+            </p>
+            <pre class="programlisting">set_flags DB_MULTIVERSION
+set_flags DB_TXN_SNAPSHOT</pre>
+            <p>
+                Note that both methods will results in all transactions
+                using transaction snapshots, there is no way to enable
+                transaction snapshots in just a subset of XA managed
+                transactions.
+            </p>
+          </li>
+          <li>
+            <p>No in-memory logging</p>
+            <p>
+                Upon return from xa_open, Berkeley DB checks to ensure
+                there is no in-memory logging. If in-memory logging is
+                detected, a FAILURE message is returned to the application.
+            </p>
+          </li>
+          <li>
+            <p>
+                No application-level child transactions
+            </p>
+            <p>
+                Berkeley DB verifies in the xa_start and xa_end calls that no
+                XA transaction has a parent.  If application-level child
+                transactions are detected, a FAILURE message is returned to the
+                application.
+            </p>
+          </li>
+          <li>
+            <p>
+                All database-level operations, such as create, rename, and
+                remove,  must be performed in local BDB transactions, not
+                distributed XA transactions
+            </p>
+            <p>
+                Berkeley DB checks that there is no XA transaction
+                currently active during these operations, and if detected,
+                a FAILURE message is returned to the application.
+            </p>
+          </li>
+          <li>
+            <p>
+                Close cursors before a service invocation returns 
+            </p>
+            <p>
+                Berkeley DB checks in the <code class="literal">xa_end</code> call
+                that the <code class="literal">DB_TXN</code> has no active cursors
+                open and and if detected, a FAILURE message is returned to
+                the application.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="xa_xa_config.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="xa.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="xa_faq.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Configuring Berkeley DB with the Tuxedo System </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> XA: Frequently Asked Questions</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

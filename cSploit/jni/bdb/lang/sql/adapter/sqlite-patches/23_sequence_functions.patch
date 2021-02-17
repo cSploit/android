@@ -1,0 +1,73 @@
+--- Makefile.in
++++ Makefile.in
+@@ -164,7 +164,7 @@
+ LIBOBJS0 = alter.lo analyze.lo attach.lo auth.lo \
+          backup.lo bitvec.lo btmutex.lo btree.lo build.lo \
+          callback.lo complete.lo ctime.lo date.lo db_encrypt.lo db_pragma.lo \
+-         db_shell.lo delete.lo expr.lo fault.lo fkey.lo \
++         db_sequence.lo db_shell.lo delete.lo expr.lo fault.lo fkey.lo \
+          fts3.lo fts3_aux.lo fts3_expr.lo fts3_hash.lo fts3_icu.lo \
+          fts3_porter.lo fts3_snippet.lo fts3_tokenizer.lo fts3_tokenizer1.lo \
+          fts3_unicode.lo fts3_unicode2.lo fts3_write.lo \
+@@ -210,6 +210,7 @@
+   $(TOP)/src/date.c \
+   $(TOP)/../adapter/db_encrypt.c \
+   $(TOP)/../adapter/db_pragma.c \
++  $(TOP)/../adapter/db_sequence.c \
+   $(TOP)/../adapter/db_shell.c \
+   $(TOP)/src/delete.c \
+   $(TOP)/src/expr.c \
+@@ -396,6 +397,7 @@
+   $(TOP)/../adapter/backup.c \
+   $(TOP)/src/bitvec.c \
+   $(TOP)/../adapter/btree.c \
++  $(TOP)/../adapter/db_sequence.c \
+   $(TOP)/src/build.c \
+   $(TOP)/src/ctime.c \
+   $(TOP)/src/date.c \
+@@ -605,6 +607,10 @@
+ 		$(TOP)/../adapter/btreeInt.h
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_pragma.c
+ 
++db_sequence.lo:	$(TOP)/../adapter/db_sequence.c $(HDR) \
++		$(TOP)/../adapter/btreeInt.h
++	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_sequence.c
++
+ db_shell.lo:	$(TOP)/../adapter/db_shell.c $(HDR) \
+ 		$(TOP)/../adapter/btreeInt.h
+ 	$(LTCOMPILE) $(TEMP_STORE) -c $(TOP)/../adapter/db_shell.c
+--- src/main.c
++++ src/main.c
+@@ -55,6 +55,8 @@
+ */
+ int sqlite3_threadsafe(void){ return SQLITE_THREADSAFE; }
+ 
++extern int add_sequence_functions(sqlite3 *db);
++
+ #if !defined(SQLITE_OMIT_TRACE) && defined(SQLITE_ENABLE_IOTRACE)
+ /*
+ ** If the following function pointer is not NULL and if
+@@ -2350,6 +2352,13 @@
+   db->pDfltColl = sqlite3FindCollSeq(db, SQLITE_UTF8, "BINARY", 0);
+   assert( db->pDfltColl!=0 );
+ 
++  /*
++  ** Berkley DB customization!
++  ** Register any Berkeley DB specific extension functions.
++  */
++  add_sequence_functions(db);
++  /* End Berkeley DB customization. */
++
+   /* Also add a UTF-8 case-insensitive collation sequence. */
+   createCollation(db, "NOCASE", SQLITE_UTF8, 0, nocaseCollatingFunc, 0);
+ 
+--- tool/mksqlite3c.tcl
++++ tool/mksqlite3c.tcl
+@@ -262,6 +262,7 @@
+    backup.c
+    db_encrypt.c
+    db_pragma.c
++   db_sequence.c
+    db_shell.c
+ 
+    vdbemem.c

@@ -1,0 +1,7 @@
+COMMON_FLAGS=-ggdb -DFB_SEND_FLAGS=MSG_NOSIGNAL -DLINUX -pipe -MMD -fPIC -fmessage-length=0
+OPTIMIZE_FLAGS=-O3 -fno-omit-frame-pointer -fno-builtin
+WARN_FLAGS=-Wall -Wno-switch -Wno-parentheses -Wno-unknown-pragmas -Wno-unused-variable -Wno-non-virtual-dtor
+
+PROD_FLAGS=$(COMMON_FLAGS) $(OPTIMIZE_FLAGS)
+#DEV_FLAGS=-DUSE_VALGRIND -p $(COMMON_FLAGS) $(WARN_FLAGS)
+DEV_FLAGS=-p $(COMMON_FLAGS) $(WARN_FLAGS)

@@ -1,0 +1,296 @@
+# Search the entire database...
+dn: cn=Baby Herman,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Baby Herman
+sn: Herman
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+dn: cn=Cartoonia,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Cartoonia
+member: cn=Roger Rabbit,ou=People,dc=example,dc=com
+member: cn=Baby Herman,ou=People,dc=example,dc=com
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=Roger Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+# Re-search the entire database after adding Jessica Rabbit and Cartoonia...
+dn: cn=Baby Herman,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Baby Herman
+sn: Herman
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+dn: cn=Cartoonia,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Cartoonia
+member: cn=Roger Rabbit,ou=People,dc=example,dc=com
+member: cn=Baby Herman,ou=People,dc=example,dc=com
+member: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Jessica Rabbit
+sn: Rabbit
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=Roger Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+# Re-search the entire database after renaming Baby Herman...
+dn: cn=Baby Herman Jr,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+sn: Herman
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+cn: Baby Herman Jr
+
+dn: cn=Cartoonia,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+cn: Cartoonia
+member: cn=Roger Rabbit,ou=People,dc=example,dc=com
+member: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+member: cn=Baby Herman Jr,ou=People,dc=example,dc=com
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Jessica Rabbit
+sn: Rabbit
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=Roger Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+memberOf: cn=Cartoonia,ou=Groups,dc=example,dc=com
+
+# Re-search the entire database after renaming Cartoonia...
+dn: cn=Baby Herman Jr,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+sn: Herman
+memberOf: cn=Toon Town,ou=Groups,dc=example,dc=com
+cn: Baby Herman Jr
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Jessica Rabbit
+sn: Rabbit
+memberOf: cn=Toon Town,ou=Groups,dc=example,dc=com
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=Roger Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+memberOf: cn=Toon Town,ou=Groups,dc=example,dc=com
+
+dn: cn=Toon Town,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+member: cn=Roger Rabbit,ou=People,dc=example,dc=com
+member: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+member: cn=Baby Herman Jr,ou=People,dc=example,dc=com
+cn: Toon Town
+
+# Re-search the entire database after adding Toon Town to self...
+dn: cn=Baby Herman Jr,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+sn: Herman
+memberOf: cn=Toon Town,ou=Groups,dc=example,dc=com
+cn: Baby Herman Jr
+
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Jessica Rabbit
+sn: Rabbit
+memberOf: cn=Toon Town,ou=Groups,dc=example,dc=com
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=Roger Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+memberOf: cn=Toon Town,ou=Groups,dc=example,dc=com
+
+dn: cn=Toon Town,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+member: cn=Roger Rabbit,ou=People,dc=example,dc=com
+member: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+member: cn=Baby Herman Jr,ou=People,dc=example,dc=com
+member: cn=Toon Town,ou=Groups,dc=example,dc=com
+cn: Toon Town
+memberOf: cn=Toon Town,ou=Groups,dc=example,dc=com
+
+# Re-search the entire database after deleting Baby Herman...
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Jessica Rabbit
+sn: Rabbit
+memberOf: cn=Toon Town,ou=Groups,dc=example,dc=com
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=Roger Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+memberOf: cn=Toon Town,ou=Groups,dc=example,dc=com
+
+dn: cn=Toon Town,ou=Groups,dc=example,dc=com
+objectClass: groupOfNames
+member: cn=Roger Rabbit,ou=People,dc=example,dc=com
+member: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+member: cn=Toon Town,ou=Groups,dc=example,dc=com
+cn: Toon Town
+memberOf: cn=Toon Town,ou=Groups,dc=example,dc=com
+
+# Re-search the entire database after deleting Toon Town...
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=Jessica Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Jessica Rabbit
+sn: Rabbit
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=Roger Rabbit,ou=People,dc=example,dc=com
+objectClass: inetOrgPerson
+cn: Roger Rabbit
+sn: Rabbit
+
+# Re-search the entire database after adding groups with MAY member type schemas...
+dn: dc=example,dc=com
+objectClass: organization
+objectClass: dcObject
+o: Example, Inc.
+dc: example
+
+dn: cn=group1,ou=Groups,dc=example,dc=com
+objectClass: groupA
+cn: group1
+
+dn: cn=group2,ou=Groups,dc=example,dc=com
+objectClass: groupB
+cn: group2
+memberB: cn=person1,ou=People,dc=example,dc=com
+memberB: cn=person2,ou=People,dc=example,dc=com
+
+dn: ou=Groups,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: ou=People,dc=example,dc=com
+objectClass: organizationalUnit
+ou: People
+
+dn: cn=person1,ou=People,dc=example,dc=com
+objectClass: person
+objectClass: groupMemberA
+objectClass: groupMemberB
+cn: person1
+sn: person1
+memberOfB: cn=group2,ou=Groups,dc=example,dc=com
+
+dn: cn=person2,ou=People,dc=example,dc=com
+objectClass: person
+objectClass: groupMemberA
+objectClass: groupMemberB
+cn: person2
+sn: person2
+memberOfB: cn=group2,ou=Groups,dc=example,dc=com
+

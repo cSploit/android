@@ -1,0 +1,83 @@
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+# DUA schema from draft-joslin-config-schema (a work in progress)
+#
+# This file was automatically generated from duaconf.schema; see that file
+# for complete references.
+#
+dn: cn=duaconf,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: duaconf
+olcObjectIdentifier: {0}DUAConfSchemaOID 1.3.6.1.4.1.11.1.3.1
+olcAttributeTypes: {0}( DUAConfSchemaOID:1.0 NAME 'defaultServerList' DESC 'De
+ fault LDAP server host address used by a DUA' EQUALITY caseIgnoreMatch SYNTAX
+  1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: {1}( DUAConfSchemaOID:1.1 NAME 'defaultSearchBase' DESC 'De
+ fault LDAP base DN used by a DUA' EQUALITY distinguishedNameMatch SYNTAX 1.3.
+ 6.1.4.1.1466.115.121.1.12 SINGLE-VALUE )
+olcAttributeTypes: {2}( DUAConfSchemaOID:1.2 NAME 'preferredServerList' DESC '
+ Preferred LDAP server host addresses to be used by a            DUA' EQUALITY
+  caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+olcAttributeTypes: {3}( DUAConfSchemaOID:1.3 NAME 'searchTimeLimit' DESC 'Maxi
+ mum time in seconds a DUA should allow for a            search to complete' E
+ QUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALUE )
+olcAttributeTypes: {4}( DUAConfSchemaOID:1.4 NAME 'bindTimeLimit' DESC 'Maximu
+ m time in seconds a DUA should allow for the            bind operation to com
+ plete' EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SINGLE-VALU
+ E )
+olcAttributeTypes: {5}( DUAConfSchemaOID:1.5 NAME 'followReferrals' DESC 'Tell
+ s DUA if it should follow referrals            returned by a DSA search resul
+ t' EQUALITY booleanMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.7 SINGLE-VALUE )
+olcAttributeTypes: {6}( DUAConfSchemaOID:1.16 NAME 'dereferenceAliases' DESC '
+ Tells DUA if it should dereference aliases' EQUALITY booleanMatch SYNTAX 1.3.
+ 6.1.4.1.1466.115.121.1.7 SINGLE-VALUE )
+olcAttributeTypes: {7}( DUAConfSchemaOID:1.6 NAME 'authenticationMethod' DESC 
+ 'A keystring which identifies the type of            authentication method us
+ ed to contact the DSA' EQUALITY caseIgnoreMatch SYNTAX 1.3.6.1.4.1.1466.115.1
+ 21.1.15 SINGLE-VALUE )
+olcAttributeTypes: {8}( DUAConfSchemaOID:1.7 NAME 'profileTTL' DESC 'Time to l
+ ive, in seconds, before a client DUA            should re-read this configura
+ tion profile' EQUALITY integerMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 SING
+ LE-VALUE )
+olcAttributeTypes: {9}( DUAConfSchemaOID:1.14 NAME 'serviceSearchDescriptor' D
+ ESC 'LDAP search descriptor list used by a DUA' EQUALITY caseExactMatch SYNTA
+ X 1.3.6.1.4.1.1466.115.121.1.15 )
+olcAttributeTypes: {10}( DUAConfSchemaOID:1.9 NAME 'attributeMap' DESC 'Attrib
+ ute mappings used by a DUA' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.14
+ 66.115.121.1.26 )
+olcAttributeTypes: {11}( DUAConfSchemaOID:1.10 NAME 'credentialLevel' DESC 'Id
+ entifies type of credentials a DUA should            use when binding to the 
+ LDAP server' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+  SINGLE-VALUE )
+olcAttributeTypes: {12}( DUAConfSchemaOID:1.11 NAME 'objectclassMap' DESC 'Obj
+ ectclass mappings used by a DUA' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6.1.4
+ .1.1466.115.121.1.26 )
+olcAttributeTypes: {13}( DUAConfSchemaOID:1.12 NAME 'defaultSearchScope' DESC 
+ 'Default search scope used by a DUA' EQUALITY caseIgnoreIA5Match SYNTAX 1.3.6
+ .1.4.1.1466.115.121.1.26 SINGLE-VALUE )
+olcAttributeTypes: {14}( DUAConfSchemaOID:1.13 NAME 'serviceCredentialLevel' D
+ ESC 'Identifies type of credentials a DUA            should use when binding 
+ to the LDAP server for a            specific service' EQUALITY caseIgnoreIA5M
+ atch SYNTAX 1.3.6.1.4.1.1466.115.121.1.26 )
+olcAttributeTypes: {15}( DUAConfSchemaOID:1.15 NAME 'serviceAuthenticationMeth
+ od' DESC 'Authentication method used by a service of the DUA' EQUALITY caseIg
+ noreMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+olcObjectClasses: {0}( DUAConfSchemaOID:2.5 NAME 'DUAConfigProfile' DESC 'Abst
+ raction of a base configuration for a DUA' SUP top STRUCTURAL MUST cn MAY ( d
+ efaultServerList $ preferredServerList $ defaultSearchBase $ defaultSearchSco
+ pe $ searchTimeLimit $ bindTimeLimit $ credentialLevel $ authenticationMethod
+  $ followReferrals $ dereferenceAliases $ serviceSearchDescriptor $ serviceCr
+ edentialLevel $ serviceAuthenticationMethod $ objectclassMap $ attributeMap $
+  profileTTL ) )

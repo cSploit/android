@@ -1,0 +1,89 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+# This file should match ../../../COPYRIGHT (except in formating)
+
+!if OPT_PP_HTML
+!define	copyright '[[c]] Copyright'
+!else
+!define copyright 'Copyright'
+!endif
+
+H1: OpenLDAP Software Copyright Notices
+
+H2: OpenLDAP Copyright Notice
+
+!block nofill
+[[copyright]] 1998-2013 The OpenLDAP Foundation.
+{{All rights reserved.}}
+!endblock
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted {{only as authorized}} by the {{SECT:OpenLDAP
+Public License}}.
+
+A copy of this license is available in file {{F:LICENSE}} in the
+top-level directory of the distribution or, alternatively, at
+<{{URL:http://www.OpenLDAP.org/license.html}}>.
+
+OpenLDAP is a registered trademark of the OpenLDAP Foundation.
+
+Individual files and/or contributed packages may be copyright by
+other parties and their use subject to additional restrictions.
+
+This work is derived from the University of Michigan LDAP v3.3
+distribution.  Information concerning this software is available
+at <{{URL:http://www.umich.edu/~dirsvcs/ldap/ldap.html}}>.
+
+This work also contains materials derived from public sources.
+
+Additional information about OpenLDAP software can be obtained at
+<{{URL:http://www.OpenLDAP.org/}}>.
+
+
+H2: Additional Copyright Notices
+
+!block nofill
+Portions [[copyright]] 1998-2013 Kurt D. Zeilenga.
+Portions [[copyright]] 1998-2006 Net Boolean Incorporated.
+Portions [[copyright]] 2001-2006 IBM Corporation.
+{{All rights reserved.}}
+!endblock
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted only as authorized by the {{SECT:OpenLDAP
+Public License}}.
+
+
+!block nofill
+Portions [[copyright]] 1999-2008 Howard Y.H. Chu.
+Portions [[copyright]] 1999-2008 Symas Corporation.
+Portions [[copyright]] 1998-2003 Hallvard B. Furuseth.
+Portions [[copyright]] 2007-2011 Gavin Henry.
+Portions [[copyright]] 2007-2011 Suretec Systems Limited.
+{{All rights reserved.}}
+!endblock
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that this notice is preserved.
+The names of the copyright holders may not be used to endorse or
+promote products derived from this software without their specific
+prior written permission.  This software is provided ``as is''
+without express or implied warranty.
+
+
+H2: University of Michigan Copyright Notice
+
+!block nofill
+Portions [[copyright]] 1992-1996 Regents of the University of Michigan.
+{{All rights reserved.}}
+!endblock
+
+Redistribution and use in source and binary forms are permitted
+provided that this notice is preserved and that due credit is given
+to the University of Michigan at Ann Arbor. The name of the University
+may not be used to endorse or promote products derived from this
+software without specific prior written permission. This software
+is provided ``as is'' without express or implied warranty.
+

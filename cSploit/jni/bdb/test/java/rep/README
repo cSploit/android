@@ -1,0 +1,89 @@
+Here's how to run these tests.
+
+1. configure and build Berkeley DB, including --enable-java and
+   --enable-test
+
+   It's probably most straightforward to do this in the regular
+   build_unix or build_windows subdirectory of the local working copy
+   of the development tree.  However, it's possible to run the tests
+   using a pointer to any other arbitrary directory location.
+
+2. if you want to include upgrade tests, then also build DB 4.6 and DB
+   4.7 somewhere else.
+
+3. compile the Erlang fiddler tools.  To do so, descend to the
+   ./fiddler directory, and from there run the following command:
+
+       erl -make
+
+4. Back up here in this test/java/rep directory, notice the build.xml
+   file.  It defines some default settings for properties named
+   "db", "db46" and "db47".  You may need to override these on the Ant
+   command line.
+
+   While you're there, notice that there's a sysproperty called
+   "VERB_REPLICATION".  You can turn this on if you want to get
+   verbose replication diagnostic output.
+
+5. Choose a value for a TCP/IP port number that is not currently in
+   use.  (I've been using 8000 in my testing.)  You will need to
+   define an environment variable with this value when invoking the
+   test.
+
+6. Run Ant by typing (Bourne shell syntax shown here):
+
+       $ DB_TEST_FAKE_PORT=8000 ant -Ddb=$whatever/build_unix
+
+   to override the setting of the "db" property with the location of
+   your DB build if necessary.
+
+   This should cause Ant to compile the tests, and then run them.
+   They take a little while (on my machine, about 2 minutes), and
+   aren't very chatty.  But you can keep an eye on the progress by
+   watching a directory listing: each test puts its output in a
+   TEST-*.txt file.
+
+7. To run the upgrades tests, type:
+
+       ant test.upgrades
+
+   Again, you may add overrides for the "db", "db46" and/or "db47"
+   properties, using the -D command line argument.
+
+   Currently, the upgrades tests do not need DB_TEST_FAKE_PORT, though
+   it doesn't hurt to leave it defined.
+
+6. To run just one single test, you can type something like this:
+
+       ant -Dtests=TestDrainAbandon
+
+   Or, if you *really* want to do things manually, you can type
+   something like this:
+
+       db=/mumble/build_unix
+       java -cp ~/lib/junit-4.4.jar:tests:$db/db.jar \
+           -Djava.library.path=$db/.libs \
+           org.junit.runner.JUnitCore repmgrtests.TestDrainAbandon
+
+
+To Do
+-----
+
+1. Write a Makefile to automate a bit more of this, in particular the
+   Erlang compilations.
+
+2. Fix the old upgrade test to do the required recovery and checkpoint
+   operations when upgrading.
+
+   Then, see if we still see this message in the output:
+
+      "Program version 4.8 doesn't match environment version 4.6"
+
+   If so, then debug that too.
+
+3. Fix the build.xml to record all Java compilation dependencies
+   (e.g., "compile.upgrades" depends on "compile").
+
+4. Add a simple mixed-version test for 4.5.  This is low priority,
+   because no repmgr message protocol changes occurred in 4.6, so the
+   4.6 upgrade tests cover the same ground.

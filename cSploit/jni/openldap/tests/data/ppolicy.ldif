@@ -1,0 +1,68 @@
+dn: dc=example, dc=com
+objectClass: top
+objectClass: organization
+objectClass: dcObject
+o: Example
+dc: example
+
+dn: ou=People, dc=example, dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: People
+
+dn: ou=Policies, dc=example, dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: Policies
+
+dn: cn=Standard Policy, ou=Policies, dc=example, dc=com
+objectClass: top
+objectClass: device
+objectClass: pwdPolicy
+cn: Standard Policy
+pwdAttribute: 2.5.4.35
+pwdLockoutDuration: 15
+pwdInHistory: 6
+pwdCheckQuality: 2
+pwdExpireWarning: 10
+pwdMaxAge: 30
+pwdMinLength: 5
+pwdGraceAuthnLimit: 3
+pwdAllowUserChange: TRUE
+pwdMustChange: TRUE
+pwdMaxFailure: 3
+pwdFailureCountInterval: 120
+pwdSafeModify: TRUE
+pwdLockout: TRUE
+
+dn: uid=nd, ou=People, dc=example, dc=com
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+cn: Neil Dunbar
+uid: nd
+sn: Dunbar
+givenName: Neil
+userPassword: testpassword
+
+dn: uid=ndadmin, ou=People, dc=example, dc=com
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+cn: Neil Dunbar (Admin)
+uid: ndadmin
+sn: Dunbar
+givenName: Neil
+userPassword: testpw
+
+dn: uid=test, ou=People, dc=example, dc=com
+objectClass: top
+objectClass: person
+objectClass: inetOrgPerson
+cn: test test
+uid: test
+sn: Test
+givenName:  Test
+userPassword: kfhgkjhfdgkfd
+pwdPolicySubEntry: cn=No Policy, ou=Policies, dc=example, dc=com
+

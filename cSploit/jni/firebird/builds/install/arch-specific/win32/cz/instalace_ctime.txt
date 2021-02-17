@@ -1,0 +1,7 @@
+Databázový server Firebird $MAJOR.$MINOR.$RELEASE
+==================================================
+
+
+------------------------------------------------------
+Documentation for Firebird $MAJOR.$MINOR is not yet available.
+-------------------------------------------------------

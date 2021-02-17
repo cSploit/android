@@ -1,0 +1,88 @@
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+#
+# OpenLDAP Project's directory schema items
+#
+# depends upon:
+#	core.schema
+#	cosine.schema
+#	inetorgperson.schema
+#
+# These are provided for informational purposes only.
+#
+# This openldap.ldif file is provided as a demonstration of how to
+# convert a *.schema file into *.ldif format. The key points:
+#   In LDIF, a blank line terminates an entry. Blank lines in a *.schema
+#     file should be replaced with a single '#' to turn them into
+#     comments, or they should just be removed.
+#   In addition to the actual schema directives, the file needs a small
+#     header to make it a valid LDAP entry. This header must provide the
+#     dn of the entry, the objectClass, and the cn, as shown here:
+#
+dn: cn=openldap,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: openldap
+#
+# The schema directives need to be changed to LDAP Attributes.
+#   First a basic string substitution can be done on each of the keywords:
+#     objectIdentifier -> olcObjectIdentifier:
+#     objectClass -> olcObjectClasses:
+#     attributeType -> olcAttributeTypes:
+#   Then leading whitespace must be fixed. The slapd.conf format allows
+#     tabs or spaces to denote line continuation, while LDIF only allows
+#     the space character.
+#   Also slapd.conf preserves the continuation character, while LDIF strips
+#     it out. So a single TAB/SPACE in slapd.conf must be replaced with
+#     two SPACEs in LDIF, otherwise the continued text may get joined as
+#     a single word.
+#   The directives must be listed in a proper sequence:
+#     All olcObjectIdentifiers must be first, so they may be referenced by
+#        any following definitions.
+#     All olcAttributeTypes must be next, so they may be referenced by any
+#        following objectClass definitions.
+#     All olcObjectClasses must be after the olcAttributeTypes.
+#   And of course, any superior must occur before anything that inherits
+#     from it.
+#
+olcObjectIdentifier: OpenLDAProot 1.3.6.1.4.1.4203
+#
+olcObjectIdentifier: OpenLDAP OpenLDAProot:1
+olcObjectIdentifier: OpenLDAPattributeType OpenLDAP:3
+olcObjectIdentifier: OpenLDAPobjectClass OpenLDAP:4
+#
+olcObjectClasses: ( OpenLDAPobjectClass:3
+  NAME 'OpenLDAPorg'
+  DESC 'OpenLDAP Organizational Object'
+  SUP organization
+  MAY ( buildingName $ displayName $ labeledURI ) )
+#
+olcObjectClasses: ( OpenLDAPobjectClass:4
+  NAME 'OpenLDAPou'
+  DESC 'OpenLDAP Organizational Unit Object'
+  SUP organizationalUnit
+  MAY ( buildingName $ displayName $ labeledURI $ o ) )
+#
+olcObjectClasses: ( OpenLDAPobjectClass:5
+  NAME 'OpenLDAPperson'
+  DESC 'OpenLDAP Person'
+  SUP ( pilotPerson $ inetOrgPerson )
+  MUST ( uid $ cn )
+  MAY ( givenName $ labeledURI $ o ) )
+#
+olcObjectClasses: ( OpenLDAPobjectClass:6
+  NAME 'OpenLDAPdisplayableObject'
+  DESC 'OpenLDAP Displayable Object'
+  AUXILIARY
+  MAY displayName )

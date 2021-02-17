@@ -1,0 +1,47 @@
+--- config.h.in
++++ config.h.in
+@@ -3,6 +3,9 @@
+ /* Define to 1 if you have the <dlfcn.h> header file. */
+ #undef HAVE_DLFCN_H
+ 
++/* Define to 1 if you have the <errno.h> header file. */
++#undef HAVE_ERRNO_H
++
+ /* Define to 1 if you have the `fdatasync' function. */
+ #undef HAVE_FDATASYNC
+ 
+--- configure
++++ configure
+@@ -11993,7 +11993,8 @@
+ 
+ 
+ 
+-for ac_header in sys/types.h stdlib.h stdint.h inttypes.h malloc.h
++
++for ac_header in sys/types.h stdlib.h stdint.h inttypes.h malloc.h errno.h
+ do
+ as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
+ if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
+--- configure.ac
++++ configure.ac
+@@ -122,7 +122,7 @@
+ 
+ #########
+ # Check for needed/wanted headers
+-AC_CHECK_HEADERS([sys/types.h stdlib.h stdint.h inttypes.h malloc.h])
++AC_CHECK_HEADERS([sys/types.h stdlib.h stdint.h inttypes.h malloc.h errno.h])
+ 
+ #########
+ # Figure out whether or not we have these functions
+--- src/sqliteInt.h
++++ src/sqliteInt.h
+@@ -79,6 +79,9 @@
+ #ifdef HAVE_INTTYPES_H
+ #include <inttypes.h>
+ #endif
++#ifdef HAVE_ERRNO_H
++#include <errno.h>
++#endif
+ 
+ /*
+ ** The following macros are used to cast pointers to integers and

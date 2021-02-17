@@ -1,0 +1,19 @@
+#!/bin/sh
+
+set -x
+set -e
+
+(cd /usr/local/stow && sudo stow -D libnet libnet-*)
+
+sudo rm -rf /usr/local/stow/libnet
+sudo mkdir -p /usr/local/stow/libnet
+
+make -C doc doc
+make
+make -C../lua
+
+sudo make install prefix=/usr/local/stow/libnet
+sudo make -C../lua install prefix=/usr/local/stow/libnet
+
+(cd /usr/local/stow && sudo stow -v libnet)
+

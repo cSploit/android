@@ -1,0 +1,723 @@
+/*
+ *	PROGRAM:	Security data base manager
+ *	MODULE:		security.epp
+ *	DESCRIPTION:	Security routines
+ *
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+#include "firebird.h"
+#include "../common/classes/alloc.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include "../jrd/ibase.h"
+#include "../auth/SecurityDatabase/LegacyHash.h"
+#include "../common/enc_proto.h"
+#include "../yvalve/gds_proto.h"
+#include "../common/isc_proto.h"
+#include "../utilities/gsec/gsec.h"
+#include "../common/utils_proto.h"
+#include "../common/classes/init.h"
+#include "../common/classes/UserBlob.h"
+#include "../common/config/config_file.h"
+#include "../auth/SecurityDatabase/LegacyManagement.h"
+#include "../common/classes/ImplementHelper.h"
+#include "../common/classes/ClumpletWriter.h"
+#include "firebird/Plugin.h"
+
+static Firebird::MakeUpgradeInfo<> upInfo;
+
+// Here we use version-independent symbolic link (or copy) of actual database
+DATABASE database = STATIC FILENAME "security.fdb";
+
+static Firebird::GlobalPtr<Firebird::Mutex> execLineMutex;	// protects various gpre generated structures
+
+static bool grantRevokeAdmin(ISC_STATUS* isc_status, FB_API_HANDLE database, FB_API_HANDLE trans,
+							 Auth::IUser* user)
+{
+	if (!user->admin()->entered())
+	{
+		return true;
+	}
+
+	Firebird::string userName(user->userName()->get());
+	for (unsigned i = 0; i < userName.length(); ++i)
+	{
+		if (userName[i] == '"')
+		{
+			userName.insert(i++, 1, '"');
+		}
+	}
+
+	Firebird::string sql;
+	sql.printf((user->admin()->get() ? "GRANT %s TO \"%s\"" : "REVOKE %s FROM \"%s\""),
+			ADMIN_ROLE, userName.c_str());
+	isc_dsql_execute_immediate(isc_status, &database, &trans, sql.length(), sql.c_str(), SQL_DIALECT_V6, NULL);
+
+	if (isc_status[1] && user->admin()->get() == 0)
+	{
+		isc_req_handle request = 0;
+
+		FOR (TRANSACTION_HANDLE trans REQUEST_HANDLE request) R IN RDB$USER_PRIVILEGES
+				WITH R.RDB$USER EQ user->userName()->get()
+				 AND R.RDB$RELATION_NAME EQ 'RDB$ADMIN'
+				 AND R.RDB$PRIVILEGE EQ 'M'
+			sql.printf("REVOKE " ADMIN_ROLE " FROM \"%s\" GRANTED BY \"%s\"",
+				userName.c_str(), R.RDB$GRANTOR);
+		END_FOR
+
+		if (request)
+		{
+			ISC_STATUS_ARRAY s;
+			if (isc_release_request(s, &request) != FB_SUCCESS)
+			{
+				return false;
+			}
+		}
+
+		isc_dsql_execute_immediate(isc_status, &database, &trans, sql.length(), sql.c_str(), SQL_DIALECT_V6, NULL);
+	}
+
+	return isc_status[1] == 0;
+}
+
+/*
+static bool storePasswd(ISC_STATUS* isc_status, FB_API_HANDLE database, FB_API_HANDLE trans,
+						ISC_QUAD& blobId, const Firebird::string& passwd)
+{
+	UserBlob blob(isc_status);
+	const UCHAR blob_desc[] = {isc_bpb_version1, isc_bpb_type, 1, isc_blob_untyped};
+
+	if (!blob.create(database, trans, blobId, sizeof(blob_desc), blob_desc))
+	{
+		return false;
+	}
+
+	if (!blob.putData(passwd.length(), passwd.c_str()))
+	{
+		return false;
+	}
+
+	return blob.close();
+}
+ */
+
+const static unsigned int INIT_KEY = ((~0) - 1);
+static unsigned int secDbKey = INIT_KEY;
+
+namespace Auth {
+
+SecurityDatabaseManagement::SecurityDatabaseManagement(Firebird::IPluginConfig* par)
+	: config(Firebird::REF_NO_INCR, par->getFirebirdConf()), database(0), transaction(0)
+{ }
+
+void FB_CARG SecurityDatabaseManagement::start(Firebird::IStatus* st, ILogonInfo* logonInfo)
+{
+	try
+	{
+		Firebird::MasterInterfacePtr()->upgradeInterface(logonInfo, FB_AUTH_LOGON_INFO_VERSION, upInfo);
+
+		st->init();
+
+		if (secDbKey == INIT_KEY)
+		{
+			secDbKey = config->getKey("SecurityDatabase");
+		}
+		const char* secDbName = config->asString(secDbKey);
+
+		if (!(secDbName && secDbName[0]))
+		{
+			Firebird::Arg::Gds(isc_secdb_name).raise();
+		}
+
+		Firebird::ClumpletWriter dpb(Firebird::ClumpletReader::dpbList, MAX_DPB_SIZE);
+		dpb.insertByte(isc_dpb_sec_attach, TRUE);
+
+		const unsigned char* authBlock;
+		unsigned int authBlockSize = logonInfo->authBlock(&authBlock);
+
+		if (authBlockSize)
+			dpb.insertBytes(isc_dpb_auth_block, authBlock, authBlockSize);
+		else
+		{
+			const char* str = logonInfo->name();
+			if (str && str[0])
+				dpb.insertString(isc_dpb_trusted_auth, str, strlen(str));
+
+			str = logonInfo->role();
+			if (str && str[0])
+				dpb.insertString(isc_dpb_sql_role_name, str, strlen(str));
+		}
+
+		ISC_STATUS_ARRAY status;
+		if (isc_attach_database(status, 0, secDbName, &database,
+								dpb.getBufferLength(), reinterpret_cast<const char*>(dpb.getBuffer())))
+		{
+			Firebird::status_exception::raise(status);
+		}
+
+		if (isc_start_transaction(status, &transaction, 1, &database, 0, NULL))
+		{
+			Firebird::status_exception::raise(status);
+		}
+	}
+	catch (const Firebird::Exception& ex)
+	{
+		ex.stuffException(st);
+	}
+}
+
+void FB_CARG SecurityDatabaseManagement::commit(Firebird::IStatus* st)
+{
+	try
+	{
+		st->init();
+
+		ISC_STATUS_ARRAY status;
+		if (transaction)
+		{
+			if (isc_commit_transaction(status, &transaction))
+			{
+				Firebird::status_exception::raise(status);
+			}
+		}
+	}
+	catch (const Firebird::Exception& ex)
+	{
+		ex.stuffException(st);
+	}
+}
+
+void FB_CARG SecurityDatabaseManagement::rollback(Firebird::IStatus* st)
+{
+	try
+	{
+		st->init();
+
+		ISC_STATUS_ARRAY status;
+		if (transaction)
+		{
+			if (isc_rollback_transaction(status, &transaction))
+			{
+				Firebird::status_exception::raise(status);
+			}
+		}
+	}
+	catch (const Firebird::Exception& ex)
+	{
+		ex.stuffException(st);
+	}
+}
+
+int FB_CARG SecurityDatabaseManagement::release()
+{
+	if (--refCounter == 0)
+	{
+		ISC_STATUS_ARRAY status;
+		if (transaction)
+			isc_rollback_transaction(status, &transaction);
+		if (database)
+			isc_detach_database(status, &database);
+
+		delete this;
+		return 0;
+	}
+
+	return 1;
+}
+
+#define STR_STORE(to, from) strStore(to, from, sizeof(to))
+
+static inline void strStore(char* to, const char* from, size_t len)
+{
+	to[--len] = '\0';
+	strncpy(to, from, len);
+}
+
+int FB_CARG SecurityDatabaseManagement::execute(Firebird::IStatus* st, IUser* user, IListUsers* callback)
+{
+/*************************************
+ *
+ *	S E C U R I T Y _ e x e c _ l i n e
+ *
+ **************************************
+ *
+ * Functional description
+ *	Process a command line for the security data base manager.
+ *	This is used to add and delete users from the user information
+ *	database (security2.fdb).   It also displays information
+ *	about current users and allows modification of current
+ *	users' parameters.
+ *	Returns 0 on success, otherwise returns a Gsec message number
+ *	and the status vector containing the error info.
+ *	The syntax is:
+ *
+ *	Adding a new user:
+ *
+ *	    gsec -add <name> [ <parameter> ... ]    -- command line
+ *	    add <name> [ <parameter> ... ]          -- interactive
+ *
+ *	Deleting a current user:
+ *
+ *	    gsec -delete <name>     -- command line
+ *	    delete <name>           -- interactive
+ *
+ *	Displaying all current users:
+ *
+ *	    gsec -display           -- command line
+ *	    display                 -- interactive
+ *
+ *	Displaying one user:
+ *
+ *	    gsec -display <name>    -- command line
+ *	    display <name>          -- interactive
+ *
+ *	Modifying a user's parameters:
+ *
+ *	    gsec -modify <name> <parameter> [ <parameter> ... ] -- command line
+ *	    modify <name> <parameter> [ <parameter> ... ]       -- interactive
+ *
+ *	Get help:
+ *
+ *	    gsec -help              -- command line
+ *	    ?                       -- interactive
+ *	    help                    -- interactive
+ *
+ *	Quit interactive session:
+ *
+ *	    quit                    -- interactive
+ *
+ *	where <parameter> can be one of:
+ *
+ *	    -uid <uid>
+ *	    -gid <gid>
+ *	    -fname <firstname>
+ *	    -mname <middlename>
+ *	    -lname <lastname>
+ *
+ **************************************/
+	int ret = 0;
+
+	try
+	{
+		Firebird::MasterInterfacePtr()->upgradeInterface(user, FB_AUTH_USER_VERSION, upInfo);
+
+		ISC_STATUS_ARRAY isc_status;
+		fb_utils::init_status(isc_status);
+		st->init();
+
+		Firebird::MutexLockGuard guard(execLineMutex, FB_FUNCTION);
+
+		SCHAR encrypted1[MAX_LEGACY_PASSWORD_LENGTH + 2];
+		Firebird::string encrypted2;
+		bool found;
+
+		// check for non-printable characters in user name
+		for (const TEXT* p = user->userName()->get(); *p; p++)
+		{
+			if (!isprint(*p))
+			{
+				return GsecMsg75;  // Add special error message for this case ?
+			}
+		}
+
+		isc_req_handle request = 0;
+		isc_req_handle request2 = 0;
+
+		switch (user->operation())
+		{
+		case MAP_DROP_OPER:
+		case MAP_SET_OPER:
+			{
+				Firebird::string sql;
+				sql.printf("ALTER ROLE " ADMIN_ROLE " %s AUTO ADMIN MAPPING",
+					user->operation() == MAP_SET_OPER ? "SET" : "DROP");
+				isc_dsql_execute_immediate(isc_status, &database, &transaction, sql.length(), sql.c_str(), 1, NULL);
+				if (isc_status[1] != 0)
+				{
+					ret = GsecMsg97;
+				}
+			}
+			break;
+
+		case ADD_OPER:
+			// this checks the "entered" flags for each parameter (except the name)
+			// and makes all non-entered parameters null valued
+
+			STORE (TRANSACTION_HANDLE transaction REQUEST_HANDLE request) U IN PLG$VIEW_USERS USING
+				STR_STORE(U.PLG$USER_NAME, user->userName()->get());
+
+				U.PLG$UID.NULL = ISC_TRUE;
+				U.PLG$GID.NULL = ISC_TRUE;
+				U.PLG$GROUP_NAME.NULL = ISC_TRUE;
+				if (user->attributes()->entered())
+				{
+					ConfigFile attr(ConfigFile::USE_TEXT, user->attributes()->get());
+					const ConfigFile::Parameter* p;
+
+					if ((p = attr.findParameter("uid")) && p->value.hasData())
+					{
+						U.PLG$UID = p->asInteger();
+						U.PLG$UID.NULL = ISC_FALSE;
+					}
+
+					if ((p = attr.findParameter("gid")) && p->value.hasData())
+					{
+						U.PLG$GID = p->asInteger();
+						U.PLG$GID.NULL = ISC_FALSE;
+					}
+
+					if ((p = attr.findParameter("groupName")) && p->value.hasData())
+					{
+						STR_STORE(U.PLG$GROUP_NAME, p->value.c_str());
+						U.PLG$GROUP_NAME.NULL = ISC_FALSE;
+					}
+				}
+
+				if (user->password()->entered())
+				{
+					ENC_crypt(encrypted1, sizeof encrypted1, user->password()->get(), LEGACY_PASSWORD_SALT);
+					LegacyHash::hash(encrypted2, user->userName()->get(), &encrypted1[2]);
+					STR_STORE(U.PLG$PASSWD, encrypted2.c_str());
+					U.PLG$PASSWD.NULL = ISC_FALSE;
+				}
+				else
+					U.PLG$PASSWD.NULL = ISC_TRUE;
+				if (user->firstName()->entered())
+				{
+					STR_STORE(U.PLG$FIRST_NAME, user->firstName()->get());
+					U.PLG$FIRST_NAME.NULL = ISC_FALSE;
+				}
+				else
+					U.PLG$FIRST_NAME.NULL = ISC_TRUE;
+				if (user->middleName()->entered())
+				{
+					STR_STORE(U.PLG$MIDDLE_NAME, user->middleName()->get());
+					U.PLG$MIDDLE_NAME.NULL = ISC_FALSE;
+				}
+				else
+					U.PLG$MIDDLE_NAME.NULL = ISC_TRUE;
+				if (user->lastName()->entered())
+				{
+					STR_STORE(U.PLG$LAST_NAME, user->lastName()->get());
+					U.PLG$LAST_NAME.NULL = ISC_FALSE;
+				}
+				else
+					U.PLG$LAST_NAME.NULL = ISC_TRUE;
+			END_STORE
+			ON_ERROR
+				ret = GsecMsg19;	// gsec - add record error
+			END_ERROR;
+			if (ret == 0 && !grantRevokeAdmin(isc_status, database, transaction, user))
+			{
+				ret = GsecMsg19;	// gsec - add record error
+			}
+			break;
+
+		case MOD_OPER:
+			// this updates an existing record, replacing all fields that are
+			// entered, and for those that were specified but not entered, it
+			// changes the current value to the null value
+
+			found = false;
+			FOR (TRANSACTION_HANDLE transaction REQUEST_HANDLE request) U IN PLG$VIEW_USERS
+					WITH U.PLG$USER_NAME EQ user->userName()->get()
+			{
+				found = true;
+				MODIFY U USING
+					if (user->attributes()->entered())
+					{
+						U.PLG$UID.NULL = ISC_TRUE;
+						U.PLG$GID.NULL = ISC_TRUE;
+						U.PLG$GROUP_NAME.NULL = ISC_TRUE;
+
+						ConfigFile attr(ConfigFile::USE_TEXT, user->attributes()->get());
+						const ConfigFile::Parameter* p;
+
+						if ((p = attr.findParameter("uid")) && p->value.hasData())
+						{
+							U.PLG$UID = p->asInteger();
+							U.PLG$UID.NULL = ISC_FALSE;
+						}
+
+						if ((p = attr.findParameter("gid")) && p->value.hasData())
+						{
+							U.PLG$GID = p->asInteger();
+							U.PLG$GID.NULL = ISC_FALSE;
+						}
+
+						if ((p = attr.findParameter("groupName")) && p->value.hasData())
+						{
+							STR_STORE(U.PLG$GROUP_NAME, p->value.c_str());
+							U.PLG$GROUP_NAME.NULL = ISC_FALSE;
+						}
+					}
+					else if (user->attributes()->specified())
+					{
+						U.PLG$UID.NULL = ISC_TRUE;
+						U.PLG$GID.NULL = ISC_TRUE;
+						U.PLG$GROUP_NAME.NULL = ISC_TRUE;
+					}
+
+					if (user->password()->entered())
+					{
+						ENC_crypt(encrypted1, sizeof encrypted1, user->password()->get(), LEGACY_PASSWORD_SALT);
+						LegacyHash::hash(encrypted2, user->userName()->get(), &encrypted1[2]);
+						STR_STORE(U.PLG$PASSWD, encrypted2.c_str());
+						U.PLG$PASSWD.NULL = ISC_FALSE;
+					}
+					else if (user->password()->specified())
+						U.PLG$PASSWD.NULL = ISC_TRUE;
+
+					if (user->firstName()->entered())
+					{
+						STR_STORE(U.PLG$FIRST_NAME, user->firstName()->get());
+						U.PLG$FIRST_NAME.NULL = ISC_FALSE;
+					}
+					else if (user->firstName()->specified())
+						U.PLG$FIRST_NAME.NULL = ISC_TRUE;
+
+					if (user->middleName()->entered())
+					{
+						STR_STORE(U.PLG$MIDDLE_NAME, user->middleName()->get());
+						U.PLG$MIDDLE_NAME.NULL = ISC_FALSE;
+					}
+					else if (user->middleName()->specified())
+						U.PLG$MIDDLE_NAME.NULL = ISC_TRUE;
+
+					if (user->lastName()->entered())
+					{
+						STR_STORE(U.PLG$LAST_NAME, user->lastName()->get());
+						U.PLG$LAST_NAME.NULL = ISC_FALSE;
+					}
+					else if (user->lastName()->specified())
+						U.PLG$LAST_NAME.NULL = ISC_TRUE;
+				END_MODIFY
+				ON_ERROR
+					ret = GsecMsg20;
+				END_ERROR;
+			}
+			END_FOR
+			ON_ERROR
+				ret = GsecMsg21;
+			END_ERROR;
+
+			if (!ret && !found)
+				ret = GsecMsg22;
+
+			if (ret == 0 && !grantRevokeAdmin(isc_status, database, transaction, user))
+			{
+				ret = GsecMsg21;
+			}
+			break;
+
+		case DEL_OPER:
+			// looks up the specified user record and deletes it
+
+			found = false;
+			// Do not allow SYSDBA user to be deleted
+			if (!fb_utils::stricmp(user->userName()->get(), SYSDBA_USER_NAME))
+				ret = GsecMsg23;
+			else
+			{
+				FOR (TRANSACTION_HANDLE transaction REQUEST_HANDLE request) U IN PLG$VIEW_USERS
+						WITH U.PLG$USER_NAME EQ user->userName()->get()
+				{
+					found = true;
+					ERASE U
+					ON_ERROR
+						ret = GsecMsg23;	// gsec - delete record error
+					END_ERROR;
+				}
+				END_FOR
+				ON_ERROR
+					ret = GsecMsg24;	// gsec - find/delete record error
+				END_ERROR;
+			}
+
+			if (!ret && !found)
+				ret = GsecMsg22;	// gsec - record not found for user:
+
+			user->admin()->set(0);
+			user->admin()->setEntered(1);
+			if (ret == 0 && !grantRevokeAdmin(isc_status, database, transaction, user))
+			{
+				ret = GsecMsg24;
+			}
+			break;
+
+		case DIS_OPER:
+		case OLD_DIS_OPER:
+			// gets either the desired record, or all records, and displays them
+
+			found = false;
+			if (!user->userName()->entered())
+			{
+				FOR (TRANSACTION_HANDLE transaction REQUEST_HANDLE request) U IN PLG$VIEW_USERS
+					{
+						Firebird::string attr, a1, a2, a3;
+
+						if (!U.PLG$UID.NULL)
+							a1.printf("Uid=%d\n", U.PLG$UID);
+
+						if (!U.PLG$GID.NULL)
+							a2.printf("Gid=%d\n", U.PLG$GID);
+
+						if (!U.PLG$GROUP_NAME.NULL)
+							a3.printf("GroupName=%s\n", U.PLG$GROUP_NAME);
+
+						attr = a1 + a2 + a3;
+						user->attributes()->set(attr.c_str());
+						user->attributes()->setEntered(attr.hasData() ? 1 : 0);
+					}
+
+					user->userName()->set(U.PLG$USER_NAME);
+					user->userName()->setEntered(U.PLG$USER_NAME.NULL ? 0 : 1);
+					user->password()->set("");
+					user->password()->setEntered(0);
+					user->firstName()->set(U.PLG$FIRST_NAME);
+					user->firstName()->setEntered(U.PLG$FIRST_NAME.NULL ? 0 : 1);
+					user->middleName()->set(U.PLG$MIDDLE_NAME);
+					user->middleName()->setEntered(U.PLG$MIDDLE_NAME.NULL ? 0 : 1);
+					user->lastName()->set(U.PLG$LAST_NAME);
+					user->lastName()->setEntered(U.PLG$LAST_NAME.NULL ? 0 : 1);
+
+					user->admin()->set(0);
+
+					FOR (TRANSACTION_HANDLE transaction REQUEST_HANDLE request2)
+						 P IN RDB$USER_PRIVILEGES
+						 WITH P.RDB$USER EQ U.PLG$USER_NAME AND
+							  P.RDB$RELATION_NAME EQ 'RDB$ADMIN' AND
+							  P.RDB$PRIVILEGE EQ 'M'
+					{
+						user->admin()->set(1);
+					}
+					END_FOR
+
+					callback->list(user);
+
+					found = true;
+				END_FOR
+				ON_ERROR
+					ret = GsecMsg28;	// gsec - find/display record error
+				END_ERROR;
+			}
+			else
+			{
+				Firebird::string attr, a1, a2, a3;
+				FOR (TRANSACTION_HANDLE transaction REQUEST_HANDLE request) U IN PLG$VIEW_USERS
+						WITH U.PLG$USER_NAME EQ user->userName()->get()
+
+					if (!U.PLG$UID.NULL)
+						a1.printf("Uid=%d\n", U.PLG$UID);
+
+					if (!U.PLG$GID.NULL)
+						a2.printf("Gid=%d\n", U.PLG$GID);
+
+					if (!U.PLG$GROUP_NAME.NULL)
+						a3.printf("GroupName=%s\n", U.PLG$GROUP_NAME);
+
+					attr = a1 + a2 + a3;
+					user->attributes()->set(attr.c_str());
+					user->attributes()->setEntered(attr.hasData() ? 1 : 0);
+
+					user->userName()->set(U.PLG$USER_NAME);
+					user->userName()->setEntered(U.PLG$USER_NAME.NULL ? 0 : 1);
+					user->password()->set("");
+					user->password()->setEntered(0);
+					user->firstName()->set(U.PLG$FIRST_NAME);
+					user->firstName()->setEntered(U.PLG$FIRST_NAME.NULL ? 0 : 1);
+					user->middleName()->set(U.PLG$MIDDLE_NAME);
+					user->middleName()->setEntered(U.PLG$MIDDLE_NAME.NULL ? 0 : 1);
+					user->lastName()->set(U.PLG$LAST_NAME);
+					user->lastName()->setEntered(U.PLG$LAST_NAME.NULL ? 0 : 1);
+
+					user->admin()->set(0);
+
+					FOR (TRANSACTION_HANDLE transaction REQUEST_HANDLE request2)
+						 P IN RDB$USER_PRIVILEGES
+						 WITH P.RDB$USER EQ U.PLG$USER_NAME AND
+							  P.RDB$RELATION_NAME EQ 'RDB$ADMIN' AND
+							  P.RDB$PRIVILEGE EQ 'M'
+					{
+						user->admin()->set(1);
+					}
+					END_FOR
+
+					callback->list(user);
+
+					found = true;
+				END_FOR
+				ON_ERROR
+					ret = GsecMsg28;	// gsec - find/display record error
+				END_ERROR;
+			}
+			break;
+
+		default:
+			ret = GsecMsg16;		// gsec - error in switch specifications
+			break;
+		}
+
+		if (request)
+		{
+			ISC_STATUS_ARRAY s;
+			if (isc_release_request(s, &request) != FB_SUCCESS)
+			{
+				if (! ret)
+				{
+					ret = GsecMsg94;	// error releasing request in security database
+				}
+			}
+		}
+
+		if (request2)
+		{
+			ISC_STATUS_ARRAY s;
+			if (isc_release_request(s, &request2) != FB_SUCCESS)
+			{
+				if (! ret)
+				{
+					ret = GsecMsg94;	// error releasing request in security database
+				}
+			}
+		}
+
+		st->set(isc_status);
+	}
+	catch (const Firebird::Exception& ex)
+	{
+		ex.stuffException(st);
+	}
+
+	return ret;
+}
+
+} // namespace Auth
+
+// register plugin
+static Firebird::SimpleFactory<Auth::SecurityDatabaseManagement> factory;
+
+extern "C" void FB_PLUGIN_ENTRY_POINT(Firebird::IMaster* master)
+{
+	Firebird::CachedMasterInterface::set(master);
+	Firebird::PluginManagerInterfacePtr()->registerPluginFactory(Firebird::PluginType::AuthUserManagement, "Legacy_UserManager", &factory);
+	Firebird::myModule->registerMe();
+}

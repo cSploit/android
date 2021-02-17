@@ -1,0 +1,24 @@
+Differences from 2.0 Perl API:
+
+- Perl 5.6 is supported
+
+- backend methods return actual LDAP result codes, not
+  true/false; this gives the Perl module finer control
+  of the error returned to the client
+
+- a filterSearchResults configuration file directive was
+  added to tell the backend glue that the results returned
+  from the Perl module are candidates only
+
+- the "init" method is called after the backend has been
+  initialized - this lets you do some initialization after
+  *all* configuration file directives have been read
+
+- the interface for the search method is improved to
+  pass the scope, deferencing policy, size limit, etc.
+  See SampleLDAP.pm for details.
+
+These changes were sponsored by myinternet Limited.
+
+Luke Howard <lukeh@padl.com>
+

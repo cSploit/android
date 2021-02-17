@@ -1,0 +1,205 @@
+.\" $Id: bsqldb.1,v 1.2 2011-12-16 02:23:13 jklowden Exp $
+.Dd now
+.Os FreeTDS 0.91
+.Dt BSQLDB 1
+.Sh NAME
+.Nm bsqldb
+.Nd Batch SQL script processor using DB-Library
+.Sh SYNOPSIS
+.Nm bsqldb
+.Op Fl hqv
+.Op Fl S Ar servername
+.Op Fl D Ar dbname
+.Op Fl U Ar username
+.Op Fl P Ar password
+.Op Fl H Ar hostname
+.Op Fl e Ar errorfile
+.Op Fl i Ar inputfile
+.Op Fl o Ar outputfile
+.Op Fl t Ar field_terminator
+.Op Fl R Ar pivot_string
+.Sh DESCRIPTION
+.Nm
+is a utility program distributed with FreeTDS.
+.Pp
+.Nm
+is a batch programming equivalent of the "isql" 
+utility programs distributed by Sybase and Microsoft. Like them, 
+.Nm
+uses the command 
+.Ic go
+on a line by itself as a separator between batches. 
+The last batch need not be followed by 
+.Ic go .
+.Pp
+.Nm
+makes use of the DB-Library API provided by FreeTDS. This 
+API is of course also available to application developers.
+.Sh OPTIONS
+The following options are supported:
+.Bl -tag -width 4n
+.It Fl D Ar dbname
+Initial default database name to use.
+.It Fl H Ar hostname
+Override hostname of client sent to server. 
+.It Fl P Ar password
+DMBS password.
+.It Fl R Ar pivot_string
+Causes the resultset to be "pivoted" in the much the same way
+as the T-SQL PIVOT operator.  The
+.Ar pivot_string
+consists of four parts separated by one or more spaces.  These
+parts are:
+.Bl -tag -width 8n
+.It Ar row_columns
+The columns used for the key of each pivoted row.
+.It Ar across_columns
+The columns used for the key of each pivoted column. 
+.It Ar function
+The aggregate function to be invoked for all rows returned from the 
+server matching
+.Ar row_columns
+and
+.Ar across_columns .
+The output of this function becomes the body of the pivoted rows. Valid
+functions are:
+.Bl -tag -width 12n -compact
+.It Ar count
+.It Ar max
+.It Ar min
+.It Ar sum
+.El
+.It Ar value_column
+The value to which the 
+.Ar function
+is applied.  
+.El
+.Pp
+The 
+.Ar row_columns
+and
+.Ar across_columns
+are column numbers in the output returned by the server. 
+(Column names would be an enhancment.) 
+They are often just one column each, but can be more.  
+Column numbers are separated by commas; see EXAMPLES below.  
+.It Fl S Ar servername
+.It Fl U Ar username
+DBMS username.
+.It Fl e Ar errorfile
+Name of file for errors.
+.It Fl h
+Print column headers with the data to the same file. 
+.It Fl i Ar inputfile
+Name of script file, containing SQL.
+.It Fl o Ar outputfile
+Name of output file, holding result data.
+It Fl q
+Do not print column metadata, return status, or rowcount. Overrides -h. 
+.It Fl t Ar field_terminator
+Specifies the field terminator. Default is two spaces ('  '). 
+Recognized escape sequences are tab ('\\t'), carriage return ('\\r'), newline ('\\n'), 
+and backslash ('\\\\'). 
+.It Fl v
+Verbose mode, for more information about the DB-Library interaction.
+This also reports the result set metadata, including and return code. All
+verbose data are written to standard error (or -e), so as not to interfere 
+with the data stream.
+.El
+.Sh EXAMPLE
+.Dl bsqldb -R '1,2 3,4 sum 5' <<< 'select a,b,c,d,e'
+.Pp
+puts columns a and b, and the sum of e in each output row.  
+A column is created for each unique combination of c and d; 
+The columns are named according the the contents of c and d.  
+.Pp
+For the query
+.Dl select type, name, usertype from systypes where name < 'dec'
+.Pp
+the command 
+.Dl bsqldb -vR '1 2 count 3' ...
+.Pp
+produces
+.Bd -literal
+type       bigint       binary          bit         char     datetime
+----  -----------  -----------  -----------  -----------  -----------
+  63            1                                                    
+  45                         1                                       
+  50                                      1                          
+  47                                                   1             
+  61                                                                1
+.Ed
+.Pp
+For the query
+.Dl select type, cast(name as varchar(20)) as [typename        ], variable, usertype from systypes
+.Pp
+the command 
+.Dl bsqldb -R '1,2 3 count 4' ...
+.Pp
+produces
+.Bd -literal
+type  typename                    0            1
+----  ----------------  -----------  -----------
+  63  bigint                      1             
+  45  binary                      1             
+  50  bit                         1             
+  47  char                        1             
+  61  datetime                    1             
+  55  decimal                     1             
+  62  float                       1             
+  34  image                       1             
+  56  int                         1             
+  60  money                       1             
+  47  nchar                       1             
+  35  ntext                       1             
+  63  numeric                     1             
+  39  nvarchar                                 1
+  59  real                        1             
+  58  smalldatetime               1             
+  52  smallint                    1             
+ 122  smallmoney                  1             
+  39  sql_variant                 1             
+  39  sysname                                  1
+  35  text                        1             
+  45  timestamp                   1             
+  48  tinyint                     1             
+  37  uniqueidentifier            1             
+  37  varbinary                                1
+  39  varchar                                  1
+.Ed
+.Sh ENVIRONMENT
+.Ev  DSQUERY default servername.
+.Sh NOTES
+By default
+.Nm
+reads from standard input, writes to standard output, 
+and writes errors to standard error. The -i, -o, and -e options override 
+these.
+.Pp
+The source code for
+.Nm
+is intended as a model for DB-Library users. DB-Library
+has a rich set of functions, and it can be hard sometimes to understand how to
+use them, particularly the first time. If you are using it in this way and
+find something unclear, you are encouraged to email the author your
+comments. 
+.Sh EXIT\ STATUS
+.Nm
+exits 0 on success, and >0 if the server cannot process the query.
+.Nm
+will report any errors returned by the server.  Errors of severity
+greater than 10 cause 
+.Nm
+to stop processing. 
+.Sh HISTORY
+.Nm
+first appeared in FreeTDS 0.63.
+.Sh AUTHORS
+The 
+.Nm
+utility was written by James K. Lowden <jklowden@schemamania.org>
+.Sh BUGS
+Microsoft servers as of SQL Server 7.0 SP 3 do not return output parameters
+unless the RPC functions are used. This means 
+.Nm
+cannot return output parameters for stored procedures with these servers. 

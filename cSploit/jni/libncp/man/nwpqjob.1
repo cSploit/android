@@ -1,0 +1,97 @@
+.TH NWPQJOB 1 07/16/2003 nwpqjob nwpqjob
+.SH NAME
+nwpqjob \- Perform operations on the jobs in NetWare print queue
+.SH SYNOPSIS
+\fBnwpqjob\fP [ \fB-h\fP ] [ \fB-S\fP \fIserver\fP ] [ \fB-U\fP \fIuser name\fP ] 
+[ \fB-P\fP \fIpassword\fP | \fB-n\fP ] [ \fB-C\fP ] < \fB-d\fP | \fB-r\fP > \fIqueue_name\fP 
+\fIjob_ID\fP [ \fIanother_job_ID\fP ... ]
+
+\fBpqrm\fP [ \fB-h\fP ] [ \fB-S\fP \fIserver\fP ] [ \fB-U\fP \fIuser name\fP ] 
+[ \fB-P\fP \fIpassword\fP | \fB-n\fP ] [ \fB-C\fP ] \fIqueue_name\fP 
+\fIjob_ID\fP [ \fIanother_job_ID\fP ... ]
+
+.SH DESCRIPTION
+\fBpqrm\fP or \fBnwpqjob -d\fP remove specified jobs from the specified NetWare print queue.
+
+\fBnwpqjob -r\fP resumes specified job in the specified NetWare print queue.
+
+\fBnwpqjob\fP looks up the file \fI$HOME/.nwclient\fP to find a file server, 
+a user name and possibly a password. See nwclient(5) for more information. 
+Please note that the access permissions of \fB.nwclient\fP MUST be 600, for 
+security reasons.
+
+.SH OPTIONS
+
+.B -d
+.RS 3
+Delete specified print job(s). This is default operation for \fBpqrm\fP.
+.RE
+
+.B -r
+.RS 3
+Resume (clear \fIOPERATOR HOLD\fP and \fIUSER HOLD\fP flags) specified print job(s).
+.RE
+
+.B queue_name
+.RS 3
+.B queue_name
+is used to specify queue. You can not use wildcards in the name.
+.RE
+
+.B job_ID
+, 
+.B another_job_ID
+.RS 3
+.B job_ID
+is used to specify which job has to be deleted or resumed.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user name
+.RS 3
+If the user name your NetWare administrator gave to you differs
+from your unix user-id, you should use
+.B -U
+to tell the server about your NetWare user name.
+.RE
+
+.B -P
+.I password
+.RS 3
+You may want to give the password required by the server on the
+command line. You should be careful about using passwords in scripts.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given to mount shares which do not require a password to log in.
+
+If neither
+.B -n
+nor
+.B -P
+are given, pqstat prompts for a password.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.SH SEE ALSO
+.B nwclient(5), nprint(1), slist(1), ncpmount(8), ncpumount(8), pqlist(1), pqstat(1)
+
+.SH CREDITS
+nwpqjob was written by Petr Vandrovec (vandrove@vc.cvut.cz). Resuming of print
+jobs was added by Zdenek Roub (zroub@ssps.zcu.cz).

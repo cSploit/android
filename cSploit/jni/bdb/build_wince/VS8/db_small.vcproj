@@ -1,0 +1,250 @@
+<VisualStudioProject ProjectType="Visual C++" Version="8.00" Name="db_small" ProjectGUID="{XXX-NOT-USED-XXX}">
+  <Platforms>
+    <Platform Name="Pocket PC 2003 (ARMV4)"/>
+    <Platform Name="Smartphone 2003 (ARMV4)"/>
+    <Platform Name="Windows Mobile 6.5.3 Professional DTK (ARMV4I)"/>
+  </Platforms>
+  <Configurations>
+    <Configuration Name="Static Debug|Pocket PC 2003 (ARMV4)" OutputDirectory="..\..\build_wince\$(PlatformName)\Static_Debug" IntermediateDirectory="./$(OutDir)/db_small" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;HAVE_SMALLBUILD;DIAGNOSTIC;_LIB;" StringPooling="TRUE" RuntimeLibrary="1" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_small.pch" AssemblerListingLocation="$(OutDir)/db_small/" ObjectFile="$(OutDir)/db_small/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb_small60sd.lib"/></Configuration>
+    <Configuration Name="Static Release|Pocket PC 2003 (ARMV4)" OutputDirectory="..\..\build_wince\$(PlatformName)\Static_Release" IntermediateDirectory="./$(OutDir)/db_small" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;HAVE_SMALLBUILD;_LIB;" StringPooling="TRUE" RuntimeLibrary="0" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_small.pch" AssemblerListingLocation="$(OutDir)/db_small/" ObjectFile="$(OutDir)/db_small/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb_small60s.lib"/></Configuration>
+    <Configuration Name="Static Debug|Smartphone 2003 (ARMV4)" OutputDirectory="..\..\build_wince\$(PlatformName)\Static_Debug" IntermediateDirectory="./$(OutDir)/db_small" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;HAVE_SMALLBUILD;DIAGNOSTIC;_LIB;" StringPooling="TRUE" RuntimeLibrary="1" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_small.pch" AssemblerListingLocation="$(OutDir)/db_small/" ObjectFile="$(OutDir)/db_small/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb_small60sd.lib"/></Configuration>
+    <Configuration Name="Static Release|Smartphone 2003 (ARMV4)" OutputDirectory="..\..\build_wince\$(PlatformName)\Static_Release" IntermediateDirectory="./$(OutDir)/db_small" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;HAVE_SMALLBUILD;_LIB;" StringPooling="TRUE" RuntimeLibrary="0" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_small.pch" AssemblerListingLocation="$(OutDir)/db_small/" ObjectFile="$(OutDir)/db_small/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb_small60s.lib"/></Configuration>
+    <Configuration Name="Static Debug|Windows Mobile 6.5.3 Professional DTK (ARMV4I)" OutputDirectory="..\..\build_wince\$(PlatformName)\Static_Debug" IntermediateDirectory="./$(OutDir)/db_small" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;HAVE_SMALLBUILD;DIAGNOSTIC;_LIB;" StringPooling="TRUE" RuntimeLibrary="1" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_small.pch" AssemblerListingLocation="$(OutDir)/db_small/" ObjectFile="$(OutDir)/db_small/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb_small60sd.lib"/></Configuration>
+    <Configuration Name="Static Release|Windows Mobile 6.5.3 Professional DTK (ARMV4I)" OutputDirectory="..\..\build_wince\$(PlatformName)\Static_Release" IntermediateDirectory="./$(OutDir)/db_small" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="1">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_WIN32_WCE=$(CEVER);$(CePlatform);ARM,_ARM_,ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" BufferSecurityCheck="FALSE" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_wince,../../src" PreprocessorDefinitions="DB_WIN32;DB_WINCE;_WIN32_WCE=$(CEVER);$(CePlatform);ARM;_ARM_;ARMV4;UNDER_CE=$(CEVER);UNICODE;_UNICODE;__NO_SYSTEM_INCLUDES;HAVE_SMALLBUILD;_LIB;" StringPooling="TRUE" RuntimeLibrary="0" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_small.pch" AssemblerListingLocation="$(OutDir)/db_small/" ObjectFile="$(OutDir)/db_small/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLibrarianTool" OutputFile="$(OutDir)/libdb_small60s.lib"/></Configuration>
+  </Configurations>
+  <References/>
+  <Files>
+    <File RelativePath="..\..\src\blob\blob_fileops.c"/>
+    <File RelativePath="..\..\src\blob\blob_page.c"/>
+    <File RelativePath="..\..\src\blob\blob_stream.c"/>
+    <File RelativePath="..\..\src\blob\blob_util.c"/>
+    <File RelativePath="..\..\src\btree\bt_compact.c"/>
+    <File RelativePath="..\..\src\btree\bt_compare.c"/>
+    <File RelativePath="..\..\src\btree\bt_conv.c"/>
+    <File RelativePath="..\..\src\btree\bt_curadj.c"/>
+    <File RelativePath="..\..\src\btree\bt_cursor.c"/>
+    <File RelativePath="..\..\src\btree\bt_delete.c"/>
+    <File RelativePath="..\..\src\btree\bt_method.c"/>
+    <File RelativePath="..\..\src\btree\bt_open.c"/>
+    <File RelativePath="..\..\src\btree\bt_put.c"/>
+    <File RelativePath="..\..\src\btree\bt_rec.c"/>
+    <File RelativePath="..\..\src\btree\bt_reclaim.c"/>
+    <File RelativePath="..\..\src\btree\bt_recno.c"/>
+    <File RelativePath="..\..\src\btree\bt_rsearch.c"/>
+    <File RelativePath="..\..\src\btree\bt_search.c"/>
+    <File RelativePath="..\..\src\btree\bt_split.c"/>
+    <File RelativePath="..\..\src\btree\bt_stat.c"/>
+    <File RelativePath="..\..\src\btree\btree_auto.c"/>
+    <File RelativePath="..\..\src\clib\bsearch.c"/>
+    <File RelativePath="..\..\src\clib\strdup.c"/>
+    <File RelativePath="..\..\src\clib\strerror.c"/>
+    <File RelativePath="..\..\src\clib\strsep.c"/>
+    <File RelativePath="..\..\src\clib\time.c"/>
+    <File RelativePath="..\..\src\common\clock.c"/>
+    <File RelativePath="..\..\src\common\crypto_stub.c"/>
+    <File RelativePath="..\..\src\common\db_byteorder.c"/>
+    <File RelativePath="..\..\src\common\db_compint.c"/>
+    <File RelativePath="..\..\src\common\db_err.c"/>
+    <File RelativePath="..\..\src\common\db_getlong.c"/>
+    <File RelativePath="..\..\src\common\db_idspace.c"/>
+    <File RelativePath="..\..\src\common\db_log2.c"/>
+    <File RelativePath="..\..\src\common\db_shash.c"/>
+    <File RelativePath="..\..\src\common\dbt.c"/>
+    <File RelativePath="..\..\src\common\mkpath.c"/>
+    <File RelativePath="..\..\src\common\util_cache.c"/>
+    <File RelativePath="..\..\src\common\util_log.c"/>
+    <File RelativePath="..\..\src\common\zerofill.c"/>
+    <File RelativePath="..\..\src\db\crdel_auto.c"/>
+    <File RelativePath="..\..\src\db\crdel_rec.c"/>
+    <File RelativePath="..\..\src\db\db.c"/>
+    <File RelativePath="..\..\src\db\db_am.c"/>
+    <File RelativePath="..\..\src\db\db_auto.c"/>
+    <File RelativePath="..\..\src\db\db_backup.c"/>
+    <File RelativePath="..\..\src\db\db_cam.c"/>
+    <File RelativePath="..\..\src\db\db_cds.c"/>
+    <File RelativePath="..\..\src\db\db_compact.c"/>
+    <File RelativePath="..\..\src\db\db_conv.c"/>
+    <File RelativePath="..\..\src\db\db_copy.c"/>
+    <File RelativePath="..\..\src\db\db_dispatch.c"/>
+    <File RelativePath="..\..\src\db\db_dup.c"/>
+    <File RelativePath="..\..\src\db\db_iface.c"/>
+    <File RelativePath="..\..\src\db\db_join.c"/>
+    <File RelativePath="..\..\src\db\db_meta.c"/>
+    <File RelativePath="..\..\src\db\db_method.c"/>
+    <File RelativePath="..\..\src\db\db_open.c"/>
+    <File RelativePath="..\..\src\db\db_overflow.c"/>
+    <File RelativePath="..\..\src\db\db_pr.c"/>
+    <File RelativePath="..\..\src\db\db_rec.c"/>
+    <File RelativePath="..\..\src\db\db_reclaim.c"/>
+    <File RelativePath="..\..\src\db\db_remove.c"/>
+    <File RelativePath="..\..\src\db\db_rename.c"/>
+    <File RelativePath="..\..\src\db\db_ret.c"/>
+    <File RelativePath="..\..\src\db\db_setid.c"/>
+    <File RelativePath="..\..\src\db\db_setlsn.c"/>
+    <File RelativePath="..\..\src\db\db_sort_multiple.c"/>
+    <File RelativePath="..\..\src\db\db_stati.c"/>
+    <File RelativePath="..\..\src\db\db_truncate.c"/>
+    <File RelativePath="..\..\src\db\db_upg.c"/>
+    <File RelativePath="..\..\src\db\db_vrfy_stub.c"/>
+    <File RelativePath="..\..\src\db\partition.c"/>
+    <File RelativePath="..\..\src\dbreg\dbreg.c"/>
+    <File RelativePath="..\..\src\dbreg\dbreg_auto.c"/>
+    <File RelativePath="..\..\src\dbreg\dbreg_rec.c"/>
+    <File RelativePath="..\..\src\dbreg\dbreg_stat.c"/>
+    <File RelativePath="..\..\src\dbreg\dbreg_util.c"/>
+    <File RelativePath="..\..\src\env\env_alloc.c"/>
+    <File RelativePath="..\..\src\env\env_backup.c"/>
+    <File RelativePath="..\..\src\env\env_config.c"/>
+    <File RelativePath="..\..\src\env\env_failchk.c"/>
+    <File RelativePath="..\..\src\env\env_file.c"/>
+    <File RelativePath="..\..\src\env\env_globals.c"/>
+    <File RelativePath="..\..\src\env\env_method.c"/>
+    <File RelativePath="..\..\src\env\env_name.c"/>
+    <File RelativePath="..\..\src\env\env_open.c"/>
+    <File RelativePath="..\..\src\env\env_recover.c"/>
+    <File RelativePath="..\..\src\env\env_region.c"/>
+    <File RelativePath="..\..\src\env\env_register.c"/>
+    <File RelativePath="..\..\src\env\env_sig.c"/>
+    <File RelativePath="..\..\src\env\env_stat.c"/>
+    <File RelativePath="..\..\src\fileops\fileops_auto.c"/>
+    <File RelativePath="..\..\src\fileops\fop_basic.c"/>
+    <File RelativePath="..\..\src\fileops\fop_rec.c"/>
+    <File RelativePath="..\..\src\fileops\fop_util.c"/>
+    <File RelativePath="..\..\src\hash\hash_func.c"/>
+    <File RelativePath="..\..\src\hash\hash_stub.c"/>
+    <File RelativePath="..\..\src\heap\heap_stub.c"/>
+    <File RelativePath="..\..\src\hmac\hmac.c"/>
+    <File RelativePath="..\..\src\hmac\sha1.c"/>
+    <File RelativePath="..\..\src\lock\lock.c"/>
+    <File RelativePath="..\..\src\lock\lock_deadlock.c"/>
+    <File RelativePath="..\..\src\lock\lock_failchk.c"/>
+    <File RelativePath="..\..\src\lock\lock_id.c"/>
+    <File RelativePath="..\..\src\lock\lock_list.c"/>
+    <File RelativePath="..\..\src\lock\lock_method.c"/>
+    <File RelativePath="..\..\src\lock\lock_region.c"/>
+    <File RelativePath="..\..\src\lock\lock_stat.c"/>
+    <File RelativePath="..\..\src\lock\lock_timer.c"/>
+    <File RelativePath="..\..\src\lock\lock_util.c"/>
+    <File RelativePath="..\..\src\log\log.c"/>
+    <File RelativePath="..\..\src\log\log_archive.c"/>
+    <File RelativePath="..\..\src\log\log_compare.c"/>
+    <File RelativePath="..\..\src\log\log_debug.c"/>
+    <File RelativePath="..\..\src\log\log_get.c"/>
+    <File RelativePath="..\..\src\log\log_method.c"/>
+    <File RelativePath="..\..\src\log\log_put.c"/>
+    <File RelativePath="..\..\src\log\log_stat.c"/>
+    <File RelativePath="..\..\src\log\log_verify_stub.c"/>
+    <File RelativePath="..\..\src\mp\mp_alloc.c"/>
+    <File RelativePath="..\..\src\mp\mp_backup.c"/>
+    <File RelativePath="..\..\src\mp\mp_bh.c"/>
+    <File RelativePath="..\..\src\mp\mp_fget.c"/>
+    <File RelativePath="..\..\src\mp\mp_fmethod.c"/>
+    <File RelativePath="..\..\src\mp\mp_fopen.c"/>
+    <File RelativePath="..\..\src\mp\mp_fput.c"/>
+    <File RelativePath="..\..\src\mp\mp_fset.c"/>
+    <File RelativePath="..\..\src\mp\mp_method.c"/>
+    <File RelativePath="..\..\src\mp\mp_mvcc.c"/>
+    <File RelativePath="..\..\src\mp\mp_region.c"/>
+    <File RelativePath="..\..\src\mp\mp_register.c"/>
+    <File RelativePath="..\..\src\mp\mp_resize.c"/>
+    <File RelativePath="..\..\src\mp\mp_stat.c"/>
+    <File RelativePath="..\..\src\mp\mp_sync.c"/>
+    <File RelativePath="..\..\src\mp\mp_trickle.c"/>
+    <File RelativePath="..\..\src\mutex\mut_alloc.c"/>
+    <File RelativePath="..\..\src\mutex\mut_failchk.c"/>
+    <File RelativePath="..\..\src\mutex\mut_method.c"/>
+    <File RelativePath="..\..\src\mutex\mut_region.c"/>
+    <File RelativePath="..\..\src\mutex\mut_stat.c"/>
+    <File RelativePath="..\..\src\mutex\mut_win32.c"/>
+    <File RelativePath="..\..\src\os\os_abort.c"/>
+    <File RelativePath="..\..\src\os\os_alloc.c"/>
+    <File RelativePath="..\..\src\os\os_ctime.c"/>
+    <File RelativePath="..\..\src\os\os_path.c"/>
+    <File RelativePath="..\..\src\os\os_pid.c"/>
+    <File RelativePath="..\..\src\os\os_root.c"/>
+    <File RelativePath="..\..\src\os\os_rpath.c"/>
+    <File RelativePath="..\..\src\os\os_stack.c"/>
+    <File RelativePath="..\..\src\os\os_tmpdir.c"/>
+    <File RelativePath="..\..\src\os\os_uid.c"/>
+    <File RelativePath="..\..\src\os_windows\os_abs.c"/>
+    <File RelativePath="..\..\src\os_windows\os_clock.c"/>
+    <File RelativePath="..\..\src\os_windows\os_config.c"/>
+    <File RelativePath="..\..\src\os_windows\os_cpu.c"/>
+    <File RelativePath="..\..\src\os_windows\os_dir.c"/>
+    <File RelativePath="..\..\src\os_windows\os_errno.c"/>
+    <File RelativePath="..\..\src\os_windows\os_fid.c"/>
+    <File RelativePath="..\..\src\os_windows\os_flock.c"/>
+    <File RelativePath="..\..\src\os_windows\os_fsync.c"/>
+    <File RelativePath="..\..\src\os_windows\os_getenv.c"/>
+    <File RelativePath="..\..\src\os_windows\os_handle.c"/>
+    <File RelativePath="..\..\src\os_windows\os_map.c"/>
+    <File RelativePath="..\..\src\os_windows\os_mkdir.c"/>
+    <File RelativePath="..\..\src\os_windows\os_open.c"/>
+    <File RelativePath="..\..\src\os_windows\os_rename.c"/>
+    <File RelativePath="..\..\src\os_windows\os_rmdir.c"/>
+    <File RelativePath="..\..\src\os_windows\os_rw.c"/>
+    <File RelativePath="..\..\src\os_windows\os_seek.c"/>
+    <File RelativePath="..\..\src\os_windows\os_stat.c"/>
+    <File RelativePath="..\..\src\os_windows\os_truncate.c"/>
+    <File RelativePath="..\..\src\os_windows\os_unlink.c"/>
+    <File RelativePath="..\..\src\os_windows\os_yield.c"/>
+    <File RelativePath="..\..\src\qam\qam_stub.c"/>
+    <File RelativePath="..\..\src\rep\rep_stub.c"/>
+    <File RelativePath="..\..\src\repmgr\repmgr_stub.c"/>
+    <File RelativePath="..\..\src\sequence\seq_stat.c"/>
+    <File RelativePath="..\..\src\sequence\sequence.c"/>
+    <File RelativePath="..\..\src\txn\txn.c"/>
+    <File RelativePath="..\..\src\txn\txn_auto.c"/>
+    <File RelativePath="..\..\src\txn\txn_chkpt.c"/>
+    <File RelativePath="..\..\src\txn\txn_failchk.c"/>
+    <File RelativePath="..\..\src\txn\txn_method.c"/>
+    <File RelativePath="..\..\src\txn\txn_rec.c"/>
+    <File RelativePath="..\..\src\txn\txn_recover.c"/>
+    <File RelativePath="..\..\src\txn\txn_region.c"/>
+    <File RelativePath="..\..\src\txn\txn_stat.c"/>
+    <File RelativePath="..\..\src\txn\txn_util.c"/>
+  </Files>
+  <Globals/>
+</VisualStudioProject>

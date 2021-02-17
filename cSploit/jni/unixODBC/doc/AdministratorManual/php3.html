@@ -1,0 +1,90 @@
+<html>
+<head>
+<title>Installing PHP with unixODBC</title>
+</head>
+<body>
+<h1>Installing PHP with unixODBC</h1>
+
+This install procedure is based on apache 1.3.6 and PHP 3.0.9. The PHP4 from beta 3 will have a 
+configure option to use unixODBC so most of the following will be redundant.
+
+<p>
+This document assumes that unixODBC has been built and installed, in this case in the default location
+/usr/local, and that both Apache and PHP have been untarred in the users home directory.
+
+<ol>
+
+<li>In the Apache directory run the following command
+<pre>
+   ./configure --prefix=/www
+</pre>
+
+plus any other local config you need
+
+<p><li>Create a file in /usr/local/include called odbc.h containing the following three lines
+
+<pre>
+   #include &lt;sql.h&gt;
+   #include &lt;sqlext.h&gt;
+   #include &lt;odbcinst.h&gt;
+</pre>
+
+replacing /www with your desired apache install path
+
+<p><li>Move to the PHP directory
+
+Define the following environment variables
+
+<pre>
+   CFLAGS="-I/usr/local/include"
+   LDFLAGS=
+   CUSTOM_ODBC_LIBS="-L/usr/local/lib -lodbc"
+</pre>
+
+remember to export these variables
+
+<pre>
+   export CFLAGS LDFLAGS CUSTOM_ODBC_LIBS 
+</pre>
+
+<p><li>Configure PHP with
+
+<pre>
+   ./configure --with-apache=../apache_1.3.6 --with-custom-odbc=/usr/local  --enable-track-vars
+</pre>
+
+plus any other local config you need
+
+then...
+
+<pre>
+   make
+   make install
+</pre>
+
+<p><li>Go back to your apache directory, and do
+
+<pre>
+   ./configure --prefix=/www --activate-module=src/modules/php3/libphp3.a
+   make
+   make install
+</pre>
+
+<p><li>Back to the PHP directory
+
+Then to quote from the PHP INSTALL
+<pre>
+   cp php3.ini-dist /usr/local/lib/php3.ini
+   You can edit /usr/local/lib/php3.ini file to set PHP options.
+   Edit your httpd.conf or srm.conf file and add:
+     AddType application/x-httpd-php3 .php3
+<pre>
+
+</ol>
+
+And that should be that.
+
+<p>If this is of any help to someone, good, any problems let <a href="mailto:nick@unixodbc.org">me</a> know. 
+<p>Nick Gorham
+</body>
+</html>

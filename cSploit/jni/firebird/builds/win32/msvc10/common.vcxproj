@@ -1,0 +1,332 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\common\Auth.cpp" />
+    <ClCompile Include="..\..\..\src\common\BigInteger.cpp" />
+    <ClCompile Include="..\..\..\src\common\call_service.cpp" />
+    <ClCompile Include="..\..\..\src\common\CharSet.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\alloc.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\BaseStream.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\BlrWriter.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\ClumpletReader.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\ClumpletWriter.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\DbImplementation.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\fb_string.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\ImplementHelper.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\init.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\InternalMessageBuffer.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\locks.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\MetaName.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\MsgPrint.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\NoThrowTimeStamp.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\SafeArg.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\semaphore.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\Switches.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\Synchronize.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\SyncObject.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\TempFile.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\timestamp.cpp" />
+    <ClCompile Include="..\..\..\src\common\classes\UserBlob.cpp" />
+    <ClCompile Include="..\..\..\src\common\config\config.cpp" />
+    <ClCompile Include="..\..\..\src\common\config\ConfigCache.cpp" />
+    <ClCompile Include="..\..\..\src\common\config\config_file.cpp" />
+    <ClCompile Include="..\..\..\src\common\config\dir_list.cpp" />
+    <ClCompile Include="..\..\..\src\common\config\os\win32\config_root.cpp" />
+    <ClCompile Include="..\..\..\src\common\cvt.cpp" />
+    <ClCompile Include="..\..\..\src\common\db_alias.cpp" />
+    <ClCompile Include="..\..\..\src\common\dllinst.cpp" />
+    <ClCompile Include="..\..\..\src\common\dsc.cpp" />
+    <ClCompile Include="..\..\..\src\common\enc.cpp" />
+    <ClCompile Include="..\..\..\src\common\fb_exception.cpp" />
+    <ClCompile Include="..\..\..\src\common\IntlParametersBlock.cpp" />
+    <ClCompile Include="..\..\..\src\common\IntlUtil.cpp" />
+    <ClCompile Include="..\..\..\src\common\isc.cpp" />
+    <ClCompile Include="..\..\..\src\common\isc_file.cpp" />
+    <ClCompile Include="..\..\..\src\common\isc_sync.cpp" />
+    <ClCompile Include="..\..\..\src\common\MsgMetadata.cpp" />
+    <ClCompile Include="..\..\..\src\common\os\win32\fbsyslog.cpp" />
+    <ClCompile Include="..\..\..\src\common\os\win32\guid.cpp" />
+    <ClCompile Include="..\..\..\src\common\os\win32\isc_ipc.cpp" />
+    <ClCompile Include="..\..\..\src\common\os\win32\mod_loader.cpp" />
+    <ClCompile Include="..\..\..\src\common\os\win32\os_utils.cpp" />
+    <ClCompile Include="..\..\..\src\common\os\win32\path_utils.cpp" />
+    <ClCompile Include="..\..\..\src\common\pretty.cpp" />
+    <ClCompile Include="..\..\..\src\common\ScanDir.cpp" />
+    <ClCompile Include="..\..\..\src\common\sdl.cpp" />
+    <ClCompile Include="..\..\..\src\common\security.cpp" />
+    <ClCompile Include="..\..\..\src\common\sha.cpp" />
+    <ClCompile Include="..\..\..\src\common\StatementMetadata.cpp" />
+    <ClCompile Include="..\..\..\src\common\StatusArg.cpp" />
+    <ClCompile Include="..\..\..\src\common\StatusHolder.cpp" />
+    <ClCompile Include="..\..\..\src\common\TextType.cpp" />
+    <ClCompile Include="..\..\..\src\common\thd.cpp" />
+    <ClCompile Include="..\..\..\src\common\ThreadData.cpp" />
+    <ClCompile Include="..\..\..\src\common\ThreadStart.cpp" />
+    <ClCompile Include="..\..\..\src\common\unicode_util.cpp" />
+    <ClCompile Include="..\..\..\src\common\utils.cpp" />
+    <ClCompile Include="..\..\..\src\common\UtilSvc.cpp" />
+    <ClCompile Include="..\..\..\src\common\xdr.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\common\Auth.h" />
+    <ClInclude Include="..\..\..\src\common\BigInteger.h" />
+    <ClInclude Include="..\..\..\src\common\call_service.h" />
+    <ClInclude Include="..\..\..\src\common\cdbtable.h" />
+    <ClInclude Include="..\..\..\src\common\CharSet.h" />
+    <ClInclude Include="..\..\..\src\common\classes\Aligner.h" />
+    <ClInclude Include="..\..\..\src\common\classes\alloc.h" />
+    <ClInclude Include="..\..\..\src\common\classes\array.h" />
+    <ClInclude Include="..\..\..\src\common\classes\auto.h" />
+    <ClInclude Include="..\..\..\src\common\classes\BaseStream.h" />
+    <ClInclude Include="..\..\..\src\common\classes\BlrReader.h" />
+    <ClInclude Include="..\..\..\src\common\classes\BlrWriter.h" />
+    <ClInclude Include="..\..\..\src\common\classes\ByteChunk.h" />
+    <ClInclude Include="..\..\..\src\common\classes\ClumpletReader.h" />
+    <ClInclude Include="..\..\..\src\common\classes\ClumpletWriter.h" />
+    <ClInclude Include="..\..\..\src\common\classes\condition.h" />
+    <ClInclude Include="..\..\..\src\common\classes\DbImplementation.h" />
+    <ClInclude Include="..\..\..\src\common\classes\fb_atomic.h" />
+    <ClInclude Include="..\..\..\src\common\classes\fb_pair.h" />
+    <ClInclude Include="..\..\..\src\common\classes\fb_string.h" />
+    <ClInclude Include="..\..\..\src\common\classes\fb_tls.h" />
+    <ClInclude Include="..\..\..\src\common\classes\File.h" />
+    <ClInclude Include="..\..\..\src\common\classes\FpeControl.h" />
+    <ClInclude Include="..\..\..\src\common\classes\GenericMap.h" />
+    <ClInclude Include="..\..\..\src\common\classes\Hash.h" />
+    <ClInclude Include="..\..\..\src\common\classes\ImplementHelper.h" />
+    <ClInclude Include="..\..\..\src\common\classes\init.h" />
+    <ClInclude Include="..\..\..\src\common\classes\InternalMessageBuffer.h" />
+    <ClInclude Include="..\..\..\src\common\classes\locks.h" />
+    <ClInclude Include="..\..\..\src\common\classes\MetaName.h" />
+    <ClInclude Include="..\..\..\src\common\classes\MsgPrint.h" />
+    <ClInclude Include="..\..\..\src\common\classes\NestConst.h" />
+    <ClInclude Include="..\..\..\src\common\classes\NoThrowTimeStamp.h" />
+    <ClInclude Include="..\..\..\src\common\classes\Nullable.h" />
+    <ClInclude Include="..\..\..\src\common\classes\objects_array.h" />
+    <ClInclude Include="..\..\..\src\common\classes\QualifiedName.h" />
+    <ClInclude Include="..\..\..\src\common\classes\RefCounted.h" />
+    <ClInclude Include="..\..\..\src\common\classes\RefMutex.h" />
+    <ClInclude Include="..\..\..\src\common\classes\rwlock.h" />
+    <ClInclude Include="..\..\..\src\common\classes\SafeArg.h" />
+    <ClInclude Include="..\..\..\src\common\classes\semaphore.h" />
+    <ClInclude Include="..\..\..\src\common\classes\sparse_bitmap.h" />
+    <ClInclude Include="..\..\..\src\common\classes\stack.h" />
+    <ClInclude Include="..\..\..\src\common\classes\Switches.h" />
+    <ClInclude Include="..\..\..\src\common\classes\Synchronize.h" />
+    <ClInclude Include="..\..\..\src\common\classes\SyncObject.h" />
+    <ClInclude Include="..\..\..\src\common\classes\TempFile.h" />
+    <ClInclude Include="..\..\..\src\common\classes\timestamp.h" />
+    <ClInclude Include="..\..\..\src\common\classes\tree.h" />
+    <ClInclude Include="..\..\..\src\common\classes\TriState.h" />
+    <ClInclude Include="..\..\..\src\common\classes\UserBlob.h" />
+    <ClInclude Include="..\..\..\src\common\classes\VaryStr.h" />
+    <ClInclude Include="..\..\..\src\common\classes\vector.h" />
+    <ClInclude Include="..\..\..\src\common\common.h" />
+    <ClInclude Include="..\..\..\src\common\config\config.h" />
+    <ClInclude Include="..\..\..\src\common\config\ConfigCache.h" />
+    <ClInclude Include="..\..\..\src\common\config\config_file.h" />
+    <ClInclude Include="..\..\..\src\common\config\dir_list.h" />
+    <ClInclude Include="..\..\..\src\common\config\os\config_root.h" />
+    <ClInclude Include="..\..\..\src\common\CsConvert.h" />
+    <ClInclude Include="..\..\..\src\common\cvt.h" />
+    <ClInclude Include="..\..\..\src\common\db_alias.h" />
+    <ClInclude Include="..\..\..\src\common\dllinst.h" />
+    <ClInclude Include="..\..\..\src\common\dsc.h" />
+    <ClInclude Include="..\..\..\src\common\dsc_proto.h" />
+    <ClInclude Include="..\..\..\src\common\dsc_pub.h" />
+    <ClInclude Include="..\..\..\src\common\dyntable.h" />
+    <ClInclude Include="..\..\..\src\common\enc_proto.h" />
+    <ClInclude Include="..\..\..\src\common\file_params.h" />
+    <ClInclude Include="..\..\..\src\common\gdsassert.h" />
+    <ClInclude Include="..\..\..\src\common\intlobj_new.h" />
+    <ClInclude Include="..\..\..\src\common\IntlParametersBlock.h" />
+    <ClInclude Include="..\..\..\src\common\IntlUtil.h" />
+    <ClInclude Include="..\..\..\src\common\isc_f_proto.h" />
+    <ClInclude Include="..\..\..\src\common\isc_proto.h" />
+    <ClInclude Include="..\..\..\src\common\isc_s_proto.h" />
+    <ClInclude Include="..\..\..\src\common\MsgMetadata.h" />
+    <ClInclude Include="..\..\..\src\common\os\divorce.h" />
+    <ClInclude Include="..\..\..\src\common\os\fbsyslog.h" />
+    <ClInclude Include="..\..\..\src\common\os\guid.h" />
+    <ClInclude Include="..\..\..\src\common\os\isc_i_proto.h" />
+    <ClInclude Include="..\..\..\src\common\os\mod_loader.h" />
+    <ClInclude Include="..\..\..\src\common\os\os_utils.h" />
+    <ClInclude Include="..\..\..\src\common\os\path_utils.h" />
+    <ClInclude Include="..\..\..\src\common\prett_proto.h" />
+    <ClInclude Include="..\..\..\src\common\ScanDir.h" />
+    <ClInclude Include="..\..\..\src\common\sdl.h" />
+    <ClInclude Include="..\..\..\src\common\sdltable.h" />
+    <ClInclude Include="..\..\..\src\common\sdl_proto.h" />
+    <ClInclude Include="..\..\..\src\common\sha.h" />
+    <ClInclude Include="..\..\..\src\common\StatementMetadata.h" />
+    <ClInclude Include="..\..\..\src\common\StatusArg.h" />
+    <ClInclude Include="..\..\..\src\common\StatusHolder.h" />
+    <ClInclude Include="..\..\..\src\common\stuff.h" />
+    <ClInclude Include="..\..\..\src\common\TextType.h" />
+    <ClInclude Include="..\..\..\src\common\thd.h" />
+    <ClInclude Include="..\..\..\src\common\ThreadData.h" />
+    <ClInclude Include="..\..\..\src\common\ThreadStart.h" />
+    <ClInclude Include="..\..\..\src\common\unicode_util.h" />
+    <ClInclude Include="..\..\..\src\common\UtilSvc.h" />
+    <ClInclude Include="..\..\..\src\common\utils_proto.h" />
+    <ClInclude Include="..\..\..\src\common\xdr.h" />
+    <ClInclude Include="..\..\..\src\common\xdr_proto.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{15605F44-BFFD-444F-AD4C-55DC9D704465}</ProjectGuid>
+    <RootNamespace>common</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="firebird2.props" />
+    <Import Project="firebird2debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="firebird2.props" />
+    <Import Project="firebird2release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="firebird2.props" />
+    <Import Project="firebird2debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+    <Import Project="firebird2.props" />
+    <Import Project="firebird2release.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;SUPERSERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x041d</Culture>
+    </ResourceCompile>
+    <Lib>
+      <AdditionalDependencies>ws2_32.lib;../../../extern/libtommath/lib/$(PlatformName)\Release\tommath.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;DEV_BUILD;SUPERSERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x041d</Culture>
+    </ResourceCompile>
+    <Lib>
+      <AdditionalDependencies>ws2_32.lib;../../../extern/libtommath/lib/$(PlatformName)\Release\tommath.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;SUPERSERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x041d</Culture>
+    </ResourceCompile>
+    <Lib>
+      <AdditionalDependencies>ws2_32.lib;../../../extern/libtommath/lib/$(PlatformName)\Release\tommath.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;DEV_BUILD;SUPERSERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x041d</Culture>
+    </ResourceCompile>
+    <Lib>
+      <AdditionalDependencies>ws2_32.lib;../../../extern/libtommath/lib/$(PlatformName)\Release\tommath.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

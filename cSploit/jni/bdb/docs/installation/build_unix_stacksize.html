@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Changing Stack Size</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="upgrade_11gr2_toc.html" title="Chapter 13.  Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0" />
+    <link rel="prev" href="upgrade_11gr2_remsupp.html" title="Dropped Support" />
+    <link rel="next" href="changelog_5_0.html" title="Berkeley DB 11g Release 2 Change Log" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Changing Stack Size</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="upgrade_11gr2_remsupp.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 13. 
+        Upgrading Berkeley DB 4.8 applications to Berkeley DB 11.2.5.0
+    </th>
+          <td width="20%" align="right"> <a accesskey="n" href="changelog_5_0.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="build_unix_stacksize"></a>Changing Stack Size</h2>
+          </div>
+        </div>
+      </div>
+      <p>Prior to the 11gR2 release, Berkeley DB limited the stack size for threads it created using the POSIX thread API to 128 KB for 32-bit platforms and 256 KB for 64-bit platforms.  In this release, the system default stack size is used unless you run the Berkeley DB configure script with the <code class="literal">--with-stacksize=SIZE</code> argument to override the default.
+</p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="upgrade_11gr2_remsupp.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="upgrade_11gr2_toc.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="changelog_5_0.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Dropped Support </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Berkeley DB 11g Release 2 Change Log</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

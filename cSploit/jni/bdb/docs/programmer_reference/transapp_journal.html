@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Using Recovery on Journaling Filesystems</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="transapp.html" title="Chapter 11.  Berkeley DB Transactional Data Store Applications" />
+    <link rel="prev" href="transapp_hotfail.html" title="Hot failover" />
+    <link rel="next" href="transapp_filesys.html" title="Recovery and filesystem operations" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Using Recovery on Journaling Filesystems</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="transapp_hotfail.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 11. 
+		Berkeley DB Transactional Data Store Applications
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="transapp_filesys.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="transapp_journal"></a>Using Recovery on Journaling Filesystems</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+    In some cases, the use of meta-data only journaling file systems can
+    lead to log file corruption.  The window of vulnerability is quite
+    small, but if the operating system experiences an unclean shutdown
+    while Berkeley DB is creating a new log file, it is possible that upon
+    file system recovery, the system will be in a state where the log file
+    has been created, but its own meta-data has not.
+</p>
+      <p>
+    When a log file is corrupted to this degree, normal recovery can fail
+    and your application may be unable to open your environment. Instead,
+    an error something like this is issued when you attempt to run normal
+    recovery on environment open:
+</p>
+      <pre class="programlisting">    Ignoring log file: /var/dblog/log.0000000074: magic number 
+    6c73732f, not 40988
+    Invalid log file: log.0000000074: Invalid argument
+    PANIC: Invalid argument
+    process-private: unable to find environment
+    txn_checkpoint interface requires an environment configured for 
+    the transaction subsystem  </pre>
+      <p>
+    In this case, it may be possible to successfully recover the
+    environment by ignoring the log file that was being created — to
+    do this, rename the log file with the highest number to a temporary
+    name:
+</p>
+      <pre class="programlisting"> mv DBHOME/log.000000XXX my-temporary-log-file  </pre>
+      <p>
+    and try running normal environment recovery again. If recovery is
+    successful, and your application is able to open the environment, then
+    you can delete the log file that you renamed.
+</p>
+      <p>
+    If recovery is not successful, then you must perform a catastrophic
+    recovery from a previous backup.
+</p>
+      <p>
+    This situation has been shown to occur when using ext3 in writeback
+    mode, but other journaling filesystems could exhibit similar behavior.
+</p>
+      <p>
+    To be absolutely certain of your application's ability to recover your
+    environment in the event of a system crash, either use non-journaling
+    filesystems, or use a journaling filesystem in a safe (albeit slower)
+    configuration, such as ext3 in ordered mode.
+</p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="transapp_hotfail.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="transapp.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="transapp_filesys.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Hot failover </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Recovery and filesystem operations</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

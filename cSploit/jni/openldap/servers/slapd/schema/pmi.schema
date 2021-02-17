@@ -1,0 +1,464 @@
+# OpenLDAP X.509 PMI schema
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+## Portions Copyright (C) The Internet Society (1997-2006).
+## All Rights Reserved.
+##
+## This document and translations of it may be copied and furnished to
+## others, and derivative works that comment on or otherwise explain it
+## or assist in its implementation may be prepared, copied, published
+## and distributed, in whole or in part, without restriction of any
+## kind, provided that the above copyright notice and this paragraph are
+## included on all such copies and derivative works.  However, this
+## document itself may not be modified in any way, such as by removing
+## the copyright notice or references to the Internet Society or other
+## Internet organizations, except as needed for the purpose of
+## developing Internet standards in which case the procedures for
+## copyrights defined in the Internet Standards process must be         
+## followed, or as required to translate it into languages other than
+## English.
+##                                                                      
+## The limited permissions granted above are perpetual and will not be  
+## revoked by the Internet Society or its successors or assigns.        
+## 
+## This document and the information contained herein is provided on an 
+## "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+## TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+## BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+## HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+## MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+#
+#
+# Includes LDAPv3 schema items from:
+# ITU X.509 (08/2005)
+#
+## X.509 (08/2005) pp. 120-121
+## 
+## -- object identifier assignments --
+## -- object classes --
+## id-oc-pmiUser                            OBJECT IDENTIFIER ::= {id-oc 24}
+## id-oc-pmiAA                              OBJECT IDENTIFIER ::= {id-oc 25}
+## id-oc-pmiSOA                             OBJECT IDENTIFIER ::= {id-oc 26}
+## id-oc-attCertCRLDistributionPts          OBJECT IDENTIFIER ::= {id-oc 27}
+## id-oc-privilegePolicy                    OBJECT IDENTIFIER ::= {id-oc 32}
+## id-oc-pmiDelegationPath                  OBJECT IDENTIFIER ::= {id-oc 33}
+## id-oc-protectedPrivilegePolicy           OBJECT IDENTIFIER ::= {id-oc 34}
+## -- directory attributes --
+## id-at-attributeCertificate               OBJECT IDENTIFIER ::= {id-at 58}
+## id-at-attributeCertificateRevocationList OBJECT IDENTIFIER ::= {id-at 59}
+## id-at-aACertificate                      OBJECT IDENTIFIER ::= {id-at 61}
+## id-at-attributeDescriptorCertificate     OBJECT IDENTIFIER ::= {id-at 62}
+## id-at-attributeAuthorityRevocationList   OBJECT IDENTIFIER ::= {id-at 63}
+## id-at-privPolicy                         OBJECT IDENTIFIER ::= {id-at 71}
+## id-at-role                               OBJECT IDENTIFIER ::= {id-at 72}
+## id-at-delegationPath                     OBJECT IDENTIFIER ::= {id-at 73}
+## id-at-protPrivPolicy                     OBJECT IDENTIFIER ::= {id-at 74}
+## id-at-xMLPrivilegeInfo                   OBJECT IDENTIFIER ::= {id-at 75}
+## id-at-xMLPprotPrivPolicy                 OBJECT IDENTIFIER ::= {id-at 76}
+## -- attribute certificate extensions --
+## id-ce-authorityAttributeIdentifier       OBJECT IDENTIFIER ::= {id-ce 38}
+## id-ce-roleSpecCertIdentifier             OBJECT IDENTIFIER ::= {id-ce 39}
+## id-ce-basicAttConstraints                OBJECT IDENTIFIER ::= {id-ce 41}
+## id-ce-delegatedNameConstraints           OBJECT IDENTIFIER ::= {id-ce 42}
+## id-ce-timeSpecification                  OBJECT IDENTIFIER ::= {id-ce 43}
+## id-ce-attributeDescriptor                OBJECT IDENTIFIER ::= {id-ce 48}
+## id-ce-userNotice                         OBJECT IDENTIFIER ::= {id-ce 49}
+## id-ce-sOAIdentifier                      OBJECT IDENTIFIER ::= {id-ce 50}
+## id-ce-acceptableCertPolicies             OBJECT IDENTIFIER ::= {id-ce 52}
+## id-ce-targetInformation                  OBJECT IDENTIFIER ::= {id-ce 55}
+## id-ce-noRevAvail                         OBJECT IDENTIFIER ::= {id-ce 56}
+## id-ce-acceptablePrivilegePolicies        OBJECT IDENTIFIER ::= {id-ce 57}
+## id-ce-indirectIssuer                     OBJECT IDENTIFIER ::= {id-ce 61}
+## id-ce-noAssertion                        OBJECT IDENTIFIER ::= {id-ce 62}
+## id-ce-issuedOnBehalfOf                   OBJECT IDENTIFIER ::= {id-ce 64}
+## -- PMI matching rules --
+## id-mr-attributeCertificateMatch          OBJECT IDENTIFIER ::= {id-mr 42}
+## id-mr-attributeCertificateExactMatch     OBJECT IDENTIFIER ::= {id-mr 45}
+## id-mr-holderIssuerMatch                  OBJECT IDENTIFIER ::= {id-mr 46}
+## id-mr-authAttIdMatch                     OBJECT IDENTIFIER ::= {id-mr 53}
+## id-mr-roleSpecCertIdMatch                OBJECT IDENTIFIER ::= {id-mr 54}
+## id-mr-basicAttConstraintsMatch           OBJECT IDENTIFIER ::= {id-mr 55}
+## id-mr-delegatedNameConstraintsMatch      OBJECT IDENTIFIER ::= {id-mr 56}
+## id-mr-timeSpecMatch                      OBJECT IDENTIFIER ::= {id-mr 57}
+## id-mr-attDescriptorMatch                 OBJECT IDENTIFIER ::= {id-mr 58}
+## id-mr-acceptableCertPoliciesMatch        OBJECT IDENTIFIER ::= {id-mr 59}
+## id-mr-delegationPathMatch                OBJECT IDENTIFIER ::= {id-mr 61}
+## id-mr-sOAIdentifierMatch                 OBJECT IDENTIFIER ::= {id-mr 66}
+## id-mr-indirectIssuerMatch                OBJECT IDENTIFIER ::= {id-mr 67}
+## 
+## 
+## X.509 (08/2005) pp. 71, 86-89
+##
+## 14.4.1 Role attribute
+## role  ATTRIBUTE ::= {
+##       WITH SYNTAX         RoleSyntax
+##       ID                  id-at-role }
+## RoleSyntax ::= SEQUENCE {
+## roleAuthority     [0]     GeneralNames  OPTIONAL,
+## roleName          [1]     GeneralName }
+## 
+## 14.5     XML privilege information attribute
+##    xmlPrivilegeInfo ATTRIBUTE ::= {
+##      WITH SYNTAX UTF8String -- contains XML-encoded privilege information
+##      ID                 id-at-xMLPrivilegeInfo }
+## 
+## 17.1 PMI directory object classes
+## 
+## 17.1.1   PMI user object class
+##    pmiUser OBJECT-CLASS ::= {
+##    -- a PMI user (i.e., a "holder")
+##      SUBCLASS OF          {top}
+##      KIND                 auxiliary
+##      MAY CONTAIN          {attributeCertificateAttribute}
+##      ID                   id-oc-pmiUser }
+## 
+## 17.1.2     PMI AA object class
+##     pmiAA OBJECT-CLASS ::= {
+##     -- a PMI AA
+##       SUBCLASS OF          {top}
+##       KIND                 auxiliary
+##       MAY CONTAIN          {aACertificate |
+##                            attributeCertificateRevocationList |
+##                            attributeAuthorityRevocationList}
+##       ID                   id-oc-pmiAA }
+## 
+## 17.1.3     PMI SOA object class
+##     pmiSOA OBJECT-CLASS ::= { -- a PMI Source of Authority
+##       SUBCLASS OF {top}
+##       KIND                 auxiliary
+##       MAY CONTAIN          {attributeCertificateRevocationList |
+##                            attributeAuthorityRevocationList |
+##                            attributeDescriptorCertificate}
+##       ID                   id-oc-pmiSOA }
+## 
+## 17.1.4     Attribute certificate CRL distribution point object class
+##     attCertCRLDistributionPt          OBJECT-CLASS ::= {
+##       SUBCLASS OF {top}
+##       KIND                 auxiliary
+##       MAY CONTAIN          { attributeCertificateRevocationList |
+##                            attributeAuthorityRevocationList }
+##       ID                   id-oc-attCertCRLDistributionPts }
+## 
+## 17.1.5     PMI delegation path
+##     pmiDelegationPath            OBJECT-CLASS ::= {
+##         SUBCLASS OF              {top}
+##         KIND                     auxiliary
+##         MAY CONTAIN              { delegationPath }
+##         ID                       id-oc-pmiDelegationPath }
+## 
+## 17.1.6     Privilege policy object class
+##     privilegePolicy        OBJECT-CLASS ::= {
+##         SUBCLASS OF              {top}
+##         KIND                     auxiliary
+##         MAY CONTAIN              {privPolicy }
+##         ID                       id-oc-privilegePolicy }
+## 
+## 17.1.7     Protected privilege policy object class
+##     protectedPrivilegePolicy               OBJECT-CLASS       ::= {
+##         SUBCLASS OF              {top}
+##         KIND                     auxiliary
+##         MAY CONTAIN            {protPrivPolicy }
+##         ID                     id-oc-protectedPrivilegePolicy }
+## 
+## 17.2       PMI Directory attributes
+## 
+## 17.2.1     Attribute certificate attribute
+##     attributeCertificateAttribute ATTRIBUTE ::= {
+##         WITH SYNTAX                            AttributeCertificate
+##         EQUALITY MATCHING RULE                 attributeCertificateExactMatch
+##         ID                                     id-at-attributeCertificate }
+## 
+## 17.2.2     AA certificate attribute
+##     aACertificate         ATTRIBUTE ::= {
+##         WITH SYNTAX                            AttributeCertificate
+##         EQUALITY MATCHING RULE                 attributeCertificateExactMatch
+##         ID                                     id-at-aACertificate }
+## 
+## 17.2.3     Attribute descriptor certificate attribute
+##     attributeDescriptorCertificate        ATTRIBUTE ::= {
+##         WITH SYNTAX                            AttributeCertificate
+##         EQUALITY MATCHING RULE                 attributeCertificateExactMatch
+##         ID                                     id-at-attributeDescriptorCertificate }
+## 
+## 17.2.4     Attribute certificate revocation list attribute
+##     attributeCertificateRevocationList         ATTRIBUTE ::= {
+##         WITH SYNTAX                            CertificateList
+##         EQUALITY MATCHING RULE                 certificateListExactMatch
+##         ID                                     id-at-attributeCertificateRevocationList}
+## 
+## 17.2.5     AA certificate revocation list attribute
+##     attributeAuthorityRevocationList           ATTRIBUTE ::= {
+##         WITH SYNTAX                            CertificateList
+##         EQUALITY MATCHING RULE                 certificateListExactMatch
+##         ID                                     id-at-attributeAuthorityRevocationList }
+## 
+## 17.2.6     Delegation path attribute
+##     delegationPath        ATTRIBUTE ::= {
+##         WITH SYNTAX                  AttCertPath
+##         ID                           id-at-delegationPath }
+##     AttCertPath      ::= SEQUENCE OF AttributeCertificate
+## 
+## 17.2.7     Privilege policy attribute
+##     privPolicy ATTRIBUTE ::= {
+##         WITH SYNTAX             PolicySyntax
+##         ID                      id-at-privPolicy }
+## 
+## 17.2.8     Protected privilege policy attribute
+##        protPrivPolicy       ATTRIBUTE        ::= {
+##         WITH SYNTAX                          AttributeCertificate
+##         EQUALITY MATCHING RULE               attributeCertificateExactMatch
+##         ID                                   id-at-protPrivPolicy }
+## 
+## 17.2.9     XML Protected privilege policy attribute
+##        xmlPrivPolicy        ATTRIBUTE ::= {
+##         WITH SYNTAX         UTF8String -- contains XML-encoded privilege policy information
+##         ID                  id-at-xMLPprotPrivPolicy }
+## 
+
+## -- object identifier assignments --
+## -- object classes --
+objectidentifier	id-oc-pmiUser 2.5.6.24
+objectidentifier	id-oc-pmiAA 2.5.6.25
+objectidentifier	id-oc-pmiSOA 2.5.6.26
+objectidentifier	id-oc-attCertCRLDistributionPts 2.5.6.27
+objectidentifier	id-oc-privilegePolicy 2.5.6.32
+objectidentifier	id-oc-pmiDelegationPath 2.5.6.33
+objectidentifier	id-oc-protectedPrivilegePolicy 2.5.6.34
+## -- directory attributes --
+objectidentifier	id-at-attributeCertificate 2.5.4.58
+objectidentifier	id-at-attributeCertificateRevocationList 2.5.4.59
+objectidentifier	id-at-aACertificate 2.5.4.61
+objectidentifier	id-at-attributeDescriptorCertificate 2.5.4.62
+objectidentifier	id-at-attributeAuthorityRevocationList 2.5.4.63
+objectidentifier	id-at-privPolicy 2.5.4.71
+objectidentifier	id-at-role 2.5.4.72
+objectidentifier	id-at-delegationPath 2.5.4.73
+objectidentifier	id-at-protPrivPolicy 2.5.4.74
+objectidentifier	id-at-xMLPrivilegeInfo 2.5.4.75
+objectidentifier	id-at-xMLPprotPrivPolicy 2.5.4.76
+## -- attribute certificate extensions --
+## id-ce-authorityAttributeIdentifier       OBJECT IDENTIFIER ::= {id-ce 38}
+## id-ce-roleSpecCertIdentifier             OBJECT IDENTIFIER ::= {id-ce 39}
+## id-ce-basicAttConstraints                OBJECT IDENTIFIER ::= {id-ce 41}
+## id-ce-delegatedNameConstraints           OBJECT IDENTIFIER ::= {id-ce 42}
+## id-ce-timeSpecification                  OBJECT IDENTIFIER ::= {id-ce 43}
+## id-ce-attributeDescriptor                OBJECT IDENTIFIER ::= {id-ce 48}
+## id-ce-userNotice                         OBJECT IDENTIFIER ::= {id-ce 49}
+## id-ce-sOAIdentifier                      OBJECT IDENTIFIER ::= {id-ce 50}
+## id-ce-acceptableCertPolicies             OBJECT IDENTIFIER ::= {id-ce 52}
+## id-ce-targetInformation                  OBJECT IDENTIFIER ::= {id-ce 55}
+## id-ce-noRevAvail                         OBJECT IDENTIFIER ::= {id-ce 56}
+## id-ce-acceptablePrivilegePolicies        OBJECT IDENTIFIER ::= {id-ce 57}
+## id-ce-indirectIssuer                     OBJECT IDENTIFIER ::= {id-ce 61}
+## id-ce-noAssertion                        OBJECT IDENTIFIER ::= {id-ce 62}
+## id-ce-issuedOnBehalfOf                   OBJECT IDENTIFIER ::= {id-ce 64}
+## -- PMI matching rules --
+objectidentifier	id-mr 2.5.13
+objectidentifier	id-mr-attributeCertificateMatch id-mr:42
+objectidentifier	id-mr-attributeCertificateExactMatch id-mr:45
+objectidentifier	id-mr-holderIssuerMatch id-mr:46
+objectidentifier	id-mr-authAttIdMatch id-mr:53
+objectidentifier	id-mr-roleSpecCertIdMatch id-mr:54
+objectidentifier	id-mr-basicAttConstraintsMatch id-mr:55
+objectidentifier	id-mr-delegatedNameConstraintsMatch id-mr:56
+objectidentifier	id-mr-timeSpecMatch id-mr:57
+objectidentifier	id-mr-attDescriptorMatch id-mr:58
+objectidentifier	id-mr-acceptableCertPoliciesMatch id-mr:59
+objectidentifier	id-mr-delegationPathMatch id-mr:61
+objectidentifier	id-mr-sOAIdentifierMatch id-mr:66
+objectidentifier	id-mr-indirectIssuerMatch id-mr:67
+## -- syntaxes --
+## NOTE: 1.3.6.1.4.1.4203.666.11.10 is the oid arc assigned by OpenLDAP
+## to this work in progress
+objectidentifier	AttributeCertificate 1.3.6.1.4.1.4203.666.11.10.2.1
+objectidentifier	CertificateList 1.3.6.1.4.1.1466.115.121.1.9
+objectidentifier	AttCertPath 1.3.6.1.4.1.4203.666.11.10.2.4
+objectidentifier	PolicySyntax 1.3.6.1.4.1.4203.666.11.10.2.5
+objectidentifier	RoleSyntax 1.3.6.1.4.1.4203.666.11.10.2.6
+#  NOTE: OIDs from <draft-ietf-pkix-ldap-schema-02.txt> (expired)
+#objectidentifier	AttributeCertificate 1.2.826.0.1.3344810.7.5
+#objectidentifier	AttCertPath 1.2.826.0.1.3344810.7.10
+#objectidentifier	PolicySyntax 1.2.826.0.1.3344810.7.17
+#objectidentifier	RoleSyntax 1.2.826.0.1.3344810.7.13
+##
+## Substitute syntaxes
+##
+## AttCertPath
+ldapsyntax ( 1.3.6.1.4.1.4203.666.11.10.2.4
+	NAME 'AttCertPath'
+	DESC 'X.509 PMI attribute cartificate path: SEQUENCE OF AttributeCertificate'
+	X-SUBST '1.3.6.1.4.1.1466.115.121.1.15' )
+##
+## PolicySyntax
+ldapsyntax ( 1.3.6.1.4.1.4203.666.11.10.2.5
+	NAME 'PolicySyntax'
+	DESC 'X.509 PMI policy syntax'
+	X-SUBST '1.3.6.1.4.1.1466.115.121.1.15' )
+##
+## RoleSyntax
+ldapsyntax ( 1.3.6.1.4.1.4203.666.11.10.2.6
+	NAME 'RoleSyntax'
+	DESC 'X.509 PMI role syntax'
+	X-SUBST '1.3.6.1.4.1.1466.115.121.1.15' )
+##
+## X.509 (08/2005) pp. 71, 86-89
+## 
+## 14.4.1 Role attribute
+attributeType ( id-at-role
+	NAME 'role'
+	DESC 'X.509 Role attribute, use ;binary'
+	SYNTAX RoleSyntax )
+## 
+## 14.5     XML privilege information attribute
+##  -- contains XML-encoded privilege information
+attributeType ( id-at-xMLPrivilegeInfo
+	NAME 'xmlPrivilegeInfo'
+	DESC 'X.509 XML privilege information attribute'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+## 
+## 17.2       PMI Directory attributes
+## 
+## 17.2.1     Attribute certificate attribute
+attributeType ( id-at-attributeCertificate
+	NAME 'attributeCertificateAttribute'
+	DESC 'X.509 Attribute certificate attribute, use ;binary'
+	SYNTAX AttributeCertificate
+	EQUALITY attributeCertificateExactMatch )
+## 
+## 17.2.2     AA certificate attribute
+attributeType ( id-at-aACertificate
+	NAME 'aACertificate'
+	DESC 'X.509 AA certificate attribute, use ;binary'
+	SYNTAX AttributeCertificate
+	EQUALITY attributeCertificateExactMatch )
+## 
+## 17.2.3     Attribute descriptor certificate attribute
+attributeType ( id-at-attributeDescriptorCertificate
+	NAME 'attributeDescriptorCertificate'
+	DESC 'X.509 Attribute descriptor certificate attribute, use ;binary'
+	SYNTAX AttributeCertificate
+	EQUALITY attributeCertificateExactMatch )
+## 
+## 17.2.4     Attribute certificate revocation list attribute
+attributeType ( id-at-attributeCertificateRevocationList
+	NAME 'attributeCertificateRevocationList'
+	DESC 'X.509 Attribute certificate revocation list attribute, use ;binary'
+	SYNTAX CertificateList 
+	X-EQUALITY 'certificateListExactMatch, not implemented yet' )
+## 
+## 17.2.5     AA certificate revocation list attribute
+attributeType ( id-at-attributeAuthorityRevocationList
+	NAME 'attributeAuthorityRevocationList'
+	DESC 'X.509 AA certificate revocation list attribute, use ;binary'
+	SYNTAX CertificateList
+	X-EQUALITY 'certificateListExactMatch, not implemented yet' )
+## 
+## 17.2.6     Delegation path attribute
+attributeType ( id-at-delegationPath
+	NAME 'delegationPath'
+	DESC 'X.509 Delegation path attribute, use ;binary'
+	SYNTAX AttCertPath )
+##     AttCertPath      ::= SEQUENCE OF AttributeCertificate
+## 
+## 17.2.7     Privilege policy attribute
+attributeType ( id-at-privPolicy
+	NAME 'privPolicy'
+	DESC 'X.509 Privilege policy attribute, use ;binary'
+	SYNTAX PolicySyntax )
+## 
+## 17.2.8     Protected privilege policy attribute
+attributeType ( id-at-protPrivPolicy
+	NAME 'protPrivPolicy'
+	DESC 'X.509 Protected privilege policy attribute, use ;binary'
+	SYNTAX AttributeCertificate
+	EQUALITY attributeCertificateExactMatch )
+## 
+## 17.2.9     XML Protected privilege policy attribute
+## -- contains XML-encoded privilege policy information
+attributeType ( id-at-xMLPprotPrivPolicy
+	NAME 'xmlPrivPolicy'
+	DESC 'X.509 XML Protected privilege policy attribute'
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+##
+## 17.1 PMI directory object classes
+## 
+## 17.1.1   PMI user object class
+##    -- a PMI user (i.e., a "holder")
+objectClass ( id-oc-pmiUser
+	NAME 'pmiUser'
+	DESC 'X.509 PMI user object class'
+	SUP top
+	AUXILIARY
+	MAY ( attributeCertificateAttribute ) )
+## 
+## 17.1.2     PMI AA object class
+##     -- a PMI AA
+objectClass ( id-oc-pmiAA
+	NAME 'pmiAA'
+	DESC 'X.509 PMI AA object class'
+	SUP top
+	AUXILIARY
+	MAY ( aACertificate $
+		attributeCertificateRevocationList $
+		attributeAuthorityRevocationList
+	) )
+## 
+## 17.1.3     PMI SOA object class
+##     -- a PMI Source of Authority
+objectClass ( id-oc-pmiSOA
+	NAME 'pmiSOA'
+	DESC 'X.509 PMI SOA object class'
+	SUP top
+	AUXILIARY
+	MAY ( attributeCertificateRevocationList $
+		attributeAuthorityRevocationList $
+		attributeDescriptorCertificate
+	) )
+## 
+## 17.1.4     Attribute certificate CRL distribution point object class
+objectClass ( id-oc-attCertCRLDistributionPts
+	NAME 'attCertCRLDistributionPt'
+	DESC 'X.509 Attribute certificate CRL distribution point object class'
+	SUP top
+	AUXILIARY
+	MAY ( attributeCertificateRevocationList $
+		attributeAuthorityRevocationList
+	) )
+## 
+## 17.1.5     PMI delegation path
+objectClass ( id-oc-pmiDelegationPath
+	NAME 'pmiDelegationPath'
+	DESC 'X.509 PMI delegation path'
+	SUP top
+	AUXILIARY
+	MAY ( delegationPath ) )
+## 
+## 17.1.6     Privilege policy object class
+objectClass ( id-oc-privilegePolicy
+	NAME 'privilegePolicy'
+	DESC 'X.509 Privilege policy object class'
+	SUP top
+	AUXILIARY
+	MAY ( privPolicy ) )
+## 
+## 17.1.7     Protected privilege policy object class
+objectClass ( id-oc-protectedPrivilegePolicy
+	NAME 'protectedPrivilegePolicy'
+	DESC 'X.509 Protected privilege policy object class'
+	SUP top
+	AUXILIARY
+	MAY ( protPrivPolicy ) )
+

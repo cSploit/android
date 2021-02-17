@@ -1,0 +1,72 @@
+.TH IPX_INTERFACE 8 "IPX Utilities" "Caldera, Inc." 
+.SH NAME
+ipx_interface \- add, delete, or display an IPX interface
+.SH SYNOPSIS
+.B ipx_interface
+add [-p] device frame_type [network number[:node number]]
+.LP
+.B ipx_interface
+del device frame_type
+.LP
+.B ipx_interface
+delall
+.LP
+.B ipx_interface
+check device frame_type
+.LP
+.B ipx_interface
+help
+.SH DESCRIPTION
+.B ipx_interface
+adds, deletes, or displays IPX interfaces depending on the option selected.
+.P
+An IPX interface is the item to which IPX sockets are bound.
+An IPX interface corresponds to an IPX Network Number which corresponds 
+to a physical device and frame type.  A sample IPX Interface would be:
+.LP
+Network Number: 0x00ABCDEF
+.LP
+Device: Eth0 
+.LP
+Frame Type: 802.2.
+.P
+There is a special IPX interface per host known as the 
+.B PRIMARY
+or default interface.
+.P
+You should specify \fBnode number\fP only if you really know, what you
+are doing - on \fIpoint-to-point\fP devices, on \fIloopback\fP and on
+\fItap\fP device if you are running \fBCompatibility mode driver\fP.
+
+.SS OPTIONS
+.TP
+.I add
+This option is used to create an IPX interface.  If the 
+.B -p
+flag is used, the interface is made 
+.B
+PRIMARY.
+The network number can be optionally assigned.  If it is not assigned, it
+is set to 0 which indicates it should be detected from the traffic on the
+network.
+.TP
+.I del
+This option is used to delete an IPX interface.
+.TP
+.I delall
+This option is used to delete all IPX interfaces.
+.TP
+.I check
+This option is used to display the device, frame type, and network number
+of an IPX interface.
+.TP
+.I help
+This option displays information about the utility.
+.SH FILES
+.I /proc/net/ipx_interface /proc/net/ipx_route
+.SH BUGS
+This functionality really belongs in
+.B
+ifconfig(8).
+.SH AUTHOR
+Greg Page <greg.page@caldera.com>

@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbEnv::set_memory_init()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="env.html" title="Chapter 5.  The DbEnv Handle" />
+    <link rel="prev" href="envset_isalive.html" title="DbEnv::set_isalive()" />
+    <link rel="next" href="envset_memory_max.html" title="DbEnv::set_memory_max()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbEnv::set_memory_init()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envset_isalive.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. 
+                The DbEnv Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envset_memory_max.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envset_memory_init"></a>DbEnv::set_memory_init()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+
+int
+DbEnv::set_memory_init(DB_MEM_CONFIG type, u_int32_t count); </pre>
+      <p>
+        This method sets the number of objects to allocate and initialize
+        for a specified structure when an environment is created.  Doing
+        this helps avoid memory contention after startup.  Using this
+        method is optional; failure to use this method causes BDB to
+        allocate a minimal number of structures that will grow dynamically.
+        These structures are all allocated from the main environment
+        region.  The amount of memory in this region can be set via the 
+	    <a class="xref" href="envset_memory_max.html" title="DbEnv::set_memory_max()">DbEnv::set_memory_max()</a>
+        method.  If this method is not called then memory will be limited
+        to the initial settings or by the (deprecated) set maximum
+        interfaces.
+    </p>
+      <p>
+         The database environment's initialization  may also be configured
+         using the environment's <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file.  The syntax of the entry
+         in that file is a single line with the string "set_memory_init",
+         one or more whitespace characters, followed by the struct
+         specification, more white space and the count to be allocated.
+         Because the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file is read when the database environment
+         is opened, it will silently overrule configuration done before
+         that time.
+    </p>
+      <p>
+         The <code class="methodname">DbEnv::set_memory_init()</code> method must
+         be called prior to opening the database environment. It may be
+         called as often as needed to set the different configurations.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2087728"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp2088280"></a>type</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The <span class="bold"><strong>type</strong></span> parameter must be 
+                set to one of the following:        
+            </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p><a id="envmem_DB_MEM_LOCK"></a>
+                        <code class="literal">DB_MEM_LOCK</code>
+                    </p>
+                <p>
+                        Initialize locks.  A thread uses this structure
+                        to lock a page (or record for the QUEUE access
+                        method) and hold it to the end of a transactions.
+                    </p>
+              </li>
+              <li>
+                <p><a id="envmem_DB_MEM_LOCKOBJECT"></a>
+                        <code class="literal">DB_MEM_LOCKOBJECT</code>
+                    </p>
+                <p>
+                        Initialize lock objects.  For each page (or record) which
+                        is locked in the system, a lock object will be allocated.
+                    </p>
+              </li>
+              <li>
+                <p><a id="envmem_DB_MEM_LOCKER"></a>
+                        <code class="literal">DB_MEM_LOCKER</code>
+                    </p>
+                <p>
+                        Initialize lockers. Each thread which is active in a
+                        transactional environment will use a locker structure
+                        either for each transaction which is active, or for each
+                        non-transactional cursor that is active.
+                    </p>
+              </li>
+              <li>
+                <p><a id="envmem_DB_MEM_LOGID"></a>
+                          <code class="literal">DB_MEM_LOGID</code>
+                    </p>
+                <p>
+                        Initialize the log fileid structures.  For each database handle
+                        which is opened for writing in a transactional environment,
+                        a log fileid structure is used.
+                    </p>
+              </li>
+              <li>
+                <p><a id="envmem_DB_MEM_TRANSACTION"></a>
+                          <code class="literal">DB_MEM_TRANSACTION</code>
+                    </p>
+                <p>
+                        Initialize transaction structures.  Each active
+                        transaction uses a transaction structure until it
+                        either commits or aborts.
+                    </p>
+                <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+                  <h3 class="title">Note</h3>
+                  <p>
+                            Currently transaction structures are not
+                            preallocated. This setting will be used to
+                            preallocate memory and objects related to
+                            transactions such as locker structures and
+                            mutexes.
+                        </p>
+                </div>
+              </li>
+              <li>
+                <p><a id="envmem_DB_MEM_THREAD"></a>
+                          <code class="literal">DB_MEM_THREAD</code> 
+                    </p>
+                <p>
+                        Initialize thread identification structures.  If thread
+                        tracking is enabled then each active thread will use a
+                        structure.  Note that since a thread does not signal the
+                        BDB library that it will no longer be making calls, unused
+                        structures may accumulate until a cleanup is triggered either
+                        using a high water mark or by running 
+                        <a class="xref" href="envfailchk.html" title="DbEnv::failchk()">DbEnv::failchk()</a>.
+                    </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp2073648"></a>count</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                The <span class="bold"><strong>count</strong></span> parameter
+                sets the number of specified objects to initialize.
+            </p>
+          <p>
+                The <span class="bold"><strong>count</strong></span> specified for
+                locks and lock objects should be at least 5 times the
+                number of lock table partitions. You can examine the
+                current number of lock table partitions configured for your
+                environment using the
+                <a class="xref" href="envget_lk_partitions.html" title="DbEnv::get_lk_partitions()">DbEnv::get_lk_partitions()</a>
+                method.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2076992"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                 The <code class="methodname">DbEnv::set_memory_init()</code> <span>
+            
+            <span>
+                method may fail and throw a <a class="link" href="dbexception.html" title="Chapter 6. The DbException Class">DbException</a> 
+                exception, encapsulating one of the following non-zero errors, or return one
+                of the following non-zero errors:
+            </span>
+        </span>
+            </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp2049104"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If the method was called after <a class="xref" href="envopen.html" title="DbEnv::open()">DbEnv::open()</a> 
+                was called; or if an invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2059944"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2077256"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="env.html#envlist" title="Database Environments and Related Methods">Database Environments and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envset_isalive.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="env.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envset_memory_max.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbEnv::set_isalive() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbEnv::set_memory_max()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

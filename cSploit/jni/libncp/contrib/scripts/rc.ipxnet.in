@@ -1,0 +1,68 @@
+#!/bin/sh
+#
+# /etc/rc.d/rc.ipxnet	Bring up/down IPX networking
+#
+# Author: Roumen Petrov (RYP) <rpetrov@usa.net>, sep 1998.
+#	
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+
+sysconfdir=@sysconfdir@
+bindir=@bindir@
+
+cfgfile=${sysconfdir}/config.ipx
+ 
+if [ -x ${cfgfile} ]
+then
+  . ${cfgfile}
+else
+  echo "IPX configuration not found!"
+  exit 1
+fi         
+
+
+
+case "$1" in
+  start)
+    echo "Insert IPX modules..." 
+    /sbin/insmod -k ipx;
+    /sbin/insmod -k ncpfs;
+    echo "Starting IPX network..." 
+    if [ ${IPX_CONFIGURED} = "yes" ]; then
+      if [ ${IPX_INTERNAL_NET} = "yes" ]; then
+        ${bindir}/ipx_internal_net add ${IPX_NETNUM} ${IPX_NODE}
+      else
+        ${bindir}/ipx_interface add -p ${IPX_DEVICE} ${IPX_FRAME0} ${IPX_NETNUM}
+        ${bindir}/ipx_interface add    ${IPX_DEVICE} ${IPX_FRAME1} ${IPX_NETNUM}
+      fi
+    fi
+    ${bindir}/ipx_configure --auto_primary=on --auto_interface=on
+    ;;
+  stop)
+    echo "umount all ncp file systems..." 
+    umount -v -a -tncpfs
+    if [ $? -ne 0 ] ; then
+      exit 1;
+    fi 
+    ncpmod=`cat /proc/modules | grep -w ncpfs | sed -e 's/ .*//'`
+    if [ ! -z $ncpmod ]; then
+      echo "Removing ncpfs module..." 
+      /sbin/rmmod ncpfs;
+      if [ $? -ne 0 ] ; then
+        exit 1;
+      fi 
+    fi
+    echo "Stoping IPX network..." 
+    ${bindir}/ipx_configure --auto_primary=off --auto_interface=off
+    ${bindir}/ipx_interface delall
+    ;;
+  restart)
+    $0 stop
+    $0 start
+    ;;
+  *)
+    echo "Usage: $0 {start|stop|restart}"
+    exit 1
+esac
+

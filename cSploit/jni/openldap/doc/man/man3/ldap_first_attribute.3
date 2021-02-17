@@ -1,0 +1,73 @@
+.TH LDAP_FIRST_ATTRIBUTE 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_first_attribute, ldap_next_attribute \- step through LDAP entry attributes
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+char *ldap_first_attribute(
+	LDAP *ld, LDAPMessage *entry, BerElement **berptr )
+.LP
+.ft B
+char *ldap_next_attribute(
+	LDAP *ld, LDAPMessage *entry, BerElement *ber )
+.SH DESCRIPTION
+The
+.B ldap_first_attribute()
+and
+.B ldap_next_attribute()
+routines are used
+to step through the attributes in an LDAP entry.
+.B ldap_first_attribute()
+takes an \fIentry\fP as returned by
+.BR ldap_first_entry (3)
+or
+.BR ldap_next_entry (3)
+and returns a pointer to character string
+containing the first attribute description in the entry.
+.B ldap_next_attribute()
+returns the next attribute description in the entry.
+.LP
+It also returns, in \fIberptr\fP, a pointer to a BerElement it has
+allocated to keep track of its current position.  This pointer should
+be passed to subsequent calls to
+.B ldap_next_attribute()
+and is used
+to effectively step through the entry's attributes.  The caller is
+solely responsible for freeing the BerElement pointed to by \fIberptr\fP
+when it is no longer needed by calling
+.BR ber_free (3).
+When calling
+.BR ber_free (3)
+in this instance, be sure the second argument is 0.
+.LP
+The attribute names returned are suitable for inclusion in a call
+to
+.BR ldap_get_values (3)
+to retrieve the attribute's values.
+.SH ERRORS
+If an error occurs, NULL is returned and the ld_errno field in the
+\fIld\fP parameter is set to indicate the error.  See
+.BR ldap_error (3)
+for a description of possible error codes.
+.SH NOTES
+The
+.B ldap_first_attribute()
+and
+.B ldap_next_attribute()
+return dynamically allocated memory that must be freed by the caller via
+.BR ldap_memfree (3).   
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_first_entry (3),
+.BR ldap_get_values (3),
+.BR ldap_error (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

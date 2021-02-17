@@ -1,0 +1,16 @@
+#LEAD COMMENT
+dn: dc=example,dc=com
+dc: example
+#EMBEDDED COMMENT
+objectclass: organization
+objectclass: domainRelatedObject
+objectclass: dcobject
+l: Anytown, Michigan
+st: Michigan
+o: Example, Inc.
+o: EX
+o: Ex.
+description: The Example, Inc. at Anytown
+postaladdress: Example, Inc. $ 535 W. William St. $ Anytown, MI 48109 $ US
+telephonenumber: +1 313 555 1817
+associateddomain: example.com

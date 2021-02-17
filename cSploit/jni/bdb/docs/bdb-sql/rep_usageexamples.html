@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Replication Usage Examples</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="sqlrep.html" title="Chapter 4. Using Replication with the SQL API" />
+    <link rel="prev" href="repstatistics.html" title="Displaying Replication Statistics" />
+    <link rel="next" href="admin.html" title="Chapter 5. Administrating Berkeley DB SQL Databases" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Replication Usage Examples</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="repstatistics.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 4. Using Replication with the SQL API</th>
+          <td width="20%" align="right"> <a accesskey="n" href="admin.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="rep_usageexamples"></a>Replication Usage Examples</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="rep_usageexamples.html#rep_ex1">Example 1: Distributed Read at 3 Sites</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="rep_usageexamples.html#rep_ex2">Example 2: 2-Site Failover</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+                In this section we provide two examples of using
+                replication with BDB SQL. The first example shows a 
+                typical startup process. The second demonstrates master
+                site failover.
+            </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="rep_ex1"></a>Example 1: Distributed Read at 3 Sites</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    This example shows how a typical replication group
+                    startup sequence is performed. It initially populates
+                    the master, then starts two replicas so that read
+                    operations can be distributed. Then it shows what
+                    happens when an attempt is made to write to a replica.
+                </p>
+        <p>
+                Site 1:
+            </p>
+        <pre class="programlisting"># Start initial master.
+# univ.db does not yet exist.
+dbsql univ.db
+     pragma replication_local_site="site1:7000";
+     pragma replication_initial_master=ON;
+     pragma replication=ON;
+
+    # Create and populate university and country tables.
+    .read university.sql </pre>
+        <p>
+                Site 2:
+            </p>
+        <pre class="programlisting"># Start first replica.
+# univ.db does not yet exist.
+dbsql univ.db  
+     pragma replication_local_site="site2:7001";
+     pragma replication_remote_site="site1:7000";
+     pragma replication=ON; </pre>
+        <p>
+                Site 3:
+            </p>
+        <pre class="programlisting"># Start second replica.
+# univ.db does not yet exist.
+dbsql univ.db
+     pragma replication_local_site="site3:7002";
+     pragma replication_remote_site="site1:7000";
+     pragma replication=ON; </pre>
+        <p>
+                Site 1:
+            </p>
+        <pre class="programlisting">    # Perform some writes and reads on master.
+    insert into country values ("Greenland","gl", 0, 0, 0, 2);
+    insert into university values (26, "University College London",
+        "ucl.edu", "uk", "Europe", 18, 39, 47, 30);
+    select * from country where abbr = "gl";
+    update country set top_1000 = 1 where abbr = "gl"; </pre>
+        <p>
+                Site 2:
+            </p>
+        <pre class="programlisting">    # Perform some reads on first replica.
+    select * from university where region = "Europe";
+    select count(*) from country where top_100 &gt; 0;
+
+    # Attempt to write on first replica. 
+    insert into country values ("Antarctica","an", 0, 0, 0, 0);
+    .../univ.db: DBcursor-&gt;put: attempt to modify a read-only database
+    Error: attempt to write to a readonly database</pre>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="rep_ex2"></a>Example 2: 2-Site Failover</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    This example demonstrates failover of the master from
+                    one site to another. It shows how a failed site can
+                    rejoin the replication group, and it shows that there
+                    is a window of time during which write operations
+                    cannot be performed for the replication group. Finally,
+                    it shows how to check the master's location.
+                </p>
+        <p>
+                    Site 1:
+                </p>
+        <pre class="programlisting"># Start initial master.
+# quote.db does not yet exist.
+dbsql quote.db
+     pragma replication_local_site="site1:7000";
+     pragma replication_initial_master=ON;
+     pragma replication=ON;
+
+    # Create stock quote application table.
+    create table stock_quote (company_name text(40), price real);</pre>
+        <p>
+                    Site 2:
+                </p>
+        <pre class="programlisting"># Start replica.
+# quote.db does not yet exist.
+dbsql quote.db 
+     pragma replication_local_site="site2:7001";
+     pragma replication_remote_site="site1:7000";
+     pragma replication=ON; </pre>
+        <p>
+                    Site 1:
+                </p>
+        <pre class="programlisting">    # Perform some writes on master.
+    insert into stock_quote values ("General Electric", 20.25);
+    insert into stock_quote values ("Nabisco", 24.75);
+    insert into stock_quote values ("United Healthcare", 31.00);
+    update stock_quote set price=25.25 where company_name = "Nabisco";</pre>
+        <p>
+                    Site 2:
+                </p>
+        <pre class="programlisting">    # Perform some reads on replica.
+    select * from stock_quote where price &lt; 30.00;
+    select price from stock_quote where 
+           company_name = "General Electric";</pre>
+        <p>
+                    Site 1:
+                </p>
+        <pre class="programlisting">    # Stop the initial master.
+    .exit </pre>
+        <p>
+                    Site 2:
+                </p>
+        <pre class="programlisting">    ##########
+    ### Now the remaining site does not accept write operations until
+    ### the other site rejoins the replication group.
+    ##########
+    insert into stock_quote values ("Prudential", 17.25);
+    .../quote.db: DBcursor-&gt;put: attempt to modify a read-only database
+    Error: attempt to write to a readonly database</pre>
+        <p>
+                    Site 1:
+                </p>
+        <pre class="programlisting"># Restart site, will rejoin replication group.
+dbsql quote.db
+    # The earlier replication=ON causes replication to be 
+    # automatically started.  This site may or may not become master
+    # after rejoining replication group.  Check status of site's 
+    # startup and determine whether it is a master or a replica.
+    .stat :rep:
+    Replication summary statistics
+    Environment configured as a replication master
+    1/49056 Maximum permanent LSN
+    2       Number of environments in the replication group
+    0       Number of failed message sends
+    0       Number of messages ignored due to pending recovery
+    0       Number of log records currently queued
+
+    # Assuming this site became master, perform some writes.
+    # If this site is not the master, these writes will not
+    # succeed and must be performed at the other site.
+    insert into stock_quote values ("Raytheon", 9.25);
+    insert into stock_quote values ("Cadbury", 7.75); </pre>
+        <p>
+                    Site 2:
+                </p>
+        <pre class="programlisting">    # Read operations can be performed on master or replica 
+    # site.
+    select * from stock_quote where price &lt; 21.00; </pre>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="repstatistics.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="sqlrep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="admin.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Displaying Replication Statistics </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Chapter 5. Administrating Berkeley DB SQL Databases</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

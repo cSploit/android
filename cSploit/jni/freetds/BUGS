@@ -1,0 +1,19 @@
+
+Believed Fixed
+--------------
+1. code to send COL_NAME and COL_INFO tokens are not in the server stuff.
+
+Needs Fixing
+------------
+1. Fix formatting of dbprhead/dbprrow...its a little off
+   (Anybody care?)
+2. dbwritetext() and friends do not work under TDS 7.0
+3. There is a bug with the order of returns from ct_results() such that rows
+   affected doesn't show up in sqsh.
+4. ct-lib placeholders do not work with TDS 7.0+.  To fix 
+   this requires either an SQL parser or API modification, 
+   because the library has to determine the SQL datatype 
+   of the placeholder variable.  
+5. ML Mar 21 2009: "freebcp error HINT -b doesnt work", freebcp -n broken. 
+6. ML 2 Aug 2012 "SQL Anywhere SQLColumns".  Rewrite SQLColumns query 
+   in terms of INFORMATION_SCHEMA to get consistent results. 

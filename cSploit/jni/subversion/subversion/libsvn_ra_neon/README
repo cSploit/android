@@ -1,0 +1,112 @@
+
+                                                                 -*- text -*-
+
+Contents
+========
+
+ * Sessions and requests
+ * Passing errors back from neon callbacks
+ * Library specific conventions
+ * Error sources when dispatching a request
+
+
+
+Sessions and requests
+=====================
+
+Both Neon and ra_neon have concepts known as 'session' and 'request'.
+The request concept in ra_neon parallels the one in Neon, except that
+ra_neon stores request-related info for the RA layer.  The session
+concept in ra_neon differs from the one in Neon: while the one in Neon
+is mainly meant to track / maintain a socket connection, the ra_neon
+session is the RA session opened by an RA consumer.  An ra_neon session
+(currently) contains 2 Neon sessions.
+
+Only one request can be dispatched on a Neon session at a time; this
+is why there is a second Neon session, which is used by ra_neon
+implementations of Neon callbacks which want to retrieve information
+from the server concurrently with an active Neon session.  Allocation
+to either Neon session happens automatically.
+
+
+
+Passing errors back from neon callbacks
+=======================================
+
+The general Neon request sequence is:
+
+ 1. Create a session
+ 2. Create a request
+ 3. Add an in-memory or callback-provided request body, if applicable
+ 4. Add custom headers, if any
+ 5. Register one or more content consumers for the response body
+    (ra_neon usually creates xml parsers for this purpose)
+ 6. Dispatch the request
+    (send it to the server and process the response)
+
+While in any of the registered callbacks (be it xml parser,
+body consumer or body provider), Subversion function calls can return
+their usual errors.  The Neon APIs have been wrapped to catch these
+and marshall them through the Neon layer, so that the dispatch routine
+can raise the error for normal processing.
+
+
+
+Library specific conventions
+============================
+
+ * When a specific variable name is used frequently both to refer to
+   ra_neon and Neon resources, the Neon resource variable is prefixed
+   with 'ne_'.
+
+ * Don't use Neon functions which construct and destroy
+   their own requests (ie: ne_simple_request, ne_lock, ne_propfind etc.).
+
+ * Create wrapper functions for callbacks, creating an ra_neon callback
+   which returns an svn_error_t *, storing the returned error
+   in the request structure.
+
+ * When storing an error in the request structure 'err' field,
+   use the SVN_RA_NEON__REQ_ERR() macro.
+
+ * Make Neon resources which need explicit destruction live as short
+   as possible, or register a pool cleanup to ensure destruction.
+   Preferrably, copy the results into a pool with the necessary lifetime.
+
+
+
+Error sources when dispatching a request
+========================================
+
+There are a number of different error sources which all come
+together in svn_ra_neon__request_dispatch(), which tries to
+sort them out and generate the most important error.
+
+ 1. Neon encounters a network or authentication error
+    (all Neon errors except NE_ERROR and NE_OK)
+ 2. Neon didn't encounter an error (returns NE_OK),
+    but the response sent contains an HTTP error (ie 404 Not found, or alike)
+    In this situation, there are 2 possibilities:
+    a) The response contains extended error explanation from mod_dav,
+       which will sometimes be marked as Subversion internal error
+    b) The response contains only the error status code.
+ 3. A callback requested cancelation because the routine it wrapped
+    [see 'Passing back errors from Neon' about wrapping] returned an error
+    (request body provider or response consumer, the latter
+     are xml parser errors, most of the time).
+
+In order to make callers as simple as possible, svn_ra_neon__request_dispatch()
+condenses all these error sources into 1 returned svn_error_t, while trying
+to keep the errors returned human-readable.
+
+When condensing errors, these rules are used:
+
+ - Local errors take priority over ones received from the server
+ - Authentication problems, network problems and other unknown
+   errors are transformed into a generic error code + message
+ - Locally generated errors in the callbacks are returned as is
+ - Subversion server errors are returned when available
+ - Protocol statuses unexpectedly returned (including 2xx codes!)
+   result in a general error message including the status number
+   and description
+

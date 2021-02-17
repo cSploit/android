@@ -1,0 +1,114 @@
+README.vms -- VMS-specific notes on building and running FreeTDS
+
+FreeTDS has successfully built and passed all expected tests in the
+following environments:
+
+OpenVMS Alpha 7.2-1, Compaq C 6.4, OpenVMS Sybase 11.0.2, TDS 5.0
+OpenVMS Alpha 7.3-1, Compaq C 6.5, MS SQL Server 7.0, TDS 7.0
+OpenVMS Alpha 7.1, Compaq C 6.5, MS SQL Server 2000, TDS 8.0
+
+It will probably build and run on most versions of OpenVMS Alpha 7.0 and
+later with DEC/Compaq C 6.0 or later.
+
+Other prerequisites:
+
+    gunzip
+    vmstar
+    MMS or MMK
+
+Build Instructions
+
+Decompress and unpack the source archive using gunzip and vmstar (You
+probably have already or you wouldn't be reading this).  If you are
+untarring on an ODS-5 disk, you should use the /ODS2 or -o option to create
+universally VMS-friendly filenames; the build will fail to locate some files
+otherwise.
+
+Set default to the top-level source directory and run the configuration
+script like so:
+
+    $ @[.vms]configure
+
+This creates a descrip.mms in the top-level source directory which you may
+execute by simply running MMS (if you have the Module Management System that
+is part of DECset) or MMK (a freeware MMS alternative available from
+http://www.madgoat.com).  By default the build uses version 5.0 of the TDS
+protocol and does not include ODBC support.  You may change these defaults
+by sypplying the following macros to the make utility:
+
+TDSVER
+
+This macro expects a value that will be passed directly to the C compiler. 
+Valid values are TDS42, TDS50 (the default), TDS70, and TDS71.  Consult the
+[.doc] directory for more information about the TDS protocol, what servers
+use which versions, and the history of the versions.
+
+Example:
+
+    $ MMK/MACRO="TDSVER"="TDS71"
+
+
+MSDBLIB
+
+Enables Microsoft behavior in the db-lib API where it diverges from
+Sybase's.  See additional documentation in the [.doc] directory.
+
+Example:
+
+    $ MMK/MACRO="MSDBLIB"=1
+
+
+ODBC
+
+This macro instructs the build to include ODBC support.  At
+the moment, the unixODBC driver manager is assumed (see
+http://www.unixodbc.org), but others may work as well.
+
+The following logical names must be defined in order to build with ODBC
+support:
+
+    ODBC_LIBDIR		directory containing driver manager's libraries
+    ODBC_INCDIR		directory containing driver manager's include files
+    LIBODBC		the shareable image comprising the driver manager
+
+Note:  in unixODBC 2.2.4 and later, all of these logicals except
+ODBC_INCDIR will be set up by running ODBC_SETUP.COM in the library
+directory.
+
+Examples:
+
+    $ MMS/MACRO="ODBC"=1
+    $ MMK/MACRO=("ODBC"=1,"TDSVER"="TDS70")
+
+
+
+Caveats and To-do:
+
+It's probably best to define the locations of your configuration files as
+logical names; otherwise FreeTDS may concoct an unparseable combination of
+UNIX and VMS filename syntax.  For example:
+
+    $ DEFINE FREETDSCONF DISK$USER:[TDSDIR]freetds.conf
+
+There is currently no install target; it's up to you to put the libraries,
+include files, etc. wherever you want them.
+
+A VAX port is within the realm of possibilities.  It would need to convert
+between IEEE floating point data and native format and/or request native
+F_FLOAT and D_FLOAT from the server (which may only work on Sybase, not MS
+SQL Server, but that's TBD).
+
+As more ODBC functions are implemented, the file [.vms]odbc_driver_axp.opt
+needs to be updated to point to the real functions instead of the aliases to
+the stub for unimplemented functions.
+
+The build currently compiles with the /NAMES=AS_IS switch when the ODBC
+macro is enabled; this results in mixed-case symbol names.  Mixed-case
+symbols were necessary to get the code working with unixODBC but may cause
+problems when calling the FreeTDS libraries from other languages.  There
+are a variety of approaches that could be taken to work around this but for
+now you'll have to roll your own.
+
+
+Last updated: 	6-NOV-2004	Craig A. Berry	<craigberry@mac.com>
+$Id: README.vms,v 1.4 2009-09-04 07:12:18 freddy77 Exp $

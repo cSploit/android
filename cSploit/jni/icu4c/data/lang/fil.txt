@@ -1,0 +1,115 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/fil.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/fil.xml
+ */
+fil{
+    Languages{
+        af{"Afrikaans"}
+        am{"Amharic"}
+        ar{"Arabic"}
+        as{"Assamese"}
+        az{"Azerbaijani"}
+        be{"Belarusian"}
+        bg{"Bulgarian"}
+        bh{"Bihari"}
+        bn{"Bengali; Bangla"}
+        br{"Breton"}
+        bs{"Bosnian"}
+        ca{"Catalan"}
+        cs{"Czech"}
+        da{"Danish"}
+        de{"Aleman"}
+        el{"Griyego"}
+        en{"Ingles"}
+        en_GB{"Ingles (UK)"}
+        eo{"Esperanto"}
+        es{"Espanyol"}
+        et{"Estonian"}
+        eu{"Basque"}
+        fa{"Persian"}
+        fi{"Finnish"}
+        fil{"Filipino"}
+        fo{"Faroeso"}
+        fr{"Pranses"}
+        ga{"Irish"}
+        gd{"Scots Gaelic"}
+        gl{"Galician"}
+        gn{"Guarani"}
+        gu{"Gujarati"}
+        he{"Hebreo"}
+        hi{"Hindi"}
+        hr{"Croatian"}
+        hu{"Hungarian"}
+        hy{"Armenian"}
+        ia{"Interlingua"}
+        id{"Indonesian"}
+        ie{"Interlingue"}
+        is{"Icelandic"}
+        it{"Italyano"}
+        ja{"Japanese"}
+        jv{"Javanese"}
+        ka{"Georgian"}
+        km{"Khmer"}
+        kn{"Kannada"}
+        ko{"Korean"}
+        ku{"Kurdish"}
+        ky{"Kirghiz"}
+        la{"Latin"}
+        ln{"Lingala"}
+        lo{"Lao"}
+        lt{"Lithuanian"}
+        lv{"Latvian"}
+        mk{"Macedonian"}
+        ml{"Malayalam"}
+        mn{"Mongolian"}
+        mr{"Marathi"}
+        ms{"Malay"}
+        mt{"Maltese"}
+        ne{"Nepali"}
+        nl{"Olandes"}
+        nn{"Norwegian Nynorsk"}
+        no{"Norwegian"}
+        oc{"Occitan"}
+        or{"Oriya"}
+        pa{"Punjabi"}
+        pl{"Polish"}
+        ps{"Pashto"}
+        pt{"Portuges"}
+        rm{"Rhaeto-Romance"}
+        ro{"Romanian"}
+        ru{"Russian"}
+        sa{"Sanskrit"}
+        sd{"Sindhi"}
+        sh{"Serbo-Croatian"}
+        sl{"Slovenian"}
+        sq{"Albanian"}
+        sr{"Serbian"}
+        sv{"Swedish"}
+        swb{"Comorian"}
+        tlh{"Klingon"}
+        tr{"Turkish"}
+        uk{"Ukranian"}
+        und{"und"}
+        yue{"Cantonese"}
+        zh{"Chinese"}
+        zh_Hans{"Chinese (pinasimple)"}
+        zh_Hant{"Chinese (tradisyunal)"}
+    }
+    Variants{
+        PINYIN{"Pinyin Romanization"}
+        WADEGILE{"Wade-Giles Romanization"}
+    }
+    Version{"2.0.48.64"}
+    codePatterns{
+        language{"{0}"}
+        script{"{0}"}
+        territory{"{0}"}
+    }
+}

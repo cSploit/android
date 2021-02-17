@@ -1,0 +1,135 @@
+language: c
+
+#
+# Try building on these 4 architectures; all are 64-bit, and all but
+# "s390x", a/k/a z/Architecture, are little-endian.
+#
+arch:
+  - amd64
+  - ppc64le
+  - s390x
+  - arm64
+
+os:
+  - linux
+  - osx
+
+dist: bionic
+
+compiler:
+  - gcc
+  - clang
+
+#
+# Linux runs on all of the architectures listed above; macOS currently
+# runs only on 64-bit x86, although the Spaceshipologists are all in a
+# tizzy about the possibility of Arm-based Macs.  Suppress the macOS
+# builds that don't work.
+#
+# In addition, with newer versions of macOS, Apple ships a "gcc" that's
+# just another front end to Clang, presumably for backwards
+# compatibility with build scripts etc. that expect the compiler to be
+# "gcc", so don't bother doing "gcc" builds on macOS.
+#
+jobs:
+  exclude:
+  - arch: ppc64le
+    os: osx
+  - arch: s390x
+    os: osx
+  - arch: arm64
+    os: osx
+  - compiler: gcc
+    os: osx
+
+cache: ccache
+
+env:
+  global:
+    # encrypted COVERITY_SCAN_TOKEN from
+    # https://scan.coverity.com/projects/<project_id>/submit_build?tab=travis_ci
+    - secure: "SwNcek+I4lMVcnb5EGGmNm6ljWN6C/mnXzBr82a5rEQNKxAoJfdvvPpKIp0iEfg5j0PtYlcRHoIDyVZ/6QM/WEw0wrio9Z0cio9hkOS6kV8g2QouXfnoNtKJ5nNso7UD2GPJ9+M0GIR1GZ0Edvxr81sHlNAkpVKydYGBwCIMGyg="
+    # Coverity run condition (avoid matrix multiple runs), need customized
+    # build script. Need an update if new matrix cases.
+    - coverity_scan_run_condition='"$TRAVIS_CPU_ARCH" = amd64 -a "$TRAVIS_OS_NAME" = linux -a "$CC" = gcc -a "$REMOTE" = enable -a "$CMAKE" = no'
+    # Coverity script test mode (if true no uploading, avoid reaching the quota)
+    # usual processing: false.
+    - coverity_scan_script_test_mode=false
+    - MAKEFLAGS='-j 2' # Travis CI VMs come with 2 cores
+  matrix:
+    - REMOTE=disable CMAKE=no
+    - ENABLE_REMOTE="" CMAKE=yes
+    - REMOTE=enable CMAKE=no
+    - ENABLE_REMOTE="-DENABLE_REMOTE=ON" CMAKE=yes
+
+matrix:
+  fast_finish: true
+
+addons:
+  coverity_scan:
+    # customized build script URL
+    # TRAVIS_REPO_SLUG: owner_name/repo_name of repository currently being built
+    # TRAVIS_BRANCH: name of the branch currently being built
+    build_script_url: https://raw.githubusercontent.com/$TRAVIS_REPO_SLUG/$TRAVIS_BRANCH/.travis-coverity-scan-build.sh
+    # project metadata
+    project:
+      name: $TRAVIS_REPO_SLUG
+    # Where email notification of build analysis results will be sent
+    #notification_email: tcpdump-workers@lists.tcpdump.org
+    # Commands to prepare for build_command
+    build_command_prepend: ./configure --enable-remote
+    # This command will be added as an argument to "cov-build" to compile
+    # the project for analysis
+    build_command: make
+    # Pattern to match selecting branches that will run analysis
+    branch_pattern: coverity_scan
+  apt:
+    packages:
+      - libdbus-1-dev
+      - libbluetooth-dev
+      - libnl-genl-3-dev
+      - libibverbs-dev
+
+git:
+  quiet: true
+  depth: 3
+
+before_install:
+  - uname -a
+  - date
+  - if [ "$TRAVIS_OS_NAME" = linux ]; then apt list --installed 'lib*-dev'; fi
+
+install:
+
+before_script:
+
+script:
+  - if [ "$COVERITY_SCAN_BRANCH" = 1 ]; then echo "Coverity build - nothing more to do"; exit 0; fi
+  - touch .devel configure
+  - if [ "$CMAKE" = no ]; then echo '$ ./configure [...]' && echo travis_fold:start:script.configure; fi
+  - if [ "$CMAKE" = no ]; then ./configure --prefix=/tmp "--${REMOTE}-remote"; fi
+  - if [ "$CMAKE" = no ]; then echo -n travis_fold:end:script.configure; fi
+  - if [ "$CMAKE" = yes ]; then mkdir build; fi
+  - if [ "$CMAKE" = yes ]; then cd build; fi
+  - if [ "$CMAKE" = yes ]; then echo travis_fold:start:script.cmake; fi
+  - if [ "$CMAKE" = yes ]; then cmake -DCMAKE_INSTALL_PREFIX=/tmp $ENABLE_REMOTE ..; fi
+  - if [ "$CMAKE" = yes ]; then echo -n travis_fold:end:script.cmake; fi
+  - make -s
+  - make -s testprogs
+  - echo '$ make install [...]' && echo travis_fold:start:script.make_install
+  - PATH=$PATH make install
+  - echo -n travis_fold:end:script.make_install
+  - if [ "$CMAKE" = no ]; then testprogs/findalldevstest; fi
+  - if [ "$CMAKE" = yes ]; then run/findalldevstest; fi
+  - if [ "$CMAKE" = no ]; then make releasetar; fi
+  - echo '$ cat Makefile [...]'; echo travis_fold:start:script.cat_makefile
+  - if [ "$CMAKE" = no ]; then cat Makefile | sed -n '1,/DO NOT DELETE THIS LINE -- mkdep uses it/p'; fi
+  - if [ "$CMAKE" = yes ]; then cat Makefile; fi
+  - echo -n travis_fold:end:script.cat_makefile
+  - echo '$ cat config.h'; echo travis_fold:start:script.cat_config_h
+  - cat config.h
+  - echo -n travis_fold:end:script.cat_config_h
+  - if [ "$CMAKE" = no ]; then echo '$ cat config.log'; echo travis_fold:start:script.cat_config_log; fi
+  - if [ "$CMAKE" = no ]; then cat config.log; fi
+  - if [ "$CMAKE" = no ]; then echo -n travis_fold:end:script.cat_config_log; fi
+  - if [ "$TRAVIS_OS_NAME" = osx ]; then sleep 10; fi

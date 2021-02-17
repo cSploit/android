@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="JRD files">
+      <UniqueIdentifier>{e7e72570-dab2-4979-bea4-84f41282be29}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="FBRMCLIB files">
+      <UniqueIdentifier>{cdcc10f7-96e3-4d58-abd1-5d6c62b0578f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{6276b068-8ece-49a5-b4e9-70f1fd033bb9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\gpre\languages\fbrmclib.cpp">
+      <Filter>FBRMCLIB files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\defs\fbrmclib.def">
+      <Filter>JRD files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

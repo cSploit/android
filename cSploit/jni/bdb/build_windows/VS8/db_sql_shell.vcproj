@@ -1,0 +1,57 @@
+<VisualStudioProject ProjectType="Visual C++" Version="8.00" Name="db_sql_shell" ProjectGUID="{A5DB89F0-06E5-11DF-8A39-0800200C9A66}">
+  <Platforms>
+    <Platform Name="Win32"/>
+    <Platform Name="x64"/>
+  </Platforms>
+  <Configurations>
+    <Configuration Name="Debug|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_sql_shell" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/sql/generated,../../lang/sql/adapter,../../lang/sql/sqlite/src,../../lang/sql/sqlite/ext/fts3,../../lang/sql/sqlite/ext/rtree" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;WIN32;_CONSOLE;SQLITE_SERVER;SQLITE_PRIVATE;SQLITE_CORE;SQLITE_THREADSAFE=1;_CRT_NONSTDC_NO_DEPRECATE_UNICODE;UNICODE;SQLITE_DEBUG;SQLITE_MEMDEBUG;;_CONSOLE" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_shell.pch" AssemblerListingLocation="$(OutDir)/dbsql/" ObjectFile="$(OutDir)/dbsql/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="libdb60d.lib libdb_sql60d.lib" AdditionalLibraryDirectories="$(OutDir);$(OutDir);../../lib" OutputFile="$(OutDir)/dbsql.exe" ProgramDatabaseFile="$(OutDir)/dbsql.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|Win32" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_sql_shell" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/sql/generated,../../lang/sql/adapter,../../lang/sql/sqlite/src,../../lang/sql/sqlite/ext/fts3,../../lang/sql/sqlite/ext/rtree" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;WIN32;_CONSOLE;SQLITE_SERVER;SQLITE_PRIVATE;SQLITE_CORE;SQLITE_THREADSAFE=1;_CRT_NONSTDC_NO_DEPRECATE_UNICODE;UNICODE;_CONSOLE" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_shell.pch" AssemblerListingLocation="$(OutDir)/dbsql/" ObjectFile="$(OutDir)/dbsql/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x86" AdditionalDependencies="libdb60.lib libdb_sql60.lib" AdditionalLibraryDirectories="$(OutDir);$(OutDir);../../lib" OutputFile="$(OutDir)/dbsql.exe" ProgramDatabaseFile="$(OutDir)/dbsql.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Debug|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Debug" IntermediateDirectory="./$(OutDir)/db_sql_shell" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="0" MinimalRebuild="TRUE" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/sql/generated,../../lang/sql/adapter,../../lang/sql/sqlite/src,../../lang/sql/sqlite/ext/fts3,../../lang/sql/sqlite/ext/rtree" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_DEBUG;DIAGNOSTIC;WIN32;_CONSOLE;SQLITE_SERVER;SQLITE_PRIVATE;SQLITE_CORE;SQLITE_THREADSAFE=1;_CRT_NONSTDC_NO_DEPRECATE_UNICODE;UNICODE;SQLITE_DEBUG;SQLITE_MEMDEBUG;;_CONSOLE" StringPooling="TRUE" RuntimeLibrary="3" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_shell.pch" AssemblerListingLocation="$(OutDir)/dbsql/" ObjectFile="$(OutDir)/dbsql/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" BasicRuntimeChecks="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="libdb60d.lib libdb_sql60d.lib" AdditionalLibraryDirectories="$(OutDir);$(OutDir);../../lib" OutputFile="$(OutDir)/dbsql.exe" ProgramDatabaseFile="$(OutDir)/dbsql.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+    <Configuration Name="Release|x64" OutputDirectory="..\..\build_windows\$(PlatformName)\Release" IntermediateDirectory="./$(OutDir)/db_sql_shell" ConfigurationType="1" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="FALSE" CharacterSet="2">
+      <Tool Name="VCPreLinkEventTool"/>
+      <Tool Name="VCResourceCompilerTool"/>
+      <Tool Name="VCXMLDataGeneratorTool"/>
+      <Tool Name="VCManagedWrapperGeneratorTool"/>
+      <Tool Name="VCAuxiliaryManagedWrapperGeneratorTool"/>
+      <Tool Name="VCCLCompilerTool" Optimization="2" MinimalRebuild="TRUE" InlineFunctionExpansion="1" AdditionalIncludeDirectories="../../build_windows,../../src,../../src/dbinc,../../include,../../lang/sql/generated,../../lang/sql/adapter,../../lang/sql/sqlite/src,../../lang/sql/sqlite/ext/fts3,../../lang/sql/sqlite/ext/rtree" PreprocessorDefinitions="WIN32;_WINDOWS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;NDEBUG;WIN32;_CONSOLE;SQLITE_SERVER;SQLITE_PRIVATE;SQLITE_CORE;SQLITE_THREADSAFE=1;_CRT_NONSTDC_NO_DEPRECATE_UNICODE;UNICODE;_CONSOLE" StringPooling="TRUE" RuntimeLibrary="2" EnableFunctionLevelLinking="TRUE" UsePrecompiledHeader="0" PrecompiledHeaderFile="./$(OutDir)/db_sql_shell.pch" AssemblerListingLocation="$(OutDir)/dbsql/" ObjectFile="$(OutDir)/dbsql/" WarningLevel="3" SuppressStartupBanner="TRUE" DebugInformationFormat="3" CompileAs="0"/>
+      <Tool Name="VCLinkerTool" AdditionalOptions="/machine:x64" AdditionalDependencies="libdb60.lib libdb_sql60.lib" AdditionalLibraryDirectories="$(OutDir);$(OutDir);../../lib" OutputFile="$(OutDir)/dbsql.exe" ProgramDatabaseFile="$(OutDir)/dbsql.pdb" LinkIncremental="1" GenerateDebugInformation="TRUE" SuppressStartupBanner="TRUE" OptimizeReferences="2" TargetMachine="0"/>
+      <Tool Name="VCPreBuildEventTool"/>
+      <Tool Name="VCPostBuildEventTool"/>
+      <Tool Name="VCCustomBuildTool"/></Configuration>
+  </Configurations>
+  <References/>
+  <Files>
+    <File RelativePath="..\..\lang\sql\sqlite\src\shell.c"/>
+  </Files>
+  <Globals/>
+</VisualStudioProject>

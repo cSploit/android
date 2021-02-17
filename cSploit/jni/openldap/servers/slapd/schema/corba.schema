@@ -1,0 +1,239 @@
+# corba.schema -- Corba Object Schema
+#	depends upon core.schema
+# $OpenLDAP$
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+#
+## Portions Copyright (C) The Internet Society (1999).
+## Please see full copyright statement below.
+
+
+# Network Working Group                                            V. Ryan
+# Request for Comments: 2714                                        R. Lee
+# Category: Informational                                      S. Seligman
+#                                                   Sun Microsystems, Inc.
+#                                                             October 1999
+# 
+# 
+#   Schema for Representing CORBA Object References in an LDAP Directory
+# 
+# Status of this Memo
+# 
+#    This memo provides information for the Internet community.  It does
+#    not specify an Internet standard of any kind.  Distribution of this
+#    memo is unlimited.
+# 
+# Copyright Notice
+# 
+#    Copyright (C) The Internet Society (1999).  All Rights Reserved.
+# 
+# Abstract
+# 
+#    CORBA [CORBA] is the Common Object Request Broker Architecture
+#    defined by the Object Management Group. This document defines the
+#    schema for representing CORBA object references in an LDAP directory
+#    [LDAPv3].
+# 
+# [trimmed]
+
+# 3. Attribute Type Definitions
+# 
+#    The following attribute types are defined in this document:
+# 
+#        corbaIor
+#        corbaRepositoryId
+# 
+# 3.1 corbaIor
+# 
+#    This attribute stores the string representation of the interoperable
+#    object reference (IOR) for a CORBA object. An IOR is an opaque handle
+#    for the object which contains the information necessary to locate the
+#    object, even if the object is in another ORB.
+# 
+#    This attribute's syntax is 'IA5 String' and its case is
+#    insignificant.
+# 
+#    ( 1.3.6.1.4.1.42.2.27.4.1.14
+#     NAME 'corbaIor'
+#     DESC 'Stringified interoperable object reference of a CORBA object'
+#     EQUALITY caseIgnoreIA5Match
+#     SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+#     SINGLE-VALUE
+#    )
+# 
+attributetype ( 1.3.6.1.4.1.42.2.27.4.1.14
+	NAME 'corbaIor'
+	DESC 'Stringified interoperable object reference of a CORBA object'
+	EQUALITY caseIgnoreIA5Match
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.26
+	SINGLE-VALUE )
+
+# 3.2 corbaRepositoryId
+# 
+#    Each CORBA interface has a unique "repository id" (also called "type
+#    id") that identifies the interface.  A CORBA object has one or more
+#    repository ids, one for each interface that it implements.
+# 
+#    The format of a repository id can be any string, but the OMG
+#    specifies four standard formats:
+# 
+#       a. IDL-style
+# 
+#        IDL:Prefix/ModuleName/InterfaceName:VersionNumber
+# 
+#    For example, the repository id for the "NamingContext" in OMG's COS
+#    Naming module is:  "IDL:omg.org/CosNaming/NamingContext:1.0".
+# 
+#       b. RMI-style
+# 
+#        RMI:ClassName:HashCode[:SUID]
+# 
+#    This format is used by RMI-IIOP remote objects [RMI-IIOP].
+#    "ClassName" is the fully qualified name of the class (for example,
+#    "java.lang.String"). "HashCode" is the object's hash code (that is,
+#    that obtained by invoking the "hashCode()" method).  "SUID" is the
+#    "stream unique identifier", which is a 64-bit number that uniquely
+#    identifies the serialization version of the class; SUID is optional
+#    in the repository id.
+# 
+#       c. DCE-style
+# 
+#        DCE:UUID
+# 
+#    This format is used for DCE/CORBA interoperability [CORBA-DCE].
+#    "UUID" represents a DCE UUID.
+# 
+#       d. "local"
+# 
+#    This format is defined by the local Object Request Broker (ORB).
+# 
+#    The corbaRepositoryId attribute is a multivalued attribute; each
+#    value records a single repository id of an interface implemented by
+#    the CORBA object.  This attribute need not contain a complete list of
+#    the interfaces implemented by the CORBA object.
+# 
+#    This attribute's syntax is 'Directory String' and its case is
+#    significant.  The values of this attribute are encoded using UTF-8.
+#    Some values may require translation from their native representation
+#    in order to be correctly encoded using UTF-8.
+# 
+#    ( 1.3.6.1.4.1.42.2.27.4.1.15
+#     NAME 'corbaRepositoryId'
+#     DESC 'Repository ids of interfaces implemented by a CORBA object'
+#     EQUALITY caseExactMatch
+#     SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+#    )
+# 
+# 
+attributetype ( 1.3.6.1.4.1.42.2.27.4.1.15
+	NAME 'corbaRepositoryId'
+	DESC 'Repository ids of interfaces implemented by a CORBA object'
+	EQUALITY caseExactMatch
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 )
+
+# 4. Object Class Definitions
+# 
+#    The following object classes are defined in this document:
+# 
+#        corbaContainer
+#        corbaObject
+#        corbaObjectReference
+# 
+# 4.1 corbaContainer
+# 
+#    This structural object class represents a container for a CORBA
+#    object.
+# 
+#    ( 1.3.6.1.4.1.42.2.27.4.2.10
+#     NAME 'corbaContainer'
+#     DESC 'Container for a CORBA object'
+#     SUP top
+#     STRUCTURAL
+#     MUST ( cn )
+#    )
+# 
+objectclass ( 1.3.6.1.4.1.42.2.27.4.2.10
+	NAME 'corbaContainer'
+	DESC 'Container for a CORBA object'
+	SUP top
+	STRUCTURAL
+	MUST cn )
+
+# 4.2 corbaObject
+# 
+#    This abstract object class is the root class for representing a CORBA
+#    object.
+# 
+#    ( 1.3.6.1.4.1.42.2.27.4.2.9
+#     NAME 'corbaObject'
+#     DESC 'CORBA object representation'
+#     SUP top
+#     ABSTRACT
+#     MAY ( corbaRepositoryId $ description )
+#    )
+# 
+objectclass ( 1.3.6.1.4.1.42.2.27.4.2.9
+	NAME 'corbaObject'
+	DESC 'CORBA object representation'
+	SUP top
+	ABSTRACT
+	MAY ( corbaRepositoryId $ description ) )
+
+# 4.3 corbaObjectReference
+# 
+#    This auxiliary object class represents a CORBA object reference.  It
+#    must be mixed in with a structural object class.
+# 
+#    ( 1.3.6.1.4.1.42.2.27.4.2.11
+#     NAME 'corbaObjectReference'
+#     DESC 'CORBA interoperable object reference'
+#     SUP corbaObject
+#     AUXILIARY
+#     MUST ( corbaIor )
+#    )
+# 
+objectclass ( 1.3.6.1.4.1.42.2.27.4.2.11
+	NAME 'corbaObjectReference'
+	DESC 'CORBA interoperable object reference'
+	SUP corbaObject
+	AUXILIARY
+	MUST corbaIor )
+ 
+# 10.  Full Copyright Statement
+#
+#    Copyright (C) The Internet Society (1999).  All Rights Reserved.
+# 
+#    This document and translations of it may be copied and furnished to
+#    others, and derivative works that comment on or otherwise explain it
+#    or assist in its implementation may be prepared, copied, published
+#    and distributed, in whole or in part, without restriction of any
+#    kind, provided that the above copyright notice and this paragraph are
+#    included on all such copies and derivative works.  However, this
+#    document itself may not be modified in any way, such as by removing
+#    the copyright notice or references to the Internet Society or other
+#    Internet organizations, except as needed for the purpose of
+#    developing Internet standards in which case the procedures for
+#    copyrights defined in the Internet Standards process must be
+#    followed, or as required to translate it into languages other than
+#    English.
+# 
+#    The limited permissions granted above are perpetual and will not be
+#    revoked by the Internet Society or its successors or assigns.
+# 
+#    This document and the information contained herein is provided on an
+#    "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET ENGINEERING
+#    TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING
+#    BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE INFORMATION
+#    HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED WARRANTIES OF
+#    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.

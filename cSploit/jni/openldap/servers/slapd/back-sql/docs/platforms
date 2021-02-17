@@ -1,0 +1,8 @@
+Platforms and configurations it has been tested on:
+
+General: 
+ - ODBC managers: iODBC,unixODBC under unixes, odbc32.dll under Win32 family
+ - OSes: Linux/glibc, FreeBSD, OpenBSD, Solaris 2.6, Win98, WinNT, Win2000 server
+ - RDBMSes: Oracle 7/8/8i, MS SQL Server 6.5/7, mySQL
+ - access suites: OpenLink DAS, EasySoft OOB, various win32 drivers
+ 

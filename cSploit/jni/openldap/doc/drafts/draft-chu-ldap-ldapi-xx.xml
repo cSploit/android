@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+	<!ENTITY rfc793	PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.0793.xml'>
+	<!ENTITY rfc2119	PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml'>
+	<!ENTITY rfc2717	PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.2717.xml'>
+	<!ENTITY rfc3986	PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.3986.xml'>
+	 <!ENTITY rfc4422 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4422.xml'>
+	 <!ENTITY rfc4511 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4511.xml'>
+	 <!ENTITY rfc4513 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4513.xml'>
+	 <!ENTITY rfc4516 PUBLIC '' 'http://xml.resource.org/public/rfc/bibxml/reference.RFC.4516.xml'>
+
+]>
+<?xml-stylesheet type='text/xsl' href='http://www.greenbytes.de/tech/webdav/rfc2629.xslt' ?>
+<?rfc toc="yes" ?>
+<?rfc tocdepth="2" ?>
+<?rfc tocindent="no" ?>
+<?rfc symrefs="yes" ?>
+<?rfc sortrefs="yes"?>
+<?rfc iprnotified="no" ?>
+<?rfc strict="yes" ?>
+<rfc category="info" ipr="full3978" docName="draft-chu-ldap-ldapi-00.txt">
+	<front>
+		<title abbrev="LDAP Over IPC">Using LDAP Over IPC Mechanisms</title>
+		<author initials="H.C." fullname="Howard Chu" surname="Chu">
+			<organization>Symas Corp.</organization>
+			<address>
+				<postal>
+					<street>18740 Oxnard Street, Suite 313A</street>
+					<city>Tarzana</city>
+					<region>California</region>
+					<code>91356</code>
+					<country>USA</country>
+				</postal>
+				<phone>+1 818 757-7087</phone>
+				<email>hyc@symas.com</email>
+			</address>
+		</author>
+		<date year="2007" month="February"/>
+		<abstract>
+			<t>When both the LDAP client and server reside on the same
+machine, communication efficiency can be greatly improved using host-
+specific IPC mechanisms instead of a TCP session. Such mechanisms can
+also implicitly provide the client's identity to the server for
+extremely lightweight authentication.
+			This document describes the implementation of
+LDAP over Unix IPC that has been in use in OpenLDAP since January 2000,
+including the URL format used to specify an IPC session.
+</t>
+		</abstract>
+	</front>
+
+	<middle>
+
+		<section title="Introduction">
+			<t>While LDAP is a distributed access protocol, it is
+common for clients to be deployed on the same machine that hosts the
+server. Many applications are built on a tight integration of the
+client code and a co-resident server. In these tightly integrated
+deployments, where no actual network traffic is involved in the
+communication, the use of TCP/IP is overkill. Systems like Unix
+offer native IPC mechanisms that still provide the stream-oriented
+semantics of a TCP session, but with much greater efficiency.
+</t>
+			<t>Since January 2000, OpenLDAP releases have provided
+the option to establish LDAP sessions over Unix Domain sockets as
+well as over TCP/IP. Such sessions are inherently as secure as TCP
+loopback sessions, but they consume fewer system resources, are
+much faster to establish and tear down, and they also provide
+secure identification of the client without requiring any additional
+passwords or other credentials.
+</t>
+		</section>
+
+		<section title="Conventions">
+			<t>Imperative keywords defined in <xref target="RFC2119"/> are used
+in this document, and carry the meanings described there.</t>
+		</section>
+
+		<section title="Motivation">
+			<t>Many LDAP sessions consist of just one or two requests.
+Connection setup and teardown can become a significant portion of the time
+needed to process these sessions. Also under heavy load, the constraints
+of the 2MSL limit in TCP become a bottleneck. For example, a modest
+single processor dual-core AMD64 server running OpenLDAP
+can handle over 32,000 authentication requests per second on 100Mbps ethernet,
+with one connection per request.
+Connected over a host's loopback interface, the rate is much higher, but
+connections get completely throttled in under one second, because all of
+the host's port numbers have been used up and are in TIME_WAIT state. So
+even when the TCP processing overhead is insignificant, the constraints
+imposed in <xref target="RFC0793"/> create an artificial limit on the
+server's performance. No such constraints exist when using IPC mechanisms
+instead of TCP.
+			</t>
+		</section>
+		<section title="User-Visible Specification">
+			<t>The only change clients need to implement to use
+this feature is to use a special URL scheme instead of an ldap:// URL
+when specifying the target server. Likewise, the server needs to include
+this URL in the list of addresses on which it will listen.</t>
+			<section title="URL Scheme">
+			<t>The "ldapi:" URL scheme is used to denote an LDAP over IPC
+session. The address portion of the URL is the name of a Unix Domain socket,
+which is usually a fully qualified Unix filesystem pathname. Slashes in
+the pathname must be percent-encoded as described in section 2.1 of
+<xref target="RFC3986"/> since they do not represent URL path delimiters
+in this usage. E.g., for a socket named "/var/run/ldapi" the server URL
+would be "ldapi://%26var%26run%26ldapi/". In all other respects, an
+ldapi URL conforms to <xref target="RFC4516"/>.
+			</t>
+			<t>If no specific address is supplied, a default address MAY
+be used implicitly. In OpenLDAP the default address is a compile-time
+constant and its value is chosen by whoever built the software.</t>
+			</section>
+		</section>
+		<section title="Implementation Details">
+			<t>The basic transport uses a stream-oriented Unix Domain socket.
+The semantics of communication over such a socket are essentially identical
+to using a TCP session. Aside from the actual connection establishment, no
+special considerations are needed in the client, libraries, or server.</t>
+			<section title="Client Authentication">
+			<t>Since their introduction in 4.2 BSD Unix, Unix Domain sockets
+have also allowed passing credentials from one process to another. Modern
+systems may provide a server with easier means of obtaining the client's
+identity. The OpenLDAP implementation exploits multiple methods to acquire
+the client's identity. The discussion that follows is necessarily
+platform-specific.</t>
+			<t>The OpenLDAP library provides a getpeereid() function to
+encapsulate all of the mechanisms used to acquire the identity.</t>
+			<t>On FreeBSD and MacOSX the native getpeereid() is used.</t>
+			<t>On modern Solaris systems the getpeerucred() system call
+			is used.</t>
+			<t>On systems like Linux that support the SO_PEERCRED option to
+			getsockopt(), that option is used.</t>
+			<t>On Unix systems lacking these explicit methods, descriptor
+			passing is used. In this case, the client must send a message
+			containing the descriptor as its very first action immediately
+			after the socket is connected. The descriptor is attached to
+			an LDAP Abandon Request <xref target="RFC4511"/>
+			with message ID zero, whose parameter
+			is also message ID zero. This request is a pure no-op, and
+			will be harmlessly ignored by any server that doesn't implement
+			the protocol.</t>
+			<t>For security reasons, the passed descriptor must be tightly
+			controlled. The client creates a pipe and sends the pipe
+			descriptor in the message. The server receives the descriptor
+			and does an fstat() on it to determine the client's identity.
+			The received descriptor MUST be a pipe, and its permission
+			bits MUST only allow access to its owner. The owner uid and
+			gid are then used as the client's identity.</t>
+			<t>Note that these mechanisms are merely used to make the
+client's identity available to the server. The server will not actually
+use the identity information unless the client performs a SASL Bind <xref target="RFC4513"/>
+using the EXTERNAL mechanism. I.e., as with any normal LDAP session, the
+session remains in the anonymous state until the client issues a Bind
+request.</t>
+			</section>
+			<section title="Other Platforms">
+			<t>It is possible to implement the corresponding functionality
+on Microsoft Windows-based systems using Named Pipes, but thus far there
+has been no demand for it, so the implementation has not been written.
+These are brief notes on the steps required for an implementation.</t>
+			<t>The Pipe should be created in byte-read mode,
+and the client must specify SECURITY_IMPERSONATION access when it opens
+the pipe. The server can then retrieve the client's identity using the
+GetNamedPipeHandleState() function.</t>
+			<t>Since Windows socket handles are not interchangeable with
+IPC handles, an alternate event handler would have to be provided instead
+of using Winsock's select() function.</t>
+			</section>
+		</section>
+		<section title="Security Considerations">
+		<t>This document describes a mechanism for accessing an LDAP
+server that is co-resident with the client machine. As such, it is
+inherently immune to security issues associated with using
+LDAP across a network. The mechanism also provides a means for
+a client to authenticate itself to the server without exposing any
+sensitive passwords. The security of this authentication is equal to
+the security of the host machine.
+		</t>
+		</section>
+	</middle>
+
+	<back>
+		<references title="Normative References">
+			&rfc2119;
+			&rfc2717;
+			&rfc3986;
+			&rfc4511;
+			&rfc4513;
+			&rfc4516;
+		</references>
+		<references title="Informative References">
+			&rfc793;
+		</references>
+
+		<section title="IANA Considerations">
+			<t>This document satisfies the requirements of
+<xref target="RFC2717"/> for registration of a new URL scheme.
+			</t>
+
+		</section>
+	</back>
+</rfc>

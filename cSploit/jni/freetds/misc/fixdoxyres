@@ -1,0 +1,25 @@
+#!/usr/bin/perl -n
+
+BEGIN { chomp($pwd = `pwd`) }
+s,$pwd/?,,;
+push @all, $_;
+
+END {
+	$all = join('', @all);
+	@all = split(/^(?=\S)/m, $all);
+	@prev = grep { ! m,^[a-z0-9_./]+:\d+:,s } @all;
+	@all = map { $_ =~ s/([^:]+):(\d+):/sprintf('%s:%08d:', $1, $2)/e; $_ } grep { m,^[a-z0-9_./]+:\d+:,s } @all;
+	$_ = join('', @prev, map { $_ =~ s/([^:]+):(\d+):/sprintf('%s:%d:', $1, $2)/e; $_ } sort @all);
+
+	# output html
+	print '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Doxygen errors and warnings</title>
+</head>
+<body><pre>';
+	s,&,&amp;,; s,<,&lt;,g; s,>,&gt;,; s,",&quot;,g;
+	print;
+	print '</pre></body></html>';
+}
+

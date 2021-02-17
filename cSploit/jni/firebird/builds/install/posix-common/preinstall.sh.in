@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+#  The contents of this file are subject to the Initial
+#  Developer's Public License Version 1.0 (the "License");
+#  you may not use this file except in compliance with the
+#  License. You may obtain a copy of the License at
+#  http://www.ibphoenix.com/main.nfs?a=ibphoenix&page=ibp_idpl.
+#
+#  Software distributed under the License is distributed AS IS,
+#  WITHOUT WARRANTY OF ANY KIND, either express or implied.
+#  See the License for the specific language governing rights
+#  and limitations under the License.
+#
+#  The Original Code was created by Mark O'Donohue
+#  for the Firebird Open Source RDBMS project.
+#
+#  Copyright (c) Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#  and all contributors signed below.
+#
+#  All Rights Reserved.
+#  Contributor(s): ______________________________________.
+#		Alex Peshkoff
+#
+
+
+# The pre install routine for Firebird Server
+
+
+
+#------------------------------------------------------------------------
+#  Check for installed RPM package
+
+# (Pavel I've left this in since originally I could test for other packages,
+# even if they did not conflict with current ones, ie we can test InterBase
+# and CS/SS  The package manager does not allow it currently but I've left
+# this in in case that sort of thing gets allowed again
+
+#checkForRPMInstall() {
+#    PackageName=$1
+#
+#    rpm -q $PackageName
+#    STATUS=$? 
+#    if [ $STATUS -eq 0 ]
+#      then 
+#        echo "Previous version of $PackageName is detected on your system." 
+#        echo "this will conflict with the current install of Firebird"
+#        echo "Please unistall the previous version `rpm -q $PackageName` and then proceed." 
+#        exit $STATUS 
+#    fi 
+#
+#}
+
+# Ok so any of the following packages are a problem
+# these don't work at least in the latest rpm manager, since it 
+# has the rpm database locked and it fails.
+#    checkForRPMInstall InterBase
+#    checkForRPMInstall FirebirdCS
+#    checkForRPMInstall FirebirdSS
+
+# That test in general package is wrong also due to the fact that it does not check
+# for presence of rpm in the system - there are many rpm-less distros.
+# I keep it here commented just in order not to loose it in CVS archives. AP - 2008.
+
+
+
+#= Main PreInstall =========================================================
+
+# It's good idea not to have running firebird/interbase instances
+checkIfServerRunning
+
+# Archive any files we find
+archivePriorInstallSystemFiles

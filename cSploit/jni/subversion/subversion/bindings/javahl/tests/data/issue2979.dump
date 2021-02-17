@@ -1,0 +1,114 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 712a93d4-7deb-6645-8811-f770f3dbb12c
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2007-10-21T02:14:52.574819Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 101
+Content-length: 101
+
+K 7
+svn:log
+V 0
+
+K 10
+svn:author
+V 7
+svn4ant
+K 8
+svn:date
+V 27
+2007-10-21T02:14:52.895280Z
+PROPS-END
+
+Node-path: 20-Oct-2007_10-14-52614PM
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 104
+Content-length: 104
+
+K 7
+svn:log
+V 3
+FOO
+K 10
+svn:author
+V 7
+svn4ant
+K 8
+svn:date
+V 27
+2007-10-21T02:14:55.989729Z
+PROPS-END
+
+Node-path: 20-Oct-2007_10-14-52614PM/a
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: 20-Oct-2007_10-14-52614PM/a/world.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 100
+Text-content-length: 5
+Text-content-md5: f5a7924e621e84c9280a9a27e1bcb7f6
+Content-length: 105
+
+K 13
+svn:mime-type
+V 10
+text/plain
+K 12
+svn:keywords
+V 2
+Id
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+World
+
+Node-path: 20-Oct-2007_10-14-52614PM/hello.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 100
+Text-content-length: 5
+Text-content-md5: 8b1a9953c4611296a827abf8c47804d7
+Content-length: 105
+
+K 13
+svn:mime-type
+V 10
+text/plain
+K 12
+svn:keywords
+V 2
+Id
+K 13
+svn:eol-style
+V 6
+native
+PROPS-END
+Hello
+

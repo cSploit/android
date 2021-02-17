@@ -1,0 +1,52 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+#include <winver.h>
+#include "../jrd/build_no.h"
+
+VS_VERSION_INFO VERSIONINFO
+FILEFLAGSMASK   VS_FF_PRERELEASE
+FILEFLAGS       VS_FF_PRERELEASE | VS_FF_SPECIALBUILD
+FILEVERSION     FILE_VER_NUMBER
+PRODUCTVERSION  FILE_VER_NUMBER
+FILEOS          VOS_NT_WINDOWS32
+
+FILETYPE        VFT_APP
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "Comments", "This product created by the Firebird - All Copyright (c) retained by the individual contributors - original code Copyright (c) 2000 Inprise Corporation and predecessors.\0"
+      VALUE "CompanyName", "Firebird Project\0"
+      VALUE "FileDescription", "Firebird SQL Server\0"
+      VALUE "FileVersion", FILE_VER_STRING
+      VALUE "InternalName", "Firebird\0"
+      VALUE "LegalCopyright", "All Copyright (c) retained by individual contributors - original code Copyright (c) 2000 Inprise Corporation\0"
+      VALUE "ProductName", "Firebird SQL Server\0"
+      VALUE "ProductVersion", PRODUCT_VER_STRING
+      VALUE "SpecialBuild", FB_BUILD_SUFFIX
+    END
+  END
+
+  BLOCK "VarFileInfo"
+  BEGIN                               /*  Language   |    Translation       */
+    VALUE "Translation", 0x409, 1252  /* U.S. English, Windows Multilingual */
+  END
+END

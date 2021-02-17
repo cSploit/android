@@ -1,0 +1,1759 @@
+#
+#    May you do good and not evil.
+#    May you find forgiveness for yourself and forgive others.
+#    May you share freely, never taking more than you give.
+#
+#***********************************************************************
+# This file implements regression tests for Berkeley DB specific replication
+# simple cases.
+#
+
+set testdir [file dirname $argv0]/../../lang/sql/sqlite/test
+source $testdir/tester.tcl
+source $testdir/../../../../test/sql/bdb_util.tcl
+
+global site1addr site2addr site3addr site1dir site2dir site3dir
+
+# The SQL test system is sequential, but some HA operations like elections
+# and client synchronization are parallel operations across more than one
+# SQL database/replication site.  SQL HA test cases should observe the
+# following rules to avoid problems:
+#    - Wait the appropriate *_delay for replication operations (see below).
+#    - If you stop and restart one or more sites, you must do an initial
+#      query on each restarted site to cause it to rejoin the replication
+#      group.  If there is still a master running, a restarted site will
+#      do a client synchronization.  If there is no master, a restarted
+#      site and all other running sites will perform an election.
+#    - Any test case that runs an election after initial startup should
+#      create DB_CONFIG files on all sites that:
+#          * Set priorities to help make election winner deterministic.
+#          * Turn off 2SITE_STRICT so that there will not be an excessive
+#            wait for each site before a quorum is reached.
+#          * These DB_CONFIG files should usually be created after initial
+#            startup because during initial startup, turning off 2SITE_STRICT
+#            on an overloaded or slow machine can cause clients to call their
+#            own elections instead of finding the initial master.
+
+# Delays are needed in the test to allow time for replication operations
+# among different sites:
+#     replication_delay: Time for master transactions to appear on clients,
+#                        including group membership operations such as
+#                        removing a site.
+#     client_sync_delay: Time for a client to synchronize with a master
+#                        after client has been shut down.
+#     election_delay: Time for an election to be held and possibly retried
+#                     after master has been shut down.
+set replication_delay 3000
+set client_sync_delay 5000
+set election_delay 12000
+
+##
+## Test cases replication-1.*
+## Verify basic replication with a simple 2-site configuration.
+##
+setup_rep_sites
+
+# Initialize and start replication on master site1.
+db eval "
+  pragma replication_local_site='$site1addr';
+  "
+do_test replication-1.0 {
+  execsql {
+    pragma replication_initial_master=on;
+    pragma replication=on;
+  } db
+} {1 {Replication started}}
+
+# Insert initial data on master.
+do_test replication-1.1 {
+  execsql {
+    create table reptab (a);
+    insert into reptab values (1);
+    select * from reptab;
+  } db
+} {1}
+
+# Initialize and start replication on client site2.
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  "
+do_test replication-1.2 {
+  execsql {
+    pragma replication=on;
+  } db2
+} {{Replication started}}
+
+after $replication_delay
+
+# Make sure client got initial master insert.
+do_test replication-1.3 {
+  execsql {
+    select * from reptab;
+  } db2
+} {1}
+
+# Make sure client database is readonly.
+do_test replication-1.4 {
+  catchsql {
+    insert into reptab values (9999);
+  } db2
+} {1 {attempt to write a readonly database}}
+
+# Insert more data on master.
+do_test replication-1.5 {
+  execsql {
+    insert into reptab values (2);
+    select * from reptab order by a;
+  } db
+} {1 2}
+after $replication_delay
+
+# Make sure client got additional master data.
+do_test replication-1.6 {
+  execsql {
+    select * from reptab order by a;
+  } db2
+} {1 2}
+
+# Perform more operations on master.
+do_test replication-1.7 {
+  execsql {
+    insert into reptab values (3);
+    update reptab set a = 999 where a = 1;
+    delete from reptab where a = 2;
+    select * from reptab order by a;
+  } db
+} {3 999}
+after $replication_delay
+
+# Make sure client got additional operations.
+do_test replication-1.8 {
+  execsql {
+    select * from reptab order by a;
+  } db2
+} {3 999}
+
+# Remove client site2 from master.
+do_test replication-1.9 {
+  set ::DB db2
+  execsql "pragma replication_remove_site='$site2addr';"
+} {{Replication site removed}} 
+after $replication_delay
+
+set ::DB db
+
+catch {db2 close}
+catch {db close}
+
+##
+## Test cases replication-2.*
+## Verify Use Cases from 5.2 spec.
+##
+
+## Cases 2.0.* test Use Case 1: Distributed Read at 3 Sites.
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+
+  create table university (
+    rank int,
+    name varchar(75),
+    domains varchar(75),
+    country varchar(30),
+    region varchar(30),
+    size int,
+    visibility int,
+    rich int,
+    scholar int);
+  create table country(
+    country varchar(30),
+    abbr varchar(10),
+    Top_100 int,
+    Top_200 int,
+    Top_500 int,
+    Top_1000 int);
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+db3 eval "
+  pragma replication_local_site='$site3addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+do_test replication-2.0.1 {
+  execsql {
+    insert into country values ("Greenland","gl", 0, 0, 0, 2);
+    insert into university values (26, "University College London",
+      "ucl.edu", "uk", "Europe", 18, 39, 47, 30);
+    update country set top_1000 = 1 where abbr = "gl";
+    select * from country where abbr = "gl";
+  } db
+} {Greenland gl 0 0 0 1}
+
+after $replication_delay
+
+do_test replication-2.0.2 {
+  execsql {
+    select * from university where region = "Europe";
+    select count(*) from country where top_100 > 0;
+  } db2
+} {26 {University College London} ucl.edu uk Europe 18 39 47 30 0}
+
+do_test replication-2.0.3 {
+  catchsql {
+    insert into country values ("Antarctica","an", 0, 0, 0, 0);
+  } db2
+} {1 {attempt to write a readonly database}}
+
+catch {db3 close}
+catch {db2 close}
+catch {db close}
+
+## Cases 2.1.* test Use Case 2: 2-site Failover.
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+  create table stock_quote (company_name text(40), price real);
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+# Perform some writes on master.
+do_test replication-2.1.1 {
+  execsql {
+    insert into stock_quote values ("General Electric", 20.25);
+    insert into stock_quote values ("Nabisco", 24.75);
+    insert into stock_quote values ("United Healthcare", 31.00);
+    update stock_quote set price=25.25 where company_name = "Nabisco";
+  } db
+} {}
+
+after $replication_delay
+
+# Perform reads on client.
+do_test replication-2.1.2 {
+  execsql {
+    select * from stock_quote where price < 30.00;
+    select price from stock_quote where company_name = "United Healthcare";
+  } db2
+} {{General Electric} 20.25 Nabisco 25.25 31.0}
+
+# Stop the initial master.
+do_test replication-2.1.3 {
+  catch {db close}
+} {0}
+
+after $election_delay
+
+# The remaining client does not accept write operations until the other site
+# rejoins the replication group.
+
+do_test replication-2.1.4 {
+  catchsql {
+    insert into stock_quote values ("Prudential", 17.25);
+  } db2
+} {1 {attempt to write a readonly database}}
+
+# Restart site, will rejoin replication group. The repmgr will be started.
+sqlite3 db $site1dir/rep.db
+
+# Initial query to trigger election and client sync up.
+execsql { select * from stock_quote where price < 21.00; } db
+
+after $election_delay
+
+# Assuming the site became master, perform some writes. If it is not the master,
+# these writes will not succeed and must be performed at the other site.
+do_test replication-2.1.5 {
+  execsql {
+    insert into stock_quote values ("Raytheon", 9.25);
+    insert into stock_quote values ("Cadbury", 7.75);
+  } db
+} {}
+
+after $replication_delay
+
+do_test replication-2.1.6 {
+  execsql {
+    select * from stock_quote where price < 21.00;
+  } db2
+} {{General Electric} 20.25 Raytheon 9.25 Cadbury 7.75}
+
+##
+## Test cases replication-3.*
+## Verify replication pragma syntax and usage.
+##
+
+## Cases 3.0.* test replication_local_site by itself and internal host:port 
+## checking.
+setup_rep_sites
+
+do_test replication-3.0.0 {
+  catchsql {
+    pragma replication_local_site="badvalue"; 
+  } db
+} {1 {Format of value must be host:port}}
+
+do_test replication-3.0.1 {
+  catchsql {
+    pragma replication_local_site="badvalue"; 
+  } db
+} {1 {Format of value must be host:port}}
+
+do_test replication-3.0.2 {
+  catchsql {
+    pragma replication_local_site=":1234"; 
+  } db
+} {1 {Format of value must be host:port}}
+
+do_test replication-3.0.3 {
+  catchsql {
+    pragma replication_local_site="1234"; 
+  } db
+} {1 {Format of value must be host:port}}
+
+do_test replication-3.0.4 {
+  catchsql {
+    pragma replication_local_site=":"; 
+  } db
+} {1 {Format of value must be host:port}}
+
+do_test replication-3.0.5 {
+  execsql {
+    pragma replication_local_site="testhost:1234"; 
+    pragma replication_local_site; 
+  } db
+} {testhost:1234 testhost:1234}
+
+## Cases 3.1.* test replication_initial_master by itself.
+
+do_test replication-3.1.0 {
+  execsql {
+    pragma replication_initial_master=true; 
+    pragma replication_initial_master; 
+  } db
+} {1 1}
+
+do_test replication-3.1.1 {
+  execsql {
+    pragma replication_initial_master=false; 
+    pragma replication_initial_master; 
+  } db
+} {0 0}
+
+## Cases 3.2.* test replication_remote_site by itself.
+setup_rep_sites
+
+do_test replication-3.2.0 {
+  catchsql {
+    pragma replication_remote_site="badvalue"; 
+  } db
+} {1 {Format of value must be host:port}}
+
+do_test replication-3.2.1 {
+  execsql {
+    pragma replication_remote_site="testhost2:54321"; 
+    pragma replication_remote_site; 
+  } db
+} {testhost2:54321 testhost2:54321}
+
+## Cases 3.3.* test interactions between replication pragmas.
+setup_rep_sites
+
+do_test replication-3.3.0 {
+  catchsql {
+    pragma replication=on; 
+  } db
+} {1 {Must specify local site before starting replication}}
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  "
+do_test replication-3.3.1 {
+  catchsql {
+    pragma replication=on; 
+  } db
+} {1 {Must either be initial master or specify a remote site}}
+
+catch {db close}
+
+## Cases 3.4.* test replication_remove_site.
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+db3 eval "
+  pragma replication_local_site='$site3addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+after $replication_delay
+
+## Cases 3.4.0.* remove a remote client site.
+do_test replication-3.4.0 {
+  execsql "pragma replication_remove_site='$site2addr';"
+} {{Replication site removed}}
+
+after $replication_delay
+
+## Cases 3.4.1.* remove local client site.
+do_test replication-3.4.1 {
+  set ::DB db3
+  execsql "pragma replication_remove_site='$site3addr';"
+} {{Replication site removed}}
+
+after $replication_delay
+
+set ::DB db
+
+## Cases 3.4.2.* attempt to remove non-existent site (no error).
+do_test replication-3.4.2 {
+  execsql {
+    pragma replication_remove_site="localhost:1234";
+  } db
+} {{Replication site removed}}
+
+## Cases 3.4.3.* attempt to remove master site (error).
+do_test replication-3.4.3 {
+  catchsql "pragma replication_remove_site='$site1addr';"
+} {1 {Replication site not removed}}
+
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+## Cases 3.4.4.* attempt to remove site before group membership database
+## is available (no error).
+do_test replication-3.4.4 {
+  set ::DB db3
+  execsql "pragma replication_remove_site='$site2addr';"
+} {{Replication site removed}}
+
+set ::DB db
+
+## Cases 3.4.5.* test removing and then adding a site back into
+## the replication group.
+do_test replication-3.4.5.0 {
+  execsql "pragma replication_remove_site='$site2addr';"
+} {{Replication site removed}}
+
+after $replication_delay
+
+db eval "
+  create table reptab (a);
+  insert into reptab values (1);
+"
+
+after $replication_delay
+
+# Removing a site does not necessarily stop all replication immediately,
+# so reptab may or may not exist on db2.
+
+catch {db2 close}
+sqlite3 db2 $site2dir/rep.db
+
+# Execute a statement to open the environment
+do_test replication-3.4.5.1 {
+  execsql {
+    drop table if exists does_not_exist;
+  } db2
+} {}
+
+after $client_sync_delay
+
+db eval "
+  insert into reptab values (2);
+"
+
+after $replication_delay
+
+# Make sure db2 rejoined the replication group and is caught up.
+do_test replication-3.4.5.2 {
+  execsql {
+    select * from reptab;
+  } db2
+} {1 2}
+
+## Cases 3.5.* test replication_verbose_output and replication_verbose_file,
+## including the immediate effect of turning them on and off.
+do_test replication-3.5.0 {
+  execsql { pragma replication_verbose_output=ON; } db
+  execsql { pragma replication_verbose_file=sqloutput; } db
+} {sqloutput}
+
+catch {db2 close}
+catch {db3 close}
+catch {db close}
+
+do_test replication-3.5.1 {
+  expr [file size sqloutput] > 0
+} {1}
+
+## Cases 3.6.* test changing replication_local_site after replication is
+## started.
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+"
+
+do_test replication-3.6 {
+  catchsql "
+    pragma replication_local_site='$site2addr';
+  "
+} {1 {Cannot change local site after replication is turned on}}
+
+catch {db close}
+
+## Cases 3.7.* test running replication pragmas in a database that was
+## created without DB_INIT_REP (error).
+setup_rep_sites
+
+do_test replication-3.7.0 {
+  catchsql "pragma replication_remove_site='$site2addr';"
+} {1 {Replication site not removed}}
+
+execsql { create table reptab (a); } db
+
+catch {db close}
+
+## Cases 3.8.* test that repeating replication=on in a later dbsql session
+## is ignored.
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  "
+do_test replication-3.8.0 {
+  execsql {
+    pragma replication_initial_master=on;
+    pragma replication=on;
+  } db
+} {1 {Replication started}}
+
+# Insert initial data on master.
+do_test replication-3.8.1 {
+  execsql {
+    create table reptab (a);
+    insert into reptab values (1);
+    select * from reptab;
+  } db
+} {1}
+
+# Stop the initial master.
+do_test replication-3.8.2 {
+  catch {db close}
+} {0}
+
+# Restart site and try repeating replication pragma.
+sqlite3 db $site1dir/rep.db
+do_test replication-3.8.3 {
+  execsql {
+    pragma replication=on;
+  } db
+} {{Replication started}}
+
+# Query data on master again.
+do_test replication-3.8.4 {
+  execsql {
+    select * from reptab;
+  } db
+} {1}
+
+catch {db close}
+
+##
+## Test cases replication-4.*
+## Verify replication startup, shutdown and election scenarios.
+##
+
+# This function is called by a thread so as to start an election,
+# if this is done in the same thread, it will block waiting for
+# the other site to be called and join the election
+set open_site1 {
+  set ::DB [sqlthread open $site1dir/rep.db]
+  execsql { select * from reptab; }
+  sqlite3_close $::DB
+}
+
+set open_site2 {
+  set ::DB [sqlthread open $site2dir/rep.db]
+  execsql { select * from reptab; }
+  sqlite3_close $::DB
+}
+
+## Cases 4.0.* test a 2-site replication group starting up both sites,
+## shutting down and restarting the client, and verifying that replication
+## continues.
+setup_rep_sites
+
+# Initialize and start replication on master site1.
+db eval "
+  pragma replication_local_site='$site1addr';
+  "
+do_test replication-4.0.0 {
+  execsql {
+    pragma replication_initial_master=on;
+    pragma replication=on;
+  } db
+} {1 {Replication started}}
+
+# Initialize and start replication on client site2.
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  "
+db2 eval "
+  pragma replication_remote_site='$site1addr';
+  "
+do_test replication-4.0.1 {
+  execsql {
+    pragma replication=on;
+  } db2
+} {{Replication started}}
+
+# Insert initial data on master.
+do_test replication-4.0.2 {
+  execsql {
+    create table reptab (a);
+    insert into reptab values (1);
+    select * from reptab;
+  } db
+} {1}
+after $replication_delay
+
+# Make sure client got initial master insert.
+do_test replication-4.0.3 {
+  execsql {
+    select * from reptab;
+  } db2
+} {1}
+
+# Shut down and reopen client site.
+catch {db2 close}
+sqlite3 db2 $site2dir/rep.db
+
+# Insert more data on master.
+do_test replication-4.0.4 {
+  execsql {
+    insert into reptab values (2);
+    select * from reptab order by a;
+  } db
+} {1 2}
+
+# Client query to trigger environment open and client synchronization after 
+# shutdown.
+execsql {select * from reptab order by a;} db2
+after $client_sync_delay
+
+# Make sure client got additional master data.
+do_test replication-4.0.5 {
+  execsql {
+    select * from reptab order by a;
+  } db2
+} {1 2}
+
+# Insert more data on master.
+do_test replication-4.0.6 {
+  execsql {
+    insert into reptab values (3);
+    select * from reptab order by a;
+  } db
+} {1 2 3}
+after $replication_delay
+
+# Make sure client got additional master data.
+do_test replication-4.0.7 {
+  execsql {
+    select * from reptab order by a;
+  } db2
+} {1 2 3}
+
+catch {db2 close}
+catch {db close}
+
+## Cases 4.1.* test a 2-site replication group starting up both sites,
+## shutting down first the client then the master and restarting the
+## master then the client and verifying that replication continues.
+setup_rep_sites
+
+# Initialize and start replication on master site1.
+db eval "
+  pragma replication_local_site='$site1addr';
+  "
+do_test replication-4.1.0 {
+  execsql {
+    pragma replication_initial_master=on;
+    pragma replication=on;
+  } db
+} {1 {Replication started}}
+
+# Initialize and start replication on client site2.
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  "
+db2 eval "
+  pragma replication_remote_site='$site1addr';
+  "
+do_test replication-4.1.1 {
+  execsql {
+    pragma replication=on;
+  } db2
+} {{Replication started}}
+
+# Insert initial data on master.
+do_test replication-4.1.2 {
+  execsql {
+    create table reptab (a);
+    insert into reptab values (1);
+    select * from reptab;
+  } db
+} {1}
+after $replication_delay
+
+# Make sure client got initial master insert.
+do_test replication-4.1.3 {
+  execsql {
+    select * from reptab;
+  } db2
+} {1}
+
+# Set site priorities to make later election winner deterministic.
+# Turn off 2site_strict to enable sites to restart and join repgroup
+# sequentially after full shutdown, otherwise each initial site will wait
+# a very long time for its election until a quorum of sites is available.
+file mkdir $site1dir/rep.db-journal
+set s1config [open $site1dir/rep.db-journal/DB_CONFIG w]
+puts $s1config "rep_set_priority 100"
+puts $s1config "rep_set_config db_repmgr_conf_2site_strict off"
+close $s1config
+file mkdir $site2dir/rep.db-journal
+set s2config [open $site2dir/rep.db-journal/DB_CONFIG w]
+puts $s2config "rep_set_priority 50"
+puts $s2config "rep_set_config db_repmgr_conf_2site_strict off"
+close $s2config
+
+# Shut down and reopen master and client sites.
+catch {db2 close}
+catch {db close}
+
+# These tests require threads
+if {[run_thread_tests]!=0} {
+
+    sqlite3 db $site1dir/rep.db
+    sqlite3 db2 $site2dir/rep.db
+
+    # Execute queries on each site to trigger environment opens after shutdown.
+    # This will throw the sites into an election.  One site is called in
+    # a different thread so it will not block waiting for the other
+    # site to open.
+    array unset finished
+    thread_spawn finished(0) "" $bdb_thread_procs $open_site1
+    execsql {select * from reptab order by a;} db2
+    after $election_delay
+
+    # Insert more data on master.
+    do_test replication-4.1.4 {
+      execsql {
+	insert into reptab values (2);
+	select * from reptab order by a;
+      } db
+    } {1 2}
+    after $replication_delay
+
+    # Make sure client got additional master data.
+    do_test replication-4.1.5 {
+      execsql {
+	select * from reptab order by a;
+      } db2
+    } {1 2}
+
+    # Insert more data on master.
+    do_test replication-4.1.6 {
+      execsql {
+	insert into reptab values (3);
+	select * from reptab order by a;
+      } db
+    } {1 2 3}
+    after $replication_delay
+
+    # Make sure client got additional master data.
+    do_test replication-4.1.7 {
+      execsql {
+	select * from reptab order by a;
+      } db2
+    } {1 2 3}
+
+    catch {db2 close}
+    catch {db close}
+}
+
+## Cases 4.2.* test a 2-site replication group starting up both sites,
+## shutting down first the master then the client and restarting the
+## client then the master and verifying that replication continues.
+setup_rep_sites
+
+# Initialize and start replication on master site1.
+db eval "
+  pragma replication_local_site='$site1addr';
+  "
+do_test replication-4.2.0 {
+  execsql {
+    pragma replication_initial_master=on;
+    pragma replication=on;
+  } db
+} {1 {Replication started}}
+
+# Initialize and start replication on client site2.
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  "
+db2 eval "
+  pragma replication_remote_site='$site1addr';
+  "
+do_test replication-4.2.1 {
+  execsql {
+    pragma replication=on;
+  } db2
+} {{Replication started}}
+
+# Insert initial data on master.
+do_test replication-4.2.2 {
+  execsql {
+    create table reptab (a);
+    insert into reptab values (1);
+    select * from reptab;
+  } db
+} {1}
+after $replication_delay
+
+# Make sure client got initial master insert.
+do_test replication-4.2.3 {
+  execsql {
+    select * from reptab;
+  } db2
+} {1}
+
+# Set site priorities to make later election winner deterministic.
+# Turn off 2site_strict to enable sites to restart and join repgroup
+# sequentially after full shutdown, otherwise each initial site will wait
+# a very long time for its election until a quorum of sites is available.
+file mkdir $site1dir/rep.db-journal
+set s1config [open $site1dir/rep.db-journal/DB_CONFIG w]
+puts $s1config "rep_set_priority 100"
+puts $s1config "rep_set_config db_repmgr_conf_2site_strict off"
+close $s1config
+file mkdir $site2dir/rep.db-journal
+set s2config [open $site2dir/rep.db-journal/DB_CONFIG w]
+puts $s2config "rep_set_priority 50"
+puts $s2config "rep_set_config db_repmgr_conf_2site_strict off"
+close $s2config
+
+# Shut down and reopen master and client sites.
+catch {db close}
+catch {db2 close}
+
+if {[run_thread_tests]!=0} {
+
+    sqlite3 db $site1dir/rep.db
+    sqlite3 db2 $site2dir/rep.db
+
+    # Execute queries on each site to trigger environment opens after shutdown.
+    # This will throw the sites into an election.  Open one site in another
+    # thread because it will block waiting for the other site to join
+    # the election.
+    array unset finished
+    thread_spawn finished(0) "" $bdb_thread_procs $open_site1
+    execsql {select * from reptab order by a;} db2
+    after $election_delay
+
+    # Insert more data on master.
+    do_test replication-4.2.4 {
+      execsql {
+	insert into reptab values (2);
+	select * from reptab order by a;
+      } db
+    } {1 2}
+    after $replication_delay
+
+    # Make sure client got additional master data.
+    do_test replication-4.2.5 {
+      execsql {
+	select * from reptab order by a;
+      } db2
+    } {1 2}
+
+    # Insert more data on master.
+    do_test replication-4.2.6 {
+      execsql {
+	insert into reptab values (3);
+	select * from reptab order by a;
+      } db
+    } {1 2 3}
+    after $replication_delay
+
+    # Make sure client got additional master data.
+    do_test replication-4.2.7 {
+      execsql {
+	select * from reptab order by a;
+      } db2
+    } {1 2 3}
+
+    catch {db2 close}
+    catch {db close}
+
+}
+
+## Cases 4.3.* test that a 2-site replication group, using DB_CONFIG to turn
+## off the 2SITE_STRICT setting, can shut down the master and have the client
+## take over as master.  Verify write operations on the new master and then
+## have the original master rejoin as a client.
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+  create table reptab(a);
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+execsql { insert into reptab values (1); } db
+
+after $replication_delay
+
+# Set priorities to guarantee initial master will win election when rejoining
+# replication group.
+set s1config [open $site1dir/rep.db-journal/DB_CONFIG w]
+puts $s1config "rep_set_priority 150"
+close $s1config
+
+# Shut down master, client won't take over as master.
+catch {db close}
+
+after $election_delay
+
+do_test replication-4.3.1 {
+  catchsql {
+    insert into reptab values (1);
+    select * from reptab order by a;
+  } db2
+} {1 {attempt to write a readonly database}}
+
+# Restart master.
+sqlite3 db $site1dir/rep.db
+
+execsql {select * from reptab order by a;} db
+
+after $client_sync_delay
+
+# Make sure initial master is still master.
+do_test replication-4.3.2 {
+  execsql {
+    insert into reptab values (2);
+    select * from reptab order by a;
+  } db
+} {1 2}
+after $replication_delay
+
+# Shut down both sites.
+catch {db close}
+catch {db2 close}
+
+setup_rep_sites
+
+# Turn off 2SITE_STRICT on both sites.
+file mkdir $site1dir/rep.db-journal
+set s1config [open $site1dir/rep.db-journal/DB_CONFIG w]
+puts $s1config "rep_set_config db_repmgr_conf_2site_strict off"
+close $s1config
+file mkdir $site2dir/rep.db-journal
+set s2config [open $site2dir/rep.db-journal/DB_CONFIG w]
+puts $s2config "rep_set_config db_repmgr_conf_2site_strict off"
+close $s2config
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+  create table reptab(a);
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+execsql { insert into reptab values (1); } db
+
+after $client_sync_delay
+
+# Shut down the current master, the client can become master
+catch {db close}
+
+after $election_delay
+
+do_test replication-4.3.3 {
+  execsql {
+    insert into reptab values (2);
+    select * from reptab order by a;
+  } db2
+} {1 2}
+
+catch {db2 close}
+
+## Cases 4.4.* test a 3-site replication group that shuts down the initial
+## master, verifies that a client takes over as master and then that the 
+## original master can rejoin as a client.  Use  DB_CONFIG files to set
+## site priorities to determine which client takes over as master.
+setup_rep_sites
+
+# Set priority.
+file mkdir $site1dir/rep.db-journal
+set s1config [open $site1dir/rep.db-journal/DB_CONFIG w]
+puts $s1config "rep_set_priority 1"
+close $s1config
+file mkdir $site2dir/rep.db-journal
+set s2config [open $site2dir/rep.db-journal/DB_CONFIG w]
+puts $s2config "rep_set_priority 1"
+close $s2config
+file mkdir $site3dir/rep.db-journal
+set s3config [open $site3dir/rep.db-journal/DB_CONFIG w]
+puts $s3config "rep_set_priority 100"
+close $s3config
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+  create table reptab(a);
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+db3 eval "
+  pragma replication_local_site='$site3addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+after $client_sync_delay
+
+# Shut down master.
+catch {db close}
+
+after $election_delay
+
+# Site 3 will be elected as master
+do_test replication-4.4.0 {
+  execsql {
+    insert into reptab values (1);
+    select * from reptab order by a;
+  } db3
+} {1}
+
+# Restart previous master as client.
+sqlite3 db $site1dir/rep.db
+execsql { select * from reptab order by a; } db
+after $client_sync_delay
+
+do_test replication-4.4.1 {
+  catchsql {
+    insert into reptab values (10);
+  } db
+} {1 {attempt to write a readonly database}}
+
+do_test replication-4.4.2 {
+  execsql {
+    select * from reptab order by a;
+  } db
+} {1}
+
+catch {db close}
+catch {db2 close}
+catch {db3 close}
+
+##
+## Test cases replication-5.*
+## Verify errors for each SQL operation that can modify the database
+## on a replication client.
+##
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+  create table reptab(a);
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+after $client_sync_delay
+
+do_test replication-5.0 {
+  catchsql {
+    create table reptab_tmp as select a from reptab;
+  } db2
+} {1 {attempt to write a readonly database}}
+
+do_test replication-5.1 {
+  catchsql {
+    drop table reptab;
+  } db2
+} {1 {attempt to write a readonly database}}
+
+do_test replication-5.2 {
+  catchsql {
+    insert into reptab values (1);
+  } db2
+} {1 {attempt to write a readonly database}}
+
+do_test replication-5.3 {
+  catchsql {
+    create view testview AS select * from reptab;
+  } db2
+} {1 {attempt to write a readonly database}}
+
+do_test replication-5.4 {
+  catchsql {
+    create index testindex on reptab(a);
+  } db2
+} {1 {attempt to write a readonly database}}
+
+do_test replication-5.5 {
+  catchsql {
+    CREATE TRIGGER delete_a DELETE ON reptab
+    BEGIN
+    INSERT INTO delete_a (a) values (old.a);
+    END;
+  } db2
+} {1 {attempt to write a readonly database}}
+
+do_test replication-5.6 {
+  catchsql {
+    delete from reptab where a=1;
+  } db2
+} {1 {attempt to write a readonly database}}
+
+do_test replication-5.7 {
+  catchsql {
+    update reptab set a=2 where rowid = 1;
+  } db2
+} {1 {attempt to write a readonly database}}
+
+catch {db2 close}
+catch {db close}
+
+##
+## Test cases replication-6.*
+## Verify adding replication to an existing database and permanently turning
+## off replication.
+##
+
+## Cases 6.0.* test turning replication on in an existing database.
+setup_rep_sites
+
+# Create database without replication.
+do_test replication-6.0.1 {
+  execsql {
+    create table reptab(a);
+    insert into reptab values (1);
+    select * from reptab;
+  } db
+} {1}
+
+# Turn on replication on existing database.
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+"
+
+# Create client.
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+db3 eval "
+  pragma replication_local_site='$site3addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+after $client_sync_delay
+
+# Do more operations on the master and ensure replication is occurring.
+do_test replication-6.0.2 {
+  execsql {
+    insert into reptab values (2);
+    select * from reptab order by a;
+  } db
+} {1 2}
+after $replication_delay
+do_test replication-6.0.3 {
+  execsql {
+    select * from reptab order by a;
+  } db2
+} {1 2}
+do_test replication-6.0.4 {
+  execsql {
+    select * from reptab order by a;
+  } db3
+} {1 2}
+
+# Remove db2 from replication group.
+do_test replication-6.0.5 {
+  execsql "pragma replication_remove_site='$site2addr';"
+} {{Replication site removed}}
+
+
+# Turn off replication on db2 client.
+do_test replication-6.0.6 {
+  set ::DB db2
+  execsql {
+    pragma replication=OFF;
+  } db2
+} {{Replication stopped}}
+set ::DB db
+
+# Do more operations on the master and ensure replication is occurring
+# only to db3 remaining client.
+do_test replication-6.0.7 {
+  execsql {
+    insert into reptab values (3);
+    select * from reptab order by a;
+  } db
+} {1 2 3}
+after $replication_delay
+do_test replication-6.0.8 {
+  execsql {
+    select * from reptab order by a;
+  } db2
+} {1 2}
+do_test replication-6.0.9 {
+  execsql {
+    select * from reptab order by a;
+  } db3
+} {1 2 3}
+
+# Make sure db2 is no longer a client and can accept new data.
+do_test replication-6.0.10 {
+  execsql {
+    insert into reptab values (222);
+    select * from reptab order by a;
+  } db2
+} {1 2 222}
+
+# Make sure db2 is usable after turning off replication and restarting.
+catch {db2 close}
+sqlite3 db2 $site2dir/rep.db
+do_test replication-6.0.11 {
+  execsql {
+    insert into reptab values (223);
+    select * from reptab order by a;
+  } db2
+} {1 2 222 223}
+
+catch {db3 close}
+catch {db2 close}
+catch {db close}
+
+## Cases 6.1.* test error paths starting replication on an existing database.
+setup_rep_sites
+
+# Create database without replication.
+do_test replication-6.1.1 {
+  execsql {
+    create table reptab(a);
+    insert into reptab values (1);
+    select * from reptab;
+  } db
+} {1}
+
+# Test error when starting without a local site.
+do_test replication-6.1.2 {
+  catchsql {
+    pragma replication=on;
+  } db
+} {1 {Must specify local site before starting replication}}
+
+# Test turning off replication when it isn't already on.
+do_test replication-6.1.3 {
+  catchsql {
+    pragma replication=off;
+  } db
+} {1 {Replication is not currently running}}
+
+# Set wrong local site address that will be changed before it is used.
+db eval "
+  pragma replication_local_site='$site2addr';
+"
+
+# Test error when not starting as initial master.
+do_test replication-6.1.4 {
+  catchsql {
+    pragma replication=on;
+  } db
+} {1 {Must be initial master to start replication on an existing database}}
+
+# Change local site address before replication started.
+db eval "
+  pragma replication_local_site='$site1addr';
+  "
+
+do_test replication-6.1.5 {
+  execsql {
+    pragma replication_initial_master=on;
+    pragma replication=on;
+  } db
+} {1 {Replication started}}
+
+# Test error turning on replication when it is already on.
+do_test replication-6.1.6 {
+  catchsql {
+    pragma replication=on;
+  } db
+} {1 {Replication is already running}}
+
+# Test error changing local site address after replication started.
+do_test replication-6.1.7 {
+  catchsql "pragma replication_local_site='$site1addr';"
+} {1 {Cannot change local site after replication is turned on}}
+
+catch {db close}
+
+##
+## Test cases replication-7.*
+## Tests for miscellaneous fixes and conditions.
+##
+
+## Cases 7.0.* test the error path where the initial election for a
+## replication group fails to complete.
+setup_rep_sites
+
+# Set tiny values for election timeout and election retry so that election
+# takes minimal time to fail.
+file mkdir $site1dir/rep.db-journal
+set s1config [open $site1dir/rep.db-journal/DB_CONFIG w]
+puts $s1config "rep_set_timeout db_rep_election_timeout 1"
+puts $s1config "rep_set_timeout db_rep_election_retry 1"
+close $s1config
+
+# Initialize and start replication on master site1.
+db eval "
+  pragma replication_local_site='$site1addr';
+  "
+do_test replication-7.0.0 {
+  execsql {
+    pragma replication_initial_master=on;
+    pragma replication=on;
+  } db
+} {1 {Replication started}}
+
+# Initialize and start replication on client site2.
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  "
+db2 eval "
+  pragma replication_remote_site='$site1addr';
+  "
+do_test replication-7.0.1 {
+  execsql {
+    pragma replication=on;
+  } db2
+} {{Replication started}}
+
+# Insert initial data on master.
+do_test replication-7.0.2 {
+  execsql {
+    create table reptab (a);
+    insert into reptab values (1);
+    select * from reptab;
+  } db
+} {1}
+after $replication_delay
+
+# Make sure client got initial master insert.
+do_test replication-7.0.3 {
+  execsql {
+    select * from reptab;
+  } db2
+} {1}
+
+# Shut down master and client sites.
+catch {db2 close}
+catch {db close}
+
+sqlite3 db $site1dir/rep.db
+
+# Redirect to a file the many expected messages from the election attempt.
+set outfile $site1dir/bdbrep.out
+execsql "pragma bdbsql_error_file='$outfile';"
+
+# Try and fail to elect a new master without a quorum.
+do_test replication-7.0.4 {
+  catchsql { select * from reptab order by a; } db
+} {1 {unable to open database file}}
+
+catch {db close}
+
+## Cases 7.1.* test the error path for an unsuccessful insert on a client
+## running alone, and that the master can rejoin the replication group and
+## replication can resume afterwards.
+setup_rep_sites
+
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+  create table reptab(a);
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+# Shut down master, client cannot take over as master.
+catch {db close}
+
+after $election_delay
+
+# Try an unsuccessful write operation on the client.
+do_test replication-7.1.1 {
+  catchsql {
+    insert into reptab values (999);
+  } db2
+} {1 {attempt to write a readonly database}}
+
+# Make sure a query on the client doesn't crash here.
+do_test replication-7.1.2 {
+  execsql {
+    select * from reptab order by a;
+  } db2
+} {}
+
+# Restart master.
+sqlite3 db $site1dir/rep.db
+execsql {select * from reptab order by a;} db
+
+after $election_delay
+
+do_test replication-7.1.3 {
+  execsql {
+    insert into reptab values (1);
+    select * from reptab order by a;
+  } db
+} {1}
+
+after $replication_delay
+
+do_test replication-7.1.4 {
+  execsql {
+    select * from reptab order by a;
+  } db2
+} {1}
+
+catch {db2 close}
+catch {db close}
+
+##
+## Test cases replication-8.*
+## Test new replication related pragmas.
+##
+
+setup_rep_sites
+
+# Set the priority
+do_test replication-8.1.0 {
+  execsql {
+    pragma replication_priority=100;
+  } db
+} {100}
+
+do_test replication-8.1.1 {
+  execsql {
+    pragma replication_priority=100000;
+  } db2
+} {100000}
+
+do_test replication-8.1.2 {
+  execsql {
+    pragma replication_priority=10;
+  } db3
+} {10}
+
+# Set the ack policy
+do_test replication-8.2.0.1 {
+  execsql {
+    pragma replication_ack_policy=quorum;
+  } db
+} {quorum}
+
+do_test replication-8.2.0.2 {
+  execsql {
+    pragma replication_ack_policy=none;
+  } db
+} {none}
+
+do_test replication-8.2.0.3 {
+  execsql {
+    pragma replication_ack_policy=all_available;
+  } db
+} {all_available}
+
+do_test replication-8.2.0.3 {
+  execsql {
+    pragma replication_ack_policy=one;
+  } db
+} {one}
+
+do_test replication-8.2.0.5 {
+  execsql {
+    pragma replication_ack_policy=all_sites;
+  } db
+} {all_sites}
+
+do_test replication-8.2.1 {
+  execsql {
+    pragma replication_ack_policy=all_sites;
+  } db2
+} {all_sites}
+
+do_test replication-8.2.2 {
+  execsql {
+    pragma replication_ack_policy=all_sites;
+  } db3
+} {all_sites}
+
+# Set the ack timeout
+do_test replication-8.3.0 {
+  catchsql {
+    pragma replication_ack_timeout=-1;
+  } db
+} {1 {Invalid value replication_ack_timeout -1}}
+
+#Get number of replication sites before starting replication
+do_test replication-8.4.0 {
+  execsql {
+    pragma replication_num_sites;
+  } 
+} {0}
+
+# Site status before replication is started
+do_test replication-8.5 {
+  execsql {
+    pragma replication_site_status;
+  }
+} {UNKNOWN}
+
+# Get master before replication is started
+do_test replication-8.6 {
+  execsql {
+    pragma replication_get_master;
+  }
+} {NULL}
+
+# Get number for perm failures before replication is started
+do_test replication-8.7 {
+  execsql {
+    pragma replication_perm_failed;
+  }
+} {0}
+
+# Turn on replication on the master
+db eval "
+  pragma replication_local_site='$site1addr';
+  pragma replication_initial_master=ON;
+  pragma replication=ON;
+"
+db2 eval "
+  pragma replication_local_site='$site2addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+db3 eval "
+  pragma replication_local_site='$site3addr';
+  pragma replication_remote_site='$site1addr';
+  pragma replication=ON;
+"
+
+after $replication_delay
+
+# Get the priority
+do_test replication-8.8.0 {
+  execsql {
+    pragma replication_priority;
+  } db
+} {100}
+
+do_test replication-8.8.1 {
+  execsql {
+    pragma replication_priority;
+  } db2
+} {100000}
+
+do_test replication-8.8.2 {
+  execsql {
+    pragma replication_priority;
+  } db3
+} {10}
+
+# Get the ack policy
+do_test replication-8.9.0 {
+  execsql {
+    pragma replication_ack_policy;
+  } db
+} {all_sites}
+
+do_test replication-8.9.1 {
+  execsql {
+    pragma replication_ack_policy;
+  } db2
+} {all_sites}
+
+do_test replication-8.9.2 {
+  execsql {
+    pragma replication_ack_policy;
+  } db3
+} {all_sites}
+
+# Set the ack timeout, make it 1ms to create
+# a perm failed event, so that pragma can
+# be tested.
+do_test replication-8.10.0 {
+  execsql {
+    pragma replication_ack_timeout=1;
+  } db
+} {1}
+
+do_test replication-8.10.1 {
+  execsql {
+    pragma replication_ack_timeout=1;
+  } db2
+} {1}
+
+do_test replication-8.10.2 {
+  execsql {
+    pragma replication_ack_timeout=1;
+  } db3
+} {1}
+
+#Get number of replication sites
+do_test replication-8.11.0 {
+  execsql {
+    pragma replication_num_sites;
+  } db
+} {3}
+
+do_test replication-8.11.1 {
+  execsql {
+    pragma replication_num_sites;
+  } db2
+} {3}
+
+do_test replication-8.11.2 {
+  execsql {
+    pragma replication_num_sites;
+  } db3
+} {3}
+
+# Site status
+do_test replication-8.12.0 {
+  execsql {
+    pragma replication_site_status;
+  }
+} {MASTER}
+
+do_test replication-8.12.1 {
+  execsql {
+    pragma replication_site_status;
+  } db2
+} {CLIENT}
+
+do_test replication-8.12.2 {
+  execsql {
+    pragma replication_site_status;
+  } db3
+} {CLIENT}
+
+# Get master
+do_test replication-8.13.0 {
+  execsql {
+    pragma replication_get_master;
+  }
+} $site1addr
+
+do_test replication-8.13.1 {
+  execsql {
+    pragma replication_get_master;
+  } db2
+} $site1addr
+
+do_test replication-8.13.2 {
+  execsql {
+    pragma replication_get_master;
+  } db3
+} $site1addr
+ 
+# Since the ack timeout is 1ms, and the ack policy is all
+# this should produce a perm failure.
+do_test replication-8.14 {
+  execsql {
+    create table t1(a);
+  }
+} {}
+
+do_test replication-8.14.1 {
+  execsql {
+    pragma replication_perm_failed;
+  }
+} {1}
+
+catch {db3 close}
+catch {db2 close}
+catch {db close}
+
+finish_test

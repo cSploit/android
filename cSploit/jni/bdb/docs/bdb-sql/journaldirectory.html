@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>The Journal Directory</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="dbsqlbasics.html" title="Chapter 1. Berkeley DB SQL: The Absolute Basics" />
+    <link rel="prev" href="accessing_bdb_sql_databases.title.html" title="Accessing BDB SQL Databases" />
+    <link rel="next" href="unsupportedpragmas.html" title="Unsupported PRAGMAs" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">The Journal Directory</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="accessing_bdb_sql_databases.title.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 1. Berkeley DB SQL: The Absolute Basics</th>
+          <td width="20%" align="right"> <a accesskey="n" href="unsupportedpragmas.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="journaldirectory"></a>The Journal Directory</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                When you create a database using the BDB SQL interface, a
+                directory is created alongside of it. This directory
+                has the same name as your database file, but with a
+                <code class="literal">-journal</code> suffix.
+            </p>
+      <p>
+                That is, if you create a database called "mydb" then
+                the BDB SQL interface also creates a directory alongside of the
+                "mydb" file called "mydb-journal".
+            </p>
+      <p>
+                This directory contains files that are very important
+                for the proper functioning of the BDB SQL interface. Do not delete
+                this directory or any of its files unless you know what you
+                are doing. 
+            </p>
+      <p>
+                In Berkeley DB terms, the journal directory contains the
+                environment files that are required to provide access to
+                databases across multiple processes.
+            </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="accessing_bdb_sql_databases.title.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="dbsqlbasics.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="unsupportedpragmas.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Accessing BDB SQL Databases </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Unsupported PRAGMAs</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

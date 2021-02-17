@@ -1,0 +1,29 @@
+.TH NCPUMOUNT 8 12/27/1995 ncpumount ncpumount
+.SH NAME
+ncpumount \- unmount a NetWare filesystem mounted with ncpmount.
+.SH SYNOPSIS
+.B ncpumount
+.B mount-point
+
+.SH DESCRIPTION
+This utility unmounts a NetWare filesystem that was previously mounted
+with the ncpmount utility. If the this utility is made suid root then
+non-root users will also be able to make use of it.
+
+.B ncpumount
+has been written to give normal linux-users more control over their
+resources. It is safe to install this program suid root, because only
+the user who has mounted a filesystem is allowed to unmount it again.
+
+For root it is not necessary to use ncpumount. The normal umount
+program works perfectly well, but it would certainly be problematic to
+make umount setuid root.
+
+.SH OPTIONS
+.B mount-point
+.RS 3
+.B mount-point
+is the directory you want to unmount.
+
+.SH SEE ALSO
+.B ncpmount(8)

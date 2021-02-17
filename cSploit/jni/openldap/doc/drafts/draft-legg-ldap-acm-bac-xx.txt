@@ -1,0 +1,2351 @@
+
+INTERNET-DRAFT                                                   S. Legg
+draft-legg-ldap-acm-bac-03.txt                       Adacel Technologies
+Intended Category: Standards Track                         June 16, 2004
+Updates: RFC 2252
+
+
+             Lightweight Directory Access Protocol (LDAP):
+                  Basic and Simplified Access Control
+
+    Copyright (C) The Internet Society (2004). All Rights Reserved.
+
+   Status of this Memo
+
+
+   This document is an Internet-Draft and is in full conformance with
+   all provisions of Section 10 of RFC2026.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as
+   Internet-Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress".
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   Distribution of this document is unlimited.  Comments should be sent
+   to the author.
+
+   This Internet-Draft expires on 16 December 2004.
+
+
+Abstract
+
+   An access control scheme describes the means by which access to
+   directory information and potentially to access rights themselves may
+   be controlled.  This document adapts the X.500 directory Basic Access
+   Control and Simplied Access Control schemes for use by the
+   Lightweight Directory Access Protocol.
+
+
+
+
+
+Legg                    Expires 16 December 2004                [Page 1]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+Table of Contents
+
+   1.  Introduction . . . . . . . . . . . . . . . . . . . . . . . . .  3
+   2.  Conventions. . . . . . . . . . . . . . . . . . . . . . . . . .  3
+   3.  Basic Access Control . . . . . . . . . . . . . . . . . . . . .  4
+       3.1.  Permissions. . . . . . . . . . . . . . . . . . . . . . .  5
+             3.1.1.  Read . . . . . . . . . . . . . . . . . . . . . .  5
+             3.1.2.  Compare. . . . . . . . . . . . . . . . . . . . .  6
+             3.1.3.  Browse . . . . . . . . . . . . . . . . . . . . .  6
+             3.1.4.  ReturnDN . . . . . . . . . . . . . . . . . . . .  6
+             3.1.5.  FilterMatch. . . . . . . . . . . . . . . . . . .  6
+             3.1.6.  Modify . . . . . . . . . . . . . . . . . . . . .  6
+             3.1.7.  Add. . . . . . . . . . . . . . . . . . . . . . .  6
+             3.1.8.  Remove . . . . . . . . . . . . . . . . . . . . .  7
+             3.1.9.  DiscloseOnError. . . . . . . . . . . . . . . . .  7
+             3.1.10. Rename . . . . . . . . . . . . . . . . . . . . .  7
+             3.1.11. Export . . . . . . . . . . . . . . . . . . . . .  7
+             3.1.12. Import . . . . . . . . . . . . . . . . . . . . .  8
+             3.1.13. Invoke . . . . . . . . . . . . . . . . . . . . .  8
+       3.2.  Representation of Access Control Information . . . . . .  8
+             3.2.1.  Identification Tag . . . . . . . . . . . . . . . 11
+             3.2.2.  Precedence . . . . . . . . . . . . . . . . . . . 11
+             3.2.3.  Authentication Level . . . . . . . . . . . . . . 11
+             3.2.4.  itemFirst and userFirst Components . . . . . . . 12
+             3.2.5.  Determining Group Membership . . . . . . . . . . 16
+       3.3.  ACI Operational Attributes . . . . . . . . . . . . . . . 17
+             3.3.1.  Prescriptive ACI . . . . . . . . . . . . . . . . 17
+             3.3.2.  Entry ACI. . . . . . . . . . . . . . . . . . . . 17
+             3.3.3.  Subentry ACI . . . . . . . . . . . . . . . . . . 18
+             3.3.4.  Protecting the ACI . . . . . . . . . . . . . . . 18
+       3.4.  Access Control Decision Points for LDAP Operations . . . 18
+             3.4.1.  Common Elements of Procedure . . . . . . . . . . 19
+                     3.4.1.1.  Alias Dereferencing. . . . . . . . . . 19
+                     3.4.1.2.  Return of Names in Errors. . . . . . . 19
+                     3.4.1.3.  Non-disclosure of Entry Existence. . . 20
+             3.4.2.  Compare Operation Decision Points. . . . . . . . 20
+             3.4.3.  Search Operation Decision Points . . . . . . . . 20
+             3.4.4.  Add Operation Decision Points. . . . . . . . . . 23
+             3.4.5.  Delete Operation Decision Points . . . . . . . . 24
+             3.4.6.  Modify Operation Decision Points . . . . . . . . 24
+             3.4.7.  Modify DN Operation Decision Points. . . . . . . 25
+       3.5.  Access Control Decision Function . . . . . . . . . . . . 26
+             3.5.1.  Inputs . . . . . . . . . . . . . . . . . . . . . 26
+             3.5.2.  Tuples . . . . . . . . . . . . . . . . . . . . . 26
+             3.5.3.  Discarding Irrelevant Tuples . . . . . . . . . . 27
+             3.5.4.  Highest Precedence and Specificity . . . . . . . 28
+   4.  Simplified Access Control. . . . . . . . . . . . . . . . . . . 28
+   5.  Security Considerations. . . . . . . . . . . . . . . . . . . . 29
+
+
+
+Legg                    Expires 16 December 2004                [Page 2]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   6.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 29
+   7.  IANA Considerations. . . . . . . . . . . . . . . . . . . . . . 29
+   Appendix A. LDAP Specific Encoding for the ACI Item Syntax . . . . 30
+   Normative References . . . . . . . . . . . . . . . . . . . . . . . 39
+   Informative References . . . . . . . . . . . . . . . . . . . . . . 40
+   Author's Address . . . . . . . . . . . . . . . . . . . . . . . . . 40
+   Full Copyright Statement . . . . . . . . . . . . . . . . . . . . . 40
+
+1.  Introduction
+
+   An access control scheme describes the means by which access to
+   directory information and potentially to access rights themselves may
+   be controlled.  Control of access to information means the prevention
+   of unauthorized detection, disclosure, or modification of that
+   information.  The definition of an access control scheme in the
+   context of a Lightweight Directory Access Protocol (LDAP) [RFC3371]
+   directory includes methods to specify Access Control Information
+   (ACI), and to enforce access rights defined by that ACI.
+
+   This document adapts the X.500 Basic Access Control and Simplied
+   Access Control schemes [X501] for use in LDAP.  Both schemes conform
+   to, and make use of, the access control administrative framework for
+   LDAP [ACA].
+
+   Section 3 describes the Basic Access Control scheme and defines how
+   it applies to LDAP operations [RFC2251].
+
+   Simplified Access Control is a functional subset of the Basic Access
+   Control scheme.  This subset is described in Section 4.
+
+   As a matter of security policy, an implementation supporting Basic
+   Access Control or Simplified Access Control is permitted to grant or
+   deny any form of access to particular attributes (e.g., password
+   attributes) irrespective of access controls which may otherwise
+   apply.  However, since such security policy has no standardized
+   representation, it cannot be propagated in replicated information.
+
+   This document is derived from, and duplicates substantial portions
+   of, Section 8 of X.501 [X501], and selected extracts from X.511
+   [X511].
+
+2.  Conventions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and  "OPTIONAL" in this
+   document are to be interpreted as described in BCP 14, RFC 2119
+   [RFC2119].
+
+
+
+
+Legg                    Expires 16 December 2004                [Page 3]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   Schema definitions are provided using LDAP description formats
+   [RFC2252].  Note that the LDAP descriptions have been rendered with
+   additional white-space and line breaks for the sake of readability.
+
+3.  Basic Access Control
+
+   This section describes the functionality of the Basic Access Control
+   scheme.
+
+   When Basic Access Control is used, the accessControlScheme
+   operational attribute [ACA] SHALL have the value basic-access-control
+   (2.5.28.1).
+
+   This LDAP profile for Basic Access Control defines, for every LDAP
+   operation, one or more points at which access control decisions take
+   place.  An access control decision will involve a requestor,
+   protected items, and permissions.
+
+   A requestor is the user requesting the operation.  Basic Access
+   Control requires a user's authorization identity to be represented as
+   a distinguished name (with an optional unique identifier).  The
+   mapping of the authentication identity to an authorization identity,
+   and the mapping of the authorization identity to a distinguished name
+   and optional unique identifier, are outside the scope of this
+   document.
+
+   A protected item is the element of directory information being
+   accessed.  The protected items are entries, attributes, attribute
+   values and distinguished names.  Access to each protected item can be
+   separately controlled through ACI.
+
+   A permission is a particular right necessary to complete a portion of
+   the operation.
+
+   The Access Control Information, which is used to make access control
+   decisions, associates protected items and user classes with
+   permissions.  ACI is represented in the directory as values of
+   operational attributes with the ACI Item syntax [RFC2252].  Each such
+   value is referred to as an ACI item.
+
+   The scope of access controls can be a single entry or a collection of
+   entries that are logically related by being within the scope of an
+   access control subentry of an administrative point (see [ACA]).
+
+   The Access Control Decision Function (ACDF) (Section 3.5) is used to
+   decide whether a particular requestor has a particular access right
+   by virtue of applicable ACI items.
+
+
+
+
+Legg                    Expires 16 December 2004                [Page 4]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   Access to DSEs and operational attributes is controlled in the same
+   way as for entries and user attributes.
+
+   For query purposes, collective attributes [COLLECT] that are
+   associated with an entry are protected precisely as if they were
+   attributes actually stored in that entry.
+
+   For the purposes of modification, collective attributes are
+   associated with the subentry that holds them, not with entries within
+   the scope of the subentry.  Modify-related access controls are
+   therefore not relevant to collective attributes, except when they
+   apply to the collective attribute and its values within the subentry.
+
+3.1.  Permissions
+
+   Access is controlled by granting or denying permissions.  Access is
+   allowed only when there is an explicitly provided grant present in
+   the ACI used to make the access control decision.  The only default
+   access decision provided in the model is to deny access in the
+   absence of explicit ACI that grants access.  All other factors being
+   equal, a denial specified in ACI always overrides a grant.
+
+   Certain combinations of grants or denials are illogical, but it is
+   the responsibility of directory clients, rather than the directory
+   server, to ensure that such combinations are absent.
+
+   The decision whether or not to permit access to an entry or its
+   contents is strictly determined by the position of the entry in the
+   Directory Information Tree (DIT), in terms of its distinguished name,
+   and is independent of how the directory server locates that entry.
+
+   The following sections introduce the permissions by indicating the
+   intent associated with the granting of each.  The actual influence of
+   a particular granted permission on access control decisions are,
+   however, determined by the ACDF and the access control decision
+   points for each LDAP operation, described in detail in Section 3.4.
+
+3.1.1.  Read
+
+   If granted for an entry, Read permits the entry to be accessed using
+   LDAP Compare and baseObject Search operations, but does not imply
+   access to all the attributes and values.
+
+   If granted for an attribute type, Read permits the attribute type to
+   be returned as entry information in a Search result.  Read or Browse
+   permission for the entry is a prerequisite.
+
+   If granted for an attribute value, Read permits the attribute value
+
+
+
+Legg                    Expires 16 December 2004                [Page 5]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   to be returned as entry information in a Search result.  Read or
+   Browse permission for the entry and Read permission for the attribute
+   type are prerequisites.
+
+3.1.2.  Compare
+
+   If granted for an attribute type, Compare permits the attribute type
+   to be tested by the assertion in an LDAP Compare operation.  Read
+   permission for the entry is a prerequisite.
+
+   If granted for an attribute value, Compare permits the value to be
+   tested by the assertion in an LDAP Compare operation.  Read
+   permission for the entry and Compare permission for the attribute
+   type are prerequisites.
+
+3.1.3.  Browse
+
+   If granted for an entry, Browse permits the entry to be accessed by
+   the LDAP Search operation, including baseObject searches, but does
+   not imply access to all the attributes and values.
+
+3.1.4.  ReturnDN
+
+   If granted for an entry, ReturnDN allows the distinguished name of
+   the entry to be disclosed in a search result.
+
+3.1.5.  FilterMatch
+
+   If granted for an attribute type, Filtermatch permits the attribute
+   type to satisfy a Filter item.
+
+   If granted for an attribute value, Filtermatch permits the attribute
+   value to satisfy a Filter item.  FilterMatch permission for the
+   attribute type is a prerequisite.
+
+3.1.6.  Modify
+
+   If granted for an entry, Modify permits the information contained
+   within an entry to be modified by the LDAP Modify operation, subject
+   to controls on the attribute types and values.
+
+3.1.7.  Add
+
+   If granted for an entry, Add permits creation of an entry in the DIT,
+   subject to being able to add all specified attributes and attribute
+   values.  Add permission granted for an entry is ineffective if Add
+   permission is not also granted for at least the mandatory attributes
+   and their values.  There is no specific "add subordinate permission".
+
+
+
+Legg                    Expires 16 December 2004                [Page 6]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   Permission to add an entry is controlled using prescriptive ACI.
+
+   If granted for an attribute type, Add permits adding a new attribute,
+   subject to being able to add all specified attribute values.  Add or
+   Modify permission for the entry is a prerequisite.
+
+   If granted for an attribute value, Add permits adding that value to
+   an existing attribute.  Add or Modify permission for the entry is a
+   prerequisite.
+
+3.1.8.  Remove
+
+   If granted for an entry, Remove permits the entry to be removed from
+   the DIT regardless of controls on attributes or attribute values
+   within the entry.
+
+   If granted for an attribute, Remove permits removing an attribute,
+   subject to being able to remove any explicitly specified attribute
+   values.  Remove permission for values not explicitly specified is not
+   required.
+
+   If granted for an attribute value, Remove permits the attribute value
+   to be removed from an existing attribute.
+
+3.1.9.  DiscloseOnError
+
+   If granted for an entry, DiscloseOnError permits the name of an entry
+   to be disclosed in an error result.
+
+   If granted for an attribute, DiscloseOnError permits the presence of
+   the attribute to be disclosed by an error.
+
+   If granted for an attribute value, DiscloseOnError permits the
+   presence of the attribute value to be disclosed by an error.
+
+3.1.10.  Rename
+
+   If granted for an entry, Rename permits an entry to be renamed with a
+   new RDN.  No permissions are required for the attributes and values
+   altered by the operation, even if they are added or removed as a
+   result of the changes to the RDN.
+
+3.1.11.  Export
+
+   If granted for an entry, Export permits the entry and its
+   subordinates, if any, to be removed from the current location and
+   placed in a new location, subject to the granting of Import
+   permission at the destination.
+
+
+
+Legg                    Expires 16 December 2004                [Page 7]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   If the last RDN is changed, Rename permission at the current location
+   is also required
+
+3.1.12.  Import
+
+   If granted for an entry, Import permits an entry and its
+   subordinates, if any, to be placed at the location to which the
+   permission applies, subject to the granting of Export permission at
+   the source location.
+
+3.1.13.  Invoke
+
+   Invoke, if granted for an operational attribute, or value thereof,
+   permits the directory server to carry out some function associated
+   with the operational attribute on behalf of the user.  The specific
+   function carried out by invocation depends on the attribute.  No
+   other permissions are required by user for the operational attribute,
+   or on the entry/subentry that holds it, in order for it to be
+   "invoked".
+
+3.2.  Representation of Access Control Information
+
+   Access Control Information is represented as a set of ACI items,
+   where each ACI item grants or denies permissions in regard to certain
+   specified users and protected items.
+
+   An ACI item is represented as a value of an operational attribute
+   with the ACI Item syntax (1.3.6.1.4.1.1466.115.121.1.1) [RFC2252].
+
+   This document updates [RFC2252] by specifying a human-readable
+   LDAP-specific encoding for ACI items.  The LDAP-specific encoding of
+   values of the ACI Item syntax is defined by the Generic String
+   Encoding Rules [GSER].  Appendix A provides an equivalent ABNF for
+   this syntax.
+
+   For convenience in specifying access control policies, the ACI Item
+   syntax provides the means to identify collections of related items,
+   such as attributes in an entry or all attribute values of a given
+   attribute, and to specify a common protection for them.
+
+   The ACI Item syntax corresponds to the ACIItem ASN.1 [ASN1] type
+   defined in X.501 [X501].  It is reproduced here for convenience:
+
+   ACIItem ::= SEQUENCE {
+       identificationTag   DirectoryString { ub-tag },
+       precedence          Precedence,
+       authenticationLevel AuthenticationLevel,
+       itemOrUserFirst     CHOICE {
+
+
+
+Legg                    Expires 16 December 2004                [Page 8]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+           itemFirst   [0] SEQUENCE {
+               protectedItems  ProtectedItems,
+               itemPermissions SET OF ItemPermission },
+           userFirst   [1] SEQUENCE {
+               userClasses     UserClasses,
+               userPermissions SET OF UserPermission } } }
+
+   Precedence ::= INTEGER (0..255)
+
+   ProtectedItems ::= SEQUENCE {
+       entry                   [0] NULL OPTIONAL,
+       allUserAttributeTypes   [1] NULL OPTIONAL,
+       attributeType           [2] SET SIZE (1..MAX) OF
+                                       AttributeType OPTIONAL,
+       allAttributeValues      [3] SET SIZE (1..MAX) OF
+                                       AttributeType OPTIONAL,
+       allUserAttributeTypesAndValues  [4] NULL OPTIONAL,
+       attributeValue          [5] SET SIZE (1..MAX) OF
+                                       AttributeTypeAndValue OPTIONAL,
+       selfValue               [6] SET SIZE (1..MAX) OF
+                                       AttributeType OPTIONAL,
+       rangeOfValues           [7] Filter OPTIONAL,
+       maxValueCount           [8] SET SIZE (1..MAX) OF
+                                       MaxValueCount OPTIONAL,
+       maxImmSub               [9] INTEGER OPTIONAL,
+       restrictedBy           [10] SET SIZE (1..MAX) OF
+                                       RestrictedValue OPTIONAL,
+       contexts               [11] SET SIZE (1..MAX) OF
+                                       ContextAssertion OPTIONAL,
+       classes                [12] Refinement OPTIONAL }
+
+   MaxValueCount ::= SEQUENCE {
+       type        AttributeType,
+       maxCount    INTEGER }
+
+   RestrictedValue ::= SEQUENCE {
+       type        AttributeType,
+       valuesIn    AttributeType }
+
+   UserClasses ::= SEQUENCE {
+       allUsers    [0] NULL OPTIONAL,
+       thisEntry   [1] NULL OPTIONAL,
+       name        [2] SET SIZE (1..MAX) OF NameAndOptionalUID OPTIONAL,
+       userGroup   [3] SET SIZE (1..MAX) OF NameAndOptionalUID OPTIONAL,
+           -- dn component shall be the name of an
+           -- entry of GroupOfUniqueNames
+       subtree     [4] SET SIZE (1..MAX) OF
+                           SubtreeSpecification OPTIONAL }
+
+
+
+Legg                    Expires 16 December 2004                [Page 9]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   NameAndOptionalUID ::= SEQUENCE {
+       dn      DistinguishedName,
+       uid     UniqueIdentifier OPTIONAL }
+
+   UniqueIdentifier ::= BIT STRING
+
+   ItemPermission ::= SEQUENCE {
+       precedence          Precedence OPTIONAL,
+           -- defaults to precedence in ACIItem
+       userClasses         UserClasses,
+       grantsAndDenials    GrantsAndDenials }
+
+   UserPermission ::= SEQUENCE {
+       precedence Precedence OPTIONAL,
+           -- defaults to precedence in ACIItem
+       protectedItems ProtectedItems,
+       grantsAndDenials GrantsAndDenials }
+
+   AuthenticationLevel ::= CHOICE {
+       basicLevels     SEQUENCE {
+           level           ENUMERATED { none(0), simple(1), strong(2) },
+           localQualifier  INTEGER OPTIONAL,
+           signed          BOOLEAN DEFAULT FALSE },
+       other           EXTERNAL }
+
+   GrantsAndDenials ::= BIT STRING {
+       -- permissions that may be used in conjunction
+       -- with any component of ProtectedItems
+       grantAdd             (0),
+       denyAdd              (1),
+       grantDiscloseOnError (2),
+       denyDiscloseOnError  (3),
+       grantRead            (4),
+       denyRead             (5),
+       grantRemove          (6),
+       denyRemove           (7),
+       -- permissions that may be used only in conjunction
+       -- with the entry component
+       grantBrowse          (8),
+       denyBrowse           (9),
+       grantExport         (10),
+       denyExport          (11),
+       grantImport         (12),
+       denyImport          (13),
+       grantModify         (14),
+       denyModify          (15),
+       grantRename         (16),
+       denyRename          (17),
+
+
+
+Legg                    Expires 16 December 2004               [Page 10]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+       grantReturnDN       (18),
+       denyReturnDN        (19),
+       -- permissions that may be used in conjunction
+       -- with any component, except entry, of ProtectedItems
+       grantCompare        (20),
+       denyCompare         (21),
+       grantFilterMatch    (22),
+       denyFilterMatch     (23),
+       grantInvoke         (24),
+       denyInvoke          (25) }
+
+   AttributeTypeAndValue ::= SEQUENCE {
+       type    ATTRIBUTE.&id ({SupportedAttributes}),
+       value   ATTRIBUTE.&Type ({SupportedAttributes}{@type}) }
+
+   The SubtreeSpecification and Refinement ASN.1 types are defined in
+   X.501 [X501], and separately described for LDAP [SUBENTRY].
+
+   The following sections describe the components of ACIItem.
+
+3.2.1.  Identification Tag
+
+   identificationTag is used to identify a particular ACI item.  This is
+   used to discriminate among individual ACI items for the purposes of
+   protection and administration.
+
+3.2.2.  Precedence
+
+   Precedence is used to control the relative order in which ACI items
+   are considered during the course of making an access control decision
+   using the ACDF.  ACI items having higher precedence values prevail
+   over others with lower precedence values, other factors being equal.
+   Precedence values are integers and are compared as such.
+
+3.2.3.  Authentication Level
+
+   AuthenticationLevel defines the minimum requestor authentication
+   level required for this ACI item.  It has two forms:
+
+   1) basicLevels: which indicates the level of authentication,
+      optionally qualified by positive or negative integer
+      localQualifier.
+
+   2) other: an externally defined measure.
+
+   When basicLevels is used, an AuthenticationLevel consisting of a
+   level and optional localQualifier SHALL be assigned to the requestor
+   by the directory server according to local policy.  For a requestor's
+
+
+
+Legg                    Expires 16 December 2004               [Page 11]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   authentication level to meet or exceed the minimum requirement, the
+   requestor's level must meet or exceed that specified in the ACI item,
+   and in addition the requestor's localQualifier must be arithmetically
+   greater than or equal to that of the ACI item.  Strong authentication
+   of the requestor is considered to exceed a requirement for simple or
+   no authentication, and simple authentication exceeds a requirement
+   for no authentication.  For access control purposes, the "simple"
+   authentication level requires at least a password; the case of
+   identification only, with no password supplied, is considered "none".
+   If a localQualifier is not specified in the ACI item, then the
+   requestor need not have a corresponding value (if such a value is
+   present it is ignored).
+
+   The signed component of basicLevels is ignored for LDAP.
+
+   When other is used, an appropriate AuthenticationLevel shall be
+   assigned to the requestor by the directory server according to local
+   policy.  The form of this AuthenticationLevel and the method by which
+   it is compared with the AuthenticationLevel in the ACI is a local
+   matter.
+
+   An authentication level associated with an explicit grant indicates
+   the minimum level to which a requestor shall be authenticated in
+   order to be granted access.
+
+   An authentication level associated with an explicit deny indicates
+   the minimum level to which a requestor shall be authenticated in
+   order not to be denied access.  For example, an ACI item that denies
+   access to a particular user class and requires strong authentication
+   will deny access to all requestors who cannot prove, by means of a
+   strongly authenticated identity, that they are not in that user
+   class.
+
+   The directory server may base authentication level on factors other
+   than values received in protocol exchanges.
+
+3.2.4.  itemFirst and userFirst Components
+
+   Each ACI item contains a choice of itemFirst or userFirst.  The
+   choice allows grouping of permissions depending on whether they are
+   most conveniently grouped by user classes or by protected items.  The
+   itemFirst and userFirst components are equivalent in the sense that
+   they capture the same access control information; however, they
+   organize that information differently.  The choice between them is
+   based on administrative convenience.  The subcomponents of itemFirst
+   and userFirst are described below.
+
+   a) ProtectedItems defines the items to which the specified access
+
+
+
+Legg                    Expires 16 December 2004               [Page 12]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+      controls apply.  It is defined as a set selected from the
+      following:
+
+      - entry means the entry contents as a whole.  It does not
+        necessarily include the information in these entries.  This
+        element SHALL be ignored if the classes component is present,
+        since this latter element selects protected entries on the basis
+        of their object class.
+
+      - allUserAttributeTypes means all user attribute type information
+        associated with the entry, but not values associated with those
+        attributes.
+
+      - allUserAttributeTypesAndValues means all user attribute
+        information associated with the entry, including all values of
+        all user attributes.
+
+        The allUserAttributeTypes and allUserAttributeTypesAndValues
+        components do not include operational attributes, which MUST be
+        specified on a per attribute basis, using attributeType,
+        allAttributeValues or attributeValue.
+
+      - attributeType means attribute type information pertaining to
+        specific attributes but not values associated with the type.
+
+      - allAttributeValues means all attribute value information
+        pertaining to specific attributes.
+
+      - attributeValue means specific values of specific attribute
+        types.
+
+      - selfValue means the attribute values of the specified attribute
+        types that match the distinguished name (and unique identifier)
+        of the requestor.  It can only apply in the specific case where
+        the attribute specified is of DN syntax
+        (1.3.6.1.4.1.1466.115.121.1.12) or Name And Optional UID syntax
+        (1.3.6.1.4.1.1466.115.121.1.34) [RFC2252].
+
+      - rangeOfValues means any attribute value which matches the
+        specified filter, i.e., for which the specified filter evaluated
+        on that attribute value would return TRUE.  The filter is not
+        evaluated on any entries in the DIB, rather it is evaluated
+        using the semantics defined in 7.8 of [X511], operating on a
+        fictitious entry that contains only the single attribute value
+        which is the protected item.  Note that the filter is an X.500
+        search Filter.  It has a different syntax from the LDAP search
+        Filter, but the same semantics.
+
+
+
+
+Legg                    Expires 16 December 2004               [Page 13]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+      The following items provide constraints that may disable the
+      granting of certain permissions to protected items in the same
+      value of ProtectedItems:
+
+      - maxValueCount restricts the maximum number of attribute values
+        allowed for a specified attribute type.  It is examined if the
+        protected item is an attribute value of the specified type and
+        the permission sought is Add.  Values of that attribute in the
+        entry are counted, without regard to attribute options and
+        access control, as though the operation which is attempting to
+        add the values is successful.  If the number of values in the
+        attribute exceeds maxCount, the ACI item is treated as not
+        granting Add permission.
+
+      - maxImmSub restricts the maximum number of immediate subordinates
+        of the superior entry to an entry being added or imported.  It
+        is examined if the protected item is an entry, the permission
+        sought is Add or Import, and the immediate superior entry is in
+        the same server as the entry being added or imported.  Immediate
+        subordinates of the superior entry are counted, without regard
+        to access control, as though the entry addition or importing is
+        successful.  If the number of subordinates exceeds maxImmSub,
+        the ACI item is treated as not granting Add or Import
+        permission.
+
+      - restrictedBy restricts values added to the attribute type to
+        being values that are already present in the same entry as
+        values of the attribute identified by the valuesIn component.
+        It is examined if the protected item is an attribute value of
+        the specified type and the permission sought is Add.  Values of
+        the valuesIn attribute are checked, without regard to attribute
+        options and access control, as though the operation which adds
+        the values is successful.  If the value to be added is not
+        present in valuesIn the ACI item is treated as not granting Add
+        permission.
+
+      - contexts is not used in this version of the LDAP profile for
+        Basic Access Control.
+
+      - classes means the contents of entries that have object class
+        values that satisfy the predicate defined by Refinement (see
+        [SUBENTRY]).
+
+   b) UserClasses defines a set of zero or more users the permissions
+      apply to.  The set of users is selected from the following:
+
+      - allUsers means every directory user (with possible requirements
+        for AuthenticationLevel).
+
+
+
+Legg                    Expires 16 December 2004               [Page 14]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+      - thisEntry means the user with the same distinguished name as the
+        entry being accessed.
+
+      - name is the set of users with the specified distinguished names
+        (each with an optional unique identifier).
+
+      - userGroup is the set of users who are members of the groups
+        (i.e., groupOfNames or groupOfUniqueNames entries [RFC2256])
+        identified by the specified distinguished names (each with an
+        optional unique identifier).  Members of a group of unique names
+        are treated as individual user distinguished names, and not as
+        the names of other groups of unique names.  How group membership
+        is determined is described in 5.2.5.
+
+      - subtree is the set of users whose distinguished names fall
+        within the scope of the unrefined subtrees (specificationFilter
+        components SHOULD NOT be used - they SHALL be ignored if
+        present).
+
+   c) SubtreeSpecification is used to specify a subtree relative to the
+      root DSE, and is not constrained by administrative areas.  The
+      specificationFilter component SHOULD NOT be used.  It SHALL be
+      ignored if present.
+
+      A subtree refinement is not allowed because membership in a
+      subtree whose specification includes only base and/or a
+      ChopSpecification can be evaluated in isolation, whereas
+      membership in a subtree definition using specificationFilter can
+      only be evaluated by obtaining information from the user's entry,
+      which is potentially in another directory server.  Basic Access
+      Control is designed to avoid remote operations in the course of
+      making an access control decision.
+
+   d) ItemPermission contains a collection of users and their
+      permissions with respect to ProtectedItems within an itemFirst
+      specification.  The permissions are specified in grantsAndDenials
+      as discussed in item f).  Each of the permissions specified in
+      grantsAndDenials is considered to have the precedence level
+      specified in precedence for the purpose of the ACDF.  If
+      precedence is omitted within ItemPermission, then precedence is
+      taken from the precedence specified for ACIItem.
+
+   e) UserPermission contains a collection of protected items and the
+      associated permissions with respect to userClasses within a
+      userFirst specification.  The associated permissions are specified
+      in grantsAndDenials as discussed in item f).  Each of the
+      permissions specified in grantsAndDenials is considered to have
+      the precedence level specified in precedence for the purpose of
+
+
+
+Legg                    Expires 16 December 2004               [Page 15]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+      the ACDF.  If precedence is omitted within UserPermission, the
+      precedence is taken from the precedence specified for ACIItem.
+
+   f) GrantsAndDenials specify the access rights that are granted or
+      denied by the ACI item.
+
+   g) UniqueIdentifier may be used by the authentication mechanism to
+      distinguish between instances of distinguished name reuse.  If
+      this component is present, then for a requestor's name to match
+      the UserClasses of an ACIItem that grants permissions, in addition
+      to the requirement that the requestor's distinguished name match
+      the specified distinguished name, the authentication of the
+      requestor shall yield an associated unique identifier, and that
+      value shall match for equality with the specified value.
+
+3.2.5.  Determining Group Membership
+
+   Determining whether a given requestor is a group member requires
+   checking two criteria.  The determination may also be constrained if
+   the group definition is not known locally.  The criteria for
+   membership and the treatment of non-local groups are discussed below.
+
+   a) A directory server is not required to perform a remote operation
+      to determine whether the requestor belongs to a particular group
+      for the purposes of Basic Access Control.  If membership in the
+      group cannot be evaluated, the server shall assume that the
+      requestor does not belong to the group if the ACI item grants the
+      permission sought, and does belong to the group if it denies the
+      permission sought.
+
+      Access control administrators should beware of basing access
+      controls on membership of non-locally available groups or groups
+      which are available only through replication (and which may,
+      therefore, be out of date).
+
+   b) In order to determine whether the requestor is a member of a
+      userGroup user class, the following criteria apply:
+
+      - The entry named by the userGroup specification is an instance of
+        the object class groupOfNames or groupOfUniqueNames.
+
+      - The name of the requestor is a value of the member or
+        uniqueMember attribute of that entry.
+
+      Values of the member or uniqueMember attribute that do not match
+      the name of the requestor are ignored, even if they represent the
+      names of groups of which the originator could be found to be a
+      member.  Hence, nested groups are not supported when evaluating
+
+
+
+Legg                    Expires 16 December 2004               [Page 16]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+      access controls.
+
+3.3.  ACI Operational Attributes
+
+   ACI is stored as values of operational attributes of entries and
+   subentries.  The operational attributes are multi-valued, which
+   allows ACI to be represented as a set of ACI items.
+
+3.3.1.  Prescriptive ACI
+
+   The prescriptiveACI attribute is defined as an operational attribute
+   of an access control subentry.  It contains prescriptive ACI
+   applicable to entries within that subentry's scope.
+
+   The LDAP description [RFC2252] for the prescriptiveACI operational
+   attribute is:
+
+      ( 2.5.24.4 NAME 'prescriptiveACI'
+          EQUALITY directoryStringFirstComponentMatch
+          SYNTAX 1.3.6.1.4.1.1466.115.121.1.1
+          USAGE directoryOperation )
+
+   The directoryStringFirstComponentMatch matching rule is described in
+   [SCHEMA].
+
+   Prescriptive ACI within the subentries of a particular administrative
+   point never applies to the same or any other subentry of that
+   administrative point, but can be applicable to the subentries of
+   subordinate administrative points.
+
+   Note that prescriptiveACI attributes are not collective attributes.
+   Although the values of a prescriptiveACI attribute contribute to
+   access control decisions for each entry within the scope of the
+   subentry that holds the attribute, the prescriptiveACI attribute does
+   not appear as part of those entries.
+
+3.3.2.  Entry ACI
+
+   The entryACI attribute is defined as an operational attribute of an
+   entry or subentry (not just access control subentries).  It contains
+   entry ACI applicable to the entry or subentry in which it appears,
+   and that (sub)entry's contents.
+
+   The LDAP description [RFC2252] for the entryACI operational attribute
+   is:
+
+      ( 2.5.24.5 NAME 'entryACI'
+          EQUALITY directoryStringFirstComponentMatch
+
+
+
+Legg                    Expires 16 December 2004               [Page 17]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+          SYNTAX 1.3.6.1.4.1.1466.115.121.1.1
+          USAGE directoryOperation )
+
+3.3.3.  Subentry ACI
+
+   The subentryACI attribute is defined as an operational attribute of
+   administrative entries [ADMIN] (for any aspect of administration).
+   It contains subentry ACI that applies to each of the subentries of
+   the administrative entry in which it appears.  Only administrative
+   entries are permitted to contain a subentryACI attribute.
+
+   The LDAP description [RFC2252] for the subentryACI operational
+   attribute is:
+
+      ( 2.5.24.6 NAME 'subentryACI'
+          EQUALITY directoryStringFirstComponentMatch
+          SYNTAX 1.3.6.1.4.1.1466.115.121.1.1
+          USAGE directoryOperation )
+
+3.3.4.  Protecting the ACI
+
+   ACI operational attributes are subject to the same protection
+   mechanisms as other attributes.
+
+   The identificationTag provides an identifier for each ACI item.  This
+   tag can be used to remove a specific ACI item value, or to protect it
+   by prescriptive ACI, entry ACI or subentry ACI.  Directory rules
+   ensure that only one ACI item per access control operational
+   attribute possesses any specific identificationTag value.
+
+   The creation of subentries for an administrative entry may be
+   controlled by means of the subentryACI operational attribute in the
+   administrative entry.  The right to create prescriptive access
+   controls may also be governed directly by security policy; this
+   provision is required to create access controls in new autonomous
+   administrative areas [ADMIN].
+
+3.4.  Access Control Decision Points for LDAP Operations
+
+   Each LDAP operation involves making a series of access control
+   decisions on the various protected items that the operation accesses.
+
+   For some operations (e.g., the Modify operation), each such access
+   control decision must grant access for the operation to succeed; if
+   access is denied to any protected item, the whole operation fails.
+   For other operations (e.g., the Search operation), protected items to
+   which access is denied are simply omitted from the operation result
+   and processing continues.
+
+
+
+Legg                    Expires 16 December 2004               [Page 18]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   If the requested access is denied, further access control decisions
+   may be needed to determine if the user has DiscloseOnError
+   permissions to the protected item.  Only if DiscloseOnError
+   permission is granted may the server respond with an error that
+   reveals the existence of the protected item.  In all other cases, the
+   server MUST act so as to conceal the existence of the protected item.
+
+   The permissions required to access each protected item, are specified
+   for each operation in the following sections.  The algorithm by which
+   a permission is determined to be granted or not granted is specified
+   in Section 3.5.
+
+3.4.1.  Common Elements of Procedure
+
+   This section defines the elements of procedure that are common to all
+   LDAP operations when Basic Access Control is in effect.
+
+3.4.1.1.  Alias Dereferencing
+
+   If, in the process of locating a target object entry (nominated in an
+   LDAP request), alias dereferencing is required, no specific
+   permissions are necessary for alias dereferencing to take place.
+   However, if alias dereferencing would result in a referral being
+   returned, the following sequence of access controls applies.
+
+   1) Read permission is required to the alias entry.  If permission is
+      not granted, the operation fails in accordance to the procedure
+      described in 5.4.1.3.
+
+   2) Read permission is required to the aliasedEntryName attribute and
+      to the single value that it contains.  If permission is not
+      granted, the operation fails and the resultCode
+      aliasDereferencingProblem SHALL be returned.  The matchedDN field
+      of the LDAPResult SHALL contain the name of the alias entry.
+
+   In addition to the access controls described above, security policy
+   may prevent the disclosure of knowledge of other servers which would
+   otherwise be conveyed in a referral.  If such a policy is in effect
+   the resultCode insufficientAccessRights SHALL be returned.
+
+3.4.1.2.  Return of Names in Errors
+
+   Certain LDAP result codes, i.e., noSuchObject, aliasProblem,
+   invalidDNSyntax and aliasDereferencingProblem, provide the name of an
+   entry in the matchedDN field of an LDAPResult.  The DN of an entry
+   SHALL only be provided in the matchedDN field if DiscloseOnError
+   permission is granted to that entry, otherwise, the matchedDN field
+   of the LDAPResult SHALL either contain the name of the next superior
+
+
+
+Legg                    Expires 16 December 2004               [Page 19]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   entry to which DiscloseOnError permission is granted, or, if
+   DiscloseOnError permission is not granted to any superior entry, the
+   name of the root DSE (i.e., a zero-length LDAPDN).
+
+3.4.1.3.  Non-disclosure of Entry Existence
+
+   If, while performing an LDAP operation, the necessary entry level
+   permission is not granted to the specified target object entry -
+   e.g., the entry to be modified - the operation fails; if
+   DiscloseOnError permission is granted to the target entry, the
+   resultCode insufficientAccessRights SHALL be returned, otherwise, the
+   resultCode noSuchObject SHALL be returned.  The matchedDN field of
+   the LDAPResult SHALL either contain the name of the next superior
+   entry to which DiscloseOnError permission is granted, or, if
+   DiscloseOnError permission is not granted to any superior entry, the
+   name of the root DSE (i.e., a zero-length LDAPDN).
+
+   Additionally, whenever the server detects an operational error
+   (including a referral resultCode), it shall ensure that in returning
+   that error it does not compromise the existence of the named target
+   entry and any of its superiors.  For example, before returning a
+   resultCode of timeLimitExceeded or notAllowedOnNonLeaf, the server
+   verifies that DiscloseOnError permission is granted to the target
+   entry.  If it is not, the procedure described in the paragraph above
+   SHALL be followed.
+
+3.4.2.  Compare Operation Decision Points
+
+   The following sequence of access controls applies for an entry being
+   compared.
+
+   1) Read permission for the entry to be compared is required.  If
+      permission is not granted, the operation fails in accordance with
+      5.4.1.3.
+
+   2) Compare permission for the attribute to be compared is required.
+      If permission is not granted, the operation fails: if
+      DiscloseOnError permission is granted to the attribute being
+      compared, a resultCode of insufficientAccessRight SHALL be
+      returned, otherwise, the resultCode noSuchAttribute SHALL be
+      returned.
+
+   3) If there exists a value within the attribute being compared that
+      matches the purported argument and for which Compare permission is
+      granted, the operation returns the resultCode compareTrue,
+      otherwise the operation returns the resultCode compareFalse.
+
+3.4.3.  Search Operation Decision Points
+
+
+
+Legg                    Expires 16 December 2004               [Page 20]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   The following sequence of access controls applies for a portion of
+   the DIT being searched.
+
+   1) No specific permission is required to the entry identified by the
+      baseObject argument in order to initiate a search.  However, if
+      the baseObject is within the scope of the SearchArgument (i.e.,
+      when the subset argument specifies baseObject or wholeSubtree) the
+      access controls specified in 2) through 5) will apply.
+
+   2) Browse or Read permission is required for the single entry within
+      the scope of a baseObject search.  An entry for which neither of
+      these permissions is granted is ignored.
+
+      This differs from the X.500 DAP Search operation where the Browse
+      permission alone is required.  An entry with Read permission but
+      not Browse permission cannot be searched but can still be examined
+      with an X.500 DAP Read operation.  LDAP relies on baseObject
+      search operations to provide the functionality of the DAP Read
+      operation.  Accepting Read permission for the target entry in a
+      baseObject search gives an LDAP baseObject search the same access
+      rights to the entry as the DAP Read operation.
+
+   3) Browse permission is required for an entry within the scope of a
+      singleLevel or wholeSubtree search to be a candidate for
+      consideration.  Entries for which this permission is not granted
+      are ignored.
+
+   4) The filter argument is applied to each entry left to be considered
+      after taking 2) and 3) into account, in accordance with the
+      following:
+
+      a) For a present Filter item, if there exists an attribute value
+         such that the attribute type of the value (possibly a subtype
+         of the attribute type in the FilterItem) satisfies the Filter
+         item and FilterMatch permission is granted for the value and
+         for the attribute type then the FilterItem evaluates to TRUE,
+         otherwise, it evaluates to FALSE.
+
+         If a directory server does not support True/False filters
+         [FILTER] on LDAP searches, or if directory clients do not
+         exploit this capability, then access control administrators
+         SHOULD grant FilterMatch permission for the objectClass
+         attribute over entries where Read permission is also granted so
+         that an LDAP baseObject search with a filter testing for the
+         presence of the objectClass attribute will have the same access
+         rights to the target entry as the DAP Read operation.  An LDAP
+         baseObject search with a True filter does not require
+         FilterMatch permission for any particular attribute type.
+
+
+
+Legg                    Expires 16 December 2004               [Page 21]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+      b) For an equalityMatch, substrings, greaterOrEqual, lessOrEqual,
+         approxMatch or extensibleMatch Filter item, if there exists an
+         attribute value such that the value satisfies the Filter item
+         and FilterMatch permission is granted for the value and for its
+         attribute type (possibly a subtype of the attribute type in the
+         FilterItem) then the FilterItem evaluates to TRUE, otherwise,
+         it evaluates to FALSE.
+
+   Once the access controls defined in 2) through 4) have been applied,
+   an entry is either selected or discarded.
+
+   5) For each selected entry the information returned is as follows:
+
+      a) ReturnDN permission for an entry is required in order to return
+         its distinguished name in a SearchResultEntry response.  If
+         this permission is not granted, the server SHALL either, return
+         the name of a valid alias to the entry, or, omit the entry from
+         the search result.
+
+         If the base entry of the search was located using an alias,
+         then that alias is known to be a valid alias.  Otherwise, how
+         it is ensured that the alias is valid is outside the scope of
+         this specification.
+
+         Where a server has a choice of alias names available to it for
+         return, it is RECOMMENDED that where possible it choose the
+         same alias name for repeated requests by the same client, in
+         order to provide a consistent service.
+
+      b) If the typesOnly field of the SearchRequest is TRUE then, for
+         each attribute type that is to be returned, Read permission for
+         the attribute type and Read permission for at least one value
+         of the attribute is required.  If permission is not granted,
+         the attribute type is omitted from the attribute list in the
+         SearchResultEntry.  If as a consequence of applying these
+         controls no attribute type information is selected, the
+         SearchResultEntry is returned but no attribute type information
+         is conveyed with it (i.e., the attribute list is empty).
+
+      c) If the typesOnly field of the SearchRequest is FALSE then Read
+         permission is required for each attribute type and for each
+         attribute value that is to be returned.  If permission to an
+         attribute type is not granted, the attribute is omitted from
+         the SearchResultEntry.  If permission to an attribute value is
+         not granted, the value is omitted from its corresponding
+         attribute.  If all values of an attribute are omitted then the
+         attribute type is omitted from the attribute list in the
+         SearchResultEntry.  If as a consequence of applying these
+
+
+
+Legg                    Expires 16 December 2004               [Page 22]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+         controls no attribute information is selected, the
+         SearchResultEntry is returned but no attribute information is
+         conveyed with it (i.e., the attribute list is empty).
+
+   6) If as a consequence of applying the above controls to the entire
+      scoped subtree the search result contains no entries (excluding
+      any SearchResultReferences) and if DiscloseOnError permission is
+      not granted to the entry identified by the baseObject argument,
+      the operation fails and the resultCode noSuchObject SHALL be
+      returned.  The matchedDN field of the LDAPResult SHALL either
+      contain the name of the next superior entry to which
+      DiscloseOnError permission is granted, or the name of the root DSE
+      (i.e., a zero-length LDAPDN).  Otherwise, the operation succeeds
+      but no subordinate information is conveyed with it.
+
+   Security policy may prevent the disclosure of knowledge of other
+   servers which would otherwise be conveyed as SearchResultReferences.
+   If such a policy is in effect SearchResultReferences are omitted from
+   the search result.
+
+   No specific permissions are necessary to allow alias dereferencing to
+   take place in the course of a search operation.  However, for each
+   alias entry encountered, if alias dereferencing would result in a
+   SearchResultReference being returned, the following access controls
+   apply: Read permission is required to the alias entry, the
+   aliasedEntryName attribute and to the single value that it contains.
+   If any of these permissions is not granted, the SearchResultReference
+   SHALL be omitted from the search result.
+
+3.4.4.  Add Operation Decision Points
+
+   The following sequence of access controls apply for an entry being
+   added.
+
+   1) No specific permission is required for the immediate superior of
+      the entry identified by the entry field of the AddRequest.
+
+   2) If an entry already exists with a distinguished name equal to the
+      entry field the operation fails; if DiscloseOnError or Add
+      permission is granted to the existing entry, the resultCode
+      entryAlreadyExists SHALL be returned, otherwise, the procedure
+      described in 5.4.1.3 is followed with respect to the entry being
+      added.
+
+   3) Add permission is required for the new entry being added.  If this
+      permission is not granted, the operation fails; the procedure
+      described in 5.4.1.3 is followed with respect to the entry being
+      added.
+
+
+
+Legg                    Expires 16 December 2004               [Page 23]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+      The Add permission is provided as prescriptive ACI when attempting
+      to add an entry and as prescriptive ACI or subentry ACI when
+      attempting to add a subentry.  Any values of the entryACI
+      attribute in the entry being added SHALL be ignored.
+
+   4) Add permission is required for each attribute type and for each
+      value that is to be added.  If any permission is absent, the
+      operation fails and the resultCode insufficientAccessRights SHALL
+      be returned.
+
+3.4.5.  Delete Operation Decision Points
+
+   The following sequence of access controls apply for an entry being
+   removed.
+
+   1) Remove permission is required for the entry being removed.  If
+      this permission is not granted, the operation fails in accordance
+      with 5.4.1.3.
+
+   2) No specific permissions are required for any of the attributes and
+      attribute values present within the entry being removed.
+
+3.4.6.  Modify Operation Decision Points
+
+   The following sequence of access controls apply for an entry being
+   modified.
+
+   1) Modify permission is required for the entry being modified.  If
+      this permission is not granted, the operation fails in accordance
+      with 5.4.1.3.
+
+   2) For each of the specified modification arguments applied in
+      sequence, the following permissions are required:
+
+      a) Add permission is required for each of the attribute values
+         specified in an add modification.  If the attribute does not
+         currently exist then Add permission for the attribute type is
+         also required.  If these permissions are not granted, or any of
+         the attribute values already exist, the operation fails; if an
+         attribute value already exists and DiscloseOnError or Add is
+         granted to that attribute value, the resultCode
+         attributeOrValueExists SHALL be returned, otherwise, the
+         resultCode insufficientAccessRights SHALL be returned.
+
+      b) Remove permission is required for the attribute type specified
+         in a delete modification with no listed attribute values.  If
+         this permission is not granted, the operation fails; if
+         DiscloseOnError permission is granted to the attribute being
+
+
+
+Legg                    Expires 16 December 2004               [Page 24]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+         removed and the attribute exists, the resultCode
+         insufficientAccessRights SHALL be returned, otherwise, the
+         resultCode noSuchAttribute SHALL be returned.
+
+         No specific permissions are required for any of the attribute
+         values present within the attribute being removed.
+
+      c) Remove permission is required for each of the values in a
+         delete modification with listed attribute values.  If all
+         current values of the attribute are specified to be removed
+         (which causes the attribute itself to be removed), then Remove
+         permission for the attribute type is also required.  If these
+         permissions are not granted, the operation fails; if
+         DiscloseOnError permission is granted to any of the attribute
+         values being removed, the resultCode insufficientAccessRights
+         SHALL be returned, otherwise, the resultCode noSuchAttribute
+         SHALL be returned.
+
+      d) Remove and Add permission is required for the attribute type,
+         and Add permission is required for each of the specified
+         attribute values, in a replace modification.  If these
+         permissions are not granted the operation fails and the
+         resultCode insufficientAccessRights SHALL be returned.
+
+         No specific permissions are required to remove any existing
+         attribute values of the attribute being replaced.
+
+3.4.7.  Modify DN Operation Decision Points
+
+   The following sequence of access controls apply for an entry having
+   its DN modified.
+
+   1) If the effect of the operation is to change the RDN of the entry
+      then Rename permission (determined with respect to its original
+      name) is required for the entry.  If this permission is not
+      granted, the operation fails; the procedure described in 5.4.1.3
+      is followed with respect to the entry being renamed (considered
+      with its original name).
+
+      No additional permissions are required even if, as a result of
+      modifying the RDN of the entry, a new distinguished value needs to
+      be added, or an old one removed.  No specific permissions are
+      required for the subordinates of the renamed entry.
+
+   2) If the effect of the operation is to move an entry to a new
+      superior in the DIT then Export permission (determined with
+      respect to its original name) and Import permission (determined
+      with respect to its new name) are required for the entry.  If
+
+
+
+Legg                    Expires 16 December 2004               [Page 25]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+      either of these permissions is not granted, the operation fails;
+      the procedure described in 5.4.1.3 is followed with respect to the
+      entry being moved (considered with its original name).
+
+      The Import permission is provided as prescriptive ACI when
+      attempting to move an entry and as prescriptive ACI or subentry
+      ACI when attempting to move a subentry.  Any values of the
+      entryACI attribute in the entry or subentry being moved SHALL be
+      ignored.
+
+      No specific permissions are required for the subordinates of the
+      moved entry.
+
+   Note that a single Modify DN Operation may simultaneously rename and
+   move an entry.
+
+3.5.  Access Control Decision Function
+
+   This section describes how ACI items are processed in order to decide
+   whether to grant or deny a particular requestor a specified
+   permission to a given protected item.
+
+   Section 3.5.1 describes the inputs to the ACDF.  Sections 3.5.2
+   through 3.5.4 describe the steps in the ACDF.  The output is a
+   decision to grant or deny access to the protected item.
+
+3.5.1.  Inputs
+
+   For each invocation of the ACDF, the inputs are:
+
+   a) the requestor's Distinguished Name, unique identifier, and
+      authentication level, or as many of these as are available;
+
+   b) the protected item (an entry, an attribute, or an attribute value)
+      being considered at the current decision point for which the ACDF
+      was invoked;
+
+   c) the requested permission specified for the current decision point;
+
+   d) the ACI items applicable to the entry containing (or which is) the
+      protected item.
+
+   In addition, if the ACI items include any of the protected item
+   constraints described in 5.2.1.4, the whole entry and the number of
+   immediate subordinates of its superior entry may also be required as
+   inputs.
+
+3.5.2.  Tuples
+
+
+
+Legg                    Expires 16 December 2004               [Page 26]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   For each ACI item, expand the item into a set of tuples, one tuple
+   for each element of the itemPermissions and userPermissions sets,
+   containing the following elements:
+
+      ( userClasses, authenticationLevel, protectedItems,
+         grantsAndDenials, precedence )
+
+   Collect all tuples from all ACI items into a single set.
+
+   For any tuple whose grantsAndDenials specify both grants and denials,
+   replace the tuple with two tuples - one specifying only grants and
+   the other specifying only denials.
+
+3.5.3.  Discarding Irrelevant Tuples
+
+   Perform the following steps to discard all irrelevant tuples:
+
+   1) Discard all tuples that do not include the requestor in the
+      tuple's userClasses as follows:
+
+      a) For tuples that grant access, discard all tuples that do not
+         include the requestor's identity in the tuples's userClasses
+         element, taking into account UniqueIdentifier elements if
+         relevant.  Where a tuple's userClasses specifies a
+         UniqueIdentifier, a matching value shall be present in the
+         requestor's identity if the tuple is not to be discarded.
+         Discard tuples that specify an authentication level higher than
+         that associated with the requestor.
+
+      b) For tuples that deny access, retain all tuples that include the
+         requestor in the tuple's userClasses element, taking into
+         account uniqueIdentifier elements if relevant.  Also retain all
+         tuples that deny access and which specify an authentication
+         level higher than that associated with the requestor.  This
+         reflects the fact that the requestor has not adequately proved
+         non-membership in the user class for which the denial is
+         specified.  All other tuples that deny access are discarded.
+
+   2) Discard all tuples that do not include the protected item in
+      protectedItems.
+
+   3) Examine all tuples that include maxValueCount, maxImmSub or
+      restrictedBy.  Discard all such tuples which grant access and
+      which do not satisfy any of these constraints.
+
+   4) Discard all tuples that do not include the requested permission as
+      one of the set bits in grantsAndDenials.
+
+
+
+
+Legg                    Expires 16 December 2004               [Page 27]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   The order in which tuples are discarded does not change the output of
+   the ACDF.
+
+3.5.4.  Highest Precedence and Specificity
+
+   Perform the following steps to select those tuples of highest
+   precedence and specificity:
+
+   1) Discard all tuples having a precedence less than the highest
+      precedence among the remaining tuples.
+
+   2) If more than one tuple remains, choose the tuples with the most
+      specific user class.  If there are any tuples matching the
+      requestor with UserClasses element name or thisEntry, discard all
+      other tuples.  Otherwise if there are any tuples matching
+      UserGroup, discard all other tuples.  Otherwise if there are any
+      tuples matching subtree, discard all other tuples.
+
+   3) If more than one tuple remains, choose the tuples with the most
+      specific protected item.  If the protected item is an attribute
+      and there are tuples that specify the attribute type explicitly,
+      discard all other tuples.  If the protected item is an attribute
+      value, and there are tuples that specify the attribute value
+      explicitly, discard all other tuples.  A protected item which is a
+      rangeOfValues is to be treated as specifying an attribute value
+      explicitly.
+
+   Grant access if and only if one or more tuples remain and all grant
+   access.  Otherwise deny access.
+
+4.  Simplified Access Control
+
+   This section describes the functionality of the Simplified Access
+   Control scheme.  It provides a subset of the functionality found in
+   Basic Access Control.
+
+   When Simplified Access Control is used, the accessControlScheme
+   operational attribute [ACA] SHALL have the value
+   simplified-access-control (2.5.28.2).
+
+   The functionality of Simplified Access Control is the same as Basic
+   Access Control except that:
+
+   1) Access control decisions shall be made only on the basis of values
+      of prescriptiveACI and subentryACI operational attributes.  Values
+      of the entryACI attribute, if present, SHALL NOT be used to make
+      access control decisions.
+
+
+
+
+Legg                    Expires 16 December 2004               [Page 28]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   2) Access Control Inner Areas are not used.  Values of
+      prescriptiveACI attributes appearing in subentries of ACIPs SHALL
+      NOT be used to make access control decisions.
+
+   All other provisions SHALL be as defined for Basic Access Control.
+
+5.  Security Considerations
+
+   Access control administrators should beware of basing access controls
+   on membership of non-locally available groups or groups which are
+   available only through replication (and which may, therefore, be out
+   of date).
+
+   A particular DSA might not have the ACI governing any data that it
+   caches.  Administrators should be aware that a directory server with
+   the capability of caching may pose a significant security risk to
+   other directory servers, in that it may reveal information to
+   unauthorized users.
+
+6.  Acknowledgements
+
+   This document is derived from, and duplicates substantial portions
+   of, Section 8 of X.501 [X501], and selected extracts from X.511
+   [X511].
+
+7.  IANA Considerations
+
+   The Internet Assigned Numbers Authority (IANA) is requested to update
+   the LDAP descriptors registry [BCP64] as indicated by the following
+   templates:
+
+      Subject: Request for LDAP Descriptor Registration
+      Descriptor (short name): basic-access-control
+      Object Identifier: 2.5.28.1
+      Person & email address to contact for further information:
+        Steven Legg <steven.legg@adacel.com.au>
+      Usage: other (access control scheme)
+      Specification: RFC XXXX
+      Author/Change Controller: IESG
+
+      Subject: Request for LDAP Descriptor Registration
+      Descriptor (short name): simplified-access-control
+      Object Identifier: 2.5.28.2
+      Person & email address to contact for further information:
+        Steven Legg <steven.legg@adacel.com.au>
+      Usage: other (access control scheme)
+      Specification: RFC XXXX
+      Author/Change Controller: IESG
+
+
+
+Legg                    Expires 16 December 2004               [Page 29]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+      Subject: Request for LDAP Descriptor Registration
+      Descriptor (short name): prescriptiveACI
+      Object Identifier: 2.5.24.4
+      Person & email address to contact for further information:
+        Steven Legg <steven.legg@adacel.com.au>
+      Usage: attribute type
+      Specification: RFC XXXX
+      Author/Change Controller: IESG
+
+      Subject: Request for LDAP Descriptor Registration
+      Descriptor (short name): entryACI
+      Object Identifier: 2.5.24.5
+      Person & email address to contact for further information:
+        Steven Legg <steven.legg@adacel.com.au>
+      Usage: attribute type
+      Specification: RFC XXXX
+      Author/Change Controller: IESG
+
+      Subject: Request for LDAP Descriptor Registration
+      Descriptor (short name): subentryACI
+      Object Identifier: 2.5.24.6
+      Person & email address to contact for further information:
+        Steven Legg <steven.legg@adacel.com.au>
+      Usage: attribute type
+      Specification: RFC XXXX
+      Author/Change Controller: IESG
+
+Appendix A. LDAP Specific Encoding for the ACI Item Syntax
+
+   This appendix is non-normative.
+
+   The LDAP-specific encoding for the ACI Item syntax is specified by
+   the Generic String Encoding Rules [GSER].  The ABNF [RFC2234] in this
+   appendix for this syntax is provided only as a convenience and is
+   equivalent to the encoding specified by the application of GSER.
+   Since the ACI Item ASN.1 type may be extended in future editions of
+   X.501 [X501], the provided ABNF should be regarded as a snapshot in
+   time.  The LDAP-specific encoding for any extension to the ACI Item
+   ASN.1 type can be determined from the rules of GSER.
+
+   In the event that there is a discrepancy between this ABNF and the
+   encoding determined by GSER, then GSER is to be taken as definitive.
+
+   ACIItem = "{" sp aci-identificationTag ","
+                 sp aci-precedence ","
+                 sp aci-authenticationLevel ","
+                 sp aci-itemOrUserFirst
+                 sp "}"
+
+
+
+Legg                    Expires 16 December 2004               [Page 30]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   aci-identificationTag   = id-identificationTag   msp
+                                DirectoryString
+   aci-precedence          = id-precedence          msp Precedence
+   aci-authenticationLevel = id-authenticationLevel msp
+                                AuthenticationLevel
+   aci-itemOrUserFirst     = id-itemOrUserFirst     msp
+                                ItemOrUserFirst
+   id-identificationTag    = %x69.64.65.6E.74.69.66.69.63.61.74.69.6F
+                                %x6E.54.61.67 ; "identificationTag"
+   id-precedence           = %x70.72.65.63.65.64.65.6E.63.65
+                                ; "precedence"
+   id-authenticationLevel  = %x61.75.74.68.65.6E.74.69.63.61.74.69.6F
+                                %x6E.4C.65.76.65.6C
+                                ; "authenticationLevel"
+   id-itemOrUserFirst      = %x69.74.65.6D.4F.72.55.73.65.72.46.69.72
+                                %x73.74 ; "itemOrUserFirst"
+
+   Precedence = INTEGER-0-MAX ; MUST be less than 256
+
+   AuthenticationLevel = al-basicLevels / al-other
+   al-basicLevels      = id-basicLevels ":" BasicLevels
+   al-other            = id-other       ":" EXTERNAL
+   id-basicLevels      = %x62.61.73.69.63.4C.65.76.65.6C.73
+                            ; "basicLevels"
+   id-other            = %x6F.74.68.65.72 ; "other"
+
+   BasicLevels = "{"      sp bl-level
+                    [ "," sp bl-localQualifier ]
+                    [ "," sp bl-signed         ]
+                          sp "}"
+
+   bl-level          = id-level          msp Level
+   bl-localQualifier = id-localQualifier msp INTEGER
+   bl-signed         = id-signed         msp BOOLEAN
+   Level             = id-none / id-simple / id-strong
+   id-level          = %x6C.65.76.65.6C ; "level"
+   id-localQualifier = %x6C.6F.63.61.6C.51.75.61.6C.69.66.69.65.72
+                          ; "localQualifier"
+   id-signed         = %x73.69.67.6E.65.64 ; "signed"
+   id-none           = %x6E.6F.6E.65       ; "none"
+   id-simple         = %x73.69.6D.70.6C.65 ; "simple"
+   id-strong         = %x73.74.72.6F.6E.67 ; "strong"
+
+   ItemOrUserFirst    = ( id-itemFirst ":" ItemFirst ) /
+                        ( id-userFirst ":" UserFirst )
+   id-itemFirst       = %x69.74.65.6D.46.69.72.73.74 ; "itemFirst"
+   id-userFirst       = %x75.73.65.72.46.69.72.73.74 ; "userFirst"
+
+
+
+
+Legg                    Expires 16 December 2004               [Page 31]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   ItemFirst          = "{" sp if-protectedItems ","
+                            sp if-itemPermissions
+                            sp "}"
+   if-protectedItems  = id-protectedItems  msp ProtectedItems
+   if-itemPermissions = id-itemPermissions msp ItemPermissions
+   id-protectedItems  = %x70.72.6F.74.65.63.74.65.64.49.74.65.6D.73
+                           ; "protectedItems"
+   id-itemPermissions = %x69.74.65.6D.50.65.72.6D.69.73.73.69.6F.6E
+                           %x73 ; "itemPermissions"
+
+   UserFirst          = "{" sp uf-userClasses ","
+                            sp uf-userPermissions
+                            sp "}"
+   uf-userClasses     = id-userClasses     msp UserClasses
+   uf-userPermissions = id-userPermissions msp UserPermissions
+   id-userClasses     = %x75.73.65.72.43.6C.61.73.73.65.73
+                           ; "userClasses"
+   id-userPermissions = %x75.73.65.72.50.65.72.6D.69.73.73.69.6F.6E
+                           %x73 ; "userPermissions"
+
+   ItemPermissions     = "{" [ sp ItemPermission
+                            *( "," sp ItemPermission ) ] sp "}"
+   ItemPermission      = "{" [ sp ip-precedence "," ]
+                               sp ip-userClasses ","
+                               sp ip-grantsAndDenials
+                               sp "}"
+   ip-precedence       = id-precedence       msp Precedence
+   ip-userClasses      = id-userClasses      msp UserClasses
+   ip-grantsAndDenials = id-grantsAndDenials msp GrantsAndDenials
+   id-grantsAndDenials = %x67.72.61.6E.74.73.41.6E.64.44.65.6E.69.61
+                            %x6C.73 ; "grantsAndDenials"
+
+   UserClasses  = "{"     [ sp uc-allUsers ]
+                      [ sep sp uc-thisEntry ]
+                      [ sep sp uc-name ]
+                      [ sep sp uc-userGroup ]
+                      [ sep sp uc-subtree ]
+                            sp "}"
+   uc-allUsers  = id-allUsers  msp NULL
+   uc-thisEntry = id-thisEntry msp NULL
+   uc-name      = id-name      msp NameAndOptionalUIDs
+   uc-userGroup = id-userGroup msp NameAndOptionalUIDs
+   uc-subtree   = id-subtree   msp SubtreeSpecifications
+   id-allUsers  = %x61.6C.6C.55.73.65.72.73    ; "allUsers"
+   id-thisEntry = %x74.68.69.73.45.6E.74.72.79 ; "thisEntry"
+   id-name      = %x6E.61.6D.65                ; "name"
+   id-userGroup = %x75.73.65.72.47.72.6F.75.70 ; "userGroup"
+   id-subtree   = %x73.75.62.74.72.65.65       ; "subtree"
+
+
+
+Legg                    Expires 16 December 2004               [Page 32]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   NameAndOptionalUIDs = "{" sp NameAndOptionalUID
+                            *( "," sp NameAndOptionalUID ) sp "}"
+   NameAndOptionalUID  = "{"      sp nu-dn
+                            [ "," sp nu-uid ]
+                                  sp "}"
+   nu-dn               = id-dn  msp DistinguishedName
+   nu-uid              = id-uid msp UniqueIdentifier
+   UniqueIdentifier    = BIT-STRING
+   id-dn               = %x64.6E    ; "dn"
+   id-uid              = %x75.69.64 ; "uid"
+
+   SubtreeSpecifications = "{" sp SubtreeSpecification
+                              *( "," sp SubtreeSpecification ) sp "}"
+
+   UserPermissions     = "{" [ sp UserPermission
+                            *( "," sp UserPermission ) ] sp "}"
+   UserPermission      = "{" [ sp up-precedence "," ]
+                               sp up-protectedItems ","
+                               sp up-grantsAndDenials
+                               sp "}"
+   up-precedence       = id-precedence       msp Precedence
+   up-protectedItems   = id-protectedItems   msp ProtectedItems
+   up-grantsAndDenials = id-grantsAndDenials msp GrantsAndDenials
+
+   ProtectedItems = "{"     [ sp pi-entry ]
+                        [ sep sp pi-allUserAttributeTypes ]
+                        [ sep sp pi-attributeType ]
+                        [ sep sp pi-allAttributeValues ]
+                        [ sep sp pi-allUserTypesAndValues ]
+                        [ sep sp pi-attributeValue ]
+                        [ sep sp pi-selfValue ]
+                        [ sep sp pi-rangeOfValues ]
+                        [ sep sp pi-maxValueCount ]
+                        [ sep sp pi-maxImmSub ]
+                        [ sep sp pi-restrictedBy ]
+                        ; contexts omitted
+                        [ sep sp pi-classes ]
+                              sp "}"
+
+   pi-entry                 = id-entry msp NULL
+   pi-allUserAttributeTypes = id-allUserAttributeTypes msp NULL
+   pi-attributeType         = id-attributeType msp AttributeTypes
+   pi-allAttributeValues    = id-allAttributeValues msp
+                                 AttributeTypes
+   pi-allUserTypesAndValues = id-allUserAttributeTypesAndValues msp
+                                 NULL
+   pi-attributeValue        = id-attributeValue msp
+                                 AttributeTypeAndValues
+
+
+
+Legg                    Expires 16 December 2004               [Page 33]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   pi-selfValue             = id-selfValue msp AttributeTypes
+   pi-rangeOfValues         = id-rangeOfValues msp Filter
+   pi-maxValueCount         = id-maxValueCount msp MaxValueCounts
+   pi-maxImmSub             = id-maxImmSub msp INTEGER
+   pi-restrictedBy          = id-restrictedBy msp RestrictedValues
+   pi-classes               = id-classes msp Refinement
+   id-entry                 = %x65.6E.74.72.79 ; "entry"
+   id-allUserAttributeTypes = %x61.6C.6C.55.73.65.72.41.74.74.72.69
+                                 %x62.75.74.65.54.79.70.65.73
+                                 ; "allUserAttributeTypes"
+   id-attributeType         = %x61.74.74.72.69.62.75.74.65.54.79.70
+                                 %x65 ; "attributeType"
+   id-allAttributeValues    = %x61.6C.6C.41.74.74.72.69.62.75.74.65
+                                 %x56.61.6C.75.65.73
+                                 ; "allAttributeValues"
+   id-attributeValue        = %x61.74.74.72.69.62.75.74.65.56.61.6C
+                                 %x75.65 ; "attributeValue"
+   id-selfValue             = %x73.65.6C.66.56.61.6C.75.65
+                                 ; "selfValue"
+   id-rangeOfValues         = %x72.61.6E.67.65.4F.66.56.61.6C.75.65
+                                 %x73 ; "rangeOfValues"
+   id-maxValueCount         = %x6D.61.78.56.61.6C.75.65.43.6F.75.6E
+                                 %x74 ; "maxValueCount"
+   id-maxImmSub             = %x6D.61.78.49.6D.6D.53.75.62
+                                 ; "maxImmSub"
+   id-restrictedBy          = %x72.65.73.74.72.69.63.74.65.64.42.79
+                                 ; "restrictedBy"
+   id-classes               = %x63.6C.61.73.73.65.73 ; "classes"
+
+   id-allUserAttributeTypesAndValues = %x61.6C.6C.55.73.65.72.41.74
+                              %x74.72.69.62.75.74.65.54.79.70.65.73
+                              %x41.6E.64.56.61.6C.75.65.73
+                              ; "allUserAttributeTypesAndValues"
+
+   AttributeTypes = "{" sp AttributeType
+                       *( "," sp AttributeType ) sp "}"
+
+   AttributeTypeAndValues = "{" sp AttributeTypeAndValue
+                               *( "," sp AttributeTypeAndValue )
+                               sp "}"
+
+   AttributeTypeAndValue = "{" sp atav-type ","
+                               sp atav-value
+                               sp "}"
+   atav-type  = id-type  msp AttributeType
+   atav-value = id-value msp Value
+   id-type    = %x74.79.70.65    ; "type"
+   id-value   = %x76.61.6C.75.65 ; "value"
+
+
+
+Legg                    Expires 16 December 2004               [Page 34]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   MaxValueCounts = "{" sp MaxValueCount
+                       *( "," sp MaxValueCount ) sp "}"
+   MaxValueCount  = "{" sp mvc-type ","
+                        sp mvc-maxCount
+                        sp "}"
+   mvc-type       = id-type msp AttributeType
+   mvc-maxCount   = id-maxCount msp INTEGER
+   id-maxCount    = %x6D.61.78.43.6F.75.6E.74 ; "maxCount"
+
+   RestrictedValues = "{" sp RestrictedValue
+                         *( "," sp RestrictedValue ) sp "}"
+   RestrictedValue  = "{" sp rv-type ","
+                          sp rv-valuesin
+                          sp "}"
+   rv-type          = id-type     msp AttributeType
+   rv-valuesin      = id-valuesin msp AttributeType
+   id-valuesin      = %x76.61.6C.75.65.73.69.6E ; "valuesin"
+
+   GrantsAndDenials = "{" [ sp grantOrDeny
+                         *( "," sp grantOrDeny ) ] sp "}"
+   grantOrDeny = id-grantAdd
+                 / id-denyAdd
+                 / id-grantDiscloseOnError
+                 / id-denyDiscloseOnError
+                 / id-grantRead
+                 / id-denyRead
+                 / id-grantRemove
+                 / id-denyRemove
+                 / id-grantBrowse
+                 / id-denyBrowse
+                 / id-grantExport
+                 / id-denyExport
+                 / id-grantImport
+                 / id-denyImport
+                 / id-grantModify
+                 / id-denyModify
+                 / id-grantRename
+                 / id-denyRename
+                 / id-grantReturnDN
+                 / id-denyReturnDN
+                 / id-grantCompare
+                 / id-denyCompare
+                 / id-grantFilterMatch
+                 / id-denyFilterMatch
+                 ; grantInvoke omitted
+                 ; denyInvoke omitted
+
+   id-grantAdd     = %x67.72.61.6E.74.41.64.64 ; "grantAdd"
+
+
+
+Legg                    Expires 16 December 2004               [Page 35]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   id-denyAdd      = %x64.65.6E.79.41.64.64 ; "denyAdd"
+   id-grantBrowse  = %x67.72.61.6E.74.42.72.6F.77.73.65
+                        ; "grantBrowse"
+   id-denyBrowse   = %x64.65.6E.79.42.72.6F.77.73.65 ; "denyBrowse"
+   id-grantCompare = %x67.72.61.6E.74.43.6F.6D.70.61.72.65
+                        ; "grantCompare"
+   id-denyCompare  = %x64.65.6E.79.43.6F.6D.70.61.72.65
+                        ; "denyCompare"
+
+   id-grantDiscloseOnError = %x67.72.61.6E.74.44.69.73.63.6C.6F.73.65
+                                %x4F.6E.45.72.72.6F.72
+                                ; "grantDiscloseOnError"
+   id-denyDiscloseOnError  = %x64.65.6E.79.44.69.73.63.6C.6F.73.65.4F
+                                %x6E.45.72.72.6F.72
+                                ; "denyDiscloseOnError"
+
+   id-grantExport      = %x67.72.61.6E.74.45.78.70.6F.72.74
+                            ; "grantExport"
+   id-denyExport       = %x64.65.6E.79.45.78.70.6F.72.74
+                            ; "denyExport"
+   id-grantFilterMatch = %x67.72.61.6E.74.46.69.6C.74.65.72.4D.61.74
+                            %x63.68 ; "grantFilterMatch"
+   id-denyFilterMatch  = %x64.65.6E.79.46.69.6C.74.65.72.4D.61.74.63
+                            %x68 ; "denyFilterMatch"
+   id-grantImport      = %x67.72.61.6E.74.49.6D.70.6F.72.74
+                            ; "grantImport"
+   id-denyImport       = %x64.65.6E.79.49.6D.70.6F.72.74
+                            ; "denyImport"
+   id-grantModify      = %x67.72.61.6E.74.4D.6F.64.69.66.79
+                            ; "grantModify"
+   id-denyModify       = %x64.65.6E.79.4D.6F.64.69.66.79
+                            ; "denyModify"
+   id-grantRead        = %x67.72.61.6E.74.52.65.61.64 ; "grantRead"
+   id-denyRead         = %x64.65.6E.79.52.65.61.64 ; "denyRead"
+   id-grantRemove      = %x67.72.61.6E.74.52.65.6D.6F.76.65
+                            ; "grantRemove"
+   id-denyRemove       = %x64.65.6E.79.52.65.6D.6F.76.65
+                            ; "denyRemove"
+   id-grantRename      = %x67.72.61.6E.74.52.65.6E.61.6D.65
+                            ; "grantRename"
+   id-denyRename       = %x64.65.6E.79.52.65.6E.61.6D.65
+                            ; "denyRename"
+   id-grantReturnDN    = %x67.72.61.6E.74.52.65.74.75.72.6E.44.4E
+                            ; "grantReturnDN"
+   id-denyReturnDN     = %x64.65.6E.79.52.65.74.75.72.6E.44.4E
+                            ; "denyReturnDN"
+
+   The <sp>, <msp>, <sep>, <AttributeType>, <BIT-STRING>, <BOOLEAN>,
+
+
+
+Legg                    Expires 16 December 2004               [Page 36]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   <DirectoryString>, <DistinguishedName>, <EXTERNAL>, <INTEGER>,
+   <INTEGER-0-MAX> and <NULL> rules are described in [GCE].
+
+   The <SubtreeSpecification> and <Refinement> rules are described in
+   [SUBENTRY].
+
+   The <Value> rule is described in [GSER].
+
+   Filter      = filter-item / filter-and / filter-or / filter-not
+   filter-item = id-item ":" FilterItem
+   filter-and  = id-and  ":" SetOfFilter
+   filter-or   = id-or   ":" SetOfFilter
+   filter-not  = id-not  ":" Filter
+   id-and      = %x61.6E.64    ; "and"
+   id-item     = %x69.74.65.6D ; "item"
+   id-not      = %x6E.6F.74    ; "not"
+   id-or       = %x6F.72       ; "or"
+
+   SetOfFilter = "{" [ sp Filter *( "," sp Filter ) ] sp "}"
+
+   FilterItem = fi-equality
+                / fi-substrings
+                / fi-greaterOrEqual
+                / fi-lessOrEqual
+                / fi-present
+                / fi-approximateMatch
+                / fi-extensibleMatch
+                ; contextPresent omitted
+
+   fi-equality         = id-equality ":" AttributeValueAssertion
+   fi-substrings       = id-substrings ":" SubstringsAssertion
+   fi-greaterOrEqual   = id-greaterOrEqual ":"
+                            AttributeValueAssertion
+   fi-lessOrEqual      = id-lessOrEqual ":" AttributeValueAssertion
+   fi-present          = id-present ":" AttributeType
+   fi-approximateMatch = id-approximateMatch ":"
+                            AttributeValueAssertion
+   fi-extensibleMatch  = id-extensibleMatch ":" MatchingRuleAssertion
+   id-equality         = %x65.71.75.61.6C.69.74.79 ; "equality"
+   id-substrings       = %x73.75.62.73.74.72.69.6E.67.73
+                            ; "substrings"
+   id-greaterOrEqual   = %x67.72.65.61.74.65.72.4F.72.45.71.75.61.6C
+                            ; "greaterOrEqual"
+   id-lessOrEqual      = %x6C.65.73.73.4F.72.45.71.75.61.6C
+                            ; "lessOrEqual"
+   id-present          = %x70.72.65.73.65.6E.74 ; "present"
+   id-approximateMatch = %x61.70.70.72.6F.78.69.6D.61.74.65.4D.61.74
+                            %x63.68 ; "approximateMatch"
+
+
+
+Legg                    Expires 16 December 2004               [Page 37]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   id-extensibleMatch  = %x65.78.74.65.6E.73.69.62.6C.65.4D.61.74.63
+                            %x68 ; "extensibleMatch"
+
+   AttributeValueAssertion = "{" sp ava-type ","
+                                 sp ava-assertion
+                                 ; assertedContexts omitted
+                                 sp "}"
+
+   ava-type      = id-type      msp AttributeType
+   ava-assertion = id-assertion msp Value
+   id-assertion  = %x61.73.73.65.72.74.69.6F.6E ; "assertion"
+
+   SubstringsAssertion = "{" sp sa-type ","
+                             sp sa-strings
+                             sp "}"
+
+   sa-type    = id-type    msp AttributeType
+   sa-strings = id-strings msp Substrings
+   id-strings = %x73.74.72.69.6E.67.73 ; "strings"
+
+   Substrings = "{" [ sp Substring *( "," sp Substring ) ] sp "}"
+   Substring  = ss-initial
+                / ss-any
+                / ss-final
+                ; control omitted
+   ss-initial = id-initial ":" Value
+   ss-any     = id-any     ":" Value
+   ss-final   = id-final   ":" Value
+   id-initial = %x69.6E.69.74.69.61.6C ; "initial"
+   id-any     = %x61.6E.79             ; "any"
+   id-final   = %x66.69.6E.61.6C       ; "final"
+
+   MatchingRuleAssertion = "{"      sp mra-matchingRule
+                              [ "," sp mra-type ]
+                                "," sp mra-matchValue
+                              [ "," sp mra-dnAttributes ]
+                                    sp "}"
+
+   mra-matchingRule = id-matchingRule msp MatchingRuleIds
+   mra-type         = id-type         msp AttributeType
+   mra-matchValue   = id-matchValue   msp Value
+   mra-dnAttributes = id-dnAttributes msp BOOLEAN
+   id-matchingRule  = %x6D.61.74.63.68.69.6E.67.52.75.6C.65
+                         ; "matchingRule"
+   id-matchValue    = %x6D.61.74.63.68.56.61.6C.75.65 ; "matchValue"
+   id-dnAttributes  = %x64.6E.41.74.74.72.69.62.75.74.65.73
+                         ; "dnAttributes"
+
+
+
+
+Legg                    Expires 16 December 2004               [Page 38]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   MatchingRuleIds = "{" sp MatchingRuleId *( "," sp MatchingRuleId ) sp "}"
+   MatchingRuleId  = OBJECT-IDENTIFIER
+
+   The <OBJECT-IDENTIFIER> rule is described in [GCE].
+
+Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC2251]  Wahl, M., Howes, T. and S. Kille, "Lightweight Directory
+              Access Protocol (v3)", RFC 2251, December 1997.
+
+   [RFC2252]  Wahl, M., Coulbeck, A., Howes, T. and S. Kille,
+              "Lightweight Directory Access Protocol (v3): Attribute
+              Syntax Definitions", RFC 2252, December 1997.
+
+   [RFC2256]  Wahl, M., "A Summary of the X.500(96) User Schema for use
+              with LDAPv3", RFC 2256, December 1997.
+
+   [RFC3377]  Hodges, J. and R. Morgan, "Lightweight Directory Access
+              Protocol (v3): Technical Specification", RFC 3377,
+              September 2002.
+
+              [BCP64]    Zeilenga, K., "Internet Assigned Numbers
+              Authority (IANA) Considerations for the Lightweight
+              Directory Access Protcol (LDAP)", BCP 64, RFC 3383,
+              September 2002.
+
+   [GSER]     Legg, S., "Generic String Encoding Rules for ASN.1 Types",
+              RFC 3641, October 2003.
+
+   [COLLECT]  Zeilenga, K., "Collective Attributes in the Lightweight
+              Directory Access Protocol (LDAP)", RFC 3671, December
+              2003.
+
+   [SUBENTRY] Zeilenga, K. and S. Legg, "Subentries in the Lightweight
+              Directory Access Protocol (LDAP)", RFC 3672, December
+              2003.
+
+   [SCHEMA]   Zeilenga, K., "Lightweight Directory Access Protocol
+              (LDAP): Additional Matching Rules", RFC 3698, February
+              2004.
+
+   [ADMIN]    Legg, S., "Lightweight Directory Access Protocol (LDAP):
+              Directory Administrative Model",
+              draft-legg-ldap-admin-xx.txt, a work in progress, June
+              2004.
+
+
+
+Legg                    Expires 16 December 2004               [Page 39]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   [ACA]      Legg, S., "Lightweight Directory Access Protocol (LDAP):
+              Access Control Administration",
+              draft-legg-ldap-acm-admin-xx.txt, a work in progress, June
+              2004.
+
+   [FILTER]   Zeilenga, K., "LDAP Absolute True and False Filters",
+              draft-zeilenga-ldap-t-f-xx.txt, a work in progress,
+              February 2004.
+
+   [ASN1]     ITU-T Recommendation X.680 (07/02) | ISO/IEC 8824-1,
+              Information technology - Abstract Syntax Notation One
+              (ASN.1): Specification of basic notation
+
+Informative References
+
+   [RFC2234]  Crocker, D. and P. Overell, "Augmented BNF for Syntax
+              Specifications: ABNF", RFC 2234, November 1997.
+
+   [GCE]      Legg, S., "Common Elements of Generic String Encoding
+              Rules (GSER) Encodings", RFC 3642, October 2003.
+
+   [X501]     ITU-T Recommendation X.501 (02/01) | ISO/IEC 9594-2:2001,
+              Information technology - Open Systems Interconnection -
+              The Directory: Models
+
+   [X511]     ITU-T Recommendation X.511 (02/01) | ISO/IEC 9594-3:2001,
+              Information technology - Open Systems Interconnection -
+              The Directory: Abstract service definition
+
+Author's Address
+
+   Steven Legg
+   Adacel Technologies Ltd.
+   250 Bay Street
+   Brighton, Victoria 3186
+   AUSTRALIA
+
+   Phone: +61 3 8530 7710
+     Fax: +61 3 8530 7888
+   EMail: steven.legg@adacel.com.au
+
+Full Copyright Statement
+
+   Copyright (C) The Internet Society (2004).  This document is subject
+   to the rights, licenses and restrictions contained in BCP 78, and
+   except as set forth therein, the authors retain all their rights.
+
+   This document and the information contained herein are provided on an
+
+
+
+Legg                    Expires 16 December 2004               [Page 40]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+Intellectual Property
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+Changes in Draft 01
+
+   The Internet draft draft-legg-ldap-acm-admin-00.txt has been split
+   into two drafts, draft-legg-ldap-admin-00.txt and
+   draft-legg-ldap-acm-admin-01.txt.  Section 8 of
+   draft-legg-ldapext-component-matching-06.txt has been extracted to
+   become a separate Internet draft, draft-legg-ldap-gser-xx.txt.  The
+   references in this document have been updated accordingly.
+
+   The term "native LDAP encoding" has been replaced by the term
+   "LDAP-specific encoding" to align with terminology anticipated to be
+   used in the revision of RFC 2252.
+
+   Changes have been made to the Search Operation Decision Points
+   (Section 3.4.3):
+
+   In 4) a), the assumed FilterMatch permission for a present match of
+
+
+
+Legg                    Expires 16 December 2004               [Page 41]
+
+INTERNET-DRAFT     Basic and Simplified Access Control     June 16, 2004
+
+
+   the objectClass attribute has been removed. An LDAP search with a
+   True filter [FILTER] is the best analogue of the DAP read operation.
+   A True filter does not filter any attribute type and therefore does
+   not require FilterMatch permissions to succeed.
+
+   In 5) b) and c), there is an additional requirement for Read
+   permission for at least one attribute value before an attribute type
+   can be returned in a search result.  Without this change a search
+   result could, in some circumstances, disclose the existence of
+   particular hidden attribute values.
+
+Changes in Draft 02
+
+   RFC 3377 replaces RFC 2251 as the reference for LDAP.
+
+   An IANA Considerations section has been added.
+
+Changes in Draft 03
+
+   The document has been reformatted in line with current practice.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Legg                    Expires 16 December 2004               [Page 42]
+
+

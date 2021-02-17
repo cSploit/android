@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbEnv::get_lk_priority()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="lock.html" title="Chapter 7.  The DbLock Handle" />
+    <link rel="prev" href="envget_lk_partitions.html" title="DbEnv::get_lk_partitions()" />
+    <link rel="next" href="envget_lk_tablesize.html" title="DbEnv::get_lk_tablesize()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbEnv::get_lk_priority()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envget_lk_partitions.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 7. 
+                The DbLock Handle
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="envget_lk_tablesize.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envget_lk_priority"></a>DbEnv::get_lk_priority()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+
+int
+DbEnv::get_lk_priority(u_int32_t u_int32_t lockerid, u_int32_t *priority); </pre>
+      <p>
+         Get the deadlock priority for the given locker.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2462432"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp2456160"></a>lockerid</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    The <span class="bold"><strong>lockerid</strong></span> parameter
+                    represents a locker returned by
+                    <code class="methodname">envM;lock_id()</code>.
+                </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp2457216"></a>priority</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    Upon return, the 
+                    <span class="bold"><strong>priority</strong></span> parameter will
+                    point to a value between 0 and 2^32-1.
+                </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2444672"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                 The <code class="methodname">DbEnv::get_lk_priority()</code> <span>
+            
+            <span>
+                method may fail and throw a <a class="link" href="dbexception.html" title="Chapter 6. The DbException Class">DbException</a> 
+                exception, encapsulating one of the following non-zero errors, or return one
+                of the following non-zero errors:
+            </span>
+        </span>
+            </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp2470808"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                An invalid flag value or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2468832"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                    <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a>, 
+                    <a class="link" href="lock.html" title="Chapter 7.  The DbLock Handle">DbLock</a> 
+            </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp2472192"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                     <a class="xref" href="lock.html#locklist" title="Locking Subsystem and Related Methods">Locking Subsystem and Related Methods</a>,
+                     <a class="xref" href="envset_lk_priority.html" title="DbEnv::set_lk_priority()">DbEnv::set_lk_priority()</a>
+                </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envget_lk_partitions.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="lock.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="envget_lk_tablesize.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbEnv::get_lk_partitions() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DbEnv::get_lk_tablesize()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

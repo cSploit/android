@@ -1,0 +1,519 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+H1: Monitoring
+
+{{slapd}}(8) supports an optional {{TERM:LDAP}} monitoring interface
+you can use to obtain information regarding the current state of
+your {{slapd}} instance.  For instance, the interface allows you
+to determine how many clients are connected to the server currently.
+The monitoring information is provided by a specialized backend,
+the {{monitor}} backend.  A manual page, {{slapd-monitor}}(5) is
+available.
+
+When the monitoring interface is enabled, LDAP clients may be used
+to access information provided by the {{monitor}} backend, subject
+to access and other controls.
+
+When enabled, the {{monitor}} backend dynamically generates and
+returns objects in response to search requests in the {{cn=Monitor}}
+subtree.  Each object contains information about a particular aspect
+of the server.  The information is held in a combination of user
+applications and operational attributes.   This information can be
+access with {{ldapsearch(1)}}, with any general-purpose LDAP browser,
+or with specialized monitoring tools.  The {{SECT:Accessing Monitoring
+Information}} section provides a brief tutorial on how to use
+{{ldapsearch}}(1) to access monitoring information, while the
+{{SECT:Monitor information}} section details monitoring information
+base and its organization.
+
+While support for the monitor backend is included in default builds
+of slapd(8), this support requires some configuration to become
+active.  This may be done using either {{EX:cn=config}} or
+{{slapd.conf}}(5).  The former is discussed in the {{SECT:Monitor
+configuration via cn=config}} section of this of this chapter.  The
+latter is discussed in the {{SECT:Monitor configuration via
+slapd.conf(5)}} section of this chapter.  These sections assume
+monitor backend is built into {{slapd}} (e.g., {{EX:--enable-monitor=yes}},
+the default).  If the monitor backend was built as a module (e.g.,
+{{EX:--enable-monitor=mod}}, this module must loaded.  Loading of
+modules is discussed in the {{SECT:Configuring slapd}} and {{SECT:The
+slapd Configuration File}} chapters.
+
+
+H2: Monitor configuration via cn=config(5)
+
+{{This section has yet to be written.}}
+
+
+H2: Monitor configuration via slapd.conf(5)
+
+Configuration of the slapd.conf(5) to support LDAP monitoring
+is quite simple.
+
+First, ensure {{core.schema}} schema configuration file is included
+by your {{slapd.conf}}(5) file.  The {{monitor}} backend requires
+it.
+
+Second, instantiate the {{monitor backend}} by adding a
+{{database monitor}} directive below your existing database
+sections.  For instance:
+
+>	database monitor
+
+Lastly, add additional global or database directives as needed.
+
+Like most other database backends, the monitor backend does honor
+slapd(8) access and other administrative controls.   As some monitor
+information may be sensitive, it is generally recommend access to
+cn=monitor be restricted to directory administrators and their
+monitoring agents.  Adding an {{access}} directive immediately below
+the {{database monitor}} directive is a clear and effective approach
+for controlling access.  For instance, the addition of the following
+{{access}} directive immediately below the {{database monitor}}
+directive restricts access to monitoring information to the specified
+directory manager.
+
+>	access to *
+>		by dn.exact="cn=Manager,dc=example,dc=com
+>		by * none
+
+More information on {{slapd}}(8) access controls, see {{The access
+Control Directive}} section of the {{SECT:The slapd Configuration
+File}} chapter and {{slapd.access}}(5).
+
+After restarting {{slapd}}(8), you are ready to start exploring the
+monitoring information provided in {{EX:cn=config}} as discussed
+in the {{SECT:Accessing Monitoring Information}} section of this
+chapter.
+
+One can verify slapd(8) is properly configured to provide monitoring
+information by attempting to read the {{EX:cn=monitor}} object.
+For instance, if the following {{ldapsearch}}(1) command returns the
+cn=monitor object (with, as requested, no attributes), it's working.
+
+>	ldapsearch -x -D 'cn=Manager,dc=example,dc=com' -W \
+>		-b 'cn=Monitor' -s base 1.1
+
+Note that unlike general purpose database backends, the database
+suffix is hardcoded.  It's always {{EX:cn=Monitor}}.  So no {{suffix}}
+directive should be provided.  Also note that general purpose
+database backends, the monitor backend cannot be instantiated
+multiple times.  That is, there can only be one (or zero) occurrences
+of {{EX:database monitor}} in the server's configuration.
+
+
+H2: Accessing Monitoring Information
+
+As previously discussed, when enabled, the {{monitor}} backend
+dynamically generates and returns objects in response to search
+requests in the {{cn=Monitor}} subtree.  Each object contains
+information about a particular aspect of the server.  The information
+is held in a combination of user applications and operational
+attributes.  This information can be access with {{ldapsearch(1)}},
+with any general-purpose LDAP browser, or with specialized monitoring
+tools.
+
+This section provides a provides a brief tutorial on how to use
+{{ldapsearch}}(1) to access monitoring information.
+
+To inspect any particular monitor object, one performs search
+operation on the object with a baseObject scope and a
+{{EX:(objectClass=*)}} filter.  As the monitoring information is
+contained in a combination of user applications and operational
+attributes, the return all user applications attributes (e.g.,
+{{EX:'*'}}) and all operational attributes (e.g., {{EX:'+'}}) should
+be requested.   For instance, to read the {{EX:cn=Monitor}} object
+itself, the {{ldapsearch}}(1) command (modified to fit your configuration)
+can be used:
+
+>	ldapsearch -x -D 'cn=Manager,dc=example,dc=com' -W \
+>		-b 'cn=Monitor' -s base '(objectClass=*)' '*' '+'
+
+When run against your server, this should produce output
+similar to:
+
+>	dn: cn=Monitor
+>	objectClass: monitorServer
+>	structuralObjectClass: monitorServer
+>	cn: Monitor
+>	creatorsName:
+>	modifiersName:
+>	createTimestamp: 20061208223558Z
+>	modifyTimestamp: 20061208223558Z
+>	description: This subtree contains monitoring/managing objects.
+>	description: This object contains information about this server.
+>	description: Most of the information is held in operational attributes, which 
+>	 must be explicitly requested.
+>	monitoredInfo: OpenLDAP: slapd 2.4 (Dec  7 2006 17:30:29)
+>	entryDN: cn=Monitor
+>	subschemaSubentry: cn=Subschema
+>	hasSubordinates: TRUE
+
+To reduce the number of uninteresting attributes returned, one
+can be more selective when requesting which attributes are to be
+returned.  For instance, one could request the return of all
+attributes allowed by the {{monitorServer}} object class (e.g.,
+{{EX:@objectClass}}) instead of all user and all operational
+attributes:
+
+>	ldapsearch -x -D 'cn=Manager,dc=example,dc=com' -W \
+>		-b 'cn=Monitor' -s base '(objectClass=*)' '@monitorServer'
+
+This limits the output as follows:
+
+>	dn: cn=Monitor
+>	objectClass: monitorServer
+>	cn: Monitor
+>	description: This subtree contains monitoring/managing objects.
+>	description: This object contains information about this server.
+>	description: Most of the information is held in operational attributes, which 
+>	 must be explicitly requested.
+>	monitoredInfo: OpenLDAP: slapd 2.X (Dec  7 2006 17:30:29)
+
+To return the names of all the monitoring objects, one performs a
+search of {{EX:cn=Monitor}} with subtree scope and {{EX:(objectClass=*)}}
+filter and requesting no attributes (e.g., {{EX:1.1}}) be returned.
+
+>	ldapsearch -x -D 'cn=Manager,dc=example,dc=com' -W -b 'cn=Monitor' -s sub 1.1
+
+If you run this command you will discover that there are many objects
+in the {{cn=Monitor}} subtree.  The following section describes
+some of the commonly available monitoring objects.
+
+
+H2: Monitor Information
+
+The {{monitor}} backend provides a wealth of information useful
+for monitoring the slapd(8) contained in set of monitor objects.
+Each object contains information about a particular aspect of
+the server, such as a backends, a connection, or a thread.
+Some objects serve as containers for other objects and used
+to construct a hierarchy of objects.
+
+In this hierarchy, the most superior object is {cn=Monitor}.
+While this object primarily serves as a container for other
+objects, most of which are containers, this object provides
+information about this server.  In particular, it provides the
+slapd(8) version string.  Example:
+
+>	dn: cn=Monitor
+>	monitoredInfo: OpenLDAP: slapd 2.X (Dec  7 2006 17:30:29)
+
+Note: Examples in this section (and its subsections) have been
+trimmed to show only key information.
+
+
+H3: Backends
+
+The {{EX:cn=Backends,cn=Monitor}} object, itself, provides a list
+of available backends.  The list of available backends all builtin
+backends, as well as backends loaded by modules.  For example:
+
+>	dn: cn=Backends,cn=Monitor          
+>	monitoredInfo: config                 
+>	monitoredInfo: ldif     
+>	monitoredInfo: monitor
+>	monitoredInfo: bdb        
+>	monitoredInfo: hdb
+>	monitoredInfo: mdb
+
+This indicates the {{config}}, {{ldif}}, {{monitor}}, {{bdb}},
+and {{hdb}} backends are available.
+
+The {{EX:cn=Backends,cn=Monitor}} object is also a container
+for available backend objects.  Each available backend object
+contains information about a particular backend.  For example:
+
+>	dn: cn=Backend 0,cn=Backends,cn=Monitor 
+>	monitoredInfo: config
+>	monitorRuntimeConfig: TRUE
+>	supportedControl: 2.16.840.1.113730.3.4.2  
+>	seeAlso: cn=Database 0,cn=Databases,cn=Monitor
+>	
+>	dn: cn=Backend 1,cn=Backends,cn=Monitor  
+>	monitoredInfo: ldif          
+>	monitorRuntimeConfig: TRUE     
+>	supportedControl: 2.16.840.1.113730.3.4.2
+>	
+>	dn: cn=Backend 2,cn=Backends,cn=Monitor
+>	monitoredInfo: monitor
+>	monitorRuntimeConfig: TRUE
+>	supportedControl: 2.16.840.1.113730.3.4.2
+>	seeAlso: cn=Database 2,cn=Databases,cn=Monitor
+>	
+>	dn: cn=Backend 3,cn=Backends,cn=Monitor
+>	monitoredInfo: bdb
+>	monitorRuntimeConfig: TRUE
+>	supportedControl: 1.3.6.1.1.12
+>	supportedControl: 2.16.840.1.113730.3.4.2
+>	supportedControl: 1.3.6.1.4.1.4203.666.5.2
+>	supportedControl: 1.2.840.113556.1.4.319
+>	supportedControl: 1.3.6.1.1.13.1
+>	supportedControl: 1.3.6.1.1.13.2
+>	supportedControl: 1.3.6.1.4.1.4203.1.10.1
+>	supportedControl: 1.2.840.113556.1.4.1413
+>	supportedControl: 1.3.6.1.4.1.4203.666.11.7.2
+>	seeAlso: cn=Database 1,cn=Databases,cn=Monitor
+>	
+>	dn: cn=Backend 4,cn=Backends,cn=Monitor
+>	monitoredInfo: hdb
+>	monitorRuntimeConfig: TRUE
+>	supportedControl: 1.3.6.1.1.12
+>	supportedControl: 2.16.840.1.113730.3.4.2
+>	supportedControl: 1.3.6.1.4.1.4203.666.5.2
+>	supportedControl: 1.2.840.113556.1.4.319
+>	supportedControl: 1.3.6.1.1.13.1
+>	supportedControl: 1.3.6.1.1.13.2
+>	supportedControl: 1.3.6.1.4.1.4203.1.10.1
+>	supportedControl: 1.2.840.113556.1.4.1413
+>	supportedControl: 1.3.6.1.4.1.4203.666.11.7.2
+>
+>	dn: cn=Backend 5,cn=Backends,cn=Monitor
+>	monitoredInfo: mdb
+>	monitorRuntimeConfig: TRUE
+>	supportedControl: 1.3.6.1.1.12
+>	supportedControl: 2.16.840.1.113730.3.4.2
+>	supportedControl: 1.3.6.1.4.1.4203.666.5.2
+>	supportedControl: 1.2.840.113556.1.4.319
+>	supportedControl: 1.3.6.1.1.13.1
+>	supportedControl: 1.3.6.1.1.13.2
+>	supportedControl: 1.3.6.1.4.1.4203.1.10.1
+>	supportedControl: 1.2.840.113556.1.4.1413
+>	supportedControl: 1.3.6.1.4.1.4203.666.11.7.2
+
+For each of these objects, monitorInfo indicates which backend the
+information in the object is about.  For instance, the {{EX:cn=Backend
+5,cn=Backends,cn=Monitor}} object contains (in the example) information
+about the {{mdb}} backend. 
+
+!block table
+Attribute|Description
+monitoredInfo|Name of backend
+supportedControl|supported LDAP control extensions
+seeAlso|Database objects of instances of this backend
+!endblock
+
+H3: Connections
+
+The main entry is empty; it should contain some statistics on the number 
+of connections.
+
+Dynamic child entries are created for each open connection, with stats on
+the activity on that connection (the format will be detailed later).
+There are two special child entries that show the number of total and
+current connections respectively.
+
+For example:
+
+Total Connections:
+
+>   dn: cn=Total,cn=Connections,cn=Monitor
+>   structuralObjectClass: monitorCounterObject
+>   monitorCounter: 4
+>   entryDN: cn=Total,cn=Connections,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: FALSE
+
+Current Connections:
+
+>   dn: cn=Current,cn=Connections,cn=Monitor
+>   structuralObjectClass: monitorCounterObject
+>   monitorCounter: 2
+>   entryDN: cn=Current,cn=Connections,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: FALSE
+
+
+H3: Databases
+
+The main entry contains the naming context of each configured database; 
+the child entries contain, for each database, the type and the naming
+context.
+
+For example:
+
+>   dn: cn=Database 2,cn=Databases,cn=Monitor
+>   structuralObjectClass: monitoredObject
+>   monitoredInfo: monitor
+>   monitorIsShadow: FALSE
+>   monitorContext: cn=Monitor
+>   readOnly: FALSE
+>   entryDN: cn=Database 2,cn=Databases,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: FALSE
+
+H3: Listener
+
+It contains the description of the devices the server is currently 
+listening on:
+
+>   dn: cn=Listener 0,cn=Listeners,cn=Monitor
+>   structuralObjectClass: monitoredObject
+>   monitorConnectionLocalAddress: IP=0.0.0.0:389
+>   entryDN: cn=Listener 0,cn=Listeners,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: FALSE
+
+
+H3: Log
+
+It contains the currently active log items.  The {{Log}} subsystem allows 
+user modify operations on the {{description}} attribute, whose values {{MUST}} 
+be in the list of admittable log switches:
+
+>   Trace
+>   Packets
+>   Args
+>   Conns
+>   BER
+>   Filter
+>   Config
+>   ACL
+>   Stats
+>   Stats2
+>   Shell
+>   Parse
+>   Sync
+
+These values can be added, replaced or deleted; they affect what 
+messages are sent to the syslog device.
+Custom values could be added by custom modules.
+
+H3: Operations
+
+It shows some statistics on the operations performed by the server:
+
+>   Initiated
+>   Completed
+
+and for each operation type, i.e.:
+
+>   Bind
+>   Unbind
+>   Add
+>   Delete
+>   Modrdn
+>   Modify
+>   Compare
+>   Search
+>   Abandon
+>   Extended
+
+There are too many types to list example here, so please try for yourself 
+using {{SECT: Monitor search example}}
+
+H3: Overlays
+
+The main entry contains the type of overlays available at run-time;
+the child entries, for each overlay, contain the type of the overlay.
+
+It should also contain the modules that have been loaded if dynamic 
+overlays are enabled:
+
+>   # Overlays, Monitor
+>   dn: cn=Overlays,cn=Monitor
+>   structuralObjectClass: monitorContainer
+>   monitoredInfo: syncprov
+>   monitoredInfo: accesslog
+>   monitoredInfo: glue
+>   entryDN: cn=Overlays,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: TRUE
+
+H3: SASL
+
+Currently empty.
+
+H3: Statistics
+
+It shows some statistics on the data sent by the server:
+
+>   Bytes
+>   PDU
+>   Entries
+>   Referrals
+
+e.g.
+
+>   # Entries, Statistics, Monitor
+>   dn: cn=Entries,cn=Statistics,cn=Monitor
+>   structuralObjectClass: monitorCounterObject
+>   monitorCounter: 612248
+>   entryDN: cn=Entries,cn=Statistics,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: FALSE
+
+H3: Threads
+
+It contains the maximum number of threads enabled at startup and the 
+current backload.
+
+e.g.
+
+>   # Max, Threads, Monitor
+>   dn: cn=Max,cn=Threads,cn=Monitor
+>   structuralObjectClass: monitoredObject
+>   monitoredInfo: 16
+>   entryDN: cn=Max,cn=Threads,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: FALSE
+
+
+H3: Time
+
+It contains two child entries with the start time and the current time 
+of the server.
+
+e.g.
+
+Start time:
+
+>   dn: cn=Start,cn=Time,cn=Monitor
+>   structuralObjectClass: monitoredObject
+>   monitorTimestamp: 20061205124040Z
+>   entryDN: cn=Start,cn=Time,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: FALSE
+
+Current time:
+
+>   dn: cn=Current,cn=Time,cn=Monitor
+>   structuralObjectClass: monitoredObject
+>   monitorTimestamp: 20061207120624Z
+>   entryDN: cn=Current,cn=Time,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: FALSE
+
+H3: TLS
+
+Currently empty.
+
+H3: Waiters
+
+It contains the number of current read waiters.
+
+e.g.
+
+Read waiters:
+
+>   dn: cn=Read,cn=Waiters,cn=Monitor
+>   structuralObjectClass: monitorCounterObject
+>   monitorCounter: 7
+>   entryDN: cn=Read,cn=Waiters,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: FALSE
+
+Write waiters:
+
+>   dn: cn=Write,cn=Waiters,cn=Monitor
+>   structuralObjectClass: monitorCounterObject
+>   monitorCounter: 0
+>   entryDN: cn=Write,cn=Waiters,cn=Monitor
+>   subschemaSubentry: cn=Subschema
+>   hasSubordinates: FALSE
+
+Add new monitored things here and discuss, referencing man pages and present
+examples
+
+

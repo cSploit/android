@@ -1,0 +1,55 @@
+dn: ou=test,dc=example,dc=com
+objectClass: organizationalUnit
+ou: test
+
+dn: ou=Policies,ou=test,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Policies
+
+dn: ou=slapo-ppolicy,ou=Policies,ou=test,dc=example,dc=com
+objectClass: organizationalUnit
+ou: slapo-ppolicy
+ou: Password Policies
+
+dn: uid=michael,ou=Users,ou=test,dc=example,dc=com
+uid: michael
+objectClass: account
+objectClass: simpleSecurityObject
+userPassword: testsecret
+
+dn: ou=Users,ou=test,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Users
+
+dn: cn=slapd-1,ou=Systemkonten,ou=test,dc=example,dc=com
+cn: slapd-1
+objectClass: applicationProcess
+objectClass: simpleSecurityObject
+userPassword: pw_slapd1
+
+dn: cn=slapd-2,ou=Systemkonten,ou=test,dc=example,dc=com
+cn: slapd-2
+objectClass: applicationProcess
+objectClass: simpleSecurityObject
+userPassword: pw_slapd2
+
+dn: ou=Systemkonten,ou=test,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Systemkonten
+
+dn: ou=Groups,ou=test,dc=example,dc=com
+objectClass: organizationalUnit
+ou: Groups
+
+dn: cn=Admins,ou=Groups,ou=test,dc=example,dc=com
+cn: Admins
+cn: Password Admins
+objectClass: groupOfNames
+member: uid=michael,ou=Users,ou=test,dc=example,dc=com
+
+dn: cn=Replicas,ou=Groups,ou=test,dc=example,dc=com
+member: cn=slapd-1,ou=Systemkonten,ou=test,dc=example,dc=com
+member: cn=slapd-2,ou=Systemkonten,ou=test,dc=example,dc=com
+cn: Replicas
+objectClass: groupOfNames
+

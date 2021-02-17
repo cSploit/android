@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>Obtainign Datasources</TITLE>
+<LINK REL="Stylesheet" href="odbc.css">
+</HEAD>
+<BODY bgcolor="white">
+
+<table width="90%" cols="3" border="0">
+<TR>
+   <TD colspan="3" class="big">Obtaining a Datasourcename</TD>
+</TR>
+<TR>
+  <TD colspan="3"><P>A simple query should be a nobrainer right now. But what if
+     your programm runs on a system where you can't be sure which datasource names
+     are configured?</P>
+     <P>Then you should use <A hrEF="gloss.html#dsn"><CODE>SQLDataSources()</CODE></a>.
+     After allocating a environment handle you may use this to find out about the
+     DSN and the supplied description for the datasource.</P>
+     <P>As ODBC knows systemwide and userwide datasources, you need to give a direction
+     which datasource types you are looking for. There you may specify either of the 
+     following values:</P>
+     <TABLE COLS="2" border="0" width="90%">
+     <TR>
+       <TD valign="top"><CODE>SQL_FETCH_FIRST</CODE></TD>
+       <TD>Sets up <CODE>SQLDataSources()</CODE> to lookup the first of all
+           available datasources (either user or systemwide).
+     </TR>
+     <TR>
+       <TD valign="top"><CODE>SQL_FETCH_FIRST_USER</CODE></TD>
+       <TD>Sets up <CODE>SQLDataSources()</CODE> to lookup the first of the
+           available user datasources.
+     </TR>
+     <TR>
+       <TD valign="top"><CODE>SQL_FETCH_FIRST_SYSTEM</CODE></TD>
+       <TD>Sets up <CODE>SQLDataSources()</CODE> to lookup the first of the
+           available system datasources.
+     </TR>
+     <TR>
+       <TD valign="top"><CODE>SQL_FETCH_NEXT</CODE></TD>
+       <TD>Fetches the next datasource.
+           Depending on <CODE>SQL_FETCH_FIRST_USER</CODE>, <CODE>SQL_FETCH_FIRST_SYSTEM</CODE>
+           or <CODE>SQL_FETCH_FIRST</CODE> this may only be a user datasource, 
+           only a system datasource or one of either.
+     </TR>
+     </TABLE>
+     <P>So let's have a look on a small function, which will return all available
+     datasource names. You may insert this code into the program which you      built before and call it somewhere after you've obtained an environment      handle.</P>
+<CODE class="list"><PRE>
+void OD_ListDSN(void)
+{
+ char       l_dsn[100],l_desc[100];
+ short int  l_len1,l_len2,l_next;
+
+ l_next=SQL_FETCH_FIRST;
+ while( SQLDataSources(V_OD_Env,l_next,l_dsn, sizeof(l_dsn),
+        &l_len1, l_desc, sizeof(l_desc), &l_len2) == SQL_SUCCESS)
+     {
+      printf("Server=(%s) Beschreibung=(%s)\n",l_dsn,l_desc);
+      l_next=SQL_FETCH_NEXT;
+     }
+}
+</PRE></CODE>
+
+     
+
+
+</TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>

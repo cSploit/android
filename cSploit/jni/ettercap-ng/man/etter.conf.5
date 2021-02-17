@@ -1,0 +1,326 @@
+.\"  ettercap -- a multipurpose sniffer/interceptor utility
+.\"
+.\"  This program is free software; you can redistribute it and/or modify
+.\"  it under the terms of the GNU General Public License as published by
+.\"  the Free Software Foundation; either version 2 of the License, or
+.\"  (at your option) any later version.
+.\"
+.\"  This program is distributed in the hope that it will be useful,
+.\"  but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\"  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\"  GNU General Public License for more details.
+.\"
+.\"  You should have received a copy of the GNU General Public License
+.\"  along with this program; if not, write to the Free Software
+.\"  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+.\"
+.\"  $Id: etter.conf.5.in,v 1.30 2004/09/28 09:56:11 alor Exp $
+.\"
+.de Sp
+.if n .sp
+.if t .sp 0.4
+..
+.TH ETTER.CONF 5 "" "ettercap NG-0.7.3"
+.SH NAME
+.B etter.conf 
+\- Ettercap configuration file
+
+.SH DESCRIPTION
+.B "etter.conf"
+is the configuration file that determines ettercap behaviour. It is always loaded
+at startup and it configures some attributes used at runtime.
+.LP
+The file contains entries of the form:
+.RS
+.nf
+.ft B
+.sp
+[section]
+.ft B
+entry = value
+.I "..."
+.ft R
+.fi
+.RE
+.LP
+Each entry defines a variable that can be customized. Every value MUST be an
+integer. Sections are used only to group together some variables.
+.Sp
+.B NOTE: 
+if you omit a variable in the conf file, it will be initialized with the
+value 0. It is strongly discouraged to not initialize critical variables
+such as "arp_poison_delay" or "connection_timeout".
+.LP
+The following is a list of available variables:
+
+
+.TP 20
+.B [privs]
+.TP
+.B ec_uid
+This variable specifies the UID to which privileges are dropped at startup. After the
+socket at link layer has been opened the privileges are dropped to a specific
+uid different from root for security reasons. etter.conf is the only file that
+is read with root privs. Be sure that the specified uid has enough privs to read other files (etter.*)
+You can bypass this variable by setting the environment variable EC_UID.
+
+
+
+.TP 20
+.B [mitm]
+.TP
+.B arp_storm_delay
+The value represents the milliseconds to wait between two consecutive packets
+during the initial
+ARP scan. You can increment this value to be less aggressive at startup. The
+randomized scan plus a high delay can fool some types of ARP scan detectors.
+
+.TP
+.B arp_poison_warm_up
+When the poisoning process starts, the inter-packet delay is low for the first
+5 poisons (to be sure the poisoning process has been successful). After the
+first 5 poisons, the delay is incremented (to keep up the poisoning). This
+variable controls the delay for the first 5 poisons. The value is in seconds.
+.br
+The same delay is used when the victims are restored to the original associations
+(RE-ARPing) when ettercap is closed.
+
+.TP
+.B arp_poison_delay
+This variable controls the poisoning delay after the first 5 poisons. The
+value is expressed in seconds. You can increase this value (to try to fool the
+IDS) up to the timeout of the ARP cache (which depends on the poisoned operating system).
+
+.TP
+.B arp_poison_icmp
+Enable the sending of a spoofed ICMP message to force the targets to make an
+arp request. This will create an arp entry in the host cache, so ettercap
+will be able to win the race condition and poison the target. Useful against
+targets that don't accept gratuitous arp if the entry is not in the cache.
+
+.TP
+.B arp_poison_reply
+Use ARP replies to poison the targets. This is the classic attack.
+
+.TP
+.B arp_poison_request
+Use ARP request to poison the targets. Useful against targets that cache even
+arp request values.
+
+.TP
+.B arp_poison_equal_mac
+Set this option to 0 if you want to skip the poisoning of two hosts with the
+same mac address. This may happen if a NIC has one or more aliases on the same
+network.
+
+.TP
+.B dhcp_lease_time
+This is the lease time (in seconds) for a dhcp assignment. You can lower this
+value to permit the victims to receive a correct dhcp reply after you have
+stopped your attack. Using higher timeouts can seriously mess up your network after
+the attack has finished. On the other hand some clients will prefer a higher lease
+time, so you have to increase it to win the race condition against the real
+server.
+
+.TP
+.B port_steal_delay
+This is the delay time (in milliseconds) between stealing packets for the 
+"port" mitm method. With low delays you will be able to intercept more
+packets, but you will generate more traffic. You have to tune this value
+in order to find a good balance between
+the number of intercepted packets, re-transmitted packets and lost packets.
+This value depends on full/half duplex channels, network drivers and adapters,
+network general configuration and hardware.
+
+
+.TP
+.B port_steal_send_delay
+This is the delay time (in microseconds) between packets when the 
+"port" mitm method has to re-send packets queues. As said for port_steal_delay
+you have to tune this option to the lowest acceptable value.
+
+
+.TP 20
+.B [connections]
+.TP
+.B connection_timeout
+Every time a new connection is discovered, ettercap allocates the needed
+structures. After a customizable timeout, you can free these structures to keep
+the memory usage low. This variable represents this timeout. The value is
+expressed in seconds. This timeout is applied even to the session tracking
+system (the protocol state machine for dissectors).
+
+.TP
+.B connection_idle
+The number of seconds to wait before a connection is marked as IDLE.
+
+.TP
+.B connection_buffer
+This variable controls the size of the buffer linked to each connection.
+Every sniffed packet is added to the buffer and when the buffer is full the
+older packets are deleted to make room for newer ones. This buffer is useful
+to view data that went on the cable before you select and view a specific
+connection. The higher this value, the higher the ettercap memory occupation.
+By the way, the buffer is dynamic, so if you set a buffer of 100.000 byte it is not
+allocated all together at the first packet of a connection, but it is filled as
+packets arrive.
+
+.TP
+.B connect_timeout
+The timeout in seconds when using the connect() syscall. Increase it if you get
+a "Connection timeout" error. This option has nothing to do with connections
+sniffed by ettercap. It is a timeout for the connections made by ettercap to
+other hosts (for example when fingerprinting remote host).
+
+
+
+.TP 20
+.B [stats]
+.TP
+.B sampling_rate
+Ettercap keeps some statistics on the processing time of the bottom half (the
+sniffer) and top half (the protocol decoder). These statistics are made on the
+average processing time of sampling_rate packets. You can decrease this value to have
+a more accurate real-time picture of processing time or increase it to have a
+smoother picture. The total average will not change, but the worst value will
+be heavily influenced by this value.
+
+
+
+.TP 20
+.B [misc]
+.TP
+.B close_on_eof
+When reading from a dump file and using console or daemon UI, this variable is
+used to determine what action has to be done on EOF. It is a boolean value. If
+set to 1 ettercap will close itself (useful in scripts). Otherwise the session will
+continue waiting for user input.
+
+.TP
+.B store_profiles
+Ettercap collects in memory a profile for each host it detects. Users and
+passwords are collected there. If you want to run ettercap in background
+logging all the traffic, you may want to disable the collecting in memory to
+save system memory. Set this option to 0 (zero) to disable profiles collection.
+A value of 1 will enable collection for all the hosts, 2 will collect only
+local hosts and 3 only remote hosts (a host is considered remote if it does
+not belong to the netmask).
+
+.TP
+.B aggressive_dissectors
+Some dissectors (such as SSH and HTTPS) need to modify the payload of the
+packets in order to collect passwords and perform a decryption attack. If you
+want to disable the "dangerous" dissectors all together, set this value to 0.
+
+.TP
+.B skip_forwarded
+If you set this value to 0 you will sniff even packets forwarded by ettercap
+or by the kernel. It will generate packets duplicates in conjuction with
+arp mitm method (for example). It could be useful while running ettercap
+in unoffensive mode on a host with more than one network interface
+(waiting for the multiple-interface feature...)   
+
+.TP
+.B checksum_warning
+If you set the value to 0 the messages about incorrect checksums will not be
+displayed in the user messages windows (nor logged to a file with -m). 
+.br
+Note that this option won't disable the check on the packets, but only prevent
+the message to be displayed (see below). 
+
+.TP
+.B checksum_check
+This option is used to completely disable the check on the checksum of the
+packets that ettercap receives. The check on the packets is performed to avoid
+ettercap spotting thru bad checsum packets (see Phrack 60.12). If you disable
+the check, you will be able to sniff even bad checksummed packet, but you will
+be spotted if someone is searching for you...
+
+
+.TP 20
+.B [dissectors]
+.TP
+.B protocol_name
+This value represents the port on which the protocol dissector has to be bound. A
+value of 0 will disable the dissector. The name of the variable is the same of
+the protocol name. You can specify a non standard port for each dissector as well
+as multiple ports. The syntax for multiport selection is the following:
+port1,port2,port3,...
+.br
+NOTE: some dissectors are conditionally compiled . This means that depending
+on the libraries found in your system some dissectors will be enabled and some
+others will not. By default etter.conf contains all supported dissectors. if
+you got a "FATAL: Dissector "xxx" does not exists (etter.conf line yy)" error,
+you have to comment out the yy line in etter.conf.
+
+
+.TP 20
+.B [curses]
+.TP
+.B color
+You can customize the colors of the curses GUI.
+.br
+Simply set a field to one of the following values and look at the GUI aspect :)
+.br
+Here is a list of values: 0 Black, 1 Red, 2 Green, 3 Yellow, 4 Blue, 5 Magenta,
+6 Cyan, 7 White
+
+
+.TP 20
+.B [strings]
+.TP
+.B utf8_encoding
+specifies the encoding to be used while displaying the packets in UTF-8 format.
+Use the `iconv --list` command for a list of supported encodings.
+
+.TP
+.B remote_broswer
+This command is executed by the remote_browser plugin each time it catches a
+good URL request into an HTTP connection.
+The command should be able to get 2 parameters:
+.RS
+.TP
+.B %host
+the Host: tag in the HTTP header. Used to create the full request into the
+browser.
+.TP
+.B %url
+The page requested inside the GET request.
+.RE
+
+.TP
+.B redir_command_on
+You have to provide a valid command (or script) to enable tcp redirection at
+kernel level in order to be able to use SSL dissection. Your script should be
+able to get 3 parameters:
+.RS
+.TP
+.B %iface
+The network interface on which the rule must be set
+.TP
+.B %port
+The source port of the packets to be redirected (443 for HTTPS, 993 for imaps,
+etc).
+.TP
+.B %rport
+The internally bound port to which ettercap listens for connections.
+.RE
+NOTE: this script is executed with an execve(), so you can't use pipes or
+output redirection as if you were in a shell. We suggest you to make a script if
+you need those commands.
+
+.TP
+.B redir_command_off
+This script is used to remove the redirect rules applied by 'redir_command_on'.
+You should note that this script is called atexit() and thus it has not high
+privileges. You should provide a setuid program or set ec_uid to 0 in order to
+be sure that the script is executed successfully.
+
+
+.SH "SEE ALSO"
+.I "ettercap(8)"
+.I "ettercap_curses(8)"
+.I "ettercap_plugins(8)"
+.I "etterlog(8)"
+.I "etterfilter(8)"
+.LP

@@ -1,0 +1,2 @@
+Need to handle results larger than 1 packet. fixed 11/18/00
+Disconnect doesn't leave the FDSET. fixed 11/18/00

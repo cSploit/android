@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ISQL files">
+      <UniqueIdentifier>{432b17da-feb5-4854-bf4a-2eade764f005}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{0e9c9357-7411-4d36-b6da-5bf58d471259}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource files">
+      <UniqueIdentifier>{64a46d33-07a2-4c68-8ae0-30be298677f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ISQL files\GPRE epp">
+      <UniqueIdentifier>{a0276ced-d198-4e65-bb2b-d78e9c5e1f3c}</UniqueIdentifier>
+      <Extensions>epp</Extensions>
+    </Filter>
+    <Filter Include="ISQL files\GPRE cpp">
+      <UniqueIdentifier>{b3973b46-4da2-46d6-921f-d6e87e3ba3e7}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\isql\ColList.cpp">
+      <Filter>ISQL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\isql\Extender.cpp">
+      <Filter>ISQL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\common\fb_exception.cpp">
+      <Filter>ISQL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\isql\InputDevices.cpp">
+      <Filter>ISQL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\isql\iutils.cpp">
+      <Filter>ISQL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\isql\OptionsBase.cpp">
+      <Filter>ISQL files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\isql\extract.cpp">
+      <Filter>ISQL files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\isql\isql.cpp">
+      <Filter>ISQL files\GPRE cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gen\isql\show.cpp">
+      <Filter>ISQL files\GPRE cpp</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\src\isql\extract.epp">
+      <Filter>ISQL files\GPRE epp</Filter>
+    </None>
+    <None Include="..\..\..\src\isql\isql.epp">
+      <Filter>ISQL files\GPRE epp</Filter>
+    </None>
+    <None Include="..\..\..\src\isql\show.epp">
+      <Filter>ISQL files\GPRE epp</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\isql\ColList.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\isql\Extender.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\isql\extra_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\isql\InputDevices.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\isql\isql.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\isql\isql_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\isql\iutils_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\isql\OptionsBase.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\isql\show_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\src\jrd\version.rc">
+      <Filter>Resource files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

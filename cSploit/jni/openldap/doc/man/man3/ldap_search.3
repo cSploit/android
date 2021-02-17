@@ -1,0 +1,144 @@
+.TH LDAP_SEARCH 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_search, ldap_search_s, ldap_search_st, ldap_search_ext, ldap_search_ext_s \- Perform an LDAP search operation
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <sys/types.h>
+#include <ldap.h>
+.LP
+.ft B
+int ldap_search_ext(
+.RS
+LDAP *\fIld\fB,
+char *\fIbase\fB,
+int \fIscope\fB,
+char *\fIfilter\fB,
+char *\fIattrs\fB[],
+int \fIattrsonly\fB,
+LDAPControl **\fIserverctrls\fB,
+LDAPControl **\fIclientctrls\fB,
+struct timeval *\fItimeout\fB,
+int \fIsizelimit\fB,
+int *\fImsgidp\fB );
+.RE
+.LP
+.ft B
+int ldap_search_ext_s(
+.RS
+LDAP *\fIld\fB,
+char *\fIbase\fB,
+int \fIscope\fB,
+char *\fIfilter\fB,
+char *\fIattrs\fB[],
+int \fIattrsonly\fB,
+LDAPControl **\fIserverctrls\fB,
+LDAPControl **\fIclientctrls\fB,
+struct timeval *\fItimeout\fB,
+int \fIsizelimit\fB,
+LDAPMessage **\fIres\fB );
+.RE
+.SH DESCRIPTION
+These routines are used to perform LDAP search operations.
+The
+.B ldap_search_ext_s()
+routine
+does the search synchronously (i.e., not
+returning until the operation completes), providing a pointer
+to the resulting LDAP messages at the location pointed to by
+the \fIres\fP parameter.
+.LP
+The
+.B ldap_search_ext()
+routine is the asynchronous version, initiating the search and returning
+the message id of the operation it initiated in the integer
+pointed to by the \fImsgidp\fP parameter.
+.LP
+The \fIbase\fP parameter is the DN of the entry at which to start the search.
+.LP
+The \fIscope\fP parameter is the scope of the search and should be one
+of LDAP_SCOPE_BASE, to search the object itself, LDAP_SCOPE_ONELEVEL,
+to search the object's immediate children, LDAP_SCOPE_SUBTREE, to
+search the object and all its descendants, or LDAP_SCOPE_CHILDREN,
+to search all of the descendants.   Note that the latter requires
+the server support the LDAP Subordinates Search Scope extension.
+.LP
+The \fIfilter\fP is a string representation of the filter to
+apply in the search.  The string should conform to the format
+specified in RFC 4515 as extended by RFC 4526.  For instance,
+"(cn=Jane Doe)".  Note that use of the extension requires the
+server to support the LDAP Absolute True/False Filter extension.
+NULL may be specified to indicate the library should send the
+filter (objectClass=*).
+.LP
+The \fIattrs\fP parameter is a null-terminated array of attribute
+descriptions to return from matching entries.
+If NULL is specified, the return of all user attributes is requested.
+The description "*" (LDAP_ALL_USER_ATTRIBUTES) may be used to request
+all user attributes to be returned.
+The description "+"(LDAP_ALL_OPERATIONAL_ATTRIBUTES) may be used to
+request all operational attributes to be returned.  Note that this
+requires the server to support the LDAP All Operational Attribute
+extension.
+To request no attributes, the description "1.1" (LDAP_NO_ATTRS)
+should be listed by itself.
+.LP
+The \fIattrsonly\fP parameter should be set to a non-zero value
+if only attribute descriptions are wanted.  It should be set to zero (0)
+if both attributes descriptions and attribute values are wanted.
+.LP
+The \fIserverctrls\fP and \fIclientctrls\fP parameters may be used
+to specify server and client controls, respectively.
+.LP
+The
+.B ldap_search_ext_s()
+routine is the synchronous version of
+.BR ldap_search_ext().
+.LP
+It also returns a code indicating success or, in the
+case of failure, indicating the nature of the failure
+of the operation.  See
+.BR ldap_error (3)
+for details.
+.SH NOTES
+Note that both read
+and list functionality are subsumed by these routines,
+by using a filter like "(objectclass=*)" and a scope of LDAP_SCOPE_BASE (to
+emulate read) or LDAP_SCOPE_ONELEVEL (to emulate list).
+.LP
+These routines may dynamically allocate memory. The caller is
+responsible for freeing such memory using supplied deallocation
+routines. Return values are contained in <ldap.h>.
+.LP
+Note that \fIres\fR parameter of
+.B ldap_search_ext_s()
+and
+.B ldap_search_s()
+should be freed with
+.B ldap_msgfree()
+regardless of return value of these functions.
+.SH DEPRECATED INTERFACES
+The 
+.B ldap_search()
+routine is deprecated in favor of the
+.B ldap_search_ext()
+routine.  The 
+.B ldap_search_s()
+and
+.B ldap_search_st()
+routines are deprecated in favor of the
+.B ldap_search_ext_s()
+routine.
+.LP
+.so Deprecated
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_result (3),
+.BR ldap_error (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

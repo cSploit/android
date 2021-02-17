@@ -1,0 +1,41 @@
+#!/usr/make
+#
+# Makefile for SQLITE3 extension functions, use in conjunction with
+# mingw-cross-build.sh
+
+#### C Compile and options for use in building executables that 
+#    will run on the target platform.
+#
+TCC = /opt/mingw64/bin/x86_64-w64-mingw32-gcc -m32 -march=i386 -mtune=i386 \
+      -O2 -DNO_TCL
+
+# This is how we compile
+#
+TCCX = $(TCC) $(OPTS) $(THREADSAFE) $(USLEEP) -I. -Isqlite3 -Isqlite3/src
+
+# MKSHLIB = gcc -shared
+# SO = so
+# SHPREFIX = lib
+MKSHLIB = /opt/mingw64/bin/x86_64-w64-mingw32-ar -shared
+SO = dll
+
+# This is the default Makefile target.  The objects listed here
+# are what get build when you type just "make" with no arguments.
+#
+all:	sqlite3_mod_extfunc.$(SO)
+
+# Rules to build individual files
+#
+extfunc.o:	extfunc.c
+	$(TCCX) -c extfunc.c
+
+sqlite3_mod_extfunc.$(SO):	extfunc.o
+	$(TCCX) -shared -Wl,--kill-at \
+	    -Wl,-out-implib,libsqlite3extfunc.a -Wl,--strip-all \
+	    -o sqlite3_mod_extfunc.$(SO) extfunc.o
+
+clean:
+	rm -f extfunc.o libsqlite3extfunc.a sqlite3_mod_extfunc.$(SO)
+
+semiclean:
+	rm -f extfunc.o libsqlite3extfunc.a

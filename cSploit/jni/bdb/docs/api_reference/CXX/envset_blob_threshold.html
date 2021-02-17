@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DbEnv::set_blob_threshold()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="blob.html" title="Chapter 14.  Binary Large Objects" />
+    <link rel="prev" href="envset_blob_dir.html" title="DbEnv::set_blob_dir()" />
+    <link rel="next" href="utilities.html" title="Appendix A.  Berkeley DB Command Line Utilities" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DbEnv::set_blob_threshold()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="envset_blob_dir.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 14. 
+                Binary Large Objects
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="utilities.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="envset_blob_threshold"></a>DbEnv::set_blob_threshold()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+ 
+int
+DbEnv::set_blob_threshold(u_int32_t bytes, u_int32_t flags);  </pre>
+      <p>
+        The <code class="methodname">DbEnv::set_blob_threshold()</code> method sets
+        a default size for the environment which is used to determine when
+        a data item will be stored as a BLOB. Data items sized less than
+        this threshold are stored as normal data within the database. Data
+        items larger than this size are stored on-disk in a subdirectory
+        set aside for the purpose.
+    </p>
+      <p>
+         If this threshold value is set to <code class="literal">0</code>, then BLOB
+         support is turned off by default for databases created in the
+         environment. If this method is never called, then the default BLOB
+         threshold is <code class="literal">0</code>.
+     </p>
+      <p>
+         This method only sets the default BLOB threshold for the
+         environment. The BLOB threshold can be set for individual
+         databases created within the environment using
+         <a class="xref" href="set_blob_threshold.html" title="Db::set_blob_threshold()">Db::set_blob_threshold()</a>.
+     </p>
+      <p>
+         It is illegal to set a BLOB threshold if replication is enabled
+         for the environment. That is, if the 
+         <a class="link" href="envopen.html#envopen_DB_INIT_REP">DB_INIT_REP</a>
+         flag is specified to <a class="xref" href="envopen.html" title="DbEnv::open()">DbEnv::open()</a>.
+     </p>
+      <p>
+         This method configures operations performed using the specified
+         <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a> handle, not all operations
+         performed on the underlying database environment.
+     </p>
+      <p>
+         You may call this method at any time after the DbEnv handle
+         has been created.
+     </p>
+      <p>
+         Unless otherwise specified, the
+         <code class="methodname">DbEnv::set_blob_threshold()</code> <span>
+            
+            <span>
+                method either returns a non-zero error value or throws an
+                exception that encapsulates a non-zero error value on
+                failure, and returns 0 on success.
+            </span>
+        </span>
+     </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5311912"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5311264"></a>bytes</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 The <span class="bold"><strong>bytes</strong></span> parameter
+                 identifies the threshold size, in bytes, beyond which a
+                 data item is stored as a BLOB.
+             </p>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5304920"></a>flags</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>flags</strong></span> parameter must be set to 0.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5302344"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DbEnv::set_blob_threshold()</code> <span>
+            
+            <span>
+                method may fail and throw a <a class="link" href="dbexception.html" title="Chapter 6. The DbException Class">DbException</a> 
+                exception, encapsulating one of the following non-zero errors, or return one
+                of the following non-zero errors:
+            </span>
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5320944"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If an invalid flag or parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5318968"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DbEnv Handle">DbEnv</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5314896"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="blob.html#bloblist" title="BLOBs and Related Methods">BLOBs and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="envset_blob_dir.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="blob.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="utilities.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DbEnv::set_blob_dir() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Appendix A. 
+                Berkeley DB Command Line Utilities
+        </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

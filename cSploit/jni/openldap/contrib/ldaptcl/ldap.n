@@ -1,0 +1,396 @@
+'\"
+'\" Copyright (c) 1998 NeoSoft, Inc.
+'\"
+'\" See the file "license.terms" for information on usage and redistribution
+'\" of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+'\" 
+.so man.macros
+.TH ldap n "" Ldap "Ldap Tcl Extension"
+.BS
+'\" Note:  do not modify the .SH NAME line immediately below!
+.SH NAME
+ldap \- connect to and query an LDAP server
+.SH SYNOPSIS
+\fBldap \fBopen \fR \fIcommand\fR \fIhostlist\fR
+.br
+\fBldap \fBinit \fR \fIcommand\fR \fIhostlist\fR ?protocol_version [2|3]?
+.br
+\fBldap \fBexplode ?-nonames|-list?\fR \fIdn\fR
+.br
+\fIcommand \fBsubcommand \fIoptions ...\fR
+.BE
+
+.SH OVERVIEW
+.PP
+A new command by the name of \fIcommand\fR will be created to access
+the LDAP database at \fIhostlist\fR.  \fIhostlist\fR may contain elements
+of the format \fBhost:port\fR if a port other than the default LDAP port
+of 389 is required.  The LDAP library will attempt to connect to each
+host in turn until it succeeds or exhausts the list.
+.PP
+The \fBexplode\fR form provides a means (via ldap_explode(3)) to explode a DN
+into its component parts.  \fB-nonames\fR strips off the attribute names,
+and -list returns a list suitable for \fBarray set\fR.
+.PP
+Finally, the last form, described in more detail below, refers genericly
+to how the command created by the first two examples is used.
+.SH DESCRIPTION
+
+The Lightweight Directory Access Protocol provides TCP/IP access to
+X.500 directory services and/or to a stand-alone LDAP server.
+
+This code provides a Tcl interface to the
+Lightweight Directory Access Protocol package using the Netscape
+Software Development Kit.  It can also be used with the freely
+redistributable University of 
+Michigan (http://www.umich.edu/~rsug/ldap) version by defining the
+UMICH_LDAP macro during compilation.
+
+.SH CONNECTING TO AN LDAP SERVER
+
+To create an ldap interface entity, we use the "ldap" command.
+
+    ldap open foo foo.bar.com
+
+This opens a connection to a LDAP server on foo.bar.com, and makes
+a new Tcl command, foo, through which we will manipulate the interface
+and make queries to the remote LDAP server.
+
+    ldap init foo foo.bar.com
+
+Same as above, foo is created, but for "init", opening the connection is 
+deferred until we actually try to do something.
+
+The init command also allows some optional values to be set for the connection.
+Currently, the only useful option is \fBprotocol_version\fR which take a
+single argument to specify to use LDAP protocol 2 or 3.  This may be required
+when connecting to older LDAP server.
+
+For the purposes of this example, we're going to assume that "foo" is the
+command created by opening a connection using "ldap open".
+
+.SH BINDING
+
+After a connection is made to an LDAP server, an LDAP bind operation must
+be performed before other operations can be attempted over the connection.
+
+Both simple authentication and kerberos authentication are available.
+LDAP version 3 supports many new "SSL"-style authentication and encryption
+systems, which are not currently supported by the OpenLDAP v1.2 server, and
+hence by this interface package.
+
+Currently simple and kerberos-based authentication, are supported.
+
+To use LDAP and still have reasonable security in a networked, 
+Internet/Intranet environment, secure shell can be used to setup
+secure, encrypted connections between client machines and the LDAP
+server, and between the LDAP server and any replica or slave servers
+that might be used.
+
+To perform the LDAP "bind" operation:
+
+    foo bind simple dn password
+
+    foo bind kerberos_ldap
+    foo bind kerberos_dsa
+    foo bind kerberos_both
+
+It either returns nothing (success), or a Tcl error with appropriate error
+text.
+
+For example,
+
+    foo bind simple "cn=Manager,o=NeoSoft Inc,c=us" "secret"
+
+If you attempt to bind with one of the kerberos authentication types
+described above and your LDAP library was not built with KERBEROS
+defined, you will get an unknown auth type error.
+
+To unbind an LDAP connection previously bound with "bind":
+
+    foo unbind
+
+Note that unbinding also deletes the command (\fBfoo\fR in this case).
+Deleting the command has the same affect.
+
+The ability of the library to callback to the client, enabling re-binding
+while following referrals, is not currently supported.
+
+.SH DELETING OBJECTS
+
+To delete an object in the LDAP database, use
+
+    foo delete dn
+
+To rename an object to another relative distinguished name, use
+
+    foo rename_rdn dn rdn
+
+To rename an object to another relative distinguished name, leaving
+the old entry as some kind of attribute (FIX: not sure if this is
+right or how it works)
+
+    foo modify_rdn dn rdn
+
+
+.SH ADDING NEW OBJECTS
+
+    foo add dn attributePairList
+
+This creates a new distinguished name and defines zero or more attributes.
+
+"attributePairList" is a list of key-value pairs, the same as would
+be returned by "array get" if an array had been set up containing the
+key-value pairs.
+
+    foo add "cn=karl, ou=People, o=NeoSoft Inc, c=US" {cn karl ...}
+
+Some directory servers and/or their client SDKs will automatically
+add the leaf attribute value for you.
+
+Here is a more precise description of how an attributePairList looks:
+
+    {cn {karl {Karl Lehenbauer}} telephone 713-968-5800}
+
+Note here that two cn values, "karl" and "Karl Lehenbauer", are added.
+Is it an error to write:
+
+    {cn {Karl Lehenbauer}}
+
+Which adds two cn values, "Karl" and "Lehenbauer", when the intention
+was to give a single cn value of "Karl Lehenbauer".  In real life, one
+finds oneself making prodigous use of the \fBlist\fR command rather than
+typing hard-coded lists.
+
+We have noticed that the Netscape server will automatically add the
+left-most rdn portion of the DN (ie. cn=karl), whereas the University
+of Michigan and OpenLDAP 1.2 versions do not.
+
+.SH ADDING, DELETING, AND REPLACING OBJECT ATTRIBUTES
+
+You can have multiple values for a given attribute in an LDAP object.
+These are represented in search results, through the Tcl interface,
+as a list.
+
+    foo add_attributes dn attributePairList
+
+This adds key-value pairs to an existing DN.  If an attribute being
+added already exists, the new value will be appended to the list.
+If a particular value being added to an attribute already exists in
+the object a Tcl error is raised.
+
+    foo replace_attributes dn attributePairList
+
+This replaces the specified attributes in an existing DN, leaving
+unnamed ones untouched.  Any previous values for the supplied attributes
+(if any) are discarded.
+
+    foo delete_attributes dn attributePairList
+
+This deletes attributes in the list.  If an attribute "foo" has the
+value list {bar snap}, and you delete using the attributePairList "foo bar",
+"foo" will still have "snap".
+
+If you provide an empty string ("") for the value list,
+the entire attribute will be deleted.
+
+In Ldaptcl version 2.0, multiple operations may be combined into a single
+transaction, ie. as in:
+
+    foo add_attributes dn attributePairList replace attributePairList \
+	delete attributePairList
+
+.SH SEARCHING
+
+The Tcl interface to searching takes a control array, which contains
+a couple of mandatory key-value pairs, and can contain a number of
+optional key-value pairs as well, for controlling the search, a
+destination array, into which the specified attributes (or all attributes
+of matching DNs if none are specified) and values are stored.
+
+The "code" part is executed repeatedly, once for each DN matching the
+search criteria.
+
+.nf
+    foo search controlArray destArray code
+
+	Using data in the control array, a search is performed of the
+	LDAP server opened when foo was created.  Possible elements
+	of the control array are enumerated blow.
+
+	controlArray(base) is the DN being searched from. (required)
+
+	controlArray(filter) contains the search criteria. (required)
+
+	controlArray(scope) must be "base", "one_level", or "subtree".
+	    If not specified, scope defaults to "subtree".
+
+	controlArray(deref) must be "never", "search", "find", or "always"
+	    If not specified, deref defaults to "never"
+
+	controlArray(attributes) is a list of attributes to be fetched.
+	    If not specified, all attributes are fetched.
+
+	controlArray(timeout) a timeout value in seconds (may contain
+	    fractional values -- extremely very small values are useful
+	    for forcing timeout conditions to test timeouts).
+.fi
+
+For each matching record, destArray is populated with none,
+some or all attribute-value pairs as determined by the request and
+access control lists on the server.
+
+Note:  There are some additional parameters that can be set, such as
+how long the synchronous version of the routines should wait before
+timing out, the interfaces for which are not available in the current
+version.
+
+.SH COMPARE
+
+    foo compare dn attribute value
+
+Interface to the ldap_compare_s() command.
+Compares the value of \fIattribute\fR in the object at \fIdn\fR to the
+\fIvalue\fR given in the command line.  Returns an error if \fIdn\fR
+does not exist.  Otherwise, a 
+
+.SH CACHING (Note: Netscape clients do not have caching interfaces).
+
+The UMich and OpenLDAP client libraries offers the client application fairly
+fine-grained control of caching of results retrieved from searches, 
+offering significant performance improvement and reduced
+network traffic.
+
+By default, the cache is disabled.
+
+To enable caching of data received from an LDAP connection,
+
+    foo cache enable timeout maxmem
+
+	...where timeout is specified in seconds, and maxmem is the
+	maximum memory to be used for caching, in bytes.
+
+	If maxmem is 0, the cache size is restricted only by the timeout.
+
+    foo cache disable
+
+	...temporarily inhibits use of the cache (while disabled, new requests
+	are not cached and the cache is not checked when returning results).
+
+	Disabling the cache does not delete its contents.
+
+    foo cache destroy
+
+	...turns off caching and completely removes the cache from memory.
+
+    foo cache flush
+
+	...deletes the entire cache contents, but does not affect
+	whether or not the cache is being used.
+
+    foo cache uncache dn
+
+	...removes from the cache all request results that make reference 
+	to the specified DN.
+
+	This should be used, for example, after doing an add_attributes,
+	delete_attributes, or replace_attributes (ldap_modify(3)) 
+	involving the requested DN.  Generally this should not be needed,
+	as the Tcl interface automatically performs this operation on
+	any dn that is modified (add,replace,delete) while caching is
+	enabled.
+
+    foo cache no_errors
+
+	...suppresses caching of any requests that result in an error.
+
+    foo cache size_errors
+
+	...suppresses caching of any requests that result in an error,
+	except for requests resulting in "sizelimit exceeded", which 
+	are cached.  This is the default.
+
+    foo cache all_errors
+
+        ...enables caching of all requests, including those that result
+	in errors.
+
+.SH IMPLEMENTATION DECISIONS
+
+Because we used the new "Tcl object" C interfaces, this package only works
+with Tcl 8.0 or above.
+
+This package interfaces with the University of Michigan LDAP protocol
+package, version 3.3, and OpenLDAP version 1.2, both of which are
+implementations of version 2 of the LDAP protocol.
+
+Although an LDAP client (or server) could be written in native Tcl 8.0,
+as Tcl 8.0 and above can do binary I/O, and Tcl 8 and above have strings 
+that are fully eight-bit clean, for a first implementation, to minimize 
+compatibility problems, we created a C interface to the UMich LDAP library.
+
+A native Tcl implementation would be cool because we could bring the receiving
+of messages into the normal Tcl event loop and run the LDAP interface fully
+asynchronous.
+
+This implementation is blocking, and blocking only.  That is to say that
+the Tcl event loop is frozen while the ldap routines are waiting on data.
+
+This could be fixed either by recoding all of the I/O in the LDAP library
+to use Tcl's I/O system instead, or by simply coding the LDAP interface in
+native Tcl, as mentioned above.
+
+Another advantage of coding in high-level Tcl, of course, is that the
+client would immediately be cross-platform to Windows and the Mac, as
+well as Unix.
+
+Binary data is not currently supported.  It will probably be trivial to 
+add, we just haven't dug into it yet.
+
+
+.SH FOR MORE INFORMATION
+
+This document principally describes how to use our Tcl interface to the 
+LDAP library works.
+
+For more information on LDAP and the University of Michigan LDAP package,
+please visit the website mentioned above.  The package includes substantial
+documentation in the form of UNIX manual pages, a SLAPD/SLURPD guide
+in Adobe Portable Document Format (pdf), and a number of Internet RFCs
+related to LDAP services.
+
+.SH AUTHORS
+It was written by Karl Lehenbauer, of NeoSoft, Inc., in August and
+September of 1997.  Ldap explode, and numerous bug fixes and extensions
+by Randy Kunkee, also of NeoSoft, Inc., in 1998-1999.
+
+.SH KEYWORDS
+element, join, list, separator
+.SH BUGS
+The \fBldap init\fR syntax fails to return anything useful.  Use
+\fBldap open\fR instead.
+
+\fBPackage require Ldaptcl\fR won't work unless the ldap and lber libraries
+are also shared, and ldaptcl.so is itself created with the correct flags
+(eg. -R for Solaris).  In short there's a lot of details to make this part
+work, but it should work out of the box for Solaris.  Other systems may
+require that LD_LIBRARY_PATH or other appropraite environment variables
+be set at build and/or runtime.
+
+An asynchronous interface should be provided with callbacks.
+
+We have never tested Kerberos authentication.
+
+It does not tolerate some illegal operations very well.
+
+It is possible to create empty attributes, ie. attributes which are present
+but have no value.  This is done by deleting the attribute values rather
+than, eg. "foo delete_attributes dn {telephone {}}" which would delete
+the telephone attribute altogether.  A search for presence of the attribute
+may return an object, and yet it may have no value.  This interface presents
+such an object as not having the attribute at all (ie. you cannot tell).
+The Netscape SDK does this for you, so this makes the behavior consistent
+when using UMICH_LDAP.
+
+\--enable-netscape configuration support has not been tested and probably
+has bugs.

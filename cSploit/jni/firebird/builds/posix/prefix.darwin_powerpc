@@ -1,0 +1,32 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+#
+# Copyright (C) 2000 Inprise Corporation
+# All Rights Reserved.
+# Contributor(s): ______________________________________.
+# Start of file prefix.darwin:	$(VERSION)	@PLATFORM@
+# 2 Oct 2002, Nickolay Samofatov - Major Cleanup
+
+DYLD_LIBRARY_PATH=$(FIREBIRD)/lib
+export DYLD_LIBRARY_PATH
+
+MACOSX_DEPLOYMENT_TARGET=10.2
+export MACOSX_DEPLOYMENT_TARGET
+
+PROD_FLAGS=-DDARWIN -pipe -p -MMD -fPIC -fno-common -arch ppc -mmacosx-version-min=10.2
+DEV_FLAGS=-ggdb -DDARWIN -pipe -p -MMD -fPIC -fno-common -Wall -arch ppc -mmacosx-version-min=10.2 -Wno-non-virtual-dtor
+CXXFLAGS:=$(CXXFLAGS) -fvisibility-inlines-hidden -fvisibility=hidden -fno-weak
+
+EXE_LINK_OPTIONS:=
+
+include $(ROOT)/gen/darwin.defaults

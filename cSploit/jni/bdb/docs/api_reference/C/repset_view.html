@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB_ENV-&gt;rep_set_view()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="rep.html" title="Chapter 10.  Replication Methods" />
+    <link rel="prev" href="reptransport.html" title="DB_ENV-&gt;rep_set_transport()" />
+    <link rel="next" href="repstart.html" title="DB_ENV-&gt;rep_start()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB_ENV-&gt;rep_set_view()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="reptransport.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 10. 
+                Replication Methods
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="repstart.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="repset_view"></a>DB_ENV-&gt;rep_set_view()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB_ENV-&gt;rep_set_view(DB_ENV *env,
+    int (*partial_func)(DB_ENV *dbenv,
+    const char *name, int *result, u_int32_t flags));  </pre>
+      <p>
+        The <code class="methodname">DB_ENV-&gt;rep_set_view()</code> method specifies
+        that this environment is a replication view.  A replication view is
+        a special type of client that can contain a full or partial copy of
+        the replicated data.  A partial view uses a callback to determine
+        the subset of database files to replicate.  A replication view does
+        not vote in elections, cannot become master, and cannot contribute
+        to transactional durability.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;rep_set_view()</code> method
+         configures operations performed using the specified 
+         <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a>  handle, not all operations
+         performed on the underlying database environment.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;rep_set_view()</code> method must be
+         called prior to opening the environment.  Also the method must be
+         called every time the environment is used after that point.  Once
+         an environment is configured as a view, it stays that way for the
+         lifetime of the environment.
+    </p>
+      <p>
+         The <code class="methodname">DB_ENV-&gt;rep_set_view()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+        <h3 class="title">Note</h3>
+        <p>
+            Berkeley DB is not re-entrant. The callback function for
+            this method should not attempt to make library calls (for
+            example, to release locks or close open handles).
+            Re-entering Berkeley DB is not guaranteed to work
+            correctly, and the results are undefined.
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp54289928"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp54290120"></a>partial_func</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                  The <span class="bold"><strong>partial_func</strong></span>
+                  callback function determines whether a particular
+                  database file should be replicated to the local site.  If
+                  a NULL callback is specified, all database files will be
+                  replicated.  The parameters to 
+                  <span class="bold"><strong>partial_func</strong></span> are as follows:
+            </p>
+          <div class="itemizedlist">
+            <ul type="disc">
+              <li>
+                <p>
+                        <code class="literal">dbenv</code>
+                     </p>
+                <p>
+                         The <span class="bold"><strong>dbenv</strong></span>
+                         parameter is the enclosing database environment
+                         handle.
+                    </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">name</code>
+                     </p>
+                <p>
+                         The <span class="bold"><strong>name</strong></span>
+                         parameter is the physical on-disk file name of the
+                         database.  In-memory databases are always
+                         replicated and do not invoke this callback.
+                     </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">result</code>
+                     </p>
+                <p>
+                         The <span class="bold"><strong>result</strong></span> parameter is
+                         an output parameter indicating whether the file should be
+                         replicated.  Set it to 0 to reject this file or to a
+                         non-zero value to accept this file.
+                     </p>
+              </li>
+              <li>
+                <p>
+                        <code class="literal">flags</code>
+                     </p>
+                <p>
+                         The <span class="bold"><strong>flags</strong></span>
+                         parameter is currently unused.
+                     </p>
+              </li>
+            </ul>
+          </div>
+          <p>
+                The <span class="bold"><strong>partial</strong></span> function must
+                return 0 on success and non-zero on failure.  If the
+                partial function fails, the environment will panic.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp54224960"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                 The <code class="methodname">DB_ENV-&gt;rep_set_view()</code>
+                 <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+            </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp54303424"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                    The method was called after the environment was opened.
+                </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp54302560"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="env.html" title="Chapter 5.  The DB_ENV Handle">DB_ENV</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp54304504"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="rep.html#replist" title="Replication and Related Methods">Replication and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="reptransport.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="repstart.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB_ENV-&gt;rep_set_transport() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB_ENV-&gt;rep_start()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

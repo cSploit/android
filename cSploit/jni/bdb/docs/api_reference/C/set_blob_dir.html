@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>DB-&gt;set_blob_dir()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="blob.html" title="Chapter 13.  Binary Large Objects" />
+    <link rel="prev" href="get_blob_threshold.html" title="DB-&gt;get_blob_threshold()" />
+    <link rel="next" href="set_blob_threshold.html" title="DB-&gt;set_blob_threshold()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">DB-&gt;set_blob_dir()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="get_blob_threshold.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 13. 
+                Binary Large Objects
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="set_blob_threshold.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="set_blob_dir"></a>DB-&gt;set_blob_dir()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db.h&gt;
+
+int
+DB-&gt;set_blob_dir(DB *db, const char *dir);  </pre>
+      <p>
+         The <code class="methodname">DB-&gt;set_blob_dir()</code> method sets the
+         directory where BLOB data is stored. Use this method if the
+         database is not opened within an encompassing environment. If an
+         environment is in use, use <a class="xref" href="envset_blob_dir.html" title="DB_ENV-&gt;set_blob_dir()">DB_ENV-&gt;set_blob_dir()</a> instead.
+     </p>
+      <p>
+         By default, if this method is not called then BLOB data is placed
+         in a directory local to the current working directory.
+     </p>
+      <p>
+         Use <a class="xref" href="get_blob_dir.html" title="DB-&gt;get_blob_dir()">DB-&gt;get_blob_dir()</a> to identify the current storage location used
+         for BLOB data.
+     </p>
+      <p>
+        This method configures operations performed using the specified
+        <a class="link" href="db.html" title="Chapter 2.  The DB Handle">DB</a>  handle, not all operations
+        performed on the underlying database.
+     </p>
+      <p>
+         This method may not be called after <a class="xref" href="dbopen.html" title="DB-&gt;open()">DB-&gt;open()</a> is called.
+     </p>
+      <p>
+         Unless otherwise specified, the
+         <code class="methodname">DB-&gt;set_blob_dir()</code> <span>
+            <span>
+                  method returns a non-zero error value on failure and 0 on success.
+            </span>
+            
+        </span>
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp55102552"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp54810528"></a>dir</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 Provides the name of the directory where BLOB data is to
+                 be stored. If an absolute path is not provided, then the
+                 directory identified here is relative to the current
+                 working directory.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp55125320"></a>Errors</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             The <code class="methodname">DB-&gt;set_blob_dir()</code> <span>
+            <span>
+                 method may fail and return one of the following non-zero errors:
+            </span>
+            
+        </span>
+        </p>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp55114984"></a>EINVAL</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                If the database was opened within a named environment; or
+                if the method was called after <a class="xref" href="dbopen.html" title="DB-&gt;open()">DB-&gt;open()</a> was called; or if
+                an invalid parameter was specified.
+            </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp55131776"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="db.html" title="Chapter 2.  The DB Handle">DB</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp55133320"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="blob.html#bloblist" title="BLOBs and Related Methods">BLOBs and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="get_blob_threshold.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="blob.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="set_blob_threshold.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">DB-&gt;get_blob_threshold() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> DB-&gt;set_blob_threshold()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

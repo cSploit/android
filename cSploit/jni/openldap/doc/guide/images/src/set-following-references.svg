@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="383.93671"
+   height="174.87033"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   version="1.0"
+   sodipodi:docbase="/home/andreas/cvs/openldap-guide/images/src"
+   sodipodi:docname="set-managersecretary.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/andreas/palestra/managersecretary.png"
+   inkscape:export-xdpi="187.53"
+   inkscape:export-ydpi="187.53">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend"
+       style="overflow:visible">
+      <path
+         id="path3186"
+         d="M 0,0 L 5,-5 L -12.5,0 L 5,5 L 0,0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Lstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lstart"
+       style="overflow:visible">
+      <path
+         id="path3183"
+         d="M 0,0 L 5,-5 L -12.5,0 L 5,5 L 0,0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(0.8,0,0,0.8,10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send"
+       style="overflow:visible">
+      <path
+         id="path3198"
+         d="M 0,0 L 5,-5 L -12.5,0 L 5,5 L 0,0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lstart"
+       style="overflow:visible">
+      <path
+         id="path3201"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.97309,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="matrix(1.1,0,0,1.1,1.1,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Lend"
+       style="overflow:visible">
+      <path
+         id="path8347"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.97309,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+         transform="matrix(-1.1,0,0,-1.1,-1.1,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.1307244"
+     inkscape:cx="191.96835"
+     inkscape:cy="87.435165"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     showguides="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="953"
+     inkscape:window-x="0"
+     inkscape:window-y="24"
+     width="1052.3622px"
+     height="744.09449px" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Camada 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-241.56641,-98.789978)">
+    <g
+       id="g3270"
+       transform="translate(0,-9.9371414e-6)">
+      <text
+         inkscape:export-ydpi="136.2"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         id="text2170"
+         y="112.12766"
+         x="267.92389"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         xml:space="preserve"><tspan
+           y="112.12766"
+           x="267.92389"
+           id="tspan2172"
+           sodipodi:role="line">DN: uid=john,ou=people,dc=example,dc=com</tspan><tspan
+           id="tspan2174"
+           y="127.12766"
+           x="267.92389"
+           sodipodi:role="line">uid: john</tspan><tspan
+           id="tspan5373"
+           y="142.12766"
+           x="267.92389"
+           sodipodi:role="line">manager: uid=mary,ou=people,dc=example,dc=com</tspan><tspan
+           id="tspan3411"
+           y="157.12766"
+           x="267.92389"
+           sodipodi:role="line" /></text>
+      <rect
+         inkscape:export-ydpi="136.2"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         y="99.161621"
+         x="263.56467"
+         height="53.761242"
+         width="331.86697"
+         id="rect7321"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.74326539px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <rect
+         inkscape:export-ydpi="136.2"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         y="130.60817"
+         x="265.52121"
+         height="17.286547"
+         width="327.07599"
+         id="rect7323"
+         style="opacity:0.28915663;fill:#aa9ab2;fill-opacity:1;stroke:none;stroke-width:0.69669151;stroke-opacity:1" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="299.92389"
+       y="250.12769"
+       id="text2235"
+       inkscape:export-filename="/home/andreas/palestra/allmail.png"
+       inkscape:export-xdpi="136.2"
+       inkscape:export-ydpi="136.2"><tspan
+         sodipodi:role="line"
+         id="tspan2237"
+         x="299.92389"
+         y="250.12769">DN: uid=jane,ou=people,dc=example,dc=com</tspan><tspan
+         sodipodi:role="line"
+         x="299.92389"
+         y="265.12769"
+         id="tspan2239">uid: jane</tspan><tspan
+         sodipodi:role="line"
+         x="299.92389"
+         y="280.12769"
+         id="tspan2241" /><tspan
+         sodipodi:role="line"
+         x="299.92389"
+         y="295.12769"
+         id="tspan2243" /></text>
+    <rect
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.60843331px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="rect2245"
+       width="329.70166"
+       height="36.261875"
+       x="295.49725"
+       y="237.09422"
+       inkscape:export-filename="/home/andreas/palestra/allmail.png"
+       inkscape:export-xdpi="136.2"
+       inkscape:export-ydpi="136.2" />
+    <g
+       id="g3279"
+       transform="translate(0,-1.3751839e-5)">
+      <text
+         xml:space="preserve"
+         style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+         x="283.92386"
+         y="181.12766"
+         id="text2223"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-ydpi="136.2"><tspan
+           sodipodi:role="line"
+           id="tspan2225"
+           x="283.92386"
+           y="181.12766">DN: uid=mary,ou=people,dc=example,dc=com</tspan><tspan
+           sodipodi:role="line"
+           x="283.92386"
+           y="196.12766"
+           id="tspan2227">uid: mary</tspan><tspan
+           sodipodi:role="line"
+           x="283.92386"
+           y="211.12766"
+           id="tspan2229">secretary: uid=jane,ou=people,dc=example,dc=com</tspan><tspan
+           sodipodi:role="line"
+           x="283.92386"
+           y="226.12766"
+           id="tspan2231" /></text>
+      <rect
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:0.74326539px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         id="rect2233"
+         width="331.86697"
+         height="53.761246"
+         x="279.56464"
+         y="168.16162"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-ydpi="136.2" />
+      <rect
+         style="opacity:0.28915663;fill:#aa9ab2;fill-opacity:1;stroke:none;stroke-width:0.69669151;stroke-opacity:1"
+         id="rect2247"
+         width="327.07599"
+         height="17.286547"
+         x="281.52118"
+         y="197.60815"
+         inkscape:export-filename="/home/andreas/palestra/allmail.png"
+         inkscape:export-xdpi="136.2"
+         inkscape:export-ydpi="136.2" />
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow2Lend);stroke-opacity:1"
+       d="M 147.97396,105.42967 C 100.43828,122.29717 161.77464,141.46478 161.77464,141.46478"
+       id="path2275"
+       transform="translate(112.15223,34.695502)"
+       sodipodi:nodetypes="cc" />
+    <path
+       sodipodi:nodetypes="cc"
+       id="path3248"
+       d="M 276.12619,208.12517 C 228.59051,224.99267 289.92687,244.16028 289.92687,244.16028"
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;marker-end:url(#Arrow2Lend);stroke-opacity:1" />
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 9677aabc-7113-11dc-9ed1-dff27aa61d95
+
+Revision-number: 0
+Prop-content-length: 150
+Content-length: 150
+
+K 7
+svn:log
+V 76
+After the colon are a space, 3 bad chars, 2 good chars, and a period: 	
+.
+K 8
+svn:date
+V 27
+2007-10-02T18:16:25.707165Z
+PROPS-END
+

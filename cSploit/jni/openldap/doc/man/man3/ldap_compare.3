@@ -1,0 +1,79 @@
+.TH LDAP_COMPARE 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_compare, ldap_compare_s, ldap_compare_ext, ldap_compare_ext_s \- Perform an LDAP compare operation.
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_compare_ext(
+.RS
+.ft B
+LDAP *\fIld\fB,
+char *\fIdn\fB,
+char *\fIattr\fB,
+const struct berval *\fIbvalue\fB,
+LDAPControl **\fIserverctrls\fB,
+LDAPControl **\fIclientctrls\fB,
+int *\fImsgidp\fB );
+.RE
+.LP
+.ft B
+int ldap_compare_ext_s(
+.RS
+.ft B
+LDAP *\fIld\fB,
+char *\fIdn\fB,
+char *\fIattr\fB,
+const struct berval *\fIbvalue\fB,
+LDAPControl **\fIserverctrls\fB,
+LDAPControl **\fIclientctrls\fB );
+.RE
+.SH DESCRIPTION
+The
+.B ldap_compare_ext_s()
+routine is used to perform an LDAP compare operation synchronously.
+It takes \fIdn\fP, the DN of the entry upon which to perform the
+compare, and \fIattr\fP and \fIvalue\fP, the attribute description and
+value to compare to those found in the entry.  It returns a code, which
+will be LDAP_COMPARE_TRUE if the entry contains the attribute value and
+LDAP_COMPARE_FALSE if it does not.  Otherwise, an error code is
+returned that indicates the nature of the problem.  See
+.BR ldap (3)
+for details.
+.LP
+The
+.B ldap_compare_ext()
+routine is used to perform an LDAP compare operation
+asynchronously.  It takes the same parameters as
+.BR ldap_compare_ext_s() ,
+but provides the message id of the request it initiated in the
+integer pointed to \fImsgidp\fP.  The result of
+the compare can be obtained by a subsequent call to
+.BR ldap_result (3).
+.LP
+Both routines allow server and client controls to be specified to
+extend the compare request.
+.SH DEPRECATED INTERFACES
+The routines
+.BR ldap_compare ()
+and
+.BR ldap_compare_s ()
+are deprecated in favor of
+.BR ldap_compare_ext ()
+and
+.BR ldap_compare_ext_s (),
+respectively.
+.LP
+.so Deprecated
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_error (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

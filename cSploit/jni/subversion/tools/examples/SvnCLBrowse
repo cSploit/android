@@ -1,0 +1,489 @@
+#!/usr/bin/python
+#
+# SvnCLBrowse -- graphical Subversion changelist browser
+#
+# ====================================================================
+#    Licensed to the Apache Software Foundation (ASF) under one
+#    or more contributor license agreements.  See the NOTICE file
+#    distributed with this work for additional information
+#    regarding copyright ownership.  The ASF licenses this file
+#    to you under the Apache License, Version 2.0 (the
+#    "License"); you may not use this file except in compliance
+#    with the License.  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing,
+#    software distributed under the License is distributed on an
+#    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#    KIND, either express or implied.  See the License for the
+#    specific language governing permissions and limitations
+#    under the License.
+# ====================================================================
+
+# This script requires Python 2.5
+
+import sys
+import os
+import getopt
+
+# Try to import the wxWidgets modules.
+try:
+  import wx
+  import wx.xrc
+except ImportError:
+  sys.stderr.write("""
+ERROR: This program requires the wxWidgets Python bindings, which you
+       do not appear to have installed.
+
+""")
+  raise
+
+# Try to import the Subversion modules.
+try:
+  import svn.client, svn.wc, svn.core
+except ImportError:
+  sys.stderr.write("""
+ERROR: This program requires the Subversion Python bindings, which you
+       do not appear to have installed.
+
+""")
+  raise
+
+status_code_map = {
+  svn.wc.status_none        : ' ',
+  svn.wc.status_normal      : ' ',
+  svn.wc.status_added       : 'A',
+  svn.wc.status_missing     : '!',
+  svn.wc.status_incomplete  : '!',
+  svn.wc.status_deleted     : 'D',
+  svn.wc.status_replaced    : 'R',
+  svn.wc.status_modified    : 'M',
+  svn.wc.status_merged      : 'G',
+  svn.wc.status_conflicted  : 'C',
+  svn.wc.status_obstructed  : '~',
+  svn.wc.status_ignored     : 'I',
+  svn.wc.status_external    : 'X',
+  svn.wc.status_unversioned : '?',
+  }
+
+def output_info(path, info, window):
+  window.AppendText("Path: %s\n" % os.path.normpath(path))
+  if info.kind != svn.core.svn_node_dir:
+    window.AppendText("Name: %s\n" % os.path.basename(path))
+  if info.URL:
+    window.AppendText("URL: %s\n" % info.URL)
+  if info.repos_root_URL:
+    window.AppendText("Repository Root: %s\n" % info.repos_root_URL)
+  if info.repos_UUID:
+    window.AppendText("Repository UUID: %s\n" % info.repos_UUID)
+  if info.rev >= 0:
+    window.AppendText("Revision: %ld\n" % info.rev)
+  if info.kind == svn.core.svn_node_file:
+    window.AppendText("Node Kind: file\n")
+  elif info.kind == svn.core.svn_node_dir:
+    window.AppendText("Node Kind: directory\n")
+  elif info.kind == svn.core.svn_node_none:
+    window.AppendText("Node Kind: none\n")
+  else:
+    window.AppendText("Node Kind: unknown\n")
+  if info.has_wc_info:
+    if info.schedule == svn.wc.schedule_normal:
+      window.AppendText("Schedule: normal\n")
+    elif info.schedule == svn.wc.schedule_add:
+      window.AppendText("Schedule: add\n")
+    elif info.schedule == svn.wc.schedule_delete:
+      window.AppendText("Schedule: delete\n")
+    elif info.schedule == svn.wc.schedule_replace:
+      window.AppendText("Schedule: replace\n")
+    if info.depth == svn.core.svn_depth_unknown:
+      pass
+    elif info.depth == svn.core.svn_depth_empty:
+      window.AppendText("Depth: empty\n")
+    elif info.depth == svn.core.svn_depth_files:
+      window.AppendText("Depth: files\n")
+    elif info.depth == svn.core.svn_depth_immediates:
+      window.AppendText("Depth: immediates\n")
+    elif info.depth == svn.core.svn_depth_infinity:
+      pass
+    else:
+      window.AppendText("Depth: INVALID\n")
+    if info.copyfrom_url:
+      window.AppendText("Copied From URL: %s\n" % info.copyfrom_url)
+    if info.copyfrom_rev >= 0:
+      window.AppendText("Copied From Rev: %ld\n" % info.copyfrom_rev)
+  if info.last_changed_author:
+    window.AppendText("Last Changed Author: %s\n" % info.last_changed_author)
+  if info.last_changed_rev >= 0:
+    window.AppendText("Last Changed Rev: %ld\n" % info.last_changed_rev)
+  if info.last_changed_date:
+    window.AppendText("Last Changed Date: %s\n" %
+                      svn.core.svn_time_to_human_cstring(info.last_changed_date))
+  if info.has_wc_info:
+    if info.text_time:
+      window.AppendText("Text Last Updated: %s\n" %
+                        svn.core.svn_time_to_human_cstring(info.text_time))
+    if info.prop_time:
+      window.AppendText("Properties Last Updated: %s\n" %
+                        svn.core.svn_time_to_human_cstring(info.prop_time))
+    if info.checksum:
+      window.AppendText("Checksum: %s\n" % info.checksum)
+    if info.conflict_old:
+      window.AppendText("Conflict Previous Base File: %s\n" % info.conflict_old)
+    if info.conflict_wrk:
+      window.AppendText("Conflict Previous Working File: %s\n" % info.conflict_wrk)
+    if info.conflict_new:
+      window.AppendText("Conflict Current Base File: %s\n" % info.conflict_new)
+    if info.prejfile:
+      window.AppendText("Conflict Properties File: %s\n" % info.prejfile)
+  if info.lock:
+    if info.lock.token:
+      window.AppendText("Lock Token: %s\n" % info.lock.token)
+    if info.lock.owner:
+      window.AppendText("Lock Owner: %s\n" % info.lock.owner)
+    if info.lock.creation_date:
+      window.AppendText("Lock Created: %s\n" %
+                        svn.core.svn_time_to_human_cstring(info.lock.creation_date))
+    if info.lock.expiration_date:
+      window.AppendText("Lock Expires: %s\n" %
+                        svn.core.svn_time_to_human_cstring(info.lock.expiration_date))
+    if info.lock.comment:
+      num_lines = len(info.lock.comment.split("\n"))
+      window.AppendText("Lock Comment (%d line%s): %s\n"
+                        % (num_lines, num_lines > 1 and "s" or "", info.lock.comment))
+  if info.changelist:
+    window.AppendText("Changelist: %s\n" % info.changelist)
+  window.AppendText("\n")
+
+class _item:
+  pass
+  
+class SvnCLBrowse(wx.App):
+  def __init__(self, wc_dir):
+    svn.core.svn_config_ensure(None)
+    self.svn_ctx = svn.client.ctx_t()
+    self.svn_ctx.config = svn.core.svn_config_get_config(None)
+    if wc_dir is not None:
+      self.wc_dir = svn.core.svn_path_canonicalize(wc_dir)
+    else:
+      self.wc_dir = wc_dir
+    wx.App.__init__(self)
+
+  def OnInit(self):
+    self.SetAppName("SvnCLBrowse")
+
+    self.xrc = wx.xrc.EmptyXmlResource()
+    wx.FileSystem.AddHandler(wx.MemoryFSHandler())
+    wx.MemoryFSHandler.AddFile('XRC/SvnCLBrowse.xrc', _XML_RESOURCE)
+    self.xrc.Load('memory:XRC/SvnCLBrowse.xrc')
+
+    # XML Resource stuff.
+    self.resources = _item()
+    self.resources.CLBFrame = self.xrc.LoadFrame(None, 'CLBFrame')
+    self.resources.CLBMenuBar = self.xrc.LoadMenuBar('CLBMenuBar')
+    self.resources.CLBMenuFileQuit = self.xrc.GetXRCID('CLBMenuFileQuit')
+    self.resources.CLBMenuOpsInfo = self.xrc.GetXRCID('CLBMenuOpsInfo')
+    self.resources.CLBMenuOpsMembers = self.xrc.GetXRCID('CLBMenuOpsMembers')
+    self.resources.CLBMenuHelpAbout = self.xrc.GetXRCID('CLBMenuHelpAbout')
+    self.resources.CLBDirNav = self.resources.CLBFrame.FindWindowById(
+      self.xrc.GetXRCID('CLBDirNav'))
+    self.resources.CLBChangelists = self.resources.CLBFrame.FindWindowById(
+      self.xrc.GetXRCID('CLBChangelists'))
+    self.resources.CLBVertSplitter = self.resources.CLBFrame.FindWindowById(
+      self.xrc.GetXRCID('CLBVertSplitter'))
+    self.resources.CLBHorzSplitter = self.resources.CLBFrame.FindWindowById(
+      self.xrc.GetXRCID('CLBHorzSplitter'))
+    self.resources.CLBOutput = self.resources.CLBFrame.FindWindowById(
+      self.xrc.GetXRCID('CLBOutput'))
+    self.resources.CLBStatusBar = self.resources.CLBFrame.CreateStatusBar(2)
+    
+    # Glue some of our extra stuff onto the main frame.
+    self.resources.CLBFrame.SetMenuBar(self.resources.CLBMenuBar)
+    self.resources.CLBStatusBar.SetStatusWidths([-1, 100])
+    
+    # Event handlers.  They are the key to the world.
+    wx.EVT_CLOSE(self.resources.CLBFrame, self._FrameClosure)
+    wx.EVT_MENU(self, self.resources.CLBMenuFileQuit, self._FileQuitMenu)
+    wx.EVT_MENU(self, self.resources.CLBMenuOpsInfo, self._OpsInfoMenu)
+    wx.EVT_MENU(self, self.resources.CLBMenuOpsMembers, self._OpsMembersMenu)
+    wx.EVT_MENU(self, self.resources.CLBMenuHelpAbout, self._HelpAboutMenu)
+    wx.EVT_TREE_ITEM_ACTIVATED(self, self.resources.CLBDirNav.GetTreeCtrl().Id,
+                               self._DirNavSelChanged)
+
+    # Reset our working directory
+    self._SetWorkingDirectory(self.wc_dir)
+    
+    # Resize and display our frame.
+    self.resources.CLBFrame.SetSize(wx.Size(600, 400))
+    self.resources.CLBFrame.Center()
+    self.resources.CLBFrame.Show(True)
+    self.resources.CLBVertSplitter.SetSashPosition(
+      self.resources.CLBVertSplitter.GetSize()[0] / 2)
+    self.resources.CLBHorzSplitter.SetSashPosition(
+      self.resources.CLBHorzSplitter.GetSize()[1] / 2)
+
+    # Tell wxWidgets that this is our main window
+    self.SetTopWindow(self.resources.CLBFrame)
+
+    # Return a success flag
+    return True
+
+  def _SetWorkingDirectory(self, wc_dir):
+    if wc_dir is None:
+      return
+    if not os.path.isdir(wc_dir):
+      wc_dir = os.path.abspath('/')
+    self.wc_dir = os.path.abspath(wc_dir)
+    self.resources.CLBChangelists.Clear()
+    self.resources.CLBDirNav.SetPath(self.wc_dir)
+    self.resources.CLBFrame.SetTitle("SvnCLBrowse - %s" % (self.wc_dir))
+    changelists = {}
+    self.resources.CLBFrame.SetStatusText("Checking '%s' for status..." \
+                                         % (self.wc_dir))
+    wx.BeginBusyCursor()
+    
+    def _status_callback(path, status, clists=changelists):
+      if status.entry and status.entry.changelist:
+        clists[status.entry.changelist] = None
+        
+    # Do the status crawl, using _status_callback() as our callback function.
+    revision = svn.core.svn_opt_revision_t()
+    revision.type = svn.core.svn_opt_revision_head
+    try:
+      svn.client.status2(self.wc_dir, revision, _status_callback,
+                         svn.core.svn_depth_infinity,
+                         False, False, False, True, self.svn_ctx)
+    except svn.core.SubversionException:
+      self.resources.CLBStatusBar.SetStatusText("UNVERSIONED", 2)
+    else:
+      changelist_names = changelists.keys()
+      changelist_names.sort()
+      for changelist in changelist_names:
+        self.resources.CLBChangelists.Append(changelist)
+    finally:
+      wx.EndBusyCursor()
+      self.resources.CLBFrame.SetStatusText("")
+
+  def _Destroy(self):
+    self.resources.CLBFrame.Destroy()
+    
+  def _DirNavSelChanged(self, event):
+    self._SetWorkingDirectory(self.resources.CLBDirNav.GetPath())
+
+  def _GetSelectedChangelists(self):
+    changelists = []
+    items = self.resources.CLBChangelists.GetSelections()
+    for item in items:
+      changelists.append(str(self.resources.CLBChangelists.GetString(item)))
+    return changelists
+
+  def _OpsMembersMenu(self, event):
+    self.resources.CLBOutput.Clear()
+    changelists = self._GetSelectedChangelists()
+    if not changelists:
+      return
+
+    def _info_receiver(path, info, pool):
+      self.resources.CLBOutput.AppendText("   %s\n" % (path))
+
+    for changelist in changelists:
+      self.resources.CLBOutput.AppendText("Changelist: %s\n" % (changelist))
+      revision = svn.core.svn_opt_revision_t()
+      revision.type = svn.core.svn_opt_revision_working
+      svn.client.info2(self.wc_dir, revision, revision,
+                       _info_receiver, svn.core.svn_depth_infinity,
+                       [changelist], self.svn_ctx)
+      self.resources.CLBOutput.AppendText("\n")
+  
+  def _OpsInfoMenu(self, event):
+    self.resources.CLBOutput.Clear()
+    changelists = self._GetSelectedChangelists()
+    if not changelists:
+      return
+
+    def _info_receiver(path, info, pool):
+      output_info(path, info, self.resources.CLBOutput)
+    
+    revision = svn.core.svn_opt_revision_t()
+    revision.type = svn.core.svn_opt_revision_working
+    svn.client.info2(self.wc_dir, revision, revision,
+                     _info_receiver, svn.core.svn_depth_infinity,
+                     changelists, self.svn_ctx)
+    
+  def _FrameClosure(self, event):
+    self._Destroy()
+
+  def _FileQuitMenu(self, event):
+    self._Destroy()
+    
+  def _HelpAboutMenu(self, event):
+    wx.MessageBox("SvnCLBrowse"
+                  " -- graphical Subversion changelist browser.\n\n",
+                  "About SvnCLBrowse",
+                  wx.OK | wx.CENTER,
+                  self.resources.CLBFrame)
+
+  def OnExit(self):
+    pass
+
+
+_XML_RESOURCE = """<?xml version="1.0" ?>
+<resource>
+  <object class="wxMenuBar" name="CLBMenuBar">
+    <object class="wxMenu">
+      <label>&amp;File</label>
+      <object class="wxMenuItem" name="CLBMenuFileQuit">
+        <label>&amp;Quit</label>
+        <accel>CTRL+Q</accel>
+        <help>Quit SvnCLBrowse.</help>
+      </object>
+    </object>
+    <object class="wxMenu">
+      <label>&amp;Subversion</label>
+      <object class="wxMenuItem" name="CLBMenuOpsInfo">
+        <label>&amp;Info</label>
+        <help>Show information about members of the selected changelist(s).</help>
+      </object>
+      <object class="wxMenuItem" name="CLBMenuOpsMembers">
+        <label>&amp;Members</label>
+        <help>List the members of the selected changelist(s).</help>
+      </object>
+    </object>
+    <object class="wxMenu">
+      <label>&amp;Help</label>
+      <object class="wxMenuItem" name="CLBMenuHelpAbout">
+        <label>&amp;About...</label>
+        <help>About SvnCLBrowse.</help>
+      </object>
+    </object>
+  </object>
+  <object class="wxFrame" name="CLBFrame">
+    <title>SvnCLBrowse -- graphical Subversion changelist browser</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_FRAME_STYLE|wxCAPTION|wxSYSTEM_MENU|wxRESIZE_BORDER|wxRESIZE_BOX|wxMAXIMIZE_BOX|wxMINIMIZE_BOX|wxTAB_TRAVERSAL</style>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>1</rows>
+      <object class="sizeritem">
+        <object class="wxSplitterWindow" name="CLBVertSplitter">
+          <object class="wxPanel">
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <rows>3</rows>
+              <growablecols>0</growablecols>
+              <growablerows>0</growablerows>
+              <growablerows>1</growablerows>
+              <growablerows>2</growablerows>
+              <object class="sizeritem">
+                <object class="wxSplitterWindow" name="CLBHorzSplitter">
+                  <orientation>horizontal</orientation>
+                  <sashpos>200</sashpos>
+                  <minsize>50</minsize>
+                  <style>wxSP_NOBORDER|wxSP_LIVE_UPDATE</style>
+                  <object class="wxPanel">
+                    <object class="wxStaticBoxSizer">
+                      <label>Local Modifications</label>
+                      <orient>wxHORIZONTAL</orient>
+                      <object class="sizeritem">
+                        <object class="wxGenericDirCtrl" name="CLBDirNav">
+                          <style>wxDIRCTRL_DIR_ONLY</style>
+                        </object>
+                        <flag>wxEXPAND</flag>
+                        <option>1</option>
+                      </object>
+                    </object>
+                  </object>
+                  <object class="wxPanel">
+                    <object class="wxStaticBoxSizer">
+                      <label>Changelists</label>
+                      <orient>wxHORIZONTAL</orient>
+                      <object class="sizeritem">
+                        <object class="wxListBox" name="CLBChangelists">
+                          <content>
+                            <item/></content>
+                          <style>wxLB_MULTIPLE</style>
+                        </object>
+                        <option>1</option>
+                        <flag>wxALL|wxEXPAND</flag>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+                <flag>wxEXPAND</flag>
+                <option>1</option>
+              </object>
+            </object>
+          </object>
+          <object class="wxPanel">
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <object class="sizeritem">
+                <object class="wxStaticBoxSizer">
+                  <label>Output</label>
+                  <orient>wxVERTICAL</orient>
+                  <object class="sizeritem">
+                    <object class="wxTextCtrl" name="CLBOutput">
+                      <style>wxTE_MULTILINE|wxTE_READONLY|wxTE_LEFT|wxTE_DONTWRAP</style>
+                    </object>
+                    <option>1</option>
+                    <flag>wxEXPAND</flag>
+                  </object>
+                </object>
+                <option>1</option>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+              </object>
+              <rows>1</rows>
+              <growablecols>0</growablecols>
+              <growablerows>0</growablerows>
+            </object>
+          </object>
+          <orientation>vertical</orientation>
+          <sashpos>130</sashpos>
+          <minsize>50</minsize>
+          <style>wxSP_NOBORDER|wxSP_LIVE_UPDATE</style>
+        </object>
+        <option>1</option>
+        <flag>wxEXPAND</flag>
+      </object>
+      <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
+    </object>
+  </object>
+</resource>
+"""
+
+def usage_and_exit(errmsg=None):
+  stream = errmsg and sys.stderr or sys.stdout
+  progname = os.path.basename(sys.argv[0])
+  stream.write("""%s -- graphical Subversion changelist browser
+  
+Usage: %s [DIRECTORY]
+
+Launch the SvnCLBrowse graphical changelist browser, using DIRECTORY
+(or the current working directory, if DIRECTORY is not provided) as
+the initial browse location.
+
+""" % (progname, progname))
+  if errmsg:
+    stream.write("ERROR: %s\n" % (errmsg))
+  sys.exit(errmsg and 1 or 0)
+  
+def main():
+  opts, args = getopt.gnu_getopt(sys.argv[1:], 'h?', ['help'])
+  for name, value in opts:
+    if name == '-h' or name == '-?' or name == '--help':
+      usage_and_exit()
+  argc = len(args)
+  if argc == 0:
+    wc_dir = '.'
+  elif argc == 1:
+    wc_dir = sys.argv[1]
+  else:
+    usage_and_exit("Too many arguments")
+  app = SvnCLBrowse(wc_dir)
+  app.MainLoop()
+  app.OnExit()
+
+if __name__ == "__main__":
+  main()

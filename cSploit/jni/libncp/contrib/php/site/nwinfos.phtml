@@ -1,0 +1,149 @@
+<?
+session_start();
+#doit être après l'ouverture de session
+#global $ss_username;
+#global $ss_tree;
+#global $ss_server;
+#global $ss_authenticated;
+ if (!session_is_registered("ss_authenticated") || (!$ss_authenticated))  {
+    header ("Location: index.phtml?message=".urlencode("Vous n êtes pas authentifié"));
+    exit(); /* capital sinon execute quand même le code plus bas !!!! */
+ }
+?>
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<!-- *************************************************
+        EDITEUR WEBEXPERT
+        DATE DE CREATION: 01/01/00
+        DERNIERE MODIFICATION: 01/01/00
+************************************************** -->
+<HTML>
+<HEAD>
+<TITLE>Menu général</TITLE>
+<META NAME="Patrick Pollet" CONTENT="INSA de Lyon">
+<META NAME="Description" CONTENT="">
+
+
+</HEAD>
+<BODY >
+
+<?php
+
+$strEntete="Bienvenue au Centre Informatique du Premier Cycle<p>  Informations sur votre compte";
+include("header.inc.php3");
+?>
+<TABLE border=1 width=99%>
+
+<?
+#attention ce code semble être executé même si redirection en haut
+
+
+
+function infoStrSur ($tree,$user,$prop,$propalias) {
+     syslog (LOG_NOTICE,"infoStrSur called on".$tree." for ".$user. " to get ".$prop);
+     $fn=read_nds_string ($tree,$user,$prop);
+     if (strstr($fn,"(-60"))
+        $fn="&nbsp;";
+     return "<TR><TD BGCOLOR=#CCCCFF>".$propalias."</TD><TD>".$fn."</TD></TR>";
+
+}
+function infoNumSur ($tree,$user,$prop,$propalias) {
+     syslog (LOG_NOTICE,"infoStrSur called on".$tree." for ".$user. " to get ".$prop);
+     $fn=read_nds_int($tree,$user,$prop);
+     if (strstr($fn,"(-60"))
+        $fn="&nbsp;";
+     return "<TR><TD BGCOLOR=#CCCCFF>".$propalias."</TD><TD>".$fn."</TD></TR>";
+
+}
+if (session_is_registered("ss_authenticated") && ($ss_authenticated)) {
+
+	openlog ("php_nds_read",LOG_ID |LOG_PID ,LOG_AUTHPRIV);
+	echo(infoStrSur($ss_tree,$ss_username,"CN","Login:"));
+        echo(infoStrSur($ss_tree,$ss_username,"Full Name","Nom complet:"));
+        echo(infoStrSur($ss_tree,$ss_username,"Given Name","Prénoms:"));
+        echo(infoStrSur($ss_tree,$ss_username,"Surname","Nom de famille:"));
+        echo(infoStrSur($ss_tree,$ss_username,"Initials","Civilité:"));
+	echo(infoStrSur($ss_tree,$ss_username,"Title","Titre:"));
+	echo(infoStrSur($ss_tree,$ss_username,"Description","Description:"));
+	echo(infoStrSur($ss_tree,$ss_username,"Generational Qualifier","GQ:"));
+
+	echo(infoStrSur($ss_tree,$ss_username,"Group Membership","Adhésion aux groupes:"));
+	echo(infoStrSur($ss_tree,$ss_username,"Security Equals","Equivalence de sécurité:"));
+	echo(infoStrSur($ss_tree,$ss_username,"ACL","Droits:"));
+
+	echo(infoStrSur($ss_tree,$ss_username,"EMail Address","Adresse Email I:"));
+        echo(infoStrSur($ss_tree,$ss_username,"Internet EMail Address","Adresse EMail II:"));
+        echo(infoStrSur($ss_tree,$ss_username,"Home Directory","Repertoire home:"));
+        echo(infoStrSur($ss_tree,$ss_username,"Message Server","Serveur préféré:"));
+	echo(infoStrSur($ss_tree,$ss_username,"Profile","Profil:"));
+	echo(infoStrSur($ss_tree,$ss_username,"Language","Langue:"));
+
+	echo(infoNumSur($ss_tree,$ss_username,"Login Time","Date de login:"));
+	echo(infoNumSur($ss_tree,$ss_username,"Last Login Time","Dernier login:"));
+
+        echo(infoNumSur($ss_tree,$ss_username,"Login Disabled","Compte désactivé:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Login Expiration Time","Votre compte expire le:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Login Grace Limit","Nombre maximum d'essais:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Login Grace Remaining","Il vous reste:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Login Intruder Attempts","Essais d'intrusions:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Login Intruder Reset Time","Remise à zéro après:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Login Maximum Simultaneous","Nombre de connexions permises:"));
+
+
+	echo(infoNumSur($ss_tree,$ss_username,"Password Required","Mot de passe obligatoire:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Password Unique Required","Mots de passe uniques obligatoire:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Password Allow Change","Chgmt de mot de passe permis:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Password Minimum Length","Longueur mimimale du mot de passe:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Password Expiration Time","Date d'expiration du mot de passe:"));
+        echo(infoNumSur($ss_tree,$ss_username,"Password Expiration Interval","Votre mot de passe expire tous les:"));
+
+
+
+	echo(infoStrSur($ss_tree,$ss_username,"Telephone Number","N° de téléphone:"));
+
+        echo(infoStrSur($ss_tree,$ss_username,"Facsimile Telephone Number","N° de FAX"));
+
+
+        echo(infoStrSur($ss_tree,$ss_username,"SA","Rue:"));
+        echo(infoStrSur($ss_tree,$ss_username,"Physical Delivery Office Name","Ville:"));
+        echo(infoStrSur($ss_tree,$ss_username,"Postal Office Box","Boite postale:"));
+        echo(infoStrSur($ss_tree,$ss_username,"Postal Code","Code postal:"));
+	echo(infoStrSur($ss_tree,$ss_username,"S","Etat/Province:"));
+	echo(infoStrSur($ss_tree,$ss_username,"Postal Address","Infos sur étiquettes:"));
+
+
+	echo(infoNumSur($ss_tree,$ss_username,"LINUX:UID","ID Linux:"));
+        echo(infoNumSur($ss_tree,$ss_username,"LINUX:GID","Groupe Linux:"));
+        #echo(infoNumSur($ss_tree,$ss_username,"LINUX:Primary GroupID",""));
+        #echo(infoStrSur($ss_tree,$ss_username,"LINUX:Primary GroupName",""));
+        echo(infoStrSur($ss_tree,$ss_username,"LINUX:Login Shell","Shell Linux:"));
+        echo(infoStrSur($ss_tree,$ss_username,"LINUX:Home Directory","Home Linux:"));
+        echo(infoStrSur($ss_tree,$ss_username,"LINUX:Comments","Gecos Linux:"));
+
+	echo(infoNumSur($ss_tree,$ss_username,"UNIX:UID","ID Unix:"));
+        echo(infoNumSur($ss_tree,$ss_username,"UNIX:GID","Groupe Unix:"));
+        #echo(infoStrSur($ss_tree,$ss_username,"UNIX:Primary GroupID",""));
+        #echo(infoStrSur($ss_tree,$ss_username,"UNIX:Primary GroupName",""));
+        echo(infoStrSur($ss_tree,$ss_username,"UNIX:Login Shell","Shell Unix:"));
+        echo(infoStrSur($ss_tree,$ss_username,"UNIX:Home Directory","Home Unix:"));
+        echo(infoStrSur($ss_tree,$ss_username,"UNIX:Comments","Gecos Unix:"));
+
+	echo(infoStrSur($ss_tree,$ss_username,"OU","Organisation:"));
+	echo(infoStrSur($ss_tree,$ss_username,"L","Locations:"));
+
+	echo(infoStrSur($ss_tree,$ss_username,"Network Address","Loggué depuis:"));
+	closelog();
+
+}
+?>
+
+</table>
+
+
+<?
+require ("footer.inc.php3");
+?>
+
+</BODY>
+</HTML>
+

@@ -1,0 +1,137 @@
+.TH LDAP_MODIFY 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_modify_ext, ldap_modify_ext_s \- Perform an LDAP modify operation
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.nf
+.ft B
+#include <ldap.h>
+.LP
+.ft B
+int ldap_modify_ext(
+.RS
+.ft B
+LDAP *\fIld\fB,
+char *\fIdn\fB,
+LDAPMod *\fImods[]\fB,
+LDAPControl **\fIsctrls\fB,
+LDAPControl **\fIcctrls\fB,
+int *\fImsgidp\fB );
+.RE
+.LP
+.nf
+.ft B
+int ldap_modify_ext_s(
+.RS
+.ft B
+LDAP *\fIld\fB,
+char *\fIdn\fB,
+LDAPMod *\fImods[]\fB,
+LDAPControl **\fIsctrls\fB,
+LDAPControl **\fIcctrls\fB );
+.RE
+.LP
+.nf
+.ft B
+void ldap_mods_free(
+.RS
+.ft B
+LDAPMod **\fImods\fB,
+int \fIfreemods\fB );
+.RE
+.SH DESCRIPTION
+The routine
+.B ldap_modify_ext_s()
+is used to perform an LDAP modify operation.
+\fIdn\fP is the DN of the entry to modify, and \fImods\fP is a
+null-terminated array of modifications to make to the entry.  Each element
+of the \fImods\fP array is a pointer to an LDAPMod structure, which is
+defined below.
+.LP
+.nf
+	typedef struct ldapmod {
+	    int mod_op;
+	    char *mod_type;
+	    union {
+	        char **modv_strvals;
+	        struct berval **modv_bvals;
+	    } mod_vals;
+	    struct ldapmod *mod_next;
+	} LDAPMod;
+	#define mod_values mod_vals.modv_strvals
+	#define mod_bvalues mod_vals.modv_bvals
+.ft
+.fi
+.LP
+The \fImod_op\fP field is used to specify the type of modification to
+perform and should be one of LDAP_MOD_ADD, LDAP_MOD_DELETE, or
+LDAP_MOD_REPLACE.  The \fImod_type\fP and \fImod_values\fP fields
+specify the attribute type to modify and a null-terminated array of
+values to add, delete, or replace respectively.  The \fImod_next\fP
+field is used only by the LDAP server and may be ignored by the
+client.
+.LP
+If you need to specify a non-string value (e.g., to add a
+photo or audio attribute value), you should set \fImod_op\fP to the
+logical OR of the operation as above (e.g., LDAP_MOD_REPLACE)
+and the constant LDAP_MOD_BVALUES.  In this case, \fImod_bvalues\fP
+should be used instead of \fImod_values\fP, and it should point to
+a null-terminated array of struct bervals, as defined in <lber.h>.
+.LP
+For LDAP_MOD_ADD modifications, the given values are added to the
+entry, creating the attribute if necessary.  For LDAP_MOD_DELETE
+modifications, the given values are deleted from the entry, removing
+the attribute if no values remain.  If the entire attribute is to be deleted,
+the \fImod_values\fP field should be set to NULL.  For LDAP_MOD_REPLACE
+modifications, the attribute will have the listed values after the
+modification, having been created if necessary.  All modifications are
+performed in the order in which they are listed.
+.LP
+.B ldap_mods_free()
+can be used to free each element of a NULL-terminated
+array of mod structures.  If \fIfreemods\fP is non-zero, the
+\fImods\fP pointer itself is freed as well.
+.LP
+.B ldap_modify_ext_s()
+returns a code indicating success or, in the case of failure,
+indicating the nature of the failure.  See
+.BR ldap_error (3)
+for details
+.LP
+The
+.B ldap_modify_ext()
+operation works the same way as
+.BR ldap_modify_ext_s() ,
+except that it is asynchronous. The integer that \fImsgidp\fP points
+to is set to the message id of the modify request.  The result of
+the operation can be obtained by calling
+.BR ldap_result (3).
+.LP
+Both
+.B ldap_modify_ext() 
+and
+.B ldap_modify_ext_s() 
+allows server and client controls to be passed in
+via the sctrls and cctrls parameters, respectively.
+.SH DEPRECATED INTERFACES
+The
+.B ldap_modify()
+and
+.B ldap_modify_s()
+routines are deprecated in favor of the
+.B ldap_modify_ext()
+and
+.B ldap_modify_ext_s()
+routines, respectively.
+.LP
+.so Deprecated
+.SH SEE ALSO
+.BR ldap (3),
+.BR ldap_error (3),
+.SH ACKNOWLEDGEMENTS
+.so ../Project
+

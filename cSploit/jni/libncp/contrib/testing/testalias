@@ -1,0 +1,24 @@
+#! /bin/sh
+
+SERVER=VANA
+CTX=VANASOFT.CZ
+SEQ=7
+mkdir testdir
+ncpmount -S ${SERVER} -A vana.vc.cvut.cz -U ADMIN.VANASOFT.CZ -P "bbbbb" testdir
+mkobj -S ${SERVER} -o container${SEQ}.${CTX} -a "Object Class" -V "Organizational Unit"
+mkobj -S ${SERVER} -o user${SEQ}.container${SEQ}.${CTX} -a "Object Class" -V "User" -a Surname -V "Test Account"
+setkeys -S ${SERVER} -o user${SEQ}.container${SEQ}.${CTX} -P "NeTdBpWd____JUST_ACCIDENT__:-)"
+mkobj -S ${SERVER} -o alias${SEQ}.${CTX} -a "Object Class" -V Alias -a "Aliased Object Name" -V container${SEQ}.${CTX}
+nwdpvalues -S ${SERVER} -o user${SEQ}.container${SEQ}.${CTX}
+nwdpvalues -S ${SERVER} -q `nwdpvalues -S ${SERVER} \
+    -o user${SEQ}.container${SEQ}.${CTX} 2>&1 | \
+    sed 's/Name \(.*\) ID \([x0-9a-fA-F]*\)/\2/g'`
+nwdpvalues -S ${SERVER} -o user${SEQ}.alias${SEQ}.${CTX}
+nwdpvalues -S ${SERVER} -q `nwdpvalues -S ${SERVER} \
+    -o user${SEQ}.alias${SEQ}.${CTX} 2>&1 | \
+    sed 's/Name \(.*\) ID \([x0-9a-fA-F]*\)/\2/g'`
+rmobj -S ${SERVER} -o alias${SEQ}.${CTX}
+rmobj -S ${SERVER} -o user${SEQ}.container${SEQ}.${CTX}
+rmobj -S ${SERVER} -o container${SEQ}.${CTX}
+ncpumount testdir
+rmdir testdir

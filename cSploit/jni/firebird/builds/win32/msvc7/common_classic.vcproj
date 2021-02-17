@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="common_classic" ProjectGUID="{F5746066-8613-4811-B27C-0ED70FF9F0FF}" RootNamespace="common_classic">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Debug|Win32" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" PreprocessorDefinitions="WIN32,_DEBUG,_LIB,DEV_BUILD" UsePrecompiledHeader="0" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLinkerTool" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+    </Configuration>
+    <Configuration Name="Release|Win32" ConfigurationType="4" UseOfMFC="0" ATLMinimizesCRunTimeLibraryUsage="false" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="2" InlineFunctionExpansion="1" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" PreprocessorDefinitions="WIN32,NDEBUG,_LIB" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="1053" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLinkerTool" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="MEMORY files">
+      <File RelativePath="..\..\..\src\common\classes\alloc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\locks.cpp">
+      </File>
+    </Filter>
+    <Filter Name="EXCEPTION files">
+      <File RelativePath="..\..\..\src\common\fb_exception.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\StatusHolder.cpp">
+      </File>
+    </Filter>
+    <Filter Name="CONFIG files">
+      <File RelativePath="..\..\..\src\common\config\config.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\config\config_file.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\config_root.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\config\dir_list.cpp">
+      </File>
+    </Filter>
+    <Filter Name="OTHER files">
+      <File RelativePath="..\..\..\src\common\classes\BaseStream.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\ClumpletReader.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\ClumpletWriter.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\cvt.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\db_alias.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\dllinst.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\fb_string.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\fbsyslog.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\init.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\MetaName.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\mod_loader.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\MsgPrint.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\path_utils.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\PublicHandle.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\SafeArg.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\StatusArg.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\TempFile.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\thd.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\timestamp.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\UserBlob.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\utils.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\common\UtilSvc.cpp">
+      </File>
+    </Filter>
+    <Filter Name="Header files" Filter="h">
+      <File RelativePath="..\..\..\src\common\classes\alloc.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\array.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\BaseStream.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\ClumpletReader.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\ClumpletWriter.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\condition.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\config\config.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\config\config_file.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\config\config_impl.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\config_root.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\cvt.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\db_alias.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\config\dir_list.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\GenericMap.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\MetaName.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\MsgPrint.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\SafeArg.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\StatusArg.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\StatusHolder.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\TempFile.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\timestamp.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\classes\UserBlob.h">
+      </File>
+      <File RelativePath="..\..\..\src\common\utils_proto.h">
+      </File>
+    </Filter>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

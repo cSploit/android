@@ -1,0 +1,38 @@
+SVN-fs-dump-format-version: 3
+
+UUID: 55b1b577-cf20-0410-8f4d-bb837066729e
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2006-10-27T18:55:45.622477Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 77
+Content-length: 77
+
+K 8
+svn:date
+V 27
+2006-10-27T18:55:49.840787Z
+K 7
+svn:log
+V 4
+foo
+
+PROPS-END
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+

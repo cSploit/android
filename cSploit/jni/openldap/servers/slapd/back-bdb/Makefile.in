@@ -1,0 +1,53 @@
+# Makefile.in for back-bdb
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+SRCS = init.c tools.c config.c \
+	add.c bind.c compare.c delete.c modify.c modrdn.c search.c \
+	extended.c referral.c operational.c \
+	attr.c index.c key.c dbcache.c filterindex.c \
+	dn2entry.c dn2id.c error.c id2entry.c idl.c \
+	nextid.c cache.c trans.c monitor.c
+
+OBJS = init.lo tools.lo config.lo \
+	add.lo bind.lo compare.lo delete.lo modify.lo modrdn.lo search.lo \
+	extended.lo referral.lo operational.lo \
+	attr.lo index.lo key.lo dbcache.lo filterindex.lo \
+	dn2entry.lo dn2id.lo error.lo id2entry.lo idl.lo \
+	nextid.lo cache.lo trans.lo monitor.lo
+
+LDAP_INCDIR= ../../../include       
+LDAP_LIBDIR= ../../../libraries
+
+BUILD_OPT = "--enable-bdb"
+BUILD_MOD = @BUILD_BDB@
+
+mod_DEFS = -DSLAPD_IMPORT
+MOD_DEFS = $(@BUILD_BDB@_DEFS)
+MOD_LIBS = $(BDB_LIBS)
+
+shared_LDAP_LIBS = $(LDAP_LIBLDAP_R_LA) $(LDAP_LIBLBER_LA)
+NT_LINK_LIBS = -L.. -lslapd $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+UNIX_LINK_LIBS = $(@BUILD_LIBS_DYNAMIC@_LDAP_LIBS)
+
+LIBBASE = back_bdb
+
+XINCPATH = -I.. -I$(srcdir)/..
+XDEFS = $(MODULES_CPPFLAGS)
+
+all-local-lib:	../.backend
+
+../.backend: lib$(LIBBASE).a
+	@touch $@
+

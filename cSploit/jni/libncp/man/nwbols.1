@@ -1,0 +1,119 @@
+.TH NWBOLS 1 7/9/1996 nwbols nwbols
+.SH NAME
+nwbols \- List NetWare Bindery Objects
+.SH SYNOPSIS
+.B nwbols
+[
+.B -h
+] [
+.B -S
+.I server
+] [
+.B -U
+.I user name
+] [
+.B -P
+.I password
+|
+.B -n
+] [
+.B -C
+] [
+.B -t
+.I type
+] [
+.B -o
+.I pattern
+] [
+.B -v
+]
+
+.SH DESCRIPTION
+.B nwbols
+lists the specified NetWare Bindery Objects visible for the user.
+
+.B nwbols
+looks up the file
+.I $HOME/.nwclient
+to find a file server, a user name and possibly a password. See
+nwclient(5) for more information. Please note that the access
+permissions of $HOME/.nwclient MUST be 600 for security reasons.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B -S
+.I server
+.RS 3
+.B server
+is the name of the server you want to use.
+.RE
+
+.B -U
+.I user
+.RS 3
+.B user
+is the user name to use for login.
+.RE
+
+.B -P
+.I password
+.RS 3
+.B password
+is the password to use for login. If neither
+.B -n
+nor
+.B -P
+are given, and the user has no open connection to the server, nwbols
+prompts for a password.
+.RE
+
+.B -n
+.RS 3
+.B -n
+should be given if no password is required for the login.
+.RE
+
+.B -C
+.RS 3
+By default, passwords are converted to uppercase before they are sent
+to the server, because most servers require this. You can turn off
+this conversion by
+.B -C.
+.RE
+
+.B -t
+.I type
+.RS 3
+You can restrict the objects listed by specifying the type of the
+objects to be listed. 
+.I type
+must be given as a decimal number.
+.RE
+
+.B -o
+.I pattern
+.RS 3
+Specifying a pattern is another way to restrict the objects
+listed. Please note that this pattern is evaluated by the NetWare
+server. grep would be a better candidate for complex patterns.
+.RE
+
+.B -v
+.RS 3
+By default, the object's name, its ID and its type are listed by
+.B nwbols.
+In the verbose mode, activated by
+.B -v,
+the object flags, its security byte and the properties flag is also
+listed.
+.RE
+
+.SH AUTHORS
+nwbols was written by Volker Lendecke. See the Changes file of ncpfs
+for other contributors.

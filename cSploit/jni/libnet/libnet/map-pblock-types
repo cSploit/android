@@ -1,0 +1,15 @@
+#!/usr/bin/ruby -w
+
+open("include/libnet/libnet-structures.h").each do |line|
+  #p line
+  next unless line =~ /^#define (LIBNET_PBLOCK_)(\S+).*/
+  #p [$1, $2]
+  type = $1+$2
+  name = $2.sub(/_H$/, "").downcase.inspect
+
+  next if type == "LIBNET_PBLOCK_DO_CHECKSUM"
+
+  puts "        case #{type}:"
+  puts "            return (#{name});"
+end
+

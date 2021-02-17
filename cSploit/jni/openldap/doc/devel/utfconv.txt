@@ -1,0 +1,291 @@
+                                                                Dec 5, 2000
+                                                                Dave Steck
+                                                                Novell, Inc.
+                    
+                    UTF-8 Conversion Functions
+
+
+1.  Strings in the LDAP C SDK should be encoded in UTF-8 format.
+    However, most platforms do not provide APIs for converting to
+    this format.  If they do, they are platform-specific.
+    
+    As a result, most applications (knowingly or not) use local strings
+    with LDAP functions.  This works fine for 7-bit ASCII characters,
+    but will fail with 8-bit European characters, Asian characters, etc.
+    
+    We propose adding the following platform-independent conversion functions 
+    to the OpenLDAP SDK.  There are 4 functions for converting between UTF-8 
+    and wide characters, and 4 functions for converting between UTF-8 and 
+    multibyte characters.
+
+    For multibyte to UTF-8 conversions, charset translation is necessary.
+    While a full charset translator is not practical or appropriate for the
+    LDAP SDK, we can pass the translator function in as an argument.
+    A NULL for this argument will use the ANSI C functions mbtowc, mbstowcs,
+    wctomb, and wcstombs.
+
+2.  UTF-8 <--> Wide Character conversions
+
+The following new conversion routines will be added, following the pattern of 
+the ANSI C conversion routines (mbtowc, mbstowcs, etc).  These routines use
+the wchar_t type.  wchar_t is 2 bytes on some systems and 4 bytes on others.  
+However the advantage of using wchar_t is that all the standard wide character 
+string functions may be used on these strings:   wcslen, wcscpy, etc.
+
+   int ldap_x_utf8_to_wc  -  Convert a single UTF-8 encoded character to a wide character.
+   int ldap_x_utf8s_to_wcs  -  Convert a UTF-8 string to a wide character string.
+   int ldap_x_wc_to_utf8  -  Convert a single wide character to a UTF-8 sequence.
+   int ldap_x_wcs_to_utf8s  -  Convert a wide character string to a UTF-8 string.
+
+
+2.1  ldap_x_utf8_to_wc  -  Convert a single UTF-8  encoded character to a wide character.
+
+int ldap_x_utf8_to_wc ( wchar_t *wchar, const char *utf8char )
+
+  wchar		(OUT)	Points to a wide character code to receive the 
+                    converted character.
+
+  utf8char	(IN)	Address of the UTF8 sequence of bytes.
+
+Return Value:
+		If successful, the function returns the length in 
+        bytes of the UTF-8 input character.
+
+        If utf8char is NULL or points to an empty string, the
+        function returns 1 and a NULL is written to wchar.
+        
+        If utf8char contains an invalid UTF-8 sequence -1 is returned.
+
+
+2.2  ldap_x_utf8s_to_wcs   -  Convert a UTF-8 string to a wide character string.
+
+int ldap_x_utf8s_to_wcs (wchar_t *wcstr, const char *utf8str, size_t count)
+
+  wcstr		(OUT)	Points to a wide char buffer to receive the 
+                    converted wide char string. The output string will be 
+                    null terminated if there is space for it in the 
+                    buffer.
+
+  utf8str   (IN)	Address of the null-terminated UTF-8 string to convert.  
+
+  count		(IN)	The number of UTF-8 characters to convert, or
+        			equivalently, the size of the output buffer in wide
+        			characters.
+
+Return Value:
+    If successful, the function returns the number of wide
+    characters written to wcstr, excluding the null termination
+    character, if any.
+
+	If wcstr is NULL, the function returns the number of wide
+    characters required to contain the converted string,
+    excluding the null termination character.
+
+    If an invalid UTF-8 sequence is encountered, the 
+    function returns -1. 
+
+    If the return value equals count, there was not enough space to fit the 
+    string and the null terminator in the buffer.  
+
+
+2.3  ldap_x_wc_to_utf8  -  Convert a single wide character to a UTF-8 sequence.
+
+int ldap_x_wc_to_utf8 ( char *utf8char, wchar_t wchar, count )
+
+  utf8char	(OUT)	Points to a byte array to receive the converted UTF-8
+        			string.
+
+  wchar		(IN)	The wide character to convert.
+
+  count		(IN)	The maximum number of bytes to write to the output
+                    buffer.  Normally set this to LDAP_MAX_UTF8_LEN, which 
+                    is defined as 3 or 6 depending on the size of wchar_t.  
+                    A partial character will not be written.
+                    
+Return Value:
+		If successful, the function returns the length in bytes of
+		the converted UTF-8 output character.
+
+        If wchar is NULL, the function returns 1 and a NULL is 
+        written to utf8char.
+        
+        If wchar cannot be converted to a UTF-8 character, the 
+        function returns -1.
+
+
+2.4  int ldap_x_wcs_to_utf8s  -  Convert a wide character string to a UTF-8 string.
+
+int ldap_x_wcs_to_utf8s (char *utf8str, const wchar_t *wcstr, size_t count)
+
+  utf8str	(OUT)	Points to a byte array to receive the converted 
+                    UTF-8 string. The output string will be null 
+                    terminated if there is space for it in the 
+                    buffer.
+
+
+  wcstr		(IN)	Address of the null-terminated wide char string to convert.
+
+  count		(IN)	The size of the output buffer in bytes.
+
+Return Value:
+		If successful, the function returns the number of bytes
+		written to utf8str, excluding the null termination
+        character, if any.
+
+		If utf8str is NULL, the function returns the number of
+        bytes required to contain the converted string, excluding 
+        the null termination character.  The 'count' parameter is ignored.
+        
+        If the function encounters a wide character that cannot 
+        be mapped to a UTF-8 sequence, the function returns -1.
+        
+        If the return value equals count, there was not enough space to fit 
+        the string and the null terminator in the buffer.
+
+
+
+3. Multi-byte <--> UTF-8 Conversions
+
+These functions convert the string in a two-step process, from multibyte 
+to Wide, then from Wide to UTF8, or vice versa.  This conversion requires a 
+charset translation routine, which is passed in as an argument.
+ 
+   ldap_x_mb_to_utf8  -  Convert a multi-byte character  to a UTF-8 character.
+   ldap_x_mbs_to_utf8s  -  Convert a multi-byte string to a UTF-8 string.
+   ldap_x_utf8_to_mb  -  Convert a UTF-8 character to a multi-byte character.
+   ldap_x_utf8s_to_mbs  -  Convert a UTF-8 string to a multi-byte string.
+
+3.1  ldap_x_mb_to_utf8  - Convert a multi-byte character  to a UTF-8 character.
+
+int ldap_x_mb_to_utf8 ( char *utf8char, const char *mbchar, size_t mbsize, int (*f_mbtowc)(wchar_t *wchar, const char *mbchar, size_t count)  )
+
+  utf8char	(OUT)	Points to a byte buffer to receive the converted 
+                    UTF-8 character.  May be NULL.  The output is not
+                    null-terminated.
+
+  mbchar    (IN)	Address of a sequence of bytes forming a multibyte character.
+
+  mbsize	(IN)	The maximum number of bytes of the mbchar argument to 
+                    check.  This should normally be MB_CUR_MAX.
+
+  f_mbtowc	(IN)	The function to use for converting a multibyte 
+                    character to a wide character.  If NULL, the local 
+                    ANSI C routine mbtowc is used.
+
+Return Value:
+		If successful, the function returns the length in bytes of
+        the UTF-8 output character.  
+        
+        If utf8char is NULL, count is ignored and the funtion 
+        returns the number of bytes that would be written to the 
+        output char.
+
+        If count is zero, 0 is returned and nothing is written to
+        utf8char.
+         
+        If mbchar is NULL or points to an empty string, the 
+        function returns 1 and a null byte is written to utf8char.
+        
+        If mbchar contains an invalid multi-byte character, -1 is returned.
+
+
+3.2  ldap_x_mbs_to_utf8s  - Convert a multi-byte string  to a UTF-8 string.
+
+int ldap_x_mbs_to_utf8s (char *utf8str, const char *mbstr, size_t count, 
+        size_t (*f_mbstowcs)(wchar_t *wcstr, const char *mbstr, size_t count))
+
+utf8str	    (OUT)	Points to a buffer to receive the converted UTF-8 string.  
+                    May be NULL.
+
+  mbchar	(IN)	Address of the null-terminated multi-byte input string.
+
+  count	    (IN)	The size of the output buffer in bytes.
+
+  f_mbstowcs (IN)	The function to use for converting a multibyte string
+            		to a wide character string.  If NULL, the local ANSI
+            		C routine mbstowcs is used.
+
+Return Value:
+		If successful, the function returns the length in 
+        bytes of the UTF-8 output string, excluding the null
+        terminator, if present.
+        
+        If utf8str is NULL, count is ignored and the function 
+        returns the number of bytes required for the output string, 
+        excluding the NULL.
+        
+        If count is zero, 0 is returned and nothing is written to utf8str.
+         
+        If mbstr is NULL or points to an empty string, the 
+        function returns 1 and a null byte is written to utf8str.
+        
+        If mbstr contains an invalid multi-byte character, -1 is returned.
+        
+        If the returned value is equal to count, the entire null-terminated 
+        string would not fit in the output buffer.
+
+
+3.3  ldap_x_utf8_to_mb  -  Convert a UTF-8 character to a multi-byte character.
+
+int ldap_x_utf8_to_mb ( char *mbchar, const char *utf8char,
+                        int (*f_wctomb)(char *mbchar, wchar_t wchar) )
+
+mbchar	(OUT)	Points to a byte buffer to receive the converted multi-byte 
+                character.  May be NULL.
+
+  utf8char	(IN)	Address of the UTF-8 character sequence.
+
+  f_wctomb	(IN)	The function to use for converting a wide character 
+                    to a multibyte character.  If NULL, the local 
+                    ANSI C routine wctomb is used.
+
+
+Return Value:
+		If successful, the function returns the length in 
+        bytes of the multi-byte output character.  
+        
+        If utf8char is NULL or points to an empty string, the 
+        function returns 1 and a null byte is written to mbchar.
+        
+        If utf8char contains an invalid UTF-8 sequence, -1 is returned.
+
+
+3.4  int ldap_x_utf8s_to_mbs  - Convert a UTF-8 string to a multi-byte string.
+
+
+int ldap_x_utf8s_to_mbs ( char *mbstr, const char *utf8str, size_t count, 
+        size_t (*f_wcstombs)(char *mbstr, const wchar_t *wcstr, size_t count) )
+
+  mbstr		(OUT)	Points to a byte buffer to receive the converted 
+                    multi-byte string.  May be NULL.
+
+  utf8str   (IN)	Address of the null-terminated UTF-8 string to convert.
+
+  count		(IN)	The size of the output buffer in bytes.
+
+  f_wcstombs (IN)	The function to use for converting a wide character 
+                    string to a multibyte string.  If NULL, the local 
+                    ANSI C routine wcstombs is used.
+
+Return Value:
+        If successful, the function returns the number of bytes
+		written to mbstr, excluding the null termination
+        character, if any.
+
+        If mbstr is NULL, count is ignored and the funtion 
+        returns the number of bytes required for the output string,
+        excluding the NULL.
+        
+        If count is zero, 0 is returned and nothing is written to
+        mbstr.
+        
+        If utf8str is NULL or points to an empty string, the 
+        function returns 1 and a null byte is written to mbstr.
+        
+        If an invalid UTF-8 character is encountered, the 
+        function returns -1.
+
+The output string will be null terminated if there is space for it in 
+the output buffer.
+
+

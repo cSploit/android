@@ -1,0 +1,18 @@
+So you've got GIT commit access?  Basically here is the low down on how we do
+things.
+
+If it's a simple patch and doesn't affect anything outside of that module,
+check it in. No post to the list is necessary (appreciated not
+necessary), but do make judicious use of commit messages.
+
+If the change is going to break the libtds API, post your intentions to
+the list before hand for discussion.
+
+Large changes that do not break the interface, can be checked in (if we
+are not in feature freeze) but please post a summary to the list of what
+you did and why so the other developers know.
+
+The GIT commit comments should reflect *why* you changed things. i.e.
+
+"Fixed convert bug in tsql.c"
+

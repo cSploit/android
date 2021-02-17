@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+set -x
+
+export EF_PROTECT_FREE=1
+export EF_FREE_WIPES=1
+
+luaef $* > _ef_above.out
+
+EF_PROTECT_BELOW=1 luaef $* > _ef_below.out
+
+# glibc also has malloc checking
+
+MALLOC_CHECK=2 lua $* > _ef_libc.out
+

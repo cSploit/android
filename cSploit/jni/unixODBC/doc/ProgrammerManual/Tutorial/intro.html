@@ -1,0 +1,86 @@
+<HTML>
+<HEAD>
+<LINK REL="stylesheet" href="odbc.css">
+<TITLE>Introduction</TITLE>
+</HEAD>
+<BODY bgcolor="white">
+
+<table width="90%" cols="3" border="0">
+<TR>
+   <TD colspan="3" class="big">Introduction</TD>
+</TR>
+<TR>
+  <TD colspan="3">Welcome to a short tutorial on ODBC programming. The goal of this tutorial is 
+    to introduce a C-Programmer to ODBC programming. During this tutorial we will
+    code a simple program which connects to a database via ODBC and reads some data. 
+	There won't be any information on how to program ODBC Drivers or about <EM>unixODBC</EM> 
+	internals. Configuration won't be covered too.
+    The program developed throughout this tutorial was originally coded under WinNT
+	and later ported without any adjustments to Linux and <EM>unixODBC</EM>. This is
+	how compatibility should work :)
+	<P>
+	The information given within this tutorial are brief at best. Please
+	take it as a pointer where and how to start. 
+	</P><BR>
+   </TD>
+</TR>
+</TABLE>
+<TABLE COLS="3" Width="90%" border="0">
+<TR><TD class="head" width="25%">Requirements</TD>
+    <TD width="2%">&nbsp;</TD>
+    <TD width="73%">I assume that you have</TD>
+</TR>
+<TR>
+	<TD colspan="2">&nbsp;</TD>
+	<TD><UL>
+		   <LI>a system with unixODBC installed and with at least one
+	           working datasource configured. 
+		   <LI>the include files installed under <CODE>/usr/include/odbc</CODE>
+		   <LI>a compiler installed and that you know how to use it ;)
+		</UL>
+	</TD>
+</TR>
+<TR><TD class="head" width="25%">Compiling</TD>
+    <TD width="2%">&nbsp;</TD>
+	<TD>If gcc is installed type:</TD>
+</TR>
+<TR>
+	<TD colspan="2">&nbsp;</TD>
+	<TD><CODE>gcc odbc.c -o odbc -lodbc</CODE><BR>
+	    which will result in an executable named "odbc".
+    </TD>
+</TR>
+<TR><TD class="head"><A nAME="tab">Database</A></TD>
+    <TD width="20">&nbsp;</TD>
+	<TD>Our database will have a single table:</TD>
+</TR>
+<TR>
+	<TD colspan="2">&nbsp;</TD>
+	<TD><TABLE COLS=2 Border="0" bgcolor="#efefef">
+	    <TR>
+		   <TH colspan=2 class="head">tkeyuser</TH>
+		</TR>
+		<TR>
+		   <TD>iduser</TD>
+		   <TD>sequence</TD>
+		</TR>
+		<TR>
+		   <TD>dtname</TD>
+		   <TD>char(40)</TD>
+		</TR>
+		<TR>
+		   <TD>dtmaxSize</TD>
+		   <TD>Integer</TD>
+		</TR>
+		
+	    </TABLE>
+		<BR>
+		Our datasource will be named "web" and access is 
+		granted to the user "christa" with no password.
+    </TD>
+</TR>
+
+</table>
+
+</BODY>
+</HTML>

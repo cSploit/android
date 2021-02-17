@@ -1,0 +1,93 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" content="text/html; charset=iso-8859-1">
+<TITLE>executing a query</TITLE>
+<link rel="stylesheet" Href="odbc.css">
+</HEAD>
+<BODY bgcolor="white">
+<table width="90%" cols="3" border="0">
+<TR>
+   <TD colspan="3" class="big">Executing a query</TD>
+</TR>
+<TR>
+  <TD colspan="3"><P>If you want to execute a query you will need to specify
+  a handle (<CODE>SQL_HANDLE_STMT</CODE>) for a SQL-statement. In order to get one
+  you have to allocate one with <CODE><A HREF="gloss.html#alloc">SQLAllocHandle</A></CODE>.
+  </P>
+  Then you have to think about the SQL statement you want to execute. As I mentioned in the introduction
+  I assume that we have a table <CODE><A HREF="intro.html#tab">tkeyuser</A></CODE> which contains the following
+  data:</P>
+  <TABLE COLS=3 cellspacing="1" border="0" bgcolor="#eeeeee" cellpadding=2 width="50%">
+  <TR>
+   <TH class="head">iduser</TH>
+   <TH class="head">dtname</TH>
+   <TH class="head">dtmaxSize</TH>
+  </TR>
+  <TR>
+    <TD>1</TD>
+    <TD>Christa</TD>
+	<TD>10000</TD>
+  </TR>
+  <TR>
+    <TD>2</TD>
+	<TD>Nicole</TD>
+    <TD>9000</TD>
+  </TR>
+  </TABLE>
+  <P>
+  In this example, we want to execute a query which returns all the rows for the
+  fields <CODE>iduser</CODE> and <CODE>dtname</CODE> in this table ordered
+  by <code>iduser</CODE>. So the SQL statement would be:</P>
+  <CODE>
+  SELECT iduser,dtname FROM tkeydata ORDER BY iduser
+  </CODE>
+  <P>
+  If you execute this statement you would get two rows each with two <A HREF="gloss.html#col">columns</A> of data. 
+  This data has to be stored somewhere so that your programm can actually use it, so you need to define a variable 
+  for each of the columns. So you need to bind a column to variable in your program. Binding a variable automatically
+  stores the data of the column in the variable when you retrieve a result <A HREF="gloss.html#row">row</A> from the
+  connection. It is important that your variables match the <A HREF="gloss.html#dtyp">type</A> of the column in the table 
+  within the database.</P>
+  <P>
+  So we need to bin column #1 to a variable of type <CODE>SQLINTEGER</CODE> and the second column to
+  a variable of type <CODE>char</CODE>. This is done by <CODE><A HREF="gloss.html#bind">SQLBindCol</A></CODE>.
+  Therefore we add the variables:</P>
+  <CODE class="list">
+  SQLHSTMT       V_OD_hstmt;       &nbsp;     <FONT COLOR="blue">// Handle for a statement</FONT><BR>
+  SQLINTEGER     V_OD_err,V_OD_id;<BR>
+  char           V_OD_buffer[200];
+  </CODE>
+  <P>
+  Now we can bind the variables:</P>
+<CODE class="list"><PRE>
+SQLBindCol(V_OD_hstmt,1,SQL_C_CHAR, &V_OD_buffer,200,&V_OD_err);
+SQLBindCol(V_OD_hstmt,2,SQL_C_ULONG,&V_OD_id,sizeof(V_OD_id),&V_OD_err);
+</PRE>
+</CODE>
+  <P>
+  Yes you should check for the return code of the function call. I'm to lazy to
+  code it here once again :( 
+  </P>
+  Now we can execute the query by calling <A HREF="gloss.html#exec"><CODE>SQLExecDirect</CODE></A>:
+  </P>
+  <CODE class="list"><PRE>
+ V_OD_erg=SQLExecDirect(V_OD_hstmt,
+             "SELECT dtname,iduser FROM tkeyuser order by iduser",SQL_NTS);
+ if ((V_OD_erg != SQL_SUCCESS) && (V_OD_erg != SQL_SUCCESS_WITH_INFO))
+    {
+     printf("Error Select %d\n",V_OD_erg);
+     SQLGetDiagRec(SQL_HANDLE_DBC, V_OD_hdbc,1, V_OD_stat, &V_OD_err,
+	               V_OD_msg,100,&V_OD_mlen);
+     printf("%s (%d)\n",V_OD_msg,V_OD_err);
+     SQLFreeHandle(SQL_HANDLE_DBC,V_OD_hdbc);
+     SQLFreeHandle(SQL_HANDLE_STMT,V_OD_hstmt);
+     SQLFreeHandle(SQL_HANDLE_ENV, V_OD_Env);
+     exit(0);
+    }
+  </PRE>
+  </CODE>
+  </TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>

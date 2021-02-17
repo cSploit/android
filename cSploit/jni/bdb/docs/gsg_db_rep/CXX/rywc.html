@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Read-Your-Writes Consistency</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with Replicated Berkeley DB Applications" />
+    <link rel="up" href="addfeatures.html" title="Chapter 5. Additional Features" />
+    <link rel="prev" href="autoinit.html" title="Stop Auto-Initialization" />
+    <link rel="next" href="c2ctransfer.html" title="Client to Client Transfer" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Read-Your-Writes Consistency</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="autoinit.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. Additional Features</th>
+          <td width="20%" align="right"> <a accesskey="n" href="c2ctransfer.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="rywc"></a>Read-Your-Writes Consistency</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+            In a distributed system, the changes made at the master are not
+            always instantaneously available at every replica, although
+            they eventually will be. In general, replicas not directly
+            involved in contributing to the acknowledgement of a
+            transaction commit will lag behind other replicas because they
+            do not synchronize their commits with the master.
+        </p>
+      <p>
+            For this reason, you might want to make use of the
+            read-your-writes consistency feature. This feature allows you
+            to ensure that a  replica is at least current enough to have the
+            changes made by a specific transaction.  Because transactions
+            are applied serially, by ensuring a replica has a specific
+            commit applied to it, you know that all transaction commits
+            occurring prior to the specified transaction have also been
+            applied to the replica.
+        </p>
+      <p>
+            You determine whether a transaction has been applied to a replica by
+            generating a <span class="emphasis"><em>commit token</em></span> at the master.
+            You then transfer this commit token to the replica, where it is
+            used to determine whether the replica is consistent enough
+            relative to the master.
+        </p>
+      <p>
+            For example, suppose the you have a web application
+            where a replication group is implemented within a load
+            balanced web server group. Each request to the web server
+            consists of an update operation followed by read operations
+            (say, from the same client), The read operations naturally
+            expect to see the data from the updates executed by the
+            same request. However, the read operations might have been
+            routed to a replica that did not execute the update.
+        </p>
+      <p>
+            In such a case, the update request would generate a commit
+            token, which would be resubmitted by the browser, along with
+            subsequent read requests. The read request could be directed at
+            any one of the available web servers by a load balancer. The
+            replica which services the read request would use that commit
+            token to determine whether it can service the read
+            operation.  If the replica is current enough, it can
+            immediately execute the transaction and satisfy the request.
+        </p>
+      <p>
+            What action the replica takes if it is not consistent enough to
+            service the read request is up to you as the application
+            developer. You can do anything from blocking while you wait
+            for the transaction to be applied locally, to rejecting the
+            read request outright.
+        </p>
+      <p>
+            For more information, see the 
+            <code class="literal">Read your writes consistency</code> section in
+            the <code class="literal">Berkeley DB Replication</code> chapter of the
+            <em class="citetitle">Berkeley DB Programmer's Reference Guide</em>.
+        </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="autoinit.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="addfeatures.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="c2ctransfer.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Stop Auto-Initialization </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Client to Client Transfer</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

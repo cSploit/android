@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="btyacc" ProjectGUID="{57CDBF51-F1FB-4227-8C03-6F4134A7E234}" RootNamespace="btyacc" Keyword="ManagedCProj">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Debug|Win32" ConfigurationType="1" CharacterSet="2" ManagedExtensions="0" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" PreprocessorDefinitions="WIN32;_DEBUG" MinimalRebuild="false" BasicRuntimeChecks="0" UsePrecompiledHeader="0" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\bin\$(ProjectName).exe" LinkIncremental="2" AssemblyDebug="1" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+    <Configuration Name="Release|Win32" ConfigurationType="1" CharacterSet="2" ManagedExtensions="0" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" PreprocessorDefinitions="WIN32;NDEBUG" MinimalRebuild="false" UsePrecompiledHeader="0" AdditionalOptions="/EHsc-" OmitFramePointers="true" AdditionalIncludeDirectories="../../../src/include,../../../src/include/gen" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\bin\$(ProjectName).exe" LinkIncremental="1" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+  </Configurations>
+  <References>
+    <AssemblyReference RelativePath="mscorlib.dll" AssemblyName="mscorlib, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=IA64" />
+    <AssemblyReference RelativePath="System.dll" AssemblyName="System, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL" />
+    <AssemblyReference RelativePath="System.Data.dll" AssemblyName="System.Data, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=x86" />
+  </References>
+  <Files>
+    <Filter Name="Source Files" Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx" UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+      <File RelativePath="..\..\..\extern\btyacc\closure.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\error.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\lalr.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\lr0.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\main.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\mkpar.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\mstring.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\output.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\reader.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\readskel.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\skeleton.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\symtab.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\verbose.c">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\warshall.c">
+      </File>
+    </Filter>
+    <Filter Name="Header Files" Filter="h;hpp;hxx;hm;inl;inc;xsd" UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+      <File RelativePath="..\..\..\extern\btyacc\defs.h">
+      </File>
+      <File RelativePath="..\..\..\extern\btyacc\mstring.h">
+      </File>
+    </Filter>
+    <Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx" UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+    </Filter>
+    <File RelativePath=".\ReadMe.txt">
+    </File>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

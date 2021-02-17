@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Non-Durable Transactions</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with Berkeley DB Transaction Processing" />
+    <link rel="up" href="usingtxns.html" title="Chapter 3. Transaction Basics" />
+    <link rel="prev" href="usingtxns.html" title="Chapter 3. Transaction Basics" />
+    <link rel="next" href="abortresults.html" title="Aborting a Transaction" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Non-Durable Transactions</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="usingtxns.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 3. Transaction Basics</th>
+          <td width="20%" align="right"> <a accesskey="n" href="abortresults.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="nodurabletxn"></a>Non-Durable Transactions</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+            As previously noted, by default transaction commits are
+            durable because they cause the modifications performed
+            under the transaction to be synchronously recorded in 
+            your on-disk log files.  However, it is possible to use 
+            non-durable transactions.
+        </p>
+      <p>
+            You may want non-durable transactions for performance
+            reasons. For example, you might be using transactions
+            simply for the isolation guarantee. 
+            
+            <span>
+            In this case, you might
+            not want a durability guarantee and so you may want to
+            prevent the disk I/O that normally accompanies a
+            transaction commit.
+            </span>
+            
+        </p>
+      <p>
+            There are several ways to remove the durability guarantee
+            for your transactions:
+        </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                    Specify          
+                        <span>
+                            <code class="literal">DB_TXN_NOSYNC</code> using the
+                            
+                            <code class="methodname">DbEnv::set_flags()</code>
+                        method. 
+                        </span>
+                        
+                     This causes DB to not synchronously force any log 
+                     data to disk upon transaction commit.  That is, the modifications are held entirely
+                     in the in-memory cache and the logging information is not forced to the filesystem for
+                     long-term storage.
+                     Note, however, that the logging 
+                     data will eventually make it to the filesystem (assuming no
+                     application or OS crashes) as a part of DB's
+                     management of its logging buffers and/or cache.
+               </p>
+            <p>
+                        This form of a commit provides a weak durability
+                        guarantee because data loss can occur due to
+                        an application 
+                        or OS crash.
+                </p>
+            <p>
+                    This behavior is specified on a per-environment
+                    handle basis.  In order for your application to exhibit consistent
+                    behavior, you need to specify this 
+                        <span>flag</span>
+                        
+                    for all of the environment handles used in your application.
+                </p>
+            <p>
+                    You can achieve this behavior on a transaction by transaction basis by
+                        <span>
+                            specifying <code class="literal">DB_TXN_NOSYNC</code> to the
+                                
+                                <code class="methodname">DbTxn::commit()</code>
+                                
+                            method.
+                        </span>
+
+                        
+
+                </p>
+          </li>
+          <li>
+            <p>
+                    Specify
+                    <span>
+                        <code class="literal">DB_TXN_WRITE_NOSYNC</code> using the
+                            
+                            <code class="methodname">DbEnv::set_flags()</code>
+                        method. 
+                        </span>
+
+                        
+
+                        This causes 
+                        <span>
+                            logging 
+                        </span>
+                        data to be synchronously
+                        written to the OS's file system buffers upon
+                        transaction commit. The data will eventually be
+                        written to disk, but this occurs when the
+                        operating system chooses to schedule the
+                        activity; the transaction commit can complete
+                        successfully before this disk I/O is performed
+                        by the OS.
+                   </p>
+            <p>
+                            This  form of commit protects you against application
+                             crashes, but not against OS
+                            crashes.  This method offers less room for the possibility of data loss than does
+                            <span><code class="literal">DB_TXN_NOSYNC</code>.</span>
+                            
+                </p>
+            <p>
+                    This behavior is specified on a per-environment
+                    handle basis.  In order for your application to exhibit consistent
+                    behavior, you need to specify this 
+                        <span>flag</span>
+                        
+                    for all of the environment handles used in your application.
+                </p>
+          </li>
+          <li>
+            <p>
+                    Maintain your logs entirely in-memory. In this
+                    case, your logs are never written to disk. The
+                    result is that you lose all durability guarantees.
+                    See 
+                    <a class="xref" href="logconfig.html#inmemorylogging" title="Configuring In-Memory Logging">Configuring In-Memory Logging</a>
+                    for more information.
+                </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="usingtxns.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="usingtxns.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="abortresults.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 3. Transaction Basics </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Aborting a Transaction</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,742 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Getting Started with the Oracle Berkeley DB SQL APIs</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="next" href="preface.html" title="Preface" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Getting Started with the Oracle Berkeley DB SQL APIs</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"> </td>
+          <th width="60%" align="center"> </th>
+          <td width="20%" align="right"> <a accesskey="n" href="preface.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="book" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h1 class="title"><a id="idp11296"></a>Getting Started with the Oracle Berkeley DB SQL APIs</h1>
+          </div>
+          <div>
+            <div class="legalnotice">
+              <a id="idp50460576"></a>
+              <p class="legalnotice-title">
+                <b>Legal Notice</b>
+              </p>
+              <span>
+        <p>
+            This documentation is distributed under an open source license.
+            You may review the terms of this license at:
+            <a class="ulink" href="http://www.oracle.com/technetwork/database/berkeleydb/downloads/oslicense-093458.html" target="_top">http://www.oracle.com/technetwork/database/berkeleydb/downloads/oslicense-093458.html</a>
+            
+            
+        </p>
+
+        <p>
+                Oracle, Berkeley DB,
+                
+                
+                and
+                Sleepycat are trademarks or registered trademarks of
+                Oracle. All rights to these marks are reserved.
+                No third-party use is permitted without the
+                express prior written consent of Oracle.
+        </p>
+        
+        <p>
+            Other names may be trademarks of their respective owners.
+        </p>
+        <p>
+            To obtain a copy of this document's original source code, please
+            submit a request to the Oracle Technology Network forum at:
+            <a class="ulink" href="https://forums.oracle.com/forums/forum.jspa?forumID=271" target="_top">https://forums.oracle.com/forums/forum.jspa?forumID=271</a>
+            
+            
+        </p>
+    </span>
+            </div>
+          </div>
+          <div>
+            <p class="pubdate">1/24/2014</p>
+          </div>
+        </div>
+        <hr />
+      </div>
+      <div class="toc">
+        <p>
+          <b>Table of Contents</b>
+        </p>
+        <dl>
+          <dt>
+            <span class="preface">
+              <a href="preface.html">Preface</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect1">
+                  <a href="preface.html#conventions">Conventions Used in this Book</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="moreinfo.html">For More Information</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="moreinfo.html#contact_us">Contact Us</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="dbsqlbasics.html">1. Berkeley DB SQL: The Absolute Basics</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect1">
+                  <a href="dbsqlbasics.html#identicalusage">BDB SQL Is Nearly Identical to SQLite</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="buildinstall.html">Getting and Installing BDB SQL</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="buildinstall.html#onwin">On Windows Systems</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="buildinstall.html#onunix">On Unix</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="buildinstall.html#ado_net">The BDB SQL ADO.NET Interface</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="accessing_bdb_sql_databases.title.html">Accessing BDB SQL Databases</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="journaldirectory.html">The Journal Directory</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="unsupportedpragmas.html">Unsupported PRAGMAs</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="changedpragmas.html">Changed PRAGMAs</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="changedpragmas.html#auto_vacuum">PRAGMA auto_vacuum</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="changedpragmas.html#incremental_vacuum">PRAGMA incremental_vacuum</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="changedpragmas.html#journal_size_limit">PRAGMA journal_size_limit</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="addedpragmas.html">Added PRAGMAs</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#bdbsql_error_file">PRAGMA bdbsql_error_file</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#bdbsql_lock_tablesize">PRAGMA bdbsql_lock_tablesize</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#bdbsql_shared_resources">PRAGMA bdbsql_shared_resources</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#bdbsql_single_process">PRAGMA bdbsql_single_process</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#bdbsql_system_memory">PRAGMA bdbsql_system_memory</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#bdbsql_vacuum_fillpercent">PRAGMA bdbsql_vacuum_fillpercent</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#bdbsql_vacuum_pages">PRAGMA bdbsql_vacuum_pages</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#large_record_opt">PRAGMA large_record_opt</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#multiversion">PRAGMA multiversion</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#snapshot_isolation">PRAGMA snapshot_isolation</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#trickle">PRAGMA trickle</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#txn_bulk">PRAGMA txn_bulk</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="addedpragmas.html#replication_pragmas">Replication PRAGMAs</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="miscdiff.html">Miscellaneous Differences</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="bdb-concepts.html">Berkeley DB Concepts</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="sql_encryption.html">Encryption</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sql_encryption.html#sql_native_encrypt">Berkeley DB encryption</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sql_encryption.html#sql_see">SQLite Encryption Extension</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="sequencesupport.html">Using Sequences</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sequencesupport.html#create_sequence">create_sequence</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sequencesupport.html#seq_nextval">nextval</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sequencesupport.html#seq_currval">currval</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sequencesupport.html#seq_drop_sequence">drop_sequence</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="normal-sql.html">Differences for Users of other SQL Engines</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="lockingnotes.html">2. Locking Notes</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect1">
+                  <a href="lockingnotes.html#dbusage">Internal Database Usage</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="lockhandling.html">Lock Handling</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="lockhandling.html#sqllockmodel">SQLite Lock Usage</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="lockhandling.html#bdblockusage">Lock Usage with the BDB SQL Interface</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="dbfeatures.html">3. Berkeley DB Features</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect1">
+                  <a href="dbfeatures.html#bulkloading">Using Bulk Loading</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="mvcc.html">Using Multiversion Concurrency Control</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="selectpage_size.html">Selecting the Page Size</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="sqlrep.html">4. Using Replication with the SQL API</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect1">
+                  <a href="sqlrep.html#repoverview">Replication Overview</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sqlrep.html#repmasters">Replication Masters</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sqlrep.html#repelect">Elections</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sqlrep.html#repdurability">Durability Guarantees</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sqlrep.html#permmessage">Permanent Message Handling</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sqlrep.html#twositerep">Two-Site Replication Groups</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="reppragma.html">Replication PRAGMAs</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication">PRAGMA replication</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_ack_policy">PRAGMA replication_ack_policy</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_ack_timeout">PRAGMA replication_ack_timeout</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_get_master">PRAGMA replication_get_master</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_initial_master">PRAGMA replication_initial_master</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_local_site">PRAGMA replication_local_site</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_num_sites">PRAGMA replication_num_sites</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_perm_failed">PRAGMA replication_perm_failed</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_priority">PRAGMA replication_priority</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_remote_site">PRAGMA replication_remote_site</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_remove_site">PRAGMA replication_remove_site</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_site_status">PRAGMA replication_site_status</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_verbose_output">PRAGMA replication_verbose_output</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="reppragma.html#pragma_replication_verbose_file">PRAGMA replication_verbose_file</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="repstatistics.html">Displaying Replication Statistics</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="rep_usageexamples.html">Replication Usage Examples</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="rep_usageexamples.html#rep_ex1">Example 1: Distributed Read at 3 Sites</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="rep_usageexamples.html#rep_ex2">Example 2: 2-Site Failover</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+            </dl>
+          </dd>
+          <dt>
+            <span class="chapter">
+              <a href="admin.html">5. Administrating Berkeley DB SQL Databases</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect1">
+                  <a href="admin.html#backup">Backing Up Berkeley DB SQL Databases</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="admin.html#idp50788872">Backing Up Replicated Berkeley DB SQL Databases</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="sync.html">Syncing with Oracle Databases</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sync.html#syncunix">Syncing on Unix Platforms</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sync.html#syncwin">Syncing on Windows Platforms</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="sync.html#syncwinmobile">Syncing on Windows Mobile Platforms</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="datamigration.html">Data Migration</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="datamigration.html#shellmigrate">Migration Using the Shells</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="recoverysql.html">Catastrophic Recovery</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="statsql.html">Database Statistics</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="verifysql.html">Verify Database Structure</a>
+                </span>
+              </dt>
+            </dl>
+          </dd>
+          <dt>
+            <span class="appendix">
+              <a href="bfile-extension.html">A. Using the BFILE Extension</a>
+            </span>
+          </dt>
+          <dd>
+            <dl>
+              <dt>
+                <span class="sect1">
+                  <a href="bfile-extension.html#bfile-support">Supported Platforms and Languages</a>
+                </span>
+              </dt>
+              <dt>
+                <span class="sect1">
+                  <a href="bfile-sql.html">BFILE SQL Objects and Functions</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-sql.html#bfile_create_directory">BFILE_CREATE_DIRECTORY</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-sql.html#bfile_replace_directory">BFILE_REPLACE_DIRECTORY</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-sql.html#bfile_drop_directory">BFILE_DROP_DIRECTORY</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-sql.html#bfile_name">BFILE_NAME</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-sql.html#bfile_fullpath">BFILE_FULLPATH</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-sql.html#bfile_open">BFILE_OPEN</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-sql.html#bfile_read">BFILE_READ</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-sql.html#bfile_close">BFILE_CLOSE</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-sql.html#bfile_size">BFILE_SIZE</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+              <dt>
+                <span class="sect1">
+                  <a href="bfile-c.html">BFILE C/C++ Objects and Functions</a>
+                </span>
+              </dt>
+              <dd>
+                <dl>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-c.html#sqlite3_column_bfile">sqlite3_column_bfile</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-c.html#sqlite3_bfile_open">sqlite3_bfile_open</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-c.html#sqlite3_bfile_close">sqlite3_bfile_close</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-c.html#sqlite3_bfile_is_open">sqlite3_bfile_is_open</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-c.html#sqlite3_bfile_read">sqlite3_bfile_read</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-c.html#sqlite3_bfile_file_exists">sqlite3_bfile_file_exists</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-c.html#sqlite3_bfile_size">sqlite3_bfile_size</a>
+                    </span>
+                  </dt>
+                  <dt>
+                    <span class="sect2">
+                      <a href="bfile-c.html#sqlite3_bfile_final">sqlite3_bfile_final</a>
+                    </span>
+                  </dt>
+                </dl>
+              </dd>
+            </dl>
+          </dd>
+        </dl>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right"> <a accesskey="n" href="preface.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top"> </td>
+          <td width="20%" align="center"> </td>
+          <td width="40%" align="right" valign="top"> Preface</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

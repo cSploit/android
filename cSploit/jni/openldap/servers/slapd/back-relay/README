@@ -1,0 +1,83 @@
+Relay backend sets up a relay virtual database that allows
+to access other databases in the same instance of slapd
+through different naming contexts and remapping attribute 
+values.
+
+The DN rewrite, filter rewrite and attributeType/objectClass
+mapping is done by means of the rewrite-remap overlay.
+
+The database containing the real naming context can be
+explicitly selected by means of the "relay" directive,
+which must contain the naming context of the target 
+database.  This also causes the rewrite-remap overlay 
+to be automatically instantiated.  If the optional keyword 
+"massage" is present, the rewrite-remap overlay is 
+automatically configured to map the virtual to the real 
+naming context and vice-versa.
+
+Otherwise, the rewrite-remap overlay must be explicitly
+instantiated, by using the "overlay" directive, as 
+illustrated below.  This allows much more freedom in target 
+database selection and DN rewriting.
+
+If the "relay" directive is not present, the backend is
+not bound to a single target database; on the contrary,
+the target database is selected on a per-operation basis.
+
+This allows, for instance, to relay one database for 
+authentication and anotheir for search/modify, or allows
+to use one target for persons and another for groups
+and so on.
+
+To summarize: the "relay" directive:
+- explicitly bounds the database to a single database 
+  holding the real naming context;
+- automatically instantiates the rewrite-remap overlay;
+- automatically configures the naming context massaging
+  if the optional "massage" keyword is added
+
+If the "relay" directive is not used, the rewrite-remap
+overlay must be explicitly instantiated and the massaging
+must be configured, either by using the "suffixmassage"
+directive, or by issuing more sophisticate rewrite 
+instructions.
+
+AttributeType/objectClass mapping must be explicitly
+required.
+
+Note that the rewrite-remap overlay is not complete nor 
+production- ready yet.
+Examples are given of all the suggested usages. 
+
+# automatically massage from virtual to real naming context
+database	relay
+suffix		"dc=virtual,dc=naming,dc=context"
+relay		"dc=real,dc=naming,dc=context" massage
+
+# explicitly massage (same as above)
+database	relay
+suffix		"dc=virtual,dc=naming,dc=context"
+relay		"dc=real,dc=naming,dc=context"
+suffixmassage	"dc=virtual,dc=naming,dc=context" \
+			"dc=real,dc=naming,dc=context"
+
+# explicitly massage (same as above, but dynamic backend resolution)
+database	relay
+suffix		"dc=virtual,dc=naming,dc=context"
+overlay		rewrite-remap
+suffixmassage	"dc=virtual,dc=naming,dc=context" \
+			"dc=real,dc=naming,dc=context"
+
+# old fashioned suffixalias, applied also to DN-valued attributes
+# from virtual to real naming context, but not the reverse...
+database	relay
+suffix		"dc=virtual,dc=naming,dc=context"
+relay		"dc=real,dc=naming,dc=context"
+rewriteContext	default
+rewriteRule	"(.*)dc=virtual,dc=naming,dc=context$" \
+			"$1dc=real,dc=naming,dc=context"
+rewriteContext	searchFilter
+rewriteContext	searchResult
+rewriteContext	searchResultAttrDN
+rewriteContext	matchedDN
+

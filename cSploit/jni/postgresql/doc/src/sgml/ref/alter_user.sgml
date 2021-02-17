@@ -1,0 +1,74 @@
+<!--
+doc/src/sgml/ref/alter_user.sgml
+PostgreSQL documentation
+-->
+
+<refentry id="SQL-ALTERUSER">
+ <refmeta>
+  <refentrytitle>ALTER USER</refentrytitle>
+  <manvolnum>7</manvolnum>
+  <refmiscinfo>SQL - Language Statements</refmiscinfo>
+ </refmeta>
+
+ <refnamediv>
+  <refname>ALTER USER</refname>
+  <refpurpose>change a database role</refpurpose>
+ </refnamediv>
+
+ <indexterm zone="sql-alteruser">
+  <primary>ALTER USER</primary>
+ </indexterm>
+
+ <refsynopsisdiv>
+<synopsis>
+ALTER USER <replaceable class="PARAMETER">name</replaceable> [ [ WITH ] <replaceable class="PARAMETER">option</replaceable> [ ... ] ]
+
+<phrase>where <replaceable class="PARAMETER">option</replaceable> can be:</phrase>
+
+      SUPERUSER | NOSUPERUSER
+    | CREATEDB | NOCREATEDB
+    | CREATEROLE | NOCREATEROLE
+    | CREATEUSER | NOCREATEUSER
+    | INHERIT | NOINHERIT
+    | LOGIN | NOLOGIN
+    | REPLICATION | NOREPLICATION
+    | CONNECTION LIMIT <replaceable class="PARAMETER">connlimit</replaceable>
+    | [ ENCRYPTED | UNENCRYPTED ] PASSWORD '<replaceable class="PARAMETER">password</replaceable>'
+    | VALID UNTIL '<replaceable class="PARAMETER">timestamp</replaceable>'
+
+ALTER USER <replaceable class="PARAMETER">name</replaceable> RENAME TO <replaceable>new_name</replaceable>
+
+ALTER USER <replaceable class="PARAMETER">name</replaceable> SET <replaceable>configuration_parameter</replaceable> { TO | = } { <replaceable>value</replaceable> | DEFAULT }
+ALTER USER <replaceable class="PARAMETER">name</replaceable> SET <replaceable>configuration_parameter</replaceable> FROM CURRENT
+ALTER USER <replaceable class="PARAMETER">name</replaceable> RESET <replaceable>configuration_parameter</replaceable>
+ALTER USER <replaceable class="PARAMETER">name</replaceable> RESET ALL
+</synopsis>
+ </refsynopsisdiv>
+
+ <refsect1>
+  <title>Description</title>
+
+  <para>
+   <command>ALTER USER</command> is now an alias for
+   <xref linkend="sql-alterrole">.
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>Compatibility</title>
+
+  <para>
+   The <command>ALTER USER</command> statement is a
+   <productname>PostgreSQL</productname> extension.  The SQL standard
+   leaves the definition of users to the implementation.
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>See Also</title>
+
+  <simplelist type="inline">
+   <member><xref linkend="sql-alterrole"></member>
+  </simplelist>
+ </refsect1>
+</refentry>

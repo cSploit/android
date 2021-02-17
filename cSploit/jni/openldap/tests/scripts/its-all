@@ -1,0 +1,52 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+SHTOOL="$SRCDIR/../build/shtool"
+
+TB="" TN=""
+if test -t 1 ; then
+	TB=`$SHTOOL echo -e "%B" 2>/dev/null`
+	TN=`$SHTOOL echo -e "%b" 2>/dev/null`
+fi
+
+echo "#######################################################################"
+echo "###                                                                 ###"
+echo "### regression tests                                                ###"
+echo "###                                                                 ###"
+echo "#######################################################################"
+echo "###"
+
+echo ">>>>> Executing all LDAP ITS regression tests"
+
+for CMD in $SRCDIR/data/regressions/its*/its*; do
+	# remove cruft from prior test
+	if test $PRESERVE = yes ; then
+		/bin/rm -rf testrun/db.*
+	else
+		/bin/rm -rf testrun
+	fi
+
+	echo ">>>>> Starting ${TB}`basename $CMD`${TN} ..."
+	$CMD
+	RC=$?
+	if test $RC -eq 0 ; then
+		echo ">>>>> $CMD completed ${TB}OK${TN}."
+	else
+		echo ">>>>> $CMD ${TB}failed${TN} (exit $RC)"
+		exit $RC
+	fi
+
+	echo ""
+done

@@ -1,0 +1,57 @@
+;  The contents of this file are subject to the Interbase Public
+;  License Version 1.0 (the "License"); you may not use this file
+;  except in compliance with the License. You may obtain a copy
+;  of the License at http://www.Inprise.com/IPL.html
+; 
+;  Software distributed under the License is distributed on an
+;  "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+;  or implied. See the License for the specific language governing
+;  rights and limitations under the License.
+; 
+;  The Original Code was created by Inprise Corporation
+;  and its predecessors. Portions created by Inprise Corporation are
+;  Copyright (C) Inprise Corporation.
+; 
+;  All Rights Reserved.
+;  Contributor(s): ______________________________________.
+;------------------------------------------------------------
+;  DSQL DLL MODULE DEFINITION FILE
+;------------------------------------------------------------
+
+LIBRARY     DSQL
+
+DESCRIPTION 'DSQL INTERBASE MODULE'
+CODE MOVEABLE 
+DATA MOVEABLE
+SEGMENTS
+   _TEXT              DISCARDABLE
+   ALLD_TEXT          DISCARDABLE
+   DDL_TEXT           DISCARDABLE
+   DSQL_TEXT          DISCARDABLE
+   DSQLWEP_TEXT       PRELOAD
+   ERRD_TEXT          DISCARDABLE
+   GEN_TEXT           DISCARDABLE
+   HSH_TEXT           DISCARDABLE
+   MAKE_TEXT          DISCARDABLE
+   METD_TEXT          DISCARDABLE
+   MOVD_TEXT          DISCARDABLE
+   PARSE_TEXT         DISCARDABLE
+   PASS1_TEXT         DISCARDABLE
+   CVT_TEXT           DISCARDABLE
+   DLLSHELL_TEXT      PRELOAD
+
+EXPORTS
+
+; ../DSQL/DSQL.C
+    _dsql8_sql_info                @2   
+    _dsql8_set_cursor              @3   
+    _dsql8_prepare                 @4   
+    _dsql8_free_statement          @5   
+    _dsql8_fetch                   @6   
+    _dsql8_execute_immediate       @7   
+    _dsql8_execute                 @8   
+    _dsql8_allocate_statement      @9
+    _dsql8_insert                  @10
+
+;-----------------------------------------------
+    WEP        			   @1	RESIDENTNAME

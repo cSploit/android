@@ -1,0 +1,84 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+rm -rf $TESTDIR
+
+mkdir -p $TESTDIR $DBDIR1A $DBDIR1B $DBDIR1C
+ITS=6794
+ITSDIR=$DATADIR/regressions/its$ITS
+ITSCONF=$ITSDIR/slapd-glue.conf
+
+echo "Running multi-threaded slapadd in quick mode to build glued slapd databases..."
+. $CONFFILTER $BACKEND $MONITORDB < $ITSCONF > $CONF1
+$SLAPADD -q -d $LVL -f $CONF1 -l $LDIFORDERED > $SLAPADDLOG1 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "slapadd failed ($RC)!"
+	exit $RC
+fi
+
+echo "Starting slapd on TCP/IP port $PORT1..."
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID"
+
+sleep 1
+
+echo "Using ldapsearch to retrieve all the entries..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -b "$BASEDN" -h $LOCALHOST -p $PORT1 > $SEARCHOUT 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Filtering ldapsearch results..."
+$LDIFFILTER -s ldif=e < $SEARCHOUT > $SEARCHFLT
+echo "Filtering original ldif used to create database..."
+$LDIFFILTER -s ldif=e < $LDIFGLUED > $LDIFFLT
+echo "Comparing filter output..."
+$CMP $SEARCHFLT $LDIFFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "comparison failed - database was not created correctly"
+	echo $SEARCHFLT $LDIFFLT
+	$DIFF $SEARCHFLT $LDIFFLT
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Syncing with Oracle Databases</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Getting Started with the Oracle Berkeley DB SQL APIs" />
+    <link rel="up" href="admin.html" title="Chapter 5. Administrating Berkeley DB SQL Databases" />
+    <link rel="prev" href="admin.html" title="Chapter 5. Administrating Berkeley DB SQL Databases" />
+    <link rel="next" href="datamigration.html" title="Data Migration" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Syncing with Oracle Databases</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="admin.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5. Administrating Berkeley DB SQL Databases</th>
+          <td width="20%" align="right"> <a accesskey="n" href="datamigration.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="sync"></a>Syncing with Oracle Databases</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="sync.html#syncunix">Syncing on Unix Platforms</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="sync.html#syncwin">Syncing on Windows Platforms</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="sync.html#syncwinmobile">Syncing on Windows Mobile Platforms</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+                  Oracle's SQLite Mobile Client product allows you to synchronize a
+                  SQLite database with a back-end Oracle database. Because the
+                  BDB SQL interface is a drop-in replacement for SQLite, this means you
+                  can synchronize a Berkeley DB database with an Oracle back-end as well.
+              </p>
+      <div class="note" style="margin-left: 0.5in; margin-right: 0.5in;">
+        <h3 class="title">Note</h3>
+        <p>
+                        Berkeley DB SQL databases are not compatible with
+                        SQLite databases. In order for sync to work, you
+                        must remove any currently existing SQLite
+                        databases.
+                  </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="syncunix"></a>Syncing on Unix Platforms</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                      For Unix platforms, the easiest way to use Oracle's SQLite Mobile Client
+                      is to build the BDB SQL interface with the
+                      compatibility option. That is, specify both
+                      <code class="literal">--enable-sql</code> and
+                      <code class="literal">--enable-sql-compat</code> when you configure
+                      your Berkeley DB installation. This causes libraries with the exact
+                      same name as the SQLite libraries to be created when you
+                      build Berkeley DB.
+                  </p>
+        <p>
+                      Having done that, you must then change your platform's
+                      library search path so that it finds the Berkeley DB libraries
+                      <span class="emphasis"><em>before</em></span> any installed SQLite libraries.
+                      On many (but not all) Unix platforms, you do this by
+                      modifying the <code class="literal">LD_LIBRARY_PATH</code> environment
+                      variable. See your operating system documentation for
+                      information on how to change your search path for dynamically
+                      linked libraries.
+                  </p>
+        <p>
+                      Once you have properly configured and built your Berkeley DB
+                      installation, and you have properly configured your operating
+                      system, you can use the Oracle SQLite Mobile Client in
+                      exactly the same way as you would if you were using standard
+                      SQLite libraries and databases with it. See the 
+                      <a class="ulink" href="http://docs.oracle.com/cd/E35865_01/index.htm" target="_top">
+                          Oracle Database Mobile Server documentation.
+                      </a>
+                      documentation for information on using SQLite Mobile Client.
+                  </p>
+        <p>
+                      For information on building the BDB SQL interface, see the 
+                      <a href="../installation/build_unix_sql.html" class="olink">Configuring the SQL Interface</a> section in the 
+                      <em class="citetitle">Berkeley DB Installation and Build Guide</em>.
+                  </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="syncwin"></a>Syncing on Windows Platforms</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                      For Windows platforms, you use Oracle's SQLite Mobile Client
+                      by building the BDB SQL interface in the same way as you normally do.
+                      See the <a href="../installation/build_win.html" class="olink">Building Berkeley DB for Windows</a>
+                      chapter in the <em class="citetitle">Berkeley DB Installation and Build Guide</em> for more information.
+                  </p>
+        <p>
+                      Once you have built the product, rename the Berkeley DB
+                      SQL dlls so that they are named identically to the standard
+                      SQLite dlls (sqlite3.dll). Install the renamed Berkeley DB SQL dll along with the
+                      main Berkeley DB dll (libdb5x.dll) in the same directory as the SQLite dlls. See the
+                      <a href="../installation/build_win_sql.html" class="olink">Building the SQL API</a> section for details.
+                  </p>
+        <p>
+                      Finally, configure your Windows PATH environment variable so
+                      that it finds your Berkeley DB dlls before it finds any standard
+                      SQLite dlls that might be installed on your system.
+                  </p>
+        <p>
+                      Once you have built your Berkeley DB installation and renamed your
+                      dlls, and you have properly configured your operating system,
+                      you can use the Oracle SQLite Mobile Client in exactly the
+                      same way as you would if you were using standard SQLite
+                      libraries and databases with it. See the 
+                      <a class="ulink" href="http://docs.oracle.com/cd/E35865_01/index.htm" target="_top">
+                       Oracle Database Mobile Server </a> documentation for
+                      information on using SQLite Mobile Client.  
+                  </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="syncwinmobile"></a>Syncing on Windows Mobile Platforms</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+                      For Windows Mobile platforms, you use Oracle's SQLite Mobile Client
+                      by building the BDB SQL interface in the same way as you normally do.
+                      See the <a href="../installation/build_wince.html" class="olink">Building Berkeley DB for Windows Mobile</a>
+                      chapter in the <em class="citetitle">Berkeley DB Installation and Build Guide</em> for more information.
+                  </p>
+        <p>
+                      Once you have built the product, rename the Berkeley DB
+                      SQL dll to <code class="literal">sqlite3.dll</code>. Then, copy
+                      the dll to the <code class="literal">\Windows</code> path on
+                      the phone. Note that you only need the new
+                      <code class="literal">sqlite3.dll</code>; you do not need any
+                      of the other Berkeley DB dlls.
+                  </p>
+        <p>
+                      Once you have built your Berkeley DB installation and renamed your
+                      dlls, and you have properly configured your operating system,
+                      you can use the Oracle SQLite Mobile Client in exactly the
+                      same way as you would if you were using standard SQLite
+                      libraries and databases with it. See the 
+                      <a class="ulink" href="http://docs.oracle.com/cd/E35865_01/index.htm" target="_top">
+                          Oracle Database Mobile Server </a> documentation for
+                      information on using SQLite Mobile Client.  
+                  </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="admin.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="admin.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="datamigration.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 5. Administrating Berkeley DB SQL Databases </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Data Migration</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

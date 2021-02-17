@@ -1,0 +1,41 @@
+Howto Compile SQLite Java Wrapper for Windows:
+
+Install java in a path without spaces.
+Install Microsoft Visual C++ 6.0
+Download latest version of javasqlite-XXXXXXXX.tar.gz from http://www.ch-werner.de/javasqlite/. Locate and download
+sqlite-3.2.1.tar.gz (i.e. http://www.scyllacharybdis.com/download/sqlite-3.2.1.tar.gz). Unpack javasqlite-XXXXXXXX.tar.gz
+to a folder. Unpack sqlite-3.2.1.tar.gz inside this folder. Inside the javasqlite folder, edit the javasqlite3.mak
+file to meet your specific path to your java installation. Locate JAVA_HOME and edit the path:
+
+JAVA_HOME =    C:\Java\jdk1.5.0_06
+
+Start a command window and cd to the javasqlite folder. Now type:
+
+$ "C:\Program Files\Microsoft Visual Studio\VC98\Bin\nmake" javasqlite3.mak
+
+This should start the compilation. After the compilation is complete you should have some new files in the folder. To be
+specific there are only two files that are meaningful to the build, "sqlite.jar" and "sqlite_jni.dll".
+
+Enjoy.
+ 
+
+To test the installation, type:
+
+$ java -jar sqlite.jar db
+
+Now you should be running the Java SQLite Wrapper. To exit type:
+
+$ .exit
+
+Now it's time to create a table and add some entries:
+
+$ java -jar sqlite.jar db "create table t1 (t1key INTEGER PRIMARY KEY,data TEXT,num double,timeEnter DATE);"
+
+$ java -jar sqlite.jar db "insert into t1 (data,num) values ('This is sample data',3);"
+
+$ java -jar sqlite.jar db "insert into t1 (data,num) values ('More sample data',6);"
+
+$ java -jar sqlite.jar db "insert into t1 (data,num) values ('And a little more',9);"
+
+
+//Anton Johansson

@@ -1,0 +1,6 @@
+This directory used to contain a set of COM bindings, which were never
+completed, and just confused people by their presence.  Therefore, the
+bindings were removed in revision 11738.
+
+If you want to see them or work with them, you can check them out from an
+earlier revision.

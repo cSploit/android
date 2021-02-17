@@ -1,0 +1,171 @@
+############################################################################
+#                                                                          #
+#  etterfilter -- etterfilter.tbl -- virtual pointers for etterfilter      #
+#                                                                          #
+#  Copyright (C) ALoR & NaGA                                               #
+#                                                                          #
+#  This program is free software; you can redistribute it and/or modify    #
+#  it under the terms of the GNU General Public License as published by    #
+#  the Free Software Foundation; either version 2 of the License, or       #
+#  (at your option) any later version.                                     #
+#                                                                          #
+############################################################################
+#                                                                          #
+#  Version         : $Revision: 1.5 $                                      # 
+#  Last updated on : $Date: 2004/04/22 15:47:05 $                          #
+#                                                                          #
+############################################################################
+
+
+#
+# ethernet is at layer 2
+#
+[eth][2]
+   dst:6 = 0
+   src:6 = 6
+   proto:2 = 8
+
+#
+# token ring is at layer 2
+#
+[tr][2]
+   ac:1 = 0
+   fc:1 = 1
+   dst:6 = 2
+   src:6 = 8
+   dsap:1 = 14
+   ssap:1 = 15
+   control:1 = 16
+   orgcode:1 = 17
+   proto:2 = 20
+
+#
+# fddi is at layer 2
+#
+[fddi][2]
+   fc:1 = 0
+   dst:6 = 1
+   src:6 = 7
+   dsap:1 = 13
+   ssap:1 = 14
+   control:1 = 15
+   orgcode:1 = 16
+# split proto because it is not aligned
+   proto1:1 = 19
+   proto2:1 = 20
+
+#
+# wireless header at layer 1 / 2
+#
+[wifi][2] 
+   type:2 = 0
+   ttl:2 = 2
+   dst:6 = 4
+   src:6 = 10
+   bssid:1 = 16
+   seq:2 = 17
+
+
+#
+# we identiy arp protocol at layer 3
+# because it is onto a layer 2 (ethernet)
+#
+[arp][3] 
+   hw.fmt:2 = 0
+   proto.fmt:2 = 2
+   hw.len:1 = 4
+   proto.len:1 = 5
+   op:2 = 6
+   src.hw:6 = 8
+   src.addr:4 = 12
+   dst.hw:6 = 16
+   dst.addr:4 = 22
+
+#
+# IP is at layer 3
+# ihl and version are 4 bit each, but we have
+# to collate them in a single byte.
+#
+[ip][3] 
+   ihl_ver:1 = 0
+   tos:1 = 1
+   len:2 = 2
+   id:2 = 4
+   frags:2 = 6
+   ttl:1 = 8
+   proto:1 = 9
+   csum:2 = 10
+   src:4 = 12
+   dst:4 = 16 
+
+
+#
+# we identify icmp protocol at layer 4
+# because it is onto a layer 3 (ip)
+# id,seq overlap gw and mtu (they are in a union)
+#
+[icmp][4]
+   type:1 = 0
+   code:1 = 1
+   csum:2 = 2
+   id:2 = 4
+   seq:2 = 6
+   gw:4 = 4
+   mtu:2 = 6
+
+#
+# GRE is at layer 4
+#
+[gre][4]
+   flags:2 = 0
+   proto:2 = 2
+
+#
+# tcp is at layer 4
+#
+[tcp][4] 
+   src:2 = 0
+   dst:2 = 2
+   seq:4 = 4
+   ack:4 = 8
+   offset:1 = 12
+   flags:1 = 13
+   win:2 = 14
+   csum:2 = 16
+   urg:2 = 18
+
+
+#
+# udp is at layer 4
+#
+[udp][4] 
+   src:2 = 0
+   dst:2 = 2
+   len:2 = 4
+   csum:2 = 6
+
+
+#
+# special case for tcp/udp payload.
+# it is parsed as layer 5
+#
+# the size is set to 1 to represent the first byte, 
+# but 'data' is the entire buffer
+#
+[DATA][5] 
+   data:1 = 0
+
+#
+# some dissectors will decode/decrypt the data 
+# into a special buffer displayed to the user.
+# if you want to search in this buffer, use this table.
+#
+# the size is set to 1 to represent the first byte, 
+# but 'data' is the entire buffer
+#
+[DECODED][6]
+   data:1 = 0
+
+
+# EOF
+

@@ -1,0 +1,7 @@
+#ifndef __KERNEL_ROUTE_H__
+#define __KERNEL_ROUTE_H__
+
+@ncp_net_route_h@
+
+#endif	/* __KERNEL_ROUTE_H__ */
+

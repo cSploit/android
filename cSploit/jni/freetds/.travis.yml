@@ -1,0 +1,45 @@
+language: C
+before_install:
+- sudo apt-get install libgnutls-dev  # install libgnutls-dev BEFORE adding PPA; otherwise I seem to get some version that breaks things
+- sudo add-apt-repository ppa:dns/gnu --yes  # this PPA has a newer automake (1.14) than one in default repo (1.11)
+- sudo apt-get update
+- sudo apt-get install autoconf automake libtool
+- dpkg -l libgnutls-dev
+- autoreconf -i
+install:
+- ./configure --with-gnutls  --enable-silent-rules
+- make
+script:
+- echo -e "\n
+  [global]\n
+  port = ${TDSPORT}\n
+  tds version = ${TDSVER}\n
+  encryption = require" >> /tmp/freetds.conf.local
+- echo -e "SELECT @@VERSION\nGO\n"
+  | TDSDUMPCONFIG=stdout ./src/apps/tsql -H ${TDSPWDSRV} -p ${TDSPORT} -U $TDSPWDUID -P $TDSPWDPWD
+  | awk '(/encrypt level/ || data)   { print $0 }
+         (/^Microsoft SQL Server/)   { data = 1; print ""; print }
+         (/1 row affected/)          { exit }'
+- misc/write_PWD_from_env_vars.sh
+- make -C src/tds/unittests check
+env:
+  global:
+  - FREETDSCONF=/tmp/freetds.conf.local
+  - TDSPWDSRV=sqllibrarydev.cloudapp.net
+  - TDSPORT=1433
+  - TDSVER=7.2
+  - secure: asqyeUGDEf1oYutUMfhz2t48SKXW/oNd3i29W/csPZaxJbv9Sx1kZbpSqd6LYPtOLB3yNyVNjzFe08fmN84i4Szq/NCtmIwOKBjdbZbT4G1+CH0apQ4HlqdKmZKyrrwtL5twcx1lLNk6YQyDZrSqgUr5FGUAZmNH1eCkdOLCOuk=
+  - secure: LK3vPyh4mPEy9snNeyxuWY1hwB7vWzmzv4UdCZCRcHLUKB5ZPLeDSe42OF4JNtk2FSXOGVC3AG37vp+blFqcbzcWi1Qkt9U+iw8ne17+/gimOkWn9Slr0Do9x8m2oyr5pLKoVdacEQF1QYcF+MYUVVF7Kaz9U1KC1twUK/vUJF4=
+  - secure: NlWxWYhdMAAiUuEEf33SwguxvMinsF8/eI4ieVVNPzdxWTlASlGdlpZMnL4cio7WHlqz+ULnKLYNkM/mF49tpITXWzHc5kA/PfJ1AMNsLgSZGalxnDvedsmOsutV/J822Npy1HSBtg+HkWJpszb4/qiZ+TrwVDFnBFCXho36UrY=
+notifications:
+  email:
+    recipients:
+      - msabramo+freetds_travis_ci@gmail.com
+      # - other@example.com
+    on_success: always  # [always|never|change] # default: change
+    on_failure: always  # [always|never|change] # default: always
+  irc:
+    channels:
+      - "chat.freenode.net#freetds"
+    # on_success: [always|never|change] # default: always
+    # on_failure: [always|never|change] # default: always

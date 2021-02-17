@@ -1,0 +1,170 @@
+# $OpenLDAP$
+# Copyright 2007-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Maintenance
+
+System Administration is all about maintenance, so it is only fair that we 
+discuss how to correctly maintain an OpenLDAP deployment.
+
+
+H2: Directory Backups
+
+Backup strategies largely depend on the amount of change in the database
+and how much of that change an administrator might be willing to lose in a 
+catastrophic failure. There are two basic methods that can be used:
+
+1. Backup the LMDB database itself
+
+The LMDB database can be copied live using the mdb_copy command.  If the database
+is a sparse file via the use of the "writemap" environment flag, the resulting
+copy will be the actual size of the database rather than a sparse copy.
+
+2. Backup the Berkeley database itself and periodically back up the transaction 
+log files:
+
+Berkeley DB produces transaction logs that can be used to reconstruct
+changes from a given point in time. For example, if an administrator were willing to only
+lose one hour's worth of changes, they could take down the server in
+the middle of the night, copy the Berkeley database files offsite, and bring
+the server back online. Then, on an hourly basis, they could force a
+database checkpoint, capture the log files that have been generated in the
+past hour, and copy them offsite. The accumulated log files, in combination
+with the previous database backup, could be used with db_recover to
+reconstruct the database up to the time the last collection of log files was
+copied offsite. This method affords good protection, with minimal space
+overhead.
+
+
+3. Periodically run slapcat and back up the LDIF file:
+
+Slapcat can be run while slapd is active. However, one runs the risk of an
+inconsistent database- not from the point of slapd, but from the point of
+the applications using LDAP. For example, if a provisioning application
+performed tasks that consisted of several LDAP operations, and the slapcat
+took place concurrently with those operations, then there might be
+inconsistencies in the LDAP database from the point of view of that
+provisioning application and applications that depended on it. One must,
+therefore, be convinced something like that won't happen. One way to do that
+would be to put the database in read-only mode while performing the
+slapcat. The other disadvantage of this approach is that the generated LDIF
+files can be rather large and the accumulation of the day's backups could
+add up to a substantial amount of space.
+
+You can use {{slapcat}}(8) to generate an LDIF file for each of your {{slapd}}(8) 
+back-mdb, back-bdb, or back-hdb databases.
+
+>    slapcat -f slapd.conf -b "dc=example,dc=com"
+
+For back-mdb, back-bdb, and back-hdb, this command may be ran while slapd(8) is running.
+
+H2: Berkeley DB Logs
+
+Berkeley DB log files grow, and the administrator has to deal with it. The 
+procedure is known as log file archival or log file rotation. 
+
+Note: The actual log file rotation is handled by the Berkeley DB engine.
+
+Logs of current transactions need to be stored into files so that the database 
+can be recovered in the event of an application crash. Administrators can change 
+the size limit of a single log file (by default 10MB), and have old log files 
+removed automatically, by setting up DB environment (see below). The reason 
+Berkeley DB never deletes any log files by default is that the administrator 
+may wish to backup the log files before removal to make database recovery 
+possible even after a catastrophic failure, such as file system corruption.
+
+Log file names are {{F:log.XXXXXXXXXX}} (X is a digit). By default the log files 
+are located in the BDB backend directory. The {{F:db_archive}} tool knows what 
+log files are used in current transactions, and what are not. Administrators can 
+move unused log files to a backup media, and delete them. To have them removed 
+automatically, place set_flags {{DB_LOG_AUTOREMOVE}} directive in {{F:DB_CONFIG}}. 
+
+Note: If the log files are removed automatically, recovery after a catastrophic 
+failure is likely to be impossible.
+
+The files with names {{F:__db.001}}, {{F:__db.002}}, etc are just shared memory 
+regions (or whatever). These ARE NOT 'logs', they must be left alone. Don't be 
+afraid of them, they do not grow like logs do.
+
+To understand the {{F:db_archive}} interface, the reader should refer to 
+chapter 9 of the Berkeley DB guide. In particular, the following chapters are 
+recommended:
+
+* Database and log file archival - {{URL:http://www.oracle.com/technology/documentation/berkeley-db/db/ref/transapp/archival.html}}
+* Log file removal - {{URL:http://www.oracle.com/technology/documentation/berkeley-db/db/ref/transapp/logfile.html}}
+* Recovery procedures - {{URL:http://www.oracle.com/technology/documentation/berkeley-db/db/ref/transapp/recovery.html}}
+* Hot failover - {{URL:http://www.oracle.com/technology/documentation/berkeley-db/db/ref/transapp/hotfail.html}}
+* Complete list of Berkeley DB flags - {{URL:http://www.oracle.com/technology/documentation/berkeley-db/db/api_c/env_set_flags.html}}
+
+Advanced installations can use special environment settings to fine-tune some 
+Berkeley DB options (change the log file limit, etc). This can be done by using 
+the {{F:DB_CONFIG}} file. This magic file can be created in BDB backend directory 
+set up by {{slapd.conf}}(5). More information on this file can be found in File 
+naming chapter. Specific directives can be found in C Interface, look for 
+{{DB_ENV->set_XXXX}} calls.
+
+Note: options set in {{F:DB_CONFIG}} file override options set by OpenLDAP. 
+Use them with extreme caution. Do not use them unless You know what You are doing.
+
+The advantages of {{F:DB_CONFIG}} usage can be the following:
+
+* to keep data files and log files on different mediums (i.e. disks) to improve 
+  performance and/or reliability;
+* to fine-tune some specific options (such as shared memory region sizes);
+* to set the log file limit (please read Log file limits before doing this).
+
+To figure out the best-practice BDB backup scenario, the reader is highly 
+recommended to read the whole Chapter 9: Berkeley DB Transactional Data Store Applications. 
+This chapter is a set of small pages with examples in C language. Non-programming 
+people can skip these examples without loss of knowledge.
+
+
+H2: Checkpointing
+
+MORE/TIDY
+
+If you put "checkpoint 1024 5" in slapd.conf (to checkpoint after 1024kb or 5 minutes, 
+for example), this does not checkpoint every 5 minutes as you may think. 
+The explanation from Howard is:
+
+'In OpenLDAP 2.1 and 2.2 the checkpoint directive acts as follows - *when there 
+is a write operation*, and more than <check> minutes have occurred since the 
+last checkpoint, perform the checkpoint. If more than <check> minutes pass after 
+a write without any other write operations occurring, no checkpoint is performed, 
+so it's possible to lose the last write that occurred.''
+
+In other words, a write operation occurring less than "check" minutes after the 
+last checkpoint will not be checkpointed until the next write occurs after "check" 
+minutes have passed since the checkpoint.
+
+This has been modified in 2.3 to indeed checkpoint every so often; in the meantime 
+a workaround is to invoke "db_checkpoint" from a cron script every so often, say 5 minutes. 
+
+H2: Migration
+
+The simplest steps needed to migrate between versions or upgrade, depending on your deployment
+type are:
+
+.{{S: }}
+^{{B: Stop the current server when convenient}}
+
+.{{S: }}
++{{B: slapcat the current data out}}
+
+.{{S: }}
++{{B: Clear out the current data directory (/usr/local/var/openldap-data/) leaving DB_CONFIG in place}}
+
+.{{S: }}
++{{B: Perform the software upgrades}}
+
+.{{S: }}
++{{B: slapadd the exported data back into the directory}}
+
+.{{S: }}
++{{B: Start the server}}
+
+Obviously this doesn't cater for any complicated deployments like {{SECT: MirrorMode}} or {{SECT: N-Way Multi-Master}}, 
+but following the above sections and using either commercial support or community support should help. Also check the
+{{SECT: Troubleshooting}} section.
+
+

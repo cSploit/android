@@ -1,0 +1,164 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/zu.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/zu.xml
+ */
+zu{
+    ExemplarCharacters{
+        "[a b {bh} c {ch} d {dl} {dy} e f g {gc} {gq} {gx} h {hh} {hl} i j k {kh} {kl"
+        "} {kp} l m n {nc} {ngc} {ngq} {ngx} {nhl} {nk} {nkc} {nkq} {nkx} {nq} {ntsh}"
+        " {nx} {ny} o p {ph} q {qh} r {rh} s {sh} t {th} {tl} {ts} {tsh} u v w x {xh}"
+        " y z]"
+    }
+    ExemplarCharactersCurrency{"[a b c d e f g h i j k l m n o p q r s t u v w x y z]"}
+    LocaleScript{
+        "Latn",
+    }
+    NumberElements{
+        ",",
+        " ",
+        ";",
+        "%",
+        "0",
+        "#",
+        "-",
+        "E",
+        "‰",
+        "∞",
+        "NaN",
+        "+",
+    }
+    NumberPatterns{
+        "#,##0.###",
+        "¤#,##0.00",
+        "#,##0%",
+        "#E0",
+    }
+    Version{"2.0.47.65"}
+    calendar{
+        gregorian{
+            DateTimePatterns{
+                "h:mm:ss a zzzz",
+                "h:mm:ss a z",
+                "h:mm:ss a",
+                "h:mm a",
+                "EEEE dd MMMM y",
+                "d MMMM y",
+                "d MMM y",
+                "yyyy-MM-dd",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+                "{1} {0}",
+            }
+            dayNames{
+                format{
+                    abbreviated{
+                        "Son",
+                        "Mso",
+                        "Bil",
+                        "Tha",
+                        "Sin",
+                        "Hla",
+                        "Mgq",
+                    }
+                    wide{
+                        "Sonto",
+                        "Msombuluko",
+                        "Lwesibili",
+                        "Lwesithathu",
+                        "uLwesine",
+                        "Lwesihlanu",
+                        "Mgqibelo",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "S",
+                        "M",
+                        "B",
+                        "T",
+                        "S",
+                        "H",
+                        "M",
+                    }
+                }
+            }
+            monthNames{
+                format{
+                    abbreviated{
+                        "Jan",
+                        "Feb",
+                        "Mas",
+                        "Apr",
+                        "Mey",
+                        "Jun",
+                        "Jul",
+                        "Aga",
+                        "Sep",
+                        "Okt",
+                        "Nov",
+                        "Dis",
+                    }
+                    wide{
+                        "Januwari",
+                        "Februwari",
+                        "Mashi",
+                        "Apreli",
+                        "Meyi",
+                        "Juni",
+                        "Julayi",
+                        "Agasti",
+                        "Septhemba",
+                        "Okthoba",
+                        "Novemba",
+                        "Disemba",
+                    }
+                }
+                stand-alone{
+                    narrow{
+                        "J",
+                        "F",
+                        "M",
+                        "A",
+                        "M",
+                        "J",
+                        "J",
+                        "A",
+                        "S",
+                        "O",
+                        "N",
+                        "D",
+                    }
+                    wide{
+                        "uJanuwari",
+                        "uFebruwari",
+                        "uMashi",
+                        "u-Apreli",
+                        "uMeyi",
+                        "uJuni",
+                        "uJulayi",
+                        "uAgasti",
+                        "uSepthemba",
+                        "u-Okthoba",
+                        "uNovemba",
+                        "uDisemba",
+                    }
+                }
+            }
+        }
+    }
+    delimiters{
+        alternateQuotationEnd{"”"}
+        alternateQuotationStart{"“"}
+        quotationEnd{"’"}
+        quotationStart{"‘"}
+    }
+}

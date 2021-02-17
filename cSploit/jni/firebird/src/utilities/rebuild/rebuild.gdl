@@ -1,0 +1,147 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+define database "rebuild.fdb" ;
+define relation full_pages
+    number	long,
+    type	short,
+    flags	short,
+    checksum	short,
+    generation	short,
+    relation	short,
+    sequence	long,
+    blp_lead_page   long,
+    blp_length	short,
+    btr_sibling	long,
+    btr_length	short,
+    btr_id	    	short,
+    btr_level	short,    
+    dpg_count	short,
+    irt_count	short,
+    hdr_page_size	short,
+    hdr_ods_version	short,
+    hdr_pages	long,
+    hdr_oldest_trans long,
+    hdr_oldest_active long,
+    hdr_next_trans	long,
+    hdr_flags	short,
+    hdr_creation_date	date,
+    hdr_attachment_id	long,
+    hdr_implementation	long,
+    hdr_shadow_count	long,
+    pip_min	long,
+    ppg_next	long,
+    ppg_count	short,
+    ppg_min_space	short,
+    ppg_max_space	short,
+    tip_next	long;
+
+
+define view pages of p in full_pages
+    p.number,
+    p.type,
+    p.flags,
+    p.checksum,
+    p.generation;
+    
+define view header of p in full_pages with p.type = 1
+    p.number, 
+    p.flags, 
+    p.checksum, 
+    p.generation, 
+    page_size from p.hdr_page_size,
+    ods_version from p.hdr_ods_version,
+    pages_pointer_page from p.hdr_pages,
+    oldest_transaction from p.hdr_oldest_trans,
+    oldest_active from p.hdr_oldest_active,
+    next_transaction from p.hdr_next_trans,
+    p.sequence,
+    p.hdr_flags,
+    creation_date from p.hdr_creation_date,
+    attachment_id from p.hdr_attachment_id,
+    implementation from p.hdr_implementation,
+    shadow_count from p.hdr_shadow_count;
+ 
+define view pips of p in full_pages with p.type = 2
+    p.number, 
+    p.flags, 
+    p.checksum, 
+    p.generation, 
+    minimum from p.pip_min;
+
+define view tips of p in full_pages with p.type = 3
+    p.number, 
+    p.flags, 
+    p.checksum, 
+    p.generation, 
+    next from p.tip_next;
+    
+define view pointer_pages of p in full_pages with p.type = 4
+    p.number, 
+    p.flags, 
+    p.checksum, 
+    p.generation, 
+    p.relation,
+    next from p.ppg_next,
+    count from p.ppg_count,
+    min_space from p.ppg_min_space,
+    max_space from p.ppg_max_space;
+
+define view data_pages of p in full_pages with p.type = 5
+    p.number, 
+    p.flags, 
+    p.checksum, 
+    p.generation, 
+    p.sequence,
+    p.relation, 
+    count from p.dpg_count;
+
+define view index_root_pages of p in full_pages with p.type = 6
+    p.number, 
+    p.flags, 
+    p.checksum, 
+    p.generation, 
+    p.relation,
+    count from p.irt_count;
+
+define view index_buckets of p in full_pages with p.type = 7
+    p.number, 
+    p.flags, 
+    p.checksum, 
+    p.generation,
+    sibling from p.btr_sibling,
+    p.relation,
+    length from p.btr_length,
+    index_id from p.btr_id,
+    level from p.btr_level;
+
+define view blob_pages of p in full_pages with p.type = 8
+    p.number, 
+    p.flags, 
+    p.checksum, 
+    p.generation,
+    lead_page from p.blp_lead_page,
+    p.sequence,
+    length from p.blp_length;
+
+define view generator_pages of p in full_pages with p.type = 9
+    p.number, 
+    p.flags, 
+    p.checksum, 
+    p.generation;
+

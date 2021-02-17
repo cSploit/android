@@ -1,0 +1,18 @@
+Source: sqliteodbc
+Priority: optional
+Maintainer: Sam Clegg <samo@debian.org>
+Build-Depends: debhelper (>= 5), autotools-dev, cdbs, libsqlite-dev, unixodbc-dev, libsqlite3-dev
+Standards-Version: 3.7.2
+Section: libs
+
+Package: libsqliteodbc
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}
+Suggests: unixodbc-bin
+Enhances: unixodbc
+Description: ODBC driver for SQLite embedded database
+ This package allows you to connect to an SQLite database using
+ ODBC, the Open Database Connectivity abstraction layer which is
+ understood by a variety of database tools that may not be able
+ to talk to SQLite directly.

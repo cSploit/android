@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Db::get_blob_threshold()</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C++ API Reference" />
+    <link rel="up" href="blob.html" title="Chapter 14.  Binary Large Objects" />
+    <link rel="prev" href="get_blob_dir.html" title="Db::get_blob_dir()" />
+    <link rel="next" href="set_blob_dir.html" title="Db::set_blob_dir()" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Db::get_blob_threshold()</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="get_blob_dir.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 14. 
+                Binary Large Objects
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="set_blob_dir.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="get_blob_threshold"></a>Db::get_blob_threshold()</h2>
+          </div>
+        </div>
+      </div>
+      <pre class="programlisting">#include &lt;db_cxx.h&gt;
+ 
+int
+Db::get_blob_threshold(u_int32_t *bytes);  </pre>
+      <p>
+         The <code class="methodname">Db::get_blob_threshold()</code> method
+         returns the threshold value, in bytes, beyond which data items are
+         stored as BLOBs. This value can be set using
+         <a class="xref" href="set_blob_threshold.html" title="Db::set_blob_threshold()">Db::set_blob_threshold()</a>. A value of <code class="literal">0</code> indicates
+         that BLOBs are not in use for this database.
+    </p>
+      <p>
+         The <code class="methodname">Db::get_blob_threshold()</code> method
+         always returns <code class="literal">0</code> to indicate success.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5173664"></a>Parameters</h3>
+            </div>
+          </div>
+        </div>
+        <div class="sect3" lang="en" xml:lang="en">
+          <div class="titlepage">
+            <div>
+              <div>
+                <h4 class="title"><a id="idp5174032"></a>bytes</h4>
+              </div>
+            </div>
+          </div>
+          <p>
+                 References memory into which is copied the BLOB threshold
+                 value.
+             </p>
+        </div>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5183392"></a>Class</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            <a class="link" href="db.html" title="Chapter 2.  The Db Handle">Db</a>  
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp5184728"></a>See Also</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+             <a class="xref" href="blob.html#bloblist" title="BLOBs and Related Methods">BLOBs and Related Methods</a> 
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="get_blob_dir.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="blob.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="set_blob_dir.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Db::get_blob_dir() </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Db::set_blob_dir()</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

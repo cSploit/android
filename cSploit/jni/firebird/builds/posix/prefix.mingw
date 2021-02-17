@@ -1,0 +1,69 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+# Copyright (C) Inprise Corporation.
+#
+# All Rights Reserved.
+# Contributor(s): Blas Rodriguez Somoza
+# Start of file prefix.mingw:	$(VERSION)	$(PLATFORM)
+#
+# 2003-Sep-27 BRS Removed IPSERVER after XNET is included
+# 
+
+# -Wno-unused-variable is used due to unused gpre generated variables
+PROD_FLAGS=-O2  -march=i586 -DMINGW -mno-cygwin -Wall -Wshadow -Wundef -Wno-long-long -Wno-unused-variable -Wno-sign-compare -Wno-parentheses -Wno-switch -fmessage-length=0 -Dlint -DWIN32_LEAN_AND_MEAN -MMD -mthreads -Wno-non-virtual-dtor
+DEV_FLAGS=-ggdb -march=i586 -DMINGW -mno-cygwin -Wall -Wshadow -Wundef -Wno-long-long -Wno-unused-variable -Wno-sign-compare -Wno-parentheses -Wno-switch -fmessage-length=0 -Dlint -DWIN32_LEAN_AND_MEAN -MMD -mthreads -Wno-non-virtual-dtor
+
+PLATFORM_PATH=os/win32
+
+# Override link command for implicit stdc++ linking
+LIB_LINK=$(LD)
+
+LIB_LINK_OPTIONS+=-Wl,--enable-stdcall-fixup
+
+# Strip symbols from release versions to decrease size
+ifeq ($(IsProdTypeBuild),Y)
+EXE_LINK_OPTIONS+=-Wl,-s
+LIB_LINK_OPTIONS+=-Wl,-s
+endif
+
+# Generation of fbclient_ms.lib
+LIB_LINK_IMPLIB:=-Wl,--out-implib,firebird/lib/fbclient_ms.lib
+LIB_GUI:= -mwindows -lcomctl32 -lgdi32
+
+# Add resources to some files
+FilesToAddVersionInfo=$(LIBFBEMBED_SO) $(LIBFBCLIENT_SO) $(LIBFBINTL_SO) \
+ $(GSTAT) $(GSEC) $(GFIX) $(QLI) $(ISQL) $(GBAK) $(GPRE)
+# TODO: guardians also must be here
+FilesToAddDialog=$(FB_SUPER_SERVER) $(FB_CLASSIC_SERVER)
+FilesToAddDialog2=$(IBGUARD)
+
+# Suppress 'lib'-prefix
+LIB_PREFIX=
+
+# Override library names to suppress version suffix
+ClientLibraryNameFull := $(ClientLibraryName)
+ClientLibrarySoName := $(ClientLibraryName)
+
+# Looks like MinGW 3 does not support version scripts but support def-files
+LINK_FIREBIRD_SYMBOLS = $(BLD_ROOT)/win32/defs/fbclient_s.def $(BLD_ROOT)/win32/defs/fbclient.def
+
+# This is required for newly built executable to find newly built shared
+# libraries because on Win32 there is no such thing as LD_LIBRARY_PATH
+LIB=$(BIN)
+
+# Special options for UDF link
+LINK_UDF = $(LIB_LINK) $(LIB_LINK_OPTIONS) $(call LIB_LINK_SONAME,$(1).$(SHRLIB_EXT)) -L$(LIB) -lib_util
+LINK_UDF_LIBS = 
+
+# Special options for trace plugin link
+LINK_TRACE_LIBS = -L$(LIB) $(SO_LINK_LIBS)

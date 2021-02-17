@@ -1,0 +1,4646 @@
+<html><body>
+<h2>External defined macros cross reference</h2>
+<hr>
+<p>Last update :Tue Jul 08 20:11:04 CEST 2003<br>Author : Blas Rodriguez Somoza <blas@puertareal.com><p><h2>0.-Introduction</h2><p>Those tables give a cross reference of external macros. External macros are those not defined and used inside the sources. Due to it special use the headers autoconfig.h, autoconfig_msvc.h and common.h are excluded from the sources.<p>
+<p>This version of the tables include all the references for each macro, future versions will include only the files in which it is used.<p>This file is generated with a tool, please don't edit it. For any question regarding it please contact with the author.<p>
+<h2>1.-Macro tables</h2><ul>
+<li><a href="#def0">Unclassified defines</a></li><li><a href="#def1">Engine define</a></li><li><a href="#def2">Compiler defines</a></li><li><a href="#def3">Build defines</a></li><li><a href="#def4">Platform defines</a></li><li><a href="#def5">Platform description define</a></li><li><a href="#def6">Others</a></li><p><a name="def0">Unclassified defines</p>
+<table border="1" width ="100%" cellspacing="3">
+</table>
+<p><a name="def1">Engine define</p>
+<table border="1" width ="100%" cellspacing="3">
+<tr><td valign="top">
+(0) BURP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\xdr.cpp(52) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(1) CANCEL_OPERATION</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\cch.cpp(578) with #ifdef <br>
+used in jrd\entry.h(728) with #ifdef <br>
+used in jrd\entry.h(1397) with #ifdef <br>
+used in jrd\jrd.cpp(1537) with #ifdef <br>
+used in jrd\jrd.cpp(2366) with #ifdef <br>
+used in jrd\jrd.cpp(2510) with #ifdef <br>
+used in jrd\jrd.cpp(4448) with #ifdef <br>
+used in jrd\jrd.cpp(4729) with #ifdef <br>
+used in jrd\jrd.h(472) with #ifdef <br>
+used in jrd\jrd_proto.h(54) with #ifdef <br>
+used in jrd\why.cpp(949) with #ifdef <br>
+used in jrd\why_proto.h(123) with #ifdef <br>
+used in jrd\y-valve.cpp(951) with #ifdef <br>
+used in remote\server.cpp(135) with #ifdef <br>
+used in remote\server.cpp(384) with #ifdef <br>
+used in remote\server.cpp(413) with #ifdef <br>
+used in remote\server.cpp(957) with #ifdef <br>
+used in remote\server.cpp(1259) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(2) CMDLINE_VIA_SERVICE_MANAGER</td><td>by Dmitry Yemanov. Protect some code changed in FB 1.5 remove pending</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet.cpp(2127) with #ifdef <br>
+used in remote\wnet.cpp(462) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(3) EMBEDDED</td><td>Embedded Server</td></tr>
+<tr><td>&nbsp;</td><td>
+used in common\config\config_file.cpp(42) with #if<br>
+used in jrd\gds.cpp(1659) with #ifdef <br>
+used in jrd\ibinitdll.cpp(80) with #ifdef <br>
+used in jrd\isc_sync.cpp(2678) with #ifdef <br>
+used in jrd\isc_sync.cpp(2778) with #ifdef <br>
+used in jrd\os\posix\config_root.cpp(97) with #ifdef <br>
+used in jrd\os\posix\config_root.cpp(130) with #if<br>
+used in jrd\os\thd_priority.h(28) with #if<br>
+used in jrd\os\win32\config_root.cpp(70) with #if<br>
+used in jrd\os\win32\config_root.cpp(93) with #if<br>
+used in jrd\pwd.cpp(145) with #ifndef<br>
+used in jrd\pwd.cpp(371) with #ifdef <br>
+used in jrd\why.cpp(5969) with #ifdef <br>
+used in remote\allr.cpp(149) with #ifndef<br>
+used in remote\interface.cpp(4876) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(4) EXPRESSION_INDICES</td><td>Allow expressions in indices</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dsql\ddl.cpp(2110) with #ifdef <br>
+used in isql\show.epp(2696) with #ifdef <br>
+used in isql\show.epp(2729) with #ifdef <br>
+used in jrd\btr.cpp(425) with #ifdef <br>
+used in jrd\btr.cpp(972) with #ifdef <br>
+used in jrd\btr.cpp(1114) with #ifdef <br>
+used in jrd\dfw.epp(237) with #ifdef <br>
+used in jrd\dyn_def.epp(1756) with #ifdef <br>
+used in jrd\dyn_def.epp(1928) with #ifdef <br>
+used in jrd\opt.cpp(104) with #ifdef <br>
+used in jrd\opt.cpp(2614) with #ifdef <br>
+used in jrd\opt.cpp(5760) with #ifdef <br>
+used in jrd\opt.cpp(5796) with #ifdef <br>
+used in jrd\opt.cpp(5805) with #ifdef <br>
+used in jrd\opt.cpp(5809) with #ifdef <br>
+used in jrd\pcmet.epp(55) with #ifdef <br>
+used in jrd\pcmet.epp(200) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(6) GDS32</td><td>Build with GDS Compatibility.</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\ibinitdll.cpp(29) with #ifdef <br>
+used in jrd\ibinitdll.cpp(55) with #ifdef <br>
+used in jrd\ibinitdll.cpp(77) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(7) GOVERNOR</td><td>Unknown.</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\jrd.cpp(417) with #ifdef <br>
+used in jrd\jrd.cpp(1319) with #ifdef <br>
+used in jrd\jrd.cpp(2095) with #ifdef <br>
+used in jrd\jrd.cpp(2297) with #ifdef <br>
+used in jrd\jrd.cpp(2370) with #ifdef <br>
+used in jrd\jrd.cpp(2376) with #ifdef <br>
+used in jrd\jrd.cpp(2556) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(8) GPRE_ADA</td><td>Build gpre for Ada functionality.</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\gpre.cpp(527) with #ifdef <br>
+used in gpre\gpre.cpp(2023) with #ifdef <br>
+used in gpre\gpre.cpp(2456) with #ifdef <br>
+used in gpre\gpre.h(78) with #ifdef <br>
+used in gpre\gpreswi.h(119) with #ifdef <br>
+used in gpre\pat.cpp(408) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(9) GPRE_COBOL</td><td>Build gpre for Cobol functionality.</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\gpre.cpp(190) with #ifdef <br>
+used in gpre\gpre.cpp(595) with #ifdef <br>
+used in gpre\gpre.cpp(751) with #ifdef <br>
+used in gpre\gpre.cpp(1791) with #ifdef <br>
+used in gpre\gpre.cpp(1976) with #ifdef <br>
+used in gpre\gpre.cpp(2302) with #ifdef <br>
+used in gpre\gpre.cpp(2738) with #ifdef <br>
+used in gpre\gpreswi.h(163) with #ifdef <br>
+used in gpre\pat.cpp(417) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(10) GPRE_FORTRAN</td><td>Build gpre for Fortran functionality.</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\gpre.cpp(98) with #ifdef <br>
+used in gpre\gpre.cpp(179) with #ifdef <br>
+used in gpre\gpre.cpp(572) with #ifdef <br>
+used in gpre\gpre.cpp(1399) with #ifdef <br>
+used in gpre\gpre.cpp(1488) with #ifdef <br>
+used in gpre\gpre.cpp(1775) with #ifdef <br>
+used in gpre\gpre.cpp(1987) with #ifdef <br>
+used in gpre\gpre.cpp(2056) with #ifdef <br>
+used in gpre\gpre.cpp(2288) with #ifdef <br>
+used in gpre\gpre.cpp(2297) with #ifdef <br>
+used in gpre\gpre.cpp(2730) with #ifdef <br>
+used in gpre\gpre.cpp(2795) with #if<br>
+used in gpre\gpre.h(72) with #ifdef <br>
+used in gpre\gpreswi.h(133) with #ifdef <br>
+used in gpre\pat.cpp(426) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(11) GPRE_PASCAL</td><td>Build gpre for Pascal functionality.</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\gpre.cpp(610) with #ifdef <br>
+used in gpre\gpre.cpp(1781) with #ifdef <br>
+used in gpre\gpreswi.h(146) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(12) IGNORE_NULL_IDX_KEY</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\btr.cpp(512) with #ifdef <br>
+used in jrd\btr.cpp(592) with #ifdef <br>
+used in jrd\btr.cpp(608) with #ifdef <br>
+used in jrd\btr.cpp(648) with #ifndef<br>
+used in jrd\btr.cpp(964) with #ifdef <br>
+used in jrd\btr.cpp(1006) with #ifdef <br>
+used in jrd\btr.cpp(1033) with #ifdef <br>
+used in jrd\btr.cpp(1200) with #ifdef <br>
+used in jrd\btr.cpp(1347) with #ifdef <br>
+used in jrd\btr.cpp(1359) with #ifdef <br>
+used in jrd\btr.cpp(1379) with #ifdef <br>
+used in jrd\btr.cpp(1767) with #ifdef <br>
+used in jrd\btr.cpp(1877) with #ifdef <br>
+used in jrd\btr.cpp(1886) with #ifdef <br>
+used in jrd\btr.cpp(2366) with #ifdef <br>
+used in jrd\btr.cpp(2470) with #ifdef <br>
+used in jrd\btr.cpp(2484) with #ifdef <br>
+used in jrd\btr.cpp(2632) with #ifdef <br>
+used in jrd\btr.cpp(2643) with #ifdef <br>
+used in jrd\btr.cpp(2698) with #ifdef <br>
+used in jrd\btr.cpp(2713) with #ifdef <br>
+used in jrd\btr.cpp(2776) with #ifdef <br>
+used in jrd\btr.cpp(2964) with #ifdef <br>
+used in jrd\btr.cpp(3088) with #ifdef <br>
+used in jrd\btr.cpp(3383) with #ifdef <br>
+used in jrd\btr.cpp(3596) with #ifdef <br>
+used in jrd\btr.cpp(3607) with #ifdef <br>
+used in jrd\btr.cpp(3662) with #ifdef <br>
+used in jrd\btr.cpp(3692) with #ifdef <br>
+used in jrd\btr.cpp(3719) with #ifndef<br>
+used in jrd\btr.cpp(3816) with #ifdef <br>
+used in jrd\btr.cpp(3882) with #ifdef <br>
+used in jrd\btr.cpp(3900) with #ifdef <br>
+used in jrd\btr.cpp(3984) with #ifdef <br>
+used in jrd\btr.cpp(4236) with #ifdef <br>
+used in jrd\btr.cpp(4332) with #ifdef <br>
+used in jrd\btr.cpp(4370) with #ifdef <br>
+used in jrd\btr.cpp(4386) with #ifdef <br>
+used in jrd\btr.cpp(4516) with #ifdef <br>
+used in jrd\btr.h(133) with #ifdef <br>
+used in jrd\btr.h(145) with #ifdef <br>
+used in jrd\idx.cpp(227) with #ifdef <br>
+used in jrd\idx.cpp(365) with #ifdef <br>
+used in jrd\idx.cpp(412) with #ifdef <br>
+used in jrd\idx.cpp(431) with #ifdef <br>
+used in jrd\nav.cpp(621) with #ifdef <br>
+used in jrd\nav.cpp(1279) with #ifdef <br>
+used in jrd\nav.cpp(1429) with #ifdef <br>
+used in jrd\ods.h(269) with #ifdef <br>
+used in jrd\opt.cpp(915) with #ifdef <br>
+used in jrd\val.cpp(666) with #ifdef <br>
+used in jrd\val.cpp(1455) with #ifdef <br>
+used in utilities\dba.epp(1160) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(13) INTL_BUILTIN</td><td>Use international support built in </td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\intl.cpp(108) with #ifdef <br>
+used in jrd\intl.cpp(2173) with #ifdef <br>
+used in jrd\intl.cpp(2196) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(14) IPSERV</td><td>Build with Interprocess server</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\why.cpp(497) with #ifdef <br>
+used in jrd\why.cpp(524) with #ifdef <br>
+used in jrd\why.cpp(552) with #ifdef <br>
+used in jrd\y-valve.cpp(501) with #ifdef <br>
+used in jrd\y-valve.cpp(526) with #ifdef <br>
+used in jrd\y-valve.cpp(555) with #ifdef <br>
+used in remote\interface.cpp(90) with #if<br>
+used in remote\interface.cpp(4880) with #ifndef<br>
+used in remote\interface.cpp(4905) with #if<br>
+used in remote\interface.cpp(5004) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(15) IPSERVER</td><td>Build with Interprocess server</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\window.cpp(37) with #ifdef <br>
+used in remote\window.cpp(46) with #ifdef <br>
+used in remote\window.cpp(116) with #ifdef <br>
+used in remote\window.cpp(481) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(17) MANAGER_PROCESS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in lock\lock.cpp(105) with #ifdef <br>
+used in lock\lock.cpp(231) with #ifdef <br>
+used in lock\lock.cpp(888) with #ifdef <br>
+used in lock\lock.cpp(900) with #ifdef <br>
+used in lock\lock.cpp(1323) with #ifdef <br>
+used in lock\lock.cpp(1470) with #ifdef <br>
+used in lock\lock.cpp(2786) with #ifdef <br>
+used in lock\lock.cpp(2838) with #ifdef <br>
+used in lock\lock.cpp(3808) with #ifdef <br>
+used in lock\lock.cpp(3911) with #if<br>
+used in lock\lock.cpp(3927) with #ifdef <br>
+used in lock\lock.cpp(4252) with #ifdef <br>
+used in lock\lock.cpp(4284) with #ifdef <br>
+used in lock\lock.cpp(4295) with #ifdef <br>
+used in lock\manager.cpp(66) with #ifdef <br>
+used in lock\print.cpp(149) with #ifdef <br>
+used in lock\print.cpp(420) with #ifdef <br>
+used in utilities\drop.cpp(76) with #ifdef <br>
+used in utilities\drop.cpp(151) with #ifdef <br>
+used in utilities\drop.cpp(222) with #ifdef <br>
+used in utilities\drop.cpp(297) with #ifdef <br>
+used in utilities\drop.cpp(395) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(18) NO_NFS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(120) with #ifndef<br>
+used in jrd\isc_file.cpp(203) with #if<br>
+used in jrd\isc_file.cpp(213) with #ifndef<br>
+used in jrd\isc_file.cpp(289) with #ifndef<br>
+used in jrd\isc_file.cpp(549) with #ifndef<br>
+used in jrd\isc_file.cpp(587) with #if<br>
+used in jrd\isc_file.cpp(1018) with #if<br>
+used in jrd\isc_file.cpp(1261) with #ifndef<br>
+used in jrd\jrd.cpp(744) with #ifndef<br>
+used in jrd\jrd.cpp(1884) with #ifndef<br>
+used in remote\interface.cpp(41) with #ifndef<br>
+used in remote\interface.cpp(4851) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(19) NO_OSRI_ENTRYPOINTS</td><td>Only used to remove gds entry points</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\gdsold.h(63) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(20) NO_PASSWORD_ENCRYPTION</td><td>Added by Erik Kunze in version 1.22<br>Previously the ifdef use no_crypt changed to have_crypt<br>Since enc.cpp defines the ENC_crypt function if the crypt header doesn't exists<br>this macro seems can be removed</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\interface.cpp(5921) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(21) PC_ENGINE</td><td>Make FB support dBase style</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\bookmark.cpp(38) with #ifdef <br>
+used in jrd\bookmark.cpp(118) with #ifdef <br>
+used in jrd\bookmark.cpp(161) with #ifdef <br>
+used in jrd\cmp.cpp(162) with #ifdef <br>
+used in jrd\cmp.cpp(735) with #ifdef <br>
+used in jrd\cmp.cpp(749) with #ifdef <br>
+used in jrd\cmp.cpp(2142) with #ifdef <br>
+used in jrd\cmp.cpp(2265) with #ifdef <br>
+used in jrd\cmp.cpp(4321) with #ifdef <br>
+used in jrd\cmp.cpp(4625) with #ifdef <br>
+used in jrd\cmp.cpp(4635) with #ifdef <br>
+used in jrd\cmp.cpp(5180) with #ifdef <br>
+used in jrd\evl.cpp(148) with #ifdef <br>
+used in jrd\evl.cpp(842) with #ifdef <br>
+used in jrd\evl.cpp(1067) with #ifdef <br>
+used in jrd\evl.cpp(3755) with #ifdef <br>
+used in jrd\evl.cpp(3833) with #ifdef <br>
+used in jrd\exe.cpp(144) with #ifdef <br>
+used in jrd\exe.cpp(192) with #ifdef <br>
+used in jrd\exe.cpp(422) with #ifdef <br>
+used in jrd\exe.cpp(539) with #ifdef <br>
+used in jrd\exe.cpp(1135) with #ifdef <br>
+used in jrd\exe.cpp(1149) with #ifdef <br>
+used in jrd\exe.cpp(1176) with #ifdef <br>
+used in jrd\exe.cpp(1222) with #ifdef <br>
+used in jrd\exe.cpp(1313) with #ifdef <br>
+used in jrd\exe.cpp(1638) with #ifdef <br>
+used in jrd\exe.cpp(1718) with #ifdef <br>
+used in jrd\exe.cpp(1758) with #ifdef <br>
+used in jrd\exe.cpp(2564) with #ifdef <br>
+used in jrd\exe.cpp(2802) with #ifdef <br>
+used in jrd\exe.cpp(2823) with #ifdef <br>
+used in jrd\exe.cpp(2893) with #ifdef <br>
+used in jrd\exe.cpp(2985) with #ifdef <br>
+used in jrd\exe.cpp(3184) with #ifdef <br>
+used in jrd\exe.cpp(3379) with #ifdef <br>
+used in jrd\exe.cpp(3401) with #ifdef <br>
+used in jrd\exe.cpp(3455) with #ifdef <br>
+used in jrd\exe.cpp(3539) with #ifdef <br>
+used in jrd\exe.cpp(3701) with #ifdef <br>
+used in jrd\exe.cpp(3958) with #ifdef <br>
+used in jrd\exe_proto.h(41) with #ifdef <br>
+used in jrd\nav.cpp(60) with #ifdef <br>
+used in jrd\nav.cpp(154) with #ifdef <br>
+used in jrd\nav.cpp(404) with #ifdef <br>
+used in jrd\nav.cpp(586) with #ifdef <br>
+used in jrd\nav.cpp(610) with #ifdef <br>
+used in jrd\nav.cpp(745) with #ifdef <br>
+used in jrd\nav.cpp(754) with #ifdef <br>
+used in jrd\nav.cpp(761) with #ifdef <br>
+used in jrd\nav.cpp(783) with #ifdef <br>
+used in jrd\nav.cpp(846) with #ifdef <br>
+used in jrd\nav.cpp(1062) with #ifdef <br>
+used in jrd\nav.cpp(1154) with #ifdef <br>
+used in jrd\nav.cpp(1509) with #ifdef <br>
+used in jrd\nav_proto.h(35) with #ifdef <br>
+used in jrd\par.cpp(2760) with #ifdef <br>
+used in jrd\rlck.cpp(43) with #ifdef <br>
+used in jrd\rlck.cpp(47) with #ifdef <br>
+used in jrd\rlck.cpp(56) with #ifdef <br>
+used in jrd\rlck.cpp(124) with #ifdef <br>
+used in jrd\rlck.cpp(201) with #ifdef <br>
+used in jrd\rlck.cpp(234) with #ifdef <br>
+used in jrd\rlck.cpp(282) with #ifdef <br>
+used in jrd\rlck.cpp(335) with #ifdef <br>
+used in jrd\rlck.cpp(369) with #ifdef <br>
+used in jrd\rlck.cpp(533) with #ifdef <br>
+used in jrd\rlck.cpp(627) with #ifdef <br>
+used in jrd\rlck.cpp(672) with #ifdef <br>
+used in jrd\rlck.cpp(729) with #ifdef <br>
+used in jrd\rlck.cpp(778) with #ifdef <br>
+used in jrd\rlck.cpp(874) with #ifdef <br>
+used in jrd\rlck.cpp(917) with #ifdef <br>
+used in jrd\rlck.cpp(947) with #ifdef <br>
+used in jrd\rlck.cpp(977) with #ifdef <br>
+used in jrd\rlck.cpp(1010) with #ifdef <br>
+used in jrd\rlck_proto.h(27) with #ifdef <br>
+used in jrd\rlck_proto.h(49) with #ifdef <br>
+used in jrd\rlck_proto.h(55) with #ifdef <br>
+used in jrd\rng.cpp(54) with #ifdef <br>
+used in jrd\rng.cpp(62) with #ifdef <br>
+used in jrd\rng.cpp(136) with #ifdef <br>
+used in jrd\rng.cpp(208) with #ifdef <br>
+used in jrd\rng.cpp(285) with #ifdef <br>
+used in jrd\rng.cpp(361) with #ifdef <br>
+used in jrd\rng.cpp(466) with #ifdef <br>
+used in jrd\rng.cpp(511) with #ifdef <br>
+used in jrd\rng.cpp(540) with #ifdef <br>
+used in jrd\rng.cpp(589) with #ifdef <br>
+used in jrd\rng.cpp(664) with #ifdef <br>
+used in jrd\rng.cpp(696) with #ifdef <br>
+used in jrd\rng.cpp(752) with #ifdef <br>
+used in jrd\rng.cpp(792) with #ifdef <br>
+used in jrd\rng.cpp(829) with #ifdef <br>
+used in jrd\rng.cpp(866) with #ifdef <br>
+used in jrd\rng_proto.h(27) with #ifdef <br>
+used in jrd\rse.cpp(238) with #ifdef <br>
+used in jrd\rse.cpp(358) with #ifdef <br>
+used in jrd\rse.cpp(490) with #ifdef <br>
+used in jrd\rse.cpp(547) with #ifdef <br>
+used in jrd\rse.cpp(786) with #ifdef <br>
+used in jrd\rse.cpp(857) with #ifdef <br>
+used in jrd\rse.cpp(2232) with #ifdef <br>
+used in jrd\rse.cpp(2248) with #ifdef <br>
+used in jrd\rse.cpp(2387) with #ifdef <br>
+used in jrd\rse.cpp(2446) with #ifdef <br>
+used in jrd\rse.cpp(2497) with #ifdef <br>
+used in jrd\rse.cpp(2543) with #ifdef <br>
+used in jrd\rse.cpp(2566) with #ifdef <br>
+used in jrd\rse_proto.h(31) with #ifdef <br>
+used in jrd\rse_proto.h(37) with #ifdef <br>
+used in jrd\rse_proto.h(42) with #ifdef <br>
+used in jrd\rse_proto.h(48) with #ifdef <br>
+used in jrd\sbm.cpp(398) with #ifdef <br>
+used in jrd\sbm.cpp(499) with #ifdef <br>
+used in jrd\sbm.cpp(568) with #ifdef <br>
+used in jrd\shut.cpp(349) with #ifdef <br>
+used in jrd\sort.cpp(658) with #ifdef <br>
+used in jrd\tra.cpp(103) with #ifdef <br>
+used in jrd\tra.cpp(408) with #ifdef <br>
+used in jrd\tra.cpp(1561) with #ifdef <br>
+used in jrd\tra.cpp(2359) with #ifdef <br>
+used in jrd\tra.cpp(2685) with #ifdef <br>
+used in jrd\tra.h(63) with #ifdef <br>
+used in jrd\vio.cpp(475) with #ifdef <br>
+used in jrd\vio.cpp(715) with #ifdef <br>
+used in jrd\vio.cpp(892) with #ifdef <br>
+used in jrd\vio.cpp(1664) with #ifdef <br>
+used in jrd\vio.cpp(2330) with #ifdef <br>
+used in jrd\vio_proto.h(37) with #ifdef <br>
+used in qli\compile.h(154) with #ifdef <br>
+used in qli\exe.h(236) with #ifdef <br>
+used in qli\expand.cpp(2153) with #ifdef <br>
+used in qli\parse.cpp(3771) with #ifdef <br>
+used in qli\show.epp(1834) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(23) REPLAY_OSRI_API_CALLS_SUBSYSTEM</td><td>System to reply requests, usable for debug. Not complete.</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\blb.cpp(88) with #ifdef <br>
+used in jrd\blb.cpp(783) with #ifdef <br>
+used in jrd\blb.cpp(896) with #ifdef <br>
+used in jrd\blb.cpp(1060) with #ifdef <br>
+used in jrd\blb.cpp(2121) with #ifdef <br>
+used in jrd\blb_proto.h(74) with #ifdef <br>
+used in jrd\jrd.cpp(869) with #ifdef <br>
+used in jrd\jrd.cpp(1147) with #ifdef <br>
+used in jrd\jrd.cpp(1258) with #ifdef <br>
+used in jrd\jrd.cpp(1306) with #ifdef <br>
+used in jrd\jrd.cpp(1359) with #ifdef <br>
+used in jrd\jrd.cpp(1433) with #ifdef <br>
+used in jrd\jrd.cpp(1474) with #ifdef <br>
+used in jrd\jrd.cpp(1518) with #ifdef <br>
+used in jrd\jrd.cpp(1620) with #ifdef <br>
+used in jrd\jrd.cpp(1712) with #ifdef <br>
+used in jrd\jrd.cpp(1770) with #ifdef <br>
+used in jrd\jrd.cpp(2184) with #ifdef <br>
+used in jrd\jrd.cpp(2229) with #ifdef <br>
+used in jrd\jrd.cpp(2348) with #ifdef <br>
+used in jrd\jrd.cpp(2465) with #ifdef <br>
+used in jrd\jrd.cpp(2629) with #ifdef <br>
+used in jrd\jrd.cpp(2693) with #ifdef <br>
+used in jrd\jrd.cpp(2755) with #ifdef <br>
+used in jrd\jrd.cpp(2808) with #ifdef <br>
+used in jrd\jrd.cpp(2843) with #ifdef <br>
+used in jrd\jrd.cpp(2892) with #ifdef <br>
+used in jrd\jrd.cpp(2945) with #ifdef <br>
+used in jrd\jrd.cpp(3012) with #ifdef <br>
+used in jrd\jrd.cpp(3077) with #ifdef <br>
+used in jrd\jrd.cpp(3127) with #ifdef <br>
+used in jrd\jrd.cpp(3178) with #ifdef <br>
+used in jrd\jrd.cpp(3229) with #ifdef <br>
+used in jrd\jrd.cpp(3265) with #ifdef <br>
+used in jrd\jrd.cpp(3301) with #ifdef <br>
+used in jrd\jrd.cpp(3349) with #ifdef <br>
+used in jrd\jrd.cpp(3629) with #ifdef <br>
+used in jrd\jrd.cpp(3691) with #ifdef <br>
+used in jrd\jrd.cpp(3770) with #ifdef <br>
+used in jrd\jrd.cpp(3794) with #ifdef <br>
+used in jrd\jrd.cpp(3872) with #ifdef <br>
+used in jrd\jrd.cpp(4027) with #ifdef <br>
+used in jrd\jrd.cpp(4100) with #ifdef <br>
+used in jrd\jrd.cpp(4793) with #ifdef <br>
+used in jrd\jrd.cpp(6074) with #ifdef <br>
+used in jrd\log.cpp(44) with #ifdef <br>
+used in jrd\log_proto.h(27) with #ifdef <br>
+used in jrd\utl.cpp(63) with #ifdef <br>
+used in jrd\utl.cpp(1056) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(24) REQUESTER</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dsql\ddl.cpp(90) with #if<br>
+used in dsql\ddl.cpp(267) with #if<br>
+used in gpre\gpre_meta.epp(144) with #ifndef<br>
+used in gpre\gpre_meta_boot.cpp(133) with #ifndef<br>
+used in jrd\alt.cpp(782) with #ifndef<br>
+used in jrd\alt.cpp(810) with #ifndef<br>
+used in jrd\cvt.cpp(41) with #ifndef<br>
+used in jrd\cvt.cpp(75) with #if<br>
+used in jrd\cvt.cpp(172) with #if<br>
+used in jrd\cvt.cpp(1336) with #if<br>
+used in jrd\cvt.cpp(1570) with #ifndef<br>
+used in jrd\cvt.cpp(1602) with #ifndef<br>
+used in jrd\cvt.cpp(1621) with #ifndef<br>
+used in jrd\cvt.cpp(1814) with #if<br>
+used in jrd\cvt.cpp(2086) with #if<br>
+used in jrd\err.cpp(38) with #if<br>
+used in jrd\err.cpp(69) with #if<br>
+used in jrd\err.cpp(94) with #if<br>
+used in jrd\err.cpp(121) with #if<br>
+used in jrd\err.cpp(162) with #if<br>
+used in jrd\err.cpp(224) with #if<br>
+used in jrd\err.cpp(249) with #if<br>
+used in jrd\err.cpp(270) with #if<br>
+used in jrd\err.cpp(308) with #if<br>
+used in jrd\err.cpp(397) with #if<br>
+used in jrd\err.cpp(488) with #if<br>
+used in jrd\err.cpp(578) with #if<br>
+used in jrd\err.cpp(626) with #if<br>
+used in jrd\err_proto.h(27) with #ifndef<br>
+used in jrd\gds.cpp(169) with #ifndef<br>
+used in jrd\gds.cpp(3414) with #ifndef<br>
+used in jrd\ibase.h(203) with #if<br>
+used in jrd\isc.cpp(189) with #ifndef<br>
+used in jrd\isc.cpp(208) with #ifndef<br>
+used in jrd\isc.cpp(914) with #ifndef<br>
+used in jrd\isc_ipc.cpp(98) with #ifndef<br>
+used in jrd\isc_ipc.cpp(213) with #ifndef<br>
+used in jrd\isc_ipc.cpp(334) with #ifndef<br>
+used in jrd\isc_ipc.cpp(411) with #ifndef<br>
+used in jrd\isc_ipc.cpp(751) with #ifndef<br>
+used in jrd\isc_ipc.cpp(824) with #ifndef<br>
+used in jrd\isc_ipc.cpp(849) with #ifndef<br>
+used in jrd\isc_ipc.cpp(892) with #ifndef<br>
+used in jrd\isc_ipc.cpp(917) with #ifndef<br>
+used in jrd\isc_ipc.cpp(959) with #ifndef<br>
+used in jrd\isc_ipc.cpp(1021) with #ifndef<br>
+used in jrd\isc_sync.cpp(82) with #ifndef<br>
+used in jrd\isc_sync.cpp(1420) with #ifndef<br>
+used in jrd\isc_sync.cpp(2900) with #ifndef<br>
+used in jrd\jrd.cpp(424) with #if<br>
+used in jrd\jrd.h(1049) with #if<br>
+used in jrd\sdl.cpp(28) with #ifndef<br>
+used in jrd\utl.cpp(1070) with #if<br>
+used in jrd\val.h(52) with #ifndef<br>
+used in jrd\val.h(81) with #ifndef<br>
+used in jrd\val.h(163) with #ifndef<br>
+used in jrd\why.cpp(78) with #ifndef<br>
+used in jrd\why.cpp(162) with #ifdef <br>
+used in jrd\why.cpp(170) with #if<br>
+used in jrd\why.cpp(247) with #ifndef<br>
+used in jrd\why.cpp(277) with #if<br>
+used in jrd\why.cpp(508) with #ifndef<br>
+used in jrd\why.cpp(540) with #ifndef<br>
+used in jrd\why.cpp(679) with #if<br>
+used in jrd\why.cpp(1304) with #if<br>
+used in jrd\why.cpp(3404) with #ifndef<br>
+used in jrd\why.cpp(4060) with #if<br>
+used in jrd\why.cpp(4294) with #if<br>
+used in jrd\why.cpp(5169) with #ifndef<br>
+used in jrd\why.cpp(5190) with #ifndef<br>
+used in jrd\why.cpp(5210) with #if<br>
+used in jrd\why.cpp(5974) with #if<br>
+used in jrd\why.cpp(6013) with #if<br>
+used in jrd\why.cpp(6026) with #if<br>
+used in jrd\y-valve.cpp(78) with #ifndef<br>
+used in jrd\y-valve.cpp(155) with #ifdef <br>
+used in jrd\y-valve.cpp(163) with #if<br>
+used in jrd\y-valve.cpp(251) with #ifndef<br>
+used in jrd\y-valve.cpp(281) with #if<br>
+used in jrd\y-valve.cpp(512) with #ifndef<br>
+used in jrd\y-valve.cpp(543) with #ifndef<br>
+used in jrd\y-valve.cpp(681) with #if<br>
+used in jrd\y-valve.cpp(1306) with #if<br>
+used in jrd\y-valve.cpp(3379) with #ifndef<br>
+used in jrd\y-valve.cpp(4034) with #if<br>
+used in jrd\y-valve.cpp(4268) with #if<br>
+used in jrd\y-valve.cpp(5179) with #ifndef<br>
+used in jrd\y-valve.cpp(5200) with #ifndef<br>
+used in jrd\y-valve.cpp(5220) with #if<br>
+used in jrd\y-valve.cpp(5971) with #if<br>
+used in jrd\y-valve.cpp(6010) with #if<br>
+used in jrd\y-valve.cpp(6023) with #if<br>
+used in remote\inet.cpp(115) with #ifndef<br>
+used in remote\inet.cpp(234) with #ifndef<br>
+used in remote\inet.cpp(3558) with #ifndef<br>
+used in remote\inet.cpp(3606) with #ifndef<br>
+used in remote\inet.cpp(3703) with #ifndef<br>
+used in remote\inet.cpp(3856) with #ifndef<br>
+used in remote\wnet.cpp(405) with #ifndef<br>
+used in remote\wnet.cpp(610) with #ifndef<br>
+used in remote\wnet.cpp(624) with #ifndef<br>
+used in remote\wnet.cpp(654) with #ifndef<br>
+used in remote\wnet.cpp(664) with #ifndef<br>
+used in remote\wnet.cpp(767) with #ifndef<br>
+used in remote\wnet.cpp(849) with #ifndef<br>
+used in remote\wnet.cpp(853) with #ifndef<br>
+used in remote\wnet.cpp(944) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(25) SCROLLABLE_CURSORS</td><td>Support for scrollable cursors</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dsql\dsql.cpp(210) with #ifdef <br>
+used in dsql\dsql.cpp(327) with #ifdef <br>
+used in dsql\dsql.cpp(339) with #ifdef <br>
+used in dsql\dsql.cpp(981) with #ifdef <br>
+used in dsql\dsql.cpp(1014) with #ifdef <br>
+used in dsql\dsql.cpp(4335) with #ifdef <br>
+used in dsql\dsql_proto.h(44) with #ifdef <br>
+used in dsql\gen.cpp(2113) with #ifdef <br>
+used in dsql\gen.cpp(2366) with #ifdef <br>
+used in dsql\gen.cpp(2396) with #ifdef <br>
+used in dsql\user_dsql.cpp(461) with #ifdef <br>
+used in dsql\user_dsql.cpp(518) with #ifdef <br>
+used in dsql\user_dsql.cpp(929) with #ifdef <br>
+used in dsql\user__proto.h(52) with #ifdef <br>
+used in dsql\user__proto.h(68) with #ifdef <br>
+used in dsql\user__proto.h(74) with #ifdef <br>
+used in gpre\ada.cpp(2052) with #ifdef <br>
+used in gpre\ada.cpp(2061) with #ifdef <br>
+used in gpre\ada.cpp(2137) with #ifdef <br>
+used in gpre\ada.cpp(3278) with #ifdef <br>
+used in gpre\cme.cpp(1173) with #ifdef <br>
+used in gpre\cmp.cpp(145) with #ifdef <br>
+used in gpre\cmp.cpp(238) with #ifdef <br>
+used in gpre\cob.cpp(2775) with #ifdef <br>
+used in gpre\cob.cpp(2784) with #ifdef <br>
+used in gpre\cob.cpp(2841) with #ifdef <br>
+used in gpre\cob.cpp(4086) with #ifdef <br>
+used in gpre\c_cxx.cpp(2298) with #ifdef <br>
+used in gpre\c_cxx.cpp(2308) with #ifdef <br>
+used in gpre\c_cxx.cpp(2382) with #ifdef <br>
+used in gpre\c_cxx.cpp(3515) with #ifdef <br>
+used in gpre\gpre.h(587) with #ifdef <br>
+used in gpre\gpre.h(1097) with #ifdef <br>
+used in gpre\gpre.h(1112) with #ifdef <br>
+used in gpre\gpre.h(1150) with #ifdef <br>
+used in gpre\gpre_meta.epp(61) with #ifdef <br>
+used in gpre\gpre_meta.epp(279) with #ifdef <br>
+used in gpre\gpre_meta_boot.cpp(60) with #ifdef <br>
+used in gpre\hsh.h(22) with #ifdef <br>
+used in gpre\hsh.h(253) with #ifdef <br>
+used in gpre\hsh.h(301) with #ifdef <br>
+used in gpre\hsh.h(346) with #ifdef <br>
+used in gpre\hsh.h(371) with #ifdef <br>
+used in gpre\hsh.h(402) with #ifdef <br>
+used in gpre\pas.cpp(2169) with #ifdef <br>
+used in gpre\pas.cpp(2249) with #ifdef <br>
+used in gpre\pas.cpp(3247) with #ifdef <br>
+used in gpre\sql.cpp(2214) with #ifdef <br>
+used in gpre\sql.cpp(2266) with #ifdef <br>
+used in gpre\sql.cpp(2280) with #ifdef <br>
+used in gpre\sql.cpp(3042) with #ifdef <br>
+used in gpre\sql.cpp(3082) with #ifdef <br>
+used in gpre\sql.cpp(3119) with #ifdef <br>
+used in gpre\words.h(127) with #ifdef <br>
+used in gpre\words.h(246) with #ifdef <br>
+used in gpre\words.h(273) with #ifdef <br>
+used in gpre\words.h(305) with #ifdef <br>
+used in gpre\words.h(316) with #ifdef <br>
+used in gpre\words.h(331) with #ifdef <br>
+used in ipserver\ipapi_proto.h(79) with #ifdef <br>
+used in ipserver\ipc.h(539) with #ifdef <br>
+used in ipserver\ipclient.cpp(2428) with #ifdef <br>
+used in ipserver\ipclient.cpp(2467) with #ifdef <br>
+used in ipserver\ipserver.cpp(169) with #ifdef <br>
+used in ipserver\ipserver.cpp(2885) with #ifdef <br>
+used in ipserver\ipserver.cpp(2912) with #ifdef <br>
+used in ipserver\ipserver.cpp(2922) with #ifdef <br>
+used in isql\isql.epp(228) with #ifdef <br>
+used in isql\isql.epp(243) with #ifdef <br>
+used in isql\isql.epp(3312) with #ifdef <br>
+used in isql\isql.epp(3537) with #ifdef <br>
+used in isql\isql.epp(4526) with #ifdef <br>
+used in isql\isql.epp(4621) with #ifdef <br>
+used in isql\isql.epp(6747) with #ifdef <br>
+used in isql\isql.epp(6752) with #ifdef <br>
+used in isql\isql.h(204) with #ifdef <br>
+used in jrd\btr.cpp(747) with #ifdef <br>
+used in jrd\btr.cpp(1164) with #ifdef <br>
+used in jrd\btr.cpp(1214) with #ifdef <br>
+used in jrd\btr.cpp(2683) with #ifdef <br>
+used in jrd\cmp.cpp(1746) with #ifdef <br>
+used in jrd\cmp.cpp(3645) with #ifdef <br>
+used in jrd\cmp.cpp(3673) with #ifdef <br>
+used in jrd\cmp.cpp(3749) with #ifdef <br>
+used in jrd\cmp.cpp(4250) with #ifdef <br>
+used in jrd\cmp.cpp(4255) with #ifdef <br>
+used in jrd\cmp.cpp(4819) with #ifdef <br>
+used in jrd\cmp.cpp(5208) with #ifdef <br>
+used in jrd\dfloat_stub.cpp(335) with #ifdef <br>
+used in jrd\dfloat_stub.cpp(339) with #ifdef <br>
+used in jrd\dfloat_stub.cpp(343) with #ifdef <br>
+used in jrd\dfloat_stub.cpp(365) with #ifdef <br>
+used in jrd\dfloat_stub.cpp(369) with #ifdef <br>
+used in jrd\evl.cpp(201) with #ifdef <br>
+used in jrd\evl.cpp(3188) with #ifdef <br>
+used in jrd\exe.cpp(130) with #ifdef <br>
+used in jrd\exe.cpp(630) with #ifdef <br>
+used in jrd\exe.cpp(685) with #ifdef <br>
+used in jrd\exe.cpp(746) with #ifdef <br>
+used in jrd\exe.cpp(757) with #ifdef <br>
+used in jrd\exe.cpp(785) with #ifdef <br>
+used in jrd\exe.cpp(822) with #ifdef <br>
+used in jrd\exe.cpp(1987) with #ifdef <br>
+used in jrd\exe.cpp(2558) with #ifdef <br>
+used in jrd\exe.cpp(2732) with #ifdef <br>
+used in jrd\exe.cpp(3241) with #ifdef <br>
+used in jrd\exe.cpp(3284) with #ifdef <br>
+used in jrd\exe.h(112) with #ifdef <br>
+used in jrd\exe.h(567) with #ifdef <br>
+used in jrd\exe.h(592) with #ifdef <br>
+used in jrd\exe_proto.h(37) with #ifdef <br>
+used in jrd\inf.cpp(496) with #ifdef <br>
+used in jrd\jrd.cpp(2982) with #ifdef <br>
+used in jrd\nav.cpp(57) with #ifdef <br>
+used in jrd\nav.cpp(74) with #ifdef <br>
+used in jrd\nav.cpp(475) with #ifdef <br>
+used in jrd\nav.cpp(521) with #ifdef <br>
+used in jrd\nav.cpp(571) with #ifdef <br>
+used in jrd\nav.cpp(991) with #ifdef <br>
+used in jrd\nav.cpp(1523) with #ifdef <br>
+used in jrd\nav.cpp(1579) with #ifdef <br>
+used in jrd\nav.cpp(1766) with #ifdef <br>
+used in jrd\nav.cpp(1841) with #ifdef <br>
+used in jrd\nav.cpp(1853) with #ifdef <br>
+used in jrd\nav.cpp(1861) with #ifdef <br>
+used in jrd\nav_proto.h(29) with #ifdef <br>
+used in jrd\opt.cpp(121) with #ifdef <br>
+used in jrd\opt.cpp(1066) with #ifdef <br>
+used in jrd\opt.cpp(3696) with #ifdef <br>
+used in jrd\opt.cpp(3732) with #ifdef <br>
+used in jrd\opt.cpp(3742) with #ifdef <br>
+used in jrd\opt.cpp(3751) with #ifdef <br>
+used in jrd\opt.cpp(3775) with #ifdef <br>
+used in jrd\opt.cpp(3785) with #ifdef <br>
+used in jrd\opt.cpp(3816) with #ifdef <br>
+used in jrd\opt.cpp(5928) with #ifdef <br>
+used in jrd\par.cpp(2104) with #ifdef <br>
+used in jrd\par.cpp(2900) with #ifdef <br>
+used in jrd\req.h(142) with #ifdef <br>
+used in jrd\req.h(204) with #ifdef <br>
+used in jrd\rse.cpp(89) with #ifdef <br>
+used in jrd\rse.cpp(105) with #ifdef <br>
+used in jrd\rse.cpp(430) with #ifdef <br>
+used in jrd\rse.cpp(636) with #ifdef <br>
+used in jrd\rse.cpp(687) with #ifdef <br>
+used in jrd\rse.cpp(1063) with #ifdef <br>
+used in jrd\rse.cpp(1089) with #ifdef <br>
+used in jrd\rse.cpp(1107) with #ifdef <br>
+used in jrd\rse.cpp(1117) with #ifdef <br>
+used in jrd\rse.cpp(1130) with #ifdef <br>
+used in jrd\rse.cpp(1459) with #ifdef <br>
+used in jrd\rse.cpp(1604) with #ifdef <br>
+used in jrd\rse.cpp(2032) with #ifdef <br>
+used in jrd\rse.cpp(2058) with #ifdef <br>
+used in jrd\rse.cpp(2081) with #ifdef <br>
+used in jrd\rse.cpp(2224) with #ifdef <br>
+used in jrd\rse.cpp(2310) with #ifdef <br>
+used in jrd\rse.cpp(2662) with #ifdef <br>
+used in jrd\rse.cpp(2678) with #ifdef <br>
+used in jrd\rse.cpp(2685) with #ifdef <br>
+used in jrd\rse.cpp(2689) with #ifdef <br>
+used in jrd\rse.cpp(2700) with #ifdef <br>
+used in jrd\rse.cpp(2715) with #ifdef <br>
+used in jrd\rse.cpp(2731) with #ifdef <br>
+used in jrd\rse.cpp(2739) with #ifdef <br>
+used in jrd\rse.cpp(2766) with #ifdef <br>
+used in jrd\rse.cpp(2806) with #ifdef <br>
+used in jrd\rse.cpp(2834) with #ifdef <br>
+used in jrd\rse.cpp(3644) with #ifdef <br>
+used in jrd\rse.cpp(3747) with #ifdef <br>
+used in jrd\scroll_cursors.h(35) with #ifdef <br>
+used in jrd\scroll_cursors.h(43) with #ifdef <br>
+used in jrd\scroll_cursors.h(54) with #ifdef <br>
+used in jrd\scroll_cursors.h(62) with #ifdef <br>
+used in jrd\sort.cpp(131) with #ifdef <br>
+used in jrd\sort.cpp(179) with #ifdef <br>
+used in jrd\sort.cpp(581) with #ifdef <br>
+used in jrd\sort.cpp(867) with #ifdef <br>
+used in jrd\sort.cpp(910) with #ifndef<br>
+used in jrd\sort.cpp(919) with #ifdef <br>
+used in jrd\sort.cpp(986) with #ifndef<br>
+used in jrd\sort.cpp(1043) with #ifdef <br>
+used in jrd\sort.cpp(1054) with #ifdef <br>
+used in jrd\sort.cpp(1058) with #ifdef <br>
+used in jrd\sort.cpp(1339) with #ifndef<br>
+used in jrd\sort.cpp(1919) with #ifdef <br>
+used in jrd\sort.cpp(1938) with #ifdef <br>
+used in jrd\sort.cpp(1958) with #ifdef <br>
+used in jrd\sort.cpp(1976) with #ifdef <br>
+used in jrd\sort.cpp(1982) with #ifndef<br>
+used in jrd\sort.cpp(1990) with #ifndef<br>
+used in jrd\sort.cpp(2044) with #ifndef<br>
+used in jrd\sort.cpp(2050) with #ifdef <br>
+used in jrd\sort.cpp(2122) with #ifdef <br>
+used in jrd\sort.cpp(2134) with #ifdef <br>
+used in jrd\sort.cpp(2141) with #ifdef <br>
+used in jrd\sort.cpp(2150) with #ifdef <br>
+used in jrd\sort.cpp(2189) with #ifndef<br>
+used in jrd\sort.cpp(2430) with #ifdef <br>
+used in jrd\sort.cpp(2449) with #ifdef <br>
+used in jrd\sort.cpp(2475) with #ifdef <br>
+used in jrd\sort.cpp(2832) with #ifdef <br>
+used in jrd\sort.cpp(2946) with #ifdef <br>
+used in jrd\sort.cpp(2959) with #ifdef <br>
+used in jrd\sort.h(204) with #ifdef <br>
+used in jrd\sort.h(211) with #ifdef <br>
+used in jrd\sort.h(265) with #ifdef <br>
+used in jrd\sort_proto.h(28) with #ifdef <br>
+used in jrd\sun_ftn.cpp(2761) with #ifdef <br>
+used in jrd\sun_ftn.cpp(2811) with #ifdef <br>
+used in jrd\sun_ftn.cpp(3254) with #ifdef <br>
+used in jrd\why.cpp(341) with #ifdef <br>
+used in jrd\why.cpp(2809) with #ifdef <br>
+used in jrd\why.cpp(2894) with #ifdef <br>
+used in jrd\why.cpp(2907) with #ifdef <br>
+used in jrd\why.cpp(2927) with #ifdef <br>
+used in jrd\why.cpp(3838) with #ifdef <br>
+used in jrd\why.cpp(3865) with #ifdef <br>
+used in jrd\why_proto.h(79) with #ifdef <br>
+used in jrd\why_proto.h(85) with #ifdef <br>
+used in jrd\why_proto.h(112) with #ifdef <br>
+used in jrd\y-valve.cpp(345) with #ifdef <br>
+used in jrd\y-valve.cpp(2785) with #ifdef <br>
+used in jrd\y-valve.cpp(2870) with #ifdef <br>
+used in jrd\y-valve.cpp(2883) with #ifdef <br>
+used in jrd\y-valve.cpp(2903) with #ifdef <br>
+used in jrd\y-valve.cpp(3812) with #ifdef <br>
+used in jrd\y-valve.cpp(3839) with #ifdef <br>
+used in remote\inet.cpp(688) with #ifdef <br>
+used in remote\interface.cpp(116) with #ifdef <br>
+used in remote\interface.cpp(157) with #ifdef <br>
+used in remote\interface.cpp(773) with #ifdef <br>
+used in remote\interface.cpp(780) with #ifdef <br>
+used in remote\interface.cpp(1474) with #ifdef <br>
+used in remote\interface.cpp(1486) with #ifdef <br>
+used in remote\interface.cpp(1702) with #ifdef <br>
+used in remote\interface.cpp(1880) with #ifdef <br>
+used in remote\interface.cpp(2179) with #ifdef <br>
+used in remote\interface.cpp(3244) with #ifdef <br>
+used in remote\interface.cpp(3282) with #ifdef <br>
+used in remote\interface.cpp(3343) with #ifdef <br>
+used in remote\interface.cpp(3468) with #ifdef <br>
+used in remote\interface.cpp(5120) with #ifdef <br>
+used in remote\interface.cpp(5276) with #ifdef <br>
+used in remote\interface.cpp(5326) with #ifdef <br>
+used in remote\interface.cpp(5365) with #ifdef <br>
+used in remote\interface.cpp(5518) with #ifdef <br>
+used in remote\interface.cpp(6366) with #ifdef <br>
+used in remote\interface.cpp(6839) with #ifdef <br>
+used in remote\protocol.cpp(402) with #ifdef <br>
+used in remote\protocol.cpp(1642) with #ifdef <br>
+used in remote\protocol.h(85) with #ifdef <br>
+used in remote\protocol.h(417) with #ifdef <br>
+used in remote\remote.cpp(278) with #ifdef <br>
+used in remote\remote.cpp(628) with #ifdef <br>
+used in remote\remote.h(190) with #ifdef <br>
+used in remote\remote.h(237) with #ifdef <br>
+used in remote\server.cpp(142) with #ifdef <br>
+used in remote\server.cpp(156) with #ifdef <br>
+used in remote\server.cpp(582) with #ifdef <br>
+used in remote\server.cpp(1157) with #ifdef <br>
+used in remote\server.cpp(1426) with #ifdef <br>
+used in remote\server.cpp(3560) with #ifdef <br>
+used in remote\server.cpp(3593) with #ifdef <br>
+used in remote\server.cpp(3636) with #ifdef <br>
+used in remote\server.cpp(3654) with #ifdef <br>
+used in remote\server.cpp(3748) with #ifdef <br>
+used in remote\server.cpp(3764) with #ifdef <br>
+used in remote\server.cpp(3796) with #ifdef <br>
+used in remote\server.cpp(3990) with #ifdef <br>
+used in remote\wnet.cpp(216) with #ifdef <br>
+used in remote\xnet.cpp(254) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(26) SERVER</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\event.cpp(76) with #ifdef <br>
+used in jrd\event.cpp(309) with #ifdef <br>
+used in jrd\event.cpp(342) with #ifdef <br>
+used in jrd\event.cpp(558) with #ifndef<br>
+used in jrd\event.cpp(1140) with #ifndef<br>
+used in jrd\event.cpp(1292) with #ifndef<br>
+used in jrd\event.cpp(1405) with #ifdef <br>
+used in jrd\event.cpp(1495) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(27) SET_TCP_NO_DELAY</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet.cpp(85) with #ifdef <br>
+used in remote\inet.cpp(1077) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(28) SUPERCLIENT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in common\config\config_file.cpp(42) with #if<br>
+used in dsql\ddl.cpp(90) with #if<br>
+used in dsql\ddl.cpp(267) with #if<br>
+used in iscguard\cntl_guard.cpp(103) with #if<br>
+used in iscguard\cntl_guard.cpp(306) with #if<br>
+used in jrd\alt.cpp(809) with #ifndef<br>
+used in jrd\cvt.cpp(75) with #if<br>
+used in jrd\cvt.cpp(172) with #if<br>
+used in jrd\cvt.cpp(1336) with #if<br>
+used in jrd\cvt.cpp(1571) with #ifndef<br>
+used in jrd\cvt.cpp(1603) with #ifndef<br>
+used in jrd\cvt.cpp(1622) with #ifndef<br>
+used in jrd\cvt.cpp(1814) with #if<br>
+used in jrd\cvt.cpp(2086) with #if<br>
+used in jrd\err.cpp(38) with #if<br>
+used in jrd\err.cpp(69) with #if<br>
+used in jrd\err.cpp(94) with #if<br>
+used in jrd\err.cpp(121) with #if<br>
+used in jrd\err.cpp(162) with #if<br>
+used in jrd\err.cpp(224) with #if<br>
+used in jrd\err.cpp(249) with #if<br>
+used in jrd\err.cpp(270) with #if<br>
+used in jrd\err.cpp(308) with #if<br>
+used in jrd\err.cpp(397) with #if<br>
+used in jrd\err.cpp(488) with #if<br>
+used in jrd\err.cpp(578) with #if<br>
+used in jrd\err.cpp(626) with #if<br>
+used in jrd\gds.cpp(142) with #if<br>
+used in jrd\gds.cpp(151) with #ifdef <br>
+used in jrd\isc.cpp(69) with #if<br>
+used in jrd\isc_file.cpp(1706) with #ifndef<br>
+used in jrd\sch.cpp(771) with #ifdef <br>
+used in jrd\sch.cpp(782) with #ifdef <br>
+used in jrd\svc.h(83) with #if<br>
+used in jrd\thd.cpp(1877) with #if<br>
+used in jrd\thd.cpp(1973) with #if<br>
+used in jrd\thd.h(68) with #if<br>
+used in jrd\utl.cpp(1057) with #ifndef<br>
+used in jrd\why.cpp(166) with #ifdef <br>
+used in jrd\why.cpp(170) with #if<br>
+used in jrd\why.cpp(277) with #if<br>
+used in jrd\why.cpp(484) with #ifdef <br>
+used in jrd\why.cpp(509) with #ifndef<br>
+used in jrd\why.cpp(541) with #ifndef<br>
+used in jrd\why.cpp(561) with #ifndef<br>
+used in jrd\why.cpp(679) with #if<br>
+used in jrd\why.cpp(1304) with #if<br>
+used in jrd\why.cpp(1561) with #if<br>
+used in jrd\why.cpp(1595) with #ifndef<br>
+used in jrd\why.cpp(4060) with #if<br>
+used in jrd\why.cpp(4294) with #if<br>
+used in jrd\why.cpp(5210) with #if<br>
+used in jrd\why.cpp(5303) with #if<br>
+used in jrd\why.cpp(5316) with #ifndef<br>
+used in jrd\why.cpp(5974) with #if<br>
+used in jrd\why.cpp(6013) with #if<br>
+used in jrd\why.cpp(6026) with #if<br>
+used in jrd\y-valve.cpp(159) with #ifdef <br>
+used in jrd\y-valve.cpp(163) with #if<br>
+used in jrd\y-valve.cpp(281) with #if<br>
+used in jrd\y-valve.cpp(488) with #ifdef <br>
+used in jrd\y-valve.cpp(513) with #ifndef<br>
+used in jrd\y-valve.cpp(544) with #ifndef<br>
+used in jrd\y-valve.cpp(681) with #if<br>
+used in jrd\y-valve.cpp(1306) with #if<br>
+used in jrd\y-valve.cpp(1545) with #if<br>
+used in jrd\y-valve.cpp(1579) with #ifndef<br>
+used in jrd\y-valve.cpp(4034) with #if<br>
+used in jrd\y-valve.cpp(4268) with #if<br>
+used in jrd\y-valve.cpp(5220) with #if<br>
+used in jrd\y-valve.cpp(5316) with #if<br>
+used in jrd\y-valve.cpp(5328) with #ifndef<br>
+used in jrd\y-valve.cpp(5971) with #if<br>
+used in jrd\y-valve.cpp(6010) with #if<br>
+used in jrd\y-valve.cpp(6023) with #if<br>
+used in remote\cntl.cpp(144) with #if<br>
+used in remote\cntl.cpp(305) with #if<br>
+used in remote\cntl.cpp(425) with #if<br>
+used in remote\interface.cpp(90) with #if<br>
+used in remote\interface.cpp(4807) with #if<br>
+used in remote\interface.cpp(4876) with #if<br>
+used in remote\interface.cpp(5014) with #ifdef <br>
+used in remote\xnet.cpp(113) with #ifdef <br>
+used in remote\xnet.cpp(160) with #ifdef <br>
+used in remote\xnet.cpp(397) with #ifdef <br>
+used in remote\xnet.cpp(433) with #ifndef<br>
+used in remote\xnet.cpp(1365) with #ifdef <br>
+used in remote\xnet.cpp(1381) with #ifdef <br>
+used in remote\xnet.cpp(1408) with #ifdef <br>
+used in remote\xnet.cpp(1790) with #ifdef <br>
+used in remote\xnet.cpp(1850) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(29) SUPERSERVER</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in alice\alice.cpp(67) with #ifdef <br>
+used in alice\alice.cpp(93) with #ifndef<br>
+used in alice\alice.cpp(109) with #ifdef <br>
+used in alice\alice.cpp(119) with #ifdef <br>
+used in alice\alice.cpp(548) with #ifndef<br>
+used in alice\alice.cpp(555) with #ifdef <br>
+used in alice\alice.cpp(643) with #if<br>
+used in alice\alice.cpp(706) with #ifdef <br>
+used in alice\alice.cpp(748) with #ifdef <br>
+used in alice\alice.h(182) with #ifdef <br>
+used in alice\tdr.cpp(336) with #ifdef <br>
+used in alice\tdr.cpp(348) with #ifdef <br>
+used in alice\tdr.cpp(520) with #ifdef <br>
+used in alice\tdr.cpp(544) with #ifndef<br>
+used in alice\tdr.cpp(562) with #ifndef<br>
+used in alice\tdr.cpp(577) with #ifndef<br>
+used in alice\tdr.cpp(587) with #ifndef<br>
+used in alice\tdr.cpp(596) with #ifndef<br>
+used in alice\tdr.cpp(605) with #ifndef<br>
+used in alice\tdr.cpp(614) with #ifndef<br>
+used in alice\tdr.cpp(634) with #ifndef<br>
+used in alice\tdr.cpp(655) with #ifndef<br>
+used in alice\tdr.cpp(678) with #ifndef<br>
+used in alice\tdr.cpp(688) with #ifndef<br>
+used in alice\tdr.cpp(698) with #ifdef <br>
+used in burp\burp.cpp(72) with #ifdef <br>
+used in burp\burp.cpp(107) with #ifndef<br>
+used in burp\burp.cpp(137) with #ifdef <br>
+used in burp\burp.cpp(145) with #ifndef<br>
+used in burp\burp.cpp(168) with #ifdef <br>
+used in burp\burp.cpp(941) with #ifdef <br>
+used in burp\burp.cpp(1066) with #if<br>
+used in burp\burp.cpp(1095) with #ifdef <br>
+used in burp\burp.cpp(1120) with #ifdef <br>
+used in burp\burp.cpp(1154) with #ifdef <br>
+used in burp\burp.cpp(1164) with #ifdef <br>
+used in burp\burp.cpp(1628) with #ifdef <br>
+used in burp\burp.cpp(1655) with #ifdef <br>
+used in burp\burp.cpp(1783) with #ifdef <br>
+used in burp\burp.cpp(2005) with #ifndef<br>
+used in burp\burp.h(846) with #ifdef <br>
+used in burp\misc.cpp(34) with #ifdef <br>
+used in burp\restore.epp(2429) with #ifdef <br>
+used in burp\restore.epp(2541) with #ifdef <br>
+used in burp\restore.epp(5018) with #ifdef <br>
+used in burp\restore.epp(6574) with #ifdef <br>
+used in burp\restore.epp(6597) with #ifdef <br>
+used in burp\restore.epp(6816) with #ifdef <br>
+used in common\classes\alloc.cpp(324) with #ifdef <br>
+used in common\classes\alloc.h(116) with #ifdef <br>
+used in common\classes\locks.cpp(32) with #ifdef <br>
+used in common\classes\locks.h(6) with #ifdef <br>
+used in common\classes\locks.h(23) with #ifdef <br>
+used in common\config\config.cpp(49) with #ifdef <br>
+used in common\config\config.cpp(63) with #ifdef <br>
+used in common\config\config.cpp(421) with #ifdef <br>
+used in dsql\dsql.h(35) with #if<br>
+used in dsql\dsql.h(607) with #if<br>
+used in dsql\dsql.h(612) with #if<br>
+used in dsql\dsql.h(618) with #if<br>
+used in dsql\hsh.cpp(57) with #ifdef <br>
+used in dsql\hsh.cpp(81) with #ifdef <br>
+used in dsql\metd.epp(99) with #ifdef <br>
+used in dsql\parse.cpp(79) with #if<br>
+used in dsql\parse.cpp(5391) with #if<br>
+used in dudley\ddl.cpp(109) with #ifndef<br>
+used in include\firebird.h(64) with #if<br>
+used in ipserver\ipserver.cpp(298) with #if<br>
+used in ipserver\ipserver.cpp(371) with #if<br>
+used in iscguard\cntl_guard.cpp(103) with #if<br>
+used in iscguard\cntl_guard.cpp(306) with #if<br>
+used in jrd\all.cpp(114) with #ifdef <br>
+used in jrd\all.cpp(287) with #ifdef <br>
+used in jrd\blb.cpp(453) with #ifdef <br>
+used in jrd\btr.cpp(2949) with #ifdef <br>
+used in jrd\btr.cpp(4439) with #ifdef <br>
+used in jrd\cch.cpp(80) with #ifdef <br>
+used in jrd\cch.cpp(441) with #ifdef <br>
+used in jrd\cch.cpp(898) with #ifdef <br>
+used in jrd\cch.cpp(927) with #ifdef <br>
+used in jrd\cch.cpp(944) with #ifdef <br>
+used in jrd\cch.cpp(963) with #ifdef <br>
+used in jrd\cch.cpp(979) with #ifdef <br>
+used in jrd\cch.cpp(1189) with #ifdef <br>
+used in jrd\cch.cpp(1767) with #ifdef <br>
+used in jrd\cch.cpp(2351) with #ifndef<br>
+used in jrd\cch.cpp(2399) with #ifndef<br>
+used in jrd\cch.cpp(2849) with #ifndef<br>
+used in jrd\cch.cpp(4080) with #ifdef <br>
+used in jrd\cch.cpp(4145) with #ifdef <br>
+used in jrd\cch.cpp(5428) with #ifdef <br>
+used in jrd\cch.cpp(5471) with #ifdef <br>
+used in jrd\cch.cpp(5557) with #ifdef <br>
+used in jrd\cch.cpp(5563) with #ifdef <br>
+used in jrd\cch.cpp(5571) with #ifdef <br>
+used in jrd\cch.cpp(5577) with #ifdef <br>
+used in jrd\cch.cpp(5588) with #ifdef <br>
+used in jrd\cmp.cpp(120) with #if<br>
+used in jrd\dbg.cpp(46) with #ifdef <br>
+used in jrd\dfw.epp(3861) with #ifdef <br>
+used in jrd\dfw.epp(3903) with #ifdef <br>
+used in jrd\dfw.epp(3955) with #ifdef <br>
+used in jrd\dfw.epp(3961) with #ifdef <br>
+used in jrd\dpm.epp(593) with #ifdef <br>
+used in jrd\dyn.epp(108) with #if<br>
+used in jrd\dyn.epp(134) with #if<br>
+used in jrd\dyn.epp(151) with #if<br>
+used in jrd\dyn.epp(176) with #if<br>
+used in jrd\dyn_def.epp(83) with #ifdef <br>
+used in jrd\dyn_del.epp(64) with #ifdef <br>
+used in jrd\dyn_mod.epp(76) with #ifdef <br>
+used in jrd\dyn_mod.epp(129) with #ifdef <br>
+used in jrd\dyn_mod.epp(179) with #ifdef <br>
+used in jrd\dyn_util.epp(61) with #ifdef <br>
+used in jrd\event.cpp(595) with #if<br>
+used in jrd\event.cpp(679) with #if<br>
+used in jrd\exe.cpp(164) with #if<br>
+used in jrd\exe.cpp(168) with #if<br>
+used in jrd\exe.cpp(1878) with #ifdef <br>
+used in jrd\fun.epp(144) with #if<br>
+used in jrd\fun.epp(574) with #if<br>
+used in jrd\gds.cpp(104) with #if<br>
+used in jrd\gds.cpp(130) with #ifdef <br>
+used in jrd\gds.cpp(148) with #ifdef <br>
+used in jrd\gds.cpp(3382) with #ifdef <br>
+used in jrd\gdsassert.h(43) with #ifdef <br>
+used in jrd\ibinitdll.cpp(34) with #ifdef <br>
+used in jrd\ibsetjmp.h(45) with #ifdef <br>
+used in jrd\ibsetjmp.h(59) with #ifdef <br>
+used in jrd\idx.cpp(448) with #ifdef <br>
+used in jrd\inf.cpp(386) with #ifdef <br>
+used in jrd\isc.cpp(69) with #if<br>
+used in jrd\isc.cpp(73) with #ifdef <br>
+used in jrd\isc_file.cpp(108) with #ifdef <br>
+used in jrd\isc_file.cpp(738) with #ifdef <br>
+used in jrd\isc_file.cpp(976) with #ifdef <br>
+used in jrd\isc_sync.cpp(194) with #if<br>
+used in jrd\isc_sync.cpp(1519) with #ifdef <br>
+used in jrd\isc_sync.cpp(2384) with #ifdef <br>
+used in jrd\isc_sync.cpp(2463) with #ifdef <br>
+used in jrd\isc_sync.cpp(3943) with #ifdef <br>
+used in jrd\isc_sync.cpp(3967) with #ifdef <br>
+used in jrd\isc_sync.cpp(4301) with #ifdef <br>
+used in jrd\isc_s_proto.h(77) with #ifdef <br>
+used in jrd\jrd.cpp(158) with #ifdef <br>
+used in jrd\jrd.cpp(187) with #ifndef<br>
+used in jrd\jrd.cpp(204) with #ifdef <br>
+used in jrd\jrd.cpp(412) with #if<br>
+used in jrd\jrd.cpp(693) with #if<br>
+used in jrd\jrd.cpp(702) with #if<br>
+used in jrd\jrd.cpp(718) with #if<br>
+used in jrd\jrd.cpp(910) with #if<br>
+used in jrd\jrd.cpp(1065) with #if<br>
+used in jrd\jrd.cpp(1077) with #if<br>
+used in jrd\jrd.cpp(1084) with #if<br>
+used in jrd\jrd.cpp(1098) with #if<br>
+used in jrd\jrd.cpp(1103) with #ifdef <br>
+used in jrd\jrd.cpp(1110) with #if<br>
+used in jrd\jrd.cpp(1116) with #if<br>
+used in jrd\jrd.cpp(1168) with #if<br>
+used in jrd\jrd.cpp(1174) with #if<br>
+used in jrd\jrd.cpp(1180) with #if<br>
+used in jrd\jrd.cpp(1335) with #if<br>
+used in jrd\jrd.cpp(1370) with #if<br>
+used in jrd\jrd.cpp(1393) with #if<br>
+used in jrd\jrd.cpp(1844) with #if<br>
+used in jrd\jrd.cpp(1853) with #if<br>
+used in jrd\jrd.cpp(1869) with #if<br>
+used in jrd\jrd.cpp(1967) with #if<br>
+used in jrd\jrd.cpp(1996) with #if<br>
+used in jrd\jrd.cpp(2031) with #if<br>
+used in jrd\jrd.cpp(2036) with #if<br>
+used in jrd\jrd.cpp(2045) with #if<br>
+used in jrd\jrd.cpp(2109) with #if<br>
+used in jrd\jrd.cpp(2124) with #if<br>
+used in jrd\jrd.cpp(2147) with #if<br>
+used in jrd\jrd.cpp(2328) with #if<br>
+used in jrd\jrd.cpp(2334) with #if<br>
+used in jrd\jrd.cpp(2362) with #if<br>
+used in jrd\jrd.cpp(2385) with #if<br>
+used in jrd\jrd.cpp(2396) with #if<br>
+used in jrd\jrd.cpp(2400) with #if<br>
+used in jrd\jrd.cpp(2491) with #if<br>
+used in jrd\jrd.cpp(2528) with #if<br>
+used in jrd\jrd.cpp(2546) with #if<br>
+used in jrd\jrd.cpp(2579) with #if<br>
+used in jrd\jrd.cpp(4197) with #ifdef <br>
+used in jrd\jrd.cpp(4315) with #ifdef <br>
+used in jrd\jrd.cpp(4369) with #if<br>
+used in jrd\jrd.cpp(4387) with #if<br>
+used in jrd\jrd.cpp(4666) with #ifndef<br>
+used in jrd\jrd.cpp(4682) with #ifndef<br>
+used in jrd\jrd.cpp(4757) with #if<br>
+used in jrd\jrd.cpp(5570) with #if<br>
+used in jrd\jrd.cpp(5589) with #if<br>
+used in jrd\jrd.cpp(5598) with #ifndef<br>
+used in jrd\jrd.cpp(5625) with #ifdef <br>
+used in jrd\jrd.cpp(5812) with #if<br>
+used in jrd\jrd.cpp(5884) with #if<br>
+used in jrd\jrd.cpp(6122) with #ifdef <br>
+used in jrd\jrd.cpp(6460) with #if<br>
+used in jrd\jrd.cpp(6464) with #if<br>
+used in jrd\jrd_blks.cpp(22) with #ifdef <br>
+used in jrd\jrd_proto.h(155) with #ifdef <br>
+used in jrd\lck.cpp(87) with #ifdef <br>
+used in jrd\lck.cpp(298) with #ifndef<br>
+used in jrd\lck.cpp(306) with #ifndef<br>
+used in jrd\lck.cpp(477) with #ifdef <br>
+used in jrd\lck.cpp(658) with #ifndef<br>
+used in jrd\lck.cpp(667) with #ifndef<br>
+used in jrd\met.epp(2662) with #ifdef <br>
+used in jrd\met.epp(2714) with #ifdef <br>
+used in jrd\met.epp(2889) with #ifdef <br>
+used in jrd\met.epp(2896) with #ifdef <br>
+used in jrd\met.epp(3326) with #ifdef <br>
+used in jrd\met.epp(3341) with #ifdef <br>
+used in jrd\met.epp(3632) with #ifdef <br>
+used in jrd\met.epp(3647) with #ifdef <br>
+used in jrd\os\posix\config_root.cpp(130) with #if<br>
+used in jrd\os\thd_priority.h(28) with #if<br>
+used in jrd\pwd.cpp(38) with #ifdef <br>
+used in jrd\rse.cpp(2196) with #ifdef <br>
+used in jrd\shrinit.cpp(252) with #if<br>
+used in jrd\svc.cpp(185) with #ifndef<br>
+used in jrd\svc.cpp(196) with #ifdef <br>
+used in jrd\svc.cpp(208) with #if<br>
+used in jrd\svc.cpp(211) with #if<br>
+used in jrd\svc.cpp(236) with #ifdef <br>
+used in jrd\svc.cpp(326) with #if<br>
+used in jrd\svc.cpp(334) with #if<br>
+used in jrd\svc.cpp(353) with #ifdef <br>
+used in jrd\svc.cpp(413) with #ifndef<br>
+used in jrd\svc.cpp(623) with #ifdef <br>
+used in jrd\svc.cpp(653) with #ifndef<br>
+used in jrd\svc.cpp(659) with #ifndef<br>
+used in jrd\svc.cpp(738) with #ifdef <br>
+used in jrd\svc.cpp(790) with #ifdef <br>
+used in jrd\svc.cpp(1043) with #ifdef <br>
+used in jrd\svc.cpp(1442) with #ifdef <br>
+used in jrd\svc.cpp(1711) with #ifndef<br>
+used in jrd\svc.cpp(1862) with #ifndef<br>
+used in jrd\svc.cpp(2050) with #ifdef <br>
+used in jrd\svc.cpp(2059) with #ifdef <br>
+used in jrd\svc.cpp(2067) with #ifdef <br>
+used in jrd\svc.cpp(2076) with #ifdef <br>
+used in jrd\svc.cpp(2099) with #ifdef <br>
+used in jrd\svc.cpp(2205) with #ifndef<br>
+used in jrd\svc.cpp(2234) with #ifndef<br>
+used in jrd\svc.cpp(2644) with #ifdef <br>
+used in jrd\svc.cpp(2902) with #if<br>
+used in jrd\svc.cpp(3254) with #ifndef<br>
+used in jrd\svc.cpp(3713) with #if<br>
+used in jrd\svc.h(83) with #if<br>
+used in jrd\svc.h(91) with #ifdef <br>
+used in jrd\svc.h(103) with #ifndef<br>
+used in jrd\thd.cpp(1319) with #ifdef <br>
+used in jrd\thd.cpp(1877) with #if<br>
+used in jrd\thd.cpp(1973) with #if<br>
+used in jrd\thd.h(46) with #if<br>
+used in jrd\thd.h(51) with #if<br>
+used in jrd\thd.h(56) with #if<br>
+used in jrd\thd.h(73) with #if<br>
+used in jrd\thd.h(150) with #ifdef <br>
+used in jrd\thd_proto.h(58) with #ifdef <br>
+used in jrd\unix.cpp(78) with #if<br>
+used in jrd\unix.cpp(88) with #ifndef<br>
+used in jrd\unix.cpp(125) with #ifdef <br>
+used in jrd\utl.cpp(1104) with #ifndef<br>
+used in jrd\val.cpp(828) with #ifdef <br>
+used in jrd\vio.cpp(2649) with #ifdef <br>
+used in jrd\vio.cpp(3306) with #ifdef <br>
+used in jrd\vio.cpp(3761) with #ifdef <br>
+used in jrd\why.cpp(277) with #if<br>
+used in jrd\why.cpp(1648) with #ifdef <br>
+used in jrd\why.cpp(1678) with #ifndef<br>
+used in jrd\why.cpp(1769) with #ifdef <br>
+used in jrd\why.cpp(1801) with #ifndef<br>
+used in jrd\why.cpp(4060) with #if<br>
+used in jrd\why.cpp(5155) with #ifdef <br>
+used in jrd\why.cpp(5210) with #if<br>
+used in jrd\why.cpp(5974) with #if<br>
+used in jrd\why.cpp(6013) with #if<br>
+used in jrd\winnt.cpp(85) with #ifdef <br>
+used in jrd\y-valve.cpp(281) with #if<br>
+used in jrd\y-valve.cpp(1631) with #ifdef <br>
+used in jrd\y-valve.cpp(1661) with #ifndef<br>
+used in jrd\y-valve.cpp(1752) with #ifdef <br>
+used in jrd\y-valve.cpp(1784) with #ifndef<br>
+used in jrd\y-valve.cpp(4034) with #if<br>
+used in jrd\y-valve.cpp(5165) with #ifdef <br>
+used in jrd\y-valve.cpp(5220) with #if<br>
+used in jrd\y-valve.cpp(5971) with #if<br>
+used in jrd\y-valve.cpp(6010) with #if<br>
+used in lock\lock.cpp(116) with #if<br>
+used in lock\lock.cpp(204) with #ifndef<br>
+used in lock\lock.cpp(252) with #ifndef<br>
+used in lock\lock.cpp(294) with #if<br>
+used in lock\lock.cpp(315) with #ifndef<br>
+used in lock\lock.cpp(328) with #if<br>
+used in lock\lock.cpp(738) with #if<br>
+used in lock\lock.cpp(746) with #ifndef<br>
+used in lock\lock.cpp(819) with #ifndef<br>
+used in lock\lock.cpp(834) with #if<br>
+used in lock\lock.cpp(859) with #if<br>
+used in lock\lock.cpp(870) with #if<br>
+used in lock\lock.cpp(1398) with #if<br>
+used in lock\lock.cpp(1420) with #ifndef<br>
+used in lock\lock.cpp(1493) with #if<br>
+used in lock\lock.cpp(1538) with #if<br>
+used in lock\lock.cpp(1619) with #if<br>
+used in lock\lock.cpp(1754) with #ifndef<br>
+used in lock\lock.cpp(1900) with #if<br>
+used in lock\lock.cpp(1938) with #if<br>
+used in lock\lock.cpp(2261) with #ifndef<br>
+used in lock\lock.cpp(2343) with #ifndef<br>
+used in lock\lock.cpp(2680) with #ifndef<br>
+used in lock\lock.cpp(3067) with #if<br>
+used in lock\lock.cpp(3093) with #if<br>
+used in lock\lock.cpp(3165) with #if<br>
+used in lock\lock.cpp(3175) with #if<br>
+used in lock\lock.cpp(3728) with #ifndef<br>
+used in lock\lock.cpp(3911) with #if<br>
+used in lock\lock.cpp(3932) with #if<br>
+used in lock\lock.cpp(4272) with #if<br>
+used in lock\lock.cpp(4279) with #if<br>
+used in lock\lock.cpp(4425) with #if<br>
+used in lock\lock.cpp(4939) with #ifdef <br>
+used in lock\lock.cpp(4994) with #if<br>
+used in lock\lock.cpp(5006) with #if<br>
+used in lock\lock.cpp(5016) with #if<br>
+used in lock\lock.cpp(5030) with #ifdef <br>
+used in lock\lock.cpp(5038) with #ifdef <br>
+used in lock\lock.cpp(5048) with #ifdef <br>
+used in lock\lock.cpp(5095) with #if<br>
+used in lock\lock.cpp(5168) with #ifdef <br>
+used in lock\lock.cpp(5184) with #ifndef<br>
+used in lock\lock.h(161) with #ifdef <br>
+used in lock\lock.h(180) with #if<br>
+used in lock\lock.h(186) with #if<br>
+used in lock\lock.h(191) with #if<br>
+used in lock\lock.h(331) with #ifndef<br>
+used in lock\lock.h(339) with #if<br>
+used in remote\allr.cpp(64) with #ifdef <br>
+used in remote\allr.cpp(88) with #ifdef <br>
+used in remote\allr.cpp(222) with #ifdef <br>
+used in remote\cntl.cpp(144) with #if<br>
+used in remote\cntl.cpp(305) with #if<br>
+used in remote\cntl.cpp(425) with #if<br>
+used in remote\divorce.cpp(27) with #ifdef <br>
+used in remote\inet.cpp(80) with #ifdef <br>
+used in remote\inet.cpp(407) with #ifdef <br>
+used in remote\inet.cpp(556) with #ifdef <br>
+used in remote\inet.cpp(1456) with #if<br>
+used in remote\inet.cpp(1499) with #if<br>
+used in remote\inet.cpp(2589) with #if<br>
+used in remote\inet.cpp(3904) with #ifdef <br>
+used in remote\inet_server.cpp(90) with #ifdef <br>
+used in remote\inet_server.cpp(139) with #ifdef <br>
+used in remote\inet_server.cpp(156) with #ifdef <br>
+used in remote\inet_server.cpp(221) with #ifdef <br>
+used in remote\inet_server.cpp(237) with #ifdef <br>
+used in remote\inet_server.cpp(242) with #ifndef<br>
+used in remote\inet_server.cpp(288) with #ifdef <br>
+used in remote\inet_server.cpp(318) with #if<br>
+used in remote\inet_server.cpp(327) with #if<br>
+used in remote\inet_server.cpp(347) with #ifdef <br>
+used in remote\inet_server.cpp(405) with #ifdef <br>
+used in remote\inet_server.cpp(614) with #if<br>
+used in remote\server.cpp(58) with #ifdef <br>
+used in remote\server.cpp(217) with #ifdef <br>
+used in remote\server.cpp(1278) with #ifdef <br>
+used in remote\server.cpp(4722) with #ifdef <br>
+used in remote\server.cpp(4786) with #ifdef <br>
+used in remote\srvr_w32.cpp(163) with #ifdef <br>
+used in remote\srvr_w32.cpp(169) with #ifdef <br>
+used in remote\srvr_w32.cpp(208) with #ifdef <br>
+used in remote\srvr_w32.cpp(214) with #ifdef <br>
+used in remote\srvr_w32.cpp(236) with #ifdef <br>
+used in remote\srvr_w32.cpp(577) with #ifndef<br>
+used in remote\srvr_w32.cpp(609) with #ifdef <br>
+used in remote\wnet.cpp(936) with #if<br>
+used in remote\xnet.cpp(649) with #if<br>
+used in remote\xnet.cpp(719) with #if<br>
+used in remote\xnet.cpp(1369) with #ifdef <br>
+used in remote\xnet.cpp(1434) with #ifdef <br>
+used in remote\xnet.cpp(1519) with #if<br>
+used in utilities\dba.epp(46) with #ifndef<br>
+used in utilities\dba.epp(54) with #ifdef <br>
+used in utilities\dba.epp(151) with #ifdef <br>
+used in utilities\dba.epp(168) with #ifdef <br>
+used in utilities\dba.epp(207) with #ifdef <br>
+used in utilities\dba.epp(223) with #ifdef <br>
+used in utilities\dba.epp(253) with #ifdef <br>
+used in utilities\dba.epp(285) with #ifdef <br>
+used in utilities\dba.epp(306) with #if<br>
+used in utilities\dba.epp(315) with #ifdef <br>
+used in utilities\dba.epp(323) with #ifdef <br>
+used in utilities\dba.epp(329) with #if<br>
+used in utilities\dba.epp(343) with #ifdef <br>
+used in utilities\dba.epp(356) with #if<br>
+used in utilities\dba.epp(403) with #ifdef <br>
+used in utilities\dba.epp(465) with #ifdef <br>
+used in utilities\dba.epp(479) with #if<br>
+used in utilities\dba.epp(507) with #ifdef <br>
+used in utilities\dba.epp(518) with #ifdef <br>
+used in utilities\dba.epp(529) with #if<br>
+used in utilities\dba.epp(560) with #if<br>
+used in utilities\dba.epp(624) with #ifdef <br>
+used in utilities\dba.epp(829) with #ifdef <br>
+used in utilities\dba.epp(862) with #ifdef <br>
+used in utilities\dba.epp(905) with #ifdef <br>
+used in utilities\dba.epp(930) with #ifdef <br>
+used in utilities\dba.epp(1268) with #ifdef <br>
+used in utilities\dba.epp(1364) with #ifdef <br>
+used in utilities\dba.epp(1373) with #ifdef <br>
+used in utilities\dba.epp(1428) with #ifdef <br>
+used in utilities\dba.epp(1442) with #ifdef <br>
+used in utilities\dba.epp(1450) with #ifdef <br>
+used in utilities\dba.epp(1464) with #ifdef <br>
+used in utilities\dba.epp(1525) with #ifdef <br>
+used in utilities\dba.epp(1553) with #ifdef <br>
+used in utilities\dba.epp(1562) with #ifdef <br>
+used in utilities\dba.epp(1615) with #ifdef <br>
+used in utilities\dba.epp(1627) with #ifdef <br>
+used in utilities\dba.epp(1635) with #ifdef <br>
+used in utilities\gsec.cpp(61) with #ifndef<br>
+used in utilities\gsec.cpp(80) with #ifndef<br>
+used in utilities\gsec.cpp(84) with #ifdef <br>
+used in utilities\gsec.cpp(242) with #ifdef <br>
+used in utilities\gsec.cpp(281) with #ifdef <br>
+used in utilities\gsec.cpp(325) with #ifdef <br>
+used in utilities\gsec.cpp(407) with #ifdef <br>
+used in utilities\gsec.cpp(591) with #ifdef <br>
+used in utilities\gsec.cpp(658) with #ifdef <br>
+used in utilities\gsec.cpp(868) with #ifdef <br>
+used in utilities\gsec.cpp(876) with #ifdef <br>
+used in utilities\gsec.cpp(1112) with #ifdef <br>
+used in utilities\gsec.cpp(1155) with #ifdef <br>
+used in utilities\gsec.cpp(1165) with #ifdef <br>
+used in utilities\gsec.cpp(1255) with #ifdef <br>
+used in utilities\gsec.h(76) with #ifdef <br>
+used in utilities\ppg.cpp(44) with #ifdef <br>
+used in utilities\ppg.cpp(66) with #ifdef <br>
+used in utilities\ppg.cpp(252) with #ifdef <br>
+used in utilities\ppg_proto.h(32) with #ifdef <br>
+used in wal\wal.cpp(89) with #ifdef <br>
+used in wal\wal.cpp(1069) with #ifdef <br>
+used in wal\wal.cpp(1108) with #ifndef<br>
+used in wal\walc.cpp(68) with #ifdef <br>
+used in wal\walw.cpp(97) with #ifdef <br>
+used in wal\walw.cpp(171) with #ifdef <br>
+used in wal\walw.cpp(199) with #ifdef <br>
+used in wal\walw.cpp(566) with #ifdef <br>
+used in wal\walw_main.cpp(4) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(30) SUPERSERVER_V2</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\blb.cpp(2048) with #ifdef <br>
+used in jrd\blb.cpp(2066) with #ifdef <br>
+used in jrd\blb.cpp(2086) with #ifdef <br>
+used in jrd\cch.cpp(85) with #ifdef <br>
+used in jrd\cch.cpp(1160) with #ifdef <br>
+used in jrd\cch.cpp(3217) with #ifdef <br>
+used in jrd\cch.cpp(3280) with #ifdef <br>
+used in jrd\cch.cpp(3924) with #ifdef <br>
+used in jrd\cch.cpp(3991) with #ifdef <br>
+used in jrd\cch.cpp(4043) with #ifdef <br>
+used in jrd\cch.cpp(5440) with #ifdef <br>
+used in jrd\dpm.epp(1539) with #ifdef <br>
+used in jrd\dpm.epp(1681) with #ifdef <br>
+used in jrd\jrd.cpp(6048) with #ifdef <br>
+used in jrd\pio.h(83) with #ifdef <br>
+used in jrd\pio.h(100) with #ifdef <br>
+used in jrd\pio_proto.h(45) with #ifdef <br>
+used in jrd\rse.cpp(2283) with #ifdef <br>
+used in jrd\sdw.cpp(476) with #ifdef <br>
+used in jrd\tpc.cpp(399) with #ifdef <br>
+used in jrd\tra.cpp(94) with #ifdef <br>
+used in jrd\tra.cpp(154) with #ifdef <br>
+used in jrd\tra.cpp(293) with #ifdef <br>
+used in jrd\tra.cpp(311) with #ifdef <br>
+used in jrd\tra.cpp(650) with #ifdef <br>
+used in jrd\tra.cpp(1307) with #ifdef <br>
+used in jrd\tra.cpp(1339) with #ifdef <br>
+used in jrd\tra.cpp(1506) with #ifdef <br>
+used in jrd\tra.cpp(1572) with #ifndef<br>
+used in jrd\tra.cpp(1585) with #ifndef<br>
+used in jrd\tra.cpp(2099) with #ifdef <br>
+used in jrd\tra.cpp(2665) with #ifdef <br>
+used in jrd\tra.cpp(2690) with #ifndef<br>
+used in jrd\tra.cpp(2698) with #ifndef<br>
+used in jrd\tra_proto.h(40) with #ifdef <br>
+used in jrd\unix.cpp(324) with #ifdef <br>
+used in jrd\unix.cpp(387) with #ifndef<br>
+used in jrd\unix.cpp(420) with #ifndef<br>
+used in jrd\unix.cpp(660) with #ifdef <br>
+used in jrd\winnt.cpp(68) with #ifdef <br>
+used in jrd\winnt.cpp(79) with #ifdef <br>
+used in jrd\winnt.cpp(152) with #ifdef <br>
+used in jrd\winnt.cpp(381) with #ifdef <br>
+used in jrd\winnt.cpp(410) with #ifdef <br>
+used in jrd\winnt.cpp(427) with #ifdef <br>
+used in jrd\winnt.cpp(620) with #ifdef <br>
+used in jrd\winnt.cpp(637) with #ifdef <br>
+used in jrd\winnt.cpp(649) with #ifdef <br>
+used in jrd\winnt.cpp(756) with #ifdef <br>
+used in jrd\winnt.cpp(841) with #ifdef <br>
+used in jrd\winnt.cpp(858) with #ifdef <br>
+used in jrd\winnt.cpp(902) with #ifdef <br>
+used in jrd\winnt.cpp(998) with #ifdef <br>
+used in jrd\winnt.cpp(1049) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(31) SYMMETRIC_MATH</td><td>From Claudio V.</td></tr>
+<tr><td>&nbsp;</td><td>
+used in extlib\fbudf\fbudf.cpp(571) with #if<br>
+used in extlib\fbudf\fbudf.cpp(618) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(32) SYNC_WRITE_DEFAULT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\pag.cpp(811) with #ifdef <br>
+used in jrd\pag.cpp(1528) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(33) TERMINATE_IDLE_LOCK_MANAGER</td><td>Only to hide some code</td></tr>
+<tr><td>&nbsp;</td><td>
+used in lock\lock.cpp(1021) with #ifdef <br>
+used in lock\lock.cpp(1045) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(34) WINDOWS_ROUTER</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet_server.cpp(82) with #ifdef <br>
+used in remote\inet_server.cpp(161) with #ifdef <br>
+used in remote\inet_server.cpp(169) with #ifdef <br>
+used in remote\inet_server.cpp(196) with #ifdef <br>
+used in remote\inet_server.cpp(447) with #ifdef <br>
+used in remote\inet_server.cpp(473) with #ifdef <br>
+used in remote\serve_proto.h(27) with #ifdef <br>
+</td></tr>
+</table>
+<p><a name="def2">Compiler defines</p>
+<table border="1" width ="100%" cellspacing="3">
+<tr><td valign="top">
+(0) _MSC_VER</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in burp\backup.epp(233) with #if<br>
+used in burp\backup.epp(233) with #if<br>
+used in dsql\alld.cpp(76) with #ifdef <br>
+used in isql\isql.epp(328) with #if<br>
+used in isql\isql.epp(328) with #if<br>
+used in jrd\ibinitdll.cpp(36) with #ifdef <br>
+used in v5_examples\align.h(46) with #if<br>
+used in v5_examples\api16.c(43) with #if<br>
+used in v5_examples\apifull.c(67) with #if<br>
+used in v5_examples\dynfull.e(53) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(1) __GNUC__</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in include\fb_types.h(46) with #ifndef<br>
+used in include\firebird.h(53) with #if<br>
+used in jrd\codes.epp(758) with #if<br>
+used in jrd\codes.epp(789) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(2) __cplusplus</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in alice\alice_proto.h(27) with #ifdef <br>
+used in alice\alice_proto.h(39) with #ifdef <br>
+used in alice\exe_proto.h(27) with #ifdef <br>
+used in alice\exe_proto.h(34) with #ifdef <br>
+used in alice\tdr_proto.h(27) with #ifdef <br>
+used in alice\tdr_proto.h(38) with #ifdef <br>
+used in burp\backu_proto.h(27) with #ifdef <br>
+used in burp\backu_proto.h(33) with #ifdef <br>
+used in burp\burp.h(45) with #ifdef <br>
+used in burp\burp.h(613) with #ifdef <br>
+used in burp\burp.h(630) with #ifdef <br>
+used in burp\burp.h(856) with #ifdef <br>
+used in burp\burp.h(871) with #if<br>
+used in burp\burp.h(940) with #ifdef <br>
+used in burp\burp_proto.h(27) with #ifdef <br>
+used in burp\burp_proto.h(47) with #ifdef <br>
+used in burp\canon_proto.h(27) with #ifdef <br>
+used in burp\canon_proto.h(34) with #ifdef <br>
+used in burp\misc_proto.h(27) with #ifdef <br>
+used in burp\misc_proto.h(35) with #ifdef <br>
+used in burp\mvol_proto.h(27) with #ifndef<br>
+used in burp\resto_proto.h(27) with #ifdef <br>
+used in burp\resto_proto.h(33) with #ifdef <br>
+used in dsql\dsql_proto.h(27) with #ifdef <br>
+used in dsql\dsql_proto.h(72) with #ifdef <br>
+used in dsql\errd_proto.h(27) with #ifdef <br>
+used in dsql\errd_proto.h(41) with #ifdef <br>
+used in dsql\hsh_proto.h(27) with #ifdef <br>
+used in dsql\hsh_proto.h(39) with #ifdef <br>
+used in dsql\metd_proto.h(29) with #ifndef<br>
+used in dsql\parse_proto.h(27) with #ifdef <br>
+used in dsql\parse_proto.h(36) with #ifdef <br>
+used in dsql\pass1_proto.h(27) with #ifdef <br>
+used in dsql\pass1_proto.h(36) with #ifdef <br>
+used in dsql\prepa_proto.h(27) with #ifdef <br>
+used in dsql\prepa_proto.h(35) with #ifdef <br>
+used in dsql\user__proto.h(27) with #ifdef <br>
+used in dsql\user__proto.h(92) with #ifdef <br>
+used in dsql\utld_proto.h(30) with #ifdef <br>
+used in dsql\utld_proto.h(41) with #ifdef <br>
+used in dudley\hsh_proto.h(27) with #ifdef <br>
+used in dudley\hsh_proto.h(37) with #ifdef <br>
+used in extlib\fbudf\fbudf.h(43) with #ifdef <br>
+used in extlib\fbudf\fbudf.h(83) with #ifdef <br>
+used in gpre\cmp_proto.h(29) with #ifdef <br>
+used in gpre\cmp_proto.h(44) with #ifdef <br>
+used in gpre\gpre.h(68) with #ifdef <br>
+used in gpre\gpre.h(1203) with #ifdef <br>
+used in gpre\gpre.h(1477) with #ifdef <br>
+used in gpre\gpre.h(1481) with #ifdef <br>
+used in gpre\gpre.h(1537) with #ifdef <br>
+used in gpre\gpre.h(1541) with #ifdef <br>
+used in gpre\gpre.h(1560) with #ifdef <br>
+used in gpre\gpre_meta.h(27) with #ifdef <br>
+used in gpre\gpre_meta.h(55) with #ifdef <br>
+used in gpre\gpre_proto.h(29) with #ifdef <br>
+used in gpre\gpre_proto.h(49) with #ifdef <br>
+used in gpre\hsh_proto.h(27) with #ifdef <br>
+used in gpre\hsh_proto.h(38) with #ifdef <br>
+used in gpre\jrdme_proto.h(27) with #ifdef <br>
+used in gpre\jrdme_proto.h(33) with #ifdef <br>
+used in gpre\lang_proto.h(27) with #ifdef <br>
+used in gpre\lang_proto.h(46) with #ifdef <br>
+used in gpre\msc_proto.h(29) with #ifdef <br>
+used in gpre\msc_proto.h(59) with #ifdef <br>
+used in gpre\par_proto.h(27) with #ifdef <br>
+used in gpre\par_proto.h(49) with #ifdef <br>
+used in gpre\pat_proto.h(27) with #ifdef <br>
+used in gpre\pat_proto.h(33) with #ifdef <br>
+used in gpre\sqe_proto.h(27) with #ifdef <br>
+used in gpre\sqe_proto.h(45) with #ifdef <br>
+used in gpre\sql_proto.h(27) with #ifdef <br>
+used in gpre\sql_proto.h(43) with #ifdef <br>
+used in include\editline.h(44) with #ifdef <br>
+used in include\editline.h(52) with #ifdef <br>
+used in include\firebird.h(59) with #ifdef <br>
+used in include\gen\codes.h(24) with #ifdef <br>
+used in include\gen\msg_facs.h(32) with #ifndef<br>
+used in include\old_fb_blk.h(8) with #ifdef <br>
+used in include\old_fb_blk.h(20) with #ifdef <br>
+used in intl\charsets.h(27) with #ifdef <br>
+used in intl\charsets.h(95) with #ifdef <br>
+used in intlcpp\charsets.h(27) with #ifdef <br>
+used in intlcpp\charsets.h(95) with #ifdef <br>
+used in ipserver\ipapi_proto.h(28) with #ifdef <br>
+used in ipserver\ipapi_proto.h(157) with #ifdef <br>
+used in ipserver\ipcli_proto.h(28) with #ifdef <br>
+used in ipserver\ipcli_proto.h(35) with #ifdef <br>
+used in jrd\ail.h(32) with #ifdef <br>
+used in jrd\ail.h(57) with #ifdef <br>
+used in jrd\blb_proto.h(45) with #ifdef <br>
+used in jrd\blb_proto.h(69) with #ifdef <br>
+used in jrd\btr_proto.h(31) with #ifdef <br>
+used in jrd\btr_proto.h(67) with #ifdef <br>
+used in jrd\cch_proto.h(27) with #ifdef <br>
+used in jrd\cch_proto.h(100) with #ifdef <br>
+used in jrd\dbg_proto.h(29) with #ifdef <br>
+used in jrd\dbg_proto.h(54) with #ifdef <br>
+used in jrd\dfw_proto.h(27) with #ifdef <br>
+used in jrd\dfw_proto.h(41) with #ifdef <br>
+used in jrd\dmp_proto.h(27) with #ifdef <br>
+used in jrd\dmp_proto.h(39) with #ifdef <br>
+used in jrd\dpm_proto.h(27) with #ifdef <br>
+used in jrd\dpm_proto.h(60) with #ifdef <br>
+used in jrd\dsc.h(29) with #ifdef <br>
+used in jrd\dsc.h(197) with #ifdef <br>
+used in jrd\dsc_proto.h(29) with #ifdef <br>
+used in jrd\dsc_proto.h(45) with #ifdef <br>
+used in jrd\dyn_proto.h(27) with #ifdef <br>
+used in jrd\dyn_proto.h(35) with #ifdef <br>
+used in jrd\enc_proto.h(27) with #ifdef <br>
+used in jrd\enc_proto.h(33) with #ifdef <br>
+used in jrd\entry.h(54) with #if<br>
+used in jrd\err_proto.h(46) with #ifdef <br>
+used in jrd\err_proto.h(63) with #ifdef <br>
+used in jrd\err_proto.h(69) with #ifdef <br>
+used in jrd\err_proto.h(76) with #ifdef <br>
+used in jrd\event_proto.h(30) with #ifdef <br>
+used in jrd\event_proto.h(43) with #ifdef <br>
+used in jrd\exe_proto.h(27) with #ifdef <br>
+used in jrd\exe_proto.h(46) with #ifdef <br>
+used in jrd\ext_proto.h(27) with #ifdef <br>
+used in jrd\ext_proto.h(50) with #ifdef <br>
+used in jrd\filte_proto.h(27) with #ifdef <br>
+used in jrd\filte_proto.h(39) with #ifdef <br>
+used in jrd\flu_proto.h(28) with #ifdef <br>
+used in jrd\flu_proto.h(50) with #ifdef <br>
+used in jrd\fun_proto.h(27) with #ifdef <br>
+used in jrd\fun_proto.h(38) with #ifdef <br>
+used in jrd\gdsold.h(67) with #ifdef <br>
+used in jrd\gdsold.h(341) with #ifdef <br>
+used in jrd\gdsold.h(356) with #ifndef<br>
+used in jrd\gdsold.h(489) with #ifndef<br>
+used in jrd\gdsold.h(515) with #ifndef<br>
+used in jrd\gdsold.h(536) with #ifndef<br>
+used in jrd\gdsold.h(595) with #ifndef<br>
+used in jrd\gdsold.h(616) with #ifndef<br>
+used in jrd\gdsold.h(633) with #ifndef<br>
+used in jrd\gdsold.h(670) with #ifndef<br>
+used in jrd\gdsold.h(691) with #ifndef<br>
+used in jrd\gdsold.h(796) with #ifndef<br>
+used in jrd\gdsold.h(887) with #ifndef<br>
+used in jrd\gdsold.h(1031) with #ifndef<br>
+used in jrd\gdsold.h(1054) with #ifndef<br>
+used in jrd\gdsold.h(1069) with #ifndef<br>
+used in jrd\gdsold.h(1097) with #ifndef<br>
+used in jrd\gdsold.h(1152) with #ifndef<br>
+used in jrd\gdsold.h(1204) with #ifndef<br>
+used in jrd\gdsold.h(1220) with #ifndef<br>
+used in jrd\gdsold.h(1353) with #ifndef<br>
+used in jrd\gdsold.h(1375) with #ifndef<br>
+used in jrd\gdsold.h(1409) with #ifndef<br>
+used in jrd\gdsold.h(1444) with #ifndef<br>
+used in jrd\gdsold.h(1503) with #ifndef<br>
+used in jrd\gdsold.h(1524) with #ifndef<br>
+used in jrd\gdsold.h(1549) with #ifndef<br>
+used in jrd\gdsold.h(1578) with #ifndef<br>
+used in jrd\gdsold.h(1603) with #ifndef<br>
+used in jrd\gdsold.h(1620) with #ifndef<br>
+used in jrd\gdsold.h(1644) with #ifndef<br>
+used in jrd\gdsold.h(1667) with #ifndef<br>
+used in jrd\gdsold.h(1687) with #ifndef<br>
+used in jrd\gdsold.h(1717) with #ifndef<br>
+used in jrd\gdsold.h(1734) with #ifndef<br>
+used in jrd\gdsold.h(1757) with #ifndef<br>
+used in jrd\gdsold.h(1773) with #ifndef<br>
+used in jrd\gdsold.h(1787) with #ifndef<br>
+used in jrd\gdsold.h(1812) with #ifndef<br>
+used in jrd\gdsold.h(1830) with #ifndef<br>
+used in jrd\gdsold.h(1920) with #ifndef<br>
+used in jrd\gdsold.h(1944) with #ifndef<br>
+used in jrd\gdsold.h(1983) with #ifndef<br>
+used in jrd\gdsold.h(2004) with #ifndef<br>
+used in jrd\gdsold.h(2025) with #ifndef<br>
+used in jrd\gdsold.h(2072) with #ifndef<br>
+used in jrd\gds_proto.h(47) with #ifdef <br>
+used in jrd\gds_proto.h(72) with #if<br>
+used in jrd\gds_proto.h(149) with #ifdef <br>
+used in jrd\grant_proto.h(27) with #ifdef <br>
+used in jrd\grant_proto.h(34) with #ifdef <br>
+used in jrd\ibase.h(49) with #if<br>
+used in jrd\ibase.h(113) with #if<br>
+used in jrd\ibase.h(358) with #ifdef <br>
+used in jrd\ibase.h(1215) with #ifdef <br>
+used in jrd\ibase.h(2248) with #ifndef<br>
+used in jrd\idx_proto.h(31) with #ifdef <br>
+used in jrd\idx_proto.h(55) with #ifdef <br>
+used in jrd\inf_proto.h(27) with #ifdef <br>
+used in jrd\inf_proto.h(39) with #ifdef <br>
+used in jrd\ini_proto.h(27) with #ifdef <br>
+used in jrd\ini_proto.h(40) with #ifdef <br>
+used in jrd\intlobj.h(30) with #ifdef <br>
+used in jrd\intlobj.h(194) with #ifdef <br>
+used in jrd\isc.h(35) with #ifdef <br>
+used in jrd\isc.h(102) with #ifdef <br>
+used in jrd\isc.h(108) with #ifdef <br>
+used in jrd\isc.h(270) with #ifdef <br>
+used in jrd\isc_f_proto.h(30) with #ifdef <br>
+used in jrd\isc_f_proto.h(47) with #ifdef <br>
+used in jrd\isc_ipc.cpp(205) with #if<br>
+used in jrd\isc_ipc.cpp(300) with #if<br>
+used in jrd\isc_ipc.cpp(579) with #if<br>
+used in jrd\isc_ipc.cpp(1151) with #if<br>
+used in jrd\isc_i_proto.h(27) with #ifdef <br>
+used in jrd\isc_i_proto.h(34) with #ifdef <br>
+used in jrd\isc_i_proto.h(53) with #if<br>
+used in jrd\isc_i_proto.h(63) with #if<br>
+used in jrd\isc_proto.h(29) with #ifdef <br>
+used in jrd\isc_proto.h(62) with #ifdef <br>
+used in jrd\isc_s_proto.h(34) with #ifdef <br>
+used in jrd\isc_s_proto.h(97) with #ifdef <br>
+used in jrd\jrd.h(39) with #ifdef <br>
+used in jrd\jrd.h(90) with #ifdef <br>
+used in jrd\jrd.h(969) with #ifdef <br>
+used in jrd\jrd.h(973) with #ifdef <br>
+used in jrd\jrd.h(1063) with #ifdef <br>
+used in jrd\jrd_proto.h(28) with #ifndef<br>
+used in jrd\jrd_proto.h(42) with #ifdef <br>
+used in jrd\jrd_proto.h(164) with #ifdef <br>
+used in jrd\lck_proto.h(29) with #ifdef <br>
+used in jrd\lck_proto.h(50) with #ifdef <br>
+used in jrd\met_proto.h(31) with #ifdef <br>
+used in jrd\met_proto.h(93) with #ifdef <br>
+used in jrd\mov_proto.h(31) with #ifdef <br>
+used in jrd\mov_proto.h(60) with #ifdef <br>
+used in jrd\ods.h(222) with #ifdef <br>
+used in jrd\pag_proto.h(27) with #ifdef <br>
+used in jrd\pag_proto.h(55) with #ifdef <br>
+used in jrd\par_proto.h(27) with #ifdef <br>
+used in jrd\par_proto.h(41) with #ifdef <br>
+used in jrd\perf.h(48) with #ifdef <br>
+used in jrd\perf.h(62) with #ifdef <br>
+used in jrd\perf.h(68) with #ifdef <br>
+used in jrd\perf.h(103) with #ifdef <br>
+used in jrd\perf_proto.h(29) with #ifdef <br>
+used in jrd\perf_proto.h(39) with #ifdef <br>
+used in jrd\pio_proto.h(27) with #ifdef <br>
+used in jrd\pio_proto.h(54) with #ifdef <br>
+used in jrd\quad_proto.h(41) with #ifdef <br>
+used in jrd\quad_proto.h(52) with #ifdef <br>
+used in jrd\sbm_proto.h(32) with #ifdef <br>
+used in jrd\sbm_proto.h(36) with #ifdef <br>
+used in jrd\sbm_proto.h(42) with #ifdef <br>
+used in jrd\sbm_proto.h(58) with #ifdef <br>
+used in jrd\sch_proto.h(29) with #ifdef <br>
+used in jrd\sch_proto.h(53) with #ifdef <br>
+used in jrd\scl_proto.h(27) with #ifdef <br>
+used in jrd\scl_proto.h(44) with #ifdef <br>
+used in jrd\sdl_proto.h(27) with #ifdef <br>
+used in jrd\sdl_proto.h(40) with #ifdef <br>
+used in jrd\sdw_proto.h(27) with #ifdef <br>
+used in jrd\sdw_proto.h(46) with #ifdef <br>
+used in jrd\shdef.h(34) with #ifdef <br>
+used in jrd\shdef.h(172) with #ifdef <br>
+used in jrd\sort.h(36) with #ifdef <br>
+used in jrd\sort.h(297) with #ifdef <br>
+used in jrd\sqz_proto.h(30) with #ifdef <br>
+used in jrd\sqz_proto.h(43) with #ifdef <br>
+used in jrd\status.h(10) with #ifdef <br>
+used in jrd\svc_proto.h(27) with #ifdef <br>
+used in jrd\svc_proto.h(48) with #ifdef <br>
+used in jrd\sym_proto.h(27) with #ifdef <br>
+used in jrd\sym_proto.h(35) with #ifdef <br>
+used in jrd\thd.h(97) with #ifndef<br>
+used in jrd\thd_proto.h(29) with #ifdef <br>
+used in jrd\thd_proto.h(73) with #ifdef <br>
+used in jrd\tra_proto.h(29) with #ifdef <br>
+used in jrd\tra_proto.h(61) with #ifdef <br>
+used in jrd\utl_proto.h(31) with #ifdef <br>
+used in jrd\utl_proto.h(89) with #ifdef <br>
+used in jrd\val.h(157) with #ifdef <br>
+used in jrd\vio_proto.h(29) with #ifdef <br>
+used in jrd\vio_proto.h(67) with #ifdef <br>
+used in jrd\why_proto.h(27) with #ifdef <br>
+used in jrd\why_proto.h(143) with #ifdef <br>
+used in qli\hsh_proto.h(27) with #ifdef <br>
+used in qli\hsh_proto.h(37) with #ifdef <br>
+used in remote\allr_proto.h(27) with #ifdef <br>
+used in remote\allr_proto.h(46) with #ifdef <br>
+used in remote\chop_proto.h(27) with #ifdef <br>
+used in remote\chop_proto.h(33) with #ifdef <br>
+used in remote\ibconfig.h(31) with #ifdef <br>
+used in remote\inet_proto.h(27) with #ifdef <br>
+used in remote\inet_proto.h(37) with #ifdef <br>
+used in remote\inter_proto.h(27) with #ifdef <br>
+used in remote\inter_proto.h(80) with #ifdef <br>
+used in remote\merge.cpp(39) with #if<br>
+used in remote\merge.cpp(123) with #if<br>
+used in remote\merge_proto.h(26) with #if<br>
+used in remote\merge_proto.h(36) with #if<br>
+used in remote\remote.h(415) with #ifdef <br>
+used in remote\remot_proto.h(27) with #ifdef <br>
+used in remote\remot_proto.h(45) with #ifdef <br>
+used in remote\window_proto.h(4) with #ifdef <br>
+used in remote\window_proto.h(10) with #ifdef <br>
+used in remote\wnet_proto.h(27) with #ifdef <br>
+used in remote\wnet_proto.h(38) with #ifdef <br>
+used in remote\xnet_proto.h(27) with #ifdef <br>
+used in remote\xnet_proto.h(41) with #ifdef <br>
+used in utilities\cmd_util_proto.h(28) with #ifdef <br>
+used in utilities\cmd_util_proto.h(41) with #ifdef <br>
+used in utilities\ppg_proto.h(28) with #ifdef <br>
+used in utilities\ppg_proto.h(40) with #ifdef <br>
+used in utilities\secur_proto.h(27) with #ifdef <br>
+used in utilities\secur_proto.h(38) with #ifdef <br>
+used in v5_examples\winevent.c(87) with #ifdef <br>
+used in v5_examples\winevent.c(92) with #ifdef <br>
+used in wal\walw_proto.h(27) with #ifdef <br>
+used in wal\walw_proto.h(33) with #ifdef <br>
+used in wal\wal_proto.h(32) with #ifdef <br>
+used in wal\wal_proto.h(58) with #ifdef <br>
+</td></tr>
+</table>
+<p><a name="def3">Build defines</p>
+<table border="1" width ="100%" cellspacing="3">
+<tr><td valign="top">
+(0) BOOT_BUILD</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in common\config\config_file.cpp(42) with #if<br>
+used in common\config\dir_list.cpp(230) with #ifdef <br>
+used in jrd\alt.cpp(909) with #ifdef <br>
+used in jrd\alt.cpp(1094) with #ifdef <br>
+used in jrd\alt.cpp(1159) with #ifdef <br>
+used in jrd\alt.cpp(1316) with #ifdef <br>
+used in jrd\scl.epp(71) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(1) CHECK_HAVING</td><td>Debug having condition</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dsql\pass1.cpp(4545) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(2) DEBUG_BTR</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\btr.cpp(3184) with #ifdef <br>
+used in jrd\btr.cpp(3264) with #ifdef <br>
+used in jrd\btr.cpp(3308) with #ifdef <br>
+used in jrd\btr.cpp(3318) with #ifdef <br>
+used in jrd\btr.cpp(3337) with #ifdef <br>
+used in jrd\btr.cpp(3351) with #ifdef <br>
+used in jrd\btr.cpp(3441) with #ifdef <br>
+used in jrd\btr.cpp(3550) with #ifdef <br>
+used in jrd\btr.cpp(4248) with #ifdef <br>
+used in jrd\btr.cpp(4339) with #ifdef <br>
+used in jrd\btr.cpp(4351) with #ifdef <br>
+used in jrd\btr.cpp(4376) with #ifdef <br>
+used in jrd\btr.cpp(4400) with #ifdef <br>
+used in jrd\btr.cpp(4418) with #ifdef <br>
+used in jrd\btr.cpp(4430) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(3) DEBUG_COMPARE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in intl\lc_narrow.c(524) with #ifdef <br>
+used in intl\lc_narrow.c(564) with #ifdef <br>
+used in intlcpp\lc_narrow.cpp(539) with #ifdef <br>
+used in intlcpp\lc_narrow.cpp(579) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(4) DEBUG_EVENT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\event.cpp(1484) with #ifdef <br>
+used in jrd\event.cpp(1582) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(5) DEBUG_FPE_HANDLING</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_ipc.cpp(324) with #ifdef <br>
+used in jrd\isc_ipc.cpp(931) with #ifdef <br>
+used in jrd\isc_ipc.cpp(942) with #ifdef <br>
+used in jrd\why.cpp(5985) with #ifdef <br>
+used in jrd\y-valve.cpp(5982) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(6) DEBUG_GDS_ALLOC</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in alice\alice.cpp(643) with #if<br>
+used in burp\burp.cpp(1066) with #if<br>
+used in common\classes\alloc.cpp(38) with #ifdef <br>
+used in common\classes\alloc.cpp(153) with #ifdef <br>
+used in common\classes\alloc.cpp(159) with #ifdef <br>
+used in common\classes\alloc.cpp(221) with #ifdef <br>
+used in common\classes\alloc.cpp(340) with #ifdef <br>
+used in common\classes\alloc.cpp(356) with #ifdef <br>
+used in common\classes\alloc.cpp(369) with #ifdef <br>
+used in common\classes\alloc.cpp(408) with #ifdef <br>
+used in common\classes\alloc.cpp(436) with #ifdef <br>
+used in common\classes\alloc.cpp(474) with #ifdef <br>
+used in common\classes\alloc.cpp(644) with #ifdef <br>
+used in common\classes\alloc.cpp(657) with #ifdef <br>
+used in common\classes\alloc.h(57) with #ifdef <br>
+used in common\classes\alloc.h(143) with #ifdef <br>
+used in common\classes\alloc.h(177) with #ifdef <br>
+used in common\classes\alloc.h(194) with #ifdef <br>
+used in common\classes\alloc.h(199) with #ifdef <br>
+used in common\classes\alloc.h(232) with #ifdef <br>
+used in common\classes\alloc.h(311) with #ifdef <br>
+used in common\classes\array.h(88) with #ifdef <br>
+used in dsql\user_dsql.cpp(755) with #ifdef <br>
+used in dsql\utld.cpp(681) with #ifdef <br>
+used in dudley\ddl.cpp(454) with #ifdef <br>
+used in dudley\exe.epp(3993) with #ifdef <br>
+used in dudley\exe.epp(4017) with #ifdef <br>
+used in dudley\exe.epp(4107) with #ifdef <br>
+used in dudley\trn.cpp(118) with #ifdef <br>
+used in dudley\trn.cpp(870) with #ifdef <br>
+used in gpre\msc.cpp(113) with #ifdef <br>
+used in gpre\msc.cpp(150) with #ifdef <br>
+used in include\fb_blk.h(20) with #ifdef <br>
+used in include\fb_blk.h(50) with #ifdef <br>
+used in isql\isql.epp(508) with #ifdef <br>
+used in isql\isql.epp(3690) with #ifdef <br>
+used in isql\isql.epp(3964) with #ifdef <br>
+used in isql\isql.epp(3978) with #ifdef <br>
+used in isql\isql.epp(4714) with #ifdef <br>
+used in isql\isql.epp(4857) with #ifdef <br>
+used in isql\isql.epp(5514) with #ifdef <br>
+used in isql\isql.epp(6523) with #ifdef <br>
+used in jrd\alt.cpp(116) with #ifdef <br>
+used in jrd\alt.cpp(202) with #ifdef <br>
+used in jrd\blb.cpp(672) with #ifdef <br>
+used in jrd\blb.cpp(1625) with #ifdef <br>
+used in jrd\btr.cpp(2299) with #ifdef <br>
+used in jrd\cch.cpp(2527) with #ifdef <br>
+used in jrd\err.cpp(545) with #ifdef <br>
+used in jrd\event.cpp(319) with #ifdef <br>
+used in jrd\exe.cpp(155) with #if<br>
+used in jrd\exe.cpp(1886) with #if<br>
+used in jrd\filters.cpp(707) with #ifdef <br>
+used in jrd\filters.cpp(829) with #ifdef <br>
+used in jrd\gds.cpp(301) with #ifdef <br>
+used in jrd\gds.cpp(822) with #ifdef <br>
+used in jrd\gds.cpp(844) with #ifdef <br>
+used in jrd\gds.cpp(1445) with #ifdef <br>
+used in jrd\gds.cpp(2140) with #ifdef <br>
+used in jrd\gds.cpp(3617) with #ifdef <br>
+used in jrd\gds_proto.h(52) with #ifdef <br>
+used in jrd\isc.cpp(1274) with #ifdef <br>
+used in jrd\isc_ipc.cpp(998) with #ifdef <br>
+used in jrd\sch.cpp(668) with #ifdef <br>
+used in jrd\utl.cpp(790) with #ifdef <br>
+used in jrd\utl.cpp(876) with #ifdef <br>
+used in jrd\why.cpp(4814) with #ifdef <br>
+used in jrd\why.cpp(6088) with #ifdef <br>
+used in jrd\y-valve.cpp(4788) with #ifdef <br>
+used in jrd\y-valve.cpp(4960) with #ifdef <br>
+used in qli\all.cpp(275) with #ifdef <br>
+used in qli\dtr.cpp(320) with #ifdef <br>
+used in qli\dtr.cpp(481) with #ifdef <br>
+used in qli\eval.cpp(888) with #ifdef <br>
+used in qli\exe.cpp(746) with #ifdef <br>
+used in remote\allr.cpp(73) with #ifdef <br>
+used in remote\allr.cpp(80) with #ifdef <br>
+used in remote\allr.cpp(116) with #ifdef <br>
+used in remote\allr.cpp(170) with #ifdef <br>
+used in remote\allr_proto.h(31) with #ifdef <br>
+used in remote\inet_server.cpp(454) with #ifdef <br>
+used in remote\remote.cpp(665) with #ifdef <br>
+used in remote\srvr_w32.cpp(290) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(7) DEBUG_INDEXKEY</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\btr.cpp(175) with #ifdef <br>
+used in jrd\btr.cpp(2101) with #ifdef <br>
+used in jrd\btr.cpp(2115) with #ifdef <br>
+used in jrd\btr.cpp(2127) with #ifdef <br>
+used in jrd\btr.cpp(2135) with #ifdef <br>
+used in jrd\btr.cpp(2146) with #ifdef <br>
+used in jrd\btr.cpp(2158) with #ifdef <br>
+used in jrd\btr.cpp(2165) with #ifdef <br>
+used in jrd\btr.cpp(2265) with #ifdef <br>
+used in jrd\btr.cpp(4132) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(8) DEBUG_IP_TRACE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in ipserver\ipclient.cpp(3469) with #ifdef <br>
+used in ipserver\ipclient.cpp(3491) with #ifdef <br>
+used in ipserver\ipclient.cpp(3920) with #ifdef <br>
+used in ipserver\ipserver.cpp(237) with #ifdef <br>
+used in ipserver\ipserver.cpp(544) with #ifdef <br>
+used in ipserver\ipserver.cpp(647) with #ifdef <br>
+used in ipserver\ipserver.cpp(3207) with #ifdef <br>
+used in ipserver\ipserver.cpp(3221) with #ifdef <br>
+used in ipserver\ipserver.cpp(3307) with #ifdef <br>
+used in ipserver\ipserver.cpp(4145) with #ifdef <br>
+used in ipserver\ipserver.cpp(4164) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(9) DEBUG_ISC_SYNC</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_sync.cpp(327) with #ifdef <br>
+used in jrd\isc_sync.cpp(334) with #ifdef <br>
+used in jrd\isc_sync.cpp(545) with #ifdef <br>
+used in jrd\isc_sync.cpp(552) with #ifdef <br>
+used in jrd\isc_sync.cpp(829) with #ifdef <br>
+used in jrd\isc_sync.cpp(836) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(10) DEBUG_PROCS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\cmp.cpp(1787) with #ifdef <br>
+used in jrd\cmp.cpp(2056) with #ifdef <br>
+used in jrd\jrd.cpp(4336) with #ifdef <br>
+used in jrd\jrd_proto.h(160) with #ifdef <br>
+used in jrd\tra.cpp(834) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(11) DEBUG_REMOTE_MEMORY</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\parser.cpp(78) with #ifdef <br>
+used in remote\parser.cpp(237) with #ifdef <br>
+used in remote\parser.cpp(309) with #ifdef <br>
+used in remote\remote.cpp(258) with #ifdef <br>
+used in remote\remote.cpp(274) with #ifdef <br>
+used in remote\remote.cpp(460) with #ifdef <br>
+used in remote\remote.cpp(488) with #ifdef <br>
+used in remote\remote.cpp(532) with #ifdef <br>
+used in remote\remote.cpp(542) with #ifdef <br>
+used in remote\remote.cpp(739) with #ifdef <br>
+used in remote\remote.cpp(751) with #ifdef <br>
+used in remote\server.cpp(314) with #ifdef <br>
+used in remote\server.cpp(378) with #ifdef <br>
+used in remote\server.cpp(407) with #ifdef <br>
+used in remote\server.cpp(426) with #ifdef <br>
+used in remote\server.cpp(814) with #ifdef <br>
+used in remote\server.cpp(1130) with #ifdef <br>
+used in remote\server.cpp(1316) with #ifdef <br>
+used in remote\server.cpp(1323) with #ifdef <br>
+used in remote\server.cpp(1332) with #ifdef <br>
+used in remote\server.cpp(1341) with #ifdef <br>
+used in remote\server.cpp(1350) with #ifdef <br>
+used in remote\server.cpp(1359) with #ifdef <br>
+used in remote\server.cpp(1368) with #ifdef <br>
+used in remote\server.cpp(2358) with #ifdef <br>
+used in remote\server.cpp(2377) with #ifdef <br>
+used in remote\server.cpp(2433) with #ifdef <br>
+used in remote\server.cpp(2486) with #ifdef <br>
+used in remote\server.cpp(2520) with #ifdef <br>
+used in remote\server.cpp(2560) with #ifdef <br>
+used in remote\server.cpp(2566) with #ifdef <br>
+used in remote\server.cpp(2681) with #ifdef <br>
+used in remote\server.cpp(2693) with #ifdef <br>
+used in remote\server.cpp(2840) with #ifdef <br>
+used in remote\server.cpp(3440) with #ifdef <br>
+used in remote\server.cpp(3758) with #ifdef <br>
+used in remote\server.cpp(3849) with #ifdef <br>
+used in remote\server.cpp(3983) with #ifdef <br>
+used in remote\server.cpp(4424) with #ifdef <br>
+used in remote\server.cpp(4711) with #ifdef <br>
+used in remote\server.cpp(4880) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(12) DEBUG_SAVE_BDB_PAGE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\cch.cpp(949) with #ifdef <br>
+used in jrd\cch.cpp(5548) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(13) DEBUG_SORT_TRACE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\sort.cpp(156) with #ifdef <br>
+used in jrd\sort.cpp(940) with #ifdef <br>
+used in jrd\sort.cpp(983) with #ifdef <br>
+used in jrd\sort.cpp(1238) with #ifdef <br>
+used in jrd\sort.cpp(3008) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(14) DEBUG_THREAD</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\thd.cpp(911) with #ifdef <br>
+used in jrd\thd.cpp(917) with #ifdef <br>
+used in jrd\thd.cpp(939) with #ifdef <br>
+used in jrd\thd.cpp(945) with #ifdef <br>
+used in jrd\thd.cpp(967) with #ifdef <br>
+used in jrd\thd.cpp(979) with #ifdef <br>
+used in jrd\thd.cpp(1001) with #ifdef <br>
+used in jrd\thd.cpp(1007) with #ifdef <br>
+used in jrd\thd.cpp(1070) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(15) DEBUG_THREAD_PSCHED</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\os\win32\thd_priority.cpp(44) with #ifdef <br>
+used in jrd\os\win32\thd_priority.cpp(189) with #ifdef <br>
+used in jrd\os\win32\thd_priority.cpp(262) with #ifdef <br>
+used in jrd\os\win32\thd_priority.cpp(283) with #ifdef <br>
+used in jrd\os\win32\thd_priority.cpp(334) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(16) DEBUG_VAL_VERBOSE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\val.cpp(573) with #ifdef <br>
+used in jrd\val.cpp(647) with #ifdef <br>
+used in jrd\val.cpp(794) with #ifdef <br>
+used in jrd\val.cpp(936) with #ifdef <br>
+used in jrd\val.cpp(949) with #ifdef <br>
+used in jrd\val.cpp(1015) with #ifdef <br>
+used in jrd\val.cpp(1102) with #ifdef <br>
+used in jrd\val.cpp(1148) with #ifdef <br>
+used in jrd\val.cpp(1169) with #ifdef <br>
+used in jrd\val.cpp(1209) with #ifdef <br>
+used in jrd\val.cpp(1232) with #ifdef <br>
+used in jrd\val.cpp(1270) with #ifdef <br>
+used in jrd\val.cpp(1295) with #ifdef <br>
+used in jrd\val.cpp(1303) with #ifdef <br>
+used in jrd\val.cpp(1337) with #ifdef <br>
+used in jrd\val.cpp(1364) with #ifdef <br>
+used in jrd\val.cpp(1625) with #ifdef <br>
+used in jrd\val.cpp(1677) with #ifdef <br>
+used in jrd\val.cpp(1759) with #ifdef <br>
+used in jrd\val.cpp(1835) with #ifdef <br>
+used in jrd\val.cpp(1899) with #ifdef <br>
+used in jrd\val.cpp(1955) with #ifdef <br>
+used in jrd\val.cpp(2046) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(17) DEBUG_XDR_MEMORY</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet.cpp(2049) with #ifdef <br>
+used in remote\protocol.cpp(43) with #ifdef <br>
+used in remote\protocol.cpp(72) with #ifdef <br>
+used in remote\protocol.cpp(181) with #ifdef <br>
+used in remote\protocol.cpp(1081) with #ifdef <br>
+used in remote\protocol.h(281) with #ifdef <br>
+used in remote\protocol.h(560) with #ifdef <br>
+used in remote\proto_proto.h(27) with #ifdef <br>
+used in remote\remote.cpp(313) with #ifdef <br>
+used in remote\remote.h(394) with #ifdef <br>
+used in remote\server.cpp(5009) with #ifdef <br>
+used in remote\wnet.cpp(995) with #ifdef <br>
+used in remote\xdr.cpp(63) with #ifdef <br>
+used in remote\xnet.cpp(1474) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(18) DEBUG_gds__alloc</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\utl.cpp(1949) with #ifdef <br>
+used in jrd\utl.cpp(1970) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(19) DEV_BUILD</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in alice\aliceswi.h(126) with #ifdef <br>
+used in alice\aliceswi.h(140) with #ifdef <br>
+used in alice\aliceswi.h(182) with #ifdef <br>
+used in alice\aliceswi.h(227) with #ifdef <br>
+used in common\classes\alloc.cpp(638) with #if<br>
+used in common\classes\alloc.cpp(651) with #if<br>
+used in dsql\ddl.cpp(170) with #ifdef <br>
+used in dsql\ddl.cpp(5215) with #ifdef <br>
+used in dsql\dsql.cpp(1825) with #ifdef <br>
+used in dsql\dsql.cpp(3805) with #ifdef <br>
+used in dsql\dsql.cpp(4431) with #ifdef <br>
+used in dsql\dsql.h(35) with #if<br>
+used in dsql\dsql.h(607) with #if<br>
+used in dsql\dsql.h(612) with #if<br>
+used in dsql\dsql.h(618) with #if<br>
+used in dsql\dsql.h(641) with #ifdef <br>
+used in dsql\errd.cpp(68) with #ifdef <br>
+used in dsql\errd_proto.h(31) with #ifdef <br>
+used in dsql\hsh.cpp(95) with #ifdef <br>
+used in dsql\make.cpp(462) with #ifdef <br>
+used in dsql\parse.cpp(79) with #if<br>
+used in dsql\parse.cpp(137) with #if<br>
+used in dsql\parse.cpp(5080) with #ifdef <br>
+used in dsql\parse.cpp(5391) with #if<br>
+used in dsql\pass1.cpp(154) with #ifdef <br>
+used in dsql\pass1.cpp(971) with #ifdef <br>
+used in dsql\pass1.cpp(1453) with #ifdef <br>
+used in dsql\pass1.cpp(4303) with #ifdef <br>
+used in dsql\utld.cpp(57) with #ifdef <br>
+used in dsql\utld.cpp(838) with #ifdef <br>
+used in extlib\fbudf\fbudf.cpp(81) with #ifdef <br>
+used in extlib\fbudf\fbudf.h(47) with #ifdef <br>
+used in gpre\gpre.cpp(923) with #ifdef <br>
+used in gpre\gpre.h(1546) with #ifdef <br>
+used in gpre\gpre_proto.h(34) with #ifdef <br>
+used in gpre\sql.cpp(4374) with #ifdef <br>
+used in intl\ld.c(236) with #ifdef <br>
+used in intl\ld.c(425) with #ifdef <br>
+used in intl\ld2.c(37) with #ifdef <br>
+used in intl\ld2.c(115) with #ifdef <br>
+used in intl\ldcommon.h(46) with #ifndef<br>
+used in intl\ld_proto.h(27) with #ifdef <br>
+used in intlcpp\ld.cpp(236) with #ifdef <br>
+used in intlcpp\ld.cpp(425) with #ifdef <br>
+used in intlcpp\ld2.cpp(37) with #ifdef <br>
+used in intlcpp\ld2.cpp(107) with #ifdef <br>
+used in intlcpp\ldcommon.h(46) with #ifndef<br>
+used in intlcpp\ld_proto.h(27) with #ifdef <br>
+used in isql\isql.epp(191) with #ifdef <br>
+used in isql\isql.epp(986) with #ifdef <br>
+used in isql\isql.epp(1008) with #ifdef <br>
+used in isql\isql.epp(1030) with #ifdef <br>
+used in isql\isql.epp(1044) with #ifdef <br>
+used in isql\isql.epp(1055) with #ifdef <br>
+used in isql\isql.epp(3358) with #ifdef <br>
+used in isql\isql.epp(5272) with #ifdef <br>
+used in isql\isql.epp(5346) with #ifdef <br>
+used in isql\isql.epp(5493) with #ifdef <br>
+used in isql\isql.epp(6237) with #ifdef <br>
+used in isql\isql.epp(6483) with #ifdef <br>
+used in isql\isql.epp(6936) with #ifdef <br>
+used in isql\show.epp(1599) with #ifdef <br>
+used in isql\show.epp(1617) with #ifdef <br>
+used in journal\rebuild.e(2185) with #ifdef <br>
+used in journal\rebuild.e(2224) with #ifdef <br>
+used in jrd\ail.cpp(981) with #ifdef <br>
+used in jrd\all.cpp(53) with #ifdef <br>
+used in jrd\all.h(39) with #ifdef <br>
+used in jrd\blb.cpp(1697) with #ifdef <br>
+used in jrd\cch.cpp(1631) with #ifdef <br>
+used in jrd\cch.cpp(1660) with #ifdef <br>
+used in jrd\cch.cpp(1696) with #ifdef <br>
+used in jrd\cch.cpp(4188) with #ifdef <br>
+used in jrd\cmp.cpp(2151) with #ifdef <br>
+used in jrd\dfw.epp(2525) with #ifdef <br>
+used in jrd\dfw.epp(3188) with #ifdef <br>
+used in jrd\dfw.epp(3213) with #ifdef <br>
+used in jrd\dfw.epp(3877) with #ifdef <br>
+used in jrd\dpm.epp(72) with #ifdef <br>
+used in jrd\dsc.cpp(746) with #ifdef <br>
+used in jrd\dsc.cpp(780) with #ifdef <br>
+used in jrd\dsc.cpp(961) with #ifdef <br>
+used in jrd\flu.cpp(903) with #ifdef <br>
+used in jrd\gds.cpp(261) with #ifdef <br>
+used in jrd\gds.cpp(762) with #ifdef <br>
+used in jrd\gdsassert.h(23) with #ifdef <br>
+used in jrd\intl.cpp(125) with #ifdef <br>
+used in jrd\intl.cpp(157) with #ifdef <br>
+used in jrd\intl.cpp(757) with #ifdef <br>
+used in jrd\intl.cpp(786) with #ifdef <br>
+used in jrd\intl.cpp(1499) with #ifdef <br>
+used in jrd\inuse.cpp(142) with #ifdef <br>
+used in jrd\isc_sync.cpp(50) with #ifndef<br>
+used in jrd\jrd.cpp(476) with #ifdef <br>
+used in jrd\jrd.cpp(493) with #ifdef <br>
+used in jrd\jrd.cpp(500) with #ifdef <br>
+used in jrd\jrd.cpp(4515) with #ifdef <br>
+used in jrd\jrd.cpp(4946) with #if<br>
+used in jrd\jrd.cpp(5947) with #if<br>
+used in jrd\jrd.h(48) with #ifdef <br>
+used in jrd\jrd.h(80) with #ifdef <br>
+used in jrd\jrd.h(993) with #ifdef <br>
+used in jrd\lck.cpp(154) with #ifdef <br>
+used in jrd\met.epp(241) with #ifdef <br>
+used in jrd\met.epp(358) with #ifdef <br>
+used in jrd\met.epp(456) with #ifdef <br>
+used in jrd\met_proto.h(79) with #ifdef <br>
+used in jrd\misc.cpp(107) with #ifdef <br>
+used in jrd\misc_proto.h(31) with #ifdef <br>
+used in jrd\mov.cpp(360) with #ifdef <br>
+used in jrd\old.cpp(715) with #ifdef <br>
+used in jrd\opt.cpp(82) with #ifdef <br>
+used in jrd\opt.cpp(1487) with #ifdef <br>
+used in jrd\opt.cpp(3030) with #ifdef <br>
+used in jrd\opt.cpp(4055) with #ifdef <br>
+used in jrd\opt.cpp(6159) with #ifdef <br>
+used in jrd\os\win32\thd_priority.cpp(133) with #ifdef <br>
+used in jrd\plugin_manager.cpp(246) with #if<br>
+used in jrd\rec.cpp(1033) with #ifdef <br>
+used in jrd\rec.cpp(1075) with #ifdef <br>
+used in jrd\sbm.cpp(232) with #ifdef <br>
+used in jrd\sbm_proto.h(30) with #ifdef <br>
+used in jrd\sdl.cpp(38) with #ifndef<br>
+used in jrd\shrinit.cpp(252) with #if<br>
+used in jrd\svc.cpp(3069) with #ifdef <br>
+used in jrd\unix.cpp(517) with #ifdef <br>
+used in jrd\unix.cpp(523) with #ifdef <br>
+used in jrd\unix.cpp(794) with #ifdef <br>
+used in jrd\unix.cpp(800) with #ifdef <br>
+used in jrd\unix.cpp(1337) with #ifdef <br>
+used in jrd\unix.cpp(1382) with #if<br>
+used in jrd\vio.cpp(130) with #ifndef<br>
+used in jrd\why.cpp(136) with #ifdef <br>
+used in jrd\why.cpp(218) with #ifdef <br>
+used in jrd\why.cpp(4989) with #ifdef <br>
+used in jrd\y-valve.cpp(50) with #ifdef <br>
+used in jrd\y-valve.cpp(129) with #ifdef <br>
+used in jrd\y-valve.cpp(223) with #ifdef <br>
+used in jrd\y-valve.cpp(4999) with #ifdef <br>
+used in lock\lock.cpp(112) with #ifdef <br>
+used in lock\lock.cpp(136) with #ifdef <br>
+used in lock\lock.cpp(214) with #ifdef <br>
+used in lock\lock.cpp(219) with #ifdef <br>
+used in lock\lock.cpp(1424) with #ifdef <br>
+used in lock\lock.cpp(1571) with #ifdef <br>
+used in lock\lock.cpp(1651) with #ifdef <br>
+used in lock\lock.cpp(1987) with #ifdef <br>
+used in lock\lock.cpp(2031) with #ifdef <br>
+used in lock\lock.cpp(2079) with #ifdef <br>
+used in lock\lock.cpp(2278) with #ifdef <br>
+used in lock\lock.cpp(3614) with #ifdef <br>
+used in lock\lock.cpp(3637) with #ifdef <br>
+used in lock\lock.cpp(3652) with #ifdef <br>
+used in lock\lock.cpp(4891) with #ifdef <br>
+used in lock\lock.cpp(5241) with #ifdef <br>
+used in lock\lock.cpp(5259) with #ifdef <br>
+used in lock\print.cpp(961) with #ifdef <br>
+used in qli\command.cpp(416) with #ifdef <br>
+used in qli\compile.h(122) with #ifdef <br>
+used in qli\dtr.cpp(165) with #ifdef <br>
+used in qli\dtr.h(501) with #ifdef <br>
+used in qli\format.cpp(47) with #ifdef <br>
+used in qli\format.cpp(607) with #ifdef <br>
+used in qli\gener.cpp(72) with #ifdef <br>
+used in qli\gener.cpp(188) with #ifdef <br>
+used in qli\gener.cpp(353) with #ifdef <br>
+used in qli\gener.cpp(431) with #ifdef <br>
+used in qli\gener.cpp(601) with #ifdef <br>
+used in qli\gener.cpp(624) with #ifdef <br>
+used in qli\meta.epp(1023) with #ifdef <br>
+used in qli\parse.cpp(3978) with #ifdef <br>
+used in qli\symbols.h(95) with #ifdef <br>
+used in qli\symbols.h(127) with #ifdef <br>
+used in qli\words.h(108) with #ifdef <br>
+used in qli\words.h(143) with #ifdef <br>
+used in remote\inet_server.cpp(351) with #ifndef<br>
+used in remote\parser.cpp(37) with #if<br>
+used in remote\parser.cpp(37) with #if<br>
+used in remote\remote.h(47) with #ifdef <br>
+used in remote\server.cpp(260) with #ifdef <br>
+used in remote\server.cpp(332) with #ifdef <br>
+used in remote\server.cpp(356) with #ifdef <br>
+used in remote\server.cpp(469) with #ifdef <br>
+used in remote\server.cpp(484) with #ifdef <br>
+used in remote\window.cpp(292) with #ifdef <br>
+used in utilities\ibmgr.cpp(413) with #ifdef <br>
+used in utilities\ibmgr.cpp(683) with #ifdef <br>
+used in utilities\ibmgr.cpp(710) with #ifdef <br>
+used in utilities\ppg.cpp(128) with #ifdef <br>
+used in utilities\ppg.cpp(328) with #ifdef <br>
+used in utilities\relay.cpp(99) with #ifdef <br>
+used in utilities\relay.cpp(108) with #ifdef <br>
+used in utilities\relay.cpp(117) with #ifdef <br>
+used in utilities\srvrmgr.cpp(175) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(20) GDS_ALLOC_DEBUG</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\rpb_chain.cpp(26) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(22) PROD_BUILD</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\exe.cpp(155) with #if<br>
+used in jrd\par.cpp(2754) with #ifdef <br>
+used in jrd\vio.cpp(438) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(23) TESTING_ONLY</td><td>Alloc testing seems to be provisional</td></tr>
+<tr><td>&nbsp;</td><td>
+used in common\classes\alloc.cpp(172) with #ifdef <br>
+used in common\classes\alloc.cpp(630) with #ifndef<br>
+used in common\classes\alloc.h(222) with #ifndef<br>
+</td></tr>
+</table>
+<p><a name="def4">Platform defines</p>
+<table border="1" width ="100%" cellspacing="3">
+<tr><td valign="top">
+(0) AIX</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\cob.cpp(149) with #if<br>
+used in gpre\cob.cpp(288) with #if<br>
+used in gpre\ftn.cpp(218) with #if<br>
+used in gpre\ftn.cpp(2369) with #if<br>
+used in gpre\ftn.cpp(2408) with #if<br>
+used in gpre\gpre.h(73) with #if<br>
+used in gpre\gpre.h(91) with #if<br>
+used in gpre\pat.cpp(159) with #if<br>
+used in jrd\flu.cpp(311) with #if<br>
+used in jrd\isc_file.cpp(174) with #if<br>
+used in jrd\isc_file.cpp(214) with #if<br>
+used in jrd\isc_file.cpp(331) with #if<br>
+used in jrd\isc_file.cpp(405) with #if<br>
+used in jrd\isc_file.cpp(417) with #if<br>
+used in jrd\isc_file.cpp(1262) with #if<br>
+used in jrd\isc_ipc.cpp(90) with #if<br>
+used in jrd\license.h(103) with #ifdef <br>
+used in jrd\pag.cpp(156) with #ifdef <br>
+used in remote\remote_def.h(63) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(1) AIX_PPC</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in burp\burp.cpp(446) with #ifdef <br>
+used in gpre\cob.cpp(149) with #if<br>
+used in gpre\cob.cpp(288) with #if<br>
+used in gpre\ftn.cpp(218) with #if<br>
+used in gpre\ftn.cpp(2369) with #if<br>
+used in gpre\ftn.cpp(2408) with #if<br>
+used in gpre\gpre.h(73) with #if<br>
+used in gpre\pat.cpp(159) with #if<br>
+used in jrd\evl.cpp(3558) with #ifndef<br>
+used in jrd\evl.cpp(3564) with #ifdef <br>
+used in jrd\flu.cpp(100) with #if<br>
+used in jrd\flu.cpp(228) with #if<br>
+used in jrd\flu.cpp(311) with #if<br>
+used in jrd\isc.cpp(1167) with #ifdef <br>
+used in jrd\isc.cpp(1171) with #ifdef <br>
+used in jrd\isc_file.cpp(174) with #if<br>
+used in jrd\isc_file.cpp(214) with #if<br>
+used in jrd\isc_file.cpp(331) with #if<br>
+used in jrd\isc_file.cpp(405) with #if<br>
+used in jrd\isc_file.cpp(417) with #if<br>
+used in jrd\isc_file.cpp(1262) with #if<br>
+used in jrd\isc_ipc.cpp(90) with #if<br>
+used in jrd\license.h(107) with #ifdef <br>
+used in jrd\pag.cpp(160) with #ifdef <br>
+used in remote\remote_def.h(63) with #if<br>
+used in utilities\util.cpp(147) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(2) DARWIN</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dsql\make.cpp(36) with #ifdef <br>
+used in gpre\cob.cpp(168) with #ifdef <br>
+used in gpre\c_cxx.cpp(179) with #ifdef <br>
+used in gpre\ftn.cpp(332) with #if<br>
+used in isql\isql.epp(47) with #ifdef <br>
+used in jrd\file_params.h(107) with #ifdef <br>
+used in jrd\flu.cpp(107) with #ifdef <br>
+used in jrd\flu.cpp(235) with #ifdef <br>
+used in jrd\flu.cpp(641) with #ifdef <br>
+used in jrd\gds.cpp(69) with #ifdef <br>
+used in jrd\gds.cpp(196) with #if<br>
+used in jrd\isc.cpp(41) with #ifdef <br>
+used in jrd\isc_sync.cpp(218) with #if<br>
+used in jrd\isc_sync.cpp(656) with #if<br>
+used in jrd\isc_sync.cpp(785) with #if<br>
+used in jrd\isc_sync.cpp(3241) with #if<br>
+used in jrd\isc_sync.cpp(3262) with #if<br>
+used in jrd\jrd.h(962) with #if<br>
+used in jrd\license.h(135) with #ifdef <br>
+used in jrd\met.epp(43) with #ifdef <br>
+used in jrd\pag.cpp(192) with #ifdef <br>
+used in jrd\plugin_manager.cpp(295) with #ifdef <br>
+used in jrd\scl.epp(30) with #ifdef <br>
+used in jrd\thd.h(73) with #if<br>
+used in lock\lock.cpp(194) with #if<br>
+used in remote\inet.cpp(100) with #ifdef <br>
+used in remote\inet_server.cpp(131) with #if<br>
+used in remote\remote_def.h(83) with #ifdef <br>
+used in utilities\dba.epp(84) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(3) FREEBSD</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\cob.cpp(172) with #if<br>
+used in gpre\ftn.cpp(313) with #if<br>
+used in jrd\file_params.h(100) with #if<br>
+used in jrd\flu.cpp(100) with #if<br>
+used in jrd\flu.cpp(228) with #if<br>
+used in jrd\gds.cpp(142) with #if<br>
+used in jrd\gds.cpp(196) with #if<br>
+used in jrd\isc_file.cpp(163) with #ifdef <br>
+used in jrd\isc_file.cpp(203) with #if<br>
+used in jrd\isc_file.cpp(587) with #if<br>
+used in jrd\isc_file.cpp(1018) with #if<br>
+used in jrd\isc_sync.cpp(218) with #if<br>
+used in jrd\isc_sync.cpp(656) with #if<br>
+used in jrd\isc_sync.cpp(785) with #if<br>
+used in jrd\isc_sync.cpp(3241) with #if<br>
+used in jrd\isc_sync.cpp(3262) with #if<br>
+used in jrd\jrd.h(962) with #if<br>
+used in jrd\license.h(127) with #ifdef <br>
+used in jrd\pag.cpp(184) with #ifdef <br>
+used in jrd\thd.cpp(1870) with #if<br>
+used in jrd\thd.cpp(1887) with #if<br>
+used in jrd\thd.h(56) with #if<br>
+used in lock\lock.cpp(194) with #if<br>
+used in remote\remote_def.h(75) with #ifdef <br>
+used in utilities\dba.epp(84) with #if<br>
+used in utilities\drop.cpp(357) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(4) HP10</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\cob.cpp(156) with #if<br>
+used in gpre\cob.cpp(297) with #if<br>
+used in gpre\gpre.h(79) with #if<br>
+used in jrd\exe.cpp(168) with #if<br>
+used in jrd\flu.cpp(93) with #ifdef <br>
+used in jrd\flu.cpp(224) with #ifdef <br>
+used in jrd\flu.cpp(367) with #ifdef <br>
+used in jrd\isc_file.cpp(154) with #if<br>
+used in jrd\isc_file.cpp(223) with #if<br>
+used in jrd\isc_file.cpp(411) with #if<br>
+used in jrd\isc_file.cpp(1565) with #if<br>
+used in jrd\isc_sync.cpp(60) with #ifdef <br>
+used in jrd\isc_sync.cpp(633) with #ifdef <br>
+used in jrd\isc_sync.cpp(651) with #ifdef <br>
+used in jrd\isc_sync.cpp(696) with #ifdef <br>
+used in jrd\isc_sync.cpp(781) with #ifdef <br>
+used in jrd\isc_sync.cpp(2399) with #ifdef <br>
+used in jrd\isc_sync.cpp(3289) with #ifdef <br>
+used in jrd\isc_sync.cpp(3319) with #ifdef <br>
+used in jrd\isc_sync.cpp(3365) with #ifdef <br>
+used in jrd\license.h(71) with #ifdef <br>
+used in jrd\thd.cpp(141) with #ifdef <br>
+used in jrd\thd.cpp(172) with #ifdef <br>
+used in jrd\thd.cpp(276) with #ifdef <br>
+used in jrd\thd.cpp(349) with #ifdef <br>
+used in jrd\thd.cpp(384) with #ifdef <br>
+used in jrd\thd.cpp(416) with #ifdef <br>
+used in jrd\thd.cpp(448) with #ifdef <br>
+used in jrd\thd.cpp(479) with #ifdef <br>
+used in jrd\thd.cpp(510) with #ifdef <br>
+used in jrd\thd.cpp(1673) with #ifdef <br>
+used in jrd\thd.cpp(1741) with #ifdef <br>
+used in jrd\thd.cpp(1870) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(5) HP11</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\cob.cpp(156) with #if<br>
+used in gpre\cob.cpp(297) with #if<br>
+used in jrd\isc_file.cpp(154) with #if<br>
+used in jrd\isc_file.cpp(223) with #if<br>
+used in jrd\isc_file.cpp(411) with #if<br>
+used in jrd\isc_file.cpp(1565) with #if<br>
+used in jrd\isc_sync.cpp(656) with #if<br>
+used in jrd\isc_sync.cpp(785) with #if<br>
+used in jrd\isc_sync.cpp(3262) with #if<br>
+used in jrd\license.h(74) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(6) HPUX</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\cmp.cpp(120) with #if<br>
+used in jrd\flu.h(31) with #ifdef <br>
+used in jrd\gds.cpp(3383) with #if<br>
+used in jrd\isc_sync.cpp(3241) with #if<br>
+used in jrd\jrd.h(962) with #if<br>
+used in jrd\thd.h(46) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(7) I386</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\btr.cpp(194) with #if<br>
+used in remote\remote_def.h(87) with #ifdef <br>
+used in remote\xdr.cpp(42) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(8) IEEE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\btr.cpp(2170) with #ifdef <br>
+used in jrd\sort.cpp(419) with #ifdef <br>
+used in jrd\sort.cpp(1489) with #ifndef<br>
+used in jrd\sort.cpp(1587) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(9) LINUX</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\cob.cpp(164) with #ifdef <br>
+used in gpre\ftn.cpp(275) with #ifdef <br>
+used in gpre\gpre.cpp(987) with #ifdef <br>
+used in jrd\dbg.cpp(83) with #ifdef <br>
+used in jrd\enc.cpp(17) with #ifdef <br>
+used in jrd\event.cpp(950) with #if<br>
+used in jrd\file_params.h(95) with #ifdef <br>
+used in jrd\flu.cpp(100) with #if<br>
+used in jrd\flu.cpp(228) with #if<br>
+used in jrd\gds.cpp(142) with #if<br>
+used in jrd\gds.cpp(196) with #if<br>
+used in jrd\gds.cpp(3383) with #if<br>
+used in jrd\isc_sync.cpp(656) with #if<br>
+used in jrd\isc_sync.cpp(785) with #if<br>
+used in jrd\isc_sync.cpp(3241) with #if<br>
+used in jrd\isc_sync.cpp(3262) with #if<br>
+used in jrd\jrd.h(962) with #if<br>
+used in jrd\license.h(119) with #ifdef <br>
+used in jrd\pag.cpp(172) with #ifdef <br>
+used in jrd\perf.h(34) with #ifdef <br>
+used in jrd\thd.cpp(1870) with #if<br>
+used in jrd\thd.cpp(1887) with #if<br>
+used in jrd\thd.h(51) with #if<br>
+used in jrd\thd.h(68) with #if<br>
+used in lock\lock.cpp(194) with #if<br>
+used in remote\remote_def.h(71) with #ifdef <br>
+used in utilities\dba.epp(84) with #if<br>
+used in utilities\drop.cpp(357) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(10) MINGW</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\codes.epp(31) with #ifdef <br>
+used in jrd\dfw.epp(116) with #ifdef <br>
+used in jrd\ibsetjmp.h(58) with #if<br>
+used in jrd\jrd.cpp(49) with #ifdef <br>
+used in lock\lock.cpp(4154) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(11) NETBSD</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\cob.cpp(172) with #if<br>
+used in gpre\ftn.cpp(313) with #if<br>
+used in jrd\file_params.h(100) with #if<br>
+used in jrd\flu.cpp(113) with #if<br>
+used in jrd\flu.cpp(228) with #if<br>
+used in jrd\gds.cpp(196) with #if<br>
+used in jrd\isc_file.cpp(203) with #if<br>
+used in jrd\isc_file.cpp(587) with #if<br>
+used in jrd\isc_file.cpp(1018) with #if<br>
+used in jrd\isc_sync.cpp(218) with #if<br>
+used in jrd\license.h(131) with #ifdef <br>
+used in jrd\pag.cpp(188) with #ifdef <br>
+used in lock\lock.cpp(194) with #if<br>
+used in remote\inet_server.cpp(109) with #ifdef <br>
+used in remote\remote_def.h(79) with #ifdef <br>
+used in utilities\dba.epp(84) with #if<br>
+used in utilities\drop.cpp(357) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(16) SOLARIS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in common\classes\locks.h(12) with #ifndef<br>
+used in common\classes\locks.h(55) with #ifndef<br>
+used in extlib\ib_udf.c(40) with #ifndef<br>
+used in gpre\exp.cpp(504) with #ifdef <br>
+used in gpre\gpre.h(91) with #if<br>
+used in gpre\pretty.cpp(40) with #ifndef<br>
+used in jrd\flu.cpp(100) with #if<br>
+used in jrd\flu.cpp(228) with #if<br>
+used in jrd\flu.h(38) with #ifdef <br>
+used in jrd\gds.cpp(104) with #if<br>
+used in jrd\gds.cpp(191) with #ifndef<br>
+used in jrd\gds.cpp(3383) with #if<br>
+used in jrd\gds.cpp(3394) with #if<br>
+used in jrd\gds_proto.h(138) with #if<br>
+used in jrd\isc.cpp(79) with #ifdef <br>
+used in jrd\isc.cpp(329) with #if<br>
+used in jrd\isc_file.cpp(159) with #ifdef <br>
+used in jrd\isc_file.cpp(1336) with #if<br>
+used in jrd\isc_file.cpp(1527) with #ifdef <br>
+used in jrd\isc_ipc.cpp(60) with #ifdef <br>
+used in jrd\isc_sync.cpp(49) with #ifdef <br>
+used in jrd\isc_sync.cpp(2952) with #ifdef <br>
+used in jrd\isc_sync.cpp(3010) with #ifdef <br>
+used in jrd\jio.cpp(54) with #ifdef <br>
+used in jrd\license.h(81) with #ifdef <br>
+used in jrd\sort.cpp(70) with #ifdef <br>
+used in jrd\svc.cpp(93) with #ifdef <br>
+used in jrd\thd.cpp(52) with #ifdef <br>
+used in jrd\thd.cpp(1565) with #ifdef <br>
+used in jrd\thd.h(35) with #ifdef <br>
+used in jrd\thd.h(240) with #ifndef<br>
+used in jrd\utl.cpp(95) with #ifndef<br>
+used in lock\lock.cpp(3168) with #ifdef <br>
+used in lock\lock.cpp(3180) with #if<br>
+used in remote\protocol.cpp(99) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(17) SOLARIS26</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\exp.cpp(505) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(18) SOLARIS_MT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\event.cpp(125) with #ifdef <br>
+used in jrd\event.cpp(757) with #ifdef <br>
+used in jrd\event.cpp(765) with #if<br>
+used in jrd\event.cpp(861) with #ifdef <br>
+used in jrd\event.cpp(950) with #if<br>
+used in jrd\event.cpp(1141) with #ifdef <br>
+used in jrd\event.cpp(1681) with #ifdef <br>
+used in jrd\exe.cpp(164) with #if<br>
+used in jrd\gds.cpp(126) with #ifdef <br>
+used in jrd\isc_sync.cpp(310) with #ifdef <br>
+used in jrd\isc_sync.cpp(2151) with #if<br>
+used in jrd\isc_sync.cpp(2254) with #if<br>
+used in jrd\isc_sync.cpp(3124) with #ifdef <br>
+used in jrd\jrd.h(962) with #if<br>
+used in jrd\thd.cpp(86) with #ifdef <br>
+used in jrd\thd.cpp(134) with #ifdef <br>
+used in jrd\thd.cpp(190) with #ifdef <br>
+used in jrd\thd.cpp(283) with #ifdef <br>
+used in jrd\thd.cpp(315) with #ifdef <br>
+used in jrd\thd.cpp(531) with #ifdef <br>
+used in jrd\thd.cpp(895) with #ifdef <br>
+used in jrd\thd.cpp(1284) with #ifdef <br>
+used in jrd\thd.cpp(1577) with #ifdef <br>
+used in jrd\thd.cpp(1684) with #ifdef <br>
+used in jrd\thd.cpp(1752) with #ifdef <br>
+used in jrd\thd.cpp(1786) with #ifdef <br>
+used in jrd\thd.cpp(1948) with #ifdef <br>
+used in jrd\thd.h(36) with #ifdef <br>
+used in lock\lock.cpp(294) with #if<br>
+used in lock\lock.cpp(328) with #if<br>
+used in lock\lock.cpp(870) with #if<br>
+used in lock\lock.cpp(1398) with #if<br>
+used in lock\lock.cpp(1538) with #if<br>
+used in lock\lock.cpp(1938) with #if<br>
+used in lock\lock.cpp(3067) with #if<br>
+used in lock\lock.cpp(3171) with #ifdef <br>
+used in lock\lock.cpp(3911) with #if<br>
+used in lock\lock.cpp(3932) with #if<br>
+used in lock\lock.cpp(4159) with #ifdef <br>
+used in lock\lock.cpp(4267) with #if<br>
+used in lock\lock.cpp(4279) with #if<br>
+used in lock\lock.h(335) with #ifdef <br>
+used in lock\print.cpp(506) with #ifdef <br>
+used in lock\print.cpp(957) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(19) SOLX86</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in burp\backup.epp(46) with #ifndef<br>
+used in burp\backup.epp(506) with #ifndef<br>
+used in gpre\cob.cpp(152) with #if<br>
+used in gpre\cob.cpp(292) with #if<br>
+used in include\firebird.h(45) with #if<br>
+used in jrd\isc_ipc.cpp(69) with #ifdef <br>
+used in jrd\isc_ipc.cpp(205) with #if<br>
+used in jrd\isc_ipc.cpp(300) with #if<br>
+used in jrd\isc_ipc.cpp(579) with #if<br>
+used in jrd\isc_ipc.cpp(1151) with #if<br>
+used in jrd\isc_i_proto.h(53) with #if<br>
+used in jrd\isc_i_proto.h(63) with #if<br>
+used in remote\merge.cpp(39) with #if<br>
+used in remote\merge.cpp(123) with #if<br>
+used in remote\merge_proto.h(26) with #if<br>
+used in remote\merge_proto.h(36) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(20) UNIX</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in burp\burp.cpp(77) with #ifdef <br>
+used in dudley\lex.cpp(452) with #ifdef <br>
+used in isql\isql.h(281) with #ifdef <br>
+used in journal\console.cpp(46) with #ifdef <br>
+used in journal\rebuild.e(73) with #ifdef <br>
+used in journal\server.e(79) with #ifdef <br>
+used in journal\server.e(440) with #if<br>
+used in jrd\event.cpp(64) with #ifdef <br>
+used in jrd\event.cpp(330) with #if<br>
+used in jrd\event.cpp(352) with #ifdef <br>
+used in jrd\event.cpp(1004) with #ifdef <br>
+used in jrd\event.cpp(1413) with #ifdef <br>
+used in jrd\event.cpp(1499) with #ifdef <br>
+used in jrd\fil.h(36) with #ifdef <br>
+used in jrd\file_params.h(105) with #ifdef <br>
+used in jrd\gds.cpp(103) with #ifdef <br>
+used in jrd\gds.cpp(320) with #ifdef <br>
+used in jrd\gds.cpp(3317) with #ifdef <br>
+used in jrd\gds.cpp(3380) with #ifdef <br>
+used in jrd\ibsetjmp.h(44) with #ifdef <br>
+used in jrd\isc.cpp(137) with #if<br>
+used in jrd\isc.cpp(243) with #if<br>
+used in jrd\isc.cpp(440) with #ifdef <br>
+used in jrd\isc.cpp(1166) with #ifdef <br>
+used in jrd\isc.h(99) with #ifdef <br>
+used in jrd\isc_ipc.cpp(127) with #ifdef <br>
+used in jrd\isc_ipc.cpp(348) with #if<br>
+used in jrd\isc_ipc.cpp(363) with #ifdef <br>
+used in jrd\isc_ipc.cpp(451) with #ifdef <br>
+used in jrd\isc_ipc.cpp(657) with #if<br>
+used in jrd\isc_sync.cpp(79) with #if<br>
+used in jrd\isc_sync.cpp(85) with #ifdef <br>
+used in jrd\isc_sync.cpp(109) with #ifdef <br>
+used in jrd\isc_sync.cpp(186) with #ifdef <br>
+used in jrd\isc_sync.cpp(194) with #if<br>
+used in jrd\isc_sync.cpp(809) with #ifdef <br>
+used in jrd\isc_sync.cpp(1520) with #ifdef <br>
+used in jrd\isc_sync.cpp(1952) with #ifdef <br>
+used in jrd\isc_sync.cpp(2309) with #ifdef <br>
+used in jrd\isc_sync.cpp(3384) with #ifdef <br>
+used in jrd\isc_sync.cpp(3657) with #ifdef <br>
+used in jrd\isc_sync.cpp(3811) with #if<br>
+used in jrd\isc_sync.cpp(3855) with #if<br>
+used in jrd\isc_sync.cpp(3944) with #ifdef <br>
+used in jrd\isc_sync.cpp(3968) with #ifdef <br>
+used in jrd\isc_sync.cpp(3991) with #ifdef <br>
+used in jrd\isc_sync.cpp(4022) with #ifdef <br>
+used in jrd\isc_sync.cpp(4110) with #ifdef <br>
+used in jrd\isc_sync.cpp(4171) with #ifdef <br>
+used in jrd\isc_sync.cpp(4206) with #ifdef <br>
+used in jrd\isc_sync.cpp(4302) with #ifdef <br>
+used in jrd\isc_sync.cpp(4379) with #ifdef <br>
+used in jrd\isc_s_proto.h(78) with #ifdef <br>
+used in jrd\jrn.cpp(53) with #ifdef <br>
+used in jrd\pio.h(35) with #ifdef <br>
+used in jrd\unix.cpp(890) with #ifdef <br>
+used in jrd\utl.cpp(100) with #ifdef <br>
+used in jrd\why.cpp(237) with #ifdef <br>
+used in jrd\why.cpp(290) with #ifdef <br>
+used in jrd\why.cpp(654) with #if<br>
+used in jrd\why.cpp(727) with #ifdef <br>
+used in jrd\why.cpp(1280) with #ifdef <br>
+used in jrd\why.cpp(1351) with #ifdef <br>
+used in jrd\why.cpp(5571) with #ifdef <br>
+used in jrd\y-valve.cpp(89) with #ifdef <br>
+used in jrd\y-valve.cpp(294) with #ifdef <br>
+used in jrd\y-valve.cpp(656) with #if<br>
+used in jrd\y-valve.cpp(729) with #ifdef <br>
+used in jrd\y-valve.cpp(1282) with #ifdef <br>
+used in jrd\y-valve.cpp(1353) with #ifdef <br>
+used in jrd\y-valve.cpp(5572) with #ifdef <br>
+used in lock\lock.cpp(1437) with #if<br>
+used in lock\lock.cpp(1458) with #if<br>
+used in lock\lock.cpp(3080) with #ifdef <br>
+used in lock\lock.cpp(3093) with #if<br>
+used in lock\lock.cpp(3146) with #ifdef <br>
+used in lock\lock.cpp(3179) with #ifdef <br>
+used in lock\lock.cpp(3244) with #ifdef <br>
+used in lock\lock.cpp(4425) with #if<br>
+used in lock\lock.h(174) with #ifdef <br>
+used in lock\lock.h(180) with #if<br>
+used in lock\print.cpp(329) with #ifdef <br>
+used in lock\print.cpp(333) with #ifdef <br>
+used in lock\print.cpp(360) with #if<br>
+used in qli\dtr.cpp(123) with #ifdef <br>
+used in qli\dtr.cpp(138) with #ifdef <br>
+used in qli\help.epp(46) with #ifdef <br>
+used in qli\lex.cpp(56) with #ifdef <br>
+used in remote\inet.cpp(2397) with #ifdef <br>
+used in remote\inet.cpp(2426) with #ifdef <br>
+used in remote\inet_server.cpp(108) with #ifdef <br>
+used in remote\inet_server.cpp(318) with #if<br>
+used in remote\inet_server.cpp(614) with #if<br>
+used in remote\interface.cpp(134) with #ifdef <br>
+used in remote\interface.cpp(290) with #ifdef <br>
+used in remote\interface.cpp(907) with #ifdef <br>
+used in remote\interface.cpp(4922) with #ifdef <br>
+used in remote\interface.cpp(5015) with #ifdef <br>
+used in remote\interface.cpp(5957) with #ifdef <br>
+used in remote\xnet.cpp(73) with #ifdef <br>
+used in remote\xnet.cpp(88) with #ifdef <br>
+used in remote\xnet.cpp(100) with #ifdef <br>
+used in remote\xnet.cpp(1172) with #ifdef <br>
+used in utilities\cache.cpp(94) with #ifdef <br>
+used in utilities\sbc_print.cpp(260) with #ifdef <br>
+used in wal\walc.cpp(48) with #ifdef <br>
+used in wal\walc.cpp(439) with #if<br>
+used in wal\walc.cpp(973) with #ifdef <br>
+used in wal\walc.cpp(999) with #ifdef <br>
+used in wal\walw.cpp(78) with #ifdef <br>
+used in wal\walw.cpp(224) with #ifdef <br>
+used in wal\walw.cpp(1180) with #ifdef <br>
+used in wal\walw.cpp(1306) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(22) WIN32</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in extlib\fbudf\fbudf.h(29) with #if<br>
+used in include\fb_types.h(45) with #if<br>
+used in v5_examples\align.h(46) with #if<br>
+used in v5_examples\apifull.c(67) with #if<br>
+used in v5_examples\dynfull.e(53) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(23) WIN95</td><td>Only used for the command line tools</td></tr>
+<tr><td>&nbsp;</td><td>
+used in alice\alice.cpp(102) with #if<br>
+used in alice\alice.cpp(222) with #if<br>
+used in alice\alice.cpp(277) with #if<br>
+used in alice\alice.cpp(322) with #if<br>
+used in alice\alice.cpp(826) with #if<br>
+used in burp\burp.cpp(160) with #if<br>
+used in burp\burp.cpp(531) with #if<br>
+used in burp\burp.cpp(551) with #if<br>
+used in isql\isql.epp(208) with #if<br>
+used in isql\isql.epp(357) with #if<br>
+used in isql\isql.epp(797) with #if<br>
+used in isql\isql.epp(846) with #if<br>
+used in isql\isql.epp(2326) with #if<br>
+used in isql\isql.epp(2350) with #if<br>
+used in isql\isql.epp(4967) with #if<br>
+used in isql\isql.epp(5302) with #if<br>
+used in utilities\dba.epp(243) with #if<br>
+used in utilities\dba.epp(306) with #if<br>
+used in utilities\dba.epp(329) with #if<br>
+used in utilities\dba.epp(356) with #if<br>
+used in utilities\dba.epp(479) with #if<br>
+used in utilities\dba.epp(529) with #if<br>
+used in utilities\dba.epp(560) with #if<br>
+used in utilities\dba_full.epp(218) with #if<br>
+used in utilities\dba_full.epp(250) with #if<br>
+used in utilities\dba_full.epp(267) with #if<br>
+used in utilities\dba_full.epp(338) with #if<br>
+used in utilities\dba_full.epp(370) with #if<br>
+used in utilities\dba_full.epp(399) with #if<br>
+used in utilities\gsec.cpp(51) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(24) WIN_NT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in alice\alice.cpp(71) with #ifdef <br>
+used in alice\alice.cpp(276) with #ifdef <br>
+used in burp\burp.cpp(50) with #ifdef <br>
+used in burp\burp.cpp(93) with #if<br>
+used in burp\burp.cpp(530) with #ifdef <br>
+used in burp\burp.cpp(1610) with #ifndef<br>
+used in burp\burp.cpp(1619) with #ifdef <br>
+used in burp\burp.cpp(1737) with #ifdef <br>
+used in burp\burp.cpp(1774) with #ifdef <br>
+used in burp\burp.cpp(1820) with #ifdef <br>
+used in burp\burp.h(636) with #ifdef <br>
+used in burp\burp.h(913) with #ifdef <br>
+used in burp\mvol.cpp(43) with #ifdef <br>
+used in burp\mvol.cpp(63) with #if<br>
+used in burp\mvol.cpp(79) with #ifdef <br>
+used in burp\mvol.cpp(290) with #ifndef<br>
+used in burp\mvol.cpp(478) with #ifdef <br>
+used in burp\mvol.cpp(561) with #ifdef <br>
+used in burp\mvol.cpp(599) with #ifndef<br>
+used in burp\mvol.cpp(632) with #ifndef<br>
+used in burp\mvol.cpp(886) with #ifdef <br>
+used in burp\mvol.cpp(931) with #ifdef <br>
+used in burp\mvol.cpp(946) with #ifdef <br>
+used in burp\mvol.cpp(1163) with #ifndef<br>
+used in burp\mvol.cpp(1292) with #ifdef <br>
+used in burp\mvol.cpp(1339) with #ifdef <br>
+used in burp\mvol.cpp(1380) with #ifdef <br>
+used in burp\mvol.cpp(1405) with #ifdef <br>
+used in burp\mvol.cpp(1441) with #ifdef <br>
+used in burp\mvol_proto.h(47) with #if<br>
+used in burp\spit.cpp(58) with #ifdef <br>
+used in burp\std_desc.h(32) with #ifdef <br>
+used in common\classes\locks.cpp(33) with #ifdef <br>
+used in common\classes\locks.h(7) with #ifdef <br>
+used in common\classes\locks.h(24) with #ifdef <br>
+used in common\config\config.cpp(91) with #ifdef <br>
+used in dsql\dsql.h(35) with #if<br>
+used in dsql\dsql.h(607) with #if<br>
+used in dsql\dsql.h(612) with #if<br>
+used in dsql\dsql.h(618) with #if<br>
+used in dsql\parse.cpp(79) with #if<br>
+used in dsql\parse.cpp(5391) with #if<br>
+used in dudley\ddl.cpp(49) with #if<br>
+used in dudley\ddl.cpp(153) with #ifdef <br>
+used in dudley\exe.epp(46) with #ifdef <br>
+used in dudley\lex.cpp(235) with #if<br>
+used in dudley\lex.cpp(466) with #if<br>
+used in dudley\lex.cpp(492) with #if<br>
+used in dudley\parse.cpp(935) with #if<br>
+used in dudley\parse.cpp(979) with #if<br>
+used in dudley\parse.cpp(1951) with #if<br>
+used in gpre\cob.cpp(176) with #ifdef <br>
+used in gpre\ftn.cpp(294) with #ifdef <br>
+used in gpre\gpre.cpp(168) with #ifndef<br>
+used in gpre\gpre.cpp(216) with #if<br>
+used in gpre\gpre.cpp(1144) with #if<br>
+used in gpre\gpre.cpp(1153) with #if<br>
+used in gpre\gpre.cpp(1372) with #if<br>
+used in gpre\gpre.cpp(1447) with #if<br>
+used in gpre\gpre.h(91) with #if<br>
+used in include\firebird.h(40) with #if<br>
+used in include\firebird.h(64) with #if<br>
+used in intl\ld.c(257) with #if<br>
+used in intl\ld.h(65) with #ifdef <br>
+used in intl\ld2.c(59) with #if<br>
+used in intlcpp\ld.cpp(257) with #if<br>
+used in intlcpp\ld.h(65) with #ifdef <br>
+used in intlcpp\ld2.cpp(59) with #if<br>
+used in ipserver\ipserver.cpp(298) with #if<br>
+used in ipserver\ipserver.cpp(371) with #if<br>
+used in iscguard\cntl_guard.cpp(37) with #ifdef <br>
+used in iscguard\iscguard.cpp(45) with #ifdef <br>
+used in isql\isql.epp(95) with #if<br>
+used in isql\isql.epp(3015) with #ifdef <br>
+used in isql\isql.h(151) with #if<br>
+used in isql\isql.h(285) with #if<br>
+used in journal\console.cpp(65) with #ifdef <br>
+used in journal\console.cpp(154) with #ifdef <br>
+used in journal\console.cpp(244) with #ifdef <br>
+used in journal\console.cpp(280) with #ifdef <br>
+used in journal\console.cpp(323) with #ifdef <br>
+used in journal\console.cpp(530) with #ifdef <br>
+used in journal\console.cpp(623) with #ifdef <br>
+used in journal\console.cpp(718) with #ifdef <br>
+used in journal\gjrn.cpp(44) with #if<br>
+used in journal\gjrn.cpp(123) with #ifdef <br>
+used in journal\misc.cpp(33) with #ifdef <br>
+used in journal\rebuild.e(95) with #ifdef <br>
+used in journal\rebuild.e(3273) with #if<br>
+used in journal\server.e(105) with #ifdef <br>
+used in journal\server.e(111) with #ifndef<br>
+used in journal\server.e(128) with #ifdef <br>
+used in journal\server.e(193) with #ifdef <br>
+used in journal\server.e(218) with #if<br>
+used in journal\server.e(279) with #ifdef <br>
+used in journal\server.e(455) with #if<br>
+used in journal\server.e(594) with #ifdef <br>
+used in journal\server.e(988) with #ifdef <br>
+used in journal\server.e(1014) with #ifndef<br>
+used in journal\server.e(1130) with #ifdef <br>
+used in journal\server.e(1302) with #ifdef <br>
+used in journal\server.e(1576) with #ifdef <br>
+used in journal\server.e(1717) with #ifdef <br>
+used in journal\server.e(2771) with #ifdef <br>
+used in journal\server.e(2969) with #ifdef <br>
+used in journal\server.e(3249) with #ifndef<br>
+used in journal\server.e(3267) with #ifndef<br>
+used in jrd\cch.cpp(213) with #ifdef <br>
+used in jrd\codes.epp(758) with #if<br>
+used in jrd\codes.epp(789) with #if<br>
+used in jrd\divorce.cpp(60) with #ifdef <br>
+used in jrd\dyn.epp(108) with #if<br>
+used in jrd\dyn.epp(134) with #if<br>
+used in jrd\dyn.epp(151) with #if<br>
+used in jrd\dyn.epp(176) with #if<br>
+used in jrd\event.cpp(69) with #ifdef <br>
+used in jrd\event.cpp(130) with #if<br>
+used in jrd\event.cpp(547) with #ifdef <br>
+used in jrd\event.cpp(569) with #ifdef <br>
+used in jrd\event.cpp(606) with #ifdef <br>
+used in jrd\event.cpp(632) with #ifdef <br>
+used in jrd\event.cpp(653) with #ifdef <br>
+used in jrd\event.cpp(699) with #ifdef <br>
+used in jrd\event.cpp(947) with #ifdef <br>
+used in jrd\event.cpp(1277) with #if<br>
+used in jrd\event.cpp(1293) with #if<br>
+used in jrd\event.cpp(1657) with #ifdef <br>
+used in jrd\exe.cpp(164) with #if<br>
+used in jrd\exe.cpp(916) with #ifdef <br>
+used in jrd\exe.cpp(930) with #ifdef <br>
+used in jrd\ext.cpp(84) with #ifdef <br>
+used in jrd\ext.cpp(161) with #ifdef <br>
+used in jrd\fil.h(40) with #ifdef <br>
+used in jrd\file_params.h(61) with #ifdef <br>
+used in jrd\file_params.h(117) with #ifdef <br>
+used in jrd\flu.cpp(133) with #ifdef <br>
+used in jrd\flu.cpp(170) with #ifndef<br>
+used in jrd\flu.cpp(231) with #ifdef <br>
+used in jrd\flu.cpp(531) with #ifdef <br>
+used in jrd\flu.h(44) with #ifdef <br>
+used in jrd\fun.epp(144) with #if<br>
+used in jrd\fun.epp(574) with #if<br>
+used in jrd\fun.epp(734) with #ifndef<br>
+used in jrd\gds.cpp(60) with #ifndef<br>
+used in jrd\gds.cpp(74) with #if<br>
+used in jrd\gds.cpp(95) with #ifndef<br>
+used in jrd\gds.cpp(122) with #ifdef <br>
+used in jrd\gds.cpp(173) with #ifdef <br>
+used in jrd\gds.cpp(196) with #if<br>
+used in jrd\gds.cpp(516) with #ifdef <br>
+used in jrd\gds.cpp(1005) with #ifdef <br>
+used in jrd\gds.cpp(2258) with #ifdef <br>
+used in jrd\gds.cpp(2309) with #ifdef <br>
+used in jrd\ibsetjmp.h(58) with #if<br>
+used in jrd\intl.cpp(197) with #ifdef <br>
+used in jrd\isc.cpp(89) with #ifdef <br>
+used in jrd\isc.cpp(259) with #ifdef <br>
+used in jrd\isc.cpp(390) with #ifdef <br>
+used in jrd\isc.cpp(613) with #ifdef <br>
+used in jrd\isc.cpp(1229) with #ifdef <br>
+used in jrd\isc.h(157) with #ifdef <br>
+used in jrd\isc_file.cpp(187) with #ifdef <br>
+used in jrd\isc_file.cpp(207) with #if<br>
+used in jrd\isc_file.cpp(427) with #if<br>
+used in jrd\isc_file.cpp(499) with #ifdef <br>
+used in jrd\isc_file.cpp(559) with #if<br>
+used in jrd\isc_file.cpp(660) with #ifdef <br>
+used in jrd\isc_file.cpp(886) with #if<br>
+used in jrd\isc_file.cpp(1165) with #ifdef <br>
+used in jrd\isc_file.cpp(1599) with #ifdef <br>
+used in jrd\isc_ipc.cpp(173) with #ifdef <br>
+used in jrd\isc_ipc.cpp(517) with #ifdef <br>
+used in jrd\isc_ipc.cpp(657) with #if<br>
+used in jrd\isc_ipc.cpp(681) with #if<br>
+used in jrd\isc_ipc.cpp(705) with #if<br>
+used in jrd\isc_ipc.cpp(843) with #ifdef <br>
+used in jrd\isc_ipc.cpp(876) with #ifdef <br>
+used in jrd\isc_i_proto.h(41) with #ifdef <br>
+used in jrd\isc_proto.h(56) with #ifdef <br>
+used in jrd\isc_signal.h(27) with #ifdef <br>
+used in jrd\isc_sync.cpp(174) with #ifdef <br>
+used in jrd\isc_sync.cpp(203) with #if<br>
+used in jrd\isc_sync.cpp(1198) with #ifdef <br>
+used in jrd\isc_sync.cpp(1589) with #ifdef <br>
+used in jrd\isc_sync.cpp(1772) with #ifdef <br>
+used in jrd\isc_sync.cpp(2621) with #ifdef <br>
+used in jrd\isc_sync.cpp(3521) with #ifdef <br>
+used in jrd\isc_sync.cpp(3696) with #ifdef <br>
+used in jrd\isc_sync.cpp(4051) with #ifdef <br>
+used in jrd\isc_sync.cpp(4351) with #ifdef <br>
+used in jrd\isc_s_proto.h(45) with #if<br>
+used in jrd\isc_s_proto.h(54) with #ifdef <br>
+used in jrd\isc_s_proto.h(62) with #if<br>
+used in jrd\isc_s_proto.h(84) with #ifdef <br>
+used in jrd\jrd.cpp(234) with #ifdef <br>
+used in jrd\jrd.cpp(297) with #ifdef <br>
+used in jrd\jrd.cpp(390) with #if<br>
+used in jrd\jrd.cpp(2088) with #ifdef <br>
+used in jrd\jrd.cpp(4222) with #ifdef <br>
+used in jrd\jrd.cpp(5067) with #ifndef<br>
+used in jrd\jrd.cpp(5505) with #if<br>
+used in jrd\jrd.cpp(5581) with #if<br>
+used in jrd\jrd.cpp(6008) with #if<br>
+used in jrd\jrd.cpp(6228) with #ifdef <br>
+used in jrd\jrd.cpp(6246) with #ifdef <br>
+used in jrd\jrd.cpp(6293) with #ifdef <br>
+used in jrd\jrd.cpp(6370) with #ifdef <br>
+used in jrd\jrd.cpp(6382) with #ifdef <br>
+used in jrd\jrd.h(929) with #ifdef <br>
+used in jrd\jrd.h(962) with #if<br>
+used in jrd\jrd_proto.h(31) with #ifndef<br>
+used in jrd\jrd_proto.h(36) with #ifndef<br>
+used in jrd\jrn.cpp(67) with #ifdef <br>
+used in jrd\jrn.cpp(784) with #ifdef <br>
+used in jrd\jrn.cpp(811) with #ifdef <br>
+used in jrd\jrn.cpp(891) with #ifdef <br>
+used in jrd\jrn.cpp(945) with #ifdef <br>
+used in jrd\jrn.cpp(1068) with #ifdef <br>
+used in jrd\jrn.cpp(1109) with #ifdef <br>
+used in jrd\jrn.cpp(1188) with #ifdef <br>
+used in jrd\lck.cpp(58) with #ifdef <br>
+used in jrd\license.h(111) with #ifdef <br>
+used in jrd\llio.cpp(55) with #ifndef<br>
+used in jrd\llio.cpp(68) with #ifdef <br>
+used in jrd\llio.cpp(157) with #ifdef <br>
+used in jrd\log.cpp(30) with #ifdef <br>
+used in jrd\log2.h(112) with #if<br>
+used in jrd\log2.h(122) with #if<br>
+used in jrd\os\thd_priority.h(27) with #ifdef <br>
+used in jrd\pag.cpp(164) with #ifdef <br>
+used in jrd\perf.cpp(71) with #if<br>
+used in jrd\pio.h(82) with #ifdef <br>
+used in jrd\qatest.cpp(105) with #ifdef <br>
+used in jrd\qatest.cpp(139) with #ifdef <br>
+used in jrd\qatest.cpp(160) with #ifdef <br>
+used in jrd\qatest.cpp(174) with #ifdef <br>
+used in jrd\qatest.cpp(190) with #ifdef <br>
+used in jrd\qatest.cpp(206) with #ifdef <br>
+used in jrd\rse.cpp(81) with #if<br>
+used in jrd\sch.cpp(43) with #ifdef <br>
+used in jrd\shrinit.cpp(252) with #if<br>
+used in jrd\sort.cpp(74) with #ifdef <br>
+used in jrd\sort.cpp(169) with #ifdef <br>
+used in jrd\sort.cpp(3029) with #if<br>
+used in jrd\svc.cpp(110) with #if<br>
+used in jrd\svc.cpp(121) with #ifdef <br>
+used in jrd\svc.cpp(208) with #if<br>
+used in jrd\svc.cpp(211) with #if<br>
+used in jrd\svc.cpp(326) with #if<br>
+used in jrd\svc.cpp(334) with #if<br>
+used in jrd\svc.cpp(364) with #ifdef <br>
+used in jrd\svc.cpp(2233) with #ifdef <br>
+used in jrd\svc.cpp(2902) with #if<br>
+used in jrd\svc.cpp(3713) with #if<br>
+used in jrd\thd.cpp(41) with #ifdef <br>
+used in jrd\thd.cpp(91) with #ifdef <br>
+used in jrd\thd.cpp(131) with #ifdef <br>
+used in jrd\thd.cpp(217) with #ifdef <br>
+used in jrd\thd.cpp(287) with #ifdef <br>
+used in jrd\thd.cpp(319) with #ifdef <br>
+used in jrd\thd.cpp(324) with #ifdef <br>
+used in jrd\thd.cpp(671) with #ifdef <br>
+used in jrd\thd.cpp(1288) with #ifdef <br>
+used in jrd\thd.cpp(1407) with #ifdef <br>
+used in jrd\thd.cpp(1501) with #ifdef <br>
+used in jrd\thd.cpp(1569) with #ifdef <br>
+used in jrd\thd.cpp(1704) with #ifdef <br>
+used in jrd\thd.cpp(1712) with #ifdef <br>
+used in jrd\thd.cpp(1756) with #ifdef <br>
+used in jrd\thd.cpp(1810) with #ifdef <br>
+used in jrd\thd.cpp(1988) with #ifdef <br>
+used in jrd\thd.h(87) with #ifdef <br>
+used in jrd\utl.cpp(83) with #if<br>
+used in jrd\utl.cpp(104) with #if<br>
+used in jrd\utl.cpp(120) with #ifdef <br>
+used in jrd\utl.cpp(683) with #ifndef<br>
+used in jrd\utl.cpp(2161) with #if<br>
+used in jrd\why.cpp(106) with #ifdef <br>
+used in jrd\why.cpp(1383) with #ifdef <br>
+used in jrd\why.cpp(1425) with #ifdef <br>
+used in jrd\why.cpp(1635) with #ifdef <br>
+used in jrd\why.cpp(5204) with #ifdef <br>
+used in jrd\y-valve.cpp(99) with #ifdef <br>
+used in jrd\y-valve.cpp(1618) with #ifdef <br>
+used in jrd\y-valve.cpp(5214) with #ifdef <br>
+used in lock\driver.cpp(32) with #ifdef <br>
+used in lock\lock.cpp(99) with #ifdef <br>
+used in lock\lock.cpp(194) with #if<br>
+used in lock\lock.cpp(313) with #ifdef <br>
+used in lock\lock.cpp(360) with #if<br>
+used in lock\lock.cpp(834) with #if<br>
+used in lock\lock.cpp(1437) with #if<br>
+used in lock\lock.cpp(1458) with #if<br>
+used in lock\lock.cpp(1493) with #if<br>
+used in lock\lock.cpp(1504) with #ifdef <br>
+used in lock\lock.cpp(1619) with #if<br>
+used in lock\lock.cpp(1625) with #ifdef <br>
+used in lock\lock.cpp(1900) with #if<br>
+used in lock\lock.cpp(2032) with #if<br>
+used in lock\lock.cpp(2074) with #if<br>
+used in lock\lock.cpp(2638) with #if<br>
+used in lock\lock.cpp(3149) with #if<br>
+used in lock\lock.cpp(3159) with #ifdef <br>
+used in lock\lock.cpp(3165) with #if<br>
+used in lock\lock.cpp(3236) with #ifdef <br>
+used in lock\lock.cpp(3266) with #ifndef<br>
+used in lock\lock.cpp(3718) with #ifdef <br>
+used in lock\lock.cpp(4142) with #ifdef <br>
+used in lock\lock.cpp(4267) with #if<br>
+used in lock\lock.cpp(4272) with #if<br>
+used in lock\lock.cpp(4938) with #ifdef <br>
+used in lock\lock.cpp(5046) with #ifdef <br>
+used in lock\lock.cpp(5167) with #ifdef <br>
+used in lock\lock.h(48) with #if<br>
+used in lock\lock.h(55) with #ifdef <br>
+used in lock\lock.h(66) with #ifdef <br>
+used in lock\lock.h(186) with #if<br>
+used in lock\lock.h(191) with #if<br>
+used in lock\lock.h(329) with #ifdef <br>
+used in lock\lock.h(339) with #if<br>
+used in lock\lock.h(339) with #if<br>
+used in lock\print.cpp(53) with #if<br>
+used in lock\print.cpp(57) with #if<br>
+used in lock\print.cpp(168) with #ifdef <br>
+used in lock\print.cpp(615) with #ifdef <br>
+used in msgs\build_file.epp(58) with #ifdef <br>
+used in msgs\build_file.epp(75) with #ifndef<br>
+used in qli\command.cpp(222) with #ifdef <br>
+used in qli\command.cpp(467) with #ifndef<br>
+used in qli\exe.cpp(295) with #ifndef<br>
+used in qli\exe.cpp(327) with #ifdef <br>
+used in qli\help.epp(50) with #if<br>
+used in qli\lex.cpp(60) with #if<br>
+used in qli\lex.cpp(179) with #ifdef <br>
+used in qli\picstr.cpp(706) with #ifdef <br>
+used in qli\picstr.cpp(714) with #ifdef <br>
+used in qli\picstr.cpp(738) with #ifdef <br>
+used in qli\picstr.cpp(773) with #ifdef <br>
+used in qli\picstr.cpp(793) with #ifdef <br>
+used in remote\cntl.cpp(38) with #ifdef <br>
+used in remote\inet.cpp(81) with #ifdef <br>
+used in remote\inet.cpp(91) with #if<br>
+used in remote\inet.cpp(135) with #ifdef <br>
+used in remote\inet.cpp(336) with #if<br>
+used in remote\inet.cpp(352) with #ifdef <br>
+used in remote\inet.cpp(369) with #if<br>
+used in remote\inet.cpp(388) with #if<br>
+used in remote\inet.cpp(445) with #if<br>
+used in remote\inet.cpp(458) with #ifdef <br>
+used in remote\inet.cpp(544) with #ifdef <br>
+used in remote\inet.cpp(935) with #ifdef <br>
+used in remote\inet.cpp(1153) with #ifdef <br>
+used in remote\inet.cpp(1329) with #if<br>
+used in remote\inet.cpp(1456) with #if<br>
+used in remote\inet.cpp(1482) with #ifdef <br>
+used in remote\inet.cpp(1499) with #if<br>
+used in remote\inet.cpp(1747) with #ifndef<br>
+used in remote\inet.cpp(1845) with #if<br>
+used in remote\inet.cpp(1944) with #if<br>
+used in remote\inet.cpp(1960) with #if<br>
+used in remote\inet.cpp(2074) with #ifdef <br>
+used in remote\inet.cpp(2107) with #ifdef <br>
+used in remote\inet.cpp(2318) with #if<br>
+used in remote\inet.cpp(2359) with #if<br>
+used in remote\inet.cpp(2570) with #if<br>
+used in remote\inet.cpp(2589) with #if<br>
+used in remote\inet.cpp(2633) with #if<br>
+used in remote\inet.cpp(2637) with #ifdef <br>
+used in remote\inet.cpp(2745) with #ifdef <br>
+used in remote\inet.cpp(2774) with #ifdef <br>
+used in remote\inet.cpp(2794) with #ifdef <br>
+used in remote\inet.cpp(2806) with #ifndef<br>
+used in remote\inet.cpp(3091) with #if<br>
+used in remote\inet.cpp(3634) with #if<br>
+used in remote\inet.cpp(3798) with #ifdef <br>
+used in remote\inet_server.cpp(140) with #ifndef<br>
+used in remote\interface.cpp(71) with #if<br>
+used in remote\interface.cpp(82) with #ifdef <br>
+used in remote\interface.cpp(4807) with #if<br>
+used in remote\interface.cpp(4811) with #if<br>
+used in remote\interface.cpp(4826) with #if<br>
+used in remote\interface.cpp(4879) with #ifdef <br>
+used in remote\interface.cpp(4993) with #if<br>
+used in remote\parser.cpp(37) with #if<br>
+used in remote\property.cpp(38) with #if<br>
+used in remote\remote.h(39) with #if<br>
+used in remote\remote.h(340) with #ifndef<br>
+used in remote\server.cpp(45) with #ifdef <br>
+used in remote\server.cpp(4790) with #ifdef <br>
+used in remote\server.cpp(4921) with #ifdef <br>
+used in remote\xdr.h(38) with #ifdef <br>
+used in remote\xnet.cpp(50) with #ifdef <br>
+used in remote\xnet.cpp(54) with #if<br>
+used in remote\xnet.cpp(69) with #ifdef <br>
+used in remote\xnet.cpp(114) with #ifdef <br>
+used in remote\xnet.cpp(159) with #ifdef <br>
+used in remote\xnet.cpp(403) with #ifdef <br>
+used in remote\xnet.cpp(409) with #ifdef <br>
+used in remote\xnet.cpp(443) with #ifdef <br>
+used in remote\xnet.cpp(462) with #ifdef <br>
+used in remote\xnet.cpp(493) with #ifdef <br>
+used in remote\xnet.cpp(531) with #ifdef <br>
+used in remote\xnet.cpp(553) with #ifdef <br>
+used in remote\xnet.cpp(563) with #ifdef <br>
+used in remote\xnet.cpp(578) with #ifdef <br>
+used in remote\xnet.cpp(586) with #ifdef <br>
+used in remote\xnet.cpp(619) with #ifdef <br>
+used in remote\xnet.cpp(649) with #if<br>
+used in remote\xnet.cpp(719) with #if<br>
+used in remote\xnet.cpp(815) with #ifdef <br>
+used in remote\xnet.cpp(825) with #ifdef <br>
+used in remote\xnet.cpp(838) with #ifdef <br>
+used in remote\xnet.cpp(854) with #ifdef <br>
+used in remote\xnet.cpp(1023) with #ifdef <br>
+used in remote\xnet.cpp(1034) with #ifdef <br>
+used in remote\xnet.cpp(1120) with #ifdef <br>
+used in remote\xnet.cpp(1134) with #ifdef <br>
+used in remote\xnet.cpp(1149) with #ifdef <br>
+used in remote\xnet.cpp(1376) with #ifdef <br>
+used in remote\xnet.cpp(1410) with #ifdef <br>
+used in remote\xnet.cpp(1575) with #ifdef <br>
+used in remote\xnet.cpp(1655) with #ifdef <br>
+used in remote\xnet.cpp(1663) with #ifdef <br>
+used in remote\xnet.cpp(1718) with #ifdef <br>
+used in remote\xnet.cpp(1791) with #ifdef <br>
+used in remote\xnet.cpp(1816) with #ifdef <br>
+used in remote\xnet.cpp(1838) with #ifdef <br>
+used in remote\xnet.cpp(1851) with #ifdef <br>
+used in remote\xnet.cpp(1993) with #ifdef <br>
+used in remote\xnet.cpp(2162) with #ifdef <br>
+used in remote\xnet.cpp(2321) with #ifdef <br>
+used in remote\xnet.cpp(2343) with #ifdef <br>
+used in remote\xnet.cpp(2366) with #ifdef <br>
+used in remote\xnet.h(27) with #ifndef<br>
+used in remote\xnet.h(89) with #ifdef <br>
+used in remote\xnet.h(95) with #ifdef <br>
+used in remote\xnet.h(136) with #ifdef <br>
+used in utilities\cache.cpp(35) with #if<br>
+used in utilities\cache.cpp(76) with #ifdef <br>
+used in utilities\cmd_util.cpp(32) with #ifdef <br>
+used in utilities\dba.epp(63) with #ifdef <br>
+used in utilities\dba.epp(81) with #if<br>
+used in utilities\dba.epp(127) with #ifdef <br>
+used in utilities\dba.epp(143) with #if<br>
+used in utilities\dba.epp(170) with #if<br>
+used in utilities\dba.epp(355) with #ifdef <br>
+used in utilities\dba.epp(1267) with #ifdef <br>
+used in utilities\dba.epp(1463) with #ifndef<br>
+used in utilities\dba_full.epp(45) with #ifdef <br>
+used in utilities\dba_full.epp(64) with #if<br>
+used in utilities\dba_full.epp(103) with #ifdef <br>
+used in utilities\dba_full.epp(119) with #if<br>
+used in utilities\dba_full.epp(266) with #ifdef <br>
+used in utilities\dba_full.epp(450) with #if<br>
+used in utilities\dba_full.epp(980) with #ifdef <br>
+used in utilities\dba_full.epp(1107) with #ifndef<br>
+used in utilities\gsec.cpp(43) with #ifdef <br>
+used in utilities\gsec.cpp(257) with #ifdef <br>
+used in utilities\gsec.h(31) with #if<br>
+used in utilities\ibmgr.h(29) with #if<br>
+used in utilities\sbc_print.cpp(49) with #ifdef <br>
+used in utilities\sbc_print.cpp(72) with #if<br>
+used in utilities\sbc_print.cpp(79) with #if<br>
+used in utilities\sbc_print.cpp(107) with #ifdef <br>
+used in utilities\sbc_print.cpp(167) with #ifdef <br>
+used in utilities\sbc_print.cpp(396) with #ifdef <br>
+used in utilities\sbc_print.cpp(477) with #ifndef<br>
+used in utilities\security.epp(383) with #ifdef <br>
+used in wal\driver.cpp(44) with #ifdef <br>
+used in wal\wal.cpp(66) with #ifndef<br>
+used in wal\wal.cpp(74) with #ifdef <br>
+used in wal\wal.cpp(109) with #ifdef <br>
+used in wal\wal.cpp(1135) with #if<br>
+used in wal\wal.cpp(1160) with #if<br>
+used in wal\wal.h(42) with #ifdef <br>
+used in wal\wal.h(65) with #if<br>
+used in wal\wal.h(285) with #if<br>
+used in wal\wal.h(444) with #if<br>
+used in wal\walc.cpp(57) with #ifdef <br>
+used in wal\walc.cpp(69) with #ifdef <br>
+used in wal\walc.cpp(460) with #if<br>
+used in wal\walc.cpp(970) with #if<br>
+used in wal\walc.cpp(979) with #if<br>
+used in wal\walc.cpp(1011) with #if<br>
+used in wal\walc.cpp(1056) with #if<br>
+used in wal\walw.cpp(62) with #if<br>
+used in wal\walw.cpp(82) with #ifdef <br>
+used in wal\walw.cpp(99) with #ifdef <br>
+used in wal\walw.cpp(1172) with #ifdef <br>
+used in wal\wal_prnt.cpp(36) with #if<br>
+used in wal\wal_prnt.cpp(76) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(25) _AIX</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in journal\server.e(43) with #ifdef <br>
+used in jrd\divorce.cpp(56) with #ifdef <br>
+used in remote\divorce.cpp(35) with #ifdef <br>
+used in remote\xdr.h(49) with #ifdef <br>
+used in v5_examples\align.h(42) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(26) _M_IX86</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\btr.cpp(194) with #if<br>
+used in remote\xdr.cpp(42) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(27) _WIN32</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in extlib\fbudf\fbudf.cpp(54) with #if<br>
+used in extlib\fbudf\fbudf.cpp(518) with #if<br>
+used in extlib\fbudf\fbudf.h(29) with #if<br>
+used in include\fb_types.h(45) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(28) __ALPHA</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\gpre.cpp(728) with #ifndef<br>
+used in gpre\gpre.cpp(738) with #ifdef <br>
+used in gpre\gpre.cpp(878) with #ifdef <br>
+used in jrd\isc.cpp(986) with #ifdef <br>
+used in jrd\isc_ipc.cpp(432) with #if<br>
+used in jrd\isc_sync.cpp(3113) with #ifndef<br>
+used in jrd\license.h(96) with #ifdef <br>
+used in jrd\utl.cpp(109) with #ifdef <br>
+used in remote\chuser.cpp(33) with #ifdef <br>
+used in remote\chuser.cpp(325) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(29) __WIN32__</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in extlib\fbudf\fbudf.h(29) with #if<br>
+used in include\fb_types.h(45) with #if<br>
+used in isql\isql_win.cpp(988) with #if<br>
+used in isql\isql_win.cpp(1028) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(30) hpux</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\ftn.cpp(351) with #ifdef <br>
+used in gpre\ftn.cpp(1621) with #ifdef <br>
+used in gpre\ftn.cpp(1692) with #ifdef <br>
+used in gpre\ftn.cpp(1710) with #ifdef <br>
+used in gpre\ftn.cpp(1925) with #ifdef <br>
+used in gpre\ftn.cpp(1948) with #ifdef <br>
+used in gpre\ftn.cpp(1985) with #ifdef <br>
+used in gpre\ftn.cpp(1992) with #ifdef <br>
+used in gpre\ftn.cpp(2021) with #ifdef <br>
+used in gpre\ftn.cpp(2046) with #ifdef <br>
+used in gpre\ftn.cpp(2085) with #ifdef <br>
+used in gpre\ftn.cpp(2092) with #ifdef <br>
+used in gpre\ftn.cpp(2119) with #ifdef <br>
+used in gpre\ftn.cpp(2142) with #ifdef <br>
+used in gpre\ftn.cpp(2180) with #ifdef <br>
+used in gpre\ftn.cpp(2204) with #ifdef <br>
+used in gpre\ftn.cpp(4212) with #ifdef <br>
+used in gpre\ftn.cpp(4238) with #ifdef <br>
+used in gpre\ftn.cpp(4948) with #ifdef <br>
+used in gpre\ftn.cpp(4966) with #ifdef <br>
+used in gpre\gpre.cpp(206) with #ifdef <br>
+used in gpre\gpre.h(79) with #if<br>
+used in jrd\isc_file.cpp(151) with #ifdef <br>
+used in jrd\isc_file.cpp(221) with #ifdef <br>
+used in jrd\isc_file.cpp(409) with #ifdef <br>
+used in jrd\isc_file.cpp(1563) with #ifdef <br>
+used in jrd\isc_ipc.cpp(238) with #ifndef<br>
+used in jrd\isc_sync.cpp(208) with #ifndef<br>
+used in jrd\license.h(70) with #ifdef <br>
+used in jrd\pag.cpp(148) with #ifdef <br>
+used in jrd\unix.cpp(145) with #ifdef <br>
+used in jrd\unix.cpp(411) with #ifdef <br>
+used in jrd\unix.cpp(421) with #ifdef <br>
+used in remote\inet.cpp(122) with #if<br>
+used in remote\inet.cpp(182) with #ifndef<br>
+used in remote\inet_server.cpp(116) with #ifndef<br>
+used in remote\remote_def.h(59) with #ifdef <br>
+used in utilities\rebuild.cpp(42) with #ifdef <br>
+used in v5_examples\align.h(38) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(31) i386</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\btr.cpp(194) with #if<br>
+used in jrd\license.h(87) with #ifdef <br>
+used in jrd\license.h(112) with #ifdef <br>
+used in jrd\pag.cpp(141) with #ifdef <br>
+used in jrd\pag.cpp(173) with #ifdef <br>
+used in remote\remote_def.h(51) with #ifdef <br>
+used in remote\xdr.cpp(42) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(32) i586</td><td>Only for Linux</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\pag.cpp(176) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(33) sparc</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in burp\restore.epp(196) with #ifdef <br>
+used in burp\restore.epp(6478) with #ifdef <br>
+used in gpre\cob.cpp(152) with #if<br>
+used in gpre\cob.cpp(292) with #if<br>
+used in jrd\gds.cpp(190) with #ifdef <br>
+used in jrd\isc_ipc.cpp(59) with #ifdef <br>
+used in jrd\license.h(80) with #ifdef <br>
+used in jrd\pag.cpp(179) with #ifdef <br>
+used in jrd\svc.cpp(92) with #ifdef <br>
+used in jrd\utl.cpp(94) with #ifdef <br>
+used in remote\remote_def.h(48) with #ifdef <br>
+used in v5_examples\align.h(33) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(34) sun</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in gpre\ftn.cpp(237) with #ifdef <br>
+used in gpre\ftn.cpp(791) with #ifdef <br>
+used in gpre\gpre.cpp(579) with #ifdef <br>
+used in gpre\gpre.cpp(2795) with #if<br>
+used in gpre\gpre.h(73) with #if<br>
+used in gpre\pretty.cpp(39) with #ifdef <br>
+used in jrd\cvt.cpp(79) with #ifdef <br>
+used in jrd\file_params.h(89) with #ifdef <br>
+used in jrd\license.h(79) with #ifdef <br>
+used in jrd\pag.cpp(140) with #ifdef <br>
+used in jrd\unix.cpp(569) with #ifndef<br>
+used in remote\remote_def.h(47) with #ifdef <br>
+used in v5_examples\align.h(32) with #ifdef <br>
+</td></tr>
+</table>
+<p><a name="def5">Platform description define</p>
+<table border="1" width ="100%" cellspacing="3">
+<tr><td valign="top">
+(0) BUFSIZ</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in burp\burp.h(889) with #ifdef <br>
+used in ipserver\ipc.h(35) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(1) CHAR_BITS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\enc.cpp(114) with #ifdef <br>
+used in jrd\enc.cpp(115) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(2) CLOCKS_PER_SEC</td><td>only for winnt</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\perf.cpp(71) with #if<br>
+used in jrd\perf.cpp(75) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(3) FPE_FLTDIV_TRAP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in qli\dtr.cpp(559) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(4) FPE_FLTOVF_FAULT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in qli\dtr.cpp(571) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(5) FPE_FLTOVF_TRAP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in qli\dtr.cpp(553) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(6) FPE_FLTUND_FAULT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in qli\dtr.cpp(577) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(7) FPE_FLTUND_TRAP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in qli\dtr.cpp(565) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(8) FPE_INOVF_TRAP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in qli\dtr.cpp(541) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(9) FPE_INTDIV_TRAP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in qli\dtr.cpp(547) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(10) GETMNTENT_TAKES_TWO_ARGUMENTS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(1338) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(11) GETTIMEOFDAY_RETURNS_TIMEZONE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in extlib\fbudf\fbudf.cpp(534) with #ifdef <br>
+used in journal\misc.cpp(239) with #ifdef <br>
+used in jrd\gds.cpp(1092) with #ifdef <br>
+used in jrd\perf.cpp(246) with #ifdef <br>
+used in jrd\svc.cpp(2831) with #ifdef <br>
+used in jrd\svc.cpp(2846) with #ifdef <br>
+used in remote\inet.cpp(269) with #ifdef <br>
+used in wal\driver.cpp(593) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(12) HAVE_AIO_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\unix.cpp(50) with #ifdef <br>
+used in jrd\unix.cpp(79) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(13) HAVE_CRYPT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\enc.cpp(27) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(14) HAVE_CRYPT_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\enc.cpp(12) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(15) HAVE_CTYPES_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in qli\lex.cpp(47) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(16) HAVE_CTYPE_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in burp\burp.cpp(68) with #ifdef <br>
+used in dsql\dsql.cpp(95) with #ifdef <br>
+used in isql\show.epp(59) with #ifdef <br>
+used in jrd\isc.cpp(131) with #ifdef <br>
+used in jrd\met.epp(108) with #ifdef <br>
+used in msgs\enter_msgs.epp(36) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(17) HAVE_EDITLINE_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in isql\isql.epp(70) with #ifdef <br>
+used in isql\isql.epp(663) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(18) HAVE_ERRNO_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\why.cpp(90) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(19) HAVE_FCNTL_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\divorce.cpp(80) with #ifdef <br>
+used in jrd\why.cpp(94) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(20) HAVE_FLOCK</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_sync.cpp(1982) with #ifndef<br>
+used in jrd\isc_sync.cpp(2019) with #ifndef<br>
+used in jrd\isc_sync.cpp(2045) with #ifdef <br>
+used in jrd\isc_sync.cpp(2065) with #ifdef <br>
+used in jrd\isc_sync.cpp(2088) with #ifdef <br>
+used in jrd\isc_sync.cpp(2114) with #ifdef <br>
+used in jrd\isc_sync.cpp(2156) with #ifdef <br>
+used in jrd\isc_sync.cpp(2187) with #ifdef <br>
+used in jrd\isc_sync.cpp(2222) with #ifdef <br>
+used in jrd\isc_sync.cpp(2259) with #ifdef <br>
+used in jrd\isc_sync.cpp(2290) with #ifdef <br>
+used in jrd\isc_sync.cpp(2370) with #ifndef<br>
+used in jrd\why.cpp(102) with #ifdef <br>
+used in jrd\why.cpp(5622) with #ifdef <br>
+used in jrd\y-valve.cpp(5623) with #ifdef <br>
+used in utilities\util.cpp(34) with #ifdef <br>
+used in utilities\util.cpp(179) with #ifndef<br>
+used in utilities\util.cpp(195) with #ifndef<br>
+used in utilities\util.cpp(228) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(21) HAVE_GETCWD</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(111) with #ifdef <br>
+used in jrd\jrd.cpp(4231) with #ifdef <br>
+used in jrd\jrd.cpp(5086) with #ifdef <br>
+used in remote\interface.cpp(4758) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(22) HAVE_GETMNTENT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(1336) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(23) HAVE_GETPAGESIZE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_sync.cpp(167) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(24) HAVE_GETPGRP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet.cpp(1645) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(25) HAVE_GETTIMEOFDAY</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in journal\misc.cpp(238) with #ifdef <br>
+used in jrd\gds.cpp(1089) with #ifdef <br>
+used in jrd\perf.cpp(224) with #ifdef <br>
+used in jrd\perf.cpp(245) with #ifdef <br>
+used in jrd\svc.cpp(2824) with #ifdef <br>
+used in jrd\svc.cpp(2830) with #ifdef <br>
+used in jrd\svc.cpp(2845) with #ifdef <br>
+used in remote\inet.cpp(267) with #ifdef <br>
+used in wal\driver.cpp(592) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(26) HAVE_GRP_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet.cpp(68) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(27) HAVE_INITGROUPS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet.cpp(1379) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(28) HAVE_LIBIO_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\jrd_time.h(47) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(29) HAVE_LOCALE_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in extlib\fbudf\stdafx.h(67) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(30) HAVE_MATH_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in extlib\fbudf\stdafx.h(42) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(31) HAVE_MKSTEMP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\gds.cpp(2354) with #ifdef <br>
+used in jrd\sort.cpp(3024) with #ifdef <br>
+used in jrd\sort.cpp(3034) with #ifdef <br>
+used in jrd\utl.cpp(2167) with #ifdef <br>
+used in jrd\utl.cpp(2188) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(32) HAVE_MMAP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\event.cpp(595) with #if<br>
+used in jrd\event.cpp(679) with #if<br>
+used in jrd\isc_sync.cpp(134) with #ifdef <br>
+used in jrd\isc_sync.cpp(1953) with #ifdef <br>
+used in jrd\isc_sync.cpp(2310) with #ifndef<br>
+used in jrd\isc_sync.cpp(2930) with #ifdef <br>
+used in jrd\isc_sync.cpp(2988) with #ifdef <br>
+used in jrd\isc_sync.cpp(3658) with #ifdef <br>
+used in jrd\isc_sync.cpp(3992) with #ifdef <br>
+used in jrd\isc_sync.cpp(4023) with #ifndef<br>
+used in jrd\isc_s_proto.h(72) with #ifdef <br>
+used in lock\lock.cpp(116) with #if<br>
+used in lock\lock.cpp(738) with #if<br>
+used in lock\lock.cpp(859) with #if<br>
+used in lock\lock.cpp(1493) with #if<br>
+used in lock\lock.cpp(1619) with #if<br>
+used in lock\lock.cpp(2695) with #ifdef <br>
+used in lock\lock.cpp(4994) with #if<br>
+used in lock\lock.cpp(5006) with #if<br>
+used in lock\lock.cpp(5016) with #if<br>
+used in lock\lock.cpp(5095) with #if<br>
+used in lock\print.cpp(360) with #if<br>
+used in utilities\drop.cpp(202) with #ifndef<br>
+used in utilities\drop.cpp(275) with #ifdef <br>
+used in utilities\drop.cpp(368) with #ifndef<br>
+used in wal\walc.cpp(340) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(33) HAVE_MNTENT_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(121) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(34) HAVE_PREAD</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\unix.cpp(135) with #if<br>
+used in jrd\unix.cpp(1122) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(35) HAVE_PTHREAD_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in extlib\fbudf\fbudf.cpp(528) with #ifdef <br>
+used in extlib\fbudf\fbudf.cpp(542) with #ifdef <br>
+used in extlib\fbudf\stdafx.h(90) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(36) HAVE_PWD_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc.cpp(141) with #ifdef <br>
+used in jrd\isc_file.cpp(74) with #ifdef <br>
+used in jrd\jrd.cpp(52) with #ifdef <br>
+used in jrd\unix.cpp(40) with #ifdef <br>
+used in remote\inet.cpp(60) with #ifdef <br>
+used in utilities\ibmgr.cpp(43) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(37) HAVE_PWRITE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\unix.cpp(135) with #if<br>
+used in jrd\unix.cpp(1122) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(38) HAVE_SEMUN</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_sync.cpp(154) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(39) HAVE_SETITIMER</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet.cpp(330) with #ifdef <br>
+used in remote\inet.cpp(2928) with #ifdef <br>
+used in remote\inet.cpp(3740) with #ifdef <br>
+used in remote\inet.cpp(3797) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(40) HAVE_SETJMP_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\ibsetjmp.h(28) with #ifdef <br>
+used in jrd\isc_sync.cpp(56) with #ifdef <br>
+used in jrd\jrd.h(44) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(41) HAVE_SETMNTENT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(141) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(42) HAVE_SETPGID</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\divorce.cpp(136) with #ifdef <br>
+used in remote\divorce.cpp(103) with #ifdef <br>
+used in utilities\cache.cpp(105) with #ifdef <br>
+used in utilities\relay.cpp(70) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(43) HAVE_SETPGRP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\divorce.cpp(129) with #ifdef <br>
+used in remote\divorce.cpp(96) with #ifdef <br>
+used in utilities\cache.cpp(98) with #ifdef <br>
+used in utilities\relay.cpp(63) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(44) HAVE_SIGACTION</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_ipc.cpp(155) with #ifdef <br>
+used in jrd\isc_ipc.cpp(710) with #ifndef<br>
+used in jrd\isc_sync.cpp(992) with #ifndef<br>
+used in jrd\isc_sync.cpp(3844) with #ifndef<br>
+used in jrd\isc_sync.cpp(3877) with #ifndef<br>
+used in jrd\isc_sync.cpp(3904) with #ifndef<br>
+used in jrd\svc.cpp(3129) with #ifndef<br>
+used in remote\inet.cpp(3742) with #ifdef <br>
+used in remote\inet.cpp(3814) with #ifndef<br>
+used in remote\inet.cpp(3841) with #ifdef <br>
+used in remote\inet_server.cpp(576) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(45) HAVE_SIGNAL_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in isql\isql.epp(65) with #ifdef <br>
+used in jrd\divorce.cpp(68) with #ifdef <br>
+used in jrd\ibsetjmp.h(36) with #ifdef <br>
+used in jrd\isc.cpp(127) with #ifdef <br>
+used in jrd\isc_ipc.cpp(132) with #ifdef <br>
+used in jrd\isc_sync.cpp(114) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(46) HAVE_SNPRINTF</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\intl.cpp(2226) with #ifdef <br>
+used in jrd\intl.cpp(2234) with #ifdef <br>
+used in jrd\intl.cpp(2242) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(47) HAVE_SOCKLEN_T</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet.cpp(162) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(48) HAVE_STDARG_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dsql\errd.cpp(36) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(49) HAVE_STDIO_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\sort.cpp(63) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(50) HAVE_STDLIB_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in common\classes\alloc.h(37) with #ifdef <br>
+used in common\classes\tree.h(31) with #ifdef <br>
+used in common\config\config.cpp(32) with #ifdef <br>
+used in common\config\config_file.cpp(31) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(51) HAVE_STRCASECMP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in include\fb_string.h(19) with #ifdef <br>
+used in jrd\svc.cpp(552) with #ifdef <br>
+used in utilities\security.epp(252) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(52) HAVE_STRICMP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in include\fb_string.h(22) with #ifdef <br>
+used in jrd\svc.cpp(555) with #ifdef <br>
+used in utilities\security.epp(255) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(53) HAVE_STRING_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dsql\keywords.cpp(38) with #ifdef <br>
+used in extlib\fbudf\stdafx.h(48) with #ifdef <br>
+used in gpre\ada.cpp(32) with #ifdef <br>
+used in gpre\cob.cpp(54) with #ifdef <br>
+used in gpre\ftn.cpp(49) with #ifdef <br>
+used in jrd\isc_ipc.cpp(65) with #ifdef <br>
+used in lock\lock.cpp(91) with #ifdef <br>
+used in msgs\change_msgs.epp(31) with #ifdef <br>
+used in msgs\enter_msgs.epp(30) with #ifdef <br>
+used in qli\exe.cpp(52) with #ifdef <br>
+used in remote\inet_server.cpp(77) with #ifdef <br>
+used in utilities\cmd_util.cpp(46) with #ifdef <br>
+used in utilities\drop.cpp(65) with #ifdef <br>
+used in utilities\guard.cpp(36) with #ifdef <br>
+used in utilities\relay.cpp(38) with #ifdef <br>
+used in utilities\util.cpp(38) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(54) HAVE_SWAB</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\intl_builtin.cpp(433) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(55) HAVE_SYS_FILE_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(67) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(56) HAVE_SYS_IOCTL_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\divorce.cpp(64) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(57) HAVE_SYS_IPC_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(64) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(58) HAVE_SYS_MNTTAB_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(124) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(59) HAVE_SYS_PARAM_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in intl\ld.c(28) with #ifdef <br>
+used in intlcpp\ld.cpp(28) with #ifdef <br>
+used in jrd\divorce.cpp(72) with #ifdef <br>
+used in jrd\isc_sync.cpp(163) with #ifdef <br>
+used in remote\inet.cpp(64) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(60) HAVE_SYS_SIGNAL_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_ipc.cpp(136) with #ifdef <br>
+used in jrd\isc_sync.cpp(118) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(61) HAVE_SYS_SOCKET_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\jrn.cpp(43) with #ifdef <br>
+used in remote\inet.cpp(72) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(62) HAVE_SYS_STAT_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\llio.cpp(47) with #ifdef <br>
+used in utilities\guard.cpp(44) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(63) HAVE_SYS_TIMEB_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in extlib\fbudf\stdafx.h(63) with #ifdef <br>
+used in journal\misc.cpp(34) with #ifdef <br>
+used in jrd\memtest.cpp(55) with #ifdef <br>
+used in jrd\perf.cpp(44) with #ifdef <br>
+used in remote\inet.cpp(236) with #ifdef <br>
+used in wal\driver.cpp(55) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(64) HAVE_SYS_TIMES_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\perf.cpp(41) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(65) HAVE_SYS_TIME_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in burp\mvol.cpp(36) with #if<br>
+used in burp\spit.cpp(44) with #if<br>
+used in extlib\fbudf\stdafx.h(56) with #if<br>
+used in extlib\fbudf\stdafx.h(82) with #if<br>
+used in extlib\ib_udf.c(30) with #if<br>
+used in iscguard\iscguard.cpp(31) with #if<br>
+used in isql\isql_win.cpp(35) with #if<br>
+used in jrd\cvt.cpp(68) with #if<br>
+used in jrd\exe.cpp(53) with #if<br>
+used in jrd\jrd_time.h(36) with #if<br>
+used in jrd\memtest.cpp(49) with #if<br>
+used in lock\lock.cpp(80) with #if<br>
+used in msgs\check_msgs.epp(39) with #if<br>
+used in remote\inet_server.cpp(56) with #if<br>
+used in utilities\analyse.cpp(37) with #if<br>
+used in v5_examples\apifull.c(34) with #if<br>
+used in v5_examples\udflib.c(30) with #if<br>
+used in wal\driver.cpp(37) with #if<br>
+used in wal\driver.cpp(49) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(66) HAVE_SYS_TYPES_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\cvt.cpp(60) with #ifdef <br>
+used in jrd\event.cpp(48) with #ifdef <br>
+used in jrd\jrn.cpp(39) with #ifdef <br>
+used in jrd\lck.cpp(50) with #ifdef <br>
+used in jrd\llio.cpp(43) with #ifdef <br>
+used in jrd\sort.cpp(51) with #ifdef <br>
+used in jrd\svc.cpp(70) with #ifdef <br>
+used in lock\lock.cpp(62) with #ifdef <br>
+used in lock\manager.cpp(32) with #ifdef <br>
+used in remote\inet.cpp(48) with #ifdef <br>
+used in remote\inet_server.cpp(48) with #ifdef <br>
+used in utilities\drop.cpp(47) with #ifdef <br>
+used in utilities\guard.cpp(40) with #ifdef <br>
+used in utilities\ibmgr.cpp(35) with #ifdef <br>
+used in wal\wal.cpp(52) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(67) HAVE_SYS_UIO_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\sort.cpp(55) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(68) HAVE_SYS_WAIT_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\svc.cpp(74) with #if<br>
+used in lock\lock.cpp(66) with #if<br>
+used in remote\inet_server.cpp(67) with #if<br>
+used in utilities\drop.cpp(55) with #if<br>
+used in utilities\srvrmgr.cpp(35) with #if<br>
+used in utilities\util.cpp(50) with #if<br>
+used in wal\wal.cpp(56) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(69) HAVE_TIMES</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\perf.cpp(53) with #ifndef<br>
+used in jrd\perf.cpp(372) with #ifndef<br>
+used in jrd\perf.h(38) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(70) HAVE_TIME_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\jrd_time.h(43) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(71) HAVE_UNISTD_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in alice\alice.cpp(63) with #ifdef <br>
+used in burp\burp.h(41) with #ifdef <br>
+used in burp\mvol.cpp(66) with #ifdef <br>
+used in burp\spit.cpp(54) with #ifdef <br>
+used in dudley\ddl.cpp(45) with #ifdef <br>
+used in dudley\exe.epp(42) with #ifdef <br>
+used in dudley\lex.cpp(43) with #ifdef <br>
+used in gpre\gpre.cpp(68) with #ifdef <br>
+used in isql\isql.epp(62) with #ifdef <br>
+used in jrd\ail.cpp(67) with #if<br>
+used in jrd\codes.epp(28) with #ifdef <br>
+used in jrd\dfw.epp(112) with #ifdef <br>
+used in jrd\divorce.cpp(76) with #ifdef <br>
+used in jrd\enc.cpp(16) with #ifdef <br>
+used in jrd\event.cpp(52) with #ifdef <br>
+used in jrd\gds.cpp(56) with #ifdef <br>
+used in jrd\intl_builtin.cpp(2) with #ifdef <br>
+used in jrd\isc.cpp(144) with #ifdef <br>
+used in jrd\isc_file.cpp(71) with #ifdef <br>
+used in jrd\isc_ipc.cpp(141) with #ifdef <br>
+used in jrd\isc_sync.cpp(123) with #ifdef <br>
+used in jrd\jrd.cpp(46) with #ifdef <br>
+used in jrd\jrn.cpp(47) with #ifdef <br>
+used in jrd\lck.cpp(54) with #ifdef <br>
+used in jrd\llio.cpp(51) with #ifdef <br>
+used in jrd\llio.cpp(64) with #ifdef <br>
+used in jrd\old.cpp(51) with #ifdef <br>
+used in jrd\os\darwin\config_root.cpp(40) with #ifdef <br>
+used in jrd\os\posix\config_root.cpp(42) with #ifdef <br>
+used in jrd\os\posix\mod_loader.cpp(8) with #ifdef <br>
+used in jrd\rse.cpp(77) with #ifdef <br>
+used in jrd\sort.cpp(59) with #ifdef <br>
+used in jrd\svc.cpp(84) with #ifdef <br>
+used in jrd\thd.cpp(47) with #ifdef <br>
+used in jrd\unix.cpp(47) with #ifdef <br>
+used in jrd\utl.cpp(67) with #ifdef <br>
+used in jrd\why.cpp(98) with #ifdef <br>
+used in jrd\y-valve.cpp(93) with #ifdef <br>
+used in lock\lock.cpp(87) with #ifdef <br>
+used in lock\manager.cpp(36) with #ifdef <br>
+used in lock\print.cpp(48) with #ifdef <br>
+used in msgs\build_file.epp(39) with #ifdef <br>
+used in msgs\enter_msgs.epp(33) with #ifdef <br>
+used in qli\exe.cpp(44) with #ifdef <br>
+used in qli\lex.cpp(43) with #ifdef <br>
+used in qli\meta.epp(46) with #ifdef <br>
+used in remote\inet.cpp(76) with #ifdef <br>
+used in remote\inet_server.cpp(63) with #ifdef <br>
+used in remote\inet_server.cpp(91) with #ifdef <br>
+used in remote\interface.cpp(67) with #ifdef <br>
+used in remote\xnet.cpp(58) with #ifdef <br>
+used in utilities\dba.epp(59) with #ifdef <br>
+used in utilities\drop.cpp(51) with #ifdef <br>
+used in utilities\gsec.cpp(47) with #ifdef <br>
+used in utilities\ibmgr.cpp(31) with #ifdef <br>
+used in utilities\relay.cpp(34) with #ifdef <br>
+used in utilities\srvrmgr.cpp(31) with #ifdef <br>
+used in utilities\util.cpp(42) with #ifdef <br>
+used in wal\wal.cpp(48) with #ifdef <br>
+used in wal\walc.cpp(53) with #ifdef <br>
+used in wal\walw.cpp(58) with #ifdef <br>
+used in wal\walw.cpp(74) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(72) HAVE_VFORK_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_ipc.cpp(55) with #ifdef <br>
+used in jrd\svc.cpp(88) with #ifdef <br>
+used in lock\lock.cpp(95) with #ifdef <br>
+used in qli\exe.cpp(48) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(73) HAVE_WAIT_H</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in utilities\util.cpp(46) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(74) HAVE__PROC_SELF_EXE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\os\posix\config_root.cpp(61) with #ifdef <br>
+used in jrd\os\posix\config_root.cpp(83) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(75) HAVE__SWAB</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\intl_builtin.cpp(434) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(76) MAP_ANON</td><td>Only used for Solaris</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\gds_proto.h(138) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(77) MNTTAB</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(131) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(78) NOHOSTNAME</td><td>Used previously for obsolete SCO</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\file_params.h(40) with #ifdef <br>
+used in jrd\isc_sync.cpp(2337) with #ifdef <br>
+used in utilities\drop.cpp(189) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(79) NON_DL_COMPATIBLE</td><td>No dinamic loading</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\flu.cpp(470) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(80) OLD_POSIX_THREADS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_ipc.cpp(233) with #ifdef <br>
+used in jrd\isc_ipc.cpp(711) with #ifdef <br>
+used in jrd\isc_ipc.cpp(722) with #ifdef <br>
+used in jrd\isc_ipc.cpp(785) with #ifdef <br>
+used in jrd\isc_ipc.cpp(977) with #ifdef <br>
+used in jrd\isc_ipc.cpp(1102) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(81) O_CREAT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in burp\burp.cpp(97) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(82) O_DSYNC</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\unix.cpp(112) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(83) O_FSYNC</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\unix.cpp(108) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(84) O_RDWR</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\gds.cpp(99) with #ifndef<br>
+used in jrd\isc.cpp(149) with #ifndef<br>
+used in jrd\isc_ipc.cpp(145) with #ifndef<br>
+used in jrd\isc_sync.cpp(130) with #ifndef<br>
+used in msgs\build_file.epp(80) with #ifndef<br>
+used in utilities\rebuild.cpp(46) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(85) PREAD</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\unix.cpp(79) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(86) PWRITE</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\unix.cpp(79) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(87) SEEK_END</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\y-valve.cpp(92) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(88) SETPGRP_VOID</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\divorce.cpp(130) with #ifdef <br>
+used in remote\divorce.cpp(97) with #ifdef <br>
+used in utilities\cache.cpp(99) with #ifdef <br>
+used in utilities\relay.cpp(64) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(89) SHLIB_DEFS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dsql\dsql.h(604) with #ifndef<br>
+used in dsql\parse.cpp(149) with #ifndef<br>
+used in dsql\parse.cpp(4996) with #ifndef<br>
+used in dsql\parse.cpp(5001) with #ifndef<br>
+used in jrd\all.cpp(24) with #ifdef <br>
+used in jrd\all.cpp(43) with #ifdef <br>
+used in jrd\builtin.cpp(52) with #ifdef <br>
+used in jrd\cmp.cpp(130) with #ifdef <br>
+used in jrd\dfw.epp(51) with #ifdef <br>
+used in jrd\dfw.epp(257) with #ifdef <br>
+used in jrd\exe.cpp(113) with #ifdef <br>
+used in jrd\flu.cpp(62) with #ifdef <br>
+used in jrd\functions.cpp(58) with #ifdef <br>
+used in jrd\gds.cpp(35) with #ifdef <br>
+used in jrd\gds.cpp(339) with #ifdef <br>
+used in jrd\isc.cpp(169) with #ifdef <br>
+used in jrd\isc_file.cpp(44) with #ifdef <br>
+used in jrd\isc_file.cpp(228) with #ifdef <br>
+used in jrd\isc_ipc.cpp(39) with #ifdef <br>
+used in jrd\isc_ipc.cpp(259) with #ifdef <br>
+used in jrd\isc_sync.cpp(40) with #ifdef <br>
+used in jrd\isc_sync.cpp(222) with #ifdef <br>
+used in jrd\jrd.cpp(35) with #ifdef <br>
+used in jrd\jrd.cpp(424) with #if<br>
+used in jrd\jrd.cpp(596) with #ifdef <br>
+used in jrd\jrn.cpp(29) with #ifdef <br>
+used in jrd\jrn.cpp(105) with #ifdef <br>
+used in jrd\llio.cpp(89) with #ifdef <br>
+used in jrd\met.epp(48) with #ifdef <br>
+used in jrd\met.epp(152) with #ifdef <br>
+used in jrd\perf.cpp(83) with #ifdef <br>
+used in jrd\svc.cpp(373) with #ifdef <br>
+used in jrd\unix.cpp(30) with #ifdef <br>
+used in jrd\unix.cpp(152) with #ifdef <br>
+used in jrd\utl.cpp(42) with #ifdef <br>
+used in jrd\utl.cpp(267) with #ifdef <br>
+used in jrd\val.cpp(670) with #ifdef <br>
+used in jrd\why.cpp(122) with #ifdef <br>
+used in jrd\y-valve.cpp(115) with #ifdef <br>
+used in lock\lock.cpp(344) with #ifdef <br>
+used in remote\inet.cpp(465) with #ifdef <br>
+used in remote\protocol.cpp(124) with #ifdef <br>
+used in remote\remote.cpp(51) with #ifdef <br>
+used in v5_examples\api9f.c(47) with #ifdef <br>
+used in v5_examples\functions.c(74) with #ifdef <br>
+used in wal\wal.cpp(121) with #ifdef <br>
+used in wal\walc.cpp(131) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(90) SHMEM_PICKY</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_sync.cpp(2532) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(91) SIGALRM</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_ipc.cpp(1059) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(92) SIGTTOU</td><td>Ignore all terminal related signals</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\divorce.cpp(107) with #ifdef <br>
+used in remote\divorce.cpp(75) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(93) SIG_RESTART</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_ipc.cpp(1093) with #ifdef <br>
+used in jrd\isc_sync.cpp(79) with #if<br>
+used in jrd\isc_sync.cpp(289) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(94) SIOCSPGRP</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet.cpp(1592) with #ifdef <br>
+used in remote\inet.cpp(1641) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(95) SIZEOF_LONG</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in include\fb_types.h(69) with #if<br>
+used in jrd\align.cpp(66) with #if<br>
+used in jrd\align.cpp(114) with #if<br>
+used in jrd\ibase.h(56) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(96) SIZEOF_VOID_P</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\bookmark.cpp(80) with #if<br>
+used in jrd\bookmark.cpp(133) with #if<br>
+used in jrd\bookmark.cpp(192) with #if<br>
+used in jrd\evl.cpp(3807) with #if<br>
+used in jrd\evl.cpp(3881) with #if<br>
+used in jrd\exe.cpp(2615) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(97) SMALL_FILE_NAMES</td><td>Used previously for obsolete SCO</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dudley\lex.cpp(47) with #ifdef <br>
+used in gpre\gpre.cpp(82) with #ifdef <br>
+used in isql\isql.h(291) with #ifdef <br>
+used in jrd\file_params.h(46) with #ifdef <br>
+used in jrd\rse.cpp(128) with #ifdef <br>
+used in jrd\sort.cpp(163) with #ifdef <br>
+used in qli\lex.cpp(66) with #ifdef <br>
+used in remote\inet.cpp(295) with #ifdef <br>
+used in wal\wal.h(440) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(98) SUPPORT_RAW_DEVICES</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\jrd.cpp(154) with #ifdef <br>
+used in jrd\unix.cpp(139) with #ifdef <br>
+used in jrd\unix.cpp(328) with #ifdef <br>
+used in jrd\unix.cpp(698) with #ifdef <br>
+used in jrd\unix.cpp(1221) with #ifdef <br>
+used in jrd\unix.cpp(1229) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(99) SYSV_SHMEM</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_sync.cpp(2537) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(100) SYSV_SIGNALS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_ipc.cpp(151) with #ifdef <br>
+used in jrd\isc_ipc.cpp(601) with #ifdef <br>
+used in jrd\isc_ipc.cpp(658) with #ifndef<br>
+used in jrd\isc_sync.cpp(987) with #ifdef <br>
+used in jrd\isc_sync.cpp(3828) with #ifndef<br>
+used in jrd\isc_sync.cpp(3836) with #ifdef <br>
+used in jrd\isc_sync.cpp(3872) with #ifdef <br>
+used in jrd\isc_sync.cpp(3886) with #ifdef <br>
+used in jrd\isc_sync.cpp(3899) with #ifdef <br>
+used in jrd\isc_sync.cpp(3925) with #ifdef <br>
+used in jrd\svc.cpp(3124) with #ifdef <br>
+used in remote\inet.cpp(166) with #ifdef <br>
+used in remote\inet_server.cpp(572) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(101) TIME_WITH_SYS_TIME</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in burp\mvol.cpp(32) with #if<br>
+used in burp\spit.cpp(40) with #if<br>
+used in extlib\fbudf\stdafx.h(52) with #if<br>
+used in extlib\fbudf\stdafx.h(78) with #if<br>
+used in extlib\ib_udf.c(26) with #if<br>
+used in iscguard\iscguard.cpp(27) with #if<br>
+used in isql\isql_win.cpp(31) with #if<br>
+used in jrd\cvt.cpp(64) with #if<br>
+used in jrd\exe.cpp(49) with #if<br>
+used in jrd\jrd_time.h(32) with #if<br>
+used in jrd\memtest.cpp(45) with #if<br>
+used in lock\lock.cpp(76) with #if<br>
+used in msgs\check_msgs.epp(35) with #if<br>
+used in remote\inet_server.cpp(52) with #if<br>
+used in utilities\analyse.cpp(33) with #if<br>
+used in v5_examples\apifull.c(30) with #if<br>
+used in v5_examples\udflib.c(26) with #if<br>
+used in wal\driver.cpp(33) with #if<br>
+used in wal\driver.cpp(45) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(102) TIOCNOTTY</td><td>Perform terminal divorce (used for BSD)</td></tr>
+<tr><td>&nbsp;</td><td>
+used in journal\server.e(1041) with #ifdef <br>
+used in jrd\divorce.cpp(114) with #ifdef <br>
+used in remote\divorce.cpp(88) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(104) WORDS_BIGENDIAN</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dsql\dsql.cpp(2713) with #ifndef<br>
+used in jrd\btr.cpp(2172) with #ifndef<br>
+used in jrd\cvt.cpp(126) with #ifndef<br>
+used in jrd\cvt.cpp(188) with #ifndef<br>
+used in jrd\cvt2.cpp(55) with #ifndef<br>
+used in jrd\inf.cpp(161) with #ifndef<br>
+used in jrd\intl_builtin.cpp(484) with #ifdef <br>
+used in jrd\intl_builtin.cpp(532) with #ifdef <br>
+used in jrd\opt.cpp(4621) with #ifndef<br>
+used in jrd\opt.cpp(4632) with #ifndef<br>
+used in jrd\quad.cpp(26) with #ifndef<br>
+used in jrd\sort.cpp(180) with #ifdef <br>
+used in jrd\sort.cpp(1340) with #ifdef <br>
+used in remote\merge.cpp(144) with #ifndef<br>
+used in remote\xdr.cpp(142) with #ifndef<br>
+used in remote\xdr.cpp(154) with #ifndef<br>
+</td></tr>
+<tr><td valign="top">
+(105) _FILE_OFFSET_BITS</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\gds.cpp(3394) with #if<br>
+used in jrd\unix.cpp(973) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(106) _PATH_MNTTAB</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\isc_file.cpp(134) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(107) _POSIX_PRIORITY_SCHEDULING</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\thd.cpp(1558) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(108) _POSIX_THREAD_PRIORITY_SCHEDULING</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\thd.cpp(1558) with #if<br>
+</td></tr>
+<tr><td valign="top">
+(109) __LINE__IS_INT</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in jrd\gdsassert.h(37) with #ifndef<br>
+used in jrd\sdl.cpp(48) with #ifdef <br>
+</td></tr>
+</table>
+<p><a name="def6">Others</p>
+<table border="1" width ="100%" cellspacing="3">
+<tr><td valign="top">
+(0) LIKE_JRD</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in intl\utils\dtest.c(109) with #ifdef <br>
+used in intlcpp\utils\dtest.c(109) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(1) NEVERDEF</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in remote\inet_server.cpp(236) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(2) NOT_USED_OR_REPLACED</td><td>&nbsp;</td></tr>
+<tr><td>&nbsp;</td><td>
+used in alice\all.cpp(77) with #ifdef <br>
+used in alice\all.cpp(141) with #ifdef <br>
+used in burp\backup.epp(112) with #ifdef <br>
+used in burp\backup.epp(2555) with #ifdef <br>
+used in burp\restore.epp(185) with #ifdef <br>
+used in burp\restore.epp(7144) with #ifdef <br>
+used in dsql\ddl.cpp(120) with #ifdef <br>
+used in dsql\ddl.cpp(2129) with #ifdef <br>
+used in dsql\dsql.h(106) with #ifdef <br>
+used in dsql\parse.cpp(173) with #ifdef <br>
+used in dsql\parse.cpp(183) with #ifdef <br>
+used in dsql\parse.cpp(5138) with #ifdef <br>
+used in dsql\parse.cpp(5407) with #ifdef <br>
+used in dsql\utld.cpp(56) with #ifdef <br>
+used in dsql\utld.cpp(837) with #ifdef <br>
+used in dudley\exe.epp(125) with #ifdef <br>
+used in dudley\expand.cpp(55) with #ifdef <br>
+used in dudley\expand.cpp(59) with #ifdef <br>
+used in dudley\extract.epp(89) with #ifdef <br>
+used in gpre\ada.cpp(64) with #ifdef <br>
+used in gpre\ada.cpp(71) with #ifdef <br>
+used in gpre\ada.cpp(159) with #ifdef <br>
+used in gpre\ada.cpp(879) with #ifdef <br>
+used in gpre\ada.cpp(1029) with #ifdef <br>
+used in gpre\ada.cpp(1077) with #ifdef <br>
+used in gpre\ada.cpp(1236) with #ifdef <br>
+used in gpre\cob.cpp(315) with #ifdef <br>
+used in gpre\cob.cpp(417) with #ifdef <br>
+used in gpre\cob.cpp(986) with #ifdef <br>
+used in gpre\cob.cpp(5261) with #ifdef <br>
+used in gpre\ftn.cpp(63) with #ifdef <br>
+used in gpre\ftn.cpp(78) with #ifdef <br>
+used in gpre\ftn.cpp(147) with #ifdef <br>
+used in gpre\ftn.cpp(164) with #ifdef <br>
+used in gpre\ftn.cpp(186) with #ifdef <br>
+used in gpre\ftn.cpp(4985) with #ifdef <br>
+used in gpre\ftn.cpp(5055) with #ifdef <br>
+used in gpre\ftn.cpp(5171) with #ifdef <br>
+used in gpre\ftn.cpp(5230) with #ifdef <br>
+used in gpre\gpre_meta.epp(70) with #ifdef <br>
+used in gpre\gpre_meta.epp(2189) with #ifdef <br>
+used in gpre\gpre_meta_boot.cpp(63) with #ifdef <br>
+used in gpre\gpre_meta_boot.cpp(736) with #ifdef <br>
+used in gpre\int.cpp(43) with #ifdef <br>
+used in gpre\int.cpp(224) with #ifdef <br>
+used in gpre\int_cxx.cpp(43) with #ifdef <br>
+used in gpre\int_cxx.cpp(227) with #ifdef <br>
+used in gpre\sqe.cpp(148) with #ifdef <br>
+used in include\fb_types.h(86) with #ifdef <br>
+used in intl\cv_jis.c(522) with #ifdef <br>
+used in intlcpp\cv_jis.cpp(522) with #ifdef <br>
+used in iscguard\cntl_guard.cpp(55) with #ifdef <br>
+used in iscguard\iscguard.cpp(69) with #ifdef <br>
+used in iscguard\iscguard.cpp(73) with #ifdef <br>
+used in iscguard\iscguard.cpp(940) with #ifdef <br>
+used in iscguard\iscguard.cpp(1041) with #ifdef <br>
+used in iscguard\iscguard.cpp(1114) with #ifdef <br>
+used in isql\isql.epp(270) with #ifdef <br>
+used in isql\isql.epp(280) with #ifdef <br>
+used in isql\isql.epp(296) with #ifdef <br>
+used in isql\isql.epp(309) with #ifdef <br>
+used in jrd\ail.cpp(74) with #ifdef <br>
+used in jrd\ail.cpp(78) with #ifdef <br>
+used in jrd\ail.cpp(82) with #ifdef <br>
+used in jrd\ail.cpp(1240) with #ifdef <br>
+used in jrd\ail.cpp(1381) with #ifdef <br>
+used in jrd\ail.cpp(1467) with #ifdef <br>
+used in jrd\all.cpp(290) with #ifdef <br>
+used in jrd\entry.h(54) with #if<br>
+used in jrd\gds.h(25) with #ifdef <br>
+used in jrd\grant.epp(73) with #ifdef <br>
+used in jrd\grant.epp(83) with #ifdef <br>
+used in jrd\grant.epp(234) with #ifdef <br>
+used in jrd\grant.epp(364) with #ifdef <br>
+used in jrd\grant.epp(687) with #ifdef <br>
+used in jrd\iberr.h(45) with #ifdef <br>
+used in jrd\ini.epp(66) with #ifdef <br>
+used in jrd\ini.epp(74) with #ifdef <br>
+used in jrd\ini.epp(843) with #ifdef <br>
+used in jrd\ini.epp(1266) with #ifdef <br>
+used in jrd\intl.cpp(156) with #ifdef <br>
+used in jrd\intl.cpp(169) with #ifdef <br>
+used in jrd\intl.cpp(1393) with #ifdef <br>
+used in jrd\intl.cpp(1498) with #ifdef <br>
+used in jrd\intl_builtin.cpp(1309) with #if<br>
+used in jrd\isc_ipc.cpp(212) with #ifdef <br>
+used in jrd\isc_ipc.cpp(891) with #ifdef <br>
+used in jrd\isc_sync.cpp(2626) with #ifdef <br>
+used in jrd\sdw.cpp(62) with #ifdef <br>
+used in jrd\sdw.cpp(1260) with #ifdef <br>
+used in jrd\sort.cpp(150) with #ifdef <br>
+used in jrd\sort.cpp(2974) with #ifdef <br>
+used in jrd\svc.cpp(445) with #ifdef <br>
+used in msgs\change_msgs.epp(51) with #ifdef <br>
+used in msgs\change_msgs.epp(363) with #ifdef <br>
+used in qli\command.cpp(49) with #ifdef <br>
+used in qli\lex.cpp(107) with #ifdef <br>
+used in qli\parse.cpp(131) with #ifdef <br>
+used in qli\parse.cpp(4461) with #ifdef <br>
+used in qli\parse.cpp(4895) with #ifdef <br>
+used in remote\ibconfig.cpp(77) with #ifdef <br>
+used in remote\ibconfig.cpp(82) with #ifdef <br>
+used in remote\interface.cpp(165) with #ifdef <br>
+used in remote\interface.cpp(7192) with #ifdef <br>
+used in remote\merge.cpp(34) with #ifdef <br>
+used in remote\merge.cpp(127) with #ifdef <br>
+used in remote\protocol.cpp(90) with #ifdef <br>
+used in remote\protocol.cpp(138) with #ifdef <br>
+used in remote\window.cpp(74) with #ifdef <br>
+used in remote\xnet.cpp(121) with #ifdef <br>
+used in remote\xnet.cpp(1929) with #ifdef <br>
+</td></tr>
+<tr><td valign="top">
+(7) lint</td><td>Added by yacc</td></tr>
+<tr><td>&nbsp;</td><td>
+used in dsql\parse.cpp(1) with #ifndef<br>
+used in dsql\parse.cpp(6223) with #ifdef <br>
+used in dsql\parse.cpp(6228) with #ifdef <br>
+</td></tr>
+</table>
+</body></html>

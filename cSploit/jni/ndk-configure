@@ -1,0 +1,210 @@
+#!/bin/bash
+
+# static data
+CROSS_COMPILE=arm-linux-androideabi
+NDK_TOOLCHAIN=""
+
+function die()
+{
+  echo $@
+  exit 1
+}
+
+function arg_parse()
+{
+  if [ $# -lt 2 ] ; then
+    name=$(basename "$0")
+    die -e "Usage $name <ndk_path> <api_level> [configure_script] [stl_provider] [update_files]\n\
+\n\
+where:\n\
+\n\
+\tndk_path is the install directory of your ndk ( usually /opt/android-ndk )\n\
+\tapi_level is the target api level of your application\n\
+\tconfigure_script is the real configure script [default=./configure]\n\
+\tstl_provider is the c++ stl provider [default=system]\n\
+\tif update_files option is given will update machine detecting scripts\n\
+\n\
+stl_provider must be one of:\n\
+\n\
+\tgnustl_static:  GNU stl statically linked\n\
+\tgnustl_shared:  GNU stl shared library\n\
+\tstlport_static: android NDK stl port statically linked\n\
+\tstlport_shared: android NDK stl port shared library\n\
+\tsystem:         android NDK default stl\n\
+\n\
+read this answer for choose the right stl:\n\
+\thttp://stackoverflow.com/questions/9226513/linker-errors-in-android-ndk-undefined-reference-to-cxa-end-cleanup\n"
+  fi
+
+  if [ ! -d "$1" ] ; then
+    die "error: the ndk-path is not valid"
+  fi
+
+  if [ ! -d "$1/platforms/android-$2/" ] ; then
+    die "cannot find android sysroot in your ndk_path"
+  fi
+}
+
+function check_external_scripts()
+{
+  if [ ! -f "${NDK}/config.guess"  -o ! -f "${NDK}/config.sub" ] ; then
+    echo "warning: missing config.guess or config.sub in your ndk dir"
+    echo "info: should i download them for you? [y/n]"
+    read choice
+    if [ "x$choice" != "xy" -a "x$choice" != "xY" ] ; then
+      die "error: missing config.guess or config.sub"
+    fi
+    wget "http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD" -qO "${NDK}/config.sub" || die "cannot download config.sub"
+    wget "http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD" -qO "${NDK}/config.guess" || die "cannot download config.guess"
+  fi
+  #cp ${NDK}/config.guess . || die "cannot import files"
+  #cp ${NDK}/config.sub . || die "cannot import files"
+}
+
+function update_files()
+{
+	for f in config.sub config.guess; do
+		for dst in $(find . -name "$f"); do
+			diff -q "${NDK}/$f" "$dst" 2>&1 >/dev/null || cp -b "${NDK}/$f" "$dst"
+		done
+	done
+}
+
+function find_toolchain()
+{
+  local tmp;
+  local host_arch;
+  
+  case $(uname -m) in
+    x86_64)
+      host_arch="x86_64 x86"
+      ;;
+    i[3456]86)
+      host_arch="x86"
+      ;;
+    *)
+      die "cannot detect your system arch"
+      ;;
+  esac
+  
+  for d in $( ls -1 "${NDK}/toolchains/" ); do
+    name=$(basename "$d")
+    case $name in
+      *clang*) continue
+	  ;;
+      $CROSS_COMPILE-*) 
+	for arch in $host_arch; do
+	  NDK_TOOLCHAIN="${NDK}/toolchains/$name/prebuilt/linux-$arch/bin"
+	  tmp="${NDK_TOOLCHAIN}/${CROSS_COMPILE}-"
+	  for bin in gcc g++ ld ar ranlib strip; do
+	    if [ ! -f "$tmp$bin" ] ; then
+	      unset NDK_TOOLCHAIN
+	      break
+	    fi
+	  done
+	  test "x$NDK_TOOLCHAIN" != "x" && break
+	done
+	  ;;
+      *) 	continue
+	  ;;
+    esac
+  done
+  test "x$NDK_TOOLCHAIN" != "x" || die "cannot find an usable toolchain"
+}
+
+function find_cxxflags()
+{
+	case $1 in
+	 gnustl_*) 
+			includes=$(find ${NDK}/sources/cxx-stl/gnu* -maxdepth 2 -name include | head -n1)
+			main_path=$(grep -oE "^.*/[0-9]+\.[0-9]+\.?[0-9]*/" <<<$includes)
+			libdir=$(find $main_path -type d -name armeabi)
+			includes="$includes ${libdir}/include"
+	 ;;
+	 stlport_*) 
+			main_path="${NDK}/sources/cxx-stl/stlport/"
+			includes="${main_path}stlport"
+			libdir="${main_path}libs/armeabi"
+	 ;;
+	 *)
+			main_inc=no
+			includes=no
+			libdir=no
+	 ;;
+	esac
+	if test "x$libdir" != "xno"; then
+		test -d $libdir || die "cannot find include directories for c++"
+		CXXFLAGS="${CXXFLAGS} -L$libdir -l$1 -I${includes/ / -I}"
+		echo "CXXFLAGS=$CXXFLAGS"
+		export CXXFLAGS
+		export LDFLAGS="-L$libdir -l$1 ${LDFLAGS}"
+	fi
+}
+
+## MAIN ##
+
+arg_parse $@
+NDK=$1
+PLATFORM="android-$2"
+if test -x "$3"; then
+	CONFIGURE=$3
+	shift
+else
+	CONFIGURE="./configure"
+fi
+shift
+shift
+check_external_scripts
+
+find_toolchain 
+
+old=$CXXFLAGS
+find_cxxflags $1
+test "$CXXFLAGS" != "$old" && shift
+unset old
+
+if test "$1" == "update_files"; then
+	update_files
+	exit 0
+fi
+
+export AS=${NDK_TOOLCHAIN}/${CROSS_COMPILE}-as
+export CC=${NDK_TOOLCHAIN}/${CROSS_COMPILE}-gcc
+export CXX=${NDK_TOOLCHAIN}/${CROSS_COMPILE}-g++
+export CPP=${NDK_TOOLCHAIN}/${CROSS_COMPILE}-cpp
+export LD=${NDK_TOOLCHAIN}/${CROSS_COMPILE}-ld
+export AR=${NDK_TOOLCHAIN}/${CROSS_COMPILE}-ar
+export RANLIB=${NDK_TOOLCHAIN}/${CROSS_COMPILE}-ranlib
+export STRIP=${NDK_TOOLCHAIN}/${CROSS_COMPILE}-strip
+
+export ac_cv_func_malloc_0_nonnull=yes
+export ac_cv_func_realloc_0_nonnull=yes
+
+export SYSROOT=${NDK}/platforms/${PLATFORM}/arch-arm
+export CFLAGS="${CFLAGS} --sysroot=${SYSROOT}"
+export CPPFLAGS="${CPPFLAGS} --sysroot=${SYSROOT}"
+export CXXFLAGS="${CXXFLAGS} --sysroot=${SYSROOT}"
+export LDFLAGS="--sysroot=${SYSROOT} ${LDFLAGS}"
+argStr=""
+	
+while [ "$1" != "" ] ; do
+	argStr="${argStr} $1"
+	shift
+done
+
+warning=no
+
+if $CONFIGURE --help | grep -q "with-sysroot"; then
+	argStr="--with-sysroot=$SYSROOT  $argStr"
+else
+	warning="this configure script does not accept sysroot option.\nplease check any absolute path in the script"
+fi
+
+$CONFIGURE "--host=$CROSS_COMPILE" "--target=$CROSS_COMPILE" "--prefix=$SYSROOT/usr" $argStr
+if test "x$warning" != "xno"; then
+	echo -e $warning
+fi
+
+#make -j$(( $(cat /proc/cpuinfo | grep processor | wc -l) +1 ))
+#DEBUG
+#make install

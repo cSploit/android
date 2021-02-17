@@ -1,0 +1,872 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+
+# test now handles known issues
+#if test x"$PROXYSYNC" = x ; then
+#	echo "Test disabled; set PROXYSYNC=yes to enable"
+#	exit 0
+#fi
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+if test $BACKLDAP = ldapno; then 
+	echo "LDAP backend not available, test skipped"
+	exit 0
+fi 
+
+if test $SYNCPROV = syncprovno; then 
+	echo "Syncrepl provider overlay not available, test skipped"
+	exit 0
+fi 
+
+if test $MONITORDB = no; then 
+	echo "Monitor backend not available, test skipped"
+	exit 0
+fi 
+
+mkdir -p $TESTDIR $DBDIR1 $DBDIR2
+
+#
+# Test replication:
+# - start master
+# - start slave
+# - populate over ldap
+# - perform some modifies and deleted
+# - attempt to modify the slave (referral or chain)
+# - retrieve database over ldap and compare against expected results
+#
+
+echo "Starting master slapd on TCP/IP port $PORT1..."
+. $CONFFILTER $BACKEND $MONITORDB < $SRMASTERCONF > $CONF1
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+MASTERPID=$!
+if test $WAIT != 0 ; then
+    echo MASTERPID $MASTERPID
+    read foo
+fi
+KILLPIDS="$MASTERPID"
+
+sleep 1
+
+echo "Using ldapsearch to check that master slapd is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT1 \
+		'(objectClass=*)' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapadd to create the context prefix entry in the master..."
+$LDAPADD -D "$MANAGERDN" -h $LOCALHOST -p $PORT1 -w $PASSWD < \
+	$LDIFORDEREDCP > /dev/null 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting slave slapd on TCP/IP port $PORT2..."
+. $CONFFILTER $BACKEND $MONITORDB < $RSLAVECONF > $CONF2
+$SLAPD -f $CONF2 -h $URI2 -d $LVL $TIMING > $LOG2 2>&1 &
+SLAVEPID=$!
+if test $WAIT != 0 ; then
+    echo SLAVEPID $SLAVEPID
+    read foo
+fi
+KILLPIDS="$MASTERPID $SLAVEPID"
+
+sleep 1
+
+echo "Using ldapsearch to check that slave slapd is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT2 \
+		'(objectClass=*)' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Starting proxy slapd on TCP/IP port $PORT3..."
+. $CONFFILTER $BACKEND $MONITORDB < $PLSRSLAVECONF > $CONF3
+$SLAPD -f $CONF3 -h $URI3 -d $LVL $TIMING > $LOG3 2>&1 &
+PROXYPID=$!
+if test $WAIT != 0 ; then
+    echo PROXYPID $PROXYPID
+    read foo
+fi
+KILLPIDS="$MASTERPID $SLAVEPID $PROXYPID"
+
+sleep 1
+
+echo "Using ldapsearch to check that proxy slapd is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT3 \
+		'(objectClass=*)' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 || test $RC = 53 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+case $RC in
+0 )
+	echo "ldapsearch should have failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit -1
+	;;
+53)
+	;;
+*)
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+	;;
+esac
+
+CHECK=1
+echo "$CHECK > Using ldapadd to populate the master directory..."
+$LDAPADD -D "$MANAGERDN" -h $LOCALHOST -p $PORT1 -w $PASSWD < \
+	$LDIFORDEREDNOCP > /dev/null 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapadd failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# get master contextCSN
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	-s base '(objectClass=*)' contextCSN > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# check slave contextCSN
+sleep 1
+for i in 1 2 3; do
+	$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+		-s base '(objectClass=*)' contextCSN > "${SLAVEOUT}.$CHECK" 2>&1
+	RC=$?
+
+	if test $RC != 0 ; then
+		echo "ldapsearch failed at slave ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	$CMP ${MASTEROUT}.$CHECK ${SLAVEOUT}.$CHECK > $CMPOUT
+
+	if test $? = 0 ; then
+		break
+	fi
+
+	echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+	sleep $SLEEP1
+done
+
+#echo "Using ldapsearch to read all the entries from the master..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(objectClass=*)' > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Using ldapsearch to read all the entries from the slave..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	'(objectClass=*)' > "${SLAVEOUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at slave ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Filtering master results..."
+$LDIFFILTER < "${MASTEROUT}.$CHECK" > $MASTERFLT
+#echo "Filtering slave results..."
+$LDIFFILTER < "${SLAVEOUT}.$CHECK" > $SLAVEFLT
+
+echo "$CHECK < Comparing retrieved entries from master and slave..."
+$CMP $MASTERFLT $SLAVEFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "test failed - master and slave databases differ"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+CHECK=`expr $CHECK + 1`
+echo "$CHECK > Stopping the provider, sleeping $SLEEP2 seconds and restarting it..."
+kill -HUP "$MASTERPID"
+wait $MASTERPID
+sleep $SLEEP2
+
+echo "======================= RESTART =======================" >> $LOG1
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING >> $LOG1 2>&1 &
+MASTERPID=$!
+if test $WAIT != 0 ; then
+    echo MASTERPID $MASTERPID
+    read foo
+fi
+KILLPIDS="$MASTERPID $SLAVEPID $PROXYPID"
+
+sleep 1
+
+echo "Using ldapsearch to check that master slapd is running..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT1 \
+		'(objectClass=*)' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Using ldapmodify to modify master directory..."
+
+#
+# Do some modifications
+#
+
+$LDAPMODIFY -v -D "$MANAGERDN" -h $LOCALHOST -p $PORT1 -w $PASSWD > \
+	$TESTOUT 2>&1 << EOMODS
+dn: cn=James A Jones 1, ou=Alumni Association, ou=People, dc=example,dc=com
+changetype: modify
+add: drink
+drink: Orange Juice
+-
+delete: sn
+sn: Jones
+-
+add: sn
+sn: Jones
+
+dn: cn=Bjorn Jensen, ou=Information Technology Division, ou=People, dc=example,dc=com
+changetype: modify
+replace: drink
+drink: Iced Tea
+
+dn: cn=ITD Staff,ou=Groups,dc=example,dc=com
+changetype: modify
+delete: uniquemember
+uniquemember: cn=James A Jones 2, ou=Information Technology Division, ou=People, dc=example,dc=com
+uniquemember: cn=Bjorn Jensen, ou=Information Technology Division, ou=People, dc=example,dc=com
+-
+add: uniquemember
+uniquemember: cn=Dorothy Stevens, ou=Alumni Association, ou=People, dc=example,dc=com
+uniquemember: cn=James A Jones 1, ou=Alumni Association, ou=People, dc=example,dc=com
+
+dn: cn=Bjorn Jensen,ou=Information Technology Division,ou=People,dc=example,dc
+ =com
+changetype: modify
+delete: cn
+cn: Biiff Jensen
+
+dn: cn=Gern Jensen, ou=Information Technology Division, ou=People, dc=example,dc=com
+changetype: add
+objectclass: OpenLDAPperson
+cn: Gern Jensen
+sn: Jensen
+uid: gjensen
+title: Chief Investigator, ITD
+postaladdress: ITD $ 535 W. William St $ Ann Arbor, MI 48103
+seealso: cn=All Staff, ou=Groups, dc=example,dc=com
+drink: Coffee
+homepostaladdress: 844 Brown St. Apt. 4 $ Ann Arbor, MI 48104
+description: Very odd
+facsimiletelephonenumber: +1 313 555 7557
+telephonenumber: +1 313 555 8343
+mail: gjensen@mailgw.example.com
+homephone: +1 313 555 8844
+
+dn: ou=Retired, ou=People, dc=example,dc=com
+changetype: add
+objectclass: organizationalUnit
+ou: Retired
+
+dn: cn=Rosco P. Coltrane, ou=Information Technology Division, ou=People, dc=example,dc=com
+changetype: add
+objectclass: OpenLDAPperson
+cn: Rosco P. Coltrane
+sn: Coltrane
+uid: rosco
+description: Fat tycoon
+
+dn: cn=Rosco P. Coltrane, ou=Information Technology Division, ou=People, dc=example,dc=com
+changetype: modrdn
+newrdn: cn=Rosco P. Coltrane
+deleteoldrdn: 1
+newsuperior: ou=Retired, ou=People, dc=example,dc=com
+
+dn: cn=James A Jones 2, ou=Information Technology Division, ou=People, dc=example,dc=com
+changetype: delete
+EOMODS
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# get master contextCSN
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	-s base '(objectClass=*)' contextCSN > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# check slave contextCSN
+for i in 1 2 3; do
+	echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+	sleep $SLEEP1
+
+	$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+		-s base '(objectClass=*)' contextCSN > "${SLAVEOUT}.$CHECK" 2>&1
+	RC=$?
+
+	if test $RC != 0 ; then
+		echo "ldapsearch failed at slave ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	$CMP ${MASTEROUT}.$CHECK ${SLAVEOUT}.$CHECK > $CMPOUT
+
+	if test $? = 0 ; then
+		break
+	fi
+done
+
+#echo "Using ldapsearch to read all the entries from the master..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(objectClass=*)' > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Using ldapsearch to read all the entries from the slave..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	'(objectClass=*)' > "${SLAVEOUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at slave ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Filtering master results..."
+$LDIFFILTER < "${MASTEROUT}.$CHECK" > $MASTERFLT
+#echo "Filtering slave results..."
+$LDIFFILTER < "${SLAVEOUT}.$CHECK" > $SLAVEFLT
+
+echo "$CHECK < Comparing retrieved entries from master and slave..."
+$CMP $MASTERFLT $SLAVEFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "test failed - master and slave databases differ"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+CHECK=`expr $CHECK + 1`
+echo "$CHECK > Stopping proxy to test recovery..."
+kill -HUP $PROXYPID
+wait $PROXYPID
+
+echo "Modifying more entries on the master..."
+$LDAPMODIFY -v -D "$MANAGERDN" -h $LOCALHOST -p $PORT1 -w $PASSWD >> \
+	$TESTOUT 2>&1 << EOMODS
+dn: cn=Bjorn Jensen, ou=Information Technology Division, ou=People, dc=example,dc=com
+changetype: modify
+add: description
+description: proxy is down...
+
+dn: cn=James T. Kirk, ou=Retired, ou=People, dc=example,dc=com
+changetype: add
+objectclass: OpenLDAPperson
+sn: Kirk
+uid: jtk
+cn: James T. Kirk
+
+dn: cn=Tiberius J. Hooker, ou=Retired, ou=People, dc=example,dc=com
+changetype: add
+objectclass: OpenLDAPperson
+sn: Hooker
+uid: tjh
+cn: Tiberius J. Hooker
+
+EOMODS
+
+echo "Restarting proxy..."
+echo "======================= RESTART =======================" >> $LOG3
+$SLAPD -f $CONF3 -h $URI3 -d $LVL $TIMING >> $LOG3 2>&1 &
+PROXYPID=$!
+if test $WAIT != 0 ; then
+    echo PROXYPID $PROXYPID
+    read foo
+fi
+KILLPIDS="$MASTERPID $SLAVEPID $PROXYPID"
+
+# get master contextCSN
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	-s base '(objectClass=*)' contextCSN > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# check slave contextCSN
+for i in 1 2 3 4 5; do
+	echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+	sleep $SLEEP1
+
+	$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+		-s base '(objectClass=*)' contextCSN > "${SLAVEOUT}.$CHECK" 2>&1
+	RC=$?
+
+	if test $RC != 0 ; then
+		echo "ldapsearch failed at slave ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	$CMP ${MASTEROUT}.$CHECK ${SLAVEOUT}.$CHECK > $CMPOUT
+
+	if test $? = 0 ; then
+		break
+	fi
+done
+
+#echo "Using ldapsearch to read all the entries from the master..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(objectClass=*)' > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Using ldapsearch to read all the entries from the slave..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	'(objectClass=*)' > "${SLAVEOUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at slave ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Filtering master results..."
+$LDIFFILTER < "${MASTEROUT}.$CHECK" > $MASTERFLT
+#echo "Filtering slave results..."
+$LDIFFILTER < "${SLAVEOUT}.$CHECK" > $SLAVEFLT
+
+echo "$CHECK < Comparing retrieved entries from master and slave..."
+$CMP $MASTERFLT $SLAVEFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "test failed - master and slave databases differ"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+CHECK=`expr $CHECK + 1`
+echo "$CHECK > Try updating the slave slapd..."
+$LDAPMODIFY -v -D "$MANAGERDN" -h $LOCALHOST -p $PORT2 -w $PASSWD > \
+	$TESTOUT 2>&1 << EOMODS
+dn: cn=James A Jones 1, ou=Alumni Association, ou=People, dc=example, dc=com
+changetype: modify
+add: description
+description: This write must fail because directed to a shadow context,
+description: unless the chain overlay is configured appropriately ;)
+
+EOMODS
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# get master contextCSN
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	-s base '(objectClass=*)' contextCSN > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# check slave contextCSN
+sleep 1
+
+for i in 1 2 3; do
+	$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+		-s base '(objectClass=*)' contextCSN > "${SLAVEOUT}.$CHECK" 2>&1
+	RC=$?
+
+	if test $RC != 0 ; then
+		echo "ldapsearch failed at slave ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	$CMP ${MASTEROUT}.$CHECK ${SLAVEOUT}.$CHECK > $CMPOUT
+
+	if test $? = 0 ; then
+		break
+	fi
+
+	echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+	sleep $SLEEP1
+done
+
+#echo "Using ldapsearch to read all the entries from the master..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(objectClass=*)' > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Using ldapsearch to read all the entries from the slave..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+'(objectClass=*)' > "${SLAVEOUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at slave ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Filtering master results..."
+$LDIFFILTER < "${MASTEROUT}.$CHECK" > $MASTERFLT
+#echo "Filtering slave results..."
+$LDIFFILTER < "${SLAVEOUT}.$CHECK" > $SLAVEFLT
+
+echo "$CHECK < Comparing retrieved entries from master and slave..."
+$CMP $MASTERFLT $SLAVEFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "test failed - master and slave databases differ"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+CHECK=`expr $CHECK + 1`
+echo "$CHECK > Stopping consumer to test recovery..."
+kill -HUP $SLAVEPID
+wait $SLAVEPID
+
+echo "Modifying more entries on the master..."
+$LDAPMODIFY -v -D "$MANAGERDN" -h $LOCALHOST -p $PORT1 -w $PASSWD >> \
+	$TESTOUT 2>&1 << EOMODS
+dn: cn=Bjorn Jensen, ou=Information Technology Division, ou=People, dc=example,dc=com
+changetype: modify
+add: drink
+drink: Mad Dog 20/20
+
+EOMODS
+
+echo "Waiting $SLEEP2 seconds for syncrepl to retry..."
+sleep $SLEEP2
+
+echo "Restarting consumer..."
+echo "======================= RESTART =======================" >> $LOG2
+$SLAPD -f $CONF2 -h $URI2 -d $LVL $TIMING >> $LOG2 2>&1 &
+SLAVEPID=$!
+if test $WAIT != 0 ; then
+    echo SLAVEPID $SLAVEPID
+    read foo
+fi
+KILLPIDS="$MASTERPID $SLAVEPID $PROXYPID"
+
+# get master contextCSN
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	-s base '(objectClass=*)' contextCSN > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# check slave contextCSN
+
+for i in 1 2 3 4 5; do
+	echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+	sleep $SLEEP1
+
+	$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+		-s base '(objectClass=*)' contextCSN > "${SLAVEOUT}.$CHECK" 2>&1
+	RC=$?
+
+	if test $RC != 0 ; then
+		echo "ldapsearch failed at slave ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	$CMP ${MASTEROUT}.$CHECK ${SLAVEOUT}.$CHECK > $CMPOUT
+
+	if test $? = 0 ; then
+		break
+	fi
+done
+
+#echo "Using ldapsearch to read all the entries from the master..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(objectClass=*)' > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Using ldapsearch to read all the entries from the slave..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	'(objectClass=*)' > "${SLAVEOUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at slave ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Filtering master results..."
+$LDIFFILTER < "${MASTEROUT}.$CHECK" > $MASTERFLT
+#echo "Filtering slave results..."
+$LDIFFILTER < "${SLAVEOUT}.$CHECK" > $SLAVEFLT
+
+echo "$CHECK < Comparing retrieved entries from master and slave..."
+$CMP $MASTERFLT $SLAVEFLT > $CMPOUT
+
+if test $? != 0 ; then
+	# FIXME: keep the original workaround in place, in case we needed again
+	if test 1 = 1 ; then
+		echo "test failed - master and slave databases differ"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+
+	echo "	test failed - master and slave databases differ (ignored by now)"
+	echo "	Stopping proxy to see if it auto-recovers..."
+	kill -HUP $PROXYPID
+	wait $PROXYPID
+
+	echo "	${CHECK}.1 > Restarting proxy..."
+	echo "======================= RESTART =======================" >> $LOG3
+	$SLAPD -f $CONF3 -h $URI3 -d $LVL $TIMING >> $LOG3 2>&1 &
+	PROXYPID=$!
+	if test $WAIT != 0 ; then
+		echo PROXYPID $PROXYPID
+		read foo
+	fi
+	KILLPIDS="$MASTERPID $SLAVEPID $PROXYPID"
+
+	echo "	Waiting $SLEEP2 seconds for syncrepl to receive changes..."
+	sleep $SLEEP2
+
+	#echo "Using ldapsearch to read all the entries from the slave..."
+	$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+		'(objectClass=*)' > "${SLAVEOUT}.5.1" 2>&1
+	RC=$?
+
+	if test $RC != 0 ; then
+		echo "	ldapsearch failed at slave ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	#echo "Filtering slave results..."
+	$LDIFFILTER < "${SLAVEOUT}.5.1" > $SLAVEFLT
+
+	echo "	${CHECK}.1 < Comparing retrieved entries from master and slave..."
+	$CMP $MASTERFLT $SLAVEFLT > $CMPOUT
+
+	if test $? != 0 ; then
+		echo "	test failed - master and slave databases differ"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit 1
+	fi
+fi
+
+#
+# Modifications formerly known to fail
+#
+CHECK=`expr $CHECK + 1`
+echo "$CHECK > Performing modifications that were formerly known to fail..."
+$LDAPMODIFY -v -D "$MANAGERDN" -h $LOCALHOST -p $PORT1 -w $PASSWD > \
+	$TESTOUT 2>&1 << EOMODS
+# First, back out previous change
+dn: cn=Bjorn Jensen, ou=Information Technology Division, ou=People, dc=example,dc=com
+changetype: modify
+delete: drink
+drink: Mad Dog 20/20
+
+# From now on, perform modifications that were formerly known to fail
+dn: cn=All Staff,ou=Groups,dc=example,dc=com
+changetype: modify
+delete: description
+
+EOMODS
+
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapmodify failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# get master contextCSN
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	-s base '(objectClass=*)' contextCSN > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+# check slave contextCSN
+sleep 1
+for i in 1 2 3; do
+	$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+		-s base '(objectClass=*)' contextCSN > "${SLAVEOUT}.$CHECK" 2>&1
+	RC=$?
+
+	if test $RC != 0 ; then
+		echo "ldapsearch failed at slave ($RC)!"
+		test $KILLSERVERS != no && kill -HUP $KILLPIDS
+		exit $RC
+	fi
+
+	$CMP ${MASTEROUT}.$CHECK ${SLAVEOUT}.$CHECK > $CMPOUT
+
+	if test $? = 0 ; then
+		break
+	fi
+
+	echo "Waiting $SLEEP1 seconds for syncrepl to receive changes..."
+	sleep $SLEEP1
+done
+
+#echo "Using ldapsearch to read all the entries from the master..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT1 \
+	'(objectClass=*)' > "${MASTEROUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at master ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Using ldapsearch to read all the entries from the slave..."
+$LDAPSEARCH -S "" -b "$BASEDN" -h $LOCALHOST -p $PORT2 \
+	'(objectClass=*)' > "${SLAVEOUT}.$CHECK" 2>&1
+RC=$?
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed at slave ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+#echo "Filtering master results..."
+$LDIFFILTER < "${MASTEROUT}.$CHECK" > $MASTERFLT
+#echo "Filtering slave results..."
+$LDIFFILTER < "${SLAVEOUT}.$CHECK" > $SLAVEFLT
+
+echo "$CHECK < Comparing retrieved entries from master and slave..."
+$CMP $MASTERFLT $SLAVEFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "test failed - master and slave databases differ (ignored by now)"
+	#echo "test failed - master and slave databases differ"
+	#test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	#exit 1
+fi
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

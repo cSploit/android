@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="firebird2"
+	OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+	IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)"
+	>
+	<Tool
+		Name="VCBscMakeTool"
+		OutputFile="$(IntDir)/$(ProjectName).bsc"
+	/>
+	<Tool
+		Name="VCCLCompilerTool"
+		AdditionalOptions="/EHsc-"
+		OmitFramePointers="true"
+		AdditionalIncludeDirectories="../../../src/include;../../../src/include/gen;../../../extern/libtommath"
+		ExceptionHandling="0"
+		RuntimeTypeInfo="false"
+		PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch"
+		AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/"
+		ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/"
+		ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/"
+		BrowseInformation="1"
+		WarningLevel="3"
+		SuppressStartupBanner="true"
+		DebugInformationFormat="3"
+		PreprocessorDefinitions="_CRT_SECURE_NO_WARNINGS"
+		CompileAs="0"
+		UseFullPaths="false"
+	/>
+	<Tool
+		Name="VCLibrarianTool"
+		OutputFile="$(IntDir)\$(ProjectName).lib"
+		SuppressStartupBanner="true"
+	/>
+	<Tool
+		Name="VCLinkerTool"
+		LinkIncremental="1"
+		SuppressStartupBanner="true"
+		GenerateDebugInformation="true"
+		ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb"
+		ImportLibrary="$(IntDir)\$(TargetName).lib"
+	/>
+</VisualStudioPropertySheet>

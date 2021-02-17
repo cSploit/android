@@ -1,0 +1,197 @@
+#! /bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+RCODE=10
+test $BACKEND = null && RCODE=0
+
+echo "running defines.sh"
+. $SRCDIR/scripts/defines.sh
+
+mkdir -p $TESTDIR $DBDIR1
+
+echo "Running slapadd to build slapd database..."
+. $CONFFILTER $BACKEND $MONITORDB < $RCONF > $CONF1
+$SLAPADD -f $CONF1 -l $LDIFREF
+RC=$?
+if test $RC != 0 ; then
+	echo "slapadd failed ($RC)!"
+	exit $RC
+fi
+
+echo "Starting slapd on TCP/IP port $PORT1..."
+$SLAPD -f $CONF1 -h $URI1 -d $LVL $TIMING > $LOG1 2>&1 &
+PID=$!
+if test $WAIT != 0 ; then
+    echo PID $PID
+    read foo
+fi
+KILLPIDS="$PID"
+
+sleep 1
+
+echo "Testing slapd searching..."
+for i in 0 1 2 3 4 5; do
+	$LDAPSEARCH -s base -b "$MONITOR" -h $LOCALHOST -p $PORT1 \
+		'(objectclass=*)' > /dev/null 2>&1
+	RC=$?
+	if test $RC = 0 ; then
+		break
+	fi
+	echo "Waiting 5 seconds for slapd to start..."
+	sleep 5
+done
+
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+cat /dev/null > $SEARCHOUT
+
+echo "Testing ManageDsaIT searching at $REFDN..."
+$LDAPRSEARCH -S "" -MM -b "$REFDN" -h $LOCALHOST -p $PORT1 \
+	'(objectClass=referral)' '*' ref >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing ManageDsaIT searching at referral object..."
+$LDAPRSEARCH -S "" -MM -b "o=abc,$REFDN" -h $LOCALHOST -p $PORT1 \
+	'(objectClass=referral)' '*' ref >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing ManageDsaIT searching below referral object..."
+$LDAPRSEARCH -S "" -MM -b "uid=xxx,o=abc,$REFDN" -h $LOCALHOST -p $PORT1 \
+	'(objectClass=referral)' '*' ref >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != $RCODE ; then
+	echo "ldapsearch: unexpected result ($RC)! (referral expected)"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+XREFDN="$REFDN"
+echo "Testing base searching at $XREFDN..."
+$LDAPRSEARCH -S "" -s base -b "$XREFDN" -h $LOCALHOST -p $PORT1 1.1 >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing one-level searching at $XREFDN..."
+$LDAPRSEARCH -S "" -s one -b "$XREFDN" -h $LOCALHOST -p $PORT1 1.1 >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+echo "Testing subtree searching at $XREFDN..."
+$LDAPRSEARCH -S "" -s sub -b "$XREFDN" -h $LOCALHOST -p $PORT1 1.1 >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != 0 ; then
+	echo "ldapsearch failed ($RC)!"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit $RC
+fi
+
+XREFDN="o=abc,$REFDN"
+echo "Testing base searching at $XREFDN..."
+$LDAPRSEARCH -S "" -s base -b "$XREFDN" -h $LOCALHOST -p $PORT1 1.1 >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != $RCODE ; then
+	echo "ldapsearch: unexpected result ($RC)! (referral expected)"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing one-level searching at $XREFDN..."
+$LDAPRSEARCH -S "" -s one -b "$XREFDN" -h $LOCALHOST -p $PORT1 1.1 >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != $RCODE ; then
+	echo "ldapsearch: unexpected result ($RC)! (referral expected)"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing subtree searching at $XREFDN..."
+$LDAPRSEARCH -S "" -s sub -b "$XREFDN" -h $LOCALHOST -p $PORT1 1.1 >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != $RCODE ; then
+	echo "ldapsearch: unexpected result ($RC)! (referral expected)"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+XREFDN="uid=xxx,o=abc,$REFDN"
+echo "Testing base searching at $XREFDN..."
+$LDAPRSEARCH -S "" -s base -b "$XREFDN" -h $LOCALHOST -p $PORT1 1.1 >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != $RCODE ; then
+	echo "ldapsearch: unexpected result ($RC)! (referral expected)"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing one-level searching at $XREFDN..."
+$LDAPRSEARCH -S "" -s one -b "$XREFDN" -h $LOCALHOST -p $PORT1 1.1 >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != $RCODE ; then
+	echo "ldapsearch: unexpected result ($RC)! (referral expected)"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+echo "Testing subtree searching at $XREFDN..."
+$LDAPRSEARCH -S "" -s sub -b "$XREFDN" -h $LOCALHOST -p $PORT1 1.1 >> $SEARCHOUT 2>&1
+RC=$?
+if test $RC != $RCODE ; then
+	echo "ldapsearch: unexpected result ($RC)! (referral expected)"
+	test $KILLSERVERS != no && kill -HUP $KILLPIDS
+	exit 1
+fi
+
+test $KILLSERVERS != no && kill -HUP $KILLPIDS
+
+LDIF=$SEARCHOUTMASTER
+echo "Filtering ldapsearch results..."
+$LDIFFILTER < $SEARCHOUT > $SEARCHFLT
+echo "Filtering expected LDIF for comparison..."
+$LDIFFILTER < $REFERRALOUT > $LDIFFLT
+echo "Comparing filter output..."
+$CMP $SEARCHFLT $LDIFFLT > $CMPOUT
+
+if test $? != 0 ; then
+	echo "Comparison failed"
+	exit 1
+fi
+
+echo ">>>>> Test succeeded"
+
+test $KILLSERVERS != no && wait
+
+exit 0

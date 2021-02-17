@@ -1,0 +1,11 @@
+<Include>
+
+			<?define PRODUCT_ID=a8d93648-9f7f-407d-915c-62044644c3da ?>
+
+			<?define PACKAGE_ID=f303a426-df8b-44f9-b8bb-1373fec24b6f ?>
+
+			<?define MSM="microsoft_vc80_crt_x86.msm" ?>
+
+			<?define POLICY="policy_8_0_Microsoft_VC80_CRT_x86.msm" ?>
+
+</Include>

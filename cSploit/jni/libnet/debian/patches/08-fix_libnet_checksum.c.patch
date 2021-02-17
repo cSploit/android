@@ -1,0 +1,23 @@
+--- libnet-1.1.2.1.orig/src/libnet_checksum.c
++++ libnet-1.1.2.1/src/libnet_checksum.c
+@@ -42,8 +42,10 @@
+ libnet_in_cksum(u_int16_t *addr, int len)
+ {
+     int sum;
++    u_int16_t last_byte;
+ 
+     sum = 0;
++    last_byte = 0;
+ 
+     while (len > 1)
+     {
+@@ -52,7 +54,8 @@
+     }
+     if (len == 1)
+     {
+-        sum += *(u_int16_t *)addr;
++        *(u_int8_t *)&last_byte = *(u_int8_t *)addr;
++        sum += last_byte;
+     }
+ 
+     return (sum);

@@ -1,0 +1,57 @@
+This is a terse description of the new features added to readline-6.3 since
+the release of readline-6.2.
+
+New Features in Readline
+
+a.  Readline is now more responsive to SIGHUP and other fatal signals when
+    reading input from the terminal or performing word completion but no
+    longer attempts to run any not-allowable functions from a signal handler
+    context.
+
+b.  There are new bindable commands to search the history for the string of
+    characters between the beginning of the line and the point
+    (history-substring-search-forward, history-substring-search-backward)
+
+c.  Readline allows quoted strings as the values of variables when setting
+    them with `set'.  As a side effect, trailing spaces and tabs are ignored
+    when setting a string variable's value.
+
+d.  The history library creates a backup of the history file when writing it
+    and restores the backup on a write error.
+
+e.  New application-settable variable: rl_filename_stat_hook: a function called
+    with a filename before using it in a call to stat(2).  Bash uses it to
+    expand shell variables so things like $HOME/Downloads have a slash
+    appended.
+
+f.  New bindable function `print-last-kbd-macro', prints the most-recently-
+    defined keyboard macro in a reusable format.
+
+g.  New user-settable variable `colored-stats', enables use of colored text
+    to denote file types when displaying possible completions (colored analog
+    of visible-stats).
+
+h.  New user-settable variable `keyseq-timout', acts as an inter-character
+    timeout when reading input or incremental search strings.
+
+i.  New application-callable function: rl_clear_history. Clears the history list
+    and frees all readline-associated private data.
+
+j.  New user-settable variable, show-mode-in-prompt, adds a characters to the
+    beginning of the prompt indicating the current editing mode.
+
+k.  New application-settable variable: rl_input_available_hook; function to be
+    called when readline detects there is data available on its input file
+    descriptor.
+
+l.  Readline calls an application-set event hook (rl_event_hook) after it gets
+    a signal while reading input (read returns -1/EINTR but readline does not
+    handle the signal immediately) to allow the application to handle or
+    otherwise note it.
+
+m.  If the user-settable variable `history-size' is set to a value less than
+    0, the history list size is unlimited.
+
+n.  New application-settable variable: rl_signal_event_hook; function that is
+    called when readline is reading terminal input and read(2) is interrupted
+    by a signal.  Currently not called for SIGHUP or SIGTERM.

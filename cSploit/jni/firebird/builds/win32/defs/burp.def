@@ -1,0 +1,45 @@
+;  The contents of this file are subject to the Interbase Public
+;  License Version 1.0 (the "License"); you may not use this file
+;  except in compliance with the License. You may obtain a copy
+;  of the License at http://www.Inprise.com/IPL.html
+; 
+;  Software distributed under the License is distributed on an
+;  "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+;  or implied. See the License for the specific language governing
+;  rights and limitations under the License.
+; 
+;  The Original Code was created by Inprise Corporation
+;  and its predecessors. Portions created by Inprise Corporation are
+;  Copyright (C) Inprise Corporation.
+; 
+;  All Rights Reserved.
+;  Contributor(s): ______________________________________.
+;------------------------------------------------------------
+;  GBAK DLL MODULE DEFINITION FILE
+;------------------------------------------------------------
+
+LIBRARY     GBAK.DLL
+
+DESCRIPTION 'INTERBASE BACKUP/RESTORE DLL'
+CODE MOVEABLE 
+DATA MOVEABLE
+SEGMENTS
+
+   _TEXT              DISCARDABLE
+   BURP_TEXT          DISCARDABLE
+   CANONICA_TEXT      DISCARDABLE
+   MISC_TEXT          DISCARDABLE
+   MVOL_TEXT          DISCARDABLE
+   BACKUP_TEXT        DISCARDABLE
+   RESTORE_TEXT       DISCARDABLE
+   BURPWEP_TEXT       PRELOAD
+   XDR_TEXT           DISCARDABLE
+   NTOH_TEXT          DISCARDABLE
+   DLLSHELL_TEXT      PRELOAD
+
+EXPORTS
+    _BURP_gbak                  @2
+;    WEP                         @1	RESIDENTNAME   
+
+IMPORTS
+	_gds__start_transaction=gds32.gds__start_transaction

@@ -1,0 +1,76 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 776dcb32-51dc-11de-996d-d717ce91f81e
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2009-06-05T14:23:40.611796Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 137
+Content-length: 137
+
+K 10
+svn:author
+V 5
+neels
+K 8
+svn:date
+V 27
+2009-06-05T14:23:41.185914Z
+K 7
+svn:log
+V 37
+adding file with prop 'svn:eol-style'
+PROPS-END
+
+Node-path: file
+Node-kind: file
+Node-action: add
+Prop-content-length: 36
+Text-content-length: 13
+Text-content-md5: 65cea5e7a1cc0516de76d7f523f105e6
+Text-content-sha1: ecc6621aa15c7c96d81bb9931b33f0c12c93a1c5
+Content-length: 49
+
+K 13
+svn:eol-style
+V 2
+LF
+PROPS-END
+file-content
+
+
+Revision-number: 2
+Prop-content-length: 139
+Content-length: 139
+
+K 10
+svn:author
+V 5
+neels
+K 8
+svn:date
+V 27
+2009-06-05T14:23:42.140849Z
+K 7
+svn:log
+V 39
+removing prop 'svn:eol-style' from file
+PROPS-END
+
+Node-path: file
+Node-kind: file
+Node-action: change
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+

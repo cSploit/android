@@ -1,0 +1,142 @@
+#include <stdio.h>
+#include <netinet/in.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/uio.h>
+#include <linux/un.h>
+
+int main(int argc, char* argv[]) {
+	int fd_unix;
+	int fd_inet;
+	struct sockaddr_un unaddr;
+	struct sockaddr_in inetaddr;
+	struct sockaddr_un clnt;
+	socklen_t clntlen;
+	int err;
+
+	clnt.sun_family = AF_UNIX;
+	strcpy(clnt.sun_path, "/tmp/ncpfsdir");
+	clntlen = sizeof(clnt);
+
+	fd_unix = socket(PF_UNIX, SOCK_DGRAM, 0);
+	if (fd_unix == -1) {
+		perror("socket(PF_UNIX, SOCK_DGRAM, 0)");
+		return 1;
+	}
+	fd_inet = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	if (fd_inet == -1) {
+		perror("socket(PF_INET, SOCK_DGRAM, 0)");
+		return 1;
+	}
+	{
+		int val = 1;
+		
+		if (setsockopt(fd_unix, SOL_SOCKET, SO_PASSCRED, &val, sizeof(val)) == -1) {
+			perror("setsockopt(unix, SOL_SOCKET, SO_PASSCRED, &1, sizeof(int))");
+			return 1;
+		}
+	}
+	unaddr.sun_family = AF_UNIX;
+	memcpy(unaddr.sun_path, "\000ncpfs", 2 + 1 + 5);
+	err = bind(fd_unix, (struct sockaddr*)&unaddr, 2 + 1 + 5);
+	if (err) {
+		perror("bind(unix, &(@ncpfs), x)");
+		return 1;
+	}
+	inetaddr.sin_family = AF_INET;
+	inetaddr.sin_port = htons(0);
+	inetaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	err = bind(fd_inet, (struct sockaddr*)&inetaddr, sizeof(inetaddr));
+	if (err) {
+		perror("bind(inet, &INADDR_ANY, x)");
+		return 1;
+	}
+	inetaddr.sin_port = htons(524);
+	inetaddr.sin_addr.s_addr = htonl(0xC0A81A05);
+	err = connect(fd_inet, (struct sockaddr*)&inetaddr, sizeof(inetaddr));
+	if (err) {
+		perror("connect(inet, &192.168.26.5, x)");
+		return 1;
+	}
+	while (1) {
+		fd_set rset;
+		int ret;
+
+		FD_ZERO(&rset);
+		FD_SET(fd_unix, &rset);
+		FD_SET(fd_inet, &rset);
+		ret = select(fd_inet + 1, &rset, NULL, NULL, NULL);
+		printf("Select returned %d\n", ret);
+		if (ret < 0) {
+			perror("Select");
+		} else if (ret > 0) {
+			if (FD_ISSET(fd_unix, &rset)) {
+				unsigned char buffer[2000];
+				struct msghdr msg;
+				unsigned char ctrl[2000];
+				struct iovec io[1];
+				
+				msg.msg_name = &clnt;
+				msg.msg_namelen = sizeof(clnt);
+				msg.msg_control = ctrl;
+				msg.msg_controllen = sizeof(ctrl);
+				msg.msg_flags = 0;
+				msg.msg_iovlen = 1;
+				msg.msg_iov = io;
+				io[0].iov_base = buffer;
+				io[0].iov_len = sizeof(buffer);
+				
+				ret = recvmsg(fd_unix, &msg, MSG_DONTWAIT);
+				if (ret < 0) {
+					perror("UNIX false alarm");
+				} else if (ret == 0) {
+					perror("UNIX zero data");
+				} else {
+					struct cmsghdr* cmsg;
+					
+					clntlen = msg.msg_namelen;
+					printf("%d bytes received from UNIX...\n", ret);
+					printf("%d bytes cmsg data\n", msg.msg_controllen);
+					printf("%d bytes name data\n", msg.msg_namelen);
+					printf("%08X flags\n", msg.msg_flags);
+					
+					for (cmsg = CMSG_FIRSTHDR(&msg); cmsg; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
+						printf("cmsg len/level/type: %d/%d/%d\n",
+							cmsg->cmsg_len, cmsg->cmsg_level, cmsg->cmsg_type);
+						if ((cmsg->cmsg_level == SOL_SOCKET) && (cmsg->cmsg_type == SCM_CREDENTIALS)) {
+							struct ucred * cred = (struct ucred*)CMSG_DATA(cmsg);
+							
+							printf("PID=%u, UID=%u, GID=%u\n", cred->pid, cred->uid, cred->gid);
+						}
+					}
+					
+					ret = send(fd_inet, buffer, ret, 0);
+					if (ret < 0)
+						perror("INET send");
+				}
+			}
+			if (FD_ISSET(fd_inet, &rset)) {
+				struct sockaddr_in unaddr2;
+				socklen_t alen;
+				unsigned char buffer[2000];
+
+				alen = sizeof(unaddr2);
+				ret = recvfrom(fd_inet, buffer, sizeof(buffer), MSG_DONTWAIT, (struct sockaddr*)&unaddr, &alen);
+				if (ret < 0) {
+					perror("INET false alarm");
+				} else if (ret == 0) {
+					perror("INET zero data");
+				} else {
+					printf("%d bytes received from network...\n", ret);
+					ret = sendto(fd_unix, buffer, ret, 0, (struct sockaddr*)&clnt, clntlen);
+					if (ret < 0)
+						perror("UNIX send");
+				}
+			}
+		}
+	}
+
+}
+
+
+

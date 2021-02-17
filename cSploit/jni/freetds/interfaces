@@ -1,0 +1,66 @@
+#
+# Note: interfaces has been superceded by freetds.conf, however it can
+# continue to be used at sites that require compatibility with the
+# Sybase implementation.
+#
+# This format of the interfaces file is this:
+#
+# The entry starts with the server name beginning in the first column
+# (no whitespace preceding it).
+# 
+# Next comes the services lines. They must be preceded by some
+# whitespace (preferably a tab). There are five fields in the services
+# line:
+#
+# 1) Service.         Currently only "query" means anything "master" is
+#                     present for historical reasons only.
+#
+# 2) Transport.       Currently ignored by FreeTDS, it should be "tcp".
+#                     When ipv6 support is added a second option of "tcp6"
+#                     will probably be available.
+#
+# 3) Physical layer.  Sybase uses this field for a description of the 
+#                     physical layer (usually "ether"), FreeTDS can also
+#                     use it to specify the version of the protocol to use
+#                     when connecting to the server.
+#
+# 4) Hostname.        A hostname or IP address of the server machine.
+#
+# 5) Port.            The TCP port on the server to connect to.
+#                     Microsft SQL Server defaults to 1433.
+#
+# So putting it all together, let's say you have an NT box running a
+# Microsoft SQL Server named "myserver" at ip address 10.0.2.1 and we
+# are connecting using version 4.2 of the protocol, your interfaces
+# entry would look like this: (without the comments)
+#
+#myserver
+#	query tcp 4.2 10.0.2.1 1433
+#
+
+# This is a Sybase hosted database server, if you are directly on the
+# net you can use it to test.
+JDBC
+	query tcp 5.0 192.138.151.39 4444
+	master tcp 5.0 192.138.151.39 4444
+
+# The same server, using TDS 4.2.  Used in configuration examples for the
+# pool server, since the pool server supports only TDS 4.2.
+JDBC_42
+	query tcp 4.2 192.138.151.39 4444
+	master tcp 4.2 192.138.151.39 4444
+
+# The client connecting to the pool server will use this to find its
+# listening socket.  This entry assumes that the client is on the same
+# system as the pool server.
+mypool
+	query tcp 4.2 127.0.0.1 5000
+	master tcp 4.2 127.0.0.1 5000
+
+#myserver
+#	query tcp ether 127.0.0.1 4000
+#	master tcp ether 127.0.0.1 4000
+#
+#myserver2
+#	query tcp ether 127.0.0.1 4001
+#	master tcp ether 127.0.0.1 4001

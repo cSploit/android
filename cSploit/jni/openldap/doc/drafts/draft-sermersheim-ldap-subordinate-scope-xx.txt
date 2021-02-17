@@ -1,0 +1,335 @@
+
+Network Working Group                                    J;. Sermersheim
+Internet-Draft                                               Novell, Inc
+Updates: 2251 (if approved)                                    July 2004
+Expires: December 30, 2004
+
+
+               Subordinate Subtree Search Scope for LDAP
+              draft-sermersheim-ldap-subordinate-scope-00.txt
+
+Status of this Memo
+
+   This document is an Internet-Draft and is subject to all provisions
+   of section 3 of RFC 3667.  By submitting this Internet-Draft, each
+   author represents that any applicable patent or other IPR claims of
+   which he or she is aware have been or will be disclosed, and any of
+   which he or she become aware will be disclosed, in accordance with
+   RFC 3668.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as
+   Internet-Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on December 30, 2004.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2004).
+
+Abstract
+
+   The Lightweight Directory Application Protocol (LDAP) specification
+   supports three scope values for the search operation -- namely:
+   baseObject, singleLevel, and wholeSubtree.  This document introduces
+   a subordinateSubtree scope which constrains the search scope to all
+   subordinates of the named base object.
+
+Discussion Forum
+
+
+
+Sermersheim            Expires December 30, 2004                [Page 1]
+
+Internet-Draft    Subordinate Subtree Search Scope for LDAP    July 2004
+
+
+   Technical discussion of this document will take place on the IETF
+   LDAP Extensions mailing list <ldapext@ietf.org>.  Please send
+   editorial comments directly to the author.
+
+1.  Overview
+
+   There are a number of reasons which have surfaced for introducing a
+   Lightweight Directory Application Protocol (LDAP) [RFC3377]
+   SearchRequest.scope [RFC2251] which constrains the search scope to
+   all subordinates of the named base object, and does not include the
+   base object (as wholeSubtree does).  These reasons range from the
+   obvious utility of allowing an LDAP client application the ability to
+   exclude the base object from a wholeSubtree search scope, to
+   distributed operation applications which require this scope for
+   progressing search sub-operations resulting from an nssr DSE type
+   reference.
+
+   To meet these needs, the subordinateSubtree scope value is
+   introduced.
+
+   The subordinateSubtrees cope is applied to the SearchRequest.scope
+   field, the <scope> type and alternately the <extension> type of the
+   LDAP URL [RFC2255] and may be applied to other specifications which
+   include an LDAP search scope.  A mechanism is also given which allows
+   LDAP Directory Server Agents (DSA)s to advertise support of this
+   search scope.
+
+2.  Application to SearchRequest.scope
+
+   A new item is added to this ENUMERATED type.  The identifier is
+   subordinateSubtree and the number is 4.
+
+   A DSA which receives and supports the subordinateSubtree
+   SearchRequest.scope constrains the search scope to all subordinate
+   objects.
+
+   A DSA which receives but does not support the subordinateSubtree
+   SearchRequest.scope returns a protocolError resultCode in the
+   SearchResultDone.
+
+3.  LDAP URL applications
+
+   The LDAP URL [RFC2255] specification allows the conveyance of a
+   search scope.  This section intoduces two ways in which the
+   subordinateScope search scope may be conveyed in an LDAP URL.  One
+   way is by allowing a new "subord" scope in the <scope> part.  Another
+   way is through the introduction of an LDAP URL extension.  The LDAP
+   URL extension method is preferred for its criticality semantics.
+
+
+
+Sermersheim            Expires December 30, 2004                [Page 2]
+
+Internet-Draft    Subordinate Subtree Search Scope for LDAP    July 2004
+
+
+3.1  Application to LDAP URL <scope>
+
+   A new <scope> value of "subord" is added.  Using the <scope> type
+   from LDAP URL [RFC2255], the ABNF is as follows:
+
+   scope /= "subord"
+
+   Implementations processing but which do not understand or support the
+   "subord" <scope> of an LDAP URL raise an appropriate error.
+
+3.2  Application to LDAP URL <extension>
+
+   An LDAP URL <extension> mechanism is introduced here.  The <extype>
+   is IANA-ASSIGNED-OID.1 or the descriptor 'subordScope', and the
+   exvalue is omitted.  The extension may be marked as either critical
+   or non-critical.
+
+   If supported, the subordScope extension overrides any value set in
+   the <scope> field.
+
+4.  DSA Advertisement of support
+
+   A DSA may advertise its support of the subordinateSubtree item in the
+   SearchRequest.scope by inclusion of IANA-ASSIGNED-OID.2 in the
+   'supportedFeatures' attribute of the root DSE.
+
+5.  Security Considerations
+
+   This specification introduces no security concerns above any
+   associated with the existing wholeSubtree search scope value.
+
+   As with the wholeSubtree search scope, this scope specifies that a
+   search be applied to an entire subtree hierarchy.  Implementations
+   should be aware of the relative cost of using or allowing this scope.
+
+6  Normative References
+
+   [RFC2251]  Wahl, M., Howes, T. and S. Kille, "Lightweight Directory
+              Access Protocol (v3)", RFC 2251, December 1997.
+
+   [RFC2255]  Howes, T. and M. Smith, "The LDAP URL Format", RFC 2255,
+              December 1997.
+
+   [RFC3377]  Hodges, J. and R. Morgan, "Lightweight Directory Access
+              Protocol (v3): Technical Specification", RFC 3377,
+              September 2002.
+
+   [RFC3383]  Zeilenga, K., "Internet Assigned Numbers Authority (IANA)
+
+
+
+Sermersheim            Expires December 30, 2004                [Page 3]
+
+Internet-Draft    Subordinate Subtree Search Scope for LDAP    July 2004
+
+
+              Considerations for the Lightweight Directory Access
+              Protocol (LDAP)", BCP 64, RFC 3383, September 2002.
+
+
+Author's Address
+
+   Jim Sermersheim
+   Novell, Inc
+   1800 South Novell Place
+   Provo, Utah  84606
+   USA
+
+   Phone: +1 801 861-3088
+   EMail: jimse@novell.com
+
+Appendix A.  IANA Considerations
+
+   Registration of the following values is requested [RFC3383].
+
+A.1  LDAP Object Identifier Registrations
+
+   It is requested that IANA register upon Standards Action an LDAP
+   Object Identifier in identifying the protocol elements defined in
+   this technical specification.  The following registration template is
+   provided:
+
+      Subject: Request for LDAP OID Registration
+      Person & email address to contact for further information:
+         Jim Sermersheim
+         jimse@novell.com
+      Specification: RFCXXXX
+      Author/Change Controller: IESG
+      Comments:
+      2 delegations will be made under the assigned OID:
+         IANA-ASSIGNED-OID.1 subordScope LDAP URL extension
+         IANA-ASSIGNED-OID.2 subordinateScope Supported Feature
+
+A.2  LDAP Protocol Mechanism Registrations
+
+   It is requested that IANA register upon Standards Action the LDAP
+   protocol mechanism described in this document.  The following
+   registration templates are given:
+
+      Subject: Request for LDAP Protocol Mechanism Registration
+      Object Identifier: IANA-ASSIGNED-OID.1
+      Description: subordScope LDAP URL extension
+      Person & email address to contact for further information:
+
+
+
+
+Sermersheim            Expires December 30, 2004                [Page 4]
+
+Internet-Draft    Subordinate Subtree Search Scope for LDAP    July 2004
+
+
+         Jim Sermersheim
+         jimse@novell.com
+      Usage: Extension
+      Specification: RFCXXXX
+      Author/Change Controller: IESG
+      Comments: none
+
+A.3  LDAP Descriptor Registrations
+
+   It is requested that IANA register upon Standards Action the LDAP
+   descriptors described in this document.  The following registration
+   templates are given:
+
+      Subject: Request for LDAP Descriptor Registration
+      Descriptor (short name): subordScope
+      Object Identifier: IANA-ASSIGNED-OID.1
+      Person & email address to contact for further information:
+         Jim Sermersheim
+         jimse@novell.com
+      Usage: URL Extension
+      Specification: RFCXXXX
+      Author/Change Controller: IESG
+      Comments: none
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sermersheim            Expires December 30, 2004                [Page 5]
+
+Internet-Draft    Subordinate Subtree Search Scope for LDAP    July 2004
+
+
+Intellectual Property Statement
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+Disclaimer of Validity
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Copyright Statement
+
+   Copyright (C) The Internet Society (2004).  This document is subject
+   to the rights, licenses and restrictions contained in BCP 78, and
+   except as set forth therein, the authors retain all their rights.
+
+
+Acknowledgment
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+Sermersheim            Expires December 30, 2004                [Page 6]
+

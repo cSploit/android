@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Additional build options</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="build_win.html" title="Chapter 5.  Building Berkeley DB for Windows" />
+    <link rel="prev" href="win_build_dist_dll.html" title="Distributing DLLs" />
+    <link rel="next" href="build_win_small.html" title="Building a small memory footprint library" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Additional build options</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="win_build_dist_dll.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 5.  Building Berkeley DB for Windows </th>
+          <td width="20%" align="right"> <a accesskey="n" href="build_win_small.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="win_additional_options"></a>Additional build options</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+        There are several build options that you can configure when
+        building Berkeley DB on Windows. To specify these, select
+        <code class="literal">Project Properties</code>-&gt;<code class="literal">C/C++</code>-&gt;<code class="literal">Command Line</code>
+        and add the property.
+    </p>
+      <p>
+        These are some of the additional properties that you can specify 
+        when you are building Berkeley DB on Windows:
+    </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p><a id="HAVE_LOCALIZATION"></a>
+                <span class="bold"><strong>/D HAVE_LOCALIZATION</strong></span>
+            </p>
+            <p>
+                Enable localized error message text, if available.
+                This option should not be used when
+                enabling stripped messages.
+            </p>
+          </li>
+          <li>
+            <p><a id="HAVE_MIXED_SIZE_ADDRESSING"></a>
+                <span class="bold"><strong>/D HAVE_MIXED_SIZE_ADDRESSING</strong></span>
+            </p>
+            <p>
+                Allows for the sharing of the BDB database environment
+                between 32-bit and 64-bit applications. Note that if you
+                use this macro to rebuild your Berkeley DB library, then
+                you need to also rebuild both your 32-bit and 64-bit
+                applications using 
+                <span class="bold"><strong>/D HAVE_MIXED_SIZE_ADDRESSING</strong></span>.
+            </p>
+            <p>
+                Note that use of this macro means that private environments
+                are disabled for the library.
+            </p>
+          </li>
+          <li>
+            <p><a id="HAVE_STRIPPED_MESSAGES"></a>
+                <span class="bold"><strong>/D HAVE_STRIPPED_MESSAGES</strong></span>
+            </p>
+            <p>
+                Causes all error messages to be stripped of their textual
+                information.  This option should not be used when enabling
+                localization support. Use of this property can reduce your
+                library footprint by up to 42KB (for DLLs) or 98KB
+                (for a .lib). 
+            </p>
+            <p>
+                Note that this option is automatically enabled if you build
+                using the <code class="filename">db_small</code> project name. For
+                more information on building a small library, see
+                <a class="xref" href="build_win_small.html" title="Building a small memory footprint library">Building a small memory footprint library</a>.
+            </p>
+            <p>
+                If you use this build option, you can get an idea of 
+                what text should be issued for a given error message by using 
+                the 
+                <a href="../articles/mssgtxt/index.html" class="olink">Berkeley DB Message Reference Guide</a>.
+             </p>
+          </li>
+          <li>
+            <p><a id="DIAGNOSTIC"></a>
+                <span class="bold"><strong>/D DIAGNOSTIC</strong></span>
+            </p>
+            <p>
+                Included automatically in the Debug build. Allows a number of
+                additional checks to be performed when BDB is running, and
+                also causes some failures to trigger process abort rather than
+                returning errors to the application. Applications built using
+                this option should not share database environments with
+                applications built without this option. The <code class="literal">DIAGNOSTIC</code> 
+                option should not be specified when configuring to build production
+                binaries because it degrades performance.
+            </p>
+          </li>
+          <li>
+            <p><a id="UMRW"></a>
+                <span class="bold"><strong>/D UMRW</strong></span>
+            </p>
+            <p>
+                Rational Software's Purify product and other software analysis
+                run-time tools complain about uninitialized reads/writes of
+                structure fields whose only purpose is padding, as well as when 
+                heap memory that was never initialized is written to disk. Specify 
+                this option during configuration to mask these errors. The <code class="literal">UMRW</code> 
+                option should not be specified when configuring to build production
+                binaries.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="win_build_dist_dll.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="build_win.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="build_win_small.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Distributing DLLs </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Building a small memory footprint library</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

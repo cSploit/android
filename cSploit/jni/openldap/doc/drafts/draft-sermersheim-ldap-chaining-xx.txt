@@ -1,0 +1,406 @@
+
+Internet Draft                                           J. Sermersheim 
+Personal Submission                                         R. Harrison 
+Intended Category: Standard Track                           Novell, Inc 
+Document: draft-sermersheim-ldap-chaining-02.txt               Feb 2004 
+                                                                        
+ 
+ 
+               LDAP Control to Specify Chaining Behavior 
+ 
+ 
+Status of this Memo 
+ 
+   This document is an Internet-Draft and is in full conformance with 
+   all provisions of Section 10 of RFC2026.  
+    
+   Internet-Drafts are working documents of the Internet Engineering 
+   Task Force (IETF), its areas, and its working groups. Note that other 
+   groups may also distribute working documents as Internet-Drafts. 
+   Internet-Drafts are draft documents valid for a maximum of six months 
+   and may be updated, replaced, or obsoleted by other documents at any 
+   time. It is inappropriate to use Internet-Drafts as reference 
+   material or to cite them other than as "work in progress."  
+    
+   The list of current Internet-Drafts can be accessed at 
+   http://www.ietf.org/ietf/1id-abstracts.txt  
+    
+   The list of Internet-Draft Shadow Directories can be accessed at 
+   http://www.ietf.org/shadow.html. 
+    
+   Distribution of this memo is unlimited. Technical discussion of this 
+   document will take place on the IETF LDAP Extensions Working Group 
+   mailing list <ldapext@ietf.org>. Editorial comments may be sent to 
+   the author <jimse@novell.com>. 
+ 
+    
+Abstract 
+    
+   This document describes a Lightweight Directory Access Protocol 
+   (LDAP) request control that allows specification of chaining behavior 
+   for LDAP operations. By using the control with various LDAP 
+   operations, a directory client (DUA), or directory server (DSA) 
+   specifies whether or not a DSA or secondary DSA chains operations to 
+   other DSAs or returns referrals and/or search result references to 
+   the client. 
+    
+    
+1. Introduction 
+    
+   Many directory servers have the ability through the use of various 
+   mechanisms to participate in a distributed directory model. A 
+   distributed directory is one where the DIT is distributed over 
+   multiple DSAs. One operation completion mechanism used by DSAs in a 
+   distributed directory is chaining. Chaining is defined in [X.518], 
+   and is the act of one DSA communicating a directory operation that 
+ 
+Sermersheim, Harrison    Internet-Draft - Exp. Aug 2004         Page 1 
+               LDAP Control to Specify Chaining Behavior 
+ 
+   originated from a DUA to another DSA in a distributed directory. 
+   Contrast this with the act of passing referrals (4.1.11 of [RFC2251]) 
+   and SearchResultReferences (4.5.2 of [RFC2251]) back to the client. 
+   Chaining may happen during the name resolution part of an operation 
+   or during other parts of operations like search which apply to a 
+   number of entries in a subtree. 
+    
+   This document does not attempt to define the distributed directory 
+   model, nor does it attempt to define the manner in which DSAs chain 
+   requests. This document defines a request control that the client can 
+   use to specify whether parts of an operation should or should not be 
+   chained. 
+    
+    
+2. Conventions 
+    
+   The key words "MUST", "MUST NOT", "SHOULD", "SHOULD NOT", and "MAY" 
+   used in this document carry the meanings described in [RFC2119]. 
+    
+   The term chaining may apply to uni-chaining as well as multi-chaining 
+   (see [X.518]) depending on the capabilities and configuration of the 
+   DSAs. 
+    
+    
+3. The Control 
+    
+   Support for the control is advertised by the presence of its 
+   controlType in the supportedControl attribute of a server's root DSE. 
+    
+   This control MAY be included in any LDAP request operation except 
+   abandon, unbind, and StartTLS as part of the controls field of the 
+   LDAPMessage, as defined in Section 4.1.12 of [RFC2251]: 
+    
+   The controlType is set to <IANA-ASSIGNED-OID.1>. The criticality MAY 
+   be set to either TRUE or FALSE. The controlValue is an OCTET STRING, 
+   whose value is the following ChainingBehavior type, BER encoded 
+   following the rules in Section 5.1 of [RFC2251]: 
+    
+   ChainingBehavior ::= SEQUENCE { 
+        resolveBehavior         Behavior OPTIONAL, 
+        continuationBehavior    Behavior OPTIONAL } 
+    
+   Behavior :: = ENUMERATED { 
+        chainingPreferred       (0), 
+        chainingRequired        (1), 
+        referralsPreferred      (2), 
+        referralsRequired       (3) } 
+      
+   resolveBehavior instructs the DSA what to do when a referral is 
+   encountered during the local name resolution part of an operation. If 
+   this field is not specified, other policy dictates the DSA's 
+   behavior. 
+    
+
+  
+Sermersheim, Harrison    Internet-Draft - Exp. Aug 2004         Page 2 
+               LDAP Control to Specify Chaining Behavior 
+ 
+   continuationBehavior instructs the DSA what to do when a referral is 
+   encountered after the name resolution part of an operation has 
+   completed. This scenario occurs during search operations, and may 
+   occur during yet to be defined future operations. If this field is 
+   not specified, other policy dictates the DSA's behavior. 
+      
+   Behavior specifies whether the DSA should chain the operation or 
+   return referrals when a target object is held by a remote service.  
+     
+        chainingPreferred indicates that the preference is that 
+        chaining, rather than referrals, be used to provide the service. 
+        When this value is set, the server attempts to chain the request 
+        but if it can't it returns referrals. 
+    
+        chainingRequired indicates that chaining is to be used rather 
+        than referrals to service the request. When this value is set, 
+        the server MUST NOT return referrals. It either chains the 
+        request or fails. 
+         
+        referralsPreferred indicates that the client wishes to receive 
+        referrals rather than allow the server to chain the operation. 
+        When this value is set, the server return referrals and search 
+        references when possible, but may chain the operation otherwise. 
+    
+        referralsRequired indicates that chaining is prohibited. When 
+        this value is set, the server MUST NOT chain the request to 
+        other DSAs. Instead it returns referrals as necessary, or fails. 
+    
+   The following list assigns meanings to some of the result codes that 
+   may occur due to this control being present: 
+    
+   - chainingRequired  (IANA-ASSIGNED-1)   Unable to process without 
+                                           chaining. 
+   - cannotChain       (IANA-ASSIGNED-2)   Unable to chain the request. 
+ 
+    
+4. Notes to Implementors 
+    
+   <todo: add some> 
+ 
+ 
+4.1 Unbind and Abandon 
+    
+   Clients MUST NOT include the ChainingBehavior control with an Abandon 
+   operation or an Unbind operation. Servers MUST ignore any chaining 
+   control on the abandon and unbind requests. Servers that chain 
+   operation are responsible to keep track of where an operation was 
+   chained to for the purposes of unbind and abandon. 
+    
+    
+4.2 StartTLS 
+    
+   This operation cannot be chained because the TLS handshake protocol 
+   does not allow man-in-the-middle attacks.  
+  
+Sermersheim, Harrison    Internet-Draft - Exp. Aug 2004         Page 3 
+               LDAP Control to Specify Chaining Behavior 
+ 
+    
+    
+5. Relationship with other Extensions 
+    
+   This control MAY be used with other controls or with extended 
+   operations. When it is used with other controls or with extended 
+   operations not listed here, server behavior is undefined unless 
+   otherwise specified. 
+    
+    
+5.1 Relationship with ManageDsaIT 
+    
+   When this control is used along with the ManageDsaIT control, the 
+   resolveBehavior value is evaluated. If resolveBehavior is such that 
+   chaining is allowed, the DSA is allowed to chain the operation as 
+   necessary until the last RDN is found.  
+    
+   For example: DSA1 holds the naming context <dc=net> and a subordinate 
+   reference to <dc=example,dc=net>, DSA2 holds the naming context 
+   <dc=example,dc=net> and a subordinate reference to 
+   <dc=hostc,dc=example,dc=net>.  
+    
+   A modify operation accompanied by the ManageDsaIT control alone is 
+   sent to DSA1. The base object of the modify operation is set to 
+   <dc=hostc,dc=example,dc=net>. Since DSA1 does not hold the 
+   <dc=hostc,dc=example,dc=net> IT DSE, a referral is returned for 
+   <dc=example,dc=net>.  
+    
+   Next, the same modify operation is accompanied by both the 
+   ManageDsaIT and the ChainingBehavior control where the 
+   ChainingBehavior.resolveBehavior is set to chainingPreferred. In this 
+   case, DSA1 chains to DSA2 when it encounters <dc=example,dc=net> and 
+   DSA2 continues the operation. Since DSA2 holds the IT DSE 
+   <dc=hostc,dc=example,dc=net>, the resolve portion completes, and the 
+   rest of the operation proceeds. 
+    
+    
+6. Security Considerations 
+    
+   Because this control directs a DSA to chain requests to other DSAs, 
+   it may be used in a denial of service attack. Implementers should be 
+   cognizant of this possibility. 
+    
+   This control may be used to allow access to hosts and portions of the 
+   DIT not normally available to clients. Servers supporting this 
+   control should provide sufficient policy to prevent unwanted 
+   occurrences of this. 
+    
+    
+7. IANA Considerations 
+    
+   Registration of the following values is requested [RFC3383]. 
+    
+    
+  
+Sermersheim, Harrison    Internet-Draft - Exp. Aug 2004         Page 4 
+               LDAP Control to Specify Chaining Behavior 
+ 
+7.1. Object Identifiers 
+    
+   It is requested that IANA register upon Standards Action an LDAP 
+   Object Identifier in identifying the protocol elements defined in 
+   this technical specification.  The following registration template is 
+   suggested: 
+    
+        Subject: Request for LDAP OID Registration 
+        Person & email address to contact for further information: 
+                Jim Sermersheim 
+                jimse@novell.com 
+        Specification: RFCXXXX 
+        Author/Change Controller: IESG 
+        Comments: 
+                One delegation will be made under the assigned OID: 
+                 
+                IANA-ASSIGNED-OID.1 Chaining Behavior Request Control 
+    
+    
+7.2. LDAP Protocol Mechanism 
+    
+   It is requested that IANA register upon Standards Action the LDAP 
+   protocol mechanism described in this document.  The following 
+   registration template is suggested: 
+    
+        Subject: Request for LDAP Protocol Mechanism Registration 
+        Object Identifier: IANA-ASSIGNED-OID.1 
+        Description: Chaining Behavior Request Control 
+        Person & email address to contact for further information: 
+                Jim Sermersheim 
+                jimse@novell.com 
+        Usage: Control 
+        Specification: RFCXXXX 
+        Author/Change Controller: IESG 
+        Comments: none 
+    
+    
+7.3. LDAP Result Codes 
+    
+   It is requested that IANA register upon Standards Action the LDAP 
+   result codes: 
+    
+        chainingRequired        (IANA-ASSIGNED-1) 
+        cannotChain             (IANA-ASSIGNED-2) 
+    
+        The following registration template is suggested: 
+    
+        Subject: LDAP Result Code Registration 
+        Person & email address to contact for further information: 
+                Jim Sermersheim 
+                jimse@novell.com  
+        Result Code Name: chainingRequired 
+        Result Code Name: cannotChain 
+        Specification: RFCXXXX 
+  
+Sermersheim, Harrison    Internet-Draft - Exp. Aug 2004         Page 5 
+               LDAP Control to Specify Chaining Behavior 
+ 
+        Author/Change Controller: IESG 
+        Comments:  request consecutive result codes be assigned 
+ 
+ 
+8. Normative References 
+    
+   [X.518] 
+   ITU-T Rec. X.511, "The Directory: Abstract Service Definition", 1993. 
+    
+   [RFC2119] 
+   Bradner, Scott, "Key Words for use in RFCs to Indicate Requirement 
+   Levels", Internet Draft, March 1997.  
+   Available as RFC2119. 
+    
+   [RFC2251] 
+   Wahl, M, S. Kille and T. Howes, "Lightweight Directory Access 
+   Protocol (v3)", Internet Standard, December, 1997.  
+   Available as RFC2251. 
+    
+    
+9. Authors' Addresses 
+    
+   Jim Sermersheim 
+   Novell, Inc. 
+   1800 South Novell Place 
+   Provo, Utah 84606, USA 
+   jimse@novell.com 
+   +1 801 861-3088 
+    
+   Roger Harrison 
+   Novell, Inc. 
+   1800 South Novell Place 
+   Provo, Utah 84606, USA 
+   rharrison@novell.com 
+   +1 801 861-2642 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+Sermersheim, Harrison    Internet-Draft - Exp. Aug 2004         Page 6 
+               LDAP Control to Specify Chaining Behavior 
+ 
+Intellectual Property Rights 
+ 
+     The IETF takes no position regarding the validity or scope of any 
+     intellectual property or other rights that might be claimed to 
+     pertain to the implementation or use of the technology described in 
+     this document or the extent to which any license under such rights 
+     might or might not be available; neither does it represent that it 
+     has made any effort to identify any such rights. Information on the 
+     IETF's procedures with respect to rights in standards-track and 
+     standards-related documentation can be found in BCP-11. Copies of 
+     claims of rights made available for publication and any assurances 
+     of licenses to be made available, or the result of an attempt made 
+     to obtain a general license or permission for the use of such 
+     proprietary rights by implementors or users of this specification 
+     can be obtained from the IETF Secretariat. 
+ 
+     The IETF invites any interested party to bring to its attention any 
+     copyrights, patents or patent applications, or other proprietary 
+     rights which may cover technology that may be required to practice 
+     this standard. Please address the information to the IETF Executive 
+     Director. 
+ 
+ 
+Full Copyright Statement 
+ 
+     Copyright (C) The Internet Society (2004). All Rights Reserved. 
+      
+     This document and translations of it may be copied and furnished to 
+     others, and derivative works that comment on or otherwise explain 
+     it or assist in its implementation may be prepared, copied, 
+     published and distributed, in whole or in part, without restriction 
+     of any kind, provided that the above copyright notice and this 
+     paragraph are included on all such copies and derivative works. 
+     However, this document itself may not be modified in any way, such 
+     as by removing the copyright notice or references to the Internet 
+     Society or other Internet organizations, except as needed for the 
+     purpose of developing Internet standards in which case the 
+     procedures for copyrights defined in the Internet Standards process 
+     must be followed, or as required to translate it into languages 
+     other than English. 
+      
+     The limited permissions granted above are perpetual and will not be 
+     revoked by the Internet Society or its successors or assigns. 
+      
+     This document and the information contained herein is provided on 
+     an "AS IS" basis and THE INTERNET SOCIETY AND THE INTERNET 
+     ENGINEERING TASK FORCE DISCLAIMS ALL WARRANTIES, EXPRESS OR 
+     IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF 
+     THE INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED 
+     WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  
+    
+
+
+
+  
+Sermersheim, Harrison    Internet-Draft - Exp. Aug 2004         Page 7 
+

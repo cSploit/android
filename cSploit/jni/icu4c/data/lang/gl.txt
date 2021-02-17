@@ -1,0 +1,201 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/gl.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/gl.xml
+ */
+gl{
+    Keys{
+        calendar{"calendario"}
+        collation{"orde alfabética"}
+        currency{"moeda"}
+    }
+    Languages{
+        af{"Afrikaans"}
+        afa{"Lingua afro-asiática"}
+        alg{"Lingua algonquina"}
+        am{"Amárico"}
+        an{"Aragonés"}
+        apa{"Lingua apache"}
+        ar{"Árabe"}
+        arc{"Arameo"}
+        art{"Lingua artificial"}
+        as{"Assamés"}
+        ast{"Asturiano"}
+        aus{"Lingua australiana"}
+        az{"Azerbaiano"}
+        bat{"Lingua báltica"}
+        be{"Bielorruso"}
+        bg{"Búlgaro"}
+        bh{"Bihariano"}
+        bn{"Bengalí"}
+        br{"Bretón"}
+        bs{"Bosnio"}
+        ca{"Catalán"}
+        cai{"Lingua india centroamericana"}
+        cau{"Lingua caucásica"}
+        cel{"Lingua céltica"}
+        cs{"Checo"}
+        cu{"Eslavo eclesiástico"}
+        cy{"Galés"}
+        da{"Dinamarqués"}
+        de{"Alemán"}
+        de_AT{"Alemán de Austria"}
+        de_CH{"Alemán suízo"}
+        egy{"Exipcio antigo"}
+        el{"Grego"}
+        en{"Inglés"}
+        en_AU{"Inglés australiano"}
+        en_CA{"Inglés canadiano"}
+        en_GB{"Inglés británico"}
+        en_US{"Inglés americano"}
+        eo{"Esperanto"}
+        es{"Español"}
+        es_419{"Español latinoamericano"}
+        es_ES{"Castelán"}
+        et{"Estoniano"}
+        eu{"Éuscaro"}
+        fa{"Persa"}
+        fi{"Finés"}
+        fil{"Filipino"}
+        fiu{"Lingua finno-úgrica"}
+        fo{"Faroés"}
+        fr{"Francés"}
+        fr_CA{"Francés canadiano"}
+        fr_CH{"Francés suízo"}
+        fy{"Frisón"}
+        ga{"Irlandés"}
+        gd{"Gaélico escocés"}
+        gem{"Lingua xermánica"}
+        gl{"galego"}
+        gn{"Guaraní"}
+        grc{"Grego antigo"}
+        gu{"Guxaratiano"}
+        he{"Hebreo"}
+        hi{"Hindi"}
+        hr{"Croata"}
+        hu{"Húngaro"}
+        hy{"Armenio"}
+        ia{"Interlingua"}
+        id{"Indonesio"}
+        inc{"Lingua índica"}
+        ine{"Lingua indoeuropea"}
+        is{"Islandés"}
+        it{"Italiano"}
+        ja{"Xaponés"}
+        jv{"Xavanés"}
+        ka{"Xeorxiano"}
+        km{"Cambodiano"}
+        kn{"Kannada"}
+        ko{"Coreano"}
+        ku{"Kurdo"}
+        ky{"Kyrgiz"}
+        la{"Latín"}
+        ln{"Lingala"}
+        lo{"Laotiano"}
+        lt{"Lituano"}
+        lv{"Letón"}
+        mis{"Lingua miscelánea"}
+        mk{"Macedonio"}
+        mn{"Mongol"}
+        mr{"Marathi"}
+        ms{"Malaio"}
+        mt{"Maltés"}
+        mul{"Varias linguas"}
+        nai{"Lingua india norteamericana"}
+        nb{"Noruegués Bokmal"}
+        ne{"Nepalí"}
+        nl{"Holandés"}
+        nl_BE{"Flamenco"}
+        nn{"Noruegués nynorsk"}
+        no{"Noruegués"}
+        nub{"Lingua nubia"}
+        oc{"Occitano"}
+        pa{"Punjabi"}
+        phi{"Lingua filipina"}
+        pl{"Polaco"}
+        pt{"Portugués"}
+        pt_BR{"Portugués brasileiro"}
+        pt_PT{"Portugués ibérico"}
+        ro{"Romanés"}
+        roa{"Lingua románica"}
+        ru{"Ruso"}
+        sa{"Sánscrito"}
+        sai{"Lingua india sudamericana"}
+        sd{"Sindhi"}
+        sem{"Lingua semita"}
+        sgn{"Lingua de signos"}
+        sh{"Serbocroata"}
+        sk{"Eslovaco"}
+        sla{"Lingua eslávica"}
+        sq{"Albanés"}
+        sr{"Serbio"}
+        ssa{"Lingua do Nilo-Sáhara"}
+        sv{"Sueco"}
+        ta{"Tamil"}
+        te{"Telugu"}
+        th{"Tailandés"}
+        tl{"Tagalo"}
+        tlh{"Clingon"}
+        tr{"Turco"}
+        tut{"Lingua altaica"}
+        uk{"Ucraíno"}
+        und{"Lingua descoñecida ou non válida"}
+        ur{"Urdú"}
+        uz{"Uzbeco"}
+        vi{"Vietnamita"}
+        xh{"Xhosa"}
+        yi{"Yiddish"}
+        zh{"Chinés"}
+        zh_Hans{"Chinés simplificado"}
+        zh_Hant{"Chinés tradicional"}
+        zu{"Zulú"}
+        zxx{"Sen contido lingüístico"}
+    }
+    Scripts{
+        Arab{"árabe"}
+        Brai{"braille"}
+        Cans{"silabario aborixe canadiano unificado"}
+        Cyrl{"cirílico"}
+        Grek{"grego"}
+        Hebr{"hebreo"}
+        Latn{"latino"}
+        Zxxx{"non escrita"}
+        Zzzz{"escritura descoñecida ou non válida"}
+    }
+    Types{
+        calendar{
+            buddhist{"calendario budista"}
+            chinese{"calendario chinés"}
+            gregorian{"calendario gregoriano"}
+            hebrew{"calendario hebreo"}
+            islamic{"calendario islámico"}
+            islamic-civil{"calendario islámico civil"}
+            japanese{"calendario xaponés"}
+        }
+        collation{
+            big5han{"orde chinesa tradicional - Big5"}
+            direct{"orde alfabética directa"}
+            gb2312han{"orde chinesa simplificada - GB2312"}
+            phonebook{"orde da guía telefónica"}
+            pinyin{"orde pinyin"}
+            stroke{"orde polo número de trazos"}
+            traditional{"orde tradicional"}
+        }
+    }
+    Version{"2.0.47.53"}
+    codePatterns{
+        language{"Idioma: {0}"}
+        script{"Alfabeto: {0}"}
+        territory{"Rexión: {0}"}
+    }
+    localeDisplayPattern{
+        pattern{"{0} ({1})"}
+        separator{", "}
+    }
+}

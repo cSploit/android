@@ -1,0 +1,54 @@
+.TH IPX_CONFIGURE 8 "IPX Utilities" "Caldera, Inc." 
+.SH NAME
+ipx_configure \- query/configure IPX behavior
+.SH SYNOPSIS
+.B ipx_configure
+[ \fB\-\-help\fP | \fB-h\fP ]
+[ \fB\-\-auto_interface=\fP\fIon|off\fP | \fB-i\fP \fIon|off\fP ]
+[ \fB\-\-auto_primary=\fP\fIon|off\fP | \fB-p\fP \fIon|off\fP ] 
+.SH DESCRIPTION
+.B ipx_configure
+queries or configures IPX behavior with respect to automatic IPX
+interface detection.  IPX can be configured to automatically create
+interfaces as they are detected.  It can also be configured to 
+automatically select a primary interface when none is explicitly
+selected.  By default, it is configured to 
+.B NOT 
+have this behavior.
+Without arguments, 
+.B ipx_configure
+returns the current configuration state.  The behavior with 
+arguments is described in the section 
+.B OPTIONS.
+.SH OPTIONS
+\fB\-\-auto_interface=\fP\fIon|off\fP
+.br
+\fB\-i\fP \fIon|off\fP
+.RS 3
+This argument either turns on or off the behavior of automatically creating
+interfaces.
+.RE
+
+\fB\-\-auto_primary=\fP\fIon|off\fP
+.br
+\fB\-p\fP \fIon|off\fP
+.RS 3
+This argument either turns on or off the behavior of automatically selecting
+a primary interface.  
+.RE
+
+.B "\-\-help"
+.br
+.B "\-h"
+.RS 3
+Print out information about utility.
+.RE
+
+.SH FILES
+.I /proc/net/ipx_interface
+.SH BUGS
+This functionality really belongs in
+.B
+ifconfig(8).
+.SH AUTHOR
+Greg Page <greg.page@caldera.com>

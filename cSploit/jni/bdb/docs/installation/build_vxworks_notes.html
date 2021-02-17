@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>VxWorks notes</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Installation and Build Guide" />
+    <link rel="up" href="build_vxworks.html" title="Chapter 8.  Building Berkeley DB for VxWorks" />
+    <link rel="prev" href="build_vxworks.html" title="Chapter 8.  Building Berkeley DB for VxWorks" />
+    <link rel="next" href="build_vxworks_faq.html" title="VxWorks FAQ" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">VxWorks notes</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="build_vxworks.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 8. 
+		Building Berkeley DB for VxWorks
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="build_vxworks_faq.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="build_vxworks_notes"></a>VxWorks notes</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="build_vxworks_notes.html#idp50908184">Building and Running the Demo Program</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="build_vxworks_notes.html#idp50881280">Building and Running the Utility Programs</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="build_vxworks_notes.html#idp50914152">Support for Replication Manager</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>Berkeley DB currently disallows the <a href="../api_reference/C/dbopen.html#open_DB_TRUNCATE" class="olink">DB_TRUNCATE</a> flag to the
+<a href="../api_reference/C/dbopen.html" class="olink">DB-&gt;open()</a> method on VxWorks because the operations this flag represents
+are not fully supported under VxWorks.</p>
+      <p>The <a href="../api_reference/C/dbsync.html" class="olink">DB-&gt;sync()</a> method is implemented using an ioctl call into the file
+system driver with the FIOSYNC command.  Most, but not all file system
+drivers support this call.  Berkeley DB requires the use of a file system
+that supports FIOSYNC.</p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50908184"></a>Building and Running the Demo Program</h3>
+            </div>
+          </div>
+        </div>
+        <p>The demo program should be built in a manner very similar to building
+Berkeley DB.  If you want different or additional BSP build specifications you
+should add them by following the directions indicated in
+<a class="xref" href="build_vxworks.html#build_vxworks_intro6x" title="Building for VxWorks 6.x">Building for VxWorks 6.x</a>.</p>
+        <p>The demo program can be downloaded and run by calling the entry function
+<span class="bold"><strong>dbdemo</strong></span> with the pathname of a database to use.  The demo
+program will ask for some input keys.  It creates a database and adds
+those keys into the database, using the reverse of the key as the data
+value.  When complete you can either enter EOF (control-D) or
+<span class="bold"><strong>quit</strong></span> and the demo program will display all of the key/data
+items in the database.</p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50881280"></a>Building and Running the Utility Programs</h3>
+            </div>
+          </div>
+        </div>
+        <p>The Berkeley DB utilities can be downloaded and run by calling the function equivalent to the utility's name.  The utility functions take a string containing all the supported arguments.  The program will then decompose that string into a traditional argc/argv used internally.  For example, to execute <a href="../api_reference/C/db_stat.html" class="olink">db_stat</a> utility on a database within an environment you would execute the following from the windsh prompt.  Obviously you would change the pathname and database name to reflect
+your system.</p>
+        <pre class="programlisting">&gt; db_stat "-h /tmp/myenvhome -d mydatabase.db"</pre>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="idp50914152"></a>Support for Replication Manager</h3>
+            </div>
+          </div>
+        </div>
+        <p>The Berkeley DB Replication Manager component is available on Vxworks 6.x because it provides support for TCP/IP sockets and POSIX 1003.1
+		style networking and threads. You must build Berkley DB for Vxworks using the command line. Prior to building Berkeley DB, ensure you set appropriate values for the variables 
+		specified in Step 1 of <a class="xref" href="build_vxworks.html#build_vxworks_intro6x" title="Building for VxWorks 6.x">Building for VxWorks 6.x</a>. To use Berkeley DB Replication Manager, <code class="literal">netLib</code> and <code class="literal">ioLib</code> must be present in the Vxworks image.
+	</p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="build_vxworks.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="build_vxworks.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="build_vxworks_faq.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Chapter 8. 
+		Building Berkeley DB for VxWorks
+         </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> VxWorks FAQ</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

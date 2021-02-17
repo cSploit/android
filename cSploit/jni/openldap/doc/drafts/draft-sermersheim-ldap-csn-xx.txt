@@ -1,0 +1,898 @@
+
+
+
+
+Network Working Group                                     J. Sermersheim
+Internet-Draft                                               Novell, Inc
+Expires: August 5, 2005                                           H. Chu
+                                                             Symas Corp.
+                                                           February 2005
+
+
+                    The LDAP Change Sequence Number
+                   draft-sermersheim-ldap-csn-02.txt
+
+Status of this Memo
+
+   By submitting this Internet-Draft, each author represents that any
+   applicable patent or other IPR claims of which he or she is aware
+   have been or will be disclosed, and any of which he or she becomes
+   aware will be disclosed, in accordance with Section 6 of BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF), its areas, and its working groups.  Note that
+   other groups may also distribute working documents as Internet-
+   Drafts.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   The list of current Internet-Drafts can be accessed at
+   http://www.ietf.org/ietf/1id-abstracts.txt.
+
+   The list of Internet-Draft Shadow Directories can be accessed at
+   http://www.ietf.org/shadow.html.
+
+   This Internet-Draft will expire on August 5, 2005.
+
+Copyright Notice
+
+   Copyright (C) The Internet Society (2005).
+
+Abstract
+
+   This document defines a syntax schema element for the Lightweight
+   Directory Access Protocol (LDAP) which is used to hold a Change
+   Sequence Number (CSN).  In general, a change sequence number
+   represents the place and time that a directory entity was changed.
+   It may be used by various attributes for various LDAP replication,
+   and synchronization applications.
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                 [Page 1]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+Discussion Forum
+
+   Technical discussion of this document will take place on the IETF
+   LDAP Extensions mailing list <ldapext@ietf.org>.  Please send
+   editorial comments directly to the author(s).
+
+
+Table of Contents
+
+   1.          Introduction . . . . . . . . . . . . . . . . . . . . .  3
+   2.          Conventions  . . . . . . . . . . . . . . . . . . . . .  4
+   3.          Syntaxes . . . . . . . . . . . . . . . . . . . . . . .  5
+   3.1.        ChangeSequenceNumber Syntax  . . . . . . . . . . . . .  5
+   3.2.        UTF8String . . . . . . . . . . . . . . . . . . . . . .  6
+   4.          Matching Rules . . . . . . . . . . . . . . . . . . . .  7
+   4.1.        changeSequenceNumberMatch Matching Rule  . . . . . . .  7
+   4.2.        utf8CodePointMatch Matching Rule . . . . . . . . . . .  7
+   4.3.        changeSequenceNumberOrderingMatch Matching Rule  . . .  7
+   4.4.        utf8CodePointOrderingMatch Matching Rule . . . . . . .  8
+   5.          Attributes . . . . . . . . . . . . . . . . . . . . . .  9
+   5.1.        entryCSN Attribute . . . . . . . . . . . . . . . . . .  9
+   6.          Security Considerations  . . . . . . . . . . . . . . . 10
+   7.          Normative References . . . . . . . . . . . . . . . . . 10
+   Appendix A. IANA Considerations  . . . . . . . . . . . . . . . . . 11
+   A.1.        LDAP Object Identifier Registrations . . . . . . . . . 11
+   A.2.        LDAP Descriptor Registrations  . . . . . . . . . . . . 11
+               Authors' Addresses . . . . . . . . . . . . . . . . . . 15
+               Intellectual Property and Copyright Statements . . . . 16
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                 [Page 2]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+1.  Introduction
+
+   A number of technologies have been documented, implemented and
+   experimented with which in one way or another seek to replicate, or
+   synchronize directory data.  A common need among these technologies
+   is to determine which of two copies of an element represents the
+   latest or most authoritative data.  Part of meeting this need
+   involves associating a change sequence number to an element copy at
+   the time of an update to that element.  When replication or
+   synchronization occurs, the change sequence numbers associated with
+   directory elements can be used to decide which element's data will be
+   copied to the other element(s).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                 [Page 3]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+2.  Conventions
+
+   Imperative keywords defined in [RFC2119] are used in this document,
+   and carry the meanings described there.
+
+   The General Considerations of [I-D.ietf-ldapbis-syntaxes] apply to
+   the syntax definition in this document.
+
+   The terms "directory element" and "element" refer to data held in a
+   directory and may apply to an attribute value, attribute, entry, or
+   any other identifiable directory entity.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                 [Page 4]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+3.  Syntaxes
+
+3.1.  ChangeSequenceNumber Syntax
+
+   A value of the ChangeSequenceNumber syntax is the time of a change
+   along with a replicaID which represents the Directory System Agent
+   (DSA) holding the element when it was changed.  There are also two
+   sequence numbers used to disambiguate directory entities that are
+   changed at the same time and place.
+
+   The Abstract Syntax Notation One (ASN.1)[X680] type corresponding to
+   this syntax is defined as follows:
+
+      ChangeSequenceNumber ::= SEQUENCE {
+
+         time GeneralizedTime,
+
+         timeCount INTEGER (0 ..  MaxInt),
+
+         replicaID UTF8String,
+
+         changeCount INTEGER (0 ..  MaxInt)}
+
+   MaxInt INTEGER ::= 2147483647 -- (2^^31 - 1) --
+
+   GeneralizedTime is defined in [X680].  Local time without a
+   differential SHALL NOT be used.
+
+   UTF8String is defined below.
+
+   The LDAP-specific encoding of a value of this syntax is the Generic
+   String Encoding Rules (GSER)[RFC3641] encoding of the ASN.1 type.
+
+      Example:
+
+         { time "196701160315-0700",
+
+         timeCount 0,
+
+         replicaID "DSA666",
+
+         changeCount 1 }
+
+   The following is an LDAP syntax description [RFC2252] suitable for
+   publication in the subschema.
+
+   ( IANA-ASSIGNED-OID.1 DESC 'ChangeSequenceNumber' )
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                 [Page 5]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+3.2.  UTF8String
+
+   The UTF8String syntax is used to express a string of characters from
+   the [ISO.10646-1.1993] character set (a superset of [Unicode]),
+   encoded following the [UTF-8] algorithm.  Note that Unicode
+   characters U+0000 through U+007F are the same as ASCII 0 through 127,
+   respectively, and have the same single octet UTF-8 encoding.  Other
+   Unicode characters have a multiple octet UTF-8 encoding.
+
+      UTF8String::= OCTET STRING -- UTF-8 encoded,
+
+      -- [ISO10646] characters
+
+   The LDAP-specific encoding of a value of this syntax are the UTF-8
+   encoded characters themselves.
+
+   The following is an LDAP syntax description [RFC2252] suitable for
+   publication in the subschema.
+
+   ( IANA-ASSIGNED-OID.2 DESC 'UTF8String' )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                 [Page 6]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+4.  Matching Rules
+
+4.1.  changeSequenceNumberMatch Matching Rule
+
+   The changeSequenceNumberMatch rule compares an assertion value of the
+   ChangeSequenceNumber syntax to a value of a syntax (e.g the
+   ChangeSequenceNumber syntax) whose corresponding ASN.1 type is
+   ChangeSequenceNumber.
+
+   The rule evaluates to TRUE if and only if each of the components of
+   the two values evaluate to TRUE using the following rules:
+
+   o  The time component uses generalizedTimeMatch.
+
+   o  The timeCount and changeCount components use integerMatch.
+
+   o  The replicaID component uses utf8CodePointMatch.
+
+   The following is a LDAP matching rule description [RFC2252] suitable
+   for publication in the subschema.
+
+   ( IANA-ASSIGNED-OID.3 NAME changeSequenceNumberMatch SYNTAX IANA-
+   ASSIGNED-OID.1 )
+
+4.2.  utf8CodePointMatch Matching Rule
+
+   The utf8CodePointMatch rule compares an assertion value of the
+   UTF8String syntax to a value of a syntax (e.g the UTF8String syntax)
+   whose corresponding ASN.1 type is UTF8String.  The rule evaluates to
+   TRUE if and only if the code points [Unicode] of each of the
+   characters is equal.
+
+   The following is a LDAP matching rule description [RFC2252] suitable
+   for publication in the subschema.
+
+   ( IANA-ASSIGNED-OID.4 NAME utf8CodePointMatch SYNTAX IANA-ASSIGNED-
+   OID.2 )
+
+4.3.  changeSequenceNumberOrderingMatch Matching Rule
+
+   The changeSequenceNumberOrderingMatch rule compares the
+   ChangeSequenceNumber ordering of an assertion value of the
+   ChangeSequenceNumber syntax to a value of a syntax (e.g the
+   ChangeSequenceNumber syntax) whose corresponding ASN.1 type is
+   ChangeSequenceNumber.
+
+   When evaluating ChangeSequenceNumber values for ordering, the
+   components are evaluated in this order: time, timeCount, replicaID,
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                 [Page 7]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+   changeCount.  If a component evaluates to TRUE using the appropriate
+   ordering matching rule specified below, then the rule evaluates to
+   TRUE.  Otherwise if the component evaluates to TRUE using the
+   equality matching rule specified below, the next component is
+   evaluated.  Otherwise the changeSequenceNumberOrderingMatch rule
+   evaluates to FALSE or Undefined as appropriate.
+
+   o  The time components of the two values are evaluated for ordering
+      using GeneralizedTimeOrderingMatch, and evaluated for equality
+      using GeneralizedTimeMatch.
+
+   o  The timeCount and changeCount components of the two values are
+      evaluated for ordering using integerOrderingMatch, and evaluated
+      for equality using integerMatch.
+
+   o  The replicaID components of the two values are evaluated for
+      ordering using utf8CodePointOrderingMatch and evaluated for
+      equality using utf8CodePointMatch.
+
+   The following is a LDAP matching rule description [RFC2252] suitable
+   for publication in the subschema.
+
+   ( IANA-ASSIGNED-OID.5 NAME changeSequenceNumberOrderingMatch SYNTAX
+   SYNTAX IANA-ASSIGNED-OID.1 )
+
+4.4.  utf8CodePointOrderingMatch Matching Rule
+
+   The utf8CodePointOrderingMatch rule compares the ordering of an
+   assertion value of the UTF8String syntax to a stored value of a
+   syntax (e.g. the UTF8String syntax) whose corresponding ASN.1 type is
+   UTF8String.
+
+   The rule evaluates to TRUE if, and only if, in the code point
+   collation order, the stored value character string appears earlier
+   than the assertion value character string, i.e., the stored value is
+   "less than" the assertion value.
+
+   The following is a LDAP matching rule description [RFC2252] suitable
+   for publication in the subschema.
+
+   ( IANA-ASSIGNED-OID.6 NAME utf8CodePointOrderingMatch SYNTAX IANA-
+   ASSIGNED-OID.2 )
+
+
+
+
+
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                 [Page 8]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+5.  Attributes
+
+5.1.  entryCSN Attribute
+
+   The entryCSN operational attribute provides the CSN of the last
+   update applied to the entry.
+
+   The following is a LDAP attribute type description [RFC2252] suitable
+   for publication in the subschema.
+
+   ( IANA-ASSIGNED-OID.7 NAME entryCSN DESC 'CSN of the entry content'
+   EQUALITY changeSequenceNumberMatch ORDERING
+   changeSequenceNumberOrderingMatch SYNTAX IANA-ASSIGNED-OID.1 SINGLE-
+   VALUE NO-USER-MODIFICATION USAGE directoryOperation )
+
+   Servers MAY assign a CSN to each entry upon its addition to the
+   directory and provide the entry's CSN as the value of the entryCSN
+   operational attribute.  If the entryCSN attribute is assigned, the
+   attribute SHOULD be updated upon every update of the entry.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                 [Page 9]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+6.  Security Considerations
+
+7.  Normative References
+
+   [I-D.ietf-ldapbis-syntaxes]
+              Legg, S., "Lightweight Directory Access Protocol (LDAP):
+              Syntaxes and Matching Rules",
+              draft-ietf-ldapbis-syntaxes-11 (work in progress),
+              June 2005.
+
+   [ISO.10646-1.1993]
+              International Organization for Standardization,
+              "Information Technology - Universal Multiple-octet coded
+              Character Set (UCS) - Part 1: Architecture and Basic
+              Multilingual Plane", ISO Standard 10646-1, May 1993.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119, March 1997.
+
+   [RFC2252]  Wahl, M., Coulbeck, A., Howes, T., and S. Kille,
+              "Lightweight Directory Access Protocol (v3): Attribute
+              Syntax Definitions", RFC 2252, December 1997.
+
+   [RFC3383]  Zeilenga, K., "Internet Assigned Numbers Authority (IANA)
+              Considerations for the Lightweight Directory Access
+              Protocol (LDAP)", BCP 64, RFC 3383, September 2002.
+
+   [RFC3641]  Legg, S., "Generic String Encoding Rules (GSER) for ASN.1
+              Types", RFC 3641, October 2003.
+
+   [UTF-8]    International Organization for Standardization,
+              "Information Technology - Universal Multiple-octet coded
+              Character Set (UCS) - Amendment 2: UCS Transformation
+              Format 8 (UTF-8)", ISO Standard 10646-1 Addendum 2,
+              October 1996.
+
+   [Unicode]  The Unicode Consortium, "The Unicode Standard", 2004.
+
+   [X680]     International Telecommunications Union, "Abstract Syntax
+              Notation One (ASN.1): Specification of basic notation",
+              ITU-T Recommendation X.680, July 2002.
+
+
+
+
+
+
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                [Page 10]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+Appendix A.  IANA Considerations
+
+   Registration of the following values is requested [RFC3383].
+
+A.1.  LDAP Object Identifier Registrations
+
+   It is requested that IANA register upon Standards Action an LDAP
+   Object Identifier in identifying the protocol elements defined in
+   this technical specification.  The following registration template is
+   provided:
+
+      Subject: Request for LDAP OID Registration
+
+      Person & email address to contact for further information:
+
+         Jim Sermersheim
+
+         jimse@novell.com
+
+      Specification: RFCXXXX
+
+      Author/Change Controller: IESG
+
+      Comments:
+
+      Seven delegations will be made under the assigned OID:
+
+      IANA-ASSIGNED-OID.1 ChangeSequenceNumber: LDAP Syntax
+
+      IANA-ASSIGNED-OID.2 UTF8String: LDAP Syntax
+
+      IANA-ASSIGNED-OID.3 changeSequenceNumberMatch: LDAP Matching Rule
+
+      IANA-ASSIGNED-OID.4 utf8CodePointMatch: LDAP Matching Rule
+
+      IANA-ASSIGNED-OID.5 changeSequenceNumberOrderingMatch: LDAP
+      Matching Rule
+
+      IANA-ASSIGNED-OID.6 utf8CodePointOrderingMatch: LDAP Matching Rule
+
+      IANA-ASSIGNED-OID.7 entryCSN: LDAP Attribute Type
+
+A.2.  LDAP Descriptor Registrations
+
+   It is requested that IANA register upon Standards Action the LDAP
+   descriptors described in this document.  The following registration
+   templates are given:
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                [Page 11]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+      Subject: Request for LDAP Descriptor Registration
+
+      Descriptor (short name): ChangeSequenceNumber
+
+      Object Identifier: IANA-ASSIGNED-OID.1
+
+      Person & email address to contact for further information:
+
+         Jim Sermersheim
+
+         jimse@novell.com
+
+      Usage: other
+
+      Specification: RFCXXXX
+
+      Author/Change Controller: IESG
+
+      Comments: LDAP Syntax
+
+      Subject: Request for LDAP Descriptor Registration
+
+      Descriptor (short name): UTF8String
+
+      Object Identifier: IANA-ASSIGNED-OID.2
+
+      Person & email address to contact for further information:
+
+         Jim Sermersheim
+
+         jimse@novell.com
+
+      Usage: other
+
+      Specification: RFCXXXX
+
+      Author/Change Controller: IESG
+
+      Comments: LDAP Syntax
+
+      Subject: Request for LDAP Descriptor Registration
+
+      Descriptor (short name): changeSequenceNumberMatch
+
+      Object Identifier: IANA-ASSIGNED-OID.3
+
+      Person & email address to contact for further information:
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                [Page 12]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+         Jim Sermersheim
+
+         jimse@novell.com
+
+      Usage: other
+
+      Specification: RFCXXXX
+
+      Author/Change Controller: IESG
+
+      Comments: LDAP Matching Rule
+
+      Subject: Request for LDAP Descriptor Registration
+
+      Descriptor (short name): utf8CodePointMatch
+
+      Object Identifier: IANA-ASSIGNED-OID.4
+
+      Person & email address to contact for further information:
+
+         Jim Sermersheim
+
+         jimse@novell.com
+
+      Usage: other
+
+      Specification: RFCXXXX
+
+      Author/Change Controller: IESG
+
+      Comments: LDAP Matching Rule
+
+      Subject: Request for LDAP Descriptor Registration
+
+      Descriptor (short name): changeSequenceNumberOrderingMatch
+
+      Object Identifier: IANA-ASSIGNED-OID.5
+
+      Person & email address to contact for further information:
+
+         Jim Sermersheim
+
+         jimse@novell.com
+
+      Usage: other
+
+      Specification: RFCXXXX
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                [Page 13]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+      Author/Change Controller: IESG
+
+      Comments: LDAP Matching Rule
+
+      Subject: Request for LDAP Descriptor Registration
+
+      Descriptor (short name): utf8CodePointOrderingMatch
+
+      Object Identifier: IANA-ASSIGNED-OID.6
+
+      Person & email address to contact for further information:
+
+         Jim Sermersheim
+
+         jimse@novell.com
+
+      Usage: other
+
+      Specification: RFCXXXX
+
+      Author/Change Controller: IESG
+
+      Comments: LDAP Matching Rule
+
+      Subject: Request for LDAP Descriptor Registration
+
+      Descriptor (short name): entryCSN
+
+      Object Identifier: IANA-ASSIGNED-OID.7
+
+      Person & email address to contact for further information:
+
+         Jim Sermersheim
+
+         jimse@novell.com
+
+      Usage: Attribute Type
+
+      Specification: RFCXXXX
+
+      Author/Change Controller: IESG
+
+      Comments: LDAP Attribute Type
+
+
+
+
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                [Page 14]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+Authors' Addresses
+
+   Jim Sermersheim
+   Novell, Inc
+   1800 South Novell Place
+   Provo, Utah  84606
+   USA
+
+   Phone: +1 801 861-3088
+   Email: jimse@novell.com
+
+
+   Howard Chu
+   Symas Corp.
+   18740 Oxnard Street, Suite 313A
+   Tarzana, California  91356
+   USA
+
+   Phone: +1 818 757-7087
+   Email: hyc@symas.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                [Page 15]
+
+Internet-Draft                  LDAP CSN                   February 2005
+
+
+Intellectual Property Statement
+
+   The IETF takes no position regarding the validity or scope of any
+   Intellectual Property Rights or other rights that might be claimed to
+   pertain to the implementation or use of the technology described in
+   this document or the extent to which any license under such rights
+   might or might not be available; nor does it represent that it has
+   made any independent effort to identify any such rights.  Information
+   on the procedures with respect to rights in RFC documents can be
+   found in BCP 78 and BCP 79.
+
+   Copies of IPR disclosures made to the IETF Secretariat and any
+   assurances of licenses to be made available, or the result of an
+   attempt made to obtain a general license or permission for the use of
+   such proprietary rights by implementers or users of this
+   specification can be obtained from the IETF on-line IPR repository at
+   http://www.ietf.org/ipr.
+
+   The IETF invites any interested party to bring to its attention any
+   copyrights, patents or patent applications, or other proprietary
+   rights that may cover technology that may be required to implement
+   this standard.  Please address the information to the IETF at
+   ietf-ipr@ietf.org.
+
+
+Disclaimer of Validity
+
+   This document and the information contained herein are provided on an
+   "AS IS" basis and THE CONTRIBUTOR, THE ORGANIZATION HE/SHE REPRESENTS
+   OR IS SPONSORED BY (IF ANY), THE INTERNET SOCIETY AND THE INTERNET
+   ENGINEERING TASK FORCE DISCLAIM ALL WARRANTIES, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO ANY WARRANTY THAT THE USE OF THE
+   INFORMATION HEREIN WILL NOT INFRINGE ANY RIGHTS OR ANY IMPLIED
+   WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+
+Copyright Statement
+
+   Copyright (C) The Internet Society (2005).  This document is subject
+   to the rights, licenses and restrictions contained in BCP 78, and
+   except as set forth therein, the authors retain all their rights.
+
+
+Acknowledgment
+
+   Funding for the RFC Editor function is currently provided by the
+   Internet Society.
+
+
+
+
+Sermersheim & Chu        Expires August 5, 2005                [Page 16]
+
+

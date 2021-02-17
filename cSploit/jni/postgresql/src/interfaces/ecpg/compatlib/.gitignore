@@ -1,0 +1,5 @@
+/compatlib.def
+/libecpg_compatdll.def
+/libecpg_compatddll.def
+/blibecpg_compatdll.def
+/exports.list

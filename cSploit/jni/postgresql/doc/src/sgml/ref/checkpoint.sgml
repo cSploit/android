@@ -1,0 +1,64 @@
+<!-- doc/src/sgml/ref/checkpoint.sgml -->
+
+<refentry id="sql-checkpoint">
+ <refmeta>
+  <refentrytitle>CHECKPOINT</refentrytitle>
+  <manvolnum>7</manvolnum>
+  <refmiscinfo>SQL - Language Statements</refmiscinfo>
+ </refmeta>
+
+ <refnamediv>
+  <refname>CHECKPOINT</refname>
+  <refpurpose>force a transaction log checkpoint</refpurpose>
+ </refnamediv>
+
+ <indexterm zone="sql-checkpoint">
+  <primary>CHECKPOINT</primary>
+ </indexterm>
+
+ <refsynopsisdiv>
+<synopsis>
+CHECKPOINT
+</synopsis>
+ </refsynopsisdiv>
+
+ <refsect1>
+  <title>Description</title>
+
+  <para>
+   Write-Ahead Logging (WAL) puts a checkpoint in the transaction log
+   every so often. (To adjust the automatic checkpoint interval, see
+   the run-time configuration options <xref linkend="guc-checkpoint-segments">
+   and <xref linkend="guc-checkpoint-timeout">.)  The
+   <command>CHECKPOINT</command> command forces an immediate
+   checkpoint when the command is issued, without waiting for a
+   scheduled checkpoint.
+  </para>
+
+  <para>
+   A checkpoint is a point in the transaction log sequence at which
+   all data files have been updated to reflect the information in the
+   log.  All data files will be flushed to disk.  Refer to
+   <xref linkend="wal"> for more information about the WAL system.
+  </para>
+
+  <para>
+   If executed during recovery, the <command>CHECKPOINT</command> command
+   will force a restartpoint rather than writing a new checkpoint.
+  </para>
+
+  <para>
+   Only superusers can call <command>CHECKPOINT</command>.  The command is
+   not intended for use during normal operation.
+  </para>
+ </refsect1>
+
+ <refsect1>
+  <title>Compatibility</title>
+
+  <para>
+   The <command>CHECKPOINT</command> command is a
+   <productname>PostgreSQL</productname> language extension.
+  </para>
+ </refsect1>
+</refentry>

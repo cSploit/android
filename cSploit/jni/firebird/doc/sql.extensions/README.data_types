@@ -1,0 +1,82 @@
+---------------------
+Native SQL data types
+---------------------
+
+
+BIGINT (FB 1.5)
+--------------
+
+  Function:
+    SQL99-compliant exact numeric type.
+	
+  Author:
+    Dmitry Yemanov <yemanov@yandex.ru>
+	
+  Syntax rules:
+    BIGINT
+	
+  Storage:
+    64-bit, signed
+	
+  Example(s):
+    1. DECLARE VARIABLE VAR1 BIGINT;
+    2. CREATE TABLE TABLE1 (FIELD1 BIGINT);
+	
+  Note(s):
+    1. Available in Dialect 3 only.
+    2. Quote from the SQL-99 specification:
+
+	SMALLINT, INTEGER, and BIGINT specify the data type exact numeric,
+	with scale of 0 (zero) and binary or decimal precision. The choice
+	of binary versus decimal precision is implementation-defined, but
+	the same radix shall be chosen for all three data types. The precision
+	of SMALLINT shall be less than or equal to the precision of INTEGER,
+	and the precision of BIGINT shall be greater than or equal to the
+	precision of INTEGER.
+
+
+BOOLEAN (FB 3.0)
+--------------
+
+  Function:
+    SQL2008-compliant boolean type.
+
+  Author:
+    Adriano dos Santos Fernandes <adrianosf at gmail.com>
+
+  Syntax rules:
+    BOOLEAN
+
+  Storage:
+    8-bit
+
+  Example(s):
+    1. DECLARE VARIABLE VAR1 BOOLEAN = TRUE;
+    2. CREATE TABLE TABLE1 (FIELD1 BOOLEAN);
+
+  Note(s):
+    1. Quote from the SQL-2008 specification:
+
+       The data type boolean comprises the distinct truth values TRUE and FALSE. Unless prohibited
+       by a NOT NULL constraint, the boolean data type also supports the truth value UNKNOWN as the
+       null value. This specification does not make a distinction between the null value of the
+       boolean data type and the truth value Unknown that is the result of an SQL <predicate>,
+       <search condition>, or <boolean value expression>; they may be used interchangeably to mean
+       exactly the same thing.
+
+    2. Represented in the API with the FB_BOOLEAN type and FB_TRUE and FB_FALSE constants.
+
+    3. The value TRUE is greater than the value FALSE.
+
+    4. Booleans are not implicitly convertible to any other datatype. But it's convertible to/from
+       strings with CAST.
+
+    5. It's allowed to test booleans without compare with TRUE or FALSE. For example,
+       "field1 OR field2" and "NOT field1" are valid expressions. It's also allowed to compare with
+       others operators, including the new IS operator: "field1 IS FALSE".
+
+    6. For compatibility reasons, the names INSERTING, UPDATING and DELETING (which aren't keywords)
+       work (like in 2.5 and previous) as boolean expressions and work as values (column or
+       variable) in non-booleans expressions. For example, in:
+       SELECT INSERTING, NOT INSERTING FROM TEST WHERE INSERTING AND INSERTING IS TRUE
+       the INSERTING's are respectively recognized as value, keyword, keyword and value.

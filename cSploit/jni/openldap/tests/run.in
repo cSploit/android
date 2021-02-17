@@ -1,0 +1,273 @@
+#!/bin/sh
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+USAGE="$0 [-b <backend>] [-c] [-k] [-l #] [-p] [-s {ro|rp}] [-u] [-w] <script>"
+
+# configure generated
+SRCDIR="@srcdir@"
+TOPSRCDIR="@top_srcdir@"
+LN_S="@LN_S@"
+EGREP_CMD="@EGREP@"
+
+export SRCDIR TOPSRCDIR LN_S EGREP_CMD
+
+# backends known to ./run -b <backend> (used to deduce $BACKENDTYPE)
+AC_bdb=@BUILD_BDB@
+AC_hdb=@BUILD_HDB@
+AC_ldif=yes
+AC_mdb=@BUILD_MDB@
+AC_null=@BUILD_NULL@
+
+# other backends
+AC_ldap=ldap@BUILD_LDAP@
+AC_meta=meta@BUILD_META@
+AC_monitor=@BUILD_MONITOR@
+AC_relay=relay@BUILD_RELAY@
+AC_sql=sql@BUILD_SQL@
+
+# overlays
+AC_accesslog=accesslog@BUILD_ACCESSLOG@
+AC_constraint=constraint@BUILD_CONSTRAINT@
+AC_dds=dds@BUILD_DDS@
+AC_dynlist=dynlist@BUILD_DYNLIST@
+AC_memberof=memberof@BUILD_MEMBEROF@
+AC_pcache=pcache@BUILD_PROXYCACHE@
+AC_ppolicy=ppolicy@BUILD_PPOLICY@
+AC_refint=refint@BUILD_REFINT@
+AC_retcode=retcode@BUILD_RETCODE@
+AC_translucent=translucent@BUILD_TRANSLUCENT@
+AC_unique=unique@BUILD_UNIQUE@
+AC_rwm=rwm@BUILD_RWM@
+AC_syncprov=syncprov@BUILD_SYNCPROV@
+AC_valsort=valsort@BUILD_VALSORT@
+
+# misc
+AC_WITH_SASL=@WITH_SASL@
+AC_WITH_TLS=@WITH_TLS@
+AC_WITH_MODULES_ENABLED=@WITH_MODULES_ENABLED@
+AC_ACI_ENABLED=aci@WITH_ACI_ENABLED@
+AC_THREADS=threads@BUILD_THREAD@
+AC_LIBS_DYNAMIC=lib@BUILD_LIBS_DYNAMIC@
+
+# sanitize
+if test "${AC_ldap}" = "ldapmod" && test "${AC_LIBS_DYNAMIC}" = "static" ; then
+	AC_ldap="ldapno"
+fi
+if test "${AC_meta}" = "metamod" && test "${AC_LIBS_DYNAMIC}" = "static" ; then
+	AC_meta="metano"
+fi
+
+export AC_bdb AC_hdb AC_ldap AC_mdb AC_meta AC_monitor AC_null AC_relay AC_sql \
+	AC_accesslog AC_constraint AC_dds AC_dynlist AC_memberof AC_pcache AC_ppolicy \
+	AC_refint AC_retcode AC_rwm AC_unique AC_syncprov AC_translucent \
+	AC_valsort \
+	AC_WITH_SASL AC_WITH_TLS AC_WITH_MODULES_ENABLED AC_ACI_ENABLED \
+	AC_THREADS AC_LIBS_DYNAMIC
+
+if test ! -x ../servers/slapd/slapd ; then
+	echo "Could not locate slapd(8)"
+	exit 1
+fi
+
+BACKEND=
+CLEAN=no
+WAIT=0
+KILLSERVERS=yes
+PRESERVE=${PRESERVE-no}
+SYNCMODE=${SYNCMODE-rp}
+USERDATA=no
+LOOP=1
+COUNTER=1
+
+while test $# -gt 0 ; do
+	case "$1" in
+		-b | -backend)
+			BACKEND="$2"
+			shift; shift ;;
+
+		-c | -clean)
+			CLEAN=yes
+			shift ;;
+
+		-k | -kill)
+			KILLSERVERS=no
+			shift ;;
+		-l | -loop)
+			NUM="`echo $2 | sed 's/[0-9]//g'`"
+			if [ -z "$NUM" ]; then
+				LOOP=$2
+			else
+				echo "Loop variable not an int: $2"
+				echo "$USAGE"; exit 1
+			fi
+			shift ;
+			shift ;;
+
+		-p | -preserve)
+			PRESERVE=yes
+			shift ;;
+
+		-s | -syncmode)
+			case "$2" in
+				ro | rp)
+					SYNCMODE="$2"
+					;;
+				*)
+					echo "unknown sync mode $2"
+					echo "$USAGE"; exit 1
+					;;
+			esac
+			shift; shift ;;
+
+		-u | -userdata)
+			USERDATA=yes
+			shift ;;
+
+		-w | -wait)
+			WAIT=1
+			shift ;;
+
+		-)
+			shift
+			break ;;
+
+		-*)
+			echo "$USAGE"; exit 1
+			;;
+
+		*)
+			break ;;
+	esac
+done
+
+if test -z "$BACKEND" ; then
+	for b in bdb hdb mdb ; do
+		if eval "test \"\$AC_$b\" != no" ; then
+			BACKEND=$b
+			break
+		fi
+	done
+	if test -z "$BACKEND" ; then
+		echo "No suitable default database backend configured" >&2
+		exit 1
+	fi
+fi
+
+BACKENDTYPE=`eval 'echo $AC_'$BACKEND`
+if test "x$BACKENDTYPE" = "x" ; then
+	BACKENDTYPE="unknown"
+fi
+
+# Backend features.  indexdb: indexing and unchecked limit.
+# maindb: main storage backend.  Currently index,limits,mode,paged results.
+INDEXDB=noindexdb MAINDB=nomaindb
+case $BACKEND in
+	bdb|hdb|mdb) INDEXDB=indexdb MAINDB=maindb ;;
+	ndb) INDEXDB=indexdb ;;
+esac
+
+export	BACKEND BACKENDTYPE INDEXDB MAINDB \
+	WAIT KILLSERVERS PRESERVE SYNCMODE USERDATA
+
+if test $# = 0 ; then
+	echo "$USAGE"; exit 1
+fi
+
+# need defines.sh for the definitions of the directories
+. $SRCDIR/scripts/defines.sh
+
+SCRIPTDIR="${SRCDIR}/scripts"
+SCRIPTNAME="$1"
+shift
+
+if test -x "${SCRIPTDIR}/${SCRIPTNAME}" ; then
+	SCRIPT="${SCRIPTDIR}/${SCRIPTNAME}"
+elif test -x "`echo ${SCRIPTDIR}/test*-${SCRIPTNAME}`"; then
+	SCRIPT="`echo ${SCRIPTDIR}/test*-${SCRIPTNAME}`"
+elif test -x "`echo ${SCRIPTDIR}/${SCRIPTNAME}-*`"; then
+	SCRIPT="`echo ${SCRIPTDIR}/${SCRIPTNAME}-*`"
+else
+	echo "run: ${SCRIPTNAME} not found (or not executable)"
+	exit 1;
+fi
+
+if test ! -r ${DATADIR}/test.ldif ; then
+	${LN_S} ${SRCDIR}/data ${DATADIR}
+fi
+if test ! -r ${SCHEMADIR}/core.schema ; then
+	${LN_S} ${TOPSRCDIR}/servers/slapd/schema ${SCHEMADIR}
+fi
+
+if test -d ${TESTDIR} ; then
+	if test $PRESERVE = no ; then
+		echo "Cleaning up test run directory leftover from previous run."
+		/bin/rm -rf ${TESTDIR}
+	elif test $PRESERVE = yes ; then
+		echo "Cleaning up only database directories leftover from previous run."
+		/bin/rm -rf ${TESTDIR}/db.*
+	fi
+fi
+if test $BACKEND = ndb ; then
+	mysql --user root <<EOF
+	drop database if exists db_1;
+	drop database if exists db_2;
+	drop database if exists db_3;
+	drop database if exists db_4;
+	drop database if exists db_5;
+	drop database if exists db_6;
+EOF
+fi
+mkdir -p ${TESTDIR}
+
+if test $USERDATA = yes ; then
+	if test ! -d userdata ; then
+		echo "User data directory (userdata) does not exist."
+		exit 1
+	fi
+	cp -R userdata/* ${TESTDIR}
+fi
+
+# disable LDAP initialization
+LDAPNOINIT=true; export LDAPNOINIT
+
+echo "Running ${SCRIPT} for ${BACKEND}..."
+while [ $COUNTER -le $LOOP ]; do
+	if [ $LOOP -gt 1 ]; then
+		echo "Running $COUNTER of $LOOP iterations"
+	fi
+	$SCRIPT $*
+	RC=$?
+
+	if test $CLEAN = yes ; then
+		echo "Cleaning up test run directory from this run."
+		/bin/rm -rf ${TESTDIR}
+		echo "Cleaning up symlinks."
+		/bin/rm -f ${DATADIR} ${SCHEMADIR}
+	fi
+
+	if [ $RC -ne 0 ]; then
+		if [ $LOOP -gt 1 ]; then
+			echo "Failed after $COUNTER of $LOOP iterations"
+		fi
+		exit $RC
+	else
+		COUNTER=`expr $COUNTER + 1`
+		if [ $COUNTER -le $LOOP ]; then
+			echo "Cleaning up test run directory from this run."
+			/bin/rm -rf ${TESTDIR}
+		fi
+	fi
+done
+exit $RC

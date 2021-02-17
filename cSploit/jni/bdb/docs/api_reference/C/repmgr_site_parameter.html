@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>repmgr_site</title>
+    <link rel="stylesheet" href="apiReference.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB C API Reference" />
+    <link rel="up" href="configuration_reference.html" title="Appendix D. DB_CONFIG Parameter Reference" />
+    <link rel="prev" href="repmgr_set_ack_policy_parameter.html" title="repmgr_set_ack_policy" />
+    <link rel="next" href="set_cachesize_parameter.html" title="set_cachesize" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">repmgr_site</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="repmgr_set_ack_policy_parameter.html">Prev</a> </td>
+          <th width="60%" align="center">Appendix D. DB_CONFIG Parameter Reference</th>
+          <td width="20%" align="right"> <a accesskey="n" href="set_cachesize_parameter.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="repmgr_site_parameter"></a>repmgr_site</h2>
+          </div>
+        </div>
+      </div>
+      <p>
+                Identifies a Replication Manager site.
+            </p>
+      <p>
+                 The syntax of this parameter in the <a href="../../programmer_reference/env_db_config.html#env_db_config.DB_CONFIG" class="olink">DB_CONFIG</a> file is a
+                 single line with the string
+                 <code class="literal">repmgr_site</code>, one or more
+                 whitespace characters, the host and port parameters
+                 specified as a string and an integer respectively. 
+                 This can optionally be followed by one or more
+                 space-delimited keywords and
+                 <code class="literal">on</code>/<code class="literal">off</code>. For
+                 example:
+            </p>
+      <pre class="programlisting">repmgr_site example.com 49200 db_local_site on db_legacy off</pre>
+      <p>
+                Available keywords are:
+            </p>
+      <div class="itemizedlist">
+        <ul type="disc">
+          <li>
+            <p>
+                        <code class="literal">db_bootstrap_helper</code>
+                    </p>
+            <p>
+                        If turned <code class="literal">on</code>, the identified
+                        site may be used as a "helper" when the local site
+                        is first joining the replication group.  Once the
+                        local site has been established as a member of the
+                        group, this setting is ignored. 
+                    </p>
+          </li>
+          <li>
+            <p>
+                        <code class="literal">db_group_creator</code>
+                    </p>
+            <p>
+                        If turned <code class="literal">on</code>, this site should
+                        create the initial group membership database contents,
+                        defining a "group" of just the one site, rather
+                        than trying to join an existing group when it
+                        starts for the first time.  This setting is only
+                        used on the local site, and is ignored when
+                        configured on a remote site.
+                    </p>
+          </li>
+          <li>
+            <p>
+                        <code class="literal">db_legacy</code>
+                    </p>
+            <p>
+                        If turned <code class="literal">on</code>, specifies that the
+                        site is already part of an existing group. This
+                        setting causes the site to be upgraded from a
+                        previous version of Berkeley DB. All sites in the legacy
+                        group must specify this setting for themselves (the
+                        local site) and for all other sites currently
+                        existing in the group. Once the upgrade has been
+                        completed, this setting is no longer required. 
+                    </p>
+          </li>
+          <li>
+            <p>
+                        <code class="literal">db_local_site</code>
+                    </p>
+            <p>
+                        If turned <code class="literal">on</code>, specifies that
+                        this site is the local site within the replication
+                        group. The application must identify exactly one
+                        site as the local site before replication is
+                        started.
+                    </p>
+          </li>
+          <li>
+            <p>
+                        <code class="literal">db_repmgr_peer</code>
+                    </p>
+            <p>
+                        If turned <code class="literal">on</code>, specifies that the
+                        site may be used as a target for "client-to-client"
+                        synchronization messages. This setting is ignored
+                        if it is turned <code class="literal">on</code> for the local site. 
+                    </p>
+          </li>
+        </ul>
+      </div>
+      <p>
+                For more information, see 
+                <a class="xref" href="dbsite_set_config.html" title="DB_SITE-&gt;set_config()">DB_SITE-&gt;set_config()</a>. 
+            </p>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="repmgr_set_ack_policy_parameter.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="configuration_reference.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="set_cachesize_parameter.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">repmgr_set_ack_policy </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> set_cachesize</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

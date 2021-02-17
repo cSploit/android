@@ -1,0 +1,41 @@
+.TH NWRIGHTS 1 8/1/1996 nwrights nwrights
+.SH NAME
+nwrights \- Show effective rights for file or directory
+.SH SYNOPSIS
+.B nwrights
+[
+.B -h
+]
+.B file/directory
+
+.SH DESCRIPTION
+.B nwrights
+asks the NetWare server for the effective rights the user has for a
+specific file or directory. The rights the server grants are the
+definitive restriction for what you may do with files or
+directories. The Linux permission bits are not really relevant, they
+can only restrict the possibilities further.
+
+.B nwrights
+operates on the current directory or the file or directory that is
+given as an argument. Certainly the file or directory you specify has
+to reside on a ncpfs mounted directory for nwrights to work properly.
+
+.SH OPTIONS
+
+.B -h
+.RS 3
+.B -h
+is used to print out a short help text.
+.RE
+
+.B file/directory
+.RS 3
+You can specify the file or directory you want information about. The
+default is the current working directory.
+.RE
+
+.SH AUTHORS
+nwrights was written by Volker Lendecke with the corresponding NetWare
+utility in mind. See the Changes file of ncpfs for other contributors.
+

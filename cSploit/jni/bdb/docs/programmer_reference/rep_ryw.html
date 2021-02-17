@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Read your writes consistency</title>
+    <link rel="stylesheet" href="gettingStarted.css" type="text/css" />
+    <meta name="generator" content="DocBook XSL Stylesheets V1.73.2" />
+    <link rel="start" href="index.html" title="Berkeley DB Programmer's Reference Guide" />
+    <link rel="up" href="rep.html" title="Chapter 12.  Berkeley DB Replication" />
+    <link rel="prev" href="rep_lease.html" title="Master leases" />
+    <link rel="next" href="rep_clock_skew.html" title="Clock skew" />
+  </head>
+  <body>
+    <div xmlns="" class="navheader">
+      <div class="libver">
+        <p>Library Version 12.1.6.0</p>
+      </div>
+      <table width="100%" summary="Navigation header">
+        <tr>
+          <th colspan="3" align="center">Read your writes consistency</th>
+        </tr>
+        <tr>
+          <td width="20%" align="left"><a accesskey="p" href="rep_lease.html">Prev</a> </td>
+          <th width="60%" align="center">Chapter 12. 
+		Berkeley DB Replication
+        </th>
+          <td width="20%" align="right"> <a accesskey="n" href="rep_clock_skew.html">Next</a></td>
+        </tr>
+      </table>
+      <hr />
+    </div>
+    <div class="sect1" lang="en" xml:lang="en">
+      <div class="titlepage">
+        <div>
+          <div>
+            <h2 class="title" style="clear: both"><a id="rep_ryw"></a>Read your writes consistency</h2>
+          </div>
+        </div>
+      </div>
+      <div class="toc">
+        <dl>
+          <dt>
+            <span class="sect2">
+              <a href="rep_ryw.html#gettoken">Getting a token</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="rep_ryw.html#tokenhandling">Token handling</a>
+            </span>
+          </dt>
+          <dt>
+            <span class="sect2">
+              <a href="rep_ryw.html#usingtoken">Using a token to check or wait for a transaction</a>
+            </span>
+          </dt>
+        </dl>
+      </div>
+      <p>
+        Some applications require the ability to read replicated data at a
+        client site, and determine whether it is consistent with data that
+        has been written previously at the master site.
+    </p>
+      <p>
+        For example, a web application may be backed by multiple database
+        environments, linked to form a replication group, in order to share
+        the workload.  Web requests that update data must be served by the
+        replication master, but any site in the group may serve a read-only
+        request.  Consider a work flow of a series of web requests from one
+        specific user at a web browser: the first request generates a
+        database update, but the second request merely reads data.  If the
+        read-only request is served by a replication client database
+        environment, it may be important to make sure that the updated data
+        has been replicated to the client before performing the read (or to wait
+        until it has been replicated) in order to show this user a
+        consistent view of the data.
+    </p>
+      <p>
+        Berkeley DB supports this requirement through the use of transaction
+        "tokens".  A token is a form of identification for a transaction
+        within the scope of the replication group.  The application may
+        request a copy of the transaction's token at the master site during
+        the execution of the transaction.  Later, the application running
+        on a client site can use a copy of the token to determine whether
+        the transaction has been applied at that site.
+    </p>
+      <p>
+        It is the application's responsibility to keep track of the token
+        during the interim.  In the web example, the token might be sent to
+        the browser as a "cookie", or stored on the application server in
+        the user's session context.
+    </p>
+      <p>
+        The operations described here are supported both for Replication
+        Manager applications and for applications that use the replication
+        Base API.
+    </p>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="gettoken"></a>Getting a token</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            In order to get a token, the application must supply a small
+            memory buffer, using the <a href="../api_reference/C/txnset_commit_token.html" class="olink">DB_TXN-&gt;set_commit_token()</a> method.
+        </p>
+        <p>
+            Note that a token is generated only upon a successful commit
+            operation, and therefore the token buffer content is valid
+            only after a successful commit.  Also, if a transaction does
+            not perform any update operations it does not generate a useful
+            token.
+        </p>
+        <p>
+            In the Berkeley DB Java and C# API, getting a token is simpler.
+            The application need only invoke the <a class="ulink" href="../java/com/sleepycat/db/Transaction.html#getCommitToken()" target="_top">Transaction.getCommitToken()</a> method,
+            after the transaction has committed.
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="tokenhandling"></a>Token handling</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            The application should not try to interpret the content of the
+            token buffer, but may store and/or transmit it freely between
+            systems.  However, since the buffer contains binary data it
+            may be necessary to apply some encoding for transmission (e.g.,
+            base 64).
+        </p>
+        <p>
+            The data is resilient to differences in byte order between
+            different systems.  It does not expire: it may be retained
+            indefinitely for later use, even across Berkeley DB version
+            upgrades.
+        </p>
+      </div>
+      <div class="sect2" lang="en" xml:lang="en">
+        <div class="titlepage">
+          <div>
+            <div>
+              <h3 class="title"><a id="usingtoken"></a>Using a token to check or wait for a transaction</h3>
+            </div>
+          </div>
+        </div>
+        <p>
+            The <a href="../api_reference/C/envtxn_applied.html" class="olink">DB_ENV-&gt;txn_applied()</a> method takes a copy of a token, and
+            determines whether the corresponding transaction is currently
+            applied at the local site.  The timeout argument allows the
+            application to block for a bounded amount of time for cases
+            where the transaction has not yet been applied.
+        </p>
+        <p>
+            Depending on the transaction durability levels implemented or
+            configured by the application, it is sometimes possible for a
+            transaction to disappear from a replication group if an
+            original master site fails and a different site becomes the new
+            master without having received the transaction.  When the
+            <a href="../api_reference/C/envtxn_applied.html" class="olink">DB_ENV-&gt;txn_applied()</a> method discovers this, it produces the
+            <code class="literal">DB_NOTFOUND</code> return code.
+        </p>
+        <p>
+            This means that the results of <a href="../api_reference/C/envtxn_applied.html" class="olink">DB_ENV-&gt;txn_applied()</a> are not guaranteed
+            forever.  Even after a successful call to <a href="../api_reference/C/envtxn_applied.html" class="olink">DB_ENV-&gt;txn_applied()</a>, it is
+            possible that by the time the application tries to read the
+            data, the transaction and its data could have disappeared.
+        </p>
+        <p>
+            To avoid this problem the application should do the read
+            operations in the context of a transaction, and hold the
+            transaction handle open during the <a href="../api_reference/C/envtxn_applied.html" class="olink">DB_ENV-&gt;txn_applied()</a> call.  The
+            <a href="../api_reference/C/envtxn_applied.html" class="olink">DB_ENV-&gt;txn_applied()</a> method itself does not actually execute in the
+            context of the transaction; but no rollbacks due to new master
+            synchronization ever occur while a transaction is active, even
+            a read-only transaction at a client site.
+        </p>
+        <p>
+            Note that the <a href="../api_reference/C/envtxn_applied.html" class="olink">DB_ENV-&gt;txn_applied()</a> method can return
+            <code class="literal">DB_LOCK_DEADLOCK</code>.  The application should
+            respond to this situation just as it does for any other normal
+            operation: abort any existing transaction, and then pause
+            briefly before retrying.
+        </p>
+      </div>
+    </div>
+    <div class="navfooter">
+      <hr />
+      <table width="100%" summary="Navigation footer">
+        <tr>
+          <td width="40%" align="left"><a accesskey="p" href="rep_lease.html">Prev</a> </td>
+          <td width="20%" align="center">
+            <a accesskey="u" href="rep.html">Up</a>
+          </td>
+          <td width="40%" align="right"> <a accesskey="n" href="rep_clock_skew.html">Next</a></td>
+        </tr>
+        <tr>
+          <td width="40%" align="left" valign="top">Master leases </td>
+          <td width="20%" align="center">
+            <a accesskey="h" href="index.html">Home</a>
+          </td>
+          <td width="40%" align="right" valign="top"> Clock skew</td>
+        </tr>
+      </table>
+    </div>
+  </body>
+</html>

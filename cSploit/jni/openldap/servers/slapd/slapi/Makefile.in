@@ -1,0 +1,51 @@
+# Makefile.in for SLAPI
+# $OpenLDAP$
+## This work is part of OpenLDAP Software <http://www.openldap.org/>.
+##
+## Copyright 1998-2014 The OpenLDAP Foundation.
+## Portions Copyright IBM Corp. 1997,2002,2003
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted only as authorized by the OpenLDAP
+## Public License.
+##
+## A copy of this license is available in the file LICENSE in the
+## top-level directory of the distribution or, alternatively, at
+## <http://www.OpenLDAP.org/license.html>.
+
+LIBRARY = libslapi.la
+
+#all-common: $(LIBRARY) $(PROGRAMS)
+#	@touch plugin.c slapi_pblock.c slapi_utils.c slapi_ops.c slapi_ext.c
+
+NT_SRCS = nt_err.c
+NT_OBJS = nt_err.lo
+
+LIB_DEFS = -DSLAPI_LIBRARY
+
+SRCS=  plugin.c slapi_pblock.c slapi_utils.c printmsg.c slapi_ops.c slapi_dn.c slapi_ext.c slapi_overlay.c \
+	$(@PLAT@_SRCS)
+OBJS=  plugin.lo slapi_pblock.lo slapi_utils.lo printmsg.lo slapi_ops.lo slapi_dn.lo slapi_ext.lo slapi_overlay.lo \
+	$(@PLAT@_SRCS)
+
+XSRCS= version.c
+
+LDAP_INCDIR= ../../../include -I.. -I.       
+LDAP_LIBDIR= ../../../libraries       
+
+XLIBS = $(LIBRARY)
+XXLIBS = 
+NT_LINK_LIBS = $(AC_LIBS)
+
+XINCPATH = -I$(srcdir)/.. -I$(srcdir)
+XDEFS = $(MODULES_CPPFLAGS)
+
+BUILD_MOD = @BUILD_SLAPI@
+
+install-local: FORCE
+	if test "$(BUILD_MOD)" = "yes"; then \
+		$(MKDIR) $(DESTDIR)$(libdir); \
+		$(LTINSTALL) $(INSTALLFLAGS) -m 644 $(LIBRARY) $(DESTDIR)$(libdir); \
+	fi
+

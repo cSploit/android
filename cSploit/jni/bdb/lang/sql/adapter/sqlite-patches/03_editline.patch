@@ -1,0 +1,504 @@
+--- Makefile.in
++++ Makefile.in
+@@ -49,7 +49,7 @@
+ 
+ # Compiler options needed for programs that use the readline() library.
+ #
+-READLINE_FLAGS = -DHAVE_READLINE=@TARGET_HAVE_READLINE@ @TARGET_READLINE_INC@
++READLINE_FLAGS = -DHAVE_EDITLINE=@TARGET_HAVE_EDITLINE@ -DHAVE_READLINE=@TARGET_HAVE_READLINE@ @TARGET_READLINE_INC@
+ 
+ # The library that programs using readline() must link against.
+ #
+--- configure
++++ configure
+@@ -889,6 +889,7 @@
+ HAVE_TCL
+ TARGET_READLINE_LIBS
+ TARGET_READLINE_INC
++TARGET_HAVE_EDITLINE
+ TARGET_HAVE_READLINE
+ TARGET_DEBUG
+ USE_AMALGAMATION
+@@ -3733,13 +3734,13 @@
+ else
+   lt_cv_nm_interface="BSD nm"
+   echo "int some_variable = 0;" > conftest.$ac_ext
+-  (eval echo "\"\$as_me:3736: $ac_compile\"" >&5)
++  (eval echo "\"\$as_me:3737: $ac_compile\"" >&5)
+   (eval "$ac_compile" 2>conftest.err)
+   cat conftest.err >&5
+-  (eval echo "\"\$as_me:3739: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
++  (eval echo "\"\$as_me:3740: $NM \\\"conftest.$ac_objext\\\"\"" >&5)
+   (eval "$NM \"conftest.$ac_objext\"" 2>conftest.err > conftest.out)
+   cat conftest.err >&5
+-  (eval echo "\"\$as_me:3742: output\"" >&5)
++  (eval echo "\"\$as_me:3743: output\"" >&5)
+   cat conftest.out >&5
+   if $GREP 'External.*some_variable' conftest.out > /dev/null; then
+     lt_cv_nm_interface="MS dumpbin"
+@@ -4961,7 +4962,7 @@
+   ;;
+ *-*-irix6*)
+   # Find out which ABI we are using.
+-  echo '#line 4964 "configure"' > conftest.$ac_ext
++  echo '#line 4965 "configure"' > conftest.$ac_ext
+   if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+   (eval $ac_compile) 2>&5
+   ac_status=$?
+@@ -6830,11 +6831,11 @@
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:6833: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:6834: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>conftest.err)
+    ac_status=$?
+    cat conftest.err >&5
+-   echo "$as_me:6837: \$? = $ac_status" >&5
++   echo "$as_me:6838: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s "$ac_outfile"; then
+      # The compiler can only warn and ignore the option if not recognized
+      # So say no if there are warnings other than the usual output.
+@@ -7169,11 +7170,11 @@
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:7172: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:7173: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>conftest.err)
+    ac_status=$?
+    cat conftest.err >&5
+-   echo "$as_me:7176: \$? = $ac_status" >&5
++   echo "$as_me:7177: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s "$ac_outfile"; then
+      # The compiler can only warn and ignore the option if not recognized
+      # So say no if there are warnings other than the usual output.
+@@ -7274,11 +7275,11 @@
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:7277: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:7278: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>out/conftest.err)
+    ac_status=$?
+    cat out/conftest.err >&5
+-   echo "$as_me:7281: \$? = $ac_status" >&5
++   echo "$as_me:7282: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s out/conftest2.$ac_objext
+    then
+      # The compiler can only warn and ignore the option if not recognized
+@@ -7329,11 +7330,11 @@
+    -e 's:.*FLAGS}\{0,1\} :&$lt_compiler_flag :; t' \
+    -e 's: [^ ]*conftest\.: $lt_compiler_flag&:; t' \
+    -e 's:$: $lt_compiler_flag:'`
+-   (eval echo "\"\$as_me:7332: $lt_compile\"" >&5)
++   (eval echo "\"\$as_me:7333: $lt_compile\"" >&5)
+    (eval "$lt_compile" 2>out/conftest.err)
+    ac_status=$?
+    cat out/conftest.err >&5
+-   echo "$as_me:7336: \$? = $ac_status" >&5
++   echo "$as_me:7337: \$? = $ac_status" >&5
+    if (exit $ac_status) && test -s out/conftest2.$ac_objext
+    then
+      # The compiler can only warn and ignore the option if not recognized
+@@ -10142,7 +10143,7 @@
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 10145 "configure"
++#line 10146 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -10238,7 +10239,7 @@
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 10241 "configure"
++#line 10242 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -12923,6 +12924,7 @@
+ #
+ TARGET_READLINE_LIBS=""
+ TARGET_READLINE_INC=""
++TARGET_HAVE_EDITLINE=0
+ TARGET_HAVE_READLINE=0
+ # Check whether --enable-readline was given.
+ if test "${enable_readline+set}" = set; then
+@@ -12933,6 +12935,7 @@
+ 
+ 
+ if test x"$with_readline" != xno; then
++	header=readline.h
+ 	found="yes"
+ 
+ 
+@@ -12944,9 +12947,12 @@
+ fi
+ 
+ 	if test "x$with_readline_lib" = xauto; then
+-		save_LIBS="$LIBS"
+-		LIBS=""
+-		{ $as_echo "$as_me:$LINENO: checking for library containing tgetent" >&5
++		for rl_lib in edit readline; do
++			found="yes"
++			save_LIBS="$LIBS"
++			LIBS=""
++			$as_unset ac_cv_search_tgetent || test "${ac_cv_search_tgetent+set}" != set || { ac_cv_search_tgetent=; export ac_cv_search_tgetent; }
++			{ $as_echo "$as_me:$LINENO: checking for library containing tgetent" >&5
+ $as_echo_n "checking for library containing tgetent... " >&6; }
+ if test "${ac_cv_search_tgetent+set}" = set; then
+   $as_echo_n "(cached) " >&6
+@@ -12974,7 +12980,7 @@
+   return 0;
+ }
+ _ACEOF
+-for ac_lib in '' readline ncurses curses termcap; do
++for ac_lib in '' $rl_lib ncurses curses termcap; do
+   if test -z "$ac_lib"; then
+     ac_res="none required"
+   else
+@@ -13035,13 +13041,14 @@
+   term_LIBS=""
+ fi
+ 
+-		{ $as_echo "$as_me:$LINENO: checking for readline in -lreadline" >&5
+-$as_echo_n "checking for readline in -lreadline... " >&6; }
+-if test "${ac_cv_lib_readline_readline+set}" = set; then
++			as_ac_Lib=`$as_echo "ac_cv_lib_$rl_lib''_readline" | $as_tr_sh`
++{ $as_echo "$as_me:$LINENO: checking for readline in -l$rl_lib" >&5
++$as_echo_n "checking for readline in -l$rl_lib... " >&6; }
++if { as_var=$as_ac_Lib; eval "test \"\${$as_var+set}\" = set"; }; then
+   $as_echo_n "(cached) " >&6
+ else
+   ac_check_lib_save_LIBS=$LIBS
+-LIBS="-lreadline  $LIBS"
++LIBS="-l$rl_lib  $LIBS"
+ cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+ _ACEOF
+@@ -13085,12 +13092,12 @@
+ 	 test "$cross_compiling" = yes ||
+ 	 $as_test_x conftest$ac_exeext
+        }; then
+-  ac_cv_lib_readline_readline=yes
++  eval "$as_ac_Lib=yes"
+ else
+   $as_echo "$as_me: failed program was:" >&5
+ sed 's/^/| /' conftest.$ac_ext >&5
+ 
+-	ac_cv_lib_readline_readline=no
++	eval "$as_ac_Lib=no"
+ fi
+ 
+ rm -rf conftest.dSYM
+@@ -13098,16 +13105,28 @@
+       conftest$ac_exeext conftest.$ac_ext
+ LIBS=$ac_check_lib_save_LIBS
+ fi
+-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_readline_readline" >&5
+-$as_echo "$ac_cv_lib_readline_readline" >&6; }
+-if test $ac_cv_lib_readline_readline = yes; then
+-  TARGET_READLINE_LIBS="-lreadline"
++ac_res=`eval 'as_val=${'$as_ac_Lib'}
++		 $as_echo "$as_val"'`
++	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
++$as_echo "$ac_res" >&6; }
++if test `eval 'as_val=${'$as_ac_Lib'}
++		 $as_echo "$as_val"'` = yes; then
++  TARGET_READLINE_LIBS="-l$rl_lib"
+ else
+   found="no"
+ fi
+ 
+-		TARGET_READLINE_LIBS="$TARGET_READLINE_LIBS $term_LIBS"
+-		LIBS="$save_LIBS"
++			TARGET_READLINE_LIBS="$TARGET_READLINE_LIBS $term_LIBS"
++			LIBS="$save_LIBS"
++			if test "$found" = "yes"; then
++				break
++			fi
++		done
++
++		if test "$rl_lib" = "edit"; then
++			header="editline/readline.h"
++			TARGET_HAVE_EDITLINE=1
++		fi
+ 	else
+ 		TARGET_READLINE_LIBS="$with_readline_lib"
+ 	fi
+@@ -13121,18 +13140,21 @@
+ fi
+ 
+ 	if test "x$with_readline_inc" = xauto; then
+-		if test "${ac_cv_header_readline_h+set}" = set; then
+-  { $as_echo "$as_me:$LINENO: checking for readline.h" >&5
+-$as_echo_n "checking for readline.h... " >&6; }
+-if test "${ac_cv_header_readline_h+set}" = set; then
+-  $as_echo_n "(cached) " >&6
+-fi
+-{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_readline_h" >&5
+-$as_echo "$ac_cv_header_readline_h" >&6; }
++		as_ac_Header=`$as_echo "ac_cv_header_$header" | $as_tr_sh`
++if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
++  { $as_echo "$as_me:$LINENO: checking for $header" >&5
++$as_echo_n "checking for $header... " >&6; }
++if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
++  $as_echo_n "(cached) " >&6
++fi
++ac_res=`eval 'as_val=${'$as_ac_Header'}
++		 $as_echo "$as_val"'`
++	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
++$as_echo "$ac_res" >&6; }
+ else
+   # Is the header compilable?
+-{ $as_echo "$as_me:$LINENO: checking readline.h usability" >&5
+-$as_echo_n "checking readline.h usability... " >&6; }
++{ $as_echo "$as_me:$LINENO: checking $header usability" >&5
++$as_echo_n "checking $header usability... " >&6; }
+ cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+ _ACEOF
+@@ -13140,7 +13162,7 @@
+ cat >>conftest.$ac_ext <<_ACEOF
+ /* end confdefs.h.  */
+ $ac_includes_default
+-#include <readline.h>
++#include <$header>
+ _ACEOF
+ rm -f conftest.$ac_objext
+ if { (ac_try="$ac_compile"
+@@ -13173,15 +13195,15 @@
+ $as_echo "$ac_header_compiler" >&6; }
+ 
+ # Is the header present?
+-{ $as_echo "$as_me:$LINENO: checking readline.h presence" >&5
+-$as_echo_n "checking readline.h presence... " >&6; }
++{ $as_echo "$as_me:$LINENO: checking $header presence" >&5
++$as_echo_n "checking $header presence... " >&6; }
+ cat >conftest.$ac_ext <<_ACEOF
+ /* confdefs.h.  */
+ _ACEOF
+ cat confdefs.h >>conftest.$ac_ext
+ cat >>conftest.$ac_ext <<_ACEOF
+ /* end confdefs.h.  */
+-#include <readline.h>
++#include <$header>
+ _ACEOF
+ if { (ac_try="$ac_cpp conftest.$ac_ext"
+ case "(($ac_try" in
+@@ -13215,40 +13237,43 @@
+ # So?  What about this header?
+ case $ac_header_compiler:$ac_header_preproc:$ac_c_preproc_warn_flag in
+   yes:no: )
+-    { $as_echo "$as_me:$LINENO: WARNING: readline.h: accepted by the compiler, rejected by the preprocessor!" >&5
+-$as_echo "$as_me: WARNING: readline.h: accepted by the compiler, rejected by the preprocessor!" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: readline.h: proceeding with the compiler's result" >&5
+-$as_echo "$as_me: WARNING: readline.h: proceeding with the compiler's result" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: $header: accepted by the compiler, rejected by the preprocessor!" >&5
++$as_echo "$as_me: WARNING: $header: accepted by the compiler, rejected by the preprocessor!" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: $header: proceeding with the compiler's result" >&5
++$as_echo "$as_me: WARNING: $header: proceeding with the compiler's result" >&2;}
+     ac_header_preproc=yes
+     ;;
+   no:yes:* )
+-    { $as_echo "$as_me:$LINENO: WARNING: readline.h: present but cannot be compiled" >&5
+-$as_echo "$as_me: WARNING: readline.h: present but cannot be compiled" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: readline.h:     check for missing prerequisite headers?" >&5
+-$as_echo "$as_me: WARNING: readline.h:     check for missing prerequisite headers?" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: readline.h: see the Autoconf documentation" >&5
+-$as_echo "$as_me: WARNING: readline.h: see the Autoconf documentation" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: readline.h:     section \"Present But Cannot Be Compiled\"" >&5
+-$as_echo "$as_me: WARNING: readline.h:     section \"Present But Cannot Be Compiled\"" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: readline.h: proceeding with the preprocessor's result" >&5
+-$as_echo "$as_me: WARNING: readline.h: proceeding with the preprocessor's result" >&2;}
+-    { $as_echo "$as_me:$LINENO: WARNING: readline.h: in the future, the compiler will take precedence" >&5
+-$as_echo "$as_me: WARNING: readline.h: in the future, the compiler will take precedence" >&2;}
+-
+-    ;;
+-esac
+-{ $as_echo "$as_me:$LINENO: checking for readline.h" >&5
+-$as_echo_n "checking for readline.h... " >&6; }
+-if test "${ac_cv_header_readline_h+set}" = set; then
+-  $as_echo_n "(cached) " >&6
+-else
+-  ac_cv_header_readline_h=$ac_header_preproc
+-fi
+-{ $as_echo "$as_me:$LINENO: result: $ac_cv_header_readline_h" >&5
+-$as_echo "$ac_cv_header_readline_h" >&6; }
+-
+-fi
+-if test $ac_cv_header_readline_h = yes; then
++    { $as_echo "$as_me:$LINENO: WARNING: $header: present but cannot be compiled" >&5
++$as_echo "$as_me: WARNING: $header: present but cannot be compiled" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: $header:     check for missing prerequisite headers?" >&5
++$as_echo "$as_me: WARNING: $header:     check for missing prerequisite headers?" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: $header: see the Autoconf documentation" >&5
++$as_echo "$as_me: WARNING: $header: see the Autoconf documentation" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: $header:     section \"Present But Cannot Be Compiled\"" >&5
++$as_echo "$as_me: WARNING: $header:     section \"Present But Cannot Be Compiled\"" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: $header: proceeding with the preprocessor's result" >&5
++$as_echo "$as_me: WARNING: $header: proceeding with the preprocessor's result" >&2;}
++    { $as_echo "$as_me:$LINENO: WARNING: $header: in the future, the compiler will take precedence" >&5
++$as_echo "$as_me: WARNING: $header: in the future, the compiler will take precedence" >&2;}
++
++    ;;
++esac
++{ $as_echo "$as_me:$LINENO: checking for $header" >&5
++$as_echo_n "checking for $header... " >&6; }
++if { as_var=$as_ac_Header; eval "test \"\${$as_var+set}\" = set"; }; then
++  $as_echo_n "(cached) " >&6
++else
++  eval "$as_ac_Header=\$ac_header_preproc"
++fi
++ac_res=`eval 'as_val=${'$as_ac_Header'}
++		 $as_echo "$as_val"'`
++	       { $as_echo "$as_me:$LINENO: result: $ac_res" >&5
++$as_echo "$ac_res" >&6; }
++
++fi
++if test `eval 'as_val=${'$as_ac_Header'}
++		 $as_echo "$as_val"'` = yes; then
+   found="yes"
+ else
+ 
+@@ -13256,9 +13281,9 @@
+ 			if test "$cross_compiling" != yes; then
+ 				for dir in /usr /usr/local /usr/local/readline /usr/contrib /mingw; do
+ 					for subdir in include include/readline; do
+-						as_ac_File=`$as_echo "ac_cv_file_$dir/$subdir/readline.h" | $as_tr_sh`
+-{ $as_echo "$as_me:$LINENO: checking for $dir/$subdir/readline.h" >&5
+-$as_echo_n "checking for $dir/$subdir/readline.h... " >&6; }
++						as_ac_File=`$as_echo "ac_cv_file_$dir/$subdir/$header" | $as_tr_sh`
++{ $as_echo "$as_me:$LINENO: checking for $dir/$subdir/$header" >&5
++$as_echo_n "checking for $dir/$subdir/$header... " >&6; }
+ if { as_var=$as_ac_File; eval "test \"\${$as_var+set}\" = set"; }; then
+   $as_echo_n "(cached) " >&6
+ else
+@@ -13266,7 +13291,7 @@
+   { { $as_echo "$as_me:$LINENO: error: cannot check for file existence when cross compiling" >&5
+ $as_echo "$as_me: error: cannot check for file existence when cross compiling" >&2;}
+    { (exit 1); exit 1; }; }
+-if test -r "$dir/$subdir/readline.h"; then
++if test -r "$dir/$subdir/$header"; then
+   eval "$as_ac_File=yes"
+ else
+   eval "$as_ac_File=no"
+@@ -13300,6 +13325,7 @@
+ 	if test x"$found" = xno; then
+ 		TARGET_READLINE_LIBS=""
+ 		TARGET_READLINE_INC=""
++		TARGET_HAVE_EDITLINE=0
+ 		TARGET_HAVE_READLINE=0
+ 	else
+ 		TARGET_HAVE_READLINE=1
+@@ -13310,6 +13336,7 @@
+ 
+ 
+ 
++
+ ##########
+ # Figure out what C libraries are required to compile programs
+ # that use "fdatasync()" function.
+--- configure.ac
++++ configure.ac
+@@ -525,6 +525,7 @@
+ #
+ TARGET_READLINE_LIBS=""
+ TARGET_READLINE_INC=""
++TARGET_HAVE_EDITLINE=0
+ TARGET_HAVE_READLINE=0
+ AC_ARG_ENABLE([readline],
+ 	[AC_HELP_STRING([--disable-readline],[disable readline support [default=detect]])],
+@@ -532,6 +533,7 @@
+ 	[with_readline=auto])
+ 
+ if test x"$with_readline" != xno; then
++	header=readline.h
+ 	found="yes"
+ 
+ 	AC_ARG_WITH([readline-lib],
+@@ -539,12 +541,24 @@
+ 		[with_readline_lib=$withval],
+ 		[with_readline_lib="auto"])
+ 	if test "x$with_readline_lib" = xauto; then
+-		save_LIBS="$LIBS"
+-		LIBS=""
+-		AC_SEARCH_LIBS(tgetent, [readline ncurses curses termcap], [term_LIBS="$LIBS"], [term_LIBS=""])
+-		AC_CHECK_LIB([readline], [readline], [TARGET_READLINE_LIBS="-lreadline"], [found="no"])
+-		TARGET_READLINE_LIBS="$TARGET_READLINE_LIBS $term_LIBS"
+-		LIBS="$save_LIBS"
++		for rl_lib in edit readline; do
++			found="yes"
++			save_LIBS="$LIBS"
++			LIBS=""
++			AS_UNSET(ac_cv_search_tgetent)
++			AC_SEARCH_LIBS(tgetent, [$rl_lib ncurses curses termcap], [term_LIBS="$LIBS"], [term_LIBS=""])
++			AC_CHECK_LIB([$rl_lib], [readline], [TARGET_READLINE_LIBS="-l$rl_lib"], [found="no"])
++			TARGET_READLINE_LIBS="$TARGET_READLINE_LIBS $term_LIBS"
++			LIBS="$save_LIBS"
++			if test "$found" = "yes"; then
++				break
++			fi
++		done
++
++		if test "$rl_lib" = "edit"; then
++			header="editline/readline.h"
++			TARGET_HAVE_EDITLINE=1
++		fi
+ 	else
+ 		TARGET_READLINE_LIBS="$with_readline_lib"
+ 	fi
+@@ -554,12 +568,12 @@
+ 		[with_readline_inc=$withval],
+ 		[with_readline_inc="auto"])
+ 	if test "x$with_readline_inc" = xauto; then
+-		AC_CHECK_HEADER(readline.h, [found="yes"], [
++		AC_CHECK_HEADER($header, [found="yes"], [
+ 			found="no"
+ 			if test "$cross_compiling" != yes; then
+ 				for dir in /usr /usr/local /usr/local/readline /usr/contrib /mingw; do
+ 					for subdir in include include/readline; do
+-						AC_CHECK_FILE($dir/$subdir/readline.h, found=yes)
++						AC_CHECK_FILE($dir/$subdir/$header, found=yes)
+ 						if test "$found" = "yes"; then
+ 							TARGET_READLINE_INC="-I$dir/$subdir"
+ 							break
+@@ -576,6 +590,7 @@
+ 	if test x"$found" = xno; then
+ 		TARGET_READLINE_LIBS=""
+ 		TARGET_READLINE_INC=""
++		TARGET_HAVE_EDITLINE=0
+ 		TARGET_HAVE_READLINE=0
+ 	else
+ 		TARGET_HAVE_READLINE=1
+@@ -584,6 +599,7 @@
+ 
+ AC_SUBST(TARGET_READLINE_LIBS)
+ AC_SUBST(TARGET_READLINE_INC)
++AC_SUBST(TARGET_HAVE_EDITLINE)
+ AC_SUBST(TARGET_HAVE_READLINE)
+ 
+ ##########
+--- src/shell.c
++++ src/shell.c
+@@ -45,14 +45,13 @@
+ # include <sys/types.h>
+ #endif
+ 
+-#ifdef HAVE_EDITLINE
++#ifdef HAVE_EDITLINE && HAVE_EDITLINE==1
+ # include <editline/editline.h>
+-#endif
+-#if defined(HAVE_READLINE) && HAVE_READLINE==1
++#elif defined(HAVE_READLINE) && HAVE_READLINE==1
+ # include <readline/readline.h>
+ # include <readline/history.h>
+ #endif
+-#if !defined(HAVE_EDITLINE) && (!defined(HAVE_READLINE) || HAVE_READLINE!=1)
++#if (!defined(HAVE_EDITLINE) || HAVE_EDITLINE!=1) && (!defined(HAVE_READLINE) || HAVE_READLINE!=1)
+ # define readline(p) local_getline(p,stdin,0)
+ # define add_history(X)
+ # define read_history(X)

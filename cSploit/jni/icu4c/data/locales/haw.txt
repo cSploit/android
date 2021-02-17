@@ -1,0 +1,110 @@
+﻿// ***************************************************************************
+// *
+// * Copyright (C) 2010 International Business Machines
+// * Corporation and others.  All Rights Reserved.
+// * Tool: com.ibm.icu.dev.tool.cldr.LDML2ICUConverter.java
+// * Source File:<path>/common/main/haw.xml
+// *
+// ***************************************************************************
+/**
+ *  ICU <specials> source: <path>/xml/main/haw.xml
+ */
+haw{
+    AuxExemplarCharacters{"[b c d f g j q r s t v x y z]"}
+    ExemplarCharacters{"[a ā e ē i ī o ō u ū h k l m n p w ʻ]"}
+    LocaleScript{
+        "Latn",
+    }
+    NumberPatterns{
+        "#,##0.###",
+        "¤#,##0.00;(¤#,##0.00)",
+        "#,##0%",
+        "#E0",
+    }
+    Version{"2.0.47.68"}
+    calendar{
+        gregorian{
+            dayNames{
+                format{
+                    abbreviated{
+                        "LP",
+                        "P1",
+                        "P2",
+                        "P3",
+                        "P4",
+                        "P5",
+                        "P6",
+                    }
+                    wide{
+                        "Lāpule",
+                        "Poʻakahi",
+                        "Poʻalua",
+                        "Poʻakolu",
+                        "Poʻahā",
+                        "Poʻalima",
+                        "Poʻaono",
+                    }
+                }
+            }
+            monthNames{
+                format{
+                    abbreviated{
+                        "Ian.",
+                        "Pep.",
+                        "Mal.",
+                        "ʻAp.",
+                        "Mei",
+                        "Iun.",
+                        "Iul.",
+                        "ʻAu.",
+                        "Kep.",
+                        "ʻOk.",
+                        "Now.",
+                        "Kek.",
+                    }
+                    wide{
+                        "Ianuali",
+                        "Pepeluali",
+                        "Malaki",
+                        "ʻApelila",
+                        "Mei",
+                        "Iune",
+                        "Iulai",
+                        "ʻAukake",
+                        "Kepakemapa",
+                        "ʻOkakopa",
+                        "Nowemapa",
+                        "Kekemapa",
+                    }
+                }
+            }
+        }
+    }
+    measurementSystemNames{
+        US{"ʻAmelika Hui Pū ʻIa"}
+        metric{"Mekalika"}
+    }
+    units{
+        day{
+            other{"{0} lā"}
+        }
+        hour{
+            other{"{0} hola"}
+        }
+        minute{
+            other{"{0} minuke"}
+        }
+        month{
+            other{"{0} mahina"}
+        }
+        second{
+            other{"{0} kekona"}
+        }
+        week{
+            other{"{0} pule"}
+        }
+        year{
+            other{"{0} makahiki"}
+        }
+    }
+}

@@ -1,0 +1,61 @@
+.TH SLAPO-PBIND 5 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" Copyright 2010-2014 The OpenLDAP Foundation, All Rights Reserved.
+.\" Copying restrictions apply.  See the COPYRIGHT file.
+.\" $OpenLDAP$
+.SH NAME
+slapo\-pbind \- proxy bind overlay to slapd
+.SH SYNOPSIS
+ETCDIR/slapd.conf
+.SH DESCRIPTION
+The
+.B pbind
+overlay to
+.BR slapd (8)
+forwards Simple Binds on a local database to a remote
+LDAP server instead of processing them locally. The remote
+connection is managed using an instance of the ldap backend.
+
+.LP 
+The
+.B pbind
+overlay uses a subset of the \fIldap\fP backend's config directives. They
+are described in more detail in
+.BR slapd\-ldap (5).
+
+Note: this overlay is built into the \fIldap\fP backend; it is not a
+separate module.
+
+.TP
+.B overlay pbind
+This directive adds the proxy bind overlay to the current backend.
+The proxy bind overlay may be used with any backend, but it is mainly 
+intended for use with local storage backends.
+
+.TP
+.B uri <ldapurl>
+LDAP server to use.
+
+.TP
+.B tls <TLS parameters>
+Specify the use of TLS.
+
+.TP
+.B network\-timeout <time>
+Set the network timeout.
+
+.TP
+.B quarantine <quarantine parameters>
+Turns on quarantine of URIs that returned
+.IR LDAP_UNAVAILABLE .
+
+.SH FILES
+.TP
+ETCDIR/slapd.conf
+default slapd configuration file
+.SH SEE ALSO
+.BR slapd.conf (5),
+.BR slapd\-config (5),
+.BR slapd\-ldap (5),
+.BR slapd (8).
+.SH AUTHOR
+Howard Chu

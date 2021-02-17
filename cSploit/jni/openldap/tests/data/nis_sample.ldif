@@ -1,0 +1,8092 @@
+dn: o=SGI, c=US
+o: SGI
+objectclass: organization
+objectclass: top
+
+dn: cn=sys, o=SGI, c=US
+cn: sys
+userPassword: 
+gidNumber: 0
+memberUid: root
+memberUid: bin
+memberUid: sys
+memberUid: adm
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=root, o=SGI, c=US
+cn: root
+userPassword: 
+gidNumber: 0
+memberUid: root
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=daemon, o=SGI, c=US
+cn: daemon
+userPassword: 
+gidNumber: 1
+memberUid: root
+memberUid: daemon
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=bin, o=SGI, c=US
+cn: bin
+userPassword: 
+gidNumber: 2
+memberUid: root
+memberUid: bin
+memberUid: daemon
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=adm, o=SGI, c=US
+cn: adm
+userPassword: 
+gidNumber: 3
+memberUid: root
+memberUid: adm
+memberUid: daemon
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=mail, o=SGI, c=US
+cn: mail
+userPassword: 
+gidNumber: 4
+memberUid: root
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=uucp, o=SGI, c=US
+cn: uucp
+userPassword: 
+gidNumber: 5
+memberUid: uucp
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=rje, o=SGI, c=US
+cn: rje
+userPassword: 
+gidNumber: 8
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=lp, o=SGI, c=US
+cn: lp
+userPassword: *
+gidNumber: 9
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=nuucp, o=SGI, c=US
+cn: nuucp
+userPassword: 
+gidNumber: 10
+memberUid: nuucp
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=user, o=SGI, c=US
+cn: user
+userPassword: 
+gidNumber: 20
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=CMWlogin, o=SGI, c=US
+cn: CMWlogin
+userPassword: 
+gidNumber: 994
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=other, o=SGI, c=US
+cn: other
+userPassword: 
+gidNumber: 995
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=demos, o=SGI, c=US
+cn: demos
+userPassword: *
+gidNumber: 997
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=guest, o=SGI, c=US
+cn: guest
+userPassword: *
+gidNumber: 998
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=nobody, o=SGI, c=US
+cn: nobody
+userPassword: *
+gidNumber: 60001
+objectclass: posixGroup
+objectclass: top
+
+dn: cn=mt-everest, o=SGI, c=US
+cn: mt-everest
+cn: mt-everest.engr.sgi.com
+cn: mt-everest
+ipHostNumber: 150.166.97.201
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=IRIS, o=SGI, c=US
+cn: IRIS
+cn: IRIS
+ipHostNumber: 192.0.2.1
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=localhost, o=SGI, c=US
+cn: localhost
+cn: localhost
+ipHostNumber: 127.0.0.1
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=all-systems, o=SGI, c=US
+cn: all-systems
+cn: all-systems.mcast.net
+ipHostNumber: 224.0.0.1
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=all-routers, o=SGI, c=US
+cn: all-routers
+cn: all-routers.mcast.net
+ipHostNumber: 224.0.0.2
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=dvmrp, o=SGI, c=US
+cn: dvmrp
+cn: dvmrp.mcast.net
+ipHostNumber: 224.0.0.4
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=ospf-all, o=SGI, c=US
+cn: ospf-all
+cn: ospf-all.mcast.net
+ipHostNumber: 224.0.0.5
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=ospf-dsig, o=SGI, c=US
+cn: ospf-dsig
+cn: ospf-dsig.mcast.net
+ipHostNumber: 224.0.0.6
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=ntp, o=SGI, c=US
+cn: ntp
+cn: ntp.mcast.net
+ipHostNumber: 224.0.1.1
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=sgi-dog, o=SGI, c=US
+cn: sgi-dog
+cn: sgi-dog.mcast.net
+ipHostNumber: 224.0.1.2
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=rwhod, o=SGI, c=US
+cn: rwhod
+cn: rwhod.mcast.net
+ipHostNumber: 224.0.1.3
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=rwho, o=SGI, c=US
+cn: rwho
+cn: rwho.mcast.net
+ipHostNumber: 224.0.2.1
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=sun-rpc, o=SGI, c=US
+cn: sun-rpc
+cn: sun-rpc.mcast.net
+ipHostNumber: 224.0.2.2
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=localhost, o=SGI, c=US
+cn: localhost
+cn: localhost
+cn: localhost.engr.sgi.com
+cn: loghost
+ipHostNumber: 127.1
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=mcast, o=SGI, c=US
+cn: mcast
+cn: mcast.
+ipHostNumber: 224.0.0.0
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=allhosts-mcast, o=SGI, c=US
+cn: allhosts-mcast
+cn: allhosts-mcast.
+ipHostNumber: 224.0.0.1
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=allgates-mcast, o=SGI, c=US
+cn: allgates-mcast
+cn: allgates-mcast.
+ipHostNumber: 224.0.0.2
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=dvmrp-mcast, o=SGI, c=US
+cn: dvmrp-mcast
+cn: dvmrp-mcast.
+ipHostNumber: 224.0.0.4
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=ospf-all-routers-mcast, o=SGI, c=US
+cn: ospf-all-routers-mcast
+cn: ospf-all-routers-mcast.
+ipHostNumber: 224.0.0.5
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=ospf-desi-routers-mcast, o=SGI, c=US
+cn: ospf-desi-routers-mcast
+cn: ospf-desi-routers-mcast.
+ipHostNumber: 224.0.0.6
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=ntp-mcast, o=SGI, c=US
+cn: ntp-mcast
+cn: ntp-mcast.
+ipHostNumber: 224.0.1.1
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=sgi-dog-mcast, o=SGI, c=US
+cn: sgi-dog-mcast
+cn: sgi-dog-mcast.
+ipHostNumber: 224.0.1.2
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=rwhod-mcast, o=SGI, c=US
+cn: rwhod-mcast
+cn: rwhod-mcast.
+ipHostNumber: 224.0.1.3
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=rwho-mcast, o=SGI, c=US
+cn: rwho-mcast
+cn: rwho-mcast.
+ipHostNumber: 224.0.2.1
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=pmap-mcast, o=SGI, c=US
+cn: pmap-mcast
+cn: pmap-mcast.
+ipHostNumber: 224.0.2.2
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=fddi-odin, o=SGI, c=US
+cn: fddi-odin
+cn: fddi-odin.corp.sgi.com
+cn: fddi-odin
+cn: relay.sgi.com
+cn: oni
+cn: sgihub
+ipHostNumber: 198.29.75.194
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=sgigate, o=SGI, c=US
+cn: sgigate
+cn: sgigate.sgi.com
+cn: socks-proxy-server.sgi.com
+cn: sgigate
+cn: socks-proxy
+cn: socks
+ipHostNumber: 198.29.75.75
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=odin, o=SGI, c=US
+cn: odin
+cn: odin.corp.sgi.com
+cn: odin
+cn: gate-odin
+ipHostNumber: 192.26.51.194
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=relay, o=SGI, c=US
+cn: relay
+cn: relay.esd.sgi.com
+cn: ares
+cn: esd
+ipHostNumber: 130.62.72.10
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=rock, o=SGI, c=US
+cn: rock
+cn: rock.csd.sgi.com
+cn: csd.sgi.com
+cn: relay.csd.sgi.com
+cn: rock
+ipHostNumber: 150.166.101.10
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=stiletto, o=SGI, c=US
+cn: stiletto
+cn: stiletto
+ipHostNumber: 150.166.42.26
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=stiletto, o=SGI, c=US
+cn: stiletto
+cn: stiletto.engr.sgi.com
+cn: stiletto
+ipHostNumber: 150.166.42.26
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=lhola, o=SGI, c=US
+cn: lhola
+cn: lhola.engr.sgi.com
+cn: lhola
+ipHostNumber: 150.166.75.55
+objectclass: ipHost
+objectclass: device
+objectclass: top
+
+dn: cn=dhcp-166-75-76, o=SGI, c=US
+cn: dhcp-166-75-76
+cn: dhcp-166-75-76.engr.sgi.com
+cn: dhcp-166-75-76
+macAddress: 8:0:69:2:ed:b3
+ipHostNumber: 150.166.75.76
+objectclass: ipHost
+objectclass: device
+objectclass: top
+objectclass: ieee802Device
+
+dn: cn=loopback, o=SGI, c=US
+cn: loopback
+cn: loopback.sgi.com
+ipNetworkNumber: 127
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sgicust, o=SGI, c=US
+cn: sgicust
+ipNetworkNumber: 192.26.50
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bacbone, o=SGI, c=US
+cn: bacbone
+ipNetworkNumber: 192.26.51
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2, o=SGI, c=US
+cn: b2
+ipNetworkNumber: 192.26.52
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b4-esdvt-fddi-test-net, o=SGI, c=US
+cn: b4-esdvt-fddi-test-net
+ipNetworkNumber: 192.26.53
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3u-engr-slip, o=SGI, c=US
+cn: b3u-engr-slip
+ipNetworkNumber: 192.26.54
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-isdn-fddibackbone, o=SGI, c=US
+cn: b2u-isdn-fddibackbone
+ipNetworkNumber: 192.26.55
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-isdn-net, o=SGI, c=US
+cn: b2u-isdn-net
+ipNetworkNumber: 192.26.56
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b4, o=SGI, c=US
+cn: b4
+ipNetworkNumber: 192.26.57
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3u-ffdi-lab, o=SGI, c=US
+cn: b3u-ffdi-lab
+ipNetworkNumber: 192.26.59
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-gandalf, o=SGI, c=US
+cn: b2-gandalf
+ipNetworkNumber: 192.26.60
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9U, o=SGI, c=US
+cn: b9U
+ipNetworkNumber: 192.26.61
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-vis-sim, o=SGI, c=US
+cn: b7l-vis-sim
+ipNetworkNumber: 192.26.62
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9L-rel, o=SGI, c=US
+cn: b9L-rel
+ipNetworkNumber: 192.26.63
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8-ofc, o=SGI, c=US
+cn: b8-ofc
+ipNetworkNumber: 192.26.65
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12-mfg-lab, o=SGI, c=US
+cn: b12-mfg-lab
+ipNetworkNumber: 192.26.66
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-psd-sw, o=SGI, c=US
+cn: b1-psd-sw
+ipNetworkNumber: 192.26.67
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9L-comp-ffdi, o=SGI, c=US
+cn: b9L-comp-ffdi
+ipNetworkNumber: 192.26.68
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wpd-dless, o=SGI, c=US
+cn: wpd-dless
+ipNetworkNumber: 192.26.69
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2L-VSG-staff, o=SGI, c=US
+cn: b2L-VSG-staff
+ipNetworkNumber: 192.26.70
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-nei2, o=SGI, c=US
+cn: b2u-nei2
+ipNetworkNumber: 192.26.71
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7u-gfxsw, o=SGI, c=US
+cn: b7u-gfxsw
+ipNetworkNumber: 192.26.72
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7u-gfxhw, o=SGI, c=US
+cn: b7u-gfxhw
+ipNetworkNumber: 192.26.73
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-ids, o=SGI, c=US
+cn: b9l-ids
+ipNetworkNumber: 192.26.74
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-ng, o=SGI, c=US
+cn: b9u-ng
+ipNetworkNumber: 192.26.75
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-pfng1, o=SGI, c=US
+cn: b9l-pfng1
+ipNetworkNumber: 192.26.76
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b789atm, o=SGI, c=US
+cn: b789atm
+ipNetworkNumber: 192.26.77
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wpd-slip, o=SGI, c=US
+cn: wpd-slip
+ipNetworkNumber: 192.26.78
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-pubs, o=SGI, c=US
+cn: b9l-pubs
+ipNetworkNumber: 192.26.79
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=engr-fddi, o=SGI, c=US
+cn: engr-fddi
+ipNetworkNumber: 192.26.80
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dms, o=SGI, c=US
+cn: b1-dms
+ipNetworkNumber: 192.26.81
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-os, o=SGI, c=US
+cn: b7l-os
+cn: sgi48-150.sgi.com
+ipNetworkNumber: 192.48.150
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=show, o=SGI, c=US
+cn: show
+ipNetworkNumber: 192.26.82
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=timewarner-fsn, o=SGI, c=US
+cn: timewarner-fsn
+ipNetworkNumber: 192.48.146
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=vtel-mcast-net, o=SGI, c=US
+cn: vtel-mcast-net
+ipNetworkNumber: 192.48.147
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b24u-lab, o=SGI, c=US
+cn: b24u-lab
+ipNetworkNumber: 192.48.148
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wpd-fddi2, o=SGI, c=US
+cn: wpd-fddi2
+ipNetworkNumber: 192.48.149
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b24u-lab, o=SGI, c=US
+cn: b24u-lab
+ipNetworkNumber: 192.48.151
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-polevault, o=SGI, c=US
+cn: b1-polevault
+ipNetworkNumber: 192.48.152
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=barrnet, o=SGI, c=US
+cn: barrnet
+ipNetworkNumber: 192.48.153
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3u-eisa-lab, o=SGI, c=US
+cn: b3u-eisa-lab
+ipNetworkNumber: 192.48.154
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hippi-net, o=SGI, c=US
+cn: hippi-net
+ipNetworkNumber: 192.48.155
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=munich-support, o=SGI, c=US
+cn: munich-support
+ipNetworkNumber: 192.48.156
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=boston, o=SGI, c=US
+cn: boston
+ipNetworkNumber: 192.48.157
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9L-pfng3, o=SGI, c=US
+cn: b9L-pfng3
+cn: sgi44
+ipNetworkNumber: 192.48.158
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9L-pfng4, o=SGI, c=US
+cn: b9L-pfng4
+cn: sgi45
+ipNetworkNumber: 192.48.159
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9L-pfng5, o=SGI, c=US
+cn: b9L-pfng5
+cn: sgi46
+ipNetworkNumber: 192.48.160
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9L-pfng6, o=SGI, c=US
+cn: b9L-pfng6
+cn: sgi47
+ipNetworkNumber: 192.48.161
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9L-pfng7, o=SGI, c=US
+cn: b9L-pfng7
+cn: sgi48
+ipNetworkNumber: 192.48.162
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9L-pfng8, o=SGI, c=US
+cn: b9L-pfng8
+cn: sgi49
+ipNetworkNumber: 192.48.163
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-eprise, o=SGI, c=US
+cn: b9u-eprise
+cn: sgi48-164.sgi.com
+ipNetworkNumber: 192.48.164
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-oslab, o=SGI, c=US
+cn: b7l-oslab
+cn: sgi51
+ipNetworkNumber: 192.48.165
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=add-brds_lab1, o=SGI, c=US
+cn: add-brds_lab1
+ipNetworkNumber: 192.48.166
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-informix, o=SGI, c=US
+cn: b8u-informix
+ipNetworkNumber: 192.48.167
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dm-fddi, o=SGI, c=US
+cn: b1-dm-fddi
+cn: sgi48-168
+ipNetworkNumber: 192.48.168
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-isdn, o=SGI, c=US
+cn: b9l-isdn
+cn: sgi48-169
+ipNetworkNumber: 192.48.169
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-teleconf, o=SGI, c=US
+cn: b1-teleconf
+cn: sgi48-170.sgi.com
+ipNetworkNumber: 192.48.170
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-tr3, o=SGI, c=US
+cn: b9u-tr3
+cn: sgi48-171.sgi.com
+ipNetworkNumber: 192.48.171
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7-slip, o=SGI, c=US
+cn: b7-slip
+cn: sgi48-172.sgi.com
+ipNetworkNumber: 192.48.172
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-sqa-fddi, o=SGI, c=US
+cn: b9l-sqa-fddi
+cn: sgi48-173.sgi.com
+ipNetworkNumber: 192.48.173
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-asd-fddi, o=SGI, c=US
+cn: b7l-asd-fddi
+cn: sgi48-174
+ipNetworkNumber: 192.48.174
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sgi48-175, o=SGI, c=US
+cn: sgi48-175
+ipNetworkNumber: 192.48.175
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sgi48-176, o=SGI, c=US
+cn: sgi48-176
+ipNetworkNumber: 192.48.176
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sgi48-177, o=SGI, c=US
+cn: sgi48-177
+ipNetworkNumber: 192.48.177
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sgi48-178, o=SGI, c=US
+cn: sgi48-178
+ipNetworkNumber: 192.48.178
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sgi48-179, o=SGI, c=US
+cn: sgi48-179
+ipNetworkNumber: 192.48.179
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=engr-ppp-2, o=SGI, c=US
+cn: engr-ppp-2
+ipNetworkNumber: 192.48.180
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=engr-ppp-3, o=SGI, c=US
+cn: engr-ppp-3
+ipNetworkNumber: 192.48.181
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-tpc3, o=SGI, c=US
+cn: b7l-tpc3
+cn: sgi48-182
+ipNetworkNumber: 192.48.182
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-tpc4, o=SGI, c=US
+cn: b7l-tpc4
+cn: sgi48-183
+ipNetworkNumber: 192.48.183
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-tpc5, o=SGI, c=US
+cn: b7l-tpc5
+cn: sgi48-184
+ipNetworkNumber: 192.48.184
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-tpc6, o=SGI, c=US
+cn: b7l-tpc6
+cn: sgi48-185
+ipNetworkNumber: 192.48.185
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-tpc7, o=SGI, c=US
+cn: b7l-tpc7
+cn: sgi48-186
+ipNetworkNumber: 192.48.186
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-tpc8, o=SGI, c=US
+cn: b7l-tpc8
+cn: sgi48-187
+ipNetworkNumber: 192.48.187
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bldr-fddi_1, o=SGI, c=US
+cn: bldr-fddi_1
+cn: sgi48-188.sgi.com
+ipNetworkNumber: 192.48.188
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bldr-fddi_2, o=SGI, c=US
+cn: bldr-fddi_2
+cn: sgi48-189.sgi.com
+ipNetworkNumber: 192.48.189
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bldr-ether, o=SGI, c=US
+cn: bldr-ether
+cn: sgi48-190.sgi.com
+ipNetworkNumber: 192.48.190
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-visual, o=SGI, c=US
+cn: b1-visual
+ipNetworkNumber: 192.48.191
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3-esd-swlabs, o=SGI, c=US
+cn: b3-esd-swlabs
+ipNetworkNumber: 192.48.192
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b4-mfg-dvt, o=SGI, c=US
+cn: b4-mfg-dvt
+ipNetworkNumber: 192.48.194
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-pppnet, o=SGI, c=US
+cn: b9-pppnet
+ipNetworkNumber: 192.48.195
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-servers, o=SGI, c=US
+cn: b7l-servers
+ipNetworkNumber: 192.48.196
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-slipnet, o=SGI, c=US
+cn: is-slipnet
+ipNetworkNumber: 192.48.197
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3-esd-sw, o=SGI, c=US
+cn: b3-esd-sw
+ipNetworkNumber: 192.48.198
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ha-net, o=SGI, c=US
+cn: ha-net
+ipNetworkNumber: 192.48.199
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-awmtv-200, o=SGI, c=US
+cn: b21-awmtv-200
+ipNetworkNumber: 192.48.200
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-awmtv-201, o=SGI, c=US
+cn: b21-awmtv-201
+ipNetworkNumber: 192.48.201
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=voxproc, o=SGI, c=US
+cn: voxproc
+ipNetworkNumber: 192.48.202
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b4-csd-repair, o=SGI, c=US
+cn: b4-csd-repair
+ipNetworkNumber: 192.48.203
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3-swltest, o=SGI, c=US
+cn: b3-swltest
+ipNetworkNumber: 192.48.204
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2l-system-lab, o=SGI, c=US
+cn: b2l-system-lab
+ipNetworkNumber: 192.48.205
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=nawaf-home_net, o=SGI, c=US
+cn: nawaf-home_net
+ipNetworkNumber: 192.48.206
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-wpd-qa1, o=SGI, c=US
+cn: b9-wpd-qa1
+ipNetworkNumber: 192.82.162
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=fddi-net, o=SGI, c=US
+cn: fddi-net
+ipNetworkNumber: 192.82.163
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=fddi-mezz, o=SGI, c=US
+cn: fddi-mezz
+ipNetworkNumber: 192.82.164
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8-b11_fddi-test, o=SGI, c=US
+cn: b8-b11_fddi-test
+ipNetworkNumber: 192.82.165
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-mooosehead, o=SGI, c=US
+cn: b1-mooosehead
+ipNetworkNumber: 192.82.166
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-ppp-slip, o=SGI, c=US
+cn: b7l-ppp-slip
+ipNetworkNumber: 192.82.167
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-mfg, o=SGI, c=US
+cn: b11-mfg
+ipNetworkNumber: 192.82.168
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-slip_ppp, o=SGI, c=US
+cn: b1-slip_ppp
+ipNetworkNumber: 192.82.169
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-modem-net, o=SGI, c=US
+cn: b2-modem-net
+ipNetworkNumber: 192.82.170
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-tools, o=SGI, c=US
+cn: b1-tools
+ipNetworkNumber: 192.82.171
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-asd, o=SGI, c=US
+cn: b7l-asd
+ipNetworkNumber: 192.82.172
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=mel-net, o=SGI, c=US
+cn: mel-net
+ipNetworkNumber: 192.82.173
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12-business, o=SGI, c=US
+cn: b12-business
+ipNetworkNumber: 192.82.174
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-east, o=SGI, c=US
+cn: b11-east
+ipNetworkNumber: 192.82.175
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-west, o=SGI, c=US
+cn: b11-west
+ipNetworkNumber: 192.82.176
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=china-web_test, o=SGI, c=US
+cn: china-web_test
+ipNetworkNumber: 192.82.177
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=aw-net1, o=SGI, c=US
+cn: aw-net1
+ipNetworkNumber: 192.82.178
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-firewall-testing, o=SGI, c=US
+cn: b1-firewall-testing
+ipNetworkNumber: 192.82.179
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3-corptest, o=SGI, c=US
+cn: b3-corptest
+ipNetworkNumber: 192.82.180
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-networking, o=SGI, c=US
+cn: b9u-networking
+ipNetworkNumber: 192.82.181
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=uk, o=SGI, c=US
+cn: uk
+ipNetworkNumber: 192.82.182
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8l-lab, o=SGI, c=US
+cn: b8l-lab
+ipNetworkNumber: 192.82.183
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=isdn-net, o=SGI, c=US
+cn: isdn-net
+ipNetworkNumber: 192.82.184
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-hwlab, o=SGI, c=US
+cn: b2-hwlab
+ipNetworkNumber: 192.82.185
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-labs, o=SGI, c=US
+cn: b2u-labs
+ipNetworkNumber: 192.82.186
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b4-csd, o=SGI, c=US
+cn: b4-csd
+ipNetworkNumber: 192.82.187
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-mfg-cubes, o=SGI, c=US
+cn: b11-mfg-cubes
+ipNetworkNumber: 192.82.188
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-media-lab, o=SGI, c=US
+cn: b9l-media-lab
+ipNetworkNumber: 192.82.189
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-ort-lab, o=SGI, c=US
+cn: b11-ort-lab
+ipNetworkNumber: 192.82.190
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=meriden, o=SGI, c=US
+cn: meriden
+ipNetworkNumber: 192.82.191
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-idslabdev, o=SGI, c=US
+cn: b9-idslabdev
+ipNetworkNumber: 192.82.192
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sylvain-siou-net, o=SGI, c=US
+cn: sylvain-siou-net
+ipNetworkNumber: 192.82.193
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7u-hwtest, o=SGI, c=US
+cn: b7u-hwtest
+ipNetworkNumber: 192.82.194
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-mktg-high_performance-lab, o=SGI, c=US
+cn: b7l-mktg-high_performance-lab
+ipNetworkNumber: 192.82.195
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wan-serial-routers, o=SGI, c=US
+cn: wan-serial-routers
+ipNetworkNumber: 192.82.196
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=gouda-net, o=SGI, c=US
+cn: gouda-net
+ipNetworkNumber: 192.82.197
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=xfs-slip, o=SGI, c=US
+cn: xfs-slip
+ipNetworkNumber: 192.82.198
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-ngs-net, o=SGI, c=US
+cn: b1-ngs-net
+ipNetworkNumber: 192.82.200
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=siapt, o=SGI, c=US
+cn: siapt
+ipNetworkNumber: 192.82.202
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-token_lab, o=SGI, c=US
+cn: b1-token_lab
+ipNetworkNumber: 192.82.203
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=asd-slipnet3, o=SGI, c=US
+cn: asd-slipnet3
+ipNetworkNumber: 192.82.204
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=newport-bch1-net, o=SGI, c=US
+cn: newport-bch1-net
+ipNetworkNumber: 192.82.205
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=newport-bch2-net, o=SGI, c=US
+cn: newport-bch2-net
+ipNetworkNumber: 192.82.206
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12-esd, o=SGI, c=US
+cn: b12-esd
+ipNetworkNumber: 192.82.207
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sgi-psi, o=SGI, c=US
+cn: sgi-psi
+ipNetworkNumber: 192.82.208
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-100mb-net, o=SGI, c=US
+cn: b2-100mb-net
+ipNetworkNumber: 192.82.209
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3-100mb-net, o=SGI, c=US
+cn: b3-100mb-net
+ipNetworkNumber: 192.82.210
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-mfg_engr, o=SGI, c=US
+cn: b8u-mfg_engr
+ipNetworkNumber: 192.82.211
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=vsg-esd, o=SGI, c=US
+cn: vsg-esd
+ipNetworkNumber: 192.102.96
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=mbus-fddi_1, o=SGI, c=US
+cn: mbus-fddi_1
+ipNetworkNumber: 192.102.98
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11a-endusr-net, o=SGI, c=US
+cn: b11a-endusr-net
+ipNetworkNumber: 192.102.99
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-test, o=SGI, c=US
+cn: is-test
+ipNetworkNumber: 192.102.100
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11b-endusr-net, o=SGI, c=US
+cn: b11b-endusr-net
+ipNetworkNumber: 192.102.101
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tokyo-training1, o=SGI, c=US
+cn: tokyo-training1
+ipNetworkNumber: 192.102.102
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tokyo-training2, o=SGI, c=US
+cn: tokyo-training2
+ipNetworkNumber: 192.102.103
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=kawasaki-agd, o=SGI, c=US
+cn: kawasaki-agd
+ipNetworkNumber: 192.102.104
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=mbus-fddi_2, o=SGI, c=US
+cn: mbus-fddi_2
+ipNetworkNumber: 192.102.105
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hk-net, o=SGI, c=US
+cn: hk-net
+ipNetworkNumber: 192.102.106
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7u-hwlab, o=SGI, c=US
+cn: b7u-hwlab
+ipNetworkNumber: 192.102.107
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b6-brief, o=SGI, c=US
+cn: b6-brief
+ipNetworkNumber: 192.102.108
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=kawasaki-indy, o=SGI, c=US
+cn: kawasaki-indy
+ipNetworkNumber: 192.102.109
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11a-highend-1, o=SGI, c=US
+cn: b11a-highend-1
+ipNetworkNumber: 192.102.110
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11a-highend-2, o=SGI, c=US
+cn: b11a-highend-2
+ipNetworkNumber: 192.102.111
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b789hippi, o=SGI, c=US
+cn: b789hippi
+ipNetworkNumber: 192.102.112
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8-benchmark1, o=SGI, c=US
+cn: b8-benchmark1
+ipNetworkNumber: 192.102.114.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8-benchmark2, o=SGI, c=US
+cn: b8-benchmark2
+ipNetworkNumber: 192.102.115.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8-benchmark3, o=SGI, c=US
+cn: b8-benchmark3
+ipNetworkNumber: 192.102.116.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3u-community1, o=SGI, c=US
+cn: b3u-community1
+ipNetworkNumber: 192.102.117
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3u-community2, o=SGI, c=US
+cn: b3u-community2
+ipNetworkNumber: 192.102.118
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3u-finnance-is, o=SGI, c=US
+cn: b3u-finnance-is
+ipNetworkNumber: 192.102.119
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-agd_lab, o=SGI, c=US
+cn: b8u-agd_lab
+ipNetworkNumber: 192.102.120
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-highend-mfg1, o=SGI, c=US
+cn: b11-highend-mfg1
+ipNetworkNumber: 192.102.122
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b6-demo-net, o=SGI, c=US
+cn: b6-demo-net
+ipNetworkNumber: 192.102.129
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11b-mfg-servernet-1, o=SGI, c=US
+cn: b11b-mfg-servernet-1
+ipNetworkNumber: 192.102.130
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-asd-net, o=SGI, c=US
+cn: b9-asd-net
+ipNetworkNumber: 192.102.131
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-mfg-net, o=SGI, c=US
+cn: b2-mfg-net
+ipNetworkNumber: 192.102.132
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11b-mfg-servernet-2, o=SGI, c=US
+cn: b11b-mfg-servernet-2
+ipNetworkNumber: 192.102.133
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7u-syshw, o=SGI, c=US
+cn: b7u-syshw
+ipNetworkNumber: 192.102.135
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b4-csdlab, o=SGI, c=US
+cn: b4-csdlab
+ipNetworkNumber: 192.102.136
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-cselabC, o=SGI, c=US
+cn: b17u-cselabC
+ipNetworkNumber: 192.102.137
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b15-websafe, o=SGI, c=US
+cn: b15-websafe
+ipNetworkNumber: 192.102.138
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14l-engr, o=SGI, c=US
+cn: b14l-engr
+ipNetworkNumber: 192.102.141
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14-upper, o=SGI, c=US
+cn: b14-upper
+ipNetworkNumber: 192.102.142
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b5u-finance, o=SGI, c=US
+cn: b5u-finance
+ipNetworkNumber: 192.102.143
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14-dms1, o=SGI, c=US
+cn: b14-dms1
+ipNetworkNumber: 192.102.144
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-highend-mfg2, o=SGI, c=US
+cn: b11-highend-mfg2
+ipNetworkNumber: 192.111.1
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-totestack4, o=SGI, c=US
+cn: b11-totestack4
+ipNetworkNumber: 192.111.2
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-totestack5, o=SGI, c=US
+cn: b11-totestack5
+ipNetworkNumber: 192.111.3
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-totestack6, o=SGI, c=US
+cn: b11-totestack6
+ipNetworkNumber: 192.111.4
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-entrpse-mgmt, o=SGI, c=US
+cn: b8u-entrpse-mgmt
+ipNetworkNumber: 192.111.5
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-desktop2, o=SGI, c=US
+cn: b11-desktop2
+ipNetworkNumber: 192.111.6
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-desktop3, o=SGI, c=US
+cn: b11-desktop3
+ipNetworkNumber: 192.111.7
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-mfgsystest1, o=SGI, c=US
+cn: b11-mfgsystest1
+ipNetworkNumber: 192.111.8
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-datacollect, o=SGI, c=US
+cn: b11-datacollect
+ipNetworkNumber: 192.111.9
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-mips-mfg, o=SGI, c=US
+cn: b11-mips-mfg
+ipNetworkNumber: 192.111.10
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-OOBA, o=SGI, c=US
+cn: b11-OOBA
+ipNetworkNumber: 192.111.11
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-DCO, o=SGI, c=US
+cn: b11-DCO
+ipNetworkNumber: 192.111.12
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-dskcopy, o=SGI, c=US
+cn: b11-dskcopy
+ipNetworkNumber: 192.111.13
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12-imsd1, o=SGI, c=US
+cn: b12-imsd1
+ipNetworkNumber: 192.111.14
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12-imsd2, o=SGI, c=US
+cn: b12-imsd2
+ipNetworkNumber: 192.111.15
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12-imsd3, o=SGI, c=US
+cn: b12-imsd3
+ipNetworkNumber: 192.111.16
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dms-moose, o=SGI, c=US
+cn: dms-moose
+ipNetworkNumber: 192.111.17
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-video-lab, o=SGI, c=US
+cn: b7l-video-lab
+ipNetworkNumber: 192.111.18
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=corp-fddi, o=SGI, c=US
+cn: corp-fddi
+ipNetworkNumber: 192.111.21
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b16-engr-net, o=SGI, c=US
+cn: b16-engr-net
+ipNetworkNumber: 192.111.22
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss-hwd, o=SGI, c=US
+cn: b1-dss-hwd
+ipNetworkNumber: 192.111.23
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss-sft, o=SGI, c=US
+cn: b1-dss-sft
+ipNetworkNumber: 192.111.24
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss-mkt, o=SGI, c=US
+cn: b1-dss-mkt
+ipNetworkNumber: 192.111.25
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss-sftlab, o=SGI, c=US
+cn: b1-dss-sftlab
+ipNetworkNumber: 192.111.26
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss-hwdlab, o=SGI, c=US
+cn: b1-dss-hwdlab
+ipNetworkNumber: 192.111.27
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss-guinness, o=SGI, c=US
+cn: b1-dss-guinness
+ipNetworkNumber: 192.111.28
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=corp-isdn, o=SGI, c=US
+cn: corp-isdn
+ipNetworkNumber: 192.111.29
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=kodak-shutter, o=SGI, c=US
+cn: kodak-shutter
+ipNetworkNumber: 192.111.30
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=zursch-house, o=SGI, c=US
+cn: zursch-house
+ipNetworkNumber: 192.132.105
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14u-mkt, o=SGI, c=US
+cn: b14u-mkt
+ipNetworkNumber: 192.132.108
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=atm-net1, o=SGI, c=US
+cn: atm-net1
+ipNetworkNumber: 192.132.109
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=atm-net2, o=SGI, c=US
+cn: atm-net2
+ipNetworkNumber: 192.132.110
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-corpdc, o=SGI, c=US
+cn: b1-corpdc
+ipNetworkNumber: 192.132.111
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=qa-net, o=SGI, c=US
+cn: qa-net
+ipNetworkNumber: 192.132.112
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=aw-net3, o=SGI, c=US
+cn: aw-net3
+ipNetworkNumber: 192.132.114
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-engr-lab, o=SGI, c=US
+cn: b8u-engr-lab
+ipNetworkNumber: 192.132.115
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=euro-mbus_1, o=SGI, c=US
+cn: euro-mbus_1
+ipNetworkNumber: 192.132.116
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=euro-mbus_2, o=SGI, c=US
+cn: euro-mbus_2
+ipNetworkNumber: 192.132.117
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lsil-asd-dev, o=SGI, c=US
+cn: lsil-asd-dev
+ipNetworkNumber: 192.132.118
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neuchatel-slip, o=SGI, c=US
+cn: neuchatel-slip
+ipNetworkNumber: 192.132.119
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dialup-isdn, o=SGI, c=US
+cn: dialup-isdn
+ipNetworkNumber: 192.132.120
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dms3, o=SGI, c=US
+cn: b1-dms3
+ipNetworkNumber: 192.132.122
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss-cad, o=SGI, c=US
+cn: b1-dss-cad
+ipNetworkNumber: 192.132.127
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=cabmerwell, o=SGI, c=US
+cn: cabmerwell
+ipNetworkNumber: 192.132.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-studio-hippi, o=SGI, c=US
+cn: b21-studio-hippi
+ipNetworkNumber: 192.132.129
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tw-wan-net, o=SGI, c=US
+cn: tw-wan-net
+ipNetworkNumber: 192.132.130
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=beijing, o=SGI, c=US
+cn: beijing
+ipNetworkNumber: 192.132.131
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=homefr, o=SGI, c=US
+cn: homefr
+ipNetworkNumber: 192.132.133
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dms4, o=SGI, c=US
+cn: b1-dms4
+ipNetworkNumber: 192.132.134
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-mtcast-net, o=SGI, c=US
+cn: b1-mtcast-net
+ipNetworkNumber: 192.132.136
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=fire-wall-net, o=SGI, c=US
+cn: fire-wall-net
+ipNetworkNumber: 192.132.137
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lfsh-home-isdn, o=SGI, c=US
+cn: lfsh-home-isdn
+ipNetworkNumber: 192.132.138
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-nei4-1, o=SGI, c=US
+cn: b2u-nei4-1
+ipNetworkNumber: 192.132.139
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-nei4-2, o=SGI, c=US
+cn: b2u-nei4-2
+ipNetworkNumber: 192.132.140
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=frame-lpbck, o=SGI, c=US
+cn: frame-lpbck
+ipNetworkNumber: 192.132.141
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-gandalf-142, o=SGI, c=US
+cn: b2u-gandalf-142
+cn: Net
+cn: 192.132.142
+ipNetworkNumber: ISDN
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=home-frame1, o=SGI, c=US
+cn: home-frame1
+ipNetworkNumber: 192.132.144
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-fdd-mzz, o=SGI, c=US
+cn: b11-fdd-mzz
+ipNetworkNumber: 192.132.146
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=corp-is, o=SGI, c=US
+cn: corp-is
+ipNetworkNumber: 192.132.148
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=munich-firewall, o=SGI, c=US
+cn: munich-firewall
+ipNetworkNumber: 192.132.149
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=taipei, o=SGI, c=US
+cn: taipei
+ipNetworkNumber: 192.72.19
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=taiwan, o=SGI, c=US
+cn: taiwan
+ipNetworkNumber: 192.132.150
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sydney-tech_centre, o=SGI, c=US
+cn: sydney-tech_centre
+ipNetworkNumber: 192.132.151
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9U-atm, o=SGI, c=US
+cn: b9U-atm
+ipNetworkNumber: 192.132.153
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-fddi-test1, o=SGI, c=US
+cn: is-fddi-test1
+ipNetworkNumber: 192.132.155
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-fddi-test2, o=SGI, c=US
+cn: is-fddi-test2
+ipNetworkNumber: 192.132.156
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-fddi-test3, o=SGI, c=US
+cn: is-fddi-test3
+ipNetworkNumber: 192.132.157
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-fddi-test4, o=SGI, c=US
+cn: is-fddi-test4
+ipNetworkNumber: 192.132.158
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-fddi-test5, o=SGI, c=US
+cn: is-fddi-test5
+ipNetworkNumber: 192.132.159
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-fddi-test6, o=SGI, c=US
+cn: is-fddi-test6
+ipNetworkNumber: 192.132.160
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-fddi-test7, o=SGI, c=US
+cn: is-fddi-test7
+ipNetworkNumber: 192.132.161
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b4-evtlab, o=SGI, c=US
+cn: b4-evtlab
+ipNetworkNumber: 192.132.162
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanb8-wanb17, o=SGI, c=US
+cn: wanb8-wanb17
+ipNetworkNumber: 192.132.163
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=csd-insight, o=SGI, c=US
+cn: csd-insight
+ipNetworkNumber: 192.132.164
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b4-wan, o=SGI, c=US
+cn: b4-wan
+ipNetworkNumber: 192.132.165
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b4-csdindy, o=SGI, c=US
+cn: b4-csdindy
+ipNetworkNumber: 192.132.170
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-hwlab2-temp, o=SGI, c=US
+cn: b2-hwlab2-temp
+ipNetworkNumber: 192.132.171
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss-os-1, o=SGI, c=US
+cn: b1-dss-os-1
+ipNetworkNumber: 192.132.173
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss-msig-1, o=SGI, c=US
+cn: b1-dss-msig-1
+ipNetworkNumber: 192.132.174
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-eng-lab, o=SGI, c=US
+cn: b11-eng-lab
+ipNetworkNumber: 192.132.175
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-b, o=SGI, c=US
+cn: b2u-b
+ipNetworkNumber: 192.132.176
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-token-ring, o=SGI, c=US
+cn: b11-token-ring
+cn: sgi132-177
+ipNetworkNumber: 192.132.177
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-guiness-lab, o=SGI, c=US
+cn: b1-guiness-lab
+ipNetworkNumber: 192.132.178
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=jwag-home-slip, o=SGI, c=US
+cn: jwag-home-slip
+ipNetworkNumber: 192.132.179
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=akmal-home-slip, o=SGI, c=US
+cn: akmal-home-slip
+ipNetworkNumber: 192.132.180
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=nasa-jsc, o=SGI, c=US
+cn: nasa-jsc
+ipNetworkNumber: 192.132.181
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8l-nsd, o=SGI, c=US
+cn: b8l-nsd
+ipNetworkNumber: 192.132.182
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-fddi-servers, o=SGI, c=US
+cn: b7l-fddi-servers
+ipNetworkNumber: 192.132.186
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=msdtest-fddi, o=SGI, c=US
+cn: msdtest-fddi
+ipNetworkNumber: 192.132.187
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-mfg-test, o=SGI, c=US
+cn: b11-mfg-test
+cn: sgi132-188
+ipNetworkNumber: 192.132.188
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=paris-secure3, o=SGI, c=US
+cn: paris-secure3
+ipNetworkNumber: 192.132.189
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-digital-media-lab, o=SGI, c=US
+cn: b2u-digital-media-lab
+ipNetworkNumber: 192.132.190
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7u-swlab, o=SGI, c=US
+cn: b7u-swlab
+ipNetworkNumber: 192.132.191
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=eng-spine, o=SGI, c=US
+cn: eng-spine
+ipNetworkNumber: 192.132.194
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-ddc, o=SGI, c=US
+cn: b11-ddc
+ipNetworkNumber: 192.132.195
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12-totestack1, o=SGI, c=US
+cn: b12-totestack1
+ipNetworkNumber: 192.132.196
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12-totestack2, o=SGI, c=US
+cn: b12-totestack2
+ipNetworkNumber: 192.132.197
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-mfgoven1, o=SGI, c=US
+cn: b11-mfgoven1
+ipNetworkNumber: 192.132.198
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=aw-tokyo, o=SGI, c=US
+cn: aw-tokyo
+ipNetworkNumber: 192.132.199
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12-mfg, o=SGI, c=US
+cn: b12-mfg
+ipNetworkNumber: 192.132.204
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-cddi-net, o=SGI, c=US
+cn: b2-cddi-net
+ipNetworkNumber: 198.29.64
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=aw-net2, o=SGI, c=US
+cn: aw-net2
+ipNetworkNumber: 198.29.65
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7-net, o=SGI, c=US
+cn: b7-net
+ipNetworkNumber: 198.29.66
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14l-dms5, o=SGI, c=US
+cn: b14l-dms5
+ipNetworkNumber: 198.29.67
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=portlandwa, o=SGI, c=US
+cn: portlandwa
+ipNetworkNumber: 198.29.68
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-engr-net1, o=SGI, c=US
+cn: b9-engr-net1
+ipNetworkNumber: 198.29.69
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-ssd-benchlab_1, o=SGI, c=US
+cn: b7l-ssd-benchlab_1
+ipNetworkNumber: 198.29.71
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-mfgoven2, o=SGI, c=US
+cn: b11-mfgoven2
+ipNetworkNumber: 198.29.72
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-mfgsystest2, o=SGI, c=US
+cn: b11-mfgsystest2
+ipNetworkNumber: 198.29.73
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=burnham-local, o=SGI, c=US
+cn: burnham-local
+ipNetworkNumber: 198.29.74
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dco-fddi, o=SGI, c=US
+cn: dco-fddi
+ipNetworkNumber: 198.29.75
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-engr-net2, o=SGI, c=US
+cn: b9-engr-net2
+ipNetworkNumber: 198.29.76
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3-cddi-net, o=SGI, c=US
+cn: b3-cddi-net
+ipNetworkNumber: 198.29.77
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7u-lego-test1, o=SGI, c=US
+cn: b7u-lego-test1
+ipNetworkNumber: 198.29.78
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-networking-lab, o=SGI, c=US
+cn: b7l-networking-lab
+ipNetworkNumber: 198.29.79
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-gandalf-80-isdn, o=SGI, c=US
+cn: b2u-gandalf-80-isdn
+ipNetworkNumber: 198.29.80
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-gandalf-81-isdn, o=SGI, c=US
+cn: b2u-gandalf-81-isdn
+ipNetworkNumber: 198.29.81
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7u-syssw, o=SGI, c=US
+cn: b7u-syssw
+ipNetworkNumber: 198.29.82
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-asdlabs, o=SGI, c=US
+cn: b7l-asdlabs
+ipNetworkNumber: 198.29.83
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-compliance-lab, o=SGI, c=US
+cn: b7l-compliance-lab
+ipNetworkNumber: 198.29.84
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-gandalf-85-isdn, o=SGI, c=US
+cn: b2u-gandalf-85-isdn
+ipNetworkNumber: 198.29.85
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-engr-net3, o=SGI, c=US
+cn: b9-engr-net3
+ipNetworkNumber: 198.29.86
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=barna-internet, o=SGI, c=US
+cn: barna-internet
+ipNetworkNumber: 198.29.87
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-gandalf-88-isdn, o=SGI, c=US
+cn: b2u-gandalf-88-isdn
+ipNetworkNumber: 198.29.88
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=appletalk_net_9, o=SGI, c=US
+cn: appletalk_net_9
+ipNetworkNumber: 198.29.89
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=appletalk_net_10, o=SGI, c=US
+cn: appletalk_net_10
+ipNetworkNumber: 198.29.90
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-gandalf-91-isdn, o=SGI, c=US
+cn: b2u-gandalf-91-isdn
+ipNetworkNumber: 198.29.91
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-gandalf-92-isdn, o=SGI, c=US
+cn: b2u-gandalf-92-isdn
+ipNetworkNumber: 198.29.92
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-gandalf-93-isdn, o=SGI, c=US
+cn: b2u-gandalf-93-isdn
+ipNetworkNumber: 198.29.93
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=uktraining, o=SGI, c=US
+cn: uktraining
+ipNetworkNumber: 198.29.94
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=vbt-testnet, o=SGI, c=US
+cn: vbt-testnet
+ipNetworkNumber: 198.29.95
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14-mcast, o=SGI, c=US
+cn: b14-mcast
+ipNetworkNumber: 198.29.96
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14l-esd_mkt, o=SGI, c=US
+cn: b14l-esd_mkt
+ipNetworkNumber: 198.29.97
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14u-apps1, o=SGI, c=US
+cn: b14u-apps1
+ipNetworkNumber: 198.29.98
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14u-apps2, o=SGI, c=US
+cn: b14u-apps2
+ipNetworkNumber: 198.29.99
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-prod-eng1, o=SGI, c=US
+cn: b1-prod-eng1
+ipNetworkNumber: 198.29.100
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-prod-eng2, o=SGI, c=US
+cn: b1-prod-eng2
+ipNetworkNumber: 198.29.101
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-time-warner-3, o=SGI, c=US
+cn: b9-time-warner-3
+ipNetworkNumber: 198.29.102
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-time-warner, o=SGI, c=US
+cn: b9u-time-warner
+ipNetworkNumber: 198.29.103
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8l-prod-design, o=SGI, c=US
+cn: b8l-prod-design
+ipNetworkNumber: 198.29.104
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8l-mktg-net3, o=SGI, c=US
+cn: b8l-mktg-net3
+ipNetworkNumber: 198.29.106
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-enduser, o=SGI, c=US
+cn: b9l-enduser
+ipNetworkNumber: 198.29.108
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=partner-net, o=SGI, c=US
+cn: partner-net
+ipNetworkNumber: 198.29.110
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=solectron, o=SGI, c=US
+cn: solectron
+ipNetworkNumber: 198.29.111
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-isdn-network, o=SGI, c=US
+cn: b2-isdn-network
+ipNetworkNumber: 198.29.112
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-lego-systest, o=SGI, c=US
+cn: b11-lego-systest
+ipNetworkNumber: 198.29.113
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-lego-ovens, o=SGI, c=US
+cn: b11-lego-ovens
+ipNetworkNumber: 198.29.114
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-time-warner-4, o=SGI, c=US
+cn: b9-time-warner-4
+ipNetworkNumber: 198.29.115
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=paris-secure1, o=SGI, c=US
+cn: paris-secure1
+ipNetworkNumber: 198.29.116
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=paris-secure2, o=SGI, c=US
+cn: paris-secure2
+ipNetworkNumber: 198.29.117
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-b4backbone, o=SGI, c=US
+cn: b2-b4backbone
+ipNetworkNumber: 198.29.118
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=home-frame2, o=SGI, c=US
+cn: home-frame2
+ipNetworkNumber: 198.29.119
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=add-brds_lab2, o=SGI, c=US
+cn: add-brds_lab2
+ipNetworkNumber: 198.29.120
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-gauntlet, o=SGI, c=US
+cn: b1-gauntlet
+ipNetworkNumber: 198.29.121
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dms-fddi, o=SGI, c=US
+cn: b1-dms-fddi
+ipNetworkNumber: 198.29.122
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14l-nafo-lab, o=SGI, c=US
+cn: b14l-nafo-lab
+ipNetworkNumber: 198.29.124
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-comp-lab-a, o=SGI, c=US
+cn: b11-comp-lab-a
+ipNetworkNumber: 198.29.125
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-comp-lab-b, o=SGI, c=US
+cn: b11-comp-lab-b
+ipNetworkNumber: 198.29.126
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-comp-lab-c, o=SGI, c=US
+cn: b11-comp-lab-c
+ipNetworkNumber: 198.29.127
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-wpdlab1, o=SGI, c=US
+cn: b9-wpdlab1
+ipNetworkNumber: 199.74.33
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-wpdlab2, o=SGI, c=US
+cn: b9-wpdlab2
+ipNetworkNumber: 199.74.34
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-wpdlab3, o=SGI, c=US
+cn: b9-wpdlab3
+ipNetworkNumber: 199.74.35
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-wpdlab4, o=SGI, c=US
+cn: b9-wpdlab4
+ipNetworkNumber: 199.74.36
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-wpdlab5, o=SGI, c=US
+cn: b9-wpdlab5
+ipNetworkNumber: 199.74.37
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-wpdfddi3, o=SGI, c=US
+cn: b9-wpdfddi3
+ipNetworkNumber: 199.74.38
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-wpdfddi1, o=SGI, c=US
+cn: b9-wpdfddi1
+ipNetworkNumber: 199.74.39
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-wpdfddi2, o=SGI, c=US
+cn: b9-wpdfddi2
+ipNetworkNumber: 199.74.40
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=la-pri_hub, o=SGI, c=US
+cn: la-pri_hub
+ipNetworkNumber: 199.74.41
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=rpa-mtview-serial, o=SGI, c=US
+cn: rpa-mtview-serial
+ipNetworkNumber: 199.74.42
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b4-mfg-endusers, o=SGI, c=US
+cn: b4-mfg-endusers
+ipNetworkNumber: 199.74.43
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b6u-corp-bc, o=SGI, c=US
+cn: b6u-corp-bc
+ipNetworkNumber: 199.74.44
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=isdn1, o=SGI, c=US
+cn: isdn1
+ipNetworkNumber: 199.74.46
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=isdn2, o=SGI, c=US
+cn: isdn2
+ipNetworkNumber: 199.74.47
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b6-fddi-corp, o=SGI, c=US
+cn: b6-fddi-corp
+ipNetworkNumber: 199.74.48
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b18_xplx-apptlk, o=SGI, c=US
+cn: b18_xplx-apptlk
+ipNetworkNumber: 199.74.49
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ppp-isdn-network1, o=SGI, c=US
+cn: ppp-isdn-network1
+ipNetworkNumber: 199.74.51
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ppp-isdn-network2, o=SGI, c=US
+cn: ppp-isdn-network2
+ipNetworkNumber: 199.74.52
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dss-isdn, o=SGI, c=US
+cn: dss-isdn
+ipNetworkNumber: 199.74.53
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3l-community1, o=SGI, c=US
+cn: b3l-community1
+ipNetworkNumber: 199.74.54
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3l-community2, o=SGI, c=US
+cn: b3l-community2
+ipNetworkNumber: 199.74.56
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b3l-community3, o=SGI, c=US
+cn: b3l-community3
+ipNetworkNumber: 199.74.57
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sf-studio3, o=SGI, c=US
+cn: sf-studio3
+ipNetworkNumber: 199.74.58
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=mbus-ether, o=SGI, c=US
+cn: mbus-ether
+ipNetworkNumber: 199.74.59
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=cole-weber, o=SGI, c=US
+cn: cole-weber
+ipNetworkNumber: 199.74.60
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tre-nei1-61-cnet, o=SGI, c=US
+cn: tre-nei1-61-cnet
+ipNetworkNumber: 199.74.61
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=japan-external, o=SGI, c=US
+cn: japan-external
+ipNetworkNumber: 199.74.62
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=nsd-oracle, o=SGI, c=US
+cn: nsd-oracle
+ipNetworkNumber: 199.74.63
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-is, o=SGI, c=US
+cn: neu-is
+ipNetworkNumber: 155.11.1.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-1d1b, o=SGI, c=US
+cn: neu-1d1b
+ipNetworkNumber: 155.11.1.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-adm, o=SGI, c=US
+cn: neu-adm
+ipNetworkNumber: 155.11.2.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-1d2b, o=SGI, c=US
+cn: neu-1d2b
+ipNetworkNumber: 155.11.2.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-csd, o=SGI, c=US
+cn: neu-csd
+ipNetworkNumber: 155.11.3.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-1d3b, o=SGI, c=US
+cn: neu-1d3b
+ipNetworkNumber: 155.11.3.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-mktg, o=SGI, c=US
+cn: neu-mktg
+ipNetworkNumber: 155.11.4.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-1p4b, o=SGI, c=US
+cn: neu-1p4b
+ipNetworkNumber: 155.11.4.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-1p5b, o=SGI, c=US
+cn: neu-1p5b
+ipNetworkNumber: 155.11.5.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-1p5a, o=SGI, c=US
+cn: neu-1p5a
+ipNetworkNumber: 155.11.5.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-lab1, o=SGI, c=US
+cn: neu-lab1
+ipNetworkNumber: 155.11.6.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-lab2, o=SGI, c=US
+cn: neu-lab2
+ipNetworkNumber: 155.11.6.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-train1, o=SGI, c=US
+cn: neu-train1
+ipNetworkNumber: 155.11.7.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-train2, o=SGI, c=US
+cn: neu-train2
+ipNetworkNumber: 155.11.7.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-mfgtst, o=SGI, c=US
+cn: neu-mfgtst
+ipNetworkNumber: 155.11.8.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-1r8b, o=SGI, c=US
+cn: neu-1r8b
+ipNetworkNumber: 155.11.8.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-mfg1, o=SGI, c=US
+cn: neu-mfg1
+ipNetworkNumber: 155.11.9.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-1r9b, o=SGI, c=US
+cn: neu-1r9b
+ipNetworkNumber: 155.11.9.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-mfg2, o=SGI, c=US
+cn: neu-mfg2
+ipNetworkNumber: 155.11.10.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-itlcomm, o=SGI, c=US
+cn: neu-itlcomm
+ipNetworkNumber: 155.11.10.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=par-bb, o=SGI, c=US
+cn: par-bb
+ipNetworkNumber: 155.11.11.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=par-csd, o=SGI, c=US
+cn: par-csd
+ipNetworkNumber: 155.11.11.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=par-sales, o=SGI, c=US
+cn: par-sales
+ipNetworkNumber: 155.11.12.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=par-train, o=SGI, c=US
+cn: par-train
+ipNetworkNumber: 155.11.12.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=par-eng, o=SGI, c=US
+cn: par-eng
+ipNetworkNumber: 155.11.13.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=par-adm, o=SGI, c=US
+cn: par-adm
+ipNetworkNumber: 155.11.13.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=aix-net, o=SGI, c=US
+cn: aix-net
+ipNetworkNumber: 155.11.14.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=par-aix-ptp, o=SGI, c=US
+cn: par-aix-ptp
+ipNetworkNumber: 155.11.14.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tou-net, o=SGI, c=US
+cn: tou-net
+ipNetworkNumber: 155.11.15.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=par-tou-ptp, o=SGI, c=US
+cn: par-tou-ptp
+ipNetworkNumber: 155.11.15.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lyon-net, o=SGI, c=US
+cn: lyon-net
+ipNetworkNumber: 155.11.16.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=par-lyon-ptp, o=SGI, c=US
+cn: par-lyon-ptp
+ipNetworkNumber: 155.11.16.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=rennes-net, o=SGI, c=US
+cn: rennes-net
+ipNetworkNumber: 155.11.17.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=par-rennes-ptp, o=SGI, c=US
+cn: par-rennes-ptp
+ipNetworkNumber: 155.11.17.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=milan-net1, o=SGI, c=US
+cn: milan-net1
+ipNetworkNumber: 155.11.18.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=milan-net2, o=SGI, c=US
+cn: milan-net2
+ipNetworkNumber: 155.11.18.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=geneva-ptp, o=SGI, c=US
+cn: geneva-ptp
+ipNetworkNumber: 155.11.19.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=geneva-net, o=SGI, c=US
+cn: geneva-net
+ipNetworkNumber: 155.11.19.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=rome-net1, o=SGI, c=US
+cn: rome-net1
+ipNetworkNumber: 155.11.20.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=rome-net2, o=SGI, c=US
+cn: rome-net2
+ipNetworkNumber: 155.11.20.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-h-2511, o=SGI, c=US
+cn: neu-h-2511
+ipNetworkNumber: 155.11.21.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-blazer, o=SGI, c=US
+cn: neu-blazer
+ipNetworkNumber: 155.11.21.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=helsinki-net, o=SGI, c=US
+cn: helsinki-net
+ipNetworkNumber: 155.11.22.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=FREE-1, o=SGI, c=US
+cn: FREE-1
+ipNetworkNumber: 155.11.22.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=zurich-net, o=SGI, c=US
+cn: zurich-net
+ipNetworkNumber: 155.11.23.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-zurich-ptp, o=SGI, c=US
+cn: neu-zurich-ptp
+ipNetworkNumber: 155.11.23.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-1fddi, o=SGI, c=US
+cn: neu-1fddi
+ipNetworkNumber: 155.11.24.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-2fddi, o=SGI, c=US
+cn: neu-2fddi
+ipNetworkNumber: 155.11.24.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=london1, o=SGI, c=US
+cn: london1
+ipNetworkNumber: 155.11.25.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=london2, o=SGI, c=US
+cn: london2
+ipNetworkNumber: 155.11.25.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=falkirk1, o=SGI, c=US
+cn: falkirk1
+ipNetworkNumber: 155.11.26.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=falkirk2, o=SGI, c=US
+cn: falkirk2
+ipNetworkNumber: 155.11.26.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-wh1, o=SGI, c=US
+cn: reading-wh1
+ipNetworkNumber: 155.11.27.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-wh2, o=SGI, c=US
+cn: reading-wh2
+ipNetworkNumber: 155.11.27.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-net, o=SGI, c=US
+cn: demeern-net
+ipNetworkNumber: 155.11.28.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-net2, o=SGI, c=US
+cn: demeern-net2
+ipNetworkNumber: 155.11.28.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-net3, o=SGI, c=US
+cn: demeern-net3
+ipNetworkNumber: 155.11.29.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-net4, o=SGI, c=US
+cn: demeern-net4
+ipNetworkNumber: 155.11.29.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lausanne1, o=SGI, c=US
+cn: lausanne1
+ipNetworkNumber: 155.11.30.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lausanne2, o=SGI, c=US
+cn: lausanne2
+ipNetworkNumber: 155.11.30.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=stockholm-net, o=SGI, c=US
+cn: stockholm-net
+ipNetworkNumber: 155.11.31.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=stockholm-ptp, o=SGI, c=US
+cn: stockholm-ptp
+ipNetworkNumber: 155.11.31.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=budapest, o=SGI, c=US
+cn: budapest
+ipNetworkNumber: 155.11.32.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=budapest-ptp, o=SGI, c=US
+cn: budapest-ptp
+ipNetworkNumber: 155.11.32.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=FREE-2, o=SGI, c=US
+cn: FREE-2
+ipNetworkNumber: 155.11.33.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=FREE-3, o=SGI, c=US
+cn: FREE-3
+ipNetworkNumber: 155.11.33.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-mfg2a, o=SGI, c=US
+cn: neu-mfg2a
+ipNetworkNumber: 155.11.34.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-mfg2b, o=SGI, c=US
+cn: neu-mfg2b
+ipNetworkNumber: 155.11.34.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lan-tst, o=SGI, c=US
+cn: lan-tst
+ipNetworkNumber: 155.11.35.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wan-tst, o=SGI, c=US
+cn: wan-tst
+ipNetworkNumber: 155.11.35.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-net7, o=SGI, c=US
+cn: demeern-net7
+ipNetworkNumber: 155.11.36.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-net8, o=SGI, c=US
+cn: demeern-net8
+ipNetworkNumber: 155.11.36.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=basel-net, o=SGI, c=US
+cn: basel-net
+ipNetworkNumber: 155.11.37.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=basel-ptp, o=SGI, c=US
+cn: basel-ptp
+ipNetworkNumber: 155.11.37.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=brno-net, o=SGI, c=US
+cn: brno-net
+ipNetworkNumber: 155.11.38.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=brno-ptp, o=SGI, c=US
+cn: brno-ptp
+ipNetworkNumber: 155.11.38.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=warsaw-net, o=SGI, c=US
+cn: warsaw-net
+ipNetworkNumber: 155.11.39.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=warsaw-ptp, o=SGI, c=US
+cn: warsaw-ptp
+ipNetworkNumber: 155.11.39.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=moscow, o=SGI, c=US
+cn: moscow
+ipNetworkNumber: 155.11.40.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=moscow-ptp, o=SGI, c=US
+cn: moscow-ptp
+ipNetworkNumber: 155.11.40.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=munich-1, o=SGI, c=US
+cn: munich-1
+ipNetworkNumber: 155.11.41.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=munich-2, o=SGI, c=US
+cn: munich-2
+ipNetworkNumber: 155.11.41.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=Karlsruhe-1, o=SGI, c=US
+cn: Karlsruhe-1
+ipNetworkNumber: 155.11.42.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=Karlsruhe-2, o=SGI, c=US
+cn: Karlsruhe-2
+ipNetworkNumber: 155.11.42.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=Cologne-1, o=SGI, c=US
+cn: Cologne-1
+ipNetworkNumber: 155.11.43.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=Cologne-2, o=SGI, c=US
+cn: Cologne-2
+ipNetworkNumber: 155.11.43.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=Berlin-1, o=SGI, c=US
+cn: Berlin-1
+ipNetworkNumber: 155.11.44.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=Berlin-2, o=SGI, c=US
+cn: Berlin-2
+ipNetworkNumber: 155.11.44.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=Hannover-1, o=SGI, c=US
+cn: Hannover-1
+ipNetworkNumber: 155.11.45.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=Hannover-2, o=SGI, c=US
+cn: Hannover-2
+ipNetworkNumber: 155.11.45.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=munich-3, o=SGI, c=US
+cn: munich-3
+ipNetworkNumber: 155.11.46.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=munich-4, o=SGI, c=US
+cn: munich-4
+ipNetworkNumber: 155.11.46.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-5, o=SGI, c=US
+cn: demeern-5
+ipNetworkNumber: 155.11.47.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern, o=SGI, c=US
+cn: demeern
+ipNetworkNumber: 155.11.47.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=telaviv1, o=SGI, c=US
+cn: telaviv1
+ipNetworkNumber: 155.11.48.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=telaviv2, o=SGI, c=US
+cn: telaviv2
+ipNetworkNumber: 155.11.48.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=cort-tst1, o=SGI, c=US
+cn: cort-tst1
+ipNetworkNumber: 155.11.49.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=cort-tst2, o=SGI, c=US
+cn: cort-tst2
+ipNetworkNumber: 155.11.49.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=copen01, o=SGI, c=US
+cn: copen01
+ipNetworkNumber: 155.11.50.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=copen02, o=SGI, c=US
+cn: copen02
+ipNetworkNumber: 155.11.50.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=oslo01, o=SGI, c=US
+cn: oslo01
+ipNetworkNumber: 155.11.51.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=oslo02, o=SGI, c=US
+cn: oslo02
+ipNetworkNumber: 155.11.51.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=brussels, o=SGI, c=US
+cn: brussels
+ipNetworkNumber: 155.11.52.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=brussels_1, o=SGI, c=US
+cn: brussels_1
+ipNetworkNumber: 155.11.53.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=brussels_2, o=SGI, c=US
+cn: brussels_2
+ipNetworkNumber: 155.11.53.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=brussels_3, o=SGI, c=US
+cn: brussels_3
+ipNetworkNumber: 155.11.54.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=brussels_4, o=SGI, c=US
+cn: brussels_4
+ipNetworkNumber: 155.11.54.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lausanne3, o=SGI, c=US
+cn: lausanne3
+ipNetworkNumber: 155.11.55.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lausanne4, o=SGI, c=US
+cn: lausanne4
+ipNetworkNumber: 155.11.55.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=vienna1, o=SGI, c=US
+cn: vienna1
+ipNetworkNumber: 155.11.56.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=vienna2, o=SGI, c=US
+cn: vienna2
+ipNetworkNumber: 155.11.56.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=madrid1, o=SGI, c=US
+cn: madrid1
+ipNetworkNumber: 155.11.57.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=madrid2, o=SGI, c=US
+cn: madrid2
+ipNetworkNumber: 155.11.57.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=barcelona01, o=SGI, c=US
+cn: barcelona01
+ipNetworkNumber: 155.11.58.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=barcelona02, o=SGI, c=US
+cn: barcelona02
+ipNetworkNumber: 155.11.58.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bahrain01, o=SGI, c=US
+cn: bahrain01
+ipNetworkNumber: 155.11.59.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bahrain02, o=SGI, c=US
+cn: bahrain02
+ipNetworkNumber: 155.11.59.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=frankfurt1, o=SGI, c=US
+cn: frankfurt1
+ipNetworkNumber: 155.11.60.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=frankfurt2, o=SGI, c=US
+cn: frankfurt2
+ipNetworkNumber: 155.11.60.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=visual-land, o=SGI, c=US
+cn: visual-land
+ipNetworkNumber: 155.11.61.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=gland-wan, o=SGI, c=US
+cn: gland-wan
+ipNetworkNumber: 155.11.61.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=gothenburg1, o=SGI, c=US
+cn: gothenburg1
+ipNetworkNumber: 155.11.62.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=gothenburg2, o=SGI, c=US
+cn: gothenburg2
+ipNetworkNumber: 155.11.62.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=munich-5, o=SGI, c=US
+cn: munich-5
+ipNetworkNumber: 155.11.63.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=munich-6, o=SGI, c=US
+cn: munich-6
+ipNetworkNumber: 155.11.63.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=munich-7, o=SGI, c=US
+cn: munich-7
+ipNetworkNumber: 155.11.64.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=munich-8, o=SGI, c=US
+cn: munich-8
+ipNetworkNumber: 155.11.64.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=zurich-ppp1, o=SGI, c=US
+cn: zurich-ppp1
+ipNetworkNumber: 155.11.65.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=zurich-ppp2, o=SGI, c=US
+cn: zurich-ppp2
+ipNetworkNumber: 155.11.65.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=stavanger01, o=SGI, c=US
+cn: stavanger01
+ipNetworkNumber: 155.11.66.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=stavanger02, o=SGI, c=US
+cn: stavanger02
+ipNetworkNumber: 155.11.66.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=jerusalem1, o=SGI, c=US
+cn: jerusalem1
+ipNetworkNumber: 155.11.67.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=jerusalem2, o=SGI, c=US
+cn: jerusalem2
+ipNetworkNumber: 155.11.67.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-debug1, o=SGI, c=US
+cn: neu-debug1
+ipNetworkNumber: 155.11.68.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-debug2, o=SGI, c=US
+cn: neu-debug2
+ipNetworkNumber: 155.11.68.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-peripheral1, o=SGI, c=US
+cn: neu-peripheral1
+ipNetworkNumber: 155.11.70.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-peripheral2, o=SGI, c=US
+cn: neu-peripheral2
+ipNetworkNumber: 155.11.70.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-15, o=SGI, c=US
+cn: reading-15
+ipNetworkNumber: 155.11.71.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-16, o=SGI, c=US
+cn: reading-16
+ipNetworkNumber: 155.11.71.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-17, o=SGI, c=US
+cn: reading-17
+ipNetworkNumber: 155.11.72.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-18, o=SGI, c=US
+cn: reading-18
+ipNetworkNumber: 155.11.72.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-19, o=SGI, c=US
+cn: reading-19
+ipNetworkNumber: 155.11.73.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-20, o=SGI, c=US
+cn: reading-20
+ipNetworkNumber: 155.11.73.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-9, o=SGI, c=US
+cn: demeern-9
+ipNetworkNumber: 155.11.74.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-10, o=SGI, c=US
+cn: demeern-10
+ipNetworkNumber: 155.11.74.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-11, o=SGI, c=US
+cn: demeern-11
+ipNetworkNumber: 155.11.75.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-12, o=SGI, c=US
+cn: demeern-12
+ipNetworkNumber: 155.11.75.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-13, o=SGI, c=US
+cn: demeern-13
+ipNetworkNumber: 155.11.76.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=demeern-14, o=SGI, c=US
+cn: demeern-14
+ipNetworkNumber: 155.11.76.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-21, o=SGI, c=US
+cn: reading-21
+ipNetworkNumber: 155.11.77.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-22, o=SGI, c=US
+cn: reading-22
+ipNetworkNumber: 155.11.77.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-23, o=SGI, c=US
+cn: reading-23
+ipNetworkNumber: 155.11.78.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-24, o=SGI, c=US
+cn: reading-24
+ipNetworkNumber: 155.11.78.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-25, o=SGI, c=US
+cn: reading-25
+ipNetworkNumber: 155.11.79.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-26, o=SGI, c=US
+cn: reading-26
+ipNetworkNumber: 155.11.79.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=praha-01, o=SGI, c=US
+cn: praha-01
+ipNetworkNumber: 155.11.80.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=praha-02, o=SGI, c=US
+cn: praha-02
+ipNetworkNumber: 155.11.80.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=strasbourg-01, o=SGI, c=US
+cn: strasbourg-01
+ipNetworkNumber: 155.11.81.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=paris-08, o=SGI, c=US
+cn: paris-08
+ipNetworkNumber: 155.11.81.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=paris-09, o=SGI, c=US
+cn: paris-09
+ipNetworkNumber: 155.11.82.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=paris-10, o=SGI, c=US
+cn: paris-10
+ipNetworkNumber: 155.11.82.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=milan-03, o=SGI, c=US
+cn: milan-03
+ipNetworkNumber: 155.11.83.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=milan-04, o=SGI, c=US
+cn: milan-04
+ipNetworkNumber: 155.11.83.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=cort-desktop1, o=SGI, c=US
+cn: cort-desktop1
+ipNetworkNumber: 155.11.84.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=cort-desktop2, o=SGI, c=US
+cn: cort-desktop2
+ipNetworkNumber: 155.11.84.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=copen-3, o=SGI, c=US
+cn: copen-3
+ipNetworkNumber: 155.11.85.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=copen-4, o=SGI, c=US
+cn: copen-4
+ipNetworkNumber: 155.11.85.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu-isdn, o=SGI, c=US
+cn: neu-isdn
+ipNetworkNumber: 155.11.86.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=home-isdn, o=SGI, c=US
+cn: home-isdn
+ipNetworkNumber: 155.11.86.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lausanne5, o=SGI, c=US
+cn: lausanne5
+ipNetworkNumber: 155.11.87.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lausanne6, o=SGI, c=US
+cn: lausanne6
+ipNetworkNumber: 155.11.87.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lausanne7, o=SGI, c=US
+cn: lausanne7
+ipNetworkNumber: 155.11.88.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-01, o=SGI, c=US
+cn: reading-01
+ipNetworkNumber: 155.11.90.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-02, o=SGI, c=US
+cn: reading-02
+ipNetworkNumber: 155.11.90.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-03, o=SGI, c=US
+cn: reading-03
+ipNetworkNumber: 155.11.91.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-04, o=SGI, c=US
+cn: reading-04
+ipNetworkNumber: 155.11.91.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-05, o=SGI, c=US
+cn: reading-05
+ipNetworkNumber: 155.11.92.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-06, o=SGI, c=US
+cn: reading-06
+ipNetworkNumber: 155.11.92.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-07, o=SGI, c=US
+cn: reading-07
+ipNetworkNumber: 155.11.93.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-08, o=SGI, c=US
+cn: reading-08
+ipNetworkNumber: 155.11.93.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-09, o=SGI, c=US
+cn: reading-09
+ipNetworkNumber: 155.11.94.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-10, o=SGI, c=US
+cn: reading-10
+ipNetworkNumber: 155.11.94.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-11, o=SGI, c=US
+cn: reading-11
+ipNetworkNumber: 155.11.95.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-12, o=SGI, c=US
+cn: reading-12
+ipNetworkNumber: 155.11.95.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-13, o=SGI, c=US
+cn: reading-13
+ipNetworkNumber: 155.11.96.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-14, o=SGI, c=US
+cn: reading-14
+ipNetworkNumber: 155.11.96.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=manchester-01, o=SGI, c=US
+cn: manchester-01
+ipNetworkNumber: 155.11.97.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=manchester-02, o=SGI, c=US
+cn: manchester-02
+ipNetworkNumber: 155.11.97.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-27, o=SGI, c=US
+cn: reading-27
+ipNetworkNumber: 155.11.98.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-28, o=SGI, c=US
+cn: reading-28
+ipNetworkNumber: 155.11.98.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-29, o=SGI, c=US
+cn: reading-29
+ipNetworkNumber: 155.11.99.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neu_comms, o=SGI, c=US
+cn: neu_comms
+ipNetworkNumber: 155.11.99.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-30, o=SGI, c=US
+cn: reading-30
+ipNetworkNumber: 155.11.100.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=reading-31, o=SGI, c=US
+cn: reading-31
+ipNetworkNumber: 155.11.100.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wangate-common, o=SGI, c=US
+cn: wangate-common
+ipNetworkNumber: 155.11.254
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wangate2-wanatl, o=SGI, c=US
+cn: wangate2-wanatl
+ipNetworkNumber: 155.11.253
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wangate2-wandal, o=SGI, c=US
+cn: wangate2-wandal
+ipNetworkNumber: 155.11.252
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wangate-wanhud, o=SGI, c=US
+cn: wangate-wanhud
+ipNetworkNumber: 155.11.251
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wangate2-wanden, o=SGI, c=US
+cn: wangate2-wanden
+ipNetworkNumber: 155.11.250
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wangate2-wandiego, o=SGI, c=US
+cn: wangate2-wandiego
+ipNetworkNumber: 155.11.249
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wangate2-wanhou, o=SGI, c=US
+cn: wangate2-wanhou
+ipNetworkNumber: 155.11.248
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wangate2-wanmtv, o=SGI, c=US
+cn: wangate2-wanmtv
+ipNetworkNumber: 155.11.247
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanfarm-wanrose, o=SGI, c=US
+cn: wanfarm-wanrose
+ipNetworkNumber: 155.11.246
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanfarm-wanoak, o=SGI, c=US
+cn: wanfarm-wanoak
+ipNetworkNumber: 155.11.245
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanfarm-wanhud, o=SGI, c=US
+cn: wanfarm-wanhud
+ipNetworkNumber: 155.11.244
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanhud-wanmil, o=SGI, c=US
+cn: wanhud-wanmil
+ipNetworkNumber: 155.11.243
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanhud-wanhan, o=SGI, c=US
+cn: wanhud-wanhan
+ipNetworkNumber: 155.11.242
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanbeth-wantim, o=SGI, c=US
+cn: wanbeth-wantim
+ipNetworkNumber: 155.11.241
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanbeth-wanatl, o=SGI, c=US
+cn: wanbeth-wanatl
+ipNetworkNumber: 155.11.240
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanatl-wanmco, o=SGI, c=US
+cn: wanatl-wanmco
+ipNetworkNumber: 155.11.239
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanatl-wanlaud, o=SGI, c=US
+cn: wanatl-wanlaud
+ipNetworkNumber: 155.11.238
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wandal-wanstl, o=SGI, c=US
+cn: wandal-wanstl
+ipNetworkNumber: 155.11.237
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=aw-sydney, o=SGI, c=US
+cn: aw-sydney
+ipNetworkNumber: 155.11.236
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wantokyo-wannagoya, o=SGI, c=US
+cn: wantokyo-wannagoya
+ipNetworkNumber: 155.11.235
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=osaka, o=SGI, c=US
+cn: osaka
+ipNetworkNumber: 155.11.234
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=nagoya, o=SGI, c=US
+cn: nagoya
+ipNetworkNumber: 155.11.233
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wagner-home, o=SGI, c=US
+cn: wagner-home
+ipNetworkNumber: 155.11.232
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ntt-nsg, o=SGI, c=US
+cn: ntt-nsg
+ipNetworkNumber: 155.11.230
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bos-nei1-brige, o=SGI, c=US
+cn: bos-nei1-brige
+ipNetworkNumber: 155.11.231
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wsyd-wperth, o=SGI, c=US
+cn: wsyd-wperth
+ipNetworkNumber: 155.11.229
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wellington, o=SGI, c=US
+cn: wellington
+ipNetworkNumber: 155.11.228
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=connyers-atlanta, o=SGI, c=US
+cn: connyers-atlanta
+ipNetworkNumber: 155.11.227
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sydney, o=SGI, c=US
+cn: sydney
+ipNetworkNumber: 155.11.226
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=melbourne, o=SGI, c=US
+cn: melbourne
+ipNetworkNumber: 155.11.225
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=brisbane, o=SGI, c=US
+cn: brisbane
+ipNetworkNumber: 155.11.224
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=adelaide, o=SGI, c=US
+cn: adelaide
+ipNetworkNumber: 155.11.223
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=perth, o=SGI, c=US
+cn: perth
+ipNetworkNumber: 155.11.222
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=auckland, o=SGI, c=US
+cn: auckland
+ipNetworkNumber: 155.11.221
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tokyo-net1, o=SGI, c=US
+cn: tokyo-net1
+ipNetworkNumber: 155.11.220
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tokyo-net2, o=SGI, c=US
+cn: tokyo-net2
+ipNetworkNumber: 155.11.219
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hongkong, o=SGI, c=US
+cn: hongkong
+ipNetworkNumber: 155.11.218
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=milwaukee, o=SGI, c=US
+cn: milwaukee
+ipNetworkNumber: 155.11.216
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=kansas, o=SGI, c=US
+cn: kansas
+ipNetworkNumber: 155.11.215
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=honk-kong-test, o=SGI, c=US
+cn: honk-kong-test
+ipNetworkNumber: 155.11.214
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=beijing1, o=SGI, c=US
+cn: beijing1
+ipNetworkNumber: 155.11.213
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=kawasaki, o=SGI, c=US
+cn: kawasaki
+ipNetworkNumber: 155.11.212
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shangai1, o=SGI, c=US
+cn: shangai1
+ipNetworkNumber: 155.11.211
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=guangzhou, o=SGI, c=US
+cn: guangzhou
+ipNetworkNumber: 155.11.210
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=riverside, o=SGI, c=US
+cn: riverside
+ipNetworkNumber: 155.11.206
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=minneapolis, o=SGI, c=US
+cn: minneapolis
+ipNetworkNumber: 155.11.205
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=canberra, o=SGI, c=US
+cn: canberra
+ipNetworkNumber: 155.11.204
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=newdelhi, o=SGI, c=US
+cn: newdelhi
+ipNetworkNumber: 155.11.203
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sanantonio, o=SGI, c=US
+cn: sanantonio
+ipNetworkNumber: 155.11.202
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=frame-relay2, o=SGI, c=US
+cn: frame-relay2
+ipNetworkNumber: 155.11.201
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=pittsburgh, o=SGI, c=US
+cn: pittsburgh
+ipNetworkNumber: 155.11.200
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=albuquerque, o=SGI, c=US
+cn: albuquerque
+ipNetworkNumber: 155.11.199
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=syracuse, o=SGI, c=US
+cn: syracuse
+ipNetworkNumber: 155.11.198
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=rochester, o=SGI, c=US
+cn: rochester
+ipNetworkNumber: 155.11.197
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tulsa, o=SGI, c=US
+cn: tulsa
+ipNetworkNumber: 155.11.196
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=leffler-home, o=SGI, c=US
+cn: leffler-home
+ipNetworkNumber: 155.11.194
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=melville, o=SGI, c=US
+cn: melville
+ipNetworkNumber: 155.11.193
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hudson-slip-1, o=SGI, c=US
+cn: hudson-slip-1
+ipNetworkNumber: 155.11.192
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hudson-engr, o=SGI, c=US
+cn: hudson-engr
+ipNetworkNumber: 155.11.191
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hudson-sales, o=SGI, c=US
+cn: hudson-sales
+ipNetworkNumber: 155.11.190
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=nova, o=SGI, c=US
+cn: nova
+ipNetworkNumber: 155.11.189
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=singapore, o=SGI, c=US
+cn: singapore
+ipNetworkNumber: 155.11.188
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=allied, o=SGI, c=US
+cn: allied
+ipNetworkNumber: 155.11.187
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=manhattan, o=SGI, c=US
+cn: manhattan
+ipNetworkNumber: 155.11.186
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=mtltac, o=SGI, c=US
+cn: mtltac
+ipNetworkNumber: 155.11.185
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=cleveland, o=SGI, c=US
+cn: cleveland
+ipNetworkNumber: 155.11.184
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sao-paolo, o=SGI, c=US
+cn: sao-paolo
+ipNetworkNumber: 155.11.183
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wangate2-wbldG, o=SGI, c=US
+cn: wangate2-wbldG
+ipNetworkNumber: 155.11.181
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sanramon, o=SGI, c=US
+cn: sanramon
+ipNetworkNumber: 155.11.180
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sanramon-fddi, o=SGI, c=US
+cn: sanramon-fddi
+ipNetworkNumber: 155.11.180.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hudson-training, o=SGI, c=US
+cn: hudson-training
+ipNetworkNumber: 155.11.179
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hudson-tech, o=SGI, c=US
+cn: hudson-tech
+ipNetworkNumber: 155.11.178
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=singapore-eptc, o=SGI, c=US
+cn: singapore-eptc
+ipNetworkNumber: 155.11.177
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ottawa, o=SGI, c=US
+cn: ottawa
+ipNetworkNumber: 155.11.172
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=calgary, o=SGI, c=US
+cn: calgary
+ipNetworkNumber: 155.11.171
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=vancouver, o=SGI, c=US
+cn: vancouver
+ipNetworkNumber: 155.11.170
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tampa, o=SGI, c=US
+cn: tampa
+ipNetworkNumber: 155.11.169
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=birmingham, o=SGI, c=US
+cn: birmingham
+ipNetworkNumber: 155.11.168
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=stlouis-sales, o=SGI, c=US
+cn: stlouis-sales
+ipNetworkNumber: 155.11.167
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=stlouis-service, o=SGI, c=US
+cn: stlouis-service
+ipNetworkNumber: 155.11.166
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=albany, o=SGI, c=US
+cn: albany
+ipNetworkNumber: 155.11.165
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=neworleans, o=SGI, c=US
+cn: neworleans
+ipNetworkNumber: 155.11.164
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sacramento, o=SGI, c=US
+cn: sacramento
+ipNetworkNumber: 155.11.163
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=buffalo, o=SGI, c=US
+cn: buffalo
+ipNetworkNumber: 155.11.162
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=urbana, o=SGI, c=US
+cn: urbana
+ipNetworkNumber: 155.11.161
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=korea, o=SGI, c=US
+cn: korea
+ipNetworkNumber: 155.11.160
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=harrisburg, o=SGI, c=US
+cn: harrisburg
+ipNetworkNumber: 155.11.159
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dallas1, o=SGI, c=US
+cn: dallas1
+ipNetworkNumber: 155.11.158
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dallas2, o=SGI, c=US
+cn: dallas2
+ipNetworkNumber: 155.11.157
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=denver1, o=SGI, c=US
+cn: denver1
+ipNetworkNumber: 155.11.156
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=denver2, o=SGI, c=US
+cn: denver2
+ipNetworkNumber: 155.11.155
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=toronto, o=SGI, c=US
+cn: toronto
+ipNetworkNumber: 155.11.154
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=stlaurent, o=SGI, c=US
+cn: stlaurent
+ipNetworkNumber: 155.11.153
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=charlotte, o=SGI, c=US
+cn: charlotte
+ipNetworkNumber: 155.11.152
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bothell, o=SGI, c=US
+cn: bothell
+ipNetworkNumber: 155.11.151
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=space-vision-tokyo, o=SGI, c=US
+cn: space-vision-tokyo
+ipNetworkNumber: 155.11.150
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=cray-mfg-pro-tokyo, o=SGI, c=US
+cn: cray-mfg-pro-tokyo
+ipNetworkNumber: 155.11.149
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sandiego, o=SGI, c=US
+cn: sandiego
+ipNetworkNumber: 155.11.148
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b16-corp-avai, o=SGI, c=US
+cn: b16-corp-avai
+ipNetworkNumber: 155.11.147
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=houston, o=SGI, c=US
+cn: houston
+ipNetworkNumber: 155.11.145
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=lauderdale, o=SGI, c=US
+cn: lauderdale
+ipNetworkNumber: 155.11.144
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=huntsville, o=SGI, c=US
+cn: huntsville
+ipNetworkNumber: 155.11.143
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=jackson, o=SGI, c=US
+cn: jackson
+ipNetworkNumber: 155.11.142
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=triangle, o=SGI, c=US
+cn: triangle
+ipNetworkNumber: 155.11.141
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=knoxville-avai, o=SGI, c=US
+cn: knoxville-avai
+ipNetworkNumber: 155.11.140
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=orlando, o=SGI, c=US
+cn: orlando
+ipNetworkNumber: 155.11.139
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=pensacola, o=SGI, c=US
+cn: pensacola
+ipNetworkNumber: 155.11.138
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=atlanta-avai, o=SGI, c=US
+cn: atlanta-avai
+ipNetworkNumber: 155.11.137
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hampton-avai, o=SGI, c=US
+cn: hampton-avai
+ipNetworkNumber: 155.11.136
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=timonium, o=SGI, c=US
+cn: timonium
+ipNetworkNumber: 155.11.135
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=clubfed-avai, o=SGI, c=US
+cn: clubfed-avai
+ipNetworkNumber: 155.11.134
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dayton-avai, o=SGI, c=US
+cn: dayton-avai
+ipNetworkNumber: 155.11.133
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=columbus, o=SGI, c=US
+cn: columbus
+ipNetworkNumber: 155.11.132
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=chicago, o=SGI, c=US
+cn: chicago
+ipNetworkNumber: 155.11.131
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=indianapolis, o=SGI, c=US
+cn: indianapolis
+ipNetworkNumber: 155.11.130
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=detroit, o=SGI, c=US
+cn: detroit
+ipNetworkNumber: 155.11.129
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=trevose, o=SGI, c=US
+cn: trevose
+ipNetworkNumber: 155.11.128
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=parsippany, o=SGI, c=US
+cn: parsippany
+ipNetworkNumber: 155.11.127
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=meriden-avai, o=SGI, c=US
+cn: meriden-avai
+ipNetworkNumber: 155.11.126
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=richmond, o=SGI, c=US
+cn: richmond
+ipNetworkNumber: 155.11.125
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=aberdeen, o=SGI, c=US
+cn: aberdeen
+ipNetworkNumber: 155.11.124
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hacienda, o=SGI, c=US
+cn: hacienda
+ipNetworkNumber: 155.11.123
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=hudson-dfoulser, o=SGI, c=US
+cn: hudson-dfoulser
+ipNetworkNumber: 155.11.122
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ftworth, o=SGI, c=US
+cn: ftworth
+ipNetworkNumber: 155.11.121
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tokyo-net3, o=SGI, c=US
+cn: tokyo-net3
+ipNetworkNumber: 155.11.120
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tokyo-nptc2, o=SGI, c=US
+cn: tokyo-nptc2
+ipNetworkNumber: 155.11.119
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=johannesburg, o=SGI, c=US
+cn: johannesburg
+ipNetworkNumber: 155.11.118
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=tokyo-nptc1, o=SGI, c=US
+cn: tokyo-nptc1
+ipNetworkNumber: 155.11.117
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ssi-prod, o=SGI, c=US
+cn: ssi-prod
+ipNetworkNumber: 155.11.116
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bangalore, o=SGI, c=US
+cn: bangalore
+ipNetworkNumber: 155.11.115
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wan-atm, o=SGI, c=US
+cn: wan-atm
+ipNetworkNumber: 155.11.112
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=clearlake, o=SGI, c=US
+cn: clearlake
+ipNetworkNumber: 155.11.111
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=alamos, o=SGI, c=US
+cn: alamos
+ipNetworkNumber: 155.11.110
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=troy, o=SGI, c=US
+cn: troy
+ipNetworkNumber: 155.11.109
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=temp-ring, o=SGI, c=US
+cn: temp-ring
+ipNetworkNumber: 155.11.108
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=silicon-farm, o=SGI, c=US
+cn: silicon-farm
+ipNetworkNumber: 155.11.107
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=perftools-melb, o=SGI, c=US
+cn: perftools-melb
+ipNetworkNumber: 155.11.106
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=memphis, o=SGI, c=US
+cn: memphis
+ipNetworkNumber: 155.11.104
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=nashville, o=SGI, c=US
+cn: nashville
+ipNetworkNumber: 155.11.103
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=access-graphics, o=SGI, c=US
+cn: access-graphics
+ipNetworkNumber: 155.11.102
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sgi-uk, o=SGI, c=US
+cn: sgi-uk
+ipNetworkNumber: 192.35.108
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=melbourne-net, o=SGI, c=US
+cn: melbourne-net
+ipNetworkNumber: 192.68.139
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=oasis, o=SGI, c=US
+cn: oasis
+ipNetworkNumber: 163.154.0.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ids-1, o=SGI, c=US
+cn: ids-1
+ipNetworkNumber: 204.94.208
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=sgigate-net, o=SGI, c=US
+cn: sgigate-net
+ipNetworkNumber: 204.94.209
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-test-out, o=SGI, c=US
+cn: is-test-out
+ipNetworkNumber: 204.94.210
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-outside-ring, o=SGI, c=US
+cn: is-outside-ring
+ipNetworkNumber: 204.94.211
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-devforum, o=SGI, c=US
+cn: is-devforum
+ipNetworkNumber: 204.94.212
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=is-devline, o=SGI, c=US
+cn: is-devline
+ipNetworkNumber: 204.94.213
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=alv-temp, o=SGI, c=US
+cn: alv-temp
+ipNetworkNumber: 204.94.215
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ids-2, o=SGI, c=US
+cn: ids-2
+ipNetworkNumber: 204.94.223
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ssla-cidr-1, o=SGI, c=US
+cn: ssla-cidr-1
+ipNetworkNumber: 204.250.254
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ssla-cidr-2, o=SGI, c=US
+cn: ssla-cidr-2
+ipNetworkNumber: 204.250.255
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-cselabtr, o=SGI, c=US
+cn: b17u-cselabtr
+ipNetworkNumber: 150.166.1
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-labiso, o=SGI, c=US
+cn: b17u-labiso
+ipNetworkNumber: 150.166.2
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-cselabfddi, o=SGI, c=US
+cn: b17u-cselabfddi
+ipNetworkNumber: 150.166.3
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-labenet1, o=SGI, c=US
+cn: b17u-labenet1
+ipNetworkNumber: 150.166.4
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-labenet2, o=SGI, c=US
+cn: b17u-labenet2
+ipNetworkNumber: 150.166.5
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17l-new2, o=SGI, c=US
+cn: b17l-new2
+ipNetworkNumber: 150.166.7
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17-microwave, o=SGI, c=US
+cn: b17-microwave
+ipNetworkNumber: 150.166.9
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=etc-fiber-channel, o=SGI, c=US
+cn: etc-fiber-channel
+ipNetworkNumber: 150.166.10
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-cselabmm, o=SGI, c=US
+cn: b17u-cselabmm
+ipNetworkNumber: 150.166.11
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b30l-csd, o=SGI, c=US
+cn: b30l-csd
+ipNetworkNumber: 150.166.12
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-tring_net1, o=SGI, c=US
+cn: b8u-tring_net1
+ipNetworkNumber: 150.166.13
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-lab-conf, o=SGI, c=US
+cn: b17u-lab-conf
+ipNetworkNumber: 150.166.14
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-cselabhip, o=SGI, c=US
+cn: b17u-cselabhip
+ipNetworkNumber: 150.166.15
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-tring_net2, o=SGI, c=US
+cn: b8u-tring_net2
+ipNetworkNumber: 150.166.16
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b24u-performance-plus_lab, o=SGI, c=US
+cn: b24u-performance-plus_lab
+ipNetworkNumber: 150.166.17
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-softsuite-blockhouse-network, o=SGI, c=US
+cn: b21-softsuite-blockhouse-network
+ipNetworkNumber: 150.166.24
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14u-vsg-apps3, o=SGI, c=US
+cn: b14u-vsg-apps3
+ipNetworkNumber: 150.166.32
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14l-corp-net5, o=SGI, c=US
+cn: b14l-corp-net5
+ipNetworkNumber: 150.166.33
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-lab, o=SGI, c=US
+cn: b9u-lab
+ipNetworkNumber: 150.166.34
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1dco-ntservers, o=SGI, c=US
+cn: b1dco-ntservers
+ipNetworkNumber: 150.166.35
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-engr-net, o=SGI, c=US
+cn: b8u-engr-net
+ipNetworkNumber: 150.166.36
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-core_render_net1, o=SGI, c=US
+cn: b8u-core_render_net1
+ipNetworkNumber: 150.166.37
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b10l-pandora_lab_engr2, o=SGI, c=US
+cn: b10l-pandora_lab_engr2
+ipNetworkNumber: 150.166.39
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-ipd, o=SGI, c=US
+cn: b8u-ipd
+ipNetworkNumber: 150.166.40
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-ipd_lab, o=SGI, c=US
+cn: b8u-ipd_lab
+ipNetworkNumber: 150.166.41
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-ipd_engr, o=SGI, c=US
+cn: b8u-ipd_engr
+ipNetworkNumber: 150.166.42
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8l-ibmi_lab, o=SGI, c=US
+cn: b8l-ibmi_lab
+ipNetworkNumber: 150.166.43
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-tirix_net, o=SGI, c=US
+cn: b8u-tirix_net
+ipNetworkNumber: 150.166.44
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12-imsd5, o=SGI, c=US
+cn: b12-imsd5
+ipNetworkNumber: 150.166.45
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss2, o=SGI, c=US
+cn: b1-dss2
+ipNetworkNumber: 150.166.46
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dss3, o=SGI, c=US
+cn: b1-dss3
+ipNetworkNumber: 150.166.47
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-add-mktg, o=SGI, c=US
+cn: b8u-add-mktg
+ipNetworkNumber: 150.166.48
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-ipd_lab2, o=SGI, c=US
+cn: b8u-ipd_lab2
+ipNetworkNumber: 150.166.49
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b10l-pandora_lab_engr, o=SGI, c=US
+cn: b10l-pandora_lab_engr
+ipNetworkNumber: 150.166.51
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b10-community1, o=SGI, c=US
+cn: b10-community1
+ipNetworkNumber: 150.166.52
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b10-community2, o=SGI, c=US
+cn: b10-community2
+ipNetworkNumber: 150.166.53
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b10-community3, o=SGI, c=US
+cn: b10-community3
+ipNetworkNumber: 150.166.54
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b10-community4, o=SGI, c=US
+cn: b10-community4
+ipNetworkNumber: 150.166.55
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b10-community5, o=SGI, c=US
+cn: b10-community5
+ipNetworkNumber: 150.166.56
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b10-community6, o=SGI, c=US
+cn: b10-community6
+ipNetworkNumber: 150.166.57
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b10-community7, o=SGI, c=US
+cn: b10-community7
+ipNetworkNumber: 150.166.58
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-tw59, o=SGI, c=US
+cn: b9u-tw59
+ipNetworkNumber: 150.166.59
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty60, o=SGI, c=US
+cn: b9-empty60
+ipNetworkNumber: 150.166.60
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-engr61, o=SGI, c=US
+cn: b9u-engr61
+ipNetworkNumber: 150.166.61
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty62, o=SGI, c=US
+cn: b9-empty62
+ipNetworkNumber: 150.166.62
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty63, o=SGI, c=US
+cn: b9-empty63
+ipNetworkNumber: 150.166.63
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty64, o=SGI, c=US
+cn: b9-empty64
+ipNetworkNumber: 150.166.64
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-sw-lab1, o=SGI, c=US
+cn: b9l-sw-lab1
+ipNetworkNumber: 150.166.65
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-sw-lab2, o=SGI, c=US
+cn: b9l-sw-lab2
+ipNetworkNumber: 150.166.66
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty68, o=SGI, c=US
+cn: b9-empty68
+ipNetworkNumber: 150.166.68
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty69, o=SGI, c=US
+cn: b9-empty69
+ipNetworkNumber: 150.166.69
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-tw-itv1, o=SGI, c=US
+cn: b9u-tw-itv1
+ipNetworkNumber: 150.166.70
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty71, o=SGI, c=US
+cn: b9-empty71
+ipNetworkNumber: 150.166.71
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty72, o=SGI, c=US
+cn: b9-empty72
+ipNetworkNumber: 150.166.72
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty73, o=SGI, c=US
+cn: b9-empty73
+ipNetworkNumber: 150.166.73
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty74, o=SGI, c=US
+cn: b9-empty74
+ipNetworkNumber: 150.166.74
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-engr75, o=SGI, c=US
+cn: b9u-engr75
+ipNetworkNumber: 150.166.75
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-engr76, o=SGI, c=US
+cn: b9u-engr76
+ipNetworkNumber: 150.166.76
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty77, o=SGI, c=US
+cn: b9-empty77
+ipNetworkNumber: 150.166.77
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty78, o=SGI, c=US
+cn: b9-empty78
+ipNetworkNumber: 150.166.78
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-100bt, o=SGI, c=US
+cn: b9l-100bt
+ipNetworkNumber: 150.166.79
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty80, o=SGI, c=US
+cn: b9-empty80
+ipNetworkNumber: 150.166.80
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-advnet-lab, o=SGI, c=US
+cn: b9l-advnet-lab
+ipNetworkNumber: 150.166.81
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-empty82, o=SGI, c=US
+cn: b9-empty82
+ipNetworkNumber: 150.166.82
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-webgrp, o=SGI, c=US
+cn: b9-webgrp
+ipNetworkNumber: 150.166.83
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=aes-ams-atm2, o=SGI, c=US
+cn: aes-ams-atm2
+ipNetworkNumber: 150.166.84
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=aes-ams-atm3, o=SGI, c=US
+cn: aes-ams-atm3
+ipNetworkNumber: 150.166.85
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17l-csdtrnglab, o=SGI, c=US
+cn: b17l-csdtrnglab
+ipNetworkNumber: 150.166.87
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-sqa-fddi1, o=SGI, c=US
+cn: b9l-sqa-fddi1
+ipNetworkNumber: 150.166.88
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-sqa-fddi2, o=SGI, c=US
+cn: b9l-sqa-fddi2
+ipNetworkNumber: 150.166.89
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b20-dco-fddi, o=SGI, c=US
+cn: b20-dco-fddi
+ipNetworkNumber: 150.166.90
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b20-dco, o=SGI, c=US
+cn: b20-dco
+ipNetworkNumber: 150.166.91
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-atm-lab, o=SGI, c=US
+cn: b9u-atm-lab
+ipNetworkNumber: 150.166.92
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-atm-lab2, o=SGI, c=US
+cn: b9u-atm-lab2
+ipNetworkNumber: 150.166.67
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-etm3, o=SGI, c=US
+cn: b21-etm3
+ipNetworkNumber: 150.166.93
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-ssi2, o=SGI, c=US
+cn: b21-ssi2
+ipNetworkNumber: 150.166.94
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b22-1, o=SGI, c=US
+cn: b22-1
+ipNetworkNumber: 150.166.95
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b22-2, o=SGI, c=US
+cn: b22-2
+ipNetworkNumber: 150.166.96
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8l, o=SGI, c=US
+cn: b8l
+ipNetworkNumber: 150.166.97
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b15-micro, o=SGI, c=US
+cn: b15-micro
+ipNetworkNumber: 150.166.98
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ss-wan-net, o=SGI, c=US
+cn: ss-wan-net
+ipNetworkNumber: 150.166.99
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=fddi-campus, o=SGI, c=US
+cn: fddi-campus
+ipNetworkNumber: 150.166.100
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-cse1, o=SGI, c=US
+cn: b17u-cse1
+ipNetworkNumber: 150.166.101
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17-b21_micro, o=SGI, c=US
+cn: b17-b21_micro
+ipNetworkNumber: 150.166.102
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b15-b20_atm, o=SGI, c=US
+cn: b15-b20_atm
+ipNetworkNumber: 150.166.103
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14U-apps3, o=SGI, c=US
+cn: b14U-apps3
+ipNetworkNumber: 150.166.104
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-100bt, o=SGI, c=US
+cn: b9u-100bt
+ipNetworkNumber: 150.166.105
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b12l-mfg, o=SGI, c=US
+cn: b12l-mfg
+ipNetworkNumber: 150.166.106
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=atm-utp, o=SGI, c=US
+cn: atm-utp
+ipNetworkNumber: 150.166.107
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b5u-demo-room, o=SGI, c=US
+cn: b5u-demo-room
+ipNetworkNumber: 150.166.108
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-ssd-benchlab_2, o=SGI, c=US
+cn: b7l-ssd-benchlab_2
+ipNetworkNumber: 150.166.109
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2u-gandalf-110, o=SGI, c=US
+cn: b2u-gandalf-110
+ipNetworkNumber: 150.166.110
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dms1, o=SGI, c=US
+cn: b1-dms1
+ipNetworkNumber: 150.166.111
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-dms2, o=SGI, c=US
+cn: b1-dms2
+ipNetworkNumber: 150.166.112
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-media-qa_lab, o=SGI, c=US
+cn: b9l-media-qa_lab
+ipNetworkNumber: 150.166.113
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b23-micro, o=SGI, c=US
+cn: b23-micro
+ipNetworkNumber: 150.166.116
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b23-production, o=SGI, c=US
+cn: b23-production
+ipNetworkNumber: 150.166.117
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b23-t1, o=SGI, c=US
+cn: b23-t1
+ipNetworkNumber: 150.166.118
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b23, o=SGI, c=US
+cn: b23
+ipNetworkNumber: 150.166.119
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=btl-essA, o=SGI, c=US
+cn: btl-essA
+ipNetworkNumber: 150.166.120
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=btu-essA, o=SGI, c=US
+cn: btu-essA
+ipNetworkNumber: 150.166.121
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bt-t1-b1, o=SGI, c=US
+cn: bt-t1-b1
+ipNetworkNumber: 150.166.122
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bt-mcast-b1, o=SGI, c=US
+cn: bt-mcast-b1
+ipNetworkNumber: 150.166.123
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=bt-hssi-b1, o=SGI, c=US
+cn: bt-hssi-b1
+ipNetworkNumber: 150.166.124
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=btl-essB, o=SGI, c=US
+cn: btl-essB
+ipNetworkNumber: 150.166.125
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=btu-essB, o=SGI, c=US
+cn: btu-essB
+ipNetworkNumber: 150.166.126
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b24l-b2_micro, o=SGI, c=US
+cn: b24l-b2_micro
+ipNetworkNumber: 150.166.127
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b1-b28-t1, o=SGI, c=US
+cn: b1-b28-t1
+ipNetworkNumber: 150.166.132
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b10-b28-micro, o=SGI, c=US
+cn: b10-b28-micro
+ipNetworkNumber: 150.166.133
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b28-b29-endusers, o=SGI, c=US
+cn: b28-b29-endusers
+ipNetworkNumber: 150.166.134
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-cselabatm, o=SGI, c=US
+cn: b17u-cselabatm
+ipNetworkNumber: 150.166.135
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b16-endusers, o=SGI, c=US
+cn: b16-endusers
+ipNetworkNumber: 150.166.136
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14u-endusers, o=SGI, c=US
+cn: b14u-endusers
+ipNetworkNumber: 150.166.137
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14u-endusers1, o=SGI, c=US
+cn: b14u-endusers1
+ipNetworkNumber: 150.166.138
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14l-inperson_lab, o=SGI, c=US
+cn: b14l-inperson_lab
+ipNetworkNumber: 150.166.139
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14l-endusers, o=SGI, c=US
+cn: b14l-endusers
+ipNetworkNumber: 150.166.140
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=ntg-net, o=SGI, c=US
+cn: ntg-net
+ipNetworkNumber: 150.166.141
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9u-sw-net, o=SGI, c=US
+cn: b9u-sw-net
+ipNetworkNumber: 150.166.142
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-b27-micro, o=SGI, c=US
+cn: b2-b27-micro
+ipNetworkNumber: 150.166.143
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b27l-csd-endusers, o=SGI, c=US
+cn: b27l-csd-endusers
+ipNetworkNumber: 150.166.144
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b27u-csd-endusers, o=SGI, c=US
+cn: b27u-csd-endusers
+ipNetworkNumber: 150.166.145
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-corp-users, o=SGI, c=US
+cn: b21-corp-users
+ipNetworkNumber: 150.166.146
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8u-hppi-lab, o=SGI, c=US
+cn: b8u-hppi-lab
+ipNetworkNumber: 150.166.147
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=isdn-engr, o=SGI, c=US
+cn: isdn-engr
+ipNetworkNumber: 150.166.148
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14l-moose1, o=SGI, c=US
+cn: b14l-moose1
+ipNetworkNumber: 150.166.149
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14l-esd-users, o=SGI, c=US
+cn: b14l-esd-users
+ipNetworkNumber: 150.166.150
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b2-b26-fddi, o=SGI, c=US
+cn: b2-b26-fddi
+ipNetworkNumber: 150.166.151
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b26u-mfg, o=SGI, c=US
+cn: b26u-mfg
+ipNetworkNumber: 150.166.152
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b26u-csd, o=SGI, c=US
+cn: b26u-csd
+ipNetworkNumber: 150.166.153
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b26l-mfg, o=SGI, c=US
+cn: b26l-mfg
+ipNetworkNumber: 150.166.154
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b26l-csd, o=SGI, c=US
+cn: b26l-csd
+ipNetworkNumber: 150.166.155
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b26-mfg-floor, o=SGI, c=US
+cn: b26-mfg-floor
+ipNetworkNumber: 150.166.156
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b26-gcs-csd1, o=SGI, c=US
+cn: b26-gcs-csd1
+ipNetworkNumber: 150.166.157
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b26-mfg-server, o=SGI, c=US
+cn: b26-mfg-server
+ipNetworkNumber: 150.166.158
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b26-gcs-csd2, o=SGI, c=US
+cn: b26-gcs-csd2
+ipNetworkNumber: 150.166.159
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b27-telecomm-net, o=SGI, c=US
+cn: b27-telecomm-net
+ipNetworkNumber: 150.166.160
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14-isdn-esd, o=SGI, c=US
+cn: b14-isdn-esd
+ipNetworkNumber: 150.166.161
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7l-hippi, o=SGI, c=US
+cn: b7l-hippi
+ipNetworkNumber: 150.166.162
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-atm, o=SGI, c=US
+cn: b9-atm
+ipNetworkNumber: 150.166.163
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b7-hippi, o=SGI, c=US
+cn: b7-hippi
+ipNetworkNumber: 150.166.164
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b14-community, o=SGI, c=US
+cn: b14-community
+ipNetworkNumber: 150.166.165
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9-eis-hippi, o=SGI, c=US
+cn: b9-eis-hippi
+ipNetworkNumber: 150.166.166
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b9l-laddis-lab, o=SGI, c=US
+cn: b9l-laddis-lab
+ipNetworkNumber: 150.166.167
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b24u-dev-hlab, o=SGI, c=US
+cn: b24u-dev-hlab
+ipNetworkNumber: 150.166.171
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b25-1-community-net, o=SGI, c=US
+cn: b25-1-community-net
+ipNetworkNumber: 150.166.172.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b25-2-community-net, o=SGI, c=US
+cn: b25-2-community-net
+ipNetworkNumber: 150.166.173.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b25-3-community-net, o=SGI, c=US
+cn: b25-3-community-net
+ipNetworkNumber: 150.166.174.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b25-4-community-net, o=SGI, c=US
+cn: b25-4-community-net
+ipNetworkNumber: 150.166.175.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b25-noc-net, o=SGI, c=US
+cn: b25-noc-net
+ipNetworkNumber: 150.166.176.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b25-isac-net, o=SGI, c=US
+cn: b25-isac-net
+ipNetworkNumber: 150.166.177.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b25-mmedia-lab-net, o=SGI, c=US
+cn: b25-mmedia-lab-net
+ipNetworkNumber: 150.166.178.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b25-ntg-lab-net, o=SGI, c=US
+cn: b25-ntg-lab-net
+ipNetworkNumber: 150.166.179.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b25-cvt-lab-net, o=SGI, c=US
+cn: b25-cvt-lab-net
+ipNetworkNumber: 150.166.180.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=fddi-annex, o=SGI, c=US
+cn: fddi-annex
+ipNetworkNumber: 150.166.200
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo1, o=SGI, c=US
+cn: shore-nafo1
+ipNetworkNumber: 150.166.201
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo2, o=SGI, c=US
+cn: shore-nafo2
+ipNetworkNumber: 150.166.202
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo3, o=SGI, c=US
+cn: shore-nafo3
+ipNetworkNumber: 150.166.203
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo4, o=SGI, c=US
+cn: shore-nafo4
+ipNetworkNumber: 150.166.204
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo5, o=SGI, c=US
+cn: shore-nafo5
+ipNetworkNumber: 150.166.205
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo6, o=SGI, c=US
+cn: shore-nafo6
+ipNetworkNumber: 150.166.206
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo7, o=SGI, c=US
+cn: shore-nafo7
+ipNetworkNumber: 150.166.207
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo8, o=SGI, c=US
+cn: shore-nafo8
+ipNetworkNumber: 150.166.208
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo9, o=SGI, c=US
+cn: shore-nafo9
+ipNetworkNumber: 150.166.209
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo10, o=SGI, c=US
+cn: shore-nafo10
+ipNetworkNumber: 150.166.210
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo11, o=SGI, c=US
+cn: shore-nafo11
+ipNetworkNumber: 150.166.211
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo12, o=SGI, c=US
+cn: shore-nafo12
+ipNetworkNumber: 150.166.212
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo13, o=SGI, c=US
+cn: shore-nafo13
+ipNetworkNumber: 150.166.213
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo14, o=SGI, c=US
+cn: shore-nafo14
+ipNetworkNumber: 150.166.214
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo15, o=SGI, c=US
+cn: shore-nafo15
+ipNetworkNumber: 150.166.215
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=telecom-solutions1, o=SGI, c=US
+cn: telecom-solutions1
+ipNetworkNumber: 150.166.216
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=telecom-solutions2, o=SGI, c=US
+cn: telecom-solutions2
+ipNetworkNumber: 150.166.217
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b20l-saleslab-2, o=SGI, c=US
+cn: b20l-saleslab-2
+ipNetworkNumber: 150.166.219
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=magic-mkting, o=SGI, c=US
+cn: magic-mkting
+ipNetworkNumber: 150.166.220
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo21, o=SGI, c=US
+cn: shore-nafo21
+ipNetworkNumber: 150.166.221
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo22, o=SGI, c=US
+cn: shore-nafo22
+ipNetworkNumber: 150.166.222
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b40-leadership1, o=SGI, c=US
+cn: b40-leadership1
+ipNetworkNumber: 150.166.227
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b40-leadership2, o=SGI, c=US
+cn: b40-leadership2
+ipNetworkNumber: 150.166.228
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-cseserv, o=SGI, c=US
+cn: b17u-cseserv
+ipNetworkNumber: 150.166.229
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=atm-bckbone, o=SGI, c=US
+cn: atm-bckbone
+ipNetworkNumber: 150.166.230
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo29, o=SGI, c=US
+cn: shore-nafo29
+ipNetworkNumber: 150.166.231
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=shore-nafo30, o=SGI, c=US
+cn: shore-nafo30
+ipNetworkNumber: 150.166.232
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=atm2-bckbone, o=SGI, c=US
+cn: atm2-bckbone
+ipNetworkNumber: 150.166.233
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=intr-fddi-3, o=SGI, c=US
+cn: intr-fddi-3
+ipNetworkNumber: 150.166.234
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=atm, o=SGI, c=US
+cn: atm
+ipNetworkNumber: 150.166.235
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-mfg-endusers, o=SGI, c=US
+cn: b11-mfg-endusers
+ipNetworkNumber: 150.166.236
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b27u-tools-lab, o=SGI, c=US
+cn: b27u-tools-lab
+ipNetworkNumber: 150.166.237
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-isdn-combinet, o=SGI, c=US
+cn: b17u-isdn-combinet
+ipNetworkNumber: 150.166.238
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b17u-isdn-ppp, o=SGI, c=US
+cn: b17u-isdn-ppp
+ipNetworkNumber: 150.166.239
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b5u-visim, o=SGI, c=US
+cn: b5u-visim
+ipNetworkNumber: 150.166.241
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-5l-mfg, o=SGI, c=US
+cn: b11-5l-mfg
+ipNetworkNumber: 150.166.242
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b11-5u-mfg, o=SGI, c=US
+cn: b11-5u-mfg
+ipNetworkNumber: 150.166.243
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b8-hippi, o=SGI, c=US
+cn: b8-hippi
+ipNetworkNumber: 150.166.245
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b20l-nafo-training, o=SGI, c=US
+cn: b20l-nafo-training
+ipNetworkNumber: 150.166.246
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-etm2, o=SGI, c=US
+cn: b21-etm2
+ipNetworkNumber: 150.166.247
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dialbk-project1, o=SGI, c=US
+cn: dialbk-project1
+ipNetworkNumber: 150.166.248
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dialbk-project2, o=SGI, c=US
+cn: dialbk-project2
+ipNetworkNumber: 150.166.249
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dialbk-project3, o=SGI, c=US
+cn: dialbk-project3
+ipNetworkNumber: 150.166.250
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=dialbk-project4, o=SGI, c=US
+cn: dialbk-project4
+ipNetworkNumber: 150.166.251
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-ssi4, o=SGI, c=US
+cn: b21-ssi4
+ipNetworkNumber: 150.166.252
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-csd1, o=SGI, c=US
+cn: b21-csd1
+ipNetworkNumber: 150.166.253
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=b21-csd2, o=SGI, c=US
+cn: b21-csd2
+ipNetworkNumber: 150.166.254
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanaber.aberdeen, o=SGI, c=US
+cn: wanaber.aberdeen
+ipNetworkNumber: 169.238.31.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanbeth.clubfed, o=SGI, c=US
+cn: wanbeth.clubfed
+ipNetworkNumber: 169.238.31.4
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanham.hampton, o=SGI, c=US
+cn: wanham.hampton
+ipNetworkNumber: 169.238.31.8
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wannova.nova, o=SGI, c=US
+cn: wannova.nova
+ipNetworkNumber: 169.238.31.12
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanrich.richmond, o=SGI, c=US
+cn: wanrich.richmond
+ipNetworkNumber: 169.238.31.16
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wantim.timonium, o=SGI, c=US
+cn: wantim.timonium
+ipNetworkNumber: 169.238.31.20
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanalb.albany, o=SGI, c=US
+cn: wanalb.albany
+ipNetworkNumber: 169.238.63.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanbuf.buffalo, o=SGI, c=US
+cn: wanbuf.buffalo
+ipNetworkNumber: 169.238.63.4
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanhar.harrisburg, o=SGI, c=US
+cn: wanhar.harrisburg
+ipNetworkNumber: 169.238.63.8
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanhud.boston, o=SGI, c=US
+cn: wanhud.boston
+ipNetworkNumber: 169.238.63.12
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanmanhat.manhattan, o=SGI, c=US
+cn: wanmanhat.manhattan
+ipNetworkNumber: 169.238.63.16
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanmel.melville, o=SGI, c=US
+cn: wanmel.melville
+ipNetworkNumber: 169.238.63.20
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=anmer.meriden, o=SGI, c=US
+cn: anmer.meriden
+ipNetworkNumber: 169.238.63.24
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanparsip.parsippany, o=SGI, c=US
+cn: wanparsip.parsippany
+ipNetworkNumber: 169.238.63.28
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanroc.rochester, o=SGI, c=US
+cn: wanroc.rochester
+ipNetworkNumber: 169.238.63.32
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wansyc.syracuse, o=SGI, c=US
+cn: wansyc.syracuse
+ipNetworkNumber: 169.238.63.36
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wantre.trevose, o=SGI, c=US
+cn: wantre.trevose
+ipNetworkNumber: 169.238.63.40
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanaccessg.boulder, o=SGI, c=US
+cn: wanaccessg.boulder
+ipNetworkNumber: 169.238.95.120
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanant.sanantonio, o=SGI, c=US
+cn: wanant.sanantonio
+cn: is
+cn: down
+cn: due
+cn: to
+cn: move>
+ipNetworkNumber: <Site
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanaus.austin, o=SGI, c=US
+cn: wanaus.austin
+ipNetworkNumber: 169.238.95.116
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanclear.clearlake, o=SGI, c=US
+cn: wanclear.clearlake
+ipNetworkNumber: 169.238.95.112
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wancosprgs.cosprings, o=SGI, c=US
+cn: wancosprgs.cosprings
+ipNetworkNumber: 169.238.95.108
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wandal.dallas, o=SGI, c=US
+cn: wandal.dallas
+ipNetworkNumber: 169.238.95.104
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanden.denver, o=SGI, c=US
+cn: wanden.denver
+ipNetworkNumber: 169.238.95.100
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanhou.houst, o=SGI, c=US
+cn: wanhou.houst
+ipNetworkNumber: 169.238.95.96
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanslc.saltlake, o=SGI, c=US
+cn: wanslc.saltlake
+ipNetworkNumber: 169.238.95.92
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wantulsa.tulsa, o=SGI, c=US
+cn: wantulsa.tulsa
+ipNetworkNumber: 169.238.95.88
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanworth.ftworth, o=SGI, c=US
+cn: wanworth.ftworth
+ipNetworkNumber: 169.238.95.84
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=cisco.chez, o=SGI, c=US
+cn: cisco.chez
+ipNetworkNumber: 169.238.127.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=router-ala-jwag.engr, o=SGI, c=US
+cn: router-ala-jwag.engr
+ipNetworkNumber: 169.238.127.4
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanalamos.losalamos, o=SGI, c=US
+cn: wanalamos.losalamos
+ipNetworkNumber: 169.238.127.8
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanalbq.albuquerque, o=SGI, c=US
+cn: wanalbq.albuquerque
+ipNetworkNumber: 169.238.127.12
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wandiego.sandiego, o=SGI, c=US
+cn: wandiego.sandiego
+ipNetworkNumber: 169.238.127.16
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanlos.losangeles, o=SGI, c=US
+cn: wanlos.losangeles
+ipNetworkNumber: 169.238.127.20
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanmtv.corp, o=SGI, c=US
+cn: wanmtv.corp
+ipNetworkNumber: 169.238.127.24
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanmtv2.corp, o=SGI, c=US
+cn: wanmtv2.corp
+ipNetworkNumber: 169.238.127.28
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wannew.newport, o=SGI, c=US
+cn: wannew.newport
+ipNetworkNumber: 169.238.127.32
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanphx.phoenix, o=SGI, c=US
+cn: wanphx.phoenix
+ipNetworkNumber: 169.238.127.36
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanport.oregon, o=SGI, c=US
+cn: wanport.oregon
+ipNetworkNumber: 169.238.127.40
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanram.sanramon, o=SGI, c=US
+cn: wanram.sanramon
+ipNetworkNumber: 169.238.127.44
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanriver.riverside, o=SGI, c=US
+cn: wanriver.riverside
+ipNetworkNumber: 169.238.127.48
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wansacto.sacramento, o=SGI, c=US
+cn: wansacto.sacramento
+ipNetworkNumber: 169.238.127.52
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wansea.seattle, o=SGI, c=US
+cn: wansea.seattle
+ipNetworkNumber: 169.238.127.56
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanspo.spokane, o=SGI, c=US
+cn: wanspo.spokane
+ipNetworkNumber: 169.238.127.60
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanstudio-sm.ssla, o=SGI, c=US
+cn: wanstudio-sm.ssla
+ipNetworkNumber: 169.238.127.64
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wantuc.tucson, o=SGI, c=US
+cn: wantuc.tucson
+ipNetworkNumber: 169.238.127.68
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanvegas.lasvegas, o=SGI, c=US
+cn: wanvegas.lasvegas
+ipNetworkNumber: 169.238.127.72
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanallp.dearborn, o=SGI, c=US
+cn: wanallp.dearborn
+ipNetworkNumber: 169.238.143.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wancleve.cleveland, o=SGI, c=US
+cn: wancleve.cleveland
+ipNetworkNumber: 169.238.143.4
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wancol.columbus, o=SGI, c=US
+cn: wancol.columbus
+ipNetworkNumber: 169.238.143.8
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanday.dayton, o=SGI, c=US
+cn: wanday.dayton
+ipNetworkNumber: 169.238.143.12
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanfarm.detroit, o=SGI, c=US
+cn: wanfarm.detroit
+ipNetworkNumber: 169.238.143.16
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanindy.indianapolis, o=SGI, c=US
+cn: wanindy.indianapolis
+ipNetworkNumber: 169.238.143.20
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanpit.pittsburgh, o=SGI, c=US
+cn: wanpit.pittsburgh
+ipNetworkNumber: 169.238.143.24
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wantroy.troy, o=SGI, c=US
+cn: wantroy.troy
+ipNetworkNumber: 169.238.143.28
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanatl.atlanta, o=SGI, c=US
+cn: wanatl.atlanta
+ipNetworkNumber: 169.238.223.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanbirm.birmingham, o=SGI, c=US
+cn: wanbirm.birmingham
+ipNetworkNumber: 169.238.223.4
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wancharl.charlotte, o=SGI, c=US
+cn: wancharl.charlotte
+ipNetworkNumber: 169.238.223.8
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wancon.conyers, o=SGI, c=US
+cn: wancon.conyers
+ipNetworkNumber: 169.238.223.12
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wandur.triangle, o=SGI, c=US
+cn: wandur.triangle
+ipNetworkNumber: 169.238.223.16
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanhunt.huntsville, o=SGI, c=US
+cn: wanhunt.huntsville
+ipNetworkNumber: 169.238.223.20
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanjack.jackson, o=SGI, c=US
+cn: wanjack.jackson
+ipNetworkNumber: 169.238.223.24
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanknox.knoxville, o=SGI, c=US
+cn: wanknox.knoxville
+ipNetworkNumber: 169.238.223.28
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanlaud.lauderdale, o=SGI, c=US
+cn: wanlaud.lauderdale
+ipNetworkNumber: 169.238.223.32
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanmco.orlando, o=SGI, c=US
+cn: wanmco.orlando
+ipNetworkNumber: 169.238.223.36
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanmem.memphis, o=SGI, c=US
+cn: wanmem.memphis
+ipNetworkNumber: 169.238.223.40
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wannash.nashville, o=SGI, c=US
+cn: wannash.nashville
+ipNetworkNumber: 169.238.223.44
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanpns.pensacola, o=SGI, c=US
+cn: wanpns.pensacola
+ipNetworkNumber: 169.238.223.48
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wantamp.tampa, o=SGI, c=US
+cn: wantamp.tampa
+ipNetworkNumber: 169.238.223.52
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wancal.calgary, o=SGI, c=US
+cn: wancal.calgary
+ipNetworkNumber: 169.238.229.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanmtl.montreal, o=SGI, c=US
+cn: wanmtl.montreal
+ipNetworkNumber: 169.238.229.4
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanott.ottawa, o=SGI, c=US
+cn: wanott.ottawa
+ipNetworkNumber: 169.238.229.8
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanvan.vancouver, o=SGI, c=US
+cn: wanvan.vancouver
+ipNetworkNumber: 169.238.229.12
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wancedar.cedar, o=SGI, c=US
+cn: wancedar.cedar
+ipNetworkNumber: 169.238.239.0
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanchi.chicago, o=SGI, c=US
+cn: wanchi.chicago
+ipNetworkNumber: 169.238.239.4
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wankansas.kansas, o=SGI, c=US
+cn: wankansas.kansas
+ipNetworkNumber: 169.238.239.8
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanmilw.milwaukee, o=SGI, c=US
+cn: wanmilw.milwaukee
+ipNetworkNumber: 169.238.239.12
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanminn.minneapolis, o=SGI, c=US
+cn: wanminn.minneapolis
+ipNetworkNumber: 169.238.239.16
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanstl.stlouis, o=SGI, c=US
+cn: wanstl.stlouis
+ipNetworkNumber: 169.238.239.20
+objectclass: ipNetwork
+objectclass: top
+
+dn: cn=wanurb.urbana, o=SGI, c=US
+cn: wanurb.urbana
+ipNetworkNumber: 169.238.239.24
+objectclass: ipNetwork
+objectclass: top
+
+dn: uid=root, o=SGI, c=US
+uid: root
+userPassword: {crypt}xZuUdcHRxN1cc
+uidNumber: 0
+gidNumber: 0
+gecos: Super-User
+homeDirectory: /
+loginShell: /usr/bin/tcsh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=sysadm, o=SGI, c=US
+uid: sysadm
+userPassword: *
+uidNumber: 0
+gidNumber: 0
+gecos: System V Administration
+homeDirectory: /usr/admin
+loginShell: /bin/sh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=cmwlogin, o=SGI, c=US
+uid: cmwlogin
+userPassword: *
+uidNumber: 0
+gidNumber: 994
+gecos: CMW Login UserID
+homeDirectory: /usr/CMW
+loginShell: /sbin/csh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=diag, o=SGI, c=US
+uid: diag
+userPassword: *
+uidNumber: 0
+gidNumber: 996
+gecos: Hardware Diagnostics
+homeDirectory: /usr/diags
+loginShell: /bin/csh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=daemon, o=SGI, c=US
+uid: daemon
+userPassword: *
+uidNumber: 1
+gidNumber: 1
+gecos: daemons
+homeDirectory: /
+loginShell: /dev/null
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=bin, o=SGI, c=US
+uid: bin
+userPassword: *
+uidNumber: 2
+gidNumber: 2
+gecos: System Tools Owner
+homeDirectory: /bin
+loginShell: /dev/null
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=uucp, o=SGI, c=US
+uid: uucp
+userPassword: *
+uidNumber: 3
+gidNumber: 5
+gecos: UUCP Owner
+homeDirectory: /usr/lib/uucp
+loginShell: /bin/csh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=sys, o=SGI, c=US
+uid: sys
+userPassword: *
+uidNumber: 4
+gidNumber: 0
+gecos: System Activity Owner
+homeDirectory: /var/adm
+loginShell: /bin/sh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=adm, o=SGI, c=US
+uid: adm
+userPassword: *
+uidNumber: 5
+gidNumber: 3
+gecos: Accounting Files Owner
+homeDirectory: /var/adm
+loginShell: /bin/sh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=lp, o=SGI, c=US
+uid: lp
+userPassword: 
+uidNumber: 9
+gidNumber: 9
+gecos: Print Spooler Owner
+homeDirectory: /var/spool/lp
+loginShell: /bin/sh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=nuucp, o=SGI, c=US
+uid: nuucp
+userPassword: 
+uidNumber: 10
+gidNumber: 10
+gecos: Remote UUCP User
+homeDirectory: /var/spool/uucppublic
+loginShell: /usr/lib/uucp/uucico
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=auditor, o=SGI, c=US
+uid: auditor
+userPassword: *
+uidNumber: 11
+gidNumber: 0
+gecos: Audit Activity Owner
+homeDirectory: /auditor
+loginShell: /bin/sh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=dbadmin, o=SGI, c=US
+uid: dbadmin
+userPassword: *
+uidNumber: 12
+gidNumber: 0
+gecos: Security Database Owner
+homeDirectory: /dbadmin
+loginShell: /bin/sh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=sgiweb, o=SGI, c=US
+uid: sgiweb
+userPassword: *
+uidNumber: 13
+gidNumber: 60001
+gecos: SGI Web Applications
+homeDirectory: /var/www/htdocs
+loginShell: /bin/csh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=rfindd, o=SGI, c=US
+uid: rfindd
+userPassword: *
+uidNumber: 66
+gidNumber: 1
+gecos: Rfind Daemon and Fsdump
+homeDirectory: /var/rfindd
+loginShell: /bin/sh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=EZsetup, o=SGI, c=US
+uid: EZsetup
+userPassword: 
+uidNumber: 992
+gidNumber: 998
+gecos: System Setup
+homeDirectory: /var/sysadmdesktop/EZsetup
+loginShell: /bin/csh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=demos, o=SGI, c=US
+uid: demos
+userPassword: 
+uidNumber: 993
+gidNumber: 997
+gecos: Demonstration User
+homeDirectory: /usr/demos
+loginShell: /bin/csh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=OutOfBox, o=SGI, c=US
+uid: OutOfBox
+userPassword: 
+uidNumber: 995
+gidNumber: 997
+gecos: Out of Box Experience
+homeDirectory: /usr/people/OutOfBox
+loginShell: /bin/csh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=guest, o=SGI, c=US
+uid: guest
+userPassword: 
+uidNumber: 998
+gidNumber: 998
+gecos: Guest Account
+homeDirectory: /usr/people/guest
+loginShell: /bin/csh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=4Dgifts, o=SGI, c=US
+uid: 4Dgifts
+userPassword: *
+uidNumber: 999
+gidNumber: 998
+gecos: 4Dgifts Account
+homeDirectory: /usr/people/4Dgifts
+loginShell: /bin/csh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=nobody, o=SGI, c=US
+uid: nobody
+userPassword: *
+uidNumber: 60001
+gidNumber: 60001
+gecos: SVR4 nobody uid
+homeDirectory: /dev/null
+loginShell: /dev/null
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=noaccess, o=SGI, c=US
+uid: noaccess
+userPassword: *
+uidNumber: 60002
+gidNumber: 60002
+gecos: uid no access
+homeDirectory: /dev/null
+loginShell: /dev/null
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=nobody, o=SGI, c=US
+uid: nobody
+userPassword: *
+uidNumber: 60001
+gidNumber: 60001
+gecos: original nobody uid
+homeDirectory: /dev/null
+loginShell: /dev/null
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=gomez, o=SGI, c=US
+uid: gomez
+userPassword: fRJsjYGR3q7TE
+uidNumber: 37425
+gidNumber: 10
+gecos: Gomez
+homeDirectory: /usr/people/gomez
+loginShell: /usr/bin/tcsh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: uid=jcgomez, o=SGI, c=US
+uid: jcgomez
+userPassword: 
+uidNumber: 14427
+gidNumber: 20
+gecos: Juan Carlos Gomez
+homeDirectory: /home/people/jcgomez
+loginShell: /bin/tcsh
+objectclass: posixAccount
+objectclass: account
+objectclass: top
+
+dn: cn=ip, o=SGI, c=US
+cn: ip
+cn: IP
+ipProtocolNumber: 0
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=icmp, o=SGI, c=US
+cn: icmp
+cn: ICMP
+ipProtocolNumber: 1
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=igmp, o=SGI, c=US
+cn: igmp
+cn: IGMP
+ipProtocolNumber: 2
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=ggp, o=SGI, c=US
+cn: ggp
+cn: GGP
+ipProtocolNumber: 3
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=tcp, o=SGI, c=US
+cn: tcp
+cn: TCP
+ipProtocolNumber: 6
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=egp, o=SGI, c=US
+cn: egp
+cn: EGP
+ipProtocolNumber: 8
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=pup, o=SGI, c=US
+cn: pup
+cn: PUP
+ipProtocolNumber: 12
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=udp, o=SGI, c=US
+cn: udp
+cn: UDP
+ipProtocolNumber: 17
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=hmp, o=SGI, c=US
+cn: hmp
+cn: HMP
+ipProtocolNumber: 20
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=xns-idp, o=SGI, c=US
+cn: xns-idp
+cn: XNS-IDP
+ipProtocolNumber: 22
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=rdp, o=SGI, c=US
+cn: rdp
+cn: RDP
+ipProtocolNumber: 27
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=iso-tp4, o=SGI, c=US
+cn: iso-tp4
+cn: ISO-TP4
+ipProtocolNumber: 29
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=ipv6, o=SGI, c=US
+cn: ipv6
+cn: IPV6
+ipProtocolNumber: 41
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=rsvp, o=SGI, c=US
+cn: rsvp
+cn: RSVP
+ipProtocolNumber: 46
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=icmpv6, o=SGI, c=US
+cn: icmpv6
+cn: ICMPV6
+ipProtocolNumber: 58
+objectclass: ipProtocol
+objectclass: top
+
+dn: cn=portmapper, o=SGI, c=US
+cn: portmapper
+cn: portmap
+cn: sunrpc
+oncRpcNumber: 100000
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=rstatd, o=SGI, c=US
+cn: rstatd
+cn: rstat
+cn: rup
+cn: perfmeter
+oncRpcNumber: 100001
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=rusersd, o=SGI, c=US
+cn: rusersd
+cn: rusers
+oncRpcNumber: 100002
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=nfs, o=SGI, c=US
+cn: nfs
+cn: nfsprog
+oncRpcNumber: 100003
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=ypserv, o=SGI, c=US
+cn: ypserv
+cn: ypprog
+oncRpcNumber: 100004
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=mountd, o=SGI, c=US
+cn: mountd
+cn: mount
+cn: showmount
+oncRpcNumber: 100005
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=ypbind, o=SGI, c=US
+cn: ypbind
+oncRpcNumber: 100007
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=walld, o=SGI, c=US
+cn: walld
+cn: rwall
+cn: shutdown
+oncRpcNumber: 100008
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=yppasswdd, o=SGI, c=US
+cn: yppasswdd
+cn: yppasswd
+oncRpcNumber: 100009
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=etherstatd, o=SGI, c=US
+cn: etherstatd
+cn: etherstat
+oncRpcNumber: 100010
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=rquotad, o=SGI, c=US
+cn: rquotad
+cn: rquotaprog
+cn: quota
+cn: rquota
+oncRpcNumber: 100011
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sprayd, o=SGI, c=US
+cn: sprayd
+cn: spray
+oncRpcNumber: 100012
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=3270_mapper, o=SGI, c=US
+cn: 3270_mapper
+oncRpcNumber: 100013
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=rje_mapper, o=SGI, c=US
+cn: rje_mapper
+oncRpcNumber: 100014
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=selection_svc, o=SGI, c=US
+cn: selection_svc
+cn: selnsvc
+oncRpcNumber: 100015
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=database_svc, o=SGI, c=US
+cn: database_svc
+oncRpcNumber: 100016
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=rexd, o=SGI, c=US
+cn: rexd
+cn: rex
+oncRpcNumber: 100017
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=alis, o=SGI, c=US
+cn: alis
+oncRpcNumber: 100018
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sched, o=SGI, c=US
+cn: sched
+oncRpcNumber: 100019
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=llockmgr, o=SGI, c=US
+cn: llockmgr
+oncRpcNumber: 100020
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=nlockmgr, o=SGI, c=US
+cn: nlockmgr
+oncRpcNumber: 100021
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=x25.inr, o=SGI, c=US
+cn: x25.inr
+oncRpcNumber: 100022
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=statmon, o=SGI, c=US
+cn: statmon
+oncRpcNumber: 100023
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=status, o=SGI, c=US
+cn: status
+oncRpcNumber: 100024
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=bootparam, o=SGI, c=US
+cn: bootparam
+oncRpcNumber: 100026
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=ypupdated, o=SGI, c=US
+cn: ypupdated
+cn: ypupdate
+oncRpcNumber: 100028
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=keyserv, o=SGI, c=US
+cn: keyserv
+cn: keyserver
+oncRpcNumber: 100029
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=ttdbserverd, o=SGI, c=US
+cn: ttdbserverd
+cn: ttdbserverd
+oncRpcNumber: 100083
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=autofsd, o=SGI, c=US
+cn: autofsd
+cn: autofsd
+oncRpcNumber: 100099
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_snoopd, o=SGI, c=US
+cn: sgi_snoopd
+cn: snoopd
+cn: snoop
+oncRpcNumber: 391000
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_toolkitbus, o=SGI, c=US
+cn: sgi_toolkitbus
+oncRpcNumber: 391001
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_fam, o=SGI, c=US
+cn: sgi_fam
+oncRpcNumber: 391002
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_notepad, o=SGI, c=US
+cn: sgi_notepad
+cn: notepad
+oncRpcNumber: 391003
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_mountd, o=SGI, c=US
+cn: sgi_mountd
+cn: mount
+cn: showmount
+oncRpcNumber: 391004
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_smtd, o=SGI, c=US
+cn: sgi_smtd
+cn: smtd
+oncRpcNumber: 391005
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_pcsd, o=SGI, c=US
+cn: sgi_pcsd
+cn: pcsd
+oncRpcNumber: 391006
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_nfs, o=SGI, c=US
+cn: sgi_nfs
+oncRpcNumber: 391007
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_rfind, o=SGI, c=US
+cn: sgi_rfind
+cn: rfind
+oncRpcNumber: 391008
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_pod, o=SGI, c=US
+cn: sgi_pod
+cn: pod
+oncRpcNumber: 391009
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_iphone, o=SGI, c=US
+cn: sgi_iphone
+oncRpcNumber: 391010
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_videod, o=SGI, c=US
+cn: sgi_videod
+oncRpcNumber: 391011
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_testcd, o=SGI, c=US
+cn: sgi_testcd
+cn: testcd
+oncRpcNumber: 391012
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi.ha_hbeat, o=SGI, c=US
+cn: sgi.ha_hbeat
+cn: ha_hbeat
+oncRpcNumber: 391013
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi.ha_nc, o=SGI, c=US
+cn: sgi.ha_nc
+cn: ha_nc
+oncRpcNumber: 391014
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi.ha_appmon, o=SGI, c=US
+cn: sgi.ha_appmon
+cn: ha_appmon
+oncRpcNumber: 391015
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_xfsmd, o=SGI, c=US
+cn: sgi_xfsmd
+oncRpcNumber: 391016
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_mediad, o=SGI, c=US
+cn: sgi_mediad
+cn: mediad
+oncRpcNumber: 391017
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi.ha_orcl, o=SGI, c=US
+cn: sgi.ha_orcl
+cn: ha_orcl
+oncRpcNumber: 391018
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi.ha_ifmx, o=SGI, c=US
+cn: sgi.ha_ifmx
+cn: ha_ifmx
+oncRpcNumber: 391019
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi.ha_sybs, o=SGI, c=US
+cn: sgi.ha_sybs
+cn: ha_sybs
+oncRpcNumber: 391020
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi.ha_ifa, o=SGI, c=US
+cn: sgi.ha_ifa
+cn: ha_ifa
+oncRpcNumber: 391021
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391022
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391023
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391024
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391025
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391026
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391027
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391028
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391029
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391030
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391031
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391032
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391033
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391034
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391035
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391036
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391037
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391038
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391039
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391040
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391041
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391042
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391043
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391044
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391045
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391046
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391047
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391048
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391049
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391050
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391051
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391052
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391053
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391054
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391055
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391056
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391057
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391058
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391059
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391060
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391061
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391062
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=sgi_reserved, o=SGI, c=US
+cn: sgi_reserved
+oncRpcNumber: 391063
+objectclass: oncRpc
+objectclass: top
+
+dn: cn=tcpmux, o=SGI, c=US
+cn: tcpmux
+ipServicePort: 1
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=echo, o=SGI, c=US
+cn: echo
+ipServicePort: 7
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=echo, o=SGI, c=US
+cn: echo
+ipServicePort: 7
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=discard, o=SGI, c=US
+cn: discard
+cn: sink
+cn: null
+ipServicePort: 9
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=discard, o=SGI, c=US
+cn: discard
+cn: sink
+cn: null
+ipServicePort: 9
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=systat, o=SGI, c=US
+cn: systat
+cn: users
+ipServicePort: 11
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=daytime, o=SGI, c=US
+cn: daytime
+ipServicePort: 13
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=daytime, o=SGI, c=US
+cn: daytime
+ipServicePort: 13
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=netstat, o=SGI, c=US
+cn: netstat
+ipServicePort: 15
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=qotd, o=SGI, c=US
+cn: qotd
+cn: quote
+ipServicePort: 17
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=chargen, o=SGI, c=US
+cn: chargen
+cn: ttytst
+cn: source
+ipServicePort: 19
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=chargen, o=SGI, c=US
+cn: chargen
+cn: ttytst
+cn: source
+ipServicePort: 19
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=ftp-data, o=SGI, c=US
+cn: ftp-data
+ipServicePort: 20
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=ftp, o=SGI, c=US
+cn: ftp
+ipServicePort: 21
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=telnet, o=SGI, c=US
+cn: telnet
+ipServicePort: 23
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=smtp, o=SGI, c=US
+cn: smtp
+cn: mail
+ipServicePort: 25
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=time, o=SGI, c=US
+cn: time
+cn: timserver
+ipServicePort: 37
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=time, o=SGI, c=US
+cn: time
+cn: timserver
+ipServicePort: 37
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=rlp, o=SGI, c=US
+cn: rlp
+cn: resource
+ipServicePort: 39
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=name, o=SGI, c=US
+cn: name
+ipServicePort: 42
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=whois, o=SGI, c=US
+cn: whois
+cn: nicname
+ipServicePort: 43
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=domain, o=SGI, c=US
+cn: domain
+cn: nameserver
+ipServicePort: 53
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=domain, o=SGI, c=US
+cn: domain
+cn: nameserver
+ipServicePort: 53
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=mtp, o=SGI, c=US
+cn: mtp
+ipServicePort: 57
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=bootp, o=SGI, c=US
+cn: bootp
+cn: bootps
+ipServicePort: 67
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=bootpc, o=SGI, c=US
+cn: bootpc
+ipServicePort: 68
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=tftp, o=SGI, c=US
+cn: tftp
+ipServicePort: 69
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=rje, o=SGI, c=US
+cn: rje
+cn: netrjs
+ipServicePort: 77
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=finger, o=SGI, c=US
+cn: finger
+ipServicePort: 79
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=http, o=SGI, c=US
+cn: http
+ipServicePort: 80
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=link, o=SGI, c=US
+cn: link
+cn: ttylink
+ipServicePort: 87
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=supdup, o=SGI, c=US
+cn: supdup
+ipServicePort: 95
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=hostnames, o=SGI, c=US
+cn: hostnames
+cn: hostname
+ipServicePort: 101
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=iso-tsap, o=SGI, c=US
+cn: iso-tsap
+ipServicePort: 102
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=x400, o=SGI, c=US
+cn: x400
+ipServicePort: 103
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=x400-snd, o=SGI, c=US
+cn: x400-snd
+ipServicePort: 104
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=csnet-ns, o=SGI, c=US
+cn: csnet-ns
+ipServicePort: 105
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=pop-2, o=SGI, c=US
+cn: pop-2
+ipServicePort: 109
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=pop-3, o=SGI, c=US
+cn: pop-3
+ipServicePort: 110
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=sunrpc, o=SGI, c=US
+cn: sunrpc
+cn: rpcbind
+ipServicePort: 111
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=sunrpc, o=SGI, c=US
+cn: sunrpc
+cn: rpcbind
+ipServicePort: 111
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=auth, o=SGI, c=US
+cn: auth
+cn: authentication
+ipServicePort: 113
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=sftp, o=SGI, c=US
+cn: sftp
+ipServicePort: 115
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=uucp-path, o=SGI, c=US
+cn: uucp-path
+ipServicePort: 117
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=nntp, o=SGI, c=US
+cn: nntp
+cn: readnews
+cn: untp
+ipServicePort: 119
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=erpc, o=SGI, c=US
+cn: erpc
+ipServicePort: 121
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=ntp, o=SGI, c=US
+cn: ntp
+ipServicePort: 123
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=loc-srv, o=SGI, c=US
+cn: loc-srv
+ipServicePort: 135
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=loc-srv, o=SGI, c=US
+cn: loc-srv
+ipServicePort: 135
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=imap2, o=SGI, c=US
+cn: imap2
+ipServicePort: 143
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=snmp, o=SGI, c=US
+cn: snmp
+ipServicePort: 161
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=snmp-trap, o=SGI, c=US
+cn: snmp-trap
+cn: snmptrap
+ipServicePort: 162
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=xdmcp, o=SGI, c=US
+cn: xdmcp
+ipServicePort: 177
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=exec, o=SGI, c=US
+cn: exec
+ipServicePort: 512
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=biff, o=SGI, c=US
+cn: biff
+cn: comsat
+ipServicePort: 512
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=login, o=SGI, c=US
+cn: login
+ipServicePort: 513
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=who, o=SGI, c=US
+cn: who
+cn: whod
+ipServicePort: 513
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=shell, o=SGI, c=US
+cn: shell
+cn: cmd
+ipServicePort: 514
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=syslog, o=SGI, c=US
+cn: syslog
+ipServicePort: 514
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=printer, o=SGI, c=US
+cn: printer
+cn: spooler
+ipServicePort: 515
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=talk, o=SGI, c=US
+cn: talk
+ipServicePort: 517
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=ntalk, o=SGI, c=US
+cn: ntalk
+ipServicePort: 518
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=route, o=SGI, c=US
+cn: route
+cn: router
+cn: routed
+ipServicePort: 520
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=timed, o=SGI, c=US
+cn: timed
+cn: timeserver
+ipServicePort: 525
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=tempo, o=SGI, c=US
+cn: tempo
+cn: newdate
+ipServicePort: 526
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=courier, o=SGI, c=US
+cn: courier
+cn: rpc
+ipServicePort: 530
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=conference, o=SGI, c=US
+cn: conference
+cn: chat
+ipServicePort: 531
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=netnews, o=SGI, c=US
+cn: netnews
+cn: readnews
+ipServicePort: 532
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=netwall, o=SGI, c=US
+cn: netwall
+ipServicePort: 533
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=uucp, o=SGI, c=US
+cn: uucp
+cn: uucpd
+ipServicePort: 540
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=remotefs, o=SGI, c=US
+cn: remotefs
+cn: rfs_server
+cn: rfs
+ipServicePort: 556
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=ingreslock, o=SGI, c=US
+cn: ingreslock
+ipServicePort: 1524
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=albd, o=SGI, c=US
+cn: albd
+ipServicePort: 371
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=ta-rauth, o=SGI, c=US
+cn: ta-rauth
+cn: rauth
+ipServicePort: 601
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=kerberos, o=SGI, c=US
+cn: kerberos
+cn: kdc
+ipServicePort: 750
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=kerberos, o=SGI, c=US
+cn: kerberos
+cn: kdc
+ipServicePort: 750
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=krbupdate, o=SGI, c=US
+cn: krbupdate
+cn: kreg
+ipServicePort: 760
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=kpasswd, o=SGI, c=US
+cn: kpasswd
+cn: kpwd
+ipServicePort: 761
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=klogin, o=SGI, c=US
+cn: klogin
+ipServicePort: 543
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=nfs, o=SGI, c=US
+cn: nfs
+cn: nfs
+ipServicePort: 2049
+ipServiceProtocol: udp
+objectclass: ipService
+objectclass: top
+
+dn: cn=nfs, o=SGI, c=US
+cn: nfs
+cn: nfs
+ipServicePort: 2049
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=eklogin, o=SGI, c=US
+cn: eklogin
+ipServicePort: 2105
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=kshell, o=SGI, c=US
+cn: kshell
+cn: krcmd
+ipServicePort: 544
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=x-server, o=SGI, c=US
+cn: x-server
+ipServicePort: 6000
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=sgi-dgl, o=SGI, c=US
+cn: sgi-dgl
+ipServicePort: 5232
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=sgi-arrayd, o=SGI, c=US
+cn: sgi-arrayd
+ipServicePort: 5434
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=realaudio, o=SGI, c=US
+cn: realaudio
+cn: ra
+ipServicePort: 7070
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=wn-http, o=SGI, c=US
+cn: wn-http
+ipServicePort: 8778
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top
+
+dn: cn=sgi_iphone, o=SGI, c=US
+cn: sgi_iphone
+ipServicePort: 32769
+ipServiceProtocol: tcp
+objectclass: ipService
+objectclass: top

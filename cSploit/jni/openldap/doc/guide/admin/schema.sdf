@@ -1,0 +1,491 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Schema Specification
+
+This chapter describes how to extend the user schema used by
+{{slapd}}(8).  The chapter assumes the reader is familiar with the
+{{TERM:LDAP}}/{{TERM:X.500}} information model.
+
+The first section, {{SECT:Distributed Schema Files}} details optional
+schema definitions provided in the distribution and where to obtain
+other definitions.
+The second section, {{SECT:Extending Schema}}, details how to define
+new schema items.
+!if 0
+The third section, {{SECT:Transferring Schema}} details how you can
+export schema definitions from an LDAPv3 server and transform it
+to {{slapd.conf}}(5) format.
+!endif
+
+This chapter does not discuss how to extend system schema used by
+{{slapd}}(8) as this requires source code modification.  System
+schema includes all operational attribute types or any object class
+which allows or requires an operational attribute (directly or
+indirectly).
+
+
+H2: Distributed Schema Files
+
+OpenLDAP Software is distributed with a set of schema specifications for
+your use.  Each set is defined in a file suitable for inclusion
+(using the {{EX:include}} directive) in your {{slapd.conf}}(5)
+file.  These schema files are normally installed in the
+{{F:/usr/local/etc/openldap/schema}} directory.
+
+!block table; colaligns="LR"; coltags="F,N"; align=Center; \
+	title="Table 8.1: Provided Schema Specifications"
+File			Description
+core.schema		OpenLDAP {{core}} (required)
+cosine.schema		Cosine and Internet X.500 (useful)
+inetorgperson.schema	InetOrgPerson (useful)
+misc.schema		Assorted (experimental)
+nis.schema		Network Information Services (FYI)
+openldap.schema		OpenLDAP Project (experimental)
+!endblock
+
+To use any of these schema files, you only need to include the
+desired file in the global definitions portion of your
+{{slapd.conf}}(5) file.  For example:
+
+>	# include schema
+>	include /usr/local/etc/openldap/schema/core.schema
+>	include /usr/local/etc/openldap/schema/cosine.schema
+>	include /usr/local/etc/openldap/schema/inetorgperson.schema
+
+Additional files may be available.  Please consult the OpenLDAP
+{{TERM:FAQ}} ({{URL:http://www.openldap.org/faq/}}).
+
+Note: You should not modify any of the schema items defined
+in provided files.
+
+
+H2: Extending Schema
+
+Schema used by {{slapd}}(8) may be extended to support additional
+syntaxes, matching rules, attribute types, and object classes.  This
+chapter details how to add user application attribute types and
+object classes using the syntaxes and matching rules already supported
+by slapd.  slapd can also be extended to support additional syntaxes,
+matching rules and system schema, but this requires some programming
+and hence is not discussed here.
+
+There are five steps to defining new schema:
+^	obtain Object Identifier
++	choose a name prefix
++	create local schema file
++	define custom attribute types (if necessary)
++	define custom object classes
+
+
+H3: Object Identifiers
+
+Each schema element is identified by a globally unique {{TERM[expand]OID}}
+(OID).  OIDs are also used to identify other objects.  They are
+commonly found in protocols described by {{TERM:ASN.1}}.  In
+particular, they are heavily used by the {{TERM[expand]SNMP}} (SNMP).
+As OIDs are hierarchical, your organization can obtain one OID and
+branch it as needed.  For example, if your organization were assigned
+OID {{EX:1.1}}, you could branch the tree as follows:
+
+!block table; colaligns="LR"; coltags="EX,N"; align=Center; \
+	title="Table 8.2: Example OID hierarchy"
+OID		Assignment
+1.1		Organization's OID
+1.1.1		SNMP Elements
+1.1.2		LDAP Elements
+1.1.2.1		AttributeTypes
+1.1.2.1.1	x-my-Attribute
+1.1.2.2		ObjectClasses
+1.1.2.2.1	x-my-ObjectClass
+!endblock
+
+You are, of course, free to design a hierarchy suitable to your
+organizational needs under your organization's OID. No matter what hierarchy you choose, you should maintain a registry of assignments you make.  This can be a simple flat file or something more sophisticated such as the {{OpenLDAP OID Registry}} ({{URL:http://www.openldap.org/faq/index.cgi?file=197}}).
+
+For more information about Object Identifiers (and a listing service)
+see {{URL:http://www.alvestrand.no/objectid/}}.
+
+.{{Under no circumstances should you hijack OID namespace!}}
+
+To obtain a registered OID at {{no cost}}, apply for a OID
+under the {{ORG[expand]IANA}} (ORG:IANA) maintained {{Private Enterprise}} arc.  
+Any private enterprise (organization) may request a {{TERM[expand]PEN}} (PEN) to be assigned under this arc. Just fill out the IANA form at {{URL: http://pen.iana.org/pen/PenApplication.page}} and your official PEN will be sent to you usually within a few days. Your base OID will be something like {{EX:1.3.6.1.4.1.X}} where {{EX:X}} is an integer.
+
+Note: PENs obtained using this form may be used for any purpose
+including identifying LDAP schema elements.
+
+Alternatively, OID name space may be available from a national
+authority (e.g., {{ORG:ANSI}}, {{ORG:BSI}}).
+
+
+H3: Naming Elements
+
+In addition to assigning a unique object identifier to each schema
+element, you should provide at least one textual name for each
+element.  Names should be registered with the {{ORG:IANA}} or
+prefixed with "x-" to place in the "private use" name space.
+
+The name should be both descriptive and not likely to clash with
+names of other schema elements.  In particular, any name you choose
+should not clash with present or future Standard Track names (this
+is assured if you registered names or use names beginning with "x-").
+
+It is noted that you can obtain your own registered name
+prefix so as to avoid having to register your names individually.
+See {{REF:RFC4520}} for details.
+
+In the examples below, we have used a short prefix '{{EX:x-my-}}'.
+Such a short prefix would only be suitable for a very large, global
+organization.  In general, we recommend something like '{{EX:x-de-Firm-}}'
+(German company) or '{{EX:x-com-Example}}' (elements associated with
+organization associated with {{EX:example.com}}).
+
+
+H3: Local schema file
+
+The {{EX:objectclass}} and {{EX:attributeTypes}} configuration file
+directives can be used to define schema rules on entries in the
+directory.  It is customary to create a file to contain definitions
+of your custom schema items.  We recommend you create a file
+{{F:local.schema}} in {{F:/usr/local/etc/openldap/schema/local.schema}}
+and then include this file in your {{slapd.conf}}(5) file immediately
+after other schema {{EX:include}} directives.
+
+>	# include schema
+>	include /usr/local/etc/openldap/schema/core.schema
+>	include /usr/local/etc/openldap/schema/cosine.schema
+>	include /usr/local/etc/openldap/schema/inetorgperson.schema
+>	# include local schema
+>	include /usr/local/etc/openldap/schema/local.schema
+
+
+H3: Attribute Type Specification
+
+The {{attributetype}} directive is used to define a new attribute
+type.  The directive uses the same Attribute Type Description
+(as defined in {{REF:RFC4512}}) used by the attributeTypes
+attribute found in the subschema subentry, e.g.:
+
+E:	attributetype <{{REF:RFC4512}} Attribute Type Description>
+
+where Attribute Type Description is defined by the following
+{{TERM:ABNF}}:
+
+>      AttributeTypeDescription = "(" whsp
+>            numericoid whsp              ; AttributeType identifier
+>          [ "NAME" qdescrs ]             ; name used in AttributeType
+>          [ "DESC" qdstring ]            ; description
+>          [ "OBSOLETE" whsp ]
+>          [ "SUP" woid ]                 ; derived from this other
+>                                         ; AttributeType
+>          [ "EQUALITY" woid              ; Matching Rule name
+>          [ "ORDERING" woid              ; Matching Rule name
+>          [ "SUBSTR" woid ]              ; Matching Rule name
+>          [ "SYNTAX" whsp noidlen whsp ] ; Syntax OID
+>          [ "SINGLE-VALUE" whsp ]        ; default multi-valued
+>          [ "COLLECTIVE" whsp ]          ; default not collective
+>          [ "NO-USER-MODIFICATION" whsp ]; default user modifiable
+>          [ "USAGE" whsp AttributeUsage ]; default userApplications
+>          whsp ")"
+>
+>      AttributeUsage =
+>          "userApplications"     /
+>          "directoryOperation"   /
+>          "distributedOperation" / ; DSA-shared
+>          "dSAOperation"          ; DSA-specific, value depends on server
+>
+
+where whsp is a space ('{{EX: }}'), numericoid is a globally unique
+OID in dotted-decimal form (e.g. {{EX:1.1.0}}), qdescrs is one or
+more names, woid is either the name or OID optionally followed
+by a length specifier (e.g {{EX:{10}}}).
+
+For example, the attribute types {{EX:name}} and {{EX:cn}} are defined
+in {{F:core.schema}} as:
+
+>	attributeType ( 2.5.4.41 NAME 'name'
+>		DESC 'name(s) associated with the object'
+>		EQUALITY caseIgnoreMatch
+>		SUBSTR caseIgnoreSubstringsMatch
+>		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{32768} )
+>	attributeType ( 2.5.4.3 NAME ( 'cn' 'commonName' )
+>		DESC 'common name(s) assciated with the object'
+>		SUP name )
+
+Notice that each defines the attribute's OID, provides a short name,
+and a brief description.  Each name is an alias for the OID.
+{{slapd}}(8) returns the first listed name when returning results.
+
+The first attribute, {{EX:name}}, holds values of {{EX:directoryString}}
+({{TERM:UTF-8}} encoded Unicode) syntax.  The syntax is
+specified by OID (1.3.6.1.4.1.1466.115.121.1.15 identifies the
+directoryString syntax).  A length recommendation of 32768 is
+specified.  Servers should support values of this length, but may
+support longer values. The field does NOT specify a size constraint,
+so is ignored on servers (such as slapd) which don't impose such
+size limits.  In addition, the equality and substring matching uses
+case ignore rules.  Below are tables listing commonly used syntax
+and matching rules ({{slapd}}(8) supports these and many more).
+
+!block table; align=Center; coltags="EX,EX,N"; \
+	title="Table 8.3: Commonly Used Syntaxes"
+Name			OID				Description
+boolean			1.3.6.1.4.1.1466.115.121.1.7	boolean value
+directoryString		1.3.6.1.4.1.1466.115.121.1.15	Unicode (UTF-8) string
+distinguishedName	1.3.6.1.4.1.1466.115.121.1.12	LDAP {{TERM:DN}}
+integer			1.3.6.1.4.1.1466.115.121.1.27	integer
+numericString		1.3.6.1.4.1.1466.115.121.1.36	numeric string
+OID			1.3.6.1.4.1.1466.115.121.1.38	object identifier
+octetString		1.3.6.1.4.1.1466.115.121.1.40	arbitrary octets
+!endblock
+
+> 
+
+!block table; align=Center; coltags="EX,N"; \
+	title="Table 8.4: Commonly Used Matching Rules"
+Name					Type		Description
+booleanMatch				equality	boolean
+caseIgnoreMatch				equality	case insensitive, space insensitive
+caseIgnoreOrderingMatch			ordering	case insensitive, space insensitive
+caseIgnoreSubstringsMatch		substrings	case insensitive, space insensitive
+caseExactMatch				equality	case sensitive, space insensitive
+caseExactOrderingMatch			ordering	case sensitive, space insensitive
+caseExactSubstringsMatch		substrings	case sensitive, space insensitive
+distinguishedNameMatch			equality	distinguished name
+integerMatch				equality	integer
+integerOrderingMatch			ordering	integer
+numericStringMatch			equality	numerical
+numericStringOrderingMatch		ordering	numerical
+numericStringSubstringsMatch		substrings	numerical
+octetStringMatch			equality	octet string
+octetStringOrderingMatch		ordering	octet string
+octetStringSubstringsMatch	ordering	octet string
+objectIdentiferMatch			equality	object identifier
+!endblock
+
+The second attribute, {{EX:cn}}, is a subtype of {{EX:name}} hence
+it inherits the syntax, matching rules, and usage of {{EX:name}}.
+{{EX:commonName}} is an alternative name.
+
+Neither attribute is restricted to a single value.  Both are meant
+for usage by user applications.  Neither is obsolete nor collective.
+
+The following subsections provide a couple of examples.
+
+
+H4: x-my-UniqueName
+
+Many organizations maintain a single unique name for each user.
+Though one could use {{EX:displayName}} ({{REF:RFC2798}}), this
+attribute is really meant to be controlled by the user, not the
+organization.  We could just copy the definition of {{EX:displayName}}
+from {{F:inetorgperson.schema}} and replace the OID, name, and
+description, e.g:
+
+>	attributetype ( 1.1.2.1.1 NAME 'x-my-UniqueName'
+>		DESC 'unique name with my organization' 
+>		EQUALITY caseIgnoreMatch
+>		SUBSTR caseIgnoreSubstringsMatch
+>		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+>		SINGLE-VALUE )
+
+However, if we want this name to be used in {{EX:name}} assertions,
+e.g. {{EX:(name=*Jane*)}}, the attribute could alternatively be
+defined as a subtype of {{EX:name}}, e.g.:
+
+>	attributetype ( 1.1.2.1.1 NAME 'x-my-UniqueName'
+>		DESC 'unique name with my organization' 
+>		SUP name )
+
+
+H4: x-my-Photo
+
+Many organizations maintain a photo of each each user.  A
+{{EX:x-my-Photo}} attribute type could be defined to hold a photo.
+Of course, one could use just use {{EX:jpegPhoto}} ({{REF:RFC2798}})
+(or a subtype) to hold the photo.  However, you can only do
+this if the photo is in {{JPEG File Interchange Format}}.
+Alternatively, an attribute type which uses the {{Octet String}}
+syntax can be defined, e.g.:
+
+>	attributetype ( 1.1.2.1.2 NAME 'x-my-Photo'
+>		DESC 'a photo (application defined format)' 
+>		SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+>		SINGLE-VALUE )
+
+In this case, the syntax doesn't specify the format of the photo.
+It's assumed (maybe incorrectly) that all applications accessing
+this attribute agree on the handling of values.
+
+If you wanted to support multiple photo formats, you could define
+a separate attribute type for each format, prefix the photo
+with some typing information, or describe the value using
+{{TERM:ASN.1}} and use the {{EX:;binary}} transfer option.
+
+Another alternative is for the attribute to hold a {{TERM:URI}}
+pointing to the photo.  You can model such an attribute after
+{{EX:labeledURI}} ({{REF:RFC2079}}) or simply create a subtype,
+e.g.:
+
+>	attributetype ( 1.1.2.1.3 NAME 'x-my-PhotoURI'
+>		DESC 'URI and optional label referring to a photo' 
+>		SUP labeledURI )
+
+
+H3: Object Class Specification
+
+The {{objectclasses}} directive is used to define a new object
+class.  The directive uses the same Object Class Description
+(as defined in {{REF:RFC4512}}) used by the objectClasses
+attribute found in the subschema subentry, e.g.:
+
+E:	objectclass <{{REF:RFC4512}} Object Class Description>
+
+where Object Class Description is defined by the following
+{{TERM:ABNF}}:
+
+>	ObjectClassDescription = "(" whsp
+>		numericoid whsp      ; ObjectClass identifier
+>		[ "NAME" qdescrs ]
+>		[ "DESC" qdstring ]
+>		[ "OBSOLETE" whsp ]
+>		[ "SUP" oids ]       ; Superior ObjectClasses
+>		[ ( "ABSTRACT" / "STRUCTURAL" / "AUXILIARY" ) whsp ]
+>			; default structural
+>		[ "MUST" oids ]      ; AttributeTypes
+>		[ "MAY" oids ]       ; AttributeTypes
+>		whsp ")"
+
+where whsp is a space ('{{EX: }}'), numericoid is a globally unique
+OID in dotted-decimal form (e.g. {{EX:1.1.0}}), qdescrs is one or more
+names, and oids is one or more names and/or OIDs.
+
+
+H4: x-my-PhotoObject
+
+To define an {{auxiliary}} object class which allows
+x-my-Photo to be added to any existing entry.
+
+>	objectclass ( 1.1.2.2.1 NAME 'x-my-PhotoObject'
+>		DESC 'mixin x-my-Photo'
+>		AUXILIARY
+>		MAY x-my-Photo )
+
+
+H4: x-my-Person
+
+If your organization would like have a private {{structural}}
+object class to instantiate users, you can subclass one of
+the existing person classes, such as {{EX:inetOrgPerson}}
+({{REF:RFC2798}}), and add any additional attributes which
+you desire.
+
+>	objectclass ( 1.1.2.2.2 NAME 'x-my-Person'
+>		DESC 'my person'
+>		SUP inetOrgPerson
+>		MUST ( x-my-UniqueName $ givenName )
+>		MAY x-my-Photo )
+
+The object class inherits the required/allowed attribute
+types of {{EX:inetOrgPerson}} but requires {{EX:x-my-UniqueName}}
+and {{EX:givenName}} and allows {{EX:x-my-Photo}}.
+
+!if 0
+H2: Transferring Schema
+
+Since the {{slapd.conf}}(5) schema directives use {{REF:RFC4512}}
+format values, you can extract schema elements published by any
+{{TERM:LDAPv3}} server and easily construct directives for use with
+{{slapd}}(8).
+
+LDAPv3 servers publish schema elements in special {{subschema}}
+entries (or subentries).  While {{slapd}}(8) publishes a single
+subschema subentry normally named {{EX:cn=Subschema}}, this behavior
+cannot be expected from other servers.  The subschema subentry
+controlling a particular entry can be obtained by examining the
+{{EX:subschemaSubentry}} attribute contained in the entry at the
+root of each administrative context.  For example,
+
+>	ldapsearch -LLL -x -b "dc=example,dc=com" -s base "(objectclass=*)" subschemaSubentry
+
+To obtain the schema from a subschema subentry, you can use
+ldapsearch(1) as follows (replace the search base as needed):
+
+>	ldapsearch -LLL -x -b "cn=Subschema" -s base "(objectclass=subschema)" attributeTypes objectClasses
+
+where "cn=Subschema" is the value of subschemaSubentry returned in
+the prior search.
+
+This will return {{TERM:LDIF}} output containing many type/value
+pairs.  The following is an abbreviated example:
+
+>	dn: cn=Subschema
+>	objectClasses: ( 1.1.2.2.2 NAME 'x-my-Person' DESC 'my person' SUP inet
+>	 OrgPerson MUST ( x-my-UniqueName $ givenName ) MAY x-my-Photo )
+>	attributeTypes: ( 1.1.2.1.1 NAME 'x-my-UniqueName' DESC 'unique name wi
+>	 th my organization' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstrin
+>	 gsMatch SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 SINGLE-VALUE )
+>	attributeTypes: ( 1.1.2.1.2 NAME 'x-my-Photo' DESC 'a photo (applicatio
+>	 n defined format)' SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+
+Capture the output of the search in a file and then edit the file:
+
++ to contain only desired type/value pairs
+^ join LDIF continuation lines
+^ replace attribute type with directive name
+(e.g. {{EX:s/attributeTypes:/attributeType /}} and
+{{EX:s/objectClasses:/objectClass /}}).
+^ reorder lines so each element is defined before first use
+^ continue long directives over multiple lines
+
+For the three type/value pairs in our example, the edit should
+result in a file with contains of:
+
+>	attributetype ( 1.1.2.1.1 NAME 'x-my-UniqueName'
+>		DESC 'unique name with my organization' 
+>		EQUALITY caseIgnoreMatch
+>		SUBSTR caseIgnoreSubstringsMatch
+>		SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+>		SINGLE-VALUE )
+>	attributeType ( 1.1.2.1.2 NAME 'x-my-Photo'
+>		DESC 'a photo (application defined format)'
+>		SYNTAX 1.3.6.1.4.1.1466.115.121.1.40
+>	objectClass ( 1.1.2.2.2 NAME 'x-my-Person'
+>		DESC 'my person'
+>		SUP inetOrgPerson
+>		MUST ( x-my-UniqueName $ givenName )
+>		MAY x-my-Photo )
+
+Save in an appropriately named file (e.g. {{F:local.schema}}).
+You may now include this file in your {{slapd.conf}}(5) file.
+!endif
+
+
+H3: OID Macros
+
+To ease the management and use of OIDs, {{slapd}}(8) supports
+{{Object Identifier}} macros.  The {{EX:objectIdentifier}} directive
+is used to equate a macro (name) with a OID.  The OID may possibly
+be derived from a previously defined OID macro.   The {{slapd.conf}}(5)
+syntax is:
+
+E:	objectIdentifier <name> { <oid> | <name>[:<suffix>] }
+
+The following demonstrates definition of a set of OID macros
+and their use in defining schema elements:
+
+>	objectIdentifier myOID	1.1
+>	objectIdentifier mySNMP	myOID:1
+>	objectIdentifier myLDAP	myOID:2
+>	objectIdentifier myAttributeType	myLDAP:1
+>	objectIdentifier myObjectClass	myLDAP:2
+>	attributetype ( myAttributeType:3 NAME 'x-my-PhotoURI'
+>		DESC 'URI and optional label referring to a photo' 
+>		SUP labeledURI )
+>	objectclass ( myObjectClass:1 NAME 'x-my-PhotoObject'
+>		DESC 'mixin x-my-Photo'
+>		AUXILIARY
+>		MAY x-my-Photo )
+

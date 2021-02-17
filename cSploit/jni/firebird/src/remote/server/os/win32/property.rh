@@ -1,0 +1,56 @@
+/*
+ * The contents of this file are subject to the Interbase Public
+ * License Version 1.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy
+ * of the License at http://www.Inprise.com/IPL.html
+ *
+ * Software distributed under the License is distributed on an
+ * "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+ * or implied. See the License for the specific language governing
+ * rights and limitations under the License.
+ *
+ * The Original Code was created by Inprise Corporation
+ * and its predecessors. Portions created by Inprise Corporation are
+ * Copyright (C) Inprise Corporation.
+ *
+ * All Rights Reserved.
+ * Contributor(s): ______________________________________.
+ */
+
+/****************************************************************************
+
+
+property.rh
+
+produced by Borland Resource Workshop
+
+
+*****************************************************************************/
+
+#define GENERAL_DLG     1
+#define IDC_PRODNAME    124
+#define IDC_IBSVR_ICON  126
+#define IDC_LOCATION_TEXT 128
+#define IDC_CAPABILITIES_TEXT 129
+#define IDC_VERSION_TEXT 130
+#define IDC_NUM_ATTACH_TEXT 131
+#define IDC_NUM_DB_TEXT 132
+#define IDC_NUM_SVC_TEXT 133
+
+#define IDC_PATH        101
+#define IDC_STAT1       102
+#define IDC_STAT2       103
+#define IDC_STAT3       104
+#define IDC_STAT4       105
+#define IDC_REFRESH     106
+#define IDC_PROTOCOLS   107
+
+#define IDI_IBSVR       1007
+
+#define IDS_TCP         11
+#define IDS_NP          12
+#define IDS_IPC         13
+#define IDS_SUPER       14
+
+#define IDS_SERVERPROD_NAME     76
+#define IDS_LOCALPROD_NAME      77

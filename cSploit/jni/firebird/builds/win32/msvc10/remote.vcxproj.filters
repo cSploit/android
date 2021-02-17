@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="REMOTE files">
+      <UniqueIdentifier>{8db9d6e7-0f62-4a2d-8deb-64e4040c3f51}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{ffaa24af-5ba6-42bc-8ef9-7955cbdee0bf}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="AUTH files">
+      <UniqueIdentifier>{d7ae1b59-bd1a-4d73-8cd3-c9619194ce80}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\remote\inet.cpp">
+      <Filter>REMOTE files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\merge.cpp">
+      <Filter>REMOTE files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\parser.cpp">
+      <Filter>REMOTE files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\protocol.cpp">
+      <Filter>REMOTE files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\remote.cpp">
+      <Filter>REMOTE files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\os\win32\wnet.cpp">
+      <Filter>REMOTE files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\auth\trusted\AuthSspi.cpp">
+      <Filter>AUTH files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\remote\os\win32\xnet.cpp">
+      <Filter>REMOTE files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\auth\SecureRemotePassword\srp.cpp">
+      <Filter>AUTH files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\remote\inet_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\remote\merge_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\remote\parse_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\remote\proto_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\remote\protocol.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\remote\remot_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\remote\remote.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\remote\os\win32\wnet_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\remote\os\win32\xnet.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\remote\os\win32\xnet_proto.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\auth\SecureRemotePassword\srp.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\auth\SecureRemotePassword\Message.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

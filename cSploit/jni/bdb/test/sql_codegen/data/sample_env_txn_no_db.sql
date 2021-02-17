@@ -1,0 +1,1 @@
+CREATE DATABASE numismatics; /*+ MODE = TRANSACTIONAL */ 

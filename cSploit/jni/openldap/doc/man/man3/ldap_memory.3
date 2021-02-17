@@ -1,0 +1,50 @@
+.TH LDAP_MEMORY 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldap_memfree, ldap_memvfree, ldap_memalloc, ldap_memcalloc, ldap_memrealloc, ldap_strdup \- LDAP memory allocation routines
+.SH LIBRARY
+OpenLDAP LDAP (libldap, \-lldap)
+.SH SYNOPSIS
+.B #include <ldap.h>
+.LP
+.BI "void ldap_memfree(void *" p ");"
+.LP
+.BI "void ldap_memvfree(void **" v ");"
+.LP
+.BI "void *ldap_memalloc(ber_len_t " s ");"
+.LP
+.BI "void *ldap_memcalloc(ber_len_t " n ", ber_len_t " s ");"
+.LP
+.BI "void *ldap_memrealloc(void *" p ", ber_len_t " s ");"
+.LP
+.BI "char *ldap_strdup(LDAP_CONST char *" p ");"
+.SH DESCRIPTION
+These routines are used to allocate/deallocate memory used/returned
+by the LDAP library.
+.BR ldap_memalloc (),
+.BR ldap_memcalloc (),
+.BR ldap_memrealloc (),
+and
+.BR ldap_memfree ()
+are used exactly like the standard
+.BR malloc (3),
+.BR calloc (3),
+.BR realloc (3),
+and
+.BR free (3)
+routines, respectively.
+The
+.BR ldap_memvfree ()
+routine is used to free a dynamically allocated array of pointers to
+arbitrary dynamically allocated objects.
+The
+.BR ldap_strdup ()
+routine is used exactly like the standard
+.BR strdup (3)
+routine.
+.SH SEE ALSO
+.BR ldap (3)
+.SH ACKNOWLEDGEMENTS
+.so ../Project

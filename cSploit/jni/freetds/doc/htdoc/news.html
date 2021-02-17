@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<!-- $Id: news.html,v 1.25 2011-08-18 02:52:09 jklowden Exp $ -->
+<head>
+<title>FreeTDS.org</title>
+	<link href="freetds.css" type="text/css" rel="stylesheet" />
+</head>
+<body bgcolor="#f9f9f9">
+
+<!-- generic header -->
+	<div id="Navigation">
+	<table>
+		<tr valign="bottom">
+			<td> <a href="index.html">
+				<img src="freetdslogo3.gif" alt="FreeTDS.org" /> </a></td>
+			<td><ul>
+					<li> <a href="index.html">Home</a> </li>
+					<li> <a href="news.html">News</a> </li>
+					<li> <a href="software.html">Software</a> </li>
+					<li> <a href="docs.html">Documentation</a> </li>
+					<li> <a href="support.html">Support</a> </li>
+					<li> <a href="contrib.html">Contribute</a> </li>	
+					</ul>
+				</td></tr>
+		</table>
+				</div>
+  <hr size="1" noshade="noshade" />
+
+<!-- 
+  page specific content 
+  -->
+<p align="center">
+<font size="+3"><b>N</b></font>ews and <font size="+3"><b>P</b></font>ress
+</p>
+<table summary="layout" width="80%" align="center">
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FTP site moved</td></tr>
+<tr>
+<td>
+
+<p>The new FTP server is <a href="ftp://ftp.freetds.org/pub/freetds/">ftp://ftp.freetds.org/pub/freetds/</a>
+(30 July 2012)</p>
+<br />
+
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>Version 0.91 Released</td></tr>
+<tr>
+<td>
+
+<p>Version 0.91 is available.  
+17 August 2011</p>
+<br />
+
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>Version 0.91 Release Candidate</td></tr>
+<tr>
+<td>
+
+<p>The first release candidate for version 0.91 is available for testing.  
+9 April 2011</p>
+<br />
+
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>Building 0.82 on HP/UX</td></tr>
+<tr>
+<td>
+
+<p>To build FreeTDS 0.82 on HP/UX, you may find you need GNU libiconv.  <a href="contrib/hpux/">Detailed intructions</a> were provided Pravin Shyam Goyal on 23 June 2009:</p>
+<br />
+
+</td>
+</tr>
+
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>Building 0.82 on AIX</td></tr>
+<tr>
+<td>
+<br />
+
+To build FreeTDS 0.82 on AIX, you may find you need GNU libiconv.  The following intructions were provided Denis Putnam on 3 July 2008:
+<ol>
+<li>	Download and install the latest version of <tt>libtool</tt>.</li>
+<li>	Download and install the latest version of the <tt>GNU libiconv</tt>.</li>
+<li>	Download and install <tt>unixODBC</tt>.</li>
+<li>	Download and configure FreeTDS.</li>
+<li>	Run <tt>make</tt>.</li>
+<li>	Copy the latest <tt>libtool</tt> into the <tt>freetds-<i>ver</i></tt> directory.</li>
+<li>	Run <tt><b>make clean &amp;&amp;  make &amp;&amp; make install</b></tt>.</li>
+<li>	<tt>cd</tt> to <tt>PREFIX/lib</tt> and run <tt><b>ar -vx</b></tt> on all the <tt>*.a</tt> files to extract the <tt>.so</tt> files. </li>
+</ol>
+
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>PHP msdblib niggle encountered</td></tr>
+<tr>
+<td>
+<br />
+In configuring your new version of PHP to work with FreeTDS 0.82, 
+you may encounter:
+<blockquote>  
+	<tt>configure: error: Directory /usr/local/freetds-0.82 is not a FreeTDS installation directory</tt>
+</blockquote>  
+PHP tests for a FreeTDS installation by looking for files 
+that FreeTDS no longer installs.  To assure PHP that FreeTDS is installed, 
+create two files where FreeTDS was installed e.g.:
+<blockquote><pre>$ <b>touch /usr/local/freetds-0.82/include/tds.h</b>
+$ <b>touch /usr/local/freetds-0.82/lib/libtds.a</b></pre>
+</blockquote>  
+The file that needs to be changed is used by autoconf when the distribution 
+tarball is constructed.  Cf. revision 1.13 of <a href="http://cvs.php.net/viewvc.cgi/php-src/ext/mssql/config.m4?revision=1.13&amp;view=markup">PHP source file <tt>config.m4</tt></a>.
+(12 June 2008)
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>Version 0.82 Released</td></tr>
+<tr>
+<td>
+<br />
+Version 0.82 is now available from 
+<a href="ftp://ftp.astron.com/pub/freetds/stable/freetds-stable.tgz">
+ftp.freetds.org</a>.  This is a major release, almost two years in the 
+making.  See NEWS and ChangeLog-0.82, included in the distribution, for details.  
+(8 May 2008)
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>Third Release Candidate available for 0.82</td></tr>
+<tr>
+<td>
+<br />
+Version 0.82RC3 is now available from 
+<a href="ftp://ftp.freetds.org/pub/freetds/current/freetds-rc.tgz">
+ftp.freetds.org</a>.  (12 March 2008)
+
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>Second Release Candidate available for 0.82</td></tr>
+<tr>
+<td>
+<br />
+Version 0.82RC2 is now available from 
+<a href="ftp://ftp.astron.com/pub/freetds/current/freetds-rc.tgz">
+ftp.astron.com</a>.  (28 February 2008)
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS enters release process for Version 0.82</td></tr>
+<tr>
+<td>
+<br />
+Version 0.82RC1 is now available from 
+<a href="ftp://ftp.astron.com/pub/freetds/current/freetds-rc.tgz">
+ftp.astron.com</a>.  This important release will incorporate many new features, involving some
+23,710 lines of code.  Detailed information can be found in the NEWS file included in the 
+the distribution.  
+<p>Version 0.82 will be the successor to 0.64, released in July 2006.  The jump in version 
+number represents the progress toward version 1.0.  (17 January 2008)</p>
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS announces Version 0.63</td></tr>
+<tr>
+<td>
+<br />
+Version 0.63 is now available.  The source tarball is <tt><a href="ftp://ftp.astron.com/pub/freetds/stable/freetds-0.63.tar.gz">freetds-0.63.tar.gz</a></tt> on Ibiblio.  You may wish to read the <a href="ftp://ftp.astron.com/pub/freetds/stable/ANNOUNCEMENT">announcement</a>.  (30 April 2005)   
+<br />
+<br />
+</td>
+</tr>
+
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS announces Version 0.63 branch </td></tr>
+<tr>
+<td>
+<br />
+Version 0.63RC1 is now available in the <tt><a href="ftp://ftp.astron.com/pub/freetds/stable/">stable</a></tt> directory on Ibiblio.  Enjoy,and please test on your favorite architecture.  
+(27 November 2004)   
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS announces Version 0.62.1 </td></tr>
+<tr>
+<td>
+<br />
+Includes a small but significant fix to token.c.  <a href="ftp://ftp.astron.com/pub/freetds/stable/freetds-stable.tgz">Version 0.62.1</a> 
+(15 Jan  2004)   
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS announces Version 0.62 </td></tr>
+<tr>
+<td>
+<br />
+In the year since the last release, FreeTDS has seen many improvements.  <a href="ftp://ftp.astron.com/pub/freetds/stable/freetds-0.62.tar.gz">Version 0.62</a> includes:
+<ul>
+<li>UTF-8 support, as well as most other client-side character sets</li>
+<li>ODBC 3.0 compliance</li>
+<li>many new ODBC functions</li>
+<li>cursors, array binding, dynamic SQL, and RPC support in ct-lib</li>
+<li>improved network performance through better socket and packet handling.</li>
+<li>more Win32 development choices; VMS support</li>
+</ul>
+(11 Jan  2004)   
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS announces Release Candidate 2 for Version 0.62 </td></tr>
+<tr>
+<td>
+<br />
+We are in the process of releasing version 0.62.  See <a href="index.html">main page</a> for the latest release candidate (5 Jan  2004)   
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS announces Version 0.61.2 </td></tr>
+<tr>
+<td>
+<br />
+This point release fixes some memory leaks.  (3 August 2003)   
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS announces Version 0.61.1 </td></tr>
+<tr>
+<td>
+<br />
+This point release offers bugfixes:
+	<ul>
+		<li>Segmentation fault with iODBC</li>
+		<li>Segmentation fault opening log file in append mode</li>
+		<li>binding parameters with NULL indicator</li>
+	</ul>
+	(20 May 2003)   
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS announces Version 0.61 </td></tr>
+<tr>
+<td>
+<br />
+This release supersedes version 0.60 in all respects.  It addresses all known
+bugs except one, see README for details.  Read the <a href="ftp://ftp.freetds.org/pub/freetds/stable/announcement">announcement</a> and try out the new features.  (1 March 2003)   
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS announces Version 0.61 Release Candidate </td></tr>
+<tr>
+<td>
+<br />
+Try out the new features.  (20 February 2003)   
+<br />
+<br />
+</td>
+</tr>
+
+<!--  item  -->
+<tr bgcolor="#c9c9ff"><td>FreeTDS and PHP in Linux Journal</td></tr>
+<tr>
+<td>
+<br />
+A recent <a href="http://www.linuxjournal.com/article.php?sid=6636&amp;mode=thread&amp;order=0&amp;thold=0">online article</a> by David Perrin in the <a href="http://www.linuxjournal.com">Linux Journal</a> describes his good fortune using FreeTDS to connect his PHP-based web server to a Microsoft SQL Server. 
+<br />
+<br />
+</td>
+</tr>
+
+<tr bgcolor="#c9c9ff"><td>FreeTDS proudly announces Version 0.60</td></tr>
+<tr>
+<td>
+<br />
+The new version has better datatype handling and conversion capabilities, better BCP, better compatibility with Microsoft SQL Server 2000.  It's just way better.  More people have joined the project, and more better things are still in store.  Read the <a href="README.0.60">announcement</a> and try out the new features.  (11 September 2002)   
+<br />
+<br />
+</td>
+</tr>
+
+
+
+<tr bgcolor="#c9c9ff"><td>FreeTDS and DBD::Sybase in Linux Journal</td></tr>
+<tr>
+<td>
+<br />
+This month's (April 2002) <a href="http://www.linuxjournal.com">Linux Journal</a> has an article about using DBD::Sybase and FreeTDS to talk to Microsoft SQL Server by Andrew Trice. 
+<br />
+<br />
+</td>
+</tr>
+<tr bgcolor="#c9c9ff"><td>FreeTDS.org gets a new look</td></tr>
+<tr>
+<td>
+<br />
+FreeTDS.org has been redesigned to provide new users an easier time of finding the resources they need to use FreeTDS successfully.  Any comments (good or bad) should be directed to the <a href="http://franklin.oit.unc.edu/cgi-bin/lyris.pl?enter=freetds">Mailing List</a>.
+<br />
+<br />
+</td>
+</tr>
+<tr bgcolor="#c9c9ff"><td>CVS moves to SourceForge</td></tr>
+<tr>
+<td>
+<br />
+The CVS repository has been moved to the FreeTDS project on <a href="http://sourceforge.net/projects/freetds/">SourceForge</a>.  The old repository will stay active indefinately for tracking historical changes as the new repository starts with 0.53pre1.  Consult the <a href="faq.html">FAQ</a> for details on using the new repository.
+<br />
+<br />
+</td>
+</tr>
+<tr bgcolor="#c9c9ff"><td>FreeTDS version 0.53pre1</td></tr>
+<tr>
+<td>
+<br />
+FreeTDS 0.53pre1 is now available at ftp.freetds.org  and mirrors. This release fixes some nasty host lookup bugs with 0.52 and it is recommend for those having troubles connecting with 0.52.  This is a tarball-only release;  RPM packages will be available with the full 0.53 release.
+<br />
+<br />
+</td>
+</tr>
+<tr bgcolor="#c9c9ff"><td>FreeTDS version 0.52</td></tr>
+<tr>
+<td>
+<br />
+FreeTDS 0.52 is now available at ftp.freetds.org and its mirrors. Both the source distribution and RPMs for Linux (i386) are available. Major features include a new configuration file format, much better ODBC support, and bug fixes. An announcement and some release notes are also available.
+<br />
+<br />
+</td>
+</tr>
+<tr bgcolor="#c9c9ff"><td>The FreeTDS User Guide</td></tr>
+<tr>
+<td>
+<br />
+The FreeTDS Users Guide is an effort to provide better documentation for the FreeTDS user community, if it doesn't answer all your questions please submit your solutions so they may be included for the next person.
+<br />
+<br />
+</td>
+</tr>
+<tr bgcolor="#c9c9ff"><td>FreeTDS Article on PHPBuilder</td></tr>
+<tr>
+<td>
+<br />
+<a href="http://www.phpbuilder.com">PHPBuilder</a> has an <a href="http://www.phpbuilder.com/columns/alberto20000919.php3">article</a> on accessing SQL Server from Linux in which FreeTDS figures prominently.  And it even points out some areas for us to improve in. ;-)
+<br />
+<br />
+</td>
+</tr>
+</table>
+
+</body>
+</html>

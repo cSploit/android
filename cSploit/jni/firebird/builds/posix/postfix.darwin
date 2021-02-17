@@ -1,0 +1,183 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+#
+# Copyright (C) 2000 Inprise Corporation
+# All Rights Reserved.
+# Contributor(s): ______________________________________.
+# Start of file prefix.darwin:	$(VERSION)	DARWIN
+# 2 Oct 2002, Nickolay Samofatov - Major Cleanup
+
+
+darwin_setup_framework: FB_FW = ../gen/firebird/Firebird.framework
+darwin_setup_framework:
+	-$(RM) -rf $(FB_FW) ../gen/firebird/Firebird.framework
+	mkdir -p $(FB_FW)/Versions/A/Resources/English.lproj/var
+	mkdir -p $(FB_FW)/Versions/A/Libraries
+	ln -s Versions/Current/Firebird $(FB_FW)/Firebird
+	ln -s Versions/Current/Headers $(FB_FW)/Headers
+	ln -s Versions/Current/Resources $(FB_FW)/Resources
+	ln -s Versions/Current/Libraries $(FB_FW)/Libraries
+	ln -s A $(FB_FW)/Versions/Current
+	ln -s ../../../include $(FB_FW)/Versions/A/Headers
+	ln -s ../../../lib/libfbembed.dylib $(FB_FW)/Versions/A/Firebird
+	ln -s ../../../lib $(FB_FW)/Versions/A/Libraries
+	ln -s ../../../../../../firebird.msg \
+			$(FB_FW)/Resources/English.lproj/var/firebird.msg
+	ln -s ../../../../../../bin $(FB_FW)/Resources/English.lproj/var/bin
+	ln -s ../../../../../../UDF $(FB_FW)/Resources/English.lproj/var/UDF
+	ln -s ../../../../../../intl $(FB_FW)/Resources/English.lproj/var/intl
+	ln -s ../../../../../../plugins $(FB_FW)/Resources/English.lproj/var/plugins
+	ln -s ../../../../../../security2.fdb \
+				$(FB_FW)/Resources/English.lproj/var/security2.fdb
+	ln -s ../../../../../../help $(FB_FW)/Resources/English.lproj/var/help
+
+darwin_finish_cs_framework: FB_FW = ../gen/firebird/frameworks/FirebirdCS.framework
+darwin_finish_cs_framework:
+	-$(RM) -rf $(FB_FW)
+	mkdir -p $(FB_FW)/Versions/A/Resources/English.lproj/var
+	mkdir -p $(FB_FW)/Versions/A/Libraries
+	ln -s Versions/Current/Firebird $(FB_FW)/Firebird
+	ln -s Versions/Current/Headers $(FB_FW)/Headers
+	ln -s Versions/Current/Resources $(FB_FW)/Resources
+	ln -s Versions/Current/Libraries $(FB_FW)/Libraries
+	ln -s A $(FB_FW)/Versions/Current
+	cp -r ../gen/firebird/include $(FB_FW)/Versions/A/Headers
+	cp ../gen/firebird/lib/libfbembed.dylib $(FB_FW)/Versions/A/Firebird
+	cp ../gen/firebird/lib/libfbclient.dylib $(FB_FW)/Versions/A/Libraries/libfbclient.dylib
+	cp ../gen/firebird/lib/libicudata.dylib $(FB_FW)/Versions/A/Libraries/libicudata.dylib
+	cp ../gen/firebird/lib/libicui18n.dylib $(FB_FW)/Versions/A/Libraries/libicui18n.dylib
+	cp ../gen/firebird/lib/libicuuc.dylib $(FB_FW)/Versions/A/Libraries/libicuuc.dylib
+	cp ../gen/firebird/lib/libib_util.dylib $(FB_FW)/Versions/A/Libraries/libib_util.dylib
+	cp ../gen/firebird/firebird.msg \
+			$(FB_FW)/Resources/English.lproj/var/firebird.msg
+	cp -r ../gen/firebird/UDF $(FB_FW)/Resources/English.lproj/var/UDF
+	mkdir -p $(FB_FW)/Resources/English.lproj/var/intl
+	cp -r ../gen/firebird/intl/libfbintl.dylib \
+		$(FB_FW)/Resources/English.lproj/var/intl/fbintl
+	cp ../builds/install/misc/fbintl.conf \
+		$(FB_FW)/Resources/English.lproj/var/intl/fbintl.conf
+	chmod a+rx $(FB_FW)/Resources/English.lproj/var/intl/fbintl
+	mkdir -p $(FB_FW)/Resources/English.lproj/var/plugins
+	cp ../gen/firebird/plugins/libfbtrace.dylib \
+		$(FB_FW)/Resources/English.lproj/var/plugins/libfbtrace.dylib
+	cp -r ../gen/firebird/help $(FB_FW)/Resources/English.lproj/var/help
+	cp ../gen/firebird/security2.fdb $(FB_FW)/Resources/English.lproj/var
+	mkdir -p $(FB_FW)/Resources/doc
+	cp -r ../doc $(FB_FW)/Resources
+	mkdir -p $(FB_FW)/Resources/examples
+	cp -r ../gen/firebird/examples $(FB_FW)/Resources
+	mkdir -p $(FB_FW)/Resources/bin
+	ln -s ../../bin $(FB_FW)/Resources/English.lproj/var/bin
+	cp ../gen/firebird/bin/fb_inet_server $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gfix $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gbak $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/isql $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gpre $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gdef $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/qli $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/fb_lock_print $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gsec $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gstat $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/nbackup $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/fbsvcmgr $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/fbtracemgr $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/fbguard $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/fb_smp_server $(FB_FW)/Resources/bin
+	chmod +x ../builds/install/arch-specific/darwin/changeServerMode
+	cp ../builds/install/arch-specific/darwin/changeServerMode \
+			$(FB_FW)/Resources/bin/changeServerMode.sh
+	cp ../src/extlib/ib_udf.sql $(FB_FW)/Resources/English.lproj/var/UDF
+	cp ../src/extlib/fbudf/fbudf.sql $(FB_FW)/Resources/English.lproj/var/UDF
+	cp ../builds/install/arch-specific/darwin/FrameworkInfo.plist \
+			$(FB_FW)/Resources/Info.plist
+	cp ../builds/install/arch-specific/darwin/launchd.org.firebird.gds.plist \
+			$(FB_FW)/Resources/org.firebird.gds.plist
+	cp ../builds/install/arch-specific/darwin/Readme.txt \
+			$(FB_FW)/Resources/Readme.txt
+	cp ../gen/install/misc/firebird.conf $(FB_FW)/Resources/English.lproj/var
+	cp ../builds/install/arch-specific/darwin/databases.conf.in \
+			$(FB_FW)/Resources/English.lproj/var/databases.conf
+	cp ../src/utilities/ntrace/fbtrace.conf \
+			$(FB_FW)/Resources/English.lproj/var/fbtrace.conf
+
+darwin_finish_ss_framework: FB_FW = ../gen/firebird/frameworks/FirebirdSS.framework
+darwin_finish_ss_framework:
+	-$(RM) -rf $(FB_FW)
+	mkdir -p $(FB_FW)/Versions/A/Resources/English.lproj/var
+	mkdir -p $(FB_FW)/Versions/A/Libraries
+	ln -s Versions/Current/Firebird $(FB_FW)/Firebird
+	ln -s Versions/Current/Headers $(FB_FW)/Headers
+	ln -s Versions/Current/Resources $(FB_FW)/Resources
+	ln -s Versions/Current/Libraries $(FB_FW)/Libraries
+	ln -s A $(FB_FW)/Versions/Current
+	cp -r ../gen/firebird/include $(FB_FW)/Versions/A/Headers
+	cp ../gen/firebird/lib/libfbclient.dylib $(FB_FW)/Versions/A/Firebird
+	cp ../gen/firebird/lib/libfbclient.dylib $(FB_FW)/Versions/A/Libraries/libfbclient.dylib
+	cp ../gen/firebird/lib/libicudata.dylib $(FB_FW)/Versions/A/Libraries/libicudata.dylib
+	cp ../gen/firebird/lib/libicui18n.dylib $(FB_FW)/Versions/A/Libraries/libicui18n.dylib
+	cp ../gen/firebird/lib/libicuuc.dylib $(FB_FW)/Versions/A/Libraries/libicuuc.dylib
+	cp ../gen/firebird/lib/libib_util.dylib $(FB_FW)/Versions/A/Libraries/libib_util.dylib
+	cp ../gen/firebird/firebird.msg \
+			$(FB_FW)/Resources/English.lproj/var/firebird.msg
+	cp -r ../gen/firebird/UDF $(FB_FW)/Resources/English.lproj/var/UDF
+	mkdir -p $(FB_FW)/Resources/English.lproj/var/intl
+	cp -r ../gen/firebird/intl/libfbintl.dylib \
+		$(FB_FW)/Resources/English.lproj/var/intl/fbintl
+	cp ../builds/install/misc/fbintl.conf \
+		$(FB_FW)/Resources/English.lproj/var/intl/fbintl.conf
+	chmod a+rx $(FB_FW)/Resources/English.lproj/var/intl/fbintl
+	mkdir -p $(FB_FW)/Resources/English.lproj/var/plugins
+	cp ../gen/firebird/plugins/libfbtrace.dylib \
+		$(FB_FW)/Resources/English.lproj/var/plugins/libfbtrace.dylib
+	cp -r ../gen/firebird/help $(FB_FW)/Resources/English.lproj/var/help
+	cp ../gen/firebird/security2.fdb $(FB_FW)/Resources/English.lproj/var
+	mkdir -p $(FB_FW)/Resources/doc
+	ln -s ../../doc $(FB_FW)/Resources/doc
+	cp -r ../doc $(FB_FW)/Resources
+	mkdir -p $(FB_FW)/Resources/examples
+	cp -r ../gen/firebird/examples $(FB_FW)/Resources
+	mkdir -p $(FB_FW)/Resources/bin
+	touch $(FB_FW)/Resources/.SuperServer
+	ln -s ../../bin $(FB_FW)/Resources/English.lproj/var/bin
+	cp ../gen/firebird/bin/fbserver $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/fbguard $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gfix $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gbak $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/isql $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gpre $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/fb_lock_print $(FB_FW)/Resources/bin
+	#cp ../gen/firebird/bin/gds_relay $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gsec $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gstat $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/nbackup $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/qli $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/gdef $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/fbsvcmgr $(FB_FW)/Resources/bin
+	cp ../gen/firebird/bin/fbtracemgr $(FB_FW)/Resources/bin
+	cp ../src/extlib/ib_udf.sql $(FB_FW)/Resources/English.lproj/var/UDF
+	cp ../src/extlib/fbudf/fbudf.sql $(FB_FW)/Resources/English.lproj/var/UDF
+	cp ../builds/install/arch-specific/darwin/FrameworkInfo.plist \
+			$(FB_FW)/Resources/Info.plist
+	cp ../builds/install/arch-specific/darwin/Readme.txt \
+			$(FB_FW)/Resources/Readme.txt
+	cp ../gen/install/misc/firebird.conf $(FB_FW)/Resources/English.lproj/var
+	cp ../builds/install/arch-specific/darwin/databases.conf.in \
+			$(FB_FW)/Resources/English.lproj/var/databases.conf
+	cp ../src/utilities/ntrace/fbtrace.conf \
+			$(FB_FW)/Resources/English.lproj/var/fbtrace.conf
+darwin_postbuild_target: package
+	@echo
+	@echo Build Successful!!
+	@echo
+	@echo You can find the installer packages in gen/firebird, and the raw
+	@echo frameworks in gen/firebird/frameworks

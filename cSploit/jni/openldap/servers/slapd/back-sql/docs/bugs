@@ -1,0 +1,16 @@
+1) driver name comparison for MS SQL Server workaround is realy kinda dirty
+   hack, but for now i don't know how to code it more carefully
+2) another dirty hack: length of LONGVARCHAR and LONGVARBINARY fields is
+   currently set to MAX_ATTR_LEN. Maybe such fields must be handled with
+   SQLGetData() instead of SQLBindCol(), but it is said in documentation,
+   that it is guaranteed to work only when such column goes after last bound
+   column. Or should we get ALL columns with SQLGetData (then something like 
+   _SQLFetchAsStrings() wrapper would do SQLGetData() for all columns)...
+3) in some cases (particularly, when using OpenLink Generic ODBC driver with
+   MS SQL Server), it returns "Function sequence error" after all records are
+   fetched. I really don't know what it means, and after all
+    - it works with any other driver I tried
+4) ldapsearch sometimes refuses to show some attributes ("NOT PRINTABLE" diags)
+   on Win32 (on linux everything's fine)
+5) back-sql crashes on invalid filters (to be fixed ASAP)
+   

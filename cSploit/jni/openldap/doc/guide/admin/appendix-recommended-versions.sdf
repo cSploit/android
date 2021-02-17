@@ -1,0 +1,39 @@
+# $OpenLDAP$
+# Copyright 1999-2014 The OpenLDAP Foundation, All Rights Reserved.
+# COPYING RESTRICTIONS APPLY, see COPYRIGHT.
+
+H1: Recommended OpenLDAP Software Dependency Versions
+
+This appendix details the recommended versions of the software 
+that OpenLDAP depends on. 
+
+Please read the {{SECT:Prerequisite software}} section for more 
+information on the following software dependencies.
+
+H2: Dependency Versions
+
+!block table; align=Center; coltags="N,EX,EX"; title="Table 8.5: OpenLDAP Software Dependency Versions"
+Feature|Software|Version
+{{TERM[expand]TLS}}:
+|{{PRD:OpenSSL}}|0.9.7+
+|{{PRD:GnuTLS}}|2.0.1
+|{{PRD:MozNSS}}|3.12.9
+{{TERM[expand]SASL}}|{{PRD:Cyrus SASL}}|2.1.21+
+{{TERM[expand]Kerberos}}:
+|{{PRD:Heimdal}}|Version
+|{{PRD:MIT Kerberos}}|Version
+Database Software|{{PRD:Berkeley DB}}:|
+||4.4
+||4.5
+||4.6
+||4.7
+||4.8
+||5.0
+||5.1
+||Note: It is highly recommended to apply the patches from Oracle for a given release.
+Threads:
+|POSIX {{pthreads}}|Version
+|Mach {{CThreads}}|Version
+TCP Wrappers|Name|Version
+!endblock
+

@@ -1,0 +1,9 @@
+[section1]
+opt1=value1
+
+[SECTION2]
+opt  two=value2
+
+  [Section  3]
+   opt  three  =   value   three
+

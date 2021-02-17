@@ -1,0 +1,32 @@
+#! /usr/bin/perl -w
+
+# A simple, not very flexible bit of Perl to extract the sample code 
+# from the User Guide.  
+
+while(<>) {
+	last if /chapter id="programming"/;
+}
+
+while(<>) {
+	if (/<programlisting/) {
+		$C = 1;
+		next;
+	}
+	$C = 0 if /\/programlisting/;
+	last if /chapter id="acknowledgments"/;
+	next unless $C;
+	
+	s/<!\[CDATA\[|\]\]\>//;
+	
+	s/<lineannotation>.+$//;
+	s/<co id.+$//;
+	
+	s/&lt;/</g;
+	s/&gt;/>/g;
+	
+	print;
+}
+
+__DATA__
+ $Id: grep_sample_code,v 1.1 2007-12-10 05:13:11 jklowden Exp $
+

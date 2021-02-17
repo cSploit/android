@@ -1,0 +1,99 @@
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+# You may obtain a copy of the Licence at
+# http://www.gnu.org/licences/lgpl.html
+#
+# As a special exception this file can also be included in modules
+# with other source code as long as that source code has been
+# released under an Open Source Initiative certificed licence.
+# More information about OSI certification can be found at:
+# http://www.opensource.org
+#
+# This module is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Lesser General Public Licence for more details.
+#
+# This module was created by members of the firebird development
+# team.  All individual contributions remain the Copyright (C) of
+# those individuals and all rights are reserved.  Contributors to
+# this file are either listed below or can be obtained from a CVS
+# history command.
+#
+#  Created by:  Mark O'Donohue <mark.odonohue@ludwig.edu.au>
+#
+#  Contributor(s):
+#
+#
+#
+
+
+#-----------------------------------------------------------
+# Amongst a number of makefiles some of the targets have
+# specific rules. Rather than duplicate the rules in a
+# number of makefiles, these have been included here.
+#
+# Hopefully this file is an intermediate step, on the way to
+# potentially a single makefile, or at least one per directory.
+# MOD 07-Oct-2002
+
+# This rule creates parse.cpp from parse.y
+
+$(OBJ)/dsql/parse.cpp: $(SRC_ROOT)/include/gen/parse.h
+$(OBJ)/dsql/parse.cpp $(SRC_ROOT)/include/gen/parse.h: $(SRC_ROOT)/dsql/parse.y $(SRC_ROOT)/dsql/btyacc_fb.ske
+	sed -n '/%type .*/p' < $< > $(GEN_ROOT)/types.y
+	sed 's/%type .*//' < $< > $(GEN_ROOT)/y.y
+	$(BTYACC) -l -d -S $(SRC_ROOT)/dsql/btyacc_fb.ske $(GEN_ROOT)/y.y
+	$(MV) $(GEN_ROOT)/y_tab.c $(OBJ)/dsql/parse.cpp
+	$(MV) $(GEN_ROOT)/y_tab.h $(SRC_ROOT)/include/gen/parse.h
+
+
+# gpre_meta needs a special boot build since there is no database.
+
+$(SRC_ROOT)/gpre/gpre_meta.cpp:  $(SRC_ROOT)/gpre/gpre_meta.epp
+	$(GPRE_BOOT) -lang_internal $(GPRE_FLAGS) $< $@
+
+
+# These need to change to $(GEN_SRC) at some stage
+#$(SRC_ROOT)/qli/meta.cpp $(SRC_ROOT)/qli/proc.cpp $(SRC_ROOT)/qli/show.cpp: yachts.lnk
+#$(SRC_ROOT)/qli/help.cpp:        help.fdb
+
+# Explicit dependence on generated header (parser)
+$(OBJ)/dsql/Parser.o $(OBJ)/yvalve/keywords.o $(OBJ)/dsql/dsql.o:	$(SRC_ROOT)/include/gen/parse.h
+
+# Special cases for building cpp from epp
+$(OBJ)/dsql/metd.cpp: $(SRC_ROOT)/dsql/metd.epp
+	$(GPRE_CURRENT) $(JRD_GPRE_FLAGS) $< $@
+
+$(OBJ)/dsql/DdlNodes.cpp: $(SRC_ROOT)/dsql/DdlNodes.epp
+	$(GPRE_CURRENT) $(JRD_GPRE_FLAGS) $< $@
+
+$(OBJ)/dsql/PackageNodes.cpp: $(SRC_ROOT)/dsql/PackageNodes.epp
+	$(GPRE_CURRENT) $(JRD_GPRE_FLAGS) $< $@
+
+# Adding resources as prerequisite for some files
+
+$(FilesToAddVersionInfo): $(GEN_ROOT)/jrd/version.res
+$(FilesToAddDialog): $(GEN_ROOT)/remote/os/win32/window.res
+$(FilesToAddDialog2): $(GEN_ROOT)/iscguard/iscguard.res
+
+# Explicit dependence of resource script
+$(GEN_ROOT)/remote/os/win32/window.res: $(SRC_ROOT)/remote/os/win32/window.rc $(SRC_ROOT)/remote/os/win32/window.rh \
+ $(SRC_ROOT)/jrd/version.rc $(SRC_ROOT)/jrd/build_no.h $(SRC_ROOT)/remote/os/win32/property.rc \
+ $(SRC_ROOT)/remote/os/win32/property.rh
+
+$(GEN_ROOT)/iscguard/iscguard.res: $(SRC_ROOT)/iscguard/iscguard.rc $(SRC_ROOT)/iscguard/iscguard.rh \
+ $(SRC_ROOT)/jrd/version.rc
+
+.PHONY: FORCE
+
+
+# This target is used in the generated dependancy xxx.d files which are
+# automatically created from the .cpp files.  To simplify the build
+# process, if the .d files does not yet exist, a line is written
+# of the form  fred.o : FORCE to ennsure that fred.cpp will be
+# recompiled MOD 7-Oct-2002
+
+FORCE:

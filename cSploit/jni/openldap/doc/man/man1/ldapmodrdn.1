@@ -1,0 +1,279 @@
+.TH LDAPMODRDN 1 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ldapmodrdn \- LDAP rename entry tool
+.SH SYNOPSIS
+.B ldapmodrdn
+[\c
+.BR \-V [ V ]]
+[\c
+.BI \-d \ debuglevel\fR]
+[\c
+.BR \-n ]
+[\c
+.BR \-v ]
+[\c
+.BR \-r ]
+[\c
+.BI \-s \ newsup\fR]
+[\c
+.BR \-c ]
+[\c
+.BI \-f \ file\fR]
+[\c
+.BR \-M [ M ]]
+[\c
+.BR \-x ]
+[\c
+.BI \-D \ binddn\fR]
+[\c
+.BR \-W ]
+[\c
+.BI \-w \ passwd\fR]
+[\c
+.BI \-y \ passwdfile\fR]
+[\c
+.BI \-H \ ldapuri\fR]
+[\c
+.BI \-h \ ldaphost\fR]
+[\c
+.BI \-p \ ldapport\fR]
+[\c
+.BR \-P \ { 2 \||\| 3 }]
+[\c
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]]
+[\c
+.BI \-o \ opt \fR[= optparam \fR]]
+[\c
+.BI \-O \ security-properties\fR]
+[\c
+.BR \-I ]
+[\c
+.BR \-Q ]
+[\c
+.BR \-N ]
+[\c
+.BI \-U \ authcid\fR]
+[\c
+.BI \-R \ realm\fR]
+[\c
+.BI \-X \ authzid\fR]
+[\c
+.BI \-Y \ mech\fR]
+[\c
+.BR \-Z [ Z ]]
+[\c
+.I dn  rdn\fR]
+.SH DESCRIPTION
+.B ldapmodrdn
+is a shell-accessible interface to the
+.BR ldap_rename (3)
+library call.
+.LP
+.B ldapmodrdn
+opens a connection to an LDAP server, binds, and modifies the RDN of entries.
+The entry information is read from standard input, from \fIfile\fP through
+the use of the
+.RI \- f
+option, or from the command-line pair \fIdn\fP and
+\fIrdn\fP.
+.SH OPTIONS
+.TP
+.BR \-V [ V ]
+Print version info.
+If \fB\-VV\fP is given, only the version information is printed.
+.TP
+.BI \-d \ debuglevel
+Set the LDAP debugging level to \fIdebuglevel\fP.
+.B ldapmodrdn
+must be compiled with LDAP_DEBUG defined for this option to have any effect.
+.TP
+.B \-n
+Show what would be done, but don't actually change entries.  Useful for
+debugging in conjunction with \fB\-v\fP.
+.TP
+.B \-v
+Use verbose mode, with many diagnostics written to standard output.
+.TP
+.B \-r
+Remove old RDN values from the entry.  Default is to keep old values.
+.TP
+.BI \-s \ newsup
+Specify a new superior entry. (I.e., move the target entry and make it a
+child of the new superior.)  This option is not supported in LDAPv2.
+.TP
+.B \-c
+Continuous operation mode.  Errors  are  reported,  but ldapmodrdn
+will  continue  with  modifications.   The default is to exit after
+reporting an error.
+.TP
+.BI \-f \ file
+Read the entry modification information from \fIfile\fP instead of from
+standard input or the command-line.
+.TP
+.BR \-M [ M ]
+Enable manage DSA IT control.
+.B \-MM
+makes control critical.
+.TP
+.B \-x 
+Use simple authentication instead of SASL.
+.TP
+.BI \-D \ binddn
+Use the Distinguished Name \fIbinddn\fP to bind to the LDAP directory.
+For SASL binds, the server is expected to ignore this value.
+.TP
+.B \-W
+Prompt for simple authentication.
+This is used instead of specifying the password on the command line.
+.TP
+.BI \-w \ passwd
+Use \fIpasswd\fP as the password for simple authentication.
+.TP
+.BI \-y \ passwdfile
+Use complete contents of \fIpasswdfile\fP as the password for
+simple authentication.
+.TP
+.BI \-H \ ldapuri
+Specify URI(s) referring to the ldap server(s); only the protocol/host/port
+fields are allowed; a list of URI, separated by whitespace or commas
+is expected.
+.TP
+.BI \-h \ ldaphost
+Specify an alternate host on which the ldap server is running.
+Deprecated in favor of \fB\-H\fP.
+.TP
+.BI \-p \ ldapport
+Specify an alternate TCP port where the ldap server is listening.
+Deprecated in favor of \fB\-H\fP.
+.TP
+.BR \-P \ { 2 \||\| 3 }
+Specify the LDAP protocol version to use.
+.TP
+.BR \-e \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+.TP
+.BR \-E \ [ ! ] \fIext\fP [ =\fIextparam\fP ]
+
+Specify general extensions with \fB\-e\fP and modrdn extensions with \fB\-E\fP.
+\'\fB!\fP\' indicates criticality.
+
+General extensions:
+.nf
+  [!]assert=<filter>    (an RFC 4515 Filter)
+  !authzid=<authzid>    ("dn:<dn>" or "u:<user>")
+  [!]bauthzid           (RFC 3829 authzid control)
+  [!]chaining[=<resolve>[/<cont>]]
+  [!]manageDSAit
+  [!]noop
+  ppolicy
+  [!]postread[=<attrs>] (a comma-separated attribute list)
+  [!]preread[=<attrs>]  (a comma-separated attribute list)
+  [!]relax
+  sessiontracking[=<username>]
+  abandon,cancel,ignore (SIGINT sends abandon/cancel,
+  or ignores response; if critical, doesn't wait for SIGINT.
+  not really controls)
+.fi
+
+Modrdn extensions:
+.nf
+  (none)
+.fi
+.TP
+.BI \-o \ opt \fR[= optparam \fR]
+
+Specify general options.
+
+General options:
+.nf
+  nettimeout=<timeout>  (in seconds, or "none" or "max")
+  ldif-wrap=<width>     (in columns, or "no" for no wrapping)
+.fi
+.TP
+.BI \-O \ security-properties
+Specify SASL security properties.
+.TP
+.B \-I
+Enable SASL Interactive mode.  Always prompt.  Default is to prompt
+only as needed.
+.TP
+.B \-Q
+Enable SASL Quiet mode.  Never prompt.
+.TP
+.B \-N
+Do not use reverse DNS to canonicalize SASL host name.
+.TP
+.BI \-U \ authcid
+Specify the authentication ID for SASL bind. The form of the ID
+depends on the actual SASL mechanism used.
+.TP
+.BI \-R \ realm
+Specify the realm of authentication ID for SASL bind. The form of the realm
+depends on the actual SASL mechanism used.
+.TP
+.BI \-X \ authzid
+Specify the requested authorization ID for SASL bind.
+.I authzid
+must be one of the following formats:
+.BI dn: "<distinguished name>"
+or
+.BI u: <username>
+.TP
+.BI \-Y \ mech
+Specify the SASL mechanism to be used for authentication. If it's not
+specified, the program will choose the best mechanism the server knows.
+.TP
+.BR \-Z [ Z ]
+Issue StartTLS (Transport Layer Security) extended operation. If you use
+\fB\-ZZ\fP, the command will require the operation to be successful.
+.SH INPUT FORMAT
+If the command-line arguments \fIdn\fP and \fIrdn\fP are given, \fIrdn\fP
+will replace the RDN of the entry specified by the DN, \fIdn\fP.
+.LP
+Otherwise, the contents of \fIfile\fP (or standard input if
+no \fB\-f\fP flag is given) should consist of one or more entries.
+.LP
+.nf
+    Distinguished Name (DN)
+    Relative Distinguished Name (RDN)
+.fi
+.LP
+One or more blank lines may be used to separate each DN/RDN pair.
+.SH EXAMPLE
+Assuming that the file
+.B /tmp/entrymods
+exists and has the contents:
+.LP
+.nf
+    cn=Modify Me,dc=example,dc=com
+    cn=The New Me
+.fi
+.LP
+the command:
+.LP
+.nf
+    ldapmodrdn \-r \-f /tmp/entrymods
+.fi
+.LP
+will change the RDN of the "Modify Me" entry from "Modify Me" to
+"The New Me" and the old cn, "Modify Me" will be removed.
+.LP
+.SH DIAGNOSTICS
+Exit status is 0 if no errors occur.  Errors result in a non-zero exit
+status and a diagnostic message being written to standard error.
+.SH "SEE ALSO"
+.BR ldapadd (1),
+.BR ldapdelete (1),
+.BR ldapmodify (1),
+.BR ldapsearch (1),
+.BR ldap.conf (5),
+.BR ldap (3),
+.BR ldap_rename (3)
+.SH AUTHOR
+The OpenLDAP Project <http://www.openldap.org/>
+.SH ACKNOWLEDGEMENTS
+.so ../Project

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject ProjectType="Visual C++" Version="7.10" Name="fbtrace" ProjectGUID="{53F75437-15B8-4A5C-86BF-E238CC68FCBC}">
+  <Platforms>
+    <Platform Name="Win32" />
+  </Platforms>
+  <ToolFiles>
+  </ToolFiles>
+  <Configurations>
+    <Configuration Name="Debug|Win32" ConfigurationType="2" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="0" AdditionalIncludeDirectories="..\..\..\src\include;..\..\..\src\include\gen;..\..\..\include;..\..\..\src\common\classes;../../../extern/icu/include;../../../src/include,../../../src/include/gen" PreprocessorDefinitions="WIN32;_DEBUG;DEV_BUILD;_WINDOWS;_USRDLL;SUPERCLIENT;FBTRACE_EXPORTS;NAMESPACE=Vulcan" DebugInformationFormat="4" AdditionalOptions="/EHsc-" OmitFramePointers="true" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" CompileAs="0" UseFullPaths="false" RuntimeLibrary="1" BasicRuntimeChecks="3" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" AdditionalDependencies="mpr.lib" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\plugins\$(ProjectName).dll" LinkIncremental="1" AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/release/lib" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" GenerateManifest="false" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+    <Configuration Name="Release|Win32" ConfigurationType="2" CharacterSet="2" OutputDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)" IntermediateDirectory="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)">
+      <Tool Name="VCPreBuildEventTool" />
+      <Tool Name="VCCustomBuildTool" />
+      <Tool Name="VCXMLDataGeneratorTool" />
+      <Tool Name="VCWebServiceProxyGeneratorTool" />
+      <Tool Name="VCMIDLTool" />
+      <Tool Name="VCCLCompilerTool" Optimization="2" InlineFunctionExpansion="1" EnableIntrinsicFunctions="true" FavorSizeOrSpeed="1" AdditionalIncludeDirectories="..\..\..\src\include\gen;..\..\..\src\include;..\..\..\src\common\classes;../../../extern/icu/include;../../../src/include,../../../src/include/gen" PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;FBTRACE_EXPORTS;SUPERCLIENT;NAMESPACE=Vulcan" UsePrecompiledHeader="0" AdditionalOptions="/EHsc-" OmitFramePointers="true" ExceptionHandling="0" RuntimeTypeInfo="false" PrecompiledHeaderFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\$(ProjectName).pch" AssemblerListingLocation="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ObjectFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" ProgramDataBaseFileName="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)/" BrowseInformation="0" BrowseInformationFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\$(ProjectName)\" WarningLevel="3" SuppressStartupBanner="true" DebugInformationFormat="3" CompileAs="0" UseFullPaths="false" RuntimeLibrary="0" />
+      <Tool Name="VCManagedResourceCompilerTool" />
+      <Tool Name="VCResourceCompilerTool" />
+      <Tool Name="VCPreLinkEventTool" />
+      <Tool Name="VCLinkerTool" AdditionalDependencies="mpr.lib" OutputFile="..\..\..\temp\$(PlatformName)\$(ConfigurationName)\firebird\plugins\$(ProjectName).dll" LinkIncremental="1" AdditionalLibraryDirectories="../../../extern/icu/$(PlatformName)/release/lib" SuppressStartupBanner="true" GenerateDebugInformation="true" ProgramDatabaseFile="$(IntDir)\$(TargetName).pdb" ImportLibrary="$(IntDir)\$(TargetName).lib" GenerateManifest="false" />
+      <Tool Name="VCALinkTool" />
+      <Tool Name="VCManifestTool" />
+      <Tool Name="VCXDCMakeTool" />
+      <Tool Name="VCBscMakeTool" />
+      <Tool Name="VCFxCopTool" />
+      <Tool Name="VCAppVerifierTool" />
+      <Tool Name="VCWebDeploymentTool" />
+      <Tool Name="VCPostBuildEventTool" />
+      <Tool Name="VCLibrarianTool" OutputFile="$(IntDir)\$(ProjectName).lib" SuppressStartupBanner="true" />
+    </Configuration>
+  </Configurations>
+  <References>
+  </References>
+  <Files>
+    <Filter Name="Source Files" Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx" UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+      <File RelativePath="..\..\..\src\utilities\ntrace\os\win32\platform.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\ntrace\PluginLogWriter.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\ntrace\TraceConfiguration.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\ntrace\traceplugin.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\ntrace\TracePluginImpl.cpp">
+      </File>
+    </Filter>
+    <Filter Name="Header Files" Filter="h;hpp;hxx;hm;inl;inc;xsd" UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+      <File RelativePath="..\..\..\src\jrd\isc.h">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_f_proto.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\ntrace\paramtable.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\ntrace\os\platform.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\ntrace\PluginLogWriter.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\ntrace\TracePluginConfig.h">
+      </File>
+      <File RelativePath="..\..\..\src\utilities\ntrace\TracePluginImpl.h">
+      </File>
+    </Filter>
+    <Filter Name="Resource Files" Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx" UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+      <File RelativePath="..\..\..\src\jrd\version.rc">
+      </File>
+    </Filter>
+    <Filter Name="JRD files">
+      <File RelativePath="..\..\..\src\jrd\CharSet.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\fbsyslog.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\gds.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\IntlUtil.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_file.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\isc_ipc.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\isc_sync.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\os_utils.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\os\win32\path_utils.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\TextType.cpp">
+      </File>
+      <File RelativePath="..\..\..\src\jrd\unicode_util.cpp">
+      </File>
+    </Filter>
+  </Files>
+  <Globals>
+  </Globals>
+</VisualStudioProject>

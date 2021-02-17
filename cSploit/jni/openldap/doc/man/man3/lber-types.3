@@ -1,0 +1,188 @@
+.TH LBER_TYPES 3 "RELEASEDATE" "OpenLDAP LDVERSION"
+.\" $OpenLDAP$
+.\" Copyright 1998-2014 The OpenLDAP Foundation All Rights Reserved.
+.\" Copying restrictions apply.  See COPYRIGHT/LICENSE.
+.SH NAME
+ber_int_t, ber_uint_t, ber_len_t, ber_slen_t, ber_tag_t, struct berval, BerValue, BerVarray, BerElement, ber_bvfree, ber_bvecfree, ber_bvecadd, ber_bvarray_free, ber_bvarray_add, ber_bvdup, ber_dupbv, ber_bvstr, ber_bvstrdup, ber_str2bv, ber_alloc_t, ber_init, ber_init2, ber_free \- OpenLDAP LBER types and allocation functions
+.SH LIBRARY
+OpenLDAP LBER (liblber, \-llber)
+.SH SYNOPSIS
+.B #include <lber.h>
+.LP
+.nf
+.ft B
+typedef impl_tag_t ber_tag_t;
+typedef impl_int_t ber_int_t;
+typedef impl_uint_t ber_uint_t;
+typedef impl_len_t ber_len_t;
+typedef impl_slen_t ber_slen_t;
+
+typedef struct berval {
+    ber_len_t bv_len;
+    char *bv_val;
+} BerValue, *BerVarray;
+
+typedef struct berelement BerElement;
+.ft
+.fi
+.LP
+.BI "void ber_bvfree(struct berval *" bv ");"
+.LP
+.BI "void ber_bvecfree(struct berval **" bvec ");"
+.LP
+.BI "void ber_bvecadd(struct berval ***" bvec ", struct berval *" bv ");"
+.LP
+.BI "void ber_bvarray_free(struct berval *" bvarray ");"
+.LP
+.BI "void ber_bvarray_add(BerVarray *" bvarray ", BerValue *" bv ");"
+.LP
+.BI "struct berval *ber_bvdup(const struct berval *" bv ");"
+.LP
+.BI "struct berval *ber_dupbv(const struct berval *" dst ", struct berval *" src ");"
+.LP
+.BI "struct berval *ber_bvstr(const char *" str ");"
+.LP
+.BI "struct berval *ber_bvstrdup(const char *" str ");"
+.LP
+.BI "struct berval *ber_str2bv(const char *" str ", ber_len_t " len ", int " dup ", struct berval *" bv ");"
+.LP
+.BI "BerElement *ber_alloc_t(int " options ");"
+.LP
+.BI "BerElement *ber_init(struct berval *" bv ");"
+.LP
+.BI "void ber_init2(BerElement *" ber ", struct berval *" bv ", int " options ");"
+.LP
+.BI "void ber_free(BerElement *" ber ", int " freebuf ");"
+.SH DESCRIPTION
+.LP
+The following are the basic types and structures defined for use
+with the Lightweight BER library.  
+.LP
+.B ber_int_t
+is a signed integer of at least 32 bits.  It is commonly equivalent to
+.BR int .
+.B ber_uint_t
+is the unsigned variant of
+.BR ber_int_t .
+.LP
+.B ber_len_t
+is an unsigned integer of at least 32 bits used to represent a length.  
+It is commonly equivalent to a
+.BR size_t .
+.B ber_slen_t
+is the signed variant to
+.BR ber_len_t .
+.LP
+.B ber_tag_t
+is an unsigned integer of at least 32 bits used to represent a
+BER tag.  It is commonly equivalent to a
+.BR unsigned\ long .
+.LP
+The actual definitions of the integral impl_TYPE_t types are platform
+specific.
+.LP
+.BR BerValue ,
+commonly used as
+.BR struct\ berval ,
+is used to hold an arbitrary sequence of octets.
+.B bv_val
+points to
+.B bv_len
+octets.
+.B bv_val
+is not necessarily terminated by a NULL (zero) octet.
+.BR ber_bvfree ()
+frees a BerValue, pointed to by \fIbv\fP, returned from this API.  If \fIbv\fP
+is NULL, the routine does nothing.
+.LP
+.BR ber_bvecfree ()
+frees an array of BerValues (and the array), pointed to by \fIbvec\fP,
+returned from this API.  If \fIbvec\fP is NULL, the routine does nothing.
+.BR ber_bvecadd ()
+appends the \fIbv\fP pointer to the \fIbvec\fP array.  Space for the array
+is allocated as needed.  The end of the array is marked by a NULL pointer.
+.LP
+.BR ber_bvarray_free ()
+frees an array of BerValues (and the array), pointed to by \fIbvarray\fP,
+returned from this API.  If \fIbvarray\fP is NULL, the routine does nothing.
+.BR ber_bvarray_add ()
+appends the contents of the BerValue pointed to by \fIbv\fP to the
+\fIbvarray\fP array.  Space for the new element is allocated as needed.
+The end of the array is marked by a BerValue with a NULL bv_val field.
+.LP
+.BR ber_bvdup ()
+returns a copy of a BerValue.  The routine returns NULL upon error
+(e.g. out of memory).  The caller should use
+.BR ber_bvfree ()
+to deallocate the resulting BerValue.
+.BR ber_dupbv ()
+copies a BerValue from \fIsrc\fP to \fIdst\fP.  If \fIdst\fP is NULL a
+new BerValue will be allocated to hold the copy.  The routine returns NULL
+upon error, otherwise it returns a pointer to the copy.  If \fIdst\fP is
+NULL the caller should use
+.BR ber_bvfree ()
+to deallocate the resulting BerValue, otherwise
+.BR ber_memfree ()
+should be used to deallocate the \fIdst->bv_val\fP.  (The
+.BR ber_bvdup ()
+function is internally implemented as ber_dupbv(NULL, bv).
+.BR ber_bvdup ()
+is provided only for compatibility with an expired draft of the LDAP C API;
+.BR ber_dupbv ()
+is the preferred interface.)
+.LP
+.BR ber_bvstr ()
+returns a BerValue containing the string pointed to by \fIstr\fP.
+.BR ber_bvstrdup ()
+returns a BerValue containing a copy of the string pointed to by \fIstr\fP.
+.BR ber_str2bv ()
+returns a BerValue containing the string pointed to by \fIstr\fP, whose
+length may be optionally specified in \fIlen\fP.  If \fIdup\fP is non-zero,
+the BerValue will contain a copy of \fIstr\fP.  If \fIlen\fP is zero, the
+number of bytes to copy will be determined by
+.BR strlen (3),
+otherwise \fIlen\fP bytes will be copied.  If \fIbv\fP is non-NULL, the result
+will be stored in the given BerValue, otherwise a new BerValue will be
+allocated to store the result.  NOTE: Both
+.BR ber_bvstr ()
+and
+.BR ber_bvstrdup ()
+are implemented as macros using
+.BR ber_str2bv ()
+in this version of the library.
+.LP
+.B BerElement
+is an opaque structure used to maintain state information used in
+encoding and decoding.
+.BR ber_alloc_t ()
+is used to create an empty BerElement structure. If
+.B LBER_USE_DER
+is specified for the
+.I options
+parameter then data lengths for data written to the BerElement will be
+encoded in the minimal number of octets required, otherwise they will
+always be written as four byte values. 
+.BR ber_init ()
+creates a BerElement structure that is initialized with a copy of the
+data in its
+.I bv
+parameter.
+.BR ber_init2 ()
+initializes an existing BerElement
+.I ber
+using the data in the
+.I bv
+parameter. The data is referenced directly, not copied. The
+.I options
+parameter is the same as for
+.BR ber_alloc_t ().
+.BR ber_free ()
+frees a BerElement pointed to by \fIber\fP.  If \fIber\fP is NULL, the routine
+does nothing.  If \fIfreebuf\fP is zero, the internal buffer is not freed.
+.SH SEE ALSO
+.BR lber-encode (3),
+.BR lber-decode (3),
+.BR lber-memory (3)
+.LP
+.SH ACKNOWLEDGEMENTS
+.so ../Project
