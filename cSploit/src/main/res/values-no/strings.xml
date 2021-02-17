@@ -1,0 +1,488 @@
+<resources>
+    <string name="menu_settings">Innstillinger</string>
+    <string name="title_activity_main">cSploit</string>
+    <string name="crash_toast_text">Ooooops! Jeg krasjet, men en rapport kommer til å bli sendt til min 
+         utbygger å bidra til å løse problemet :)
+    </string>
+    <string name="toggle_button">ToggleButton</string>
+    <string name="enter_redirection_details">Skriv omdirigerings detaljer under:</string>
+    <string name="address">Adresse</string>
+    <string name="port">Port</string>
+    <string name="target">Mål</string>
+    <string name="unknown">ukjent</string>
+    <string name="services">tjenester</string>
+    <string name="os">OS</string>
+    <string name="device_type">Enhets type</string>
+    <string name="start_hijack">Trykk på en økt for å starte kapring, lang trykk for å lagre det til fil.
+    </string>
+    <string name="sort">type:</string>
+    <string name="select_module">Velg en modul å kjøre</string>
+    <string name="choose">Velg</string>
+    <string name="response">Respons</string>
+    <string name="request">forespørsel</string>
+    <string name="wait_for_response">Vent på respons</string>
+    <string name="protocol">Protokoll</string>
+    <string name="csploit_catchphrase">cSploit - An Android network penetration suite.</string>
+    <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
+    <string name="disclaimer">ansvarsfraskrivelse</string>
+    <string name="csploit_disclaimer">
+        <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
+    <string name="license">License</string>
+    <string name="gpl_license">This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by the Free Software
+        Foundation, either version 3 of the License, or (at your option) any later version.
+        This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+        without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+        See the GNU General Public License for more details.
+        You should have received a copy of the GNU General Public License along with this program.
+        If not, see http://www.gnu.org/licenses/.
+    </string>
+    <string name="service">Tjeneste</string>
+    <string name="stopped">Stoppet&#8230;</string>
+    <string name="start">Start</string>
+    <string name="stop">Stopp</string>
+    <string name="stopped_dots">Stoppet &#8230;</string>
+    <string name="starting_dots">Starter &#8230;</string>
+    <string name="max_length">Max Lengde</string>
+    <string name="min_length">Min Lengde</string>
+    <string name="username">Brukernavn</string>
+    <string name="Charset">tegnsett</string>
+    <string name="filter_desc">Skriv inn et egendefinert filter, inkludert enkel string erstatning eller 
+         regulære uttrykk.
+    </string>
+    <string name="from">Fra</string>
+    <string name="to">Til</string>
+    <string name="wake_on_lan">Våkne på LAN</string>
+    <string name="send">Send</string>
+    <string name="update_available">Oppdatering tilgjengelig</string>
+    <string name="new_update_desc">En ny oppdatering til versjon</string>
+    <string name="new_update_desc2">er tilgjengelig laste ned?</string>
+    <string name="checking">Sjekker&#8230;</string>
+    <string name="no_updates_available">Ingen oppdateringer tilgjengelig.</string>
+    <string name="new_msf_update_desc">En MetasploitFramework oppdatering</string>
+    <string name="new_version">Ny versjon</string>
+    <string name="new_version2">funnet</string>
+    <string name="downloading_update">Laster ned oppdatering&#8230;</string>
+    <string name="connecting">Kobler til&#8230;</string>
+    <string name="cancel">Avbryt</string>
+    <string name="error">Feil</string>
+    <string name="error_occured">En feil ble oppdaget under nedlastningen.</string>
+    <string name="invalid_target">Ugyldig mål.</string>
+    <string name="add_custom_target">Legg til egendefinert mål</string>
+    <string name="enter_url">Skriv inn en URL, vertsnavnet eller IP-adressen nedenfor:</string>
+    <string name="net_discovery_stopped">nettverks oppdaging stoppet.</string>
+    <string name="net_discovery_started">nettverks oppdaging startet.</string>
+    <string name="start_monitor">Start nettverks Monitor</string>
+    <string name="stop_monitor">Stopp nettverks Monitor</string>
+    <string name="start_msfrpcd">Start Metasploit RPCD</string>
+    <string name="stop_msfrpcd">Stopp Metasploit RPCD</string>
+    <string name="exit">Avslutt</string>
+    <string name="close_confirm">Dette vil lukke dSpolit, fortsette?
+    </string>
+    <string name="press_back">trykk igjen for å avslutte.</string>
+    <string name="selected_">Valgt&#160;</string>
+    <string name="no_session_found">Ingen økt funnet på SD kort.</string>
+    <string name="select_session_file">Velg en økt fil fra SD kortet :</string>
+    <string name="select_session">Velg økt</string>
+    <string name="invalid_session">Ugyldig økt navn.</string>
+    <string name="session_saved_to">Økt lagret til &#160;</string>
+    <string name="save_session">Lagre økt</string>
+    <string name="enter_session_name">Skriv navnet på økt filen :</string>
+    <string name="new_session_started">Ny økt startet</string>
+    <string name="warning">Advarsel</string>
+    <string name="warning_new_session">Starte en ny økt vil slette den nåværende, 
+         fortsette?
+    </string>
+    <string name="fatal_error_html">
+        <![CDATA[<p>It seems like your ROM has the <b>LD_LIBRARY_PATH bug</b>, i\'m sorry but it\'s not compatible with cSploit.</p>]]></string>
+    <string name="fatal_error_html2">
+        <![CDATA[<p>For more info read the <a href=\"http://csploit.net/#faq\">FAQ</a>.</p>]]></string>
+    <string name="install_error">feil under fil installasjon!</string>
+    <string name="arm_error">
+        <![CDATA[<p>It seems like your device processor is not an ARM, i\'m sorry but it\'s not compatible with cSploit.</p>]]></string>
+    <string name="arm_error2">
+        <![CDATA[<p>For more info read the <a href=\"http://csploit.net/#requirements\">requirements</a> section.</p>]]></string>
+    <string name="busybox_required">Full busybox installasjon kreves, killall binære ikke 
+         funnet (kanskje du har en gammel busybox versjon).
+    </string>
+    <string name="only_4_root">Denne appen fungerer på enheter med root tilgang.</string>
+    <string name="initializing">Initialiserer&#8230;</string>
+    <string name="initialization_error">Initialiserings feil</string>
+    <string name="target_alias">Mål Alias</string>
+    <string name="set_alias">Sett en alias for dette målet:</string>
+    <string name="no_connectivity">Ingen tilkobling tilgjengelig.</string>
+    <string name="wifi_key_copied">WiFi nøkkel koblet til utklippstavle.</string>
+    <string name="connected_to"><![CDATA[Connected to <b>]]></string>
+    <string name="connected_to2"><![CDATA[</b> with key <b><font color=\"green\">]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
+    <string name="connection_to"><![CDATA[Connection to <b>]]></string>
+    <string name="connection_to2">
+        <![CDATA[</b> <b><font color=\"red\">FAILED</font></b>.]]></string>
+    <string name="enter_key_or_crack">Skriv WiFi nøkkel er prøv å cracke:</string>
+    <string name="enter_wifi_key">Skriv WiFi Nøkkel:</string>
+    <string name="scanning">Søker&#8230;</string>
+    <string name="invalid_filename">Ugyldig filnavn.</string>
+    <string name="something_went_wrong">Noe gikk galt, kan du velge igjen et gyldig mål.
+    </string>
+    <string name="selected">Valgt</string>
+    <string name="nothing_found"><![CDATA[<small><i>Ingenting funnet</i></small>]]></string>
+    <string name="no_open_ports">Ingen åpne porter oppdaget på nåværende målet, kjøre tjeneste inspektør først.</string>
+    <string name="no_exploits_found">Ingen sårbarheter funnet.</string>
+    <string name="no_open_ports_focused_scan">Ingen åpne porter, kjør port søker før du velger en fokusert skanning.</string>
+    <string name="no_open_ports_exploitfinder">Ingen utnytting finnes på dette målet, kjøre UtnyttingsFinderen først.</string>
+    <string name="no_exploit_started">Ingen utnytting startet.</string>
+    <string name="no_vulnerabilities_found">Ingen sårbarheter funnet om dette målet. kjøre Sårbarhet Finder først.</string>
+    <string name="no_infos_on_target">Ingen spesifikke opplysninger om tjenester som kjører på målet 
+         maskin, kjør tjeneste inspektør først.
+    </string>
+    <string name="custom_charset">egendefinert tegnsetting</string>
+    <string name="enter_chars_wanted">Skriv inn tegnene du vil bruke i den egendefinerte tegnsettet:
+    </string>
+    <string name="invalid_port">Ugyldig port spesifikert.</string>
+    <string name="request_empty">Forespørselen kan ikke være tom.</string>
+    <string name="request_sent">forespørsel sendt.</string>
+    <string name="customize_wol_port">Rediger WOL port og press send.</string>
+    <string name="couldnt_send_wol_packet">Kunne ikke sende en WOL pakke til et mål uten en kjent 
+         MAC-adressen.
+    </string>
+    <string name="no_activities_for_url">Ingen aktiviteter for å håndtere denne type URL.</string>
+    <string name="select_ports">Velg Porter</string>
+    <string name="enter_ports_list">Skriv inn en kommaseparert liste over porter:</string>
+    <string name="invalid_port_">Ugyldig Port \'</string>
+    <string name="port_must_be_greater">Port må være større enn 0 og mindre enn 65535.</string>
+    <string name="invalid_ports">Ugyldige porter spesifisert.</string>
+    <string name="empty_port_list">Tom Port liste.</string>
+    <string name="about_csploit_v_">Om cSploit v</string>
+    <string name="select_target">Velg et mål under ved å klikke på rad, eller lang klikk på den for å 
+         angi et alias eller starte en flere angrep.
+    </string>
+    <string name="generating_keys">Generere nøkler&#8230;</string>
+    <string name="no_wifi_available">Ingen WiFi-tilkobling tilgjengelig, vil programmet bare sjekke 
+         etter oppdateringer. #STATUS#
+    </string>
+     <string name="missing_core_update">Kjernen er ikke installert, programmet vil sjekke 
+........ etter oppdateringer. #STATUS#
+    </string>
+    <string name="heart_attack_update">Heart attack har oppstått, programmet vil sjekke
+........ etter oppdateringer. #STATUS#
+    </string>
+    <string name="loading_changelog">Loading changelog&#8230;</string>
+    <string name="something_went_wrong_changelog">
+        <![CDATA[<html><body><p><b>Something went wrong while retrieving the changelog:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
+    <string name="cancel_dialog">Avbryt</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nei</string>
+    <string name="connect">Koble til</string>
+    <string name="crack">Crack</string>
+    <string name="could_not_read_folder">Kunne ikke lese mappe innhold.</string>
+    <string name="choose_dir">velg&#160;</string>
+    <string name="vulnerability_finder">sårbarhets Finner</string>
+    <string name="vulnerability_finder_desc">Søk etter kjente sårbarheter for målet ved bruk av 
+         tjenester på National Vulnerability Database.
+    </string>
+    <string name="inspector">Inspektør</string>
+    <string name="inspector_desc">Utfør måloperativsystemet og tjenester dyp deteksjon 
+         (saktere enn port søker, men mer nøyaktig).
+    </string>
+    <string name="login_cracker">Logginn Cracker</string>
+    <string name="login_cracker_desc">En svært rask nettverkspålogging cracker som støtter mange ulike 
+         tjenester.
+    </string>
+    <string name="packet_forger">Packet Forger</string>
+    <string name="packet_forger_desc">Lag og sende en tilpasset TCP eller UDP pakke til målet.
+    </string>
+    <string name="port_scanner">Port Søker</string>
+    <string name="port_scanner_desc">Gjør a SYN port søking på målet.</string>
+    <string name="router_pwn">Router PWN</string>
+    <string name="router_pwn_desc">Kjør http://routerpwn.com/ tjenesten til å pwn din router.
+    </string>
+    <string name="trace">Trace</string>
+    <string name="trace_desc">Kjør en traceroute på målet.</string>
+    <string name="mitm">MITM</string>
+    <string name="mitm_desc">Utføre ulike man-in-the-middle angrep, slik som nettverk sniffing, 
+         trafikk manipulasjon, etc&#8230;
+    </string>
+    <string name="network_subnet_mask">Dette er din nettverks subnet mask</string>
+    <string name="gateway_router">(Din nettverk gateway / router)</string>
+    <string name="this_device">&#160;(Denne enheten)</string>
+    <string name="wifi_went_down">WiFi tilkoblingen ble mistet.</string>
+    <string name="hijack_session">Kapre økt</string>
+    <string name="start_hijacking">Stopp sniffing og start økt kapring?</string>
+    <string name="start_hijacking2">Start økt kapring?</string>
+    <string name="set_session_filename">Skriv økt filnavn:</string>
+    <string name="session_sniffer">Økt sniffer</string>
+
+    <string name="untraced_hops">untraced hops</string>
+    <string name="add_username">Legg til brukernavn</string>
+    <string name="enter_username">Skriv inn Brukernavn:</string>
+    <string name="select_wordlist">Velg ordliste</string>
+    <string name="error_filepath">Kunne ikke bestemme filbane, vennligst bruk en annen fil 
+         behandler.
+    </string>
+    <string name="trying">Prøver</string>
+    <string name="left">Venstre</string>
+    <string name="error_filepath2">Kunne ikke bestemme filbane.</string>
+    <string name="tap_again">Trykk igjen for å stoppe.</string>
+    <string name="unexpected_file_error">Uventet feil under lesing av filen : </string>
+    <string name="the_port">Porten</string>
+    <string name="error_proxy_port"> som er nødvendig av transparent proxy er tatt fra en annen prosess, åpne program instillinger?</string>
+    <string name="error_mitm_port"> som er nødvendig av MITM serveren er tatt fra en annen prosess, åpne program innstillinger?</string>
+    <string name="error_https_port"> som er nødvendig av MITM https redirector er tatt fra en annen prosess, åpne program innstillinger?</string>
+    <string name="error_mitm_ports">MITM moduler trenger alle porter tilgjengelig.</string>
+
+    <!-- rpc stuff -->
+    <string name="error_rpc">RPC Feil</string>
+    <string name="error_rpcd_inval">dårlige innstillinger</string>
+    <string name="error_rpcd_shell">kan ikke utføre shell</string>
+    <string name="rpcd_starting">Starter Metasploit RPCD&#8230;</string>
+    <string name="rpcd_started">Metasploit RPCD startet</string>
+    <string name="rpcd_stopped">Metasploit RPCD stoppet</string>
+    <string name="rpcd_running">Metasploit RPCD kjører allerede</string>
+    <string name="rpcd_timedout">Metasploit RPCD svarer ikke</string>
+    <string name="error_rcpd_fatal">fatal error occurred, i\'m searching that bug for send it to my developers.
+        if i won\'t exit please close me from preferences->applications,
+        and ALERT MY DEVELOPERS.
+    </string>
+
+    <!-- mitm modules -->
+    <string name="mitm_simple_sniff">Enkel Sniff</string>
+    <string name="mitm_simple_sniff_desc">Omdirigere målet \'s trafikk gjennom denne enheten og viser noen statistikk mens dumping den til en pcap fil.</string>
+    <string name="mitm_password_sniff">Passord Sniffer</string>
+    <string name="mitm_password_sniff_desc">Sniff passord av mange protokoller som http, ftp, imap, imaps, irc, msn, etc fra målet.</string>
+    <string name="mitm_session_hijack">Økt Kapring</string>
+    <string name="mitm_session_hijack_desc">Lytt for cookies på nettverket og kapre økter.</string>
+    <string name="mitm_connection_kill">Drep tilkoblinger</string>
+    <string name="mitm_connection_kill_desc">Drep tilkoblinger hindre målet å nå ethvert nettsted eller server.</string>
+    <string name="mitm_connection_kill_error">Tilkobling dreperen kan bare brukes mot enkelt endepunkter.</string>
+    <string name="mitm_redirect">Omdiriger</string>
+    <string name="mitm_redirect_desc">Omdiriger all http trafikktil en annen adresse.</string>
+    <string name="mitm_redirection">Omdirigering</string>
+    <string name="error_port_outofrange">Port ut av rekkevidde.</string>
+    <string name="error_invalid_address_or_port">Ugyldig adresse og/eller port spesifisert.</string>
+    <string name="mitm_image_replace">Erstatt Bilder</string>
+    <string name="mitm_image_replace_desc">Erstatte alle bildene på nettsider med spesifisert en.</string>
+    <string name="choose_source">Velg en kilde:</string>
+    <string name="local_images">Lokale Bilder</string>
+    <string name="error_image_intent">Dette er merkelig, virker som du har ingen program for å håndtere bilde surfing.</string>
+    <string name="image">Bilde</string>
+    <string name="enter_image_url">Skriv inn URL for bilde :</string>
+    <string name="error_image_url">Ugyldig bilde URL.</string>
+    <string name="mitm_video_replace">Erstatt Videoer</string>
+    <string name="mitm_video_replace_desc">Erstatte alle youtube-videoer på nettsider med spesifisert en.</string>
+    <string name="video">Video</string>
+    <string name="enter_video_url">Skriv in URL av Videoen :</string>
+    <string name="error_video_url">Ugyldig youtube video.</string>
+    <string name="mitm_script_injection">Script Injection</string>
+    <string name="mitm_script_injection_desc">Injisere et javascript i hver besøkt nettside.</string>
+    <string name="choose_method">Velg en metode:</string>
+    <string name="choose_branch">Velg en branch:</string>
+    <string name="local_files">Lokale filer</string>
+    <string name="custom_code">tilpassede kode</string>
+    <string name="error_file_intent">Virker som du har ingen filbehandler i stand til å lese filer, du må installere en.</string>
+    <string name="enter_js_code">Skriv inn js koden får å injisere :</string>
+    <string name="error_js_code"><![CDATA[Invalid javascript code, remember to use <script></script> enclosing tags.]]></string>
+    <string name="mitm_custom">Tilpasset filter</string>
+    <string name="mitm_custom_desc">Erstatte egendefinert tekst på nettsider med spesifisert en.</string>
+    <string name="custom_filter">Tilpasset filter</string>
+    <string name="error_filter">Ugyldig uttrykk</string>
+    <string name="file_output">File Output</string>
+    <string name="question_save_to_pcap">Vil du lagre sniffet trafikk til en pcap fil?</string>
+    <string name="dumping_traffic_to">Dumper trafikk til </string>
+
+    <string name="error_mitm_proxy">Unable to create the proxy, please check your connection and port availability.</string>
+    <string name="error_mitm_https_redirector">Unable to create the HTTPS redirector, please check your connection and port availability.</string>
+    <string name="error_mitm_resource_server">Unable to create the resource server, please check your connection and port availability.</string>
+
+    <string name="hijacker_load_from_file">Last inn fra fil</string>
+    <string name="login_user_wordlist">Bruker Ordliste</string>
+    <string name="login_pass_wordlist">Passord Ordliste</string>
+
+    <string name="menu_new_session">Ny økt</string>
+    <string name="menu_save_session">Lagre økt</string>
+    <string name="menu_restore_session">gjenopprette økt</string>
+    <string name="menu_stop_monitor">Stopp Netverk Monitor</string>
+    <string name="menu_submit_issue">Send in problem</string>
+    <string name="menu_about">Om</string>
+
+    <string name="scanner_select_ports">Velg tilpassede porter</string>
+
+    <string name="wifi_initializing">Initialiserer &#8230;</string>
+    <string name="wifi_activating_iface">Aktiverer WiFi interface &#8230;</string>
+    <string name="wifi_activated">WiFi aktivert.</string>
+    <string name="wifi_scanning">Søker &#8230;</string>
+    <string name="wifi_attempting_to">Forsøker tilkobling til</string>
+    <string name="wifi_with_key">med nøkkel</string>
+    <string name="wifi_connecting_to">kobler til</string>
+    <string name="wifi_error_keys">Kunne ikke generere nøkler.</string>
+    <string name="wifi_scan_finished">Søking ferdig</string>
+
+    <!-- preferences -->
+    <string name="pref_general">Generelt</string>
+    <string name="pref_modules">Moduler</string>
+    <string name="pref_msf">Metasploit Framework</string>
+    <string name="pref_performance">ytelse</string>
+    <string name="pref_check_updates">Søk etter oppdatering</string>
+    <string name="pref_wake_lock">Våkne lås</string>
+    <string name="pref_save_path">Lagre Bane</string>
+    <string name="pref_debug_error_logging">Debug feil logging</string>
+    <string name="pref_enable_profiler">Kode Profiler</string>
+    <string name="pref_sniffer_sample_time">Sniffer Sample Time</string>
+    <string name="pref_http_proxy_port">HTTP Proxy Port</string>
+    <string name="pref_http_server_port">HTTP Server Port</string>
+    <string name="pref_https_redirect">SSL Stripping</string>
+    <string name="pref_https_redirector_port">HTTPS Redirector Port</string>
+    <string name="pref_http_max_buffer_size">HTTP Max Buffer Size</string>
+    <string name="pref_password_filename">Password Sniffer File</string>
+    <string name="pref_check_updates_desc">Check for updates every time the application is started.</string>
+    <string name="pref_wake_lock_desc">Prevents the device going in sleep mode while the application is running.</string>
+    <string name="pref_save_path_desc">Global save path to put every log file.</string>
+    <string name="pref_debug_error_logging_desc">Enable or disable error logging on a debug file.</string>
+    <string name="pref_enable_profiler_desc">Enable or disable network code profiler logging.</string>
+    <string name="pref_sniffer_sample_time_desc">Sample time in seconds of the sniffer module network statistics.</string>
+    <string name="pref_http_proxy_port_desc">MITM transparent proxy port to listen on, change this if you have problems starting the proxy.</string>
+    <string name="pref_http_server_port_desc">MITM http server port to listen on, change this if you have problems starting the server.</string>
+    <string name="pref_https_redirect_desc">Redirect traffic from HTTPS to HTTP.</string>
+    <string name="pref_https_redirector_port_desc">MITM https redirection server port to listen on.</string>
+    <string name="pref_http_max_buffer_size_desc">Max buffer size of HTTP requests handled by the transparent proxy.</string>
+    <string name="pref_password_filename_desc">Name of the file to use to log passwords and cookies.</string>
+    <string name="pref_msf_check_updates">Check for MSF updates</string>
+    <string name="pref_msf_check_updates_desc">Check for MSF updates every time the application is started.</string>
+    <string name="pref_rpc_user">RPC Brukernavn</string>
+    <string name="pref_rpc_user_desc">Brukernavn for tilkobling til Metasploit RPCD.</string>
+    <string name="pref_rpc_pswd">RPC passord</string>
+    <string name="pref_rpc_pswd_desc">Passord for tilkobling til Metasploit RPCD.</string>
+    <string name="pref_rpc_host">RPC host</string>
+    <string name="pref_rpc_host_desc">host where the Metasploit RPC server is on</string>
+    <string name="pref_rpc_port">RPC port</string>
+    <string name="pref_rpc_port_desc">Port for connect to Metasploit RPCD.</string>
+    <string name="pref_rpc_ssl">RPC use SSL</string>
+    <string name="pref_rpc_ssl_desc">Specify if Metasploit RPC use SSL</string>
+    <string name="pref_msfdir">MSF directory</string>
+    <string name="pref_msfdir_desc">Directory containing the Metasploit Framework.</string>
+    <string name="pref_rubydir">Ruby directory</string>
+    <string name="pref_rubydir_desc">Directory containing the Ruby interpreter.</string>
+    <string name="pref_msf_branch_desc">The Metasploit Framework branch to use</string>
+    <string name="pref_msf_branch_title">MSF branch</string>
+    <string name="pref_performance_vuln_title">Search preferences</string>
+    <string name="pref_performance_vuln_desc">Search for vulnerability using</string>
+    <string-array name="pref_performance_vuln" >
+        <item>OSVDB</item>
+        <item>CVE</item>
+        <item>both CVE and OSVDB</item>
+    </string-array>
+    <string name="pref_performance_exploit_desc">Search exploits</string>
+    <string-array name="pref_performance_exploit" >
+        <item>MSF compatible only</item>
+        <item>on exploitdb only</item>
+        <item>from both exploitdb and MSF</item>
+    </string-array>
+    <string name="pref_performance_widescan">bred host søk</string>
+    <string name="pref_performance_widescan_desc">søk for hosts utenfor network mask</string>
+    <string name="pref_advanced">Avansert</string>
+    <string name="pref_folder">Mappe</string>
+    <string name="pref_msf_enable">Aktiver MSF</string>
+    <string name="pref_msf_enable_desc">Aktiver Metasploit Framework</string>
+    <string name="pref_msf_delete">Slett MSF</string>
+    <string name="pref_msf_delete_desc">Sletter Metasploit Framework fra enheten din</string>
+    <string name="pref_msfwipe_message">Vil du slette Metasploit Framework?</string>
+    <string name="pref_msfwipe_size">Rundt %d MB vil be frigjort.</string>
+    <string name="pref_err_exists">eksisterer ikke.</string>
+    <string name="pref_err_writable">er ikke skrivbar.</string>
+    <string name="pref_err_executable">ikke tillater opprettelse av kjør innholdet.</string>
+    <string name="pref_err_sample_time">Prøvetiden må være mellom 0,4 og 1,0.</string>
+    <string name="pref_err_invalid_number">Ugyldig Nummer.</string>
+    <string name="pref_err_port_range">Porten må være mellong 1024 og 65535.</string>
+    <string name="pref_err_busy_port">En annen prosess lytter på denne porten, kan du bruke en annen.</string>
+    <string name="pref_err_buffer_size">Buffer størrelse må være mellom 1024 og 104857600.</string>
+    <string name="pref_persistent_network_monitor">vedvarende nettverk monitor</string>
+    <string name="pref_persistent_network_monitor_desc">holde nettverk monitor seende på nettverket</string>
+
+    <string name="exploit_finder">Utnyttings Finner</string>
+    <string name="exploit_finder_desc">Søk etter utnytte av treff i sårbarheter.</string>
+    <string name="exploit_launch_all">Kjør alle</string>
+    <string name="sessions">Økter</string>
+    <string name="sessions_desc">Økter på pwned mål.</string>
+    <string name="exploit_launch">Kjør</string>
+    <string name="exploit_edit_options">Rediger alternativ</string>
+    <string name="payload_edit_settings">Rediger payload innstillinger</string>
+    <string name="exploit_choose_payload">Velg payload</string>
+    <string name="exploit_choose_target">Velg mål</string>
+    <string name="open_url">Åpne URL</string>
+    <string name="show_full_description">Vis full beskrivelse</string>
+    <string name="choose_an_option">Velg et alternativ</string>
+    <string name="required">Påkrevd</string>
+    
+    <string name="menu_add">Legg til</string>
+    <string name="menu_scan">Søk</string>
+    <string name="menu_wifi_scan">WiFi Søk</string>
+    <string name="menu_stop_msfrpcd">Stopp msfrpcd</string>
+    
+    <string name="pref_theme">Mørkt tema</string>
+    <string name="pref_choose_theme">Aktiver mørkt tema, som er lettere på øynene</string>
+    <string name="please_restart">Det nye temaet vil ikke bli brukt før du starter appen på nytt</string>
+    <string name="evasion">Evasion</string>
+    <string name="search_exact_version">Nøyaktig versjon matching</string>
+    <string name="sessions_title">Åpne et shell ved å klikke på en økt, eller se flere alternativer ved å trykke lenge på den.</string>
+    <string name="open_shell">Åpne shell</string>
+    <string name="clear_event_log">Tøm hendelse logg</string>
+    <string name="run">Kjør</string>
+    <string name="command">Kommando</string>
+    <string name="clear">Tøm</string>
+    <string name="msfrpc_disconnected">MSF RPC frakoblet</string>
+    <string name="no_opened_sessions">Det er ingen åpne økter for dette målet</string>
+    <string name="delete">Slett</string>
+    <string name="checksum_failed">Filen er Korrupt</string>
+    <string name="extraction_failed">Pakk ut feilet</string>
+    <string name="extracting">Pakker ut&#8230;</string>
+    <string name="click_here_to_upgrade">Klikk her for å oppgradere</string>
+    <string name="bad_permissions">Den lokale filen som du legger på lagring har dårlige tillatelser, jeg kan ikke lese og / eller skrive det!</string>
+    <string name="restore_default_path">gjenopprette standard banen</string>
+    <string name="choose_a_custom_path">Velg en tilpasset bane</string>
+    <string name="error_symlink">destinasjonsenhet støtter ikke symbolske lenker, kan du velge et anstendig filsystem.</string>
+    <string name="target_selected">Mål valgt</string>
+    <string name="targets_selected">Målene valgt</string>
+    <string name="multiple_attack">flere angrep</string>
+    <string name="connect_msf">Koble til Metasploit</string>
+    <string name="disconnect_msf">Koble fra Metasploit</string>
+    <string name="connected_msf">Koblet til Metasploit</string>
+    <string name="connection_failed">tilkobling feilet!</string>
+    <string name="new_ruby_update_desc">En oppdatering for ruby er tilgjengelig</string>
+    <string name="delete_previous_location">Slett forrige destionasjon?</string>
+    <string name="setting_file_modes">sette filrettigheter…</string>
+    <string name="updating_rubygem">Oppdaterer RubyGems</string>
+    <string name="installing_gems">innstallerer gems…</string>
+    <string name="patching_shebang">patching shebang</string>
+    <string name="installing_msf_gems">innstallerer gems for MSF</string>
+    <string name="installing_bundle">innstallerer bundle</string>
+    <string name="new_gems_update_desc">En oppdatering for ruby gems</string>
+    <string name="heart_attack">heart attack</string>
+    <string name="cannot_download_core">kan ikke laste ned kjernen for din enhet</string>
+    <string name="unable_to_start_updateservice">kan ikke starte oppdateringstjeneste</string>
+    <string name="no_core_no_connectivity">kjernen er ikke installert, en nettverkstilkobling kreves ved førstegangsoppstart</string>
+    <string name="no_core_found">kan ikke finne en kjerne for denne enheten</string>
+    <string name="mandatory_update">denne oppdateringen er påkrevd</string>
+    <string name="new_core_found">Kjerne versjon %s er tilgjendelig, vil du oppgradere?</string>
+    <string name="update_cancelled">oppdatering avbrutt</string>
+    <string name="child_not_started">kan ikke starte prosess</string>
+    <string name="pref_updates">Oppdateringer</string>
+    <string name="pref_updates_app">App</string>
+    <string name="pref_updates_app_desc">sjekk etter App oppdateringer</string>
+    <string name="pref_updates_core">Kjerne</string>
+    <string name="pref_updates_core_desc">sjekk etter Kjerne oppdateringer</string>
+    <string name="pref_updates_ruby">Ruby</string>
+    <string name="pref_updates_ruby_desc">Sjekk etter Ruby oppdateringer</string>
+    <string name="pref_updates_msf">MSF</string>
+    <string name="pref_updates_msf_desc">Sjekk etter MSF oppdateringer</string>
+    <string name="pref_updates_gems">RubyGems</string>
+    <string name="pref_updates_gems_desc">Sjekk etter RubyGems oppdateringer</string>
+    <string name="pref_msf_manifest">Egendefinert manifest</string>
+    <string name="pref_msf_manifest_desc">egendefinert MSF manifest URL</string>
+    <string name="buildinfo">Bygg info</string>
+    <string name="menu_multiaction">Multihandling</string>
+    <string name="menu_focusedscan">fokusert skanning</string>
+ 
+    <string name="crash_dialog_title">cSploit har krasjet</string>
+    <string name="crash_dialog_text">En uventet feil har medført at programmet og/eller noen av dets komponenter har krasjet. Vennligst hjelp oss med å fikse problemet ved å sende oss feilmeldingen. Alt du trenger å gjøre er å trykke \'OK\'.</string>
+    <string name="crash_dialog_comment">Du kan legge til en kommentar til problemet nedenfor</string>
+    <string name="JNI_crash_detected">JNI biblioteket har tidligere krasjet, Jeg håper du har sendt i rapporten.</string>
+</resources>

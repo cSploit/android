@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="org.csploit.android">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" tools:node="replace"/>
+
+    <application
+        android:name=".CSploitApplication"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme"
+        android:resizeableActivity="true">
+
+    <meta-data
+            android:name="android.max_aspect"
+            android:value="2.1" />
+
+        <activity
+            android:name=".MainActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="WindowManagerPreference:SuppressWindowControlNavigationButton" android:value="true" />
+            <layout
+                android:gravity="center"
+                android:minHeight="320dp"
+                android:minWidth="480dp" />
+        </activity>
+
+        <!-- suppress AndroidDomInspection -->
+        <service
+            android:name=".services.UpdateService"
+            android:enabled="true" />
+
+        <service
+            android:name=".core.MultiAttackService"
+            android:enabled="true" />
+
+        <activity
+            android:name=".WifiScannerActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".SettingsActivity"
+            android:theme="@style/Theme.AppCompat.Light"
+
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".gui.DirectoryPicker"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".gui.MsfPreferences"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".gui.Console"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".ActionActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.RouterPwn"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.Traceroute"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.PortScanner"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.Inspector"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.Sessions"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.ExploitFinder"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.mitm.MITM"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.mitm.Sniffer"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.mitm.PasswordSniffer"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.mitm.DNSSpoofing"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.mitm.hijacker.Hijacker"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.mitm.hijacker.HijackerWebView"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.LoginCracker"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".plugins.PacketForger"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_main" />
+        <activity
+            android:name=".gui.FileEdit"
+            android:label="@string/title_activity_main"
+            android:parentActivityName=".plugins.mitm.PasswordSniffer" >
+        </activity>
+    </application>
+
+</manifest>

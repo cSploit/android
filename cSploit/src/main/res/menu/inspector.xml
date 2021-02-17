@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/focused_scan"
+        android:checkable="true"
+        android:checked="false"
+        android:enabled="false"
+        android:title="@string/menu_focusedscan" />
+</menu>

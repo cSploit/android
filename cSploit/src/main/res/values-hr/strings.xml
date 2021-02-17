@@ -1,0 +1,431 @@
+﻿<resources>
+    <string name="menu_settings">Postavke</string>
+    <string name="title_activity_main">cSploit</string>
+    <string name="crash_toast_text">Ooooops! Srušio sam se, ali izvješće će se poslati mojem
+        razvijaču da pokuša riješiti problem :)
+    </string>
+    <string name="toggle_button">PreklopniGumb</string>
+    <string name="enter_redirection_details">Unesi detalje za preusmjeravanje:</string>
+    <string name="address">Adresa</string>
+    <string name="port">Port</string>
+    <string name="target">Meta</string>
+    <string name="unknown">nepoznato</string>
+    <string name="services">Servisi</string>
+    <string name="os">OS</string>
+    <string name="device_type">Tip Uređaja</string>
+    <string name="start_hijack">Dodirni sesiju da započneš krađu, drži prst na njoj da je zaštitiš u datoteku.
+    </string>
+    <string name="sort">Razvrstavanje:</string>
+    <string name="select_module">Izaberi modul za pokretanje</string>
+    <string name="choose">Izaberi</string>
+    <string name="response">Odgovor</string>
+    <string name="request">Zahtjev</string>
+    <string name="wait_for_response">Čekanje na odgovor</string>
+    <string name="protocol">Protokol</string>
+    <string name="csploit_catchphrase">cSploit - Android paket za testiranje mreže</string>
+    <string name="csploit_copyleft">Copyleft of Simone Margaritelli aka evilsocket.</string>
+    <string name="disclaimer">Disclaimer</string>
+    <string name="csploit_disclaimer">
+        <![CDATA[This application is not to be used for any purposes other than to demonstrate its functions, and must only be used on networks for which you have permission to do so. Any other use is not the responsibility of the developer.In other words, don&apos;t be stupid, and don&apos;t direct angry people towards me.]]></string>
+    <string name="license">Licenca</string>
+    <string name="gpl_license">This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by the Free Software
+        Foundation, either version 3 of the License, or (at your option) any later version.
+        This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+        without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+        See the GNU General Public License for more details.
+        You should have received a copy of the GNU General Public License along with this program.
+        If not, see http://www.gnu.org/licenses/.
+    </string>
+    <string name="service">Servis</string>
+    <string name="stopped">Zaustavljen&#8230;</string>
+    <string name="start">Pokreni</string>
+    <string name="stop">Zaustavi</string>
+    <string name="stopped_dots">Zaustavljeno &#8230;</string>
+    <string name="starting_dots">Pokretanje &#8230;</string>
+    <string name="max_length">Maksimalna duljina</string>
+    <string name="min_length">Minimalna duljina</string>
+    <string name="username">Korisničko ime</string>
+    <string name="Charset">Skup znakova</string>
+    <string name="filter_desc">Napiši zamjenski filter, uključujući jednostavnu zamjenu niza ili
+        standardne izraze.
+    </string>
+    <string name="from">Iz</string>
+    <string name="to">U</string>
+    <string name="wake_on_lan">Buđenje preko LAN-a</string>
+    <string name="send">Pošalji</string>
+    <string name="update_available">Ažuriranje Dostupno</string>
+    <string name="new_update_desc">Novo ažuriranje na verziju</string>
+    <string name="new_update_desc2">je dostupno, želite li ga preuzeti?</string>
+    <string name="checking">Provjera&#8230;</string>
+    <string name="no_updates_available">Nema dostupnih ažuriranja.</string>
+    <string name="new_msf_update_desc">MetasploitFramework nadogradnja</string>
+    <string name="new_version">Nova verzija</string>
+    <string name="new_version2">je pronađena!</string>
+    <string name="downloading_update">Skidanje ažuriranja&#8230;</string>
+    <string name="connecting">Spajanje&#8230;</string>
+    <string name="cancel">Zaustavi</string>
+    <string name="error">Greška</string>
+    <string name="error_occured">Greška se pojavila pri skidanju ažuriranja.</string>
+    <string name="invalid_target">Nevažeća meta.</string>
+    <string name="add_custom_target">Dodaj posebnu metu</string>
+    <string name="enter_url">Napiši URL, ime izvora (uređaja) ili IP adresu ispod:</string>
+    <string name="net_discovery_stopped">Pretraga mreže zaustavljena.</string>
+    <string name="net_discovery_started">Pretraga mreže pokrenuta.</string>
+    <string name="start_monitor">Pokreni Pretragu Mreže</string>
+    <string name="stop_monitor">Zaustavi Pretragu Mreže</string>
+    <string name="start_msfrpcd">Pokreni Metasploit RPCD</string>
+    <string name="stop_msfrpcd">Zaustavi Metasploit RPCD</string>
+    <string name="exit">Zaustavi</string>
+    <string name="close_confirm">Ovo će zatvoriti cSploit, jeste li sigurni da želite nastaviti?
+    </string>
+    <string name="press_back">Pritisnite opet tipku nazad za izlaz.</string>
+    <string name="selected_">Izabrano&#160;</string>
+    <string name="no_session_found">Nije pronađena sesija na SD kartici.</string>
+    <string name="select_session_file">Odaberi sesiju sa SD kartice :</string>
+    <string name="select_session">Izabrana Sesija</string>
+    <string name="invalid_session">Netočno ime sesije.</string>
+    <string name="session_saved_to">Sesija spremljena u &#160;</string>
+    <string name="save_session">Spremi Sesiju</string>
+    <string name="enter_session_name">Napiši ime datoteke za sesiju :</string>
+    <string name="new_session_started">Nova sesija započeta</string>
+    <string name="warning">Upozorenje</string>
+    <string name="warning_new_session">Pokretanje nove sesije će izbrisati trenutnu sesiju,
+        nastaviti?
+    </string>
+    <string name="fatal_error_html">
+        <![CDATA[<p>Izgleda da vaš ROM (sustav) sadrži <b>LD_LIBRARY_PATH bug</b>, žao mi je ali vaš uređaj ne podržava cSploit.</p>]]></string>
+    <string name="fatal_error_html2">
+        <![CDATA[<p>Za više informacija pročitajte <a href=\"http://csploit.net/#faq\">Često Postavljena Pitanja</a>.</p>]]></string>
+    <string name="install_error">Greška prilikom instalacije datoteka!</string>
+    <string name="arm_error">
+        <![CDATA[<p>Čini se da procesor u vašem uređaju nije ARM, žao mi je ali vaš uređaj ne podržava cSploit.</p>]]></string>
+    <string name="arm_error2">
+        <![CDATA[<p>Za više informacija pročitajte <a href=\"http://csploit.net/#requirements\">requirements (zahtjevi)</a> sekciju.</p>]]></string>
+    <string name="busybox_required">Potpuna BusyBox instalacija potrebna, killall binarna datoteka nije
+        pronađena(možda je instalirana starija verzija BusyBoxa).
+    </string>
+    <string name="only_4_root">Ova aplikacija radi samo na uređajima koji imaju root.</string>
+    <string name="initializing">Pokretanje&#8230;</string>
+    <string name="initialization_error">Greška Pri Pokretanju</string>
+    <string name="target_alias">Nadimak Mete</string>
+    <string name="set_alias">Postavi nadimak za metu:</string>
+    <string name="no_connectivity">Nema povezanosti.</string>
+    <string name="wifi_key_copied">WiFi ključ kopiran u međuspremnik.</string>
+    <string name="connected_to"><![CDATA[Povezan sa <b>]]></string>
+    <string name="connected_to2"><![CDATA[</b> sa ključem <b><font color=\"green\">]]></string>
+    <string name="connected_to3"><![CDATA[</font></b>!]]></string>
+    <string name="connection_to"><![CDATA[Povezan na <b>]]></string>
+    <string name="connection_to2">
+        <![CDATA[</b> <b><font color=\"red\">NEUSPJEŠNO</font></b>.]]></string>
+    <string name="enter_key_or_crack">Napiši WiFi Ključ or pokušaj probiti:</string>
+    <string name="enter_wifi_key">Napiši WiFi Ključ:</string>
+    <string name="scanning">Pretraživanje&#8230;</string>
+    <string name="invalid_filename">Nevaljalo ime datoteke.</string>
+    <string name="something_went_wrong">Pojavila se greška, molimo da opet odaberete valjanu metu.
+    </string>
+    <string name="selected">Odabrano</string>
+    <string name="nothing_found"><![CDATA[<small><i>Ništa Nije Pronađeno</i></small>]]></string>
+    <string name="no_open_ports">Nisu pronađeni otvoreni portovi na meti, prvo pokreni Pretraživač Servisa.</string>
+    <string name="no_exploits_found">Nisu pronađeni exploiti.</string>
+    <string name="no_open_ports_focused_scan">Nisu pronađeni otvoreni portovi, pokreni pretraživač portova prije pokretanja fokusiranog pretraživanja.</string>
+    <string name="no_open_ports_exploitfinder">Nema exploita na meti, prvo pokreni Pretraživač Exploita.</string>
+    <string name="no_exploit_started">Nijedan exploit nije pokrenut.</string>
+    <string name="no_vulnerabilities_found">Nisu pronađene ranjivosti za ovu metu, prvo pokreni Pretraživač Ranjivosti.</string>
+    <string name="no_infos_on_target">Nema posebnih informacija o servisima pokrenutim na meti,
+        prvo pokreni Pretraživač Servisa.
+    </string>
+    <string name="custom_charset">Prilagođeni Skup Znakova</string>
+    <string name="enter_chars_wanted">Napiši znakove koji će se koristiti u prilagođenom skupu znakova:
+    </string>
+    <string name="invalid_port">Napisan je netočan port.</string>
+    <string name="request_empty">Ovaj zahtjev ne može biti prazan.</string>
+    <string name="request_sent">Zahtjev poslan.</string>
+    <string name="customize_wol_port">Prilagodi WOL(Buđenje Preko LAN-a) port i pritisni Pošalji.</string>
+    <string name="couldnt_send_wol_packet">Nemoguće poslati WOL(Buđenje Preko LAN-a) paket meti bez poznate
+        MAC adrese.
+    </string>
+    <string name="no_activities_for_url">Nema aktivnosti za obradu ovog tipa URL-a.</string>
+    <string name="select_ports">Odaberi Portove</string>
+    <string name="enter_ports_list">Napiši portove koji su odvojeni zarezom:</string>
+    <string name="invalid_port_">Netočan port \'</string>
+    <string name="port_must_be_greater">Port mora biti veći od 0 i manji od 65535.</string>
+    <string name="invalid_ports">Netočni portovi napisani.</string>
+    <string name="empty_port_list">Prazan popis portova.</string>
+    <string name="about_csploit_v_">Informacije o cSploit v</string>
+    <string name="select_target">Odaberi metu ispod dodirom na red ili drži prst da
+        napišeš nadimak.
+    </string>
+    <string name="generating_keys">Stvaranje ključeva&#8230;</string>
+    <string name="no_wifi_available">Nema WiFi povezanosti, aplikacija će samo provjeriti
+        ažuriranja. #STATUS#
+    </string>
+    <string name="loading_changelog">Učitavam zapisnik promjena&#8230;</string>
+    <string name="something_went_wrong_changelog">
+        <![CDATA[<html><body><p><b>Pojavila se greška pri pristupanju zapisniku promjena:</b></p><p><pre>{DESCRIPTION}</pre></p></body></html>]]></string>
+    <string name="cancel_dialog">Zaustavi</string>
+    <string name="yes">Da</string>
+    <string name="no">Ne</string>
+    <string name="connect">Spoji se</string>
+    <string name="crack">Probij</string>
+    <string name="could_not_read_folder">Nemoguće pročitati sadržaj mape.</string>
+    <string name="choose_dir">Odaberi&#160;</string>
+    <string name="vulnerability_finder">Pretraživač Ranjivosti</string>
+    <string name="vulnerability_finder_desc">Pretraži poznate ranjivosti na National Vulnerability Database(Nacionalnoj Bazi Ranjivosti)
+        na meti koja ima pokrenute servise.
+    </string>
+    <string name="inspector">Pretraživač Servisa</string>
+    <string name="inspector_desc">Pokreni otkrivanje Operativnog Sistema i duboko pretraživanje pokrenutih servisa
+        (Sporije ali točnije od Pretraživača Portova).
+    </string>
+    <string name="login_cracker">Probijač Prijava</string>
+    <string name="login_cracker_desc">Vrlo brzi mrežni probijač prijava koji podržaje mnogo različitih
+        servisa.
+    </string>
+    <string name="packet_forger">Stvaranje Paketa</string>
+    <string name="packet_forger_desc">Napravi i pošalji prilagođeni TCP ili UDP paket prema meti.
+    </string>
+    <string name="port_scanner">Pretraživač Portova</string>
+    <string name="port_scanner_desc">Izvrši SYN port pretraživanje na meti.</string>
+    <string name="router_pwn">Router PWN</string>
+    <string name="router_pwn_desc">Pokreni http://routerpwn.com/ servis da testiraš svoj router.
+    </string>
+    <string name="trace">Praćenje</string>
+    <string name="trace_desc">Izvrši traceroute naredbu prema meti.</string>
+    <string name="mitm">MITM</string>
+    <string name="mitm_desc">Izvrši razne man-in-the-middle (čovjek-u-sredini) napade, kao što su osluškivanje mreže,
+        upravljanje mrežnim prometom, itd&#8230;
+    </string>
+    <string name="network_subnet_mask">Tvoja maska podmreže</string>
+    <string name="gateway_router">(Tvoj mrežni gateway / router)</string>
+    <string name="this_device">&#160;(Ovaj uređaj)</string>
+    <string name="wifi_went_down">Nema WiFi povezanosti.</string>
+    <string name="hijack_session">Ukradi Sesiju</string>
+    <string name="start_hijacking">Zaustavi osluškivanje i pokreni krađu?</string>
+    <string name="start_hijacking2">Započni Krađu Sesije?</string>
+    <string name="set_session_filename">Napiši ime datoteke za sesiju:</string>
+    <string name="session_sniffer">Osluškivanje Sesija</string>
+
+    <string name="untraced_hops">nepraćeni čvorovi</string>
+    <string name="add_username">Dodaj korisničko ime</string>
+    <string name="enter_username">Napiši korisničko ime koje će se koristiti:</string>
+    <string name="select_wordlist">Izaberi Riječnik</string>
+    <string name="error_filepath">Nemoguće pronaći navedeni put, molimo koristite drugi upravitelj
+        datoteka.
+    </string>
+    <string name="trying">Pokušavanje</string>
+    <string name="left">ostalo</string>
+    <string name="error_filepath2">Nemoguće pronaći navedeni put.</string>
+    <string name="tap_again">Dodirni opet za zaustavljanje.</string>
+    <string name="unexpected_file_error">Neočekivana greška pri čitanju datoteke : </string>
+    <string name="the_port">Port</string>
+    <string name="error_proxy_port"> koji je potreban prozirnom proxyju je zauzeo drugi proces, otvori postavke?</string>
+    <string name="error_mitm_port"> koji je potreban MITM serveru je zauzeo drugi proces, otvori postavke?</string>
+    <string name="error_https_port"> koji je potreban MITM HTTPS preusmjerivaču je zauzeo drugi proces, otvori postavke?</string>
+    <string name="error_mitm_ports">MITM modulima je potrebno da su svi portovi otvoreni.</string>
+
+    <!-- rpc stuff -->
+    <string name="error_rpc">RPC greška</string>
+    <string name="error_rpcd_inval">Loše postavke</string>
+    <string name="error_rpcd_shell">nemoguće pokrenuti ljusku</string>
+    <string name="rpcd_starting">Pokretanje Metasploit RPCD&#8230;</string>
+    <string name="rpcd_started">Metasploit RPCD pokrenut</string>
+    <string name="rpcd_stopped">Metasploit RPCD zaustavljen</string>
+    <string name="rpcd_running">Metasploit RPCD je već pokrenut</string>
+    <string name="rpcd_timedout">Metasploit RPCD ne reagira</string>
+    <string name="error_rcpd_fatal">Fatalna greška se pojavila, upravo pretražujem grešku da je pošaljem mojem razvijatelju,
+        ako se ne ugasim ugasi me preko postavke->aplikacije,
+        i UPOZORI MOJE RAZVIJATELJE.
+    </string>
+
+    <!-- mitm modules -->
+    <string name="mitm_simple_sniff">Jednostavno Osluškivanje</string>
+    <string name="mitm_simple_sniff_desc">Preusmjeri promet mete/meta kroz ovaj uređaj i pokaži neke statistike dok se podaci zapisuju u pcap datoteku.</string>
+    <string name="mitm_password_sniff">Osluškivač Za Prijave</string>
+    <string name="mitm_password_sniff_desc">Osluškuj prijave sa mnogo protokola uključujući HTTP, FTP, IMAP, IMAPS, IRC, MSN, itd sa mete.</string>
+    <string name="mitm_session_hijack">Krađa Sesija</string>
+    <string name="mitm_session_hijack_desc">Osluškuj kolačiće na mreži i ukradi sesije.</string>
+    <string name="mitm_connection_kill">Ubijanje Veza</string>
+    <string name="mitm_connection_kill_desc">Ubij veze spriječavajući metu da otvori bilo koju stranicu.</string>
+    <string name="mitm_connection_kill_error">Ubijanje veza se može koristiti samo protiv pojedinačnih krajnjih točaka.</string>
+    <string name="mitm_redirect">Preusmjeri</string>
+    <string name="mitm_redirect_desc">Preusmjeri sav HTTP promet na drugu adresu.</string>
+    <string name="mitm_redirection">Preusmjeravanje</string>
+    <string name="error_port_outofrange">Port izvan raspona.</string>
+    <string name="error_invalid_address_or_port">Nevaljala adresa i/ili port napisan.</string>
+    <string name="mitm_image_replace">Zamijeni Slike</string>
+    <string name="mitm_image_replace_desc">Zamijeni sve slike na stranici sa jednom slikom.</string>
+    <string name="choose_source">Odaberi izvor:</string>
+    <string name="local_images">Uređaj</string>
+    <string name="error_image_intent">Ovo je čudno, izgleda da nemaš nijednu aplikaciju za pretragu slika.</string>
+    <string name="image">Slika</string>
+    <string name="enter_image_url">Napiši URL slike :</string>
+    <string name="error_image_url">Nevaljali URL slike.</string>
+    <string name="mitm_video_replace">Zamijeni Video</string>
+    <string name="mitm_video_replace_desc">Zamijeni svaki YouTube video sa jednim videom.</string>
+    <string name="video">Video</string>
+    <string name="enter_video_url">Napiši URL videa :</string>
+    <string name="error_video_url">Nevaljali YouTube video.</string>
+    <string name="mitm_script_injection">Ubrizgavanje skripti</string>
+    <string name="mitm_script_injection_desc">Ubrizgaj JavaScript na svaku posjećenu stranicu.</string>
+    <string name="choose_method">Odaberi način:</string>
+    <string name="local_files">Datoteka</string>
+    <string name="custom_code">Prilagođeni Kod</string>
+    <string name="error_file_intent">Izgleda da nemaš nijedan upravitelj datoteka za pretraživanje datoteka, molimo instalirajte pretraživač.</string>
+    <string name="enter_js_code">Napiši JS kod za ubrizgavanje :</string>
+    <string name="error_js_code"><![CDATA[Netočan JavaScript kod, ne zaboravi koristiti <script></script> oznake za zatvaranje.]]></string>
+    <string name="mitm_custom">Prilagođeni Filter</string>
+    <string name="mitm_custom_desc">Zamijeni tekst na web stranicama sa svojim tekstom.</string>
+    <string name="custom_filter">Prilagođeni Filter</string>
+    <string name="error_filter">Normalan izraz nije valjan</string>
+    <string name="file_output">Sadržaj Datoteke</string>
+    <string name="question_save_to_pcap">Želite li spasiti osluškivani promet u pcap datoteku?</string>
+    <string name="dumping_traffic_to">Zapisujem promet u </string>
+
+    <string name="error_mitm_proxy">Nemoguće stvoriti proxy, molimo provjerite svoju vezu i dostupnost portova.</string>
+    <string name="error_mitm_https_redirector">Nemoguće stvoriti HTTPS preusmjerivač, molimo provjerite svoju vezu i dostupnost portova.</string>
+    <string name="error_mitm_resource_server">Nemoguće stvoriti poslužitelj za resurse, molimo provjerite svoju vezu i dostupnost portova.</string>
+
+    <string name="hijacker_load_from_file">Učitaj Iz Datoteke</string>
+    <string name="login_user_wordlist">Korisnički Riječnik</string>
+    <string name="login_pass_wordlist">Riječnik Za Šifre</string>
+
+    <string name="menu_new_session">Nova sesija</string>
+    <string name="menu_save_session">Zaštiti Sesiju</string>
+    <string name="menu_restore_session">Vrati Sesiju</string>
+    <string name="menu_stop_monitor">Zaustavi Pretragu Mreže</string>
+    <string name="menu_submit_issue">Pošalji Problem</string>
+    <string name="menu_about">Informacije</string>
+
+    <string name="scanner_select_ports">Odaberi Prilagođene Portove</string>
+
+    <string name="wifi_initializing">Pokretanje &#8230;</string>
+    <string name="wifi_activating_iface">Pokretanje WiFi sučelja &#8230;</string>
+    <string name="wifi_activated">WiFi uključen.</string>
+    <string name="wifi_scanning">Pretraživanje &#8230;</string>
+    <string name="wifi_attempting_to">Pokušaj spajanja na</string>
+    <string name="wifi_with_key">sa ključem</string>
+    <string name="wifi_connecting_to">Spajanje na</string>
+    <string name="wifi_error_keys">Nije moguće stvoriti ključeve.</string>
+    <string name="wifi_scan_finished">Pretraživanje završeno.</string>
+
+    <!-- preferences -->
+    <string name="pref_general">Osnovno</string>
+    <string name="pref_modules">Moduli</string>
+    <string name="pref_msf">Metasploit Framework</string>
+    <string name="pref_performance">Performanse</string>
+    <string name="pref_check_updates">Provjeri Ažuriranja</string>
+    <string name="pref_wake_lock">Ostani Budan</string>
+    <string name="pref_save_path">Putanja Za Spašavanje</string>
+    <string name="pref_debug_error_logging">Prijavljivanje Grešaka</string>
+    <string name="pref_enable_profiler">Profil Za Kod</string>
+    <string name="pref_sniffer_sample_time">Vrijeme Osluškivanja</string>
+    <string name="pref_http_proxy_port">HTTP Proxy Port</string>
+    <string name="pref_http_server_port">HTTP Server Port</string>
+    <string name="pref_https_redirect">SSL Stripping</string>
+    <string name="pref_https_redirector_port">HTTPS Port Za Preusmjeravanje</string>
+    <string name="pref_http_max_buffer_size">HTTP Maksimalna Veličina Međuspremnika</string>
+    <string name="pref_password_filename">Datoteka Osluškivača Za Prijave</string>
+    <string name="pref_check_updates_desc">Provjera ažuriranja pri pokretanju.</string>
+    <string name="pref_wake_lock_desc">Spriječava uređaj da spava dok je aplikacija pokrenuta.</string>
+    <string name="pref_save_path_desc">Globalna putanja za spašavanje u koju se spremaju svi zapisi.</string>
+    <string name="pref_debug_error_logging_desc">Uključi ili isključi zapisivanje grešaka u datoteku za ispravljanje grešaka.</string>
+    <string name="pref_enable_profiler_desc">Uključi ili isključi zapisivanje koda za mrežni profiler.</string>
+    <string name="pref_sniffer_sample_time_desc">Vrijeme uzorkovanja u sekundama za mrežnu statistiku modula za osluškivanje. </string>
+    <string name="pref_http_proxy_port_desc">MITM prozirni proxy port za osluškivanje, promijeni ako imaš problema sa pokretanjem proxyja.</string>
+    <string name="pref_http_server_port_desc">MITM HTTP server port za osluškivanje, promijeni ako imaš problema sa pokretanjem servera.</string>
+    <string name="pref_https_redirect_desc">Preusmjeri promet sa HTTPS u HTTP.</string>
+    <string name="pref_https_redirector_port_desc">MITM HTTPS server port za osluškivanje.</string>
+    <string name="pref_http_max_buffer_size_desc">Maksimalna veličina međuspremnika HTTP zahtjeva kojom će upravljati prozirni proxy.</string>
+    <string name="pref_password_filename_desc">Ime datoteke za zapisivanje lozinki i kolačića.</string>
+    <string name="pref_rpc_user">RPC korisničko ime</string>
+    <string name="pref_rpc_user_desc">Korisničko ime za spajanje na Metasploit RPCD.</string>
+    <string name="pref_rpc_pswd">RPC lozinka</string>
+    <string name="pref_rpc_pswd_desc">Lozinka za spajanje na Metasploit RPCD.</string>
+    <string name="pref_rpc_host">RPC izvor</string>
+    <string name="pref_rpc_host_desc">izvor na kojemu se Metasploit RPC server nalazi</string>
+    <string name="pref_rpc_port">RPC port</string>
+    <string name="pref_rpc_port_desc">Port za spajanje na Metasploit RPCD.</string>
+    <string name="pref_rpc_ssl">RPC koristi SSL</string>
+    <string name="pref_rpc_ssl_desc">Opcija da Metasploit RPC koristi SSL</string>
+    <string name="pref_performance_vuln_desc">Traži ranjivosti koristeći</string>
+    <string-array name="pref_performance_vuln" >
+        <item>OSVDB</item>
+        <item>CVE</item>
+        <item>OSVDB i CVE</item>
+    </string-array>
+    <string name="pref_performance_exploit_desc">Traži exploite</string>
+    <string-array name="pref_performance_exploit" >
+        <item>samo koje podržava MSF</item>
+        <item>samo sa exploitdb</item>
+        <item>sa MSF i exploitdb</item>
+    </string-array>
+    <string name="pref_performance_widescan">Opsežna potraga za izvorima</string>
+    <string name="pref_performance_widescan_desc">Potraga za izvorima izvan mrežne maske</string>
+    <string name="pref_advanced">Napredno</string>
+    <string name="pref_folder">Mapa</string>
+    <string name="pref_msf_enable">Omogući MSF</string>
+    <string name="pref_msf_enable_desc">Uključuje Metasploit Framework</string>
+    <string name="pref_msf_delete">Izbriši MSF</string>
+    <string name="pref_msf_delete_desc">Izbriši Metasploit Framework sa uređaja</string>
+    <string name="pref_msfwipe_message">Jeste li sigurni da hoćete izbrisata Metasploit Framework?</string>
+    <string name="pref_msfwipe_size">Oko %d MB će biti oslobođeno.</string>
+    <string name="pref_err_exists">ne postoji.</string>
+    <string name="pref_err_writable">ne dopušta zapisivanje.</string>
+    <string name="pref_err_sample_time">Vrijeme uzorkovanja mora biti između 0.4 i 1.0.</string>
+    <string name="pref_err_invalid_number">Nevaljan broj.</string>
+    <string name="pref_err_port_range">Port mora biti između 1024 i 65535.</string>
+    <string name="pref_err_busy_port">Drugi proces koristi ovaj port za osluškivanje, molimo koristite drugi port.</string>
+    <string name="pref_err_buffer_size">Veličina međuspremnika mora biti između 1024 i 104857600.</string>
+    <string name="pref_persistent_network_monitor">Ustrajno mrežno nadgledanje</string>
+    <string name="pref_persistent_network_monitor_desc">Mrežno nadgledanje će stalno pretraživati mrežne izvore</string>
+
+    <string name="exploit_finder">Traženje Exploita</string>
+    <string name="exploit_finder_desc">Traži exploite koji koriste pronađene ranjivosti.</string>
+    <string name="sessions">Sesije</string>
+    <string name="sessions_desc">Sesije na zaposjednutoj meti.</string>
+    <string name="exploit_launch">Pokreni</string>
+    <string name="exploit_edit_options">Uredi postavke</string>
+    <string name="payload_edit_settings">Uredi postavke nositelja</string>
+    <string name="exploit_choose_payload">Odaberi nostitelja</string>
+    <string name="exploit_choose_target">Odaberi metu</string>
+    <string name="open_url">Otvori URL</string>
+    <string name="show_full_description">Prikaži potpuni opis</string>
+    <string name="choose_an_option">Odaberi opciju</string>
+    <string name="required">Neophodno</string>
+    
+    <string name="menu_add">Dodaj</string>
+    <string name="menu_scan">Pretraži</string>
+    <string name="menu_wifi_scan">WiFi Pretraživanje</string>
+    <string name="menu_stop_msfrpcd">Zaustavi msfrpcd</string>
+    
+    <string name="pref_theme">Tamna tema</string>
+    <string name="pref_choose_theme">Omogući tamnu temu, koja je lakša za oči</string>
+    <string name="please_restart">Nova tema neće se primjeniti​sve dok ponovno ne pokrenete aplikaciju</string>
+    <string name="evasion">Izbjegavanje</string>
+    <string name="search_exact_version">Podudaranje točne verzije</string>
+    <string name="sessions_title">Otvori ljusku pritiskom na sesiju, ili pogledaj više opcija dužim pritiskom.</string>
+    <string name="open_shell">Otvori ljusku</string>
+    <string name="clear_event_log">Očisti dnevnik događaja</string>
+    <string name="run">Pokreni</string>
+    <string name="command">Naredba</string>
+    <string name="clear">Očisti</string>
+    <string name="msfrpc_disconnected">MSF RPC odspojen</string>
+    <string name="no_opened_sessions">nema otvorene sesije na ovoj meti</string>
+    <string name="delete">Izbriši</string>
+    <string name="checksum_failed">Datoteka je oštećena</string>
+    <string name="extraction_failed">Izvlačenje nije uspjelo</string>
+    <string name="extracting">Izvlačenje&#8230;</string>
+    <string name="click_here_to_upgrade">Kliknite ovdje za nadogradnju</string>
+    <string name="bad_permissions">Lokalna datoteka koju ste stavili na svoj prostor za pohranu ima loša dopuštenja, ne mogu ga čitati i/ili pisati!</string>
+    <string name="restore_default_path">vratiti zadanu putanju</string>
+    <string name="choose_a_custom_path">odaberi prilagođenu putanju</string>
+    <string name="error_symlink">odredišni uređaj ne podržava simboličke veze, molim odaberite pristojan datotečni sustav.</string>
+    <string name="target_selected">meta odabrana</string>
+    <string name="targets_selected">mete odabrane</string>
+    <string name="multiple_attack">višestruki napad</string>
+    <string name="connect_msf">spoji se na Metasploit</string>
+    <string name="disconnect_msf">odspoji se sa Metasploita</string>
+    <string name="connected_msf">spojen na Metasploit</string>
+    <string name="connection_failed">veza NIJE USPJELA!</string>
+</resources>

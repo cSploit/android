@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <ToggleButton
+        android:id="@+id/hijackToggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/app_color"
+        android:fontFamily="sans-serif-condensed"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:text="@string/toggle_button"
+        android:textAllCaps="true"
+        android:textColor="@android:color/white"
+        android:textOff="Start"
+        android:textOn="Stop" />
+
+    <ProgressBar
+        android:id="@+id/hijackActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/hijackToggleButton"
+        android:visibility="invisible" />
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/hijackToggleButton"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@android:color/darker_gray" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/separator"
+        android:layout_alignRight="@+id/separator"
+        android:layout_below="@+id/separator"
+        android:gravity="center_horizontal"
+        android:padding="8dp"
+        android:text="@string/start_hijack"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/gray_text" />
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignRight="@+id/textView"
+        android:layout_below="@+id/textView"
+        android:animateLayoutChanges="true"
+        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp" />
+
+</RelativeLayout>
