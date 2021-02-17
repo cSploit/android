@@ -163,9 +163,7 @@
     <string name="no_wifi_available">No WiFi connection available, the application will just check
         for updates. #STATUS#
     </string>
-    <string name="missing_core_update">Core is not installed, the application will just check
-        for updates. #STATUS#
-    </string>
+    <string name="missing_core">Installing core..."</string>
     <string name="heart_attack_update">Heart attack occurred, the application will just check
         for updates. #STATUS#
     </string>
