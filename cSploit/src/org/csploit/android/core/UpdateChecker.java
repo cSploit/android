@@ -73,11 +73,11 @@ public class UpdateChecker extends Thread
     boolean checkMsf = canCheckMsf && prefs.getBoolean("PREF_UPDATES_MSF", true) &&
             System.getLocalRubyVersion() != null;
 
-    if(checkApp && UpdateService.isUpdateAvailable())
-      send(UPDATE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteVersion());
-    else if(checkCore && UpdateService.isCoreUpdateAvailable())
-      send(CORE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteCoreVersion());
-    else if(checkRuby && UpdateService.isRubyUpdateAvailable())
+    //if(checkApp && UpdateService.isUpdateAvailable())
+    //  send(UPDATE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteVersion());
+    //if(checkCore && UpdateService.isCoreUpdateAvailable())
+      //send(CORE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteCoreVersion());
+    if(checkRuby && UpdateService.isRubyUpdateAvailable())
       send(RUBY_AVAILABLE);
     else if(checkMsf && UpdateService.isMsfUpdateAvailable()) {
       send(MSF_AVAILABLE);

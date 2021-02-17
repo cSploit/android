@@ -211,7 +211,8 @@ public class GitHubParser {
     for(int i=0; i<assets.length(); i++) {
       JSONObject item = assets.getJSONObject(i);
 
-      if(item.getString("name").contains(assetFilter)) {
+      if(item.getString("name").contains(assetFilter))
+      {
         return item.getString("browser_download_url");
       }
     }

@@ -6,11 +6,11 @@ import java.net.InetAddress;
  * an hop has been found
  */
 public class Hop {
-  public final int hop;
-  public final long usec;
+  public final short hop;
+  public final int usec;
   public final InetAddress node;
 
-  public Hop(int hop, long usec, InetAddress node) {
+  public Hop(short hop, int usec, InetAddress node, String guai) {
     this.hop = hop;
     this.usec = usec;
     this.node = node;

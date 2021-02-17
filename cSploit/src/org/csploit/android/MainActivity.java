@@ -59,6 +59,7 @@ import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
 import org.csploit.android.core.UpdateChecker;
 import org.csploit.android.core.UpdateService;
+import org.csploit.android.core.ToolsInstaller;
 import org.csploit.android.events.Event;
 import org.csploit.android.gui.dialogs.AboutDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
@@ -142,8 +143,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
 
     createUpdateStatusText();
 
-    mUpdateStatus
-            .setText(UPDATE_MESSAGE.replace("#STATUS#", "..."));
+    mUpdateStatus.setText(UPDATE_MESSAGE);
 
     mUpdateReceiver.register(MainActivity.this);
 
@@ -388,7 +388,10 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     }
 
     if (!coreInstalled) {
-      UPDATE_MESSAGE = getString(R.string.missing_core_update);
+      new ToolsInstaller(MainActivity.this.getApplicationContext()).install();
+      System.reloadTools();
+      onCoreUpdated();
+      UPDATE_MESSAGE = getString(R.string.no_wifi_available);
     } else if (!coreBeating) {
       UPDATE_MESSAGE = getString(R.string.heart_attack_update);
     } else if (!isWifiAvailable) {
@@ -397,6 +400,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
 
     if (connectivityAvailable)
       startUpdateChecker();
+
 
     if (coreBeating && isWifiAvailable)
       startNetworkRadar(true);
@@ -1299,8 +1303,9 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
                   "#STATUS#", getString(R.string.no_updates_available)));
 
         if (!System.isCoreInitialized()) {
-          new FatalDialog(getString(R.string.initialization_error),
+          /*new FatalDialog(getString(R.string.initialization_error),
                   getString(R.string.no_core_found), MainActivity.this).show();
+           */
         }
 
       } else if (intent.getAction().equals(RUBY_AVAILABLE)) {

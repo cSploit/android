@@ -1,7 +1,0 @@
-Add prebuilt jni libraries here:
-
-./armeabi-v7a/libcSploitClient.so
-./armeabi-v7a/libcSploitCommon.so
-./armeabi/libcSploitClient.so
-./armeabi/libcSploitCommon.so
-etc.
