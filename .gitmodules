@@ -1,3 +1,0 @@
-[submodule "cSploit/jni"]
-	path = cSploit/jni
-	url = https://github.com/cSploit/android.native.git
