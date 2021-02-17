@@ -1,26 +1,33 @@
 buildscript {
     repositories {
+<<<<<<< HEAD
         jcenter()
         google()
+=======
+        google()
+        jcenter()
+>>>>>>> develop
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.0-beta1'
+        classpath 'com.android.tools.build:gradle:4.1.1'
     }
-}
-
-def getDate() {
-    return Calendar.getInstance().getTimeInMillis();
 }
 
 allprojects {
     repositories {
+<<<<<<< HEAD
         jcenter()
         google()
+=======
+        google()
+        jcenter()
+>>>>>>> develop
     }
 }
 apply plugin:  'com.android.application'
 
 dependencies {
+<<<<<<< HEAD
     implementation 'com.android.support:support-v4:22.2.1'
     implementation 'com.android.support:appcompat-v7:22.2.1'
     implementation 'org.apache.commons:commons-compress:1.20'
@@ -30,16 +37,37 @@ dependencies {
     implementation 'joda-time:joda-time:2.10.10'
     implementation 'com.github.zafarkhaja:java-semver:0.9.0'
     implementation 'com.sksamuel.diff:diff:1.1.11'
+=======
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.appcompat:appcompat:1.0.0'
+    implementation 'androidx.preference:preference:1.0.0'
+    implementation 'androidx.multidex:multidex:2.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'org.apache.commons:commons-compress:1.18'
+    implementation 'commons-net:commons-net:3.6'
+    implementation 'com.github.zafarkhaja:java-semver:0.9.0'
+>>>>>>> develop
     implementation 'org.unbescape:unbescape:1.1.6.RELEASE'
     implementation 'org.msgpack:msgpack:0.6.12'
     implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
     implementation 'org.tukaani:xz:1.8'
+<<<<<<< HEAD
     implementation 'ch.acra:acra:4.6.2'
 }
 
 android {
     compileSdkVersion 22
     buildToolsVersion '29.0.3'
+=======
+    implementation 'ch.acra:acra-http:5.2.0'
+    implementation 'ch.acra:acra-notification:5.2.0'
+    testImplementation 'junit:junit:4.12'
+}
+
+android {
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
+>>>>>>> develop
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -52,9 +80,26 @@ android {
     }
 
     defaultConfig {
+<<<<<<< HEAD
         minSdkVersion 9
         versionCode 1
         versionName "1.5.4"
+=======
+        minSdkVersion 14
+        targetSdkVersion 28
+        versionCode 4
+        versionName "1.7.0-unstable"
+        if(System.getenv("NIGHTLY_BUILD")) {
+            versionName += "+" + System.getenv("NIGHTLY_BUILD_COMMIT").substring(0, 7)
+        }
+    }
+
+    lintOptions {
+        if (System.getenv("NIGHTLY_BUILD")) {
+            checkReleaseBuilds false
+        }
+        abortOnError false
+>>>>>>> develop
     }
 
     signingConfigs {
@@ -65,27 +110,32 @@ android {
                 keyAlias = System.getenv("KEYSTORE_ALIAS")
                 keyPassword = System.getenv("KEYSTORE_ALIAS_PWD")
             }
+            return true
         }
     }
 
     buildTypes {
         debug {
-            buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + getDate() + "L)"
-            buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\"";
+            buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + Calendar.getInstance().getTimeInMillis() + "L)"
+            buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\""
             minifyEnabled false
             shrinkResources false
             debuggable true
             jniDebuggable true
             zipAlignEnabled true
+            multiDexEnabled true
         }
         release {
-            buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + getDate() + "L)"
-            buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\"";
+            buildConfigField "java.util.Date", "BUILD_TIME", "new java.util.Date(" + Calendar.getInstance().getTimeInMillis() + "L)"
+            buildConfigField "String", "BUILD_NAME", "\"" + System.getenv("USER") + "\""
             if (System.getenv("KEYSTORE_FILE") != null) {
                 signingConfig signingConfigs.release
             }
+            multiDexEnabled true
+            return true
         }
     }
+<<<<<<< HEAD
 
     sourceSets {
         main {
@@ -99,4 +149,6 @@ android {
             jniLibs.srcDir 'src/main/jniLibs'
         }
     }
+=======
+>>>>>>> develop
 }
