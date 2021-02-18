@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/input"
+        android:layout_gravity="bottom|left"
+        android:hint="@string/command"
+        android:capitalize="none"
+        android:clickable="true"
+        android:editable="true"
+        android:enabled="true"
+        android:imeActionId="4"
+        android:longClickable="true"
+        android:imeActionLabel="@string/run"
+        android:typeface="monospace"
+        android:inputType="textMultiLine|textNoSuggestions"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignBottom="@android:id/button1"
+        android:layout_toLeftOf="@android:id/button1"/>
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/run"
+        android:id="@android:id/button1"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:enabled="true"
+        android:clickable="true"
+        android:fontFamily="sans-serif-condensed"/>
+
+    <!-- <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/output"
+        android:layout_below="@+id/input"
+        android:layout_alignParentBottom="true"
+        android:typeface="monospace"
+        android:scrollbars="horizontal|vertical"/> -->
+
+    <EditText
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:id="@+id/output"
+        android:layout_below="@+id/input"
+        android:layout_alignParentBottom="true"
+        android:typeface="monospace"
+        android:scrollbars="horizontal|vertical"
+        android:gravity="top|left"
+        android:scrollHorizontally="true"
+        android:inputType="textMultiLine|textNoSuggestions"/>
+</RelativeLayout>

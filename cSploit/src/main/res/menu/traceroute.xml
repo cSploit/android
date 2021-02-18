@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/resolve_names"
-        android:checkable="true"
-        android:checked="false"
-        android:enabled="true"
-        android:title="@string/menu_resolve_names"/>
-</menu>

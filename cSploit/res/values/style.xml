@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="actionBarStyle">@style/Theme.DSploitActionBarStyle</item>
+        <item name="android:windowBackground">@color/background_window</item>
+        <item name="colorPrimary">@color/app_color</item>
+        <!-- darker variant of colorPrimary (for status bar, contextual app bars) -->
+        <item name="colorPrimaryDark">@color/holo_blue</item>
+        <!-- theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">@color/selectable_blue</item>
+        <item name="actionModeBackground">@color/app_color_dark</item>
+        <item name="colorControlHighlight">@color/selectable_blue</item>
+    </style>
+
+    <!-- this dark theme needs a lot of help and support in the app overall -->
+
+    <style name="DarkTheme" parent="Theme.AppCompat.Light">
+        <item name="actionBarStyle">@style/Theme.DSploitActionBarDarkStyle</item>
+        <item name="actionModeBackground">@color/app_color_dark</item>
+        <item name="colorPrimary">@color/app_color_dark</item>
+        <!-- darker variant of colorPrimary (for status bar, contextual app bars) -->
+        <item name="colorPrimaryDark">@color/holo_blue_dark</item>
+        <!-- theme UI controls like checkboxes and text fields -->
+        <item name="colorAccent">@color/selectable_blue_dark</item>
+        <item name="colorControlHighlight">@color/selectable_blue_dark</item>
+        <item name="android:windowBackground">@color/background_window_dark</item>
+    </style>
+
+
+    <style name="Theme.DSploitActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="android:windowBackground">@color/background_window</item>
+    </style>
+
+    <style name="Theme.DSploitActionBarDarkStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="android:windowBackground">@color/background_window_dark</item>
+    </style>
+
+    <style name="Theme.Dialog" parent="@android:style/Theme.Dialog" />
+
+</resources>
