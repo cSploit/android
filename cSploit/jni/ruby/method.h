@@ -26,8 +26,8 @@ typedef enum {
 } rb_method_flag_t;
 
 #define NOEX_SAFE(n) ((int)((n) >> 8) & 0x0F)
-#define NOEX_WITH(n, s) ((s << 8) | (n) | (ruby_running ? 0 : NOEX_BASIC))
-#define NOEX_WITH_SAFE(n) NOEX_WITH(n, rb_safe_level())
+#define NOEX_WITH(n, s) (((s) << 8) | (n) | (ruby_running ? 0 : NOEX_BASIC))
+#define NOEX_WITH_SAFE(n) NOEX_WITH((n), rb_safe_level())
 
 /* method data type */
 
@@ -95,9 +95,11 @@ rb_method_entry_t *rb_method_entry_get_without_cache(VALUE klass, ID id);
 rb_method_entry_t *rb_method_entry_set(VALUE klass, ID mid, const rb_method_entry_t *, rb_method_flag_t noex);
 
 int rb_method_entry_arity(const rb_method_entry_t *me);
+int rb_method_entry_eq(const rb_method_entry_t *m1, const rb_method_entry_t *m2);
 
 void rb_mark_method_entry(const rb_method_entry_t *me);
 void rb_free_method_entry(rb_method_entry_t *me);
 void rb_sweep_method_entry(void *vm);
+void rb_free_m_table(st_table *tbl);
 
 #endif /* METHOD_H */

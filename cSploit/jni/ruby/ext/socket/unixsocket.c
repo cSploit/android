@@ -13,6 +13,7 @@
 #ifdef HAVE_SYS_UN_H
 struct unixsock_arg {
     struct sockaddr_un *sockaddr;
+    socklen_t sockaddrlen;
     int fd;
 };
 
@@ -21,13 +22,14 @@ unixsock_connect_internal(VALUE a)
 {
     struct unixsock_arg *arg = (struct unixsock_arg *)a;
     return (VALUE)rsock_connect(arg->fd, (struct sockaddr*)arg->sockaddr,
-			        (socklen_t)sizeof(*arg->sockaddr), 0);
+			        arg->sockaddrlen, 0);
 }
 
 VALUE
 rsock_init_unixsock(VALUE sock, VALUE path, int server)
 {
     struct sockaddr_un sockaddr;
+    socklen_t sockaddrlen;
     int fd, status;
     rb_io_t *fptr;
 
@@ -39,19 +41,21 @@ rsock_init_unixsock(VALUE sock, VALUE path, int server)
 
     MEMZERO(&sockaddr, struct sockaddr_un, 1);
     sockaddr.sun_family = AF_UNIX;
-    if (sizeof(sockaddr.sun_path) <= (size_t)RSTRING_LEN(path)) {
-        rb_raise(rb_eArgError, "too long unix socket path (max: %dbytes)",
-            (int)sizeof(sockaddr.sun_path)-1);
+    if (sizeof(sockaddr.sun_path) < (size_t)RSTRING_LEN(path)) {
+        rb_raise(rb_eArgError, "too long unix socket path (%ldbytes given but %dbytes max)",
+            RSTRING_LEN(path), (int)sizeof(sockaddr.sun_path));
     }
     memcpy(sockaddr.sun_path, RSTRING_PTR(path), RSTRING_LEN(path));
+    sockaddrlen = rsock_unix_sockaddr_len(path);
 
     if (server) {
-        status = bind(fd, (struct sockaddr*)&sockaddr, (socklen_t)sizeof(sockaddr));
+        status = bind(fd, (struct sockaddr*)&sockaddr, sockaddrlen);
     }
     else {
 	int prot;
 	struct unixsock_arg arg;
 	arg.sockaddr = &sockaddr;
+	arg.sockaddrlen = sockaddrlen;
 	arg.fd = fd;
         status = (int)rb_protect(unixsock_connect_internal, (VALUE)&arg, &prot);
 	if (prot) {
@@ -62,7 +66,7 @@ rsock_init_unixsock(VALUE sock, VALUE path, int server)
 
     if (status < 0) {
 	close(fd);
-	rb_sys_fail(sockaddr.sun_path);
+	rb_sys_fail_str(rb_inspect(path));
     }
 
     if (server) {
@@ -116,9 +120,11 @@ unix_path(VALUE sock)
     if (NIL_P(fptr->pathv)) {
 	struct sockaddr_un addr;
 	socklen_t len = (socklen_t)sizeof(addr);
+	socklen_t len0 = len;
 	if (getsockname(fptr->fd, (struct sockaddr*)&addr, &len) < 0)
 	    rb_sys_fail(0);
-	fptr->pathv = rb_obj_freeze(rb_str_new_cstr(rsock_unixpath(&addr, len)));
+        if (len0 < len) len = len0;
+	fptr->pathv = rb_obj_freeze(rsock_unixpath_str(&addr, len));
     }
     return rb_str_dup(fptr->pathv);
 }
@@ -248,9 +254,10 @@ unix_send_io(VALUE sock, VALUE val)
 #endif
 
     arg.fd = fptr->fd;
-    rb_thread_fd_writable(arg.fd);
-    if ((int)BLOCKING_REGION(sendmsg_blocking, &arg) == -1)
-	rb_sys_fail("sendmsg(2)");
+    while ((int)BLOCKING_REGION_FD(sendmsg_blocking, &arg) == -1) {
+	if (!rb_io_wait_writable(arg.fd))
+	    rb_sys_fail("sendmsg(2)");
+    }
 
     return Qnil;
 }
@@ -334,12 +341,13 @@ unix_recv_io(int argc, VALUE *argv, VALUE sock)
 #endif
 
     arg.fd = fptr->fd;
-    rb_thread_wait_fd(arg.fd);
-    if ((int)BLOCKING_REGION(recvmsg_blocking, &arg) == -1)
-	rb_sys_fail("recvmsg(2)");
+    while ((int)BLOCKING_REGION_FD(recvmsg_blocking, &arg) == -1) {
+	if (!rb_io_wait_readable(arg.fd))
+	    rb_sys_fail("recvmsg(2)");
+    }
 
 #if FD_PASSING_BY_MSG_CONTROL
-    if (arg.msg.msg_controllen < sizeof(struct cmsghdr)) {
+    if (arg.msg.msg_controllen < (socklen_t)sizeof(struct cmsghdr)) {
 	rb_raise(rb_eSocket,
 		 "file descriptor was not passed (msg_controllen=%d smaller than sizeof(struct cmsghdr)=%d)",
 		 (int)arg.msg.msg_controllen, (int)sizeof(struct cmsghdr));
@@ -354,18 +362,18 @@ unix_recv_io(int argc, VALUE *argv, VALUE sock)
 		 "file descriptor was not passed (cmsg_type=%d, %d expected)",
 		 cmsg.hdr.cmsg_type, SCM_RIGHTS);
     }
-    if (arg.msg.msg_controllen < CMSG_LEN(sizeof(int))) {
+    if (arg.msg.msg_controllen < (socklen_t)CMSG_LEN(sizeof(int))) {
 	rb_raise(rb_eSocket,
 		 "file descriptor was not passed (msg_controllen=%d smaller than CMSG_LEN(sizeof(int))=%d)",
 		 (int)arg.msg.msg_controllen, (int)CMSG_LEN(sizeof(int)));
     }
-    if (CMSG_SPACE(sizeof(int)) < arg.msg.msg_controllen) {
+    if ((socklen_t)CMSG_SPACE(sizeof(int)) < arg.msg.msg_controllen) {
 	rb_raise(rb_eSocket,
 		 "file descriptor was not passed (msg_controllen=%d bigger than CMSG_SPACE(sizeof(int))=%d)",
 		 (int)arg.msg.msg_controllen, (int)CMSG_SPACE(sizeof(int)));
     }
     if (cmsg.hdr.cmsg_len != CMSG_LEN(sizeof(int))) {
-	rsock_discard_cmsg_resource(&arg.msg);
+	rsock_discard_cmsg_resource(&arg.msg, 0);
 	rb_raise(rb_eSocket,
 		 "file descriptor was not passed (cmsg_len=%d, %d expected)",
 		 (int)cmsg.hdr.cmsg_len, (int)CMSG_LEN(sizeof(int)));
@@ -381,6 +389,7 @@ unix_recv_io(int argc, VALUE *argv, VALUE sock)
 #if FD_PASSING_BY_MSG_CONTROL
     memcpy(&fd, CMSG_DATA(&cmsg.hdr), sizeof(int));
 #endif
+    rb_update_max_fd(fd);
 
     if (klass == Qnil)
 	return INT2FIX(fd);
@@ -442,11 +451,13 @@ unix_peeraddr(VALUE sock)
     rb_io_t *fptr;
     struct sockaddr_un addr;
     socklen_t len = (socklen_t)sizeof addr;
+    socklen_t len0 = len;
 
     GetOpenFile(sock, fptr);
 
     if (getpeername(fptr->fd, (struct sockaddr*)&addr, &len) < 0)
 	rb_sys_fail("getpeername(2)");
+    if (len0 < len) len = len0;
     return rsock_unixaddr(&addr, len);
 }
 
@@ -489,15 +500,15 @@ unix_s_socketpair(int argc, VALUE *argv, VALUE klass)
 }
 #endif
 
-/*
- * Document-class: ::UNIXSocket < BasicSocket
- *
- * UNIXSocket represents a UNIX domain stream client socket.
- */
 void
 rsock_init_unixsocket(void)
 {
 #ifdef HAVE_SYS_UN_H
+    /*
+     * Document-class: UNIXSocket < BasicSocket
+     *
+     * UNIXSocket represents a UNIX domain stream client socket.
+     */
     rb_cUNIXSocket = rb_define_class("UNIXSocket", rb_cBasicSocket);
     rb_define_method(rb_cUNIXSocket, "initialize", unix_init, 1);
     rb_define_method(rb_cUNIXSocket, "path", unix_path, 0);

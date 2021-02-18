@@ -79,6 +79,15 @@ struct st_table {
     st_index_t num_bins;
     unsigned int entries_packed : 1;
 #ifdef __GNUC__
+    /*
+     * C spec says,
+     *   A bit-field shall have a type that is a qualified or unqualified
+     *   version of _Bool, signed int, unsigned int, or some other
+     *   implementation-defined type. It is implementation-defined whether
+     *   atomic types are permitted.
+     * In short, long and long long bit-field are implementation-defined
+     * feature. Therefore we want to supress a warning explicitly.
+     */
     __extension__
 #endif
     st_index_t num_entries : ST_INDEX_BITS - 1;
@@ -86,7 +95,7 @@ struct st_table {
     struct st_table_entry *head, *tail;
 };
 
-#define st_is_member(table,key) st_lookup(table,key,(st_data_t *)0)
+#define st_is_member(table,key) st_lookup((table),(key),(st_data_t *)0)
 
 enum st_retval {ST_CONTINUE, ST_STOP, ST_DELETE, ST_CHECK};
 
@@ -100,6 +109,7 @@ st_table *st_init_strcasetable(void);
 st_table *st_init_strcasetable_with_size(st_index_t);
 int st_delete(st_table *, st_data_t *, st_data_t *); /* returns 0:notfound 1:deleted */
 int st_delete_safe(st_table *, st_data_t *, st_data_t *, st_data_t);
+int st_shift(st_table *, st_data_t *, st_data_t *); /* returns 0:notfound 1:deleted */
 int st_insert(st_table *, st_data_t, st_data_t);
 int st_insert2(st_table *, st_data_t, st_data_t, st_data_t (*)(st_data_t));
 int st_lookup(st_table *, st_data_t, st_data_t *);

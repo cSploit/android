@@ -53,7 +53,7 @@ uint8_t nbns_nbstat_request[NBNS_NBSTATREQ_LEN] = {
  */
 char *nbns_get_status_name(struct nbnshdr *nbpkt) {
   
-  uint8_t *p, names, group, node;
+  uint8_t *p, names;
   struct nbns_name *node_name;
   struct nbns_node_name_tail *node_name_tail;
   
@@ -69,8 +69,8 @@ char *nbns_get_status_name(struct nbnshdr *nbpkt) {
   p+= 10;
   
   // skip encoded name
+  
   while((*p)) p++;
-  p++;
   
   p += sizeof(struct nbns_resource_tail);
   
@@ -82,16 +82,13 @@ char *nbns_get_status_name(struct nbnshdr *nbpkt) {
     node_name = (struct nbns_name *) p;
     node_name_tail = (struct nbns_node_name_tail *) (node_name + 1);
     
-    group = node_name_tail->flags & NBNS_NODE_NAME_TAIL_GROUP;
-    node  = node_name_tail->flags & NBNS_NODE_NAME_TAIL_NODE;
-    
-    if(!group && node == NBNS_NAME_NODE_B &&
-       ( node_name->purpose == NBNS_NAME_PURPOSE_WORKSTATION || node_name->purpose == NBNS_NAME_PURPOSE_FILE)) {      
+    if(!(node_name_tail->group) && node_name_tail->node == NBNS_NAME_NODE_B &&
+       ( node_name->purpose == NBNS_NAME_PURPOSE_WORKSTATION || node_name->purpose == NBNS_NAME_PURPOSE_FILE)) {
       
       // find last space from right
       for(names=(NBNS_NAME_SIZE-1); names && node_name->name[names] == ' '; names--);
       
-      return strndup((char *) node_name->name, names + 1);
+      return strndup((char *) node_name->name, names);
     }
     
     p = (uint8_t *) (node_name_tail+1);

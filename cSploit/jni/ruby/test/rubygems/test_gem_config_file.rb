@@ -1,7 +1,7 @@
-require_relative 'gemutilities'
+require 'rubygems/test_case'
 require 'rubygems/config_file'
 
-class TestGemConfigFile < RubyGemTestCase
+class TestGemConfigFile < Gem::TestCase
 
   def setup
     super
@@ -46,13 +46,14 @@ class TestGemConfigFile < RubyGemTestCase
       fp.puts ":benchmark: true"
       fp.puts ":bulk_threshold: 10"
       fp.puts ":verbose: false"
-      fp.puts ":rubygems_api_key: 701229f217cdf23b1344c7b4b54ca97"
       fp.puts ":sources:"
       fp.puts "  - http://more-gems.example.com"
       fp.puts "install: --wrappers"
       fp.puts ":gempath:"
       fp.puts "- /usr/ruby/1.8/lib/ruby/gems/1.8"
       fp.puts "- /var/ruby/1.8/gem_home"
+      fp.puts ":ssl_verify_mode: 0"
+      fp.puts ":ssl_ca_cert: /etc/ssl/certs"
     end
 
     util_config_file
@@ -62,11 +63,12 @@ class TestGemConfigFile < RubyGemTestCase
     assert_equal 10, @cfg.bulk_threshold
     assert_equal false, @cfg.verbose
     assert_equal false, @cfg.update_sources
-    assert_equal "701229f217cdf23b1344c7b4b54ca97", @cfg.rubygems_api_key
     assert_equal %w[http://more-gems.example.com], Gem.sources
     assert_equal '--wrappers', @cfg[:install]
     assert_equal(['/usr/ruby/1.8/lib/ruby/gems/1.8', '/var/ruby/1.8/gem_home'],
                  @cfg.path)
+    assert_equal 0, @cfg.ssl_verify_mode
+    assert_equal '/etc/ssl/certs', @cfg.ssl_ca_cert
   end
 
   def test_initialize_handle_arguments_config_file
@@ -277,6 +279,36 @@ class TestGemConfigFile < RubyGemTestCase
     util_config_file
 
     assert_equal "701229f217cdf23b1344c7b4b54ca97", @cfg.rubygems_api_key
+  end
+
+  def test_load_api_keys_from_config
+    temp_cred = File.join Gem.user_home, '.gem', 'credentials'
+    FileUtils.mkdir File.dirname(temp_cred)
+    File.open temp_cred, 'w' do |fp|
+      fp.puts ":rubygems_api_key: 701229f217cdf23b1344c7b4b54ca97"
+      fp.puts ":other: a5fdbb6ba150cbb83aad2bb2fede64c"
+    end
+
+    util_config_file
+
+    assert_equal({:rubygems => '701229f217cdf23b1344c7b4b54ca97',
+                  :other => 'a5fdbb6ba150cbb83aad2bb2fede64c'}, @cfg.api_keys)
+  end
+
+  def test_load_ssl_verify_mode_from_config
+    File.open @temp_conf, 'w' do |fp|
+      fp.puts ":ssl_verify_mode: 1"
+    end
+    util_config_file
+    assert_equal(1, @cfg.ssl_verify_mode)
+  end
+
+  def test_load_ssl_ca_cert_from_config
+    File.open @temp_conf, 'w' do |fp|
+      fp.puts ":ssl_ca_cert: /home/me/certs"
+    end
+    util_config_file
+    assert_equal('/home/me/certs', @cfg.ssl_ca_cert)
   end
 
   def util_config_file(args = @cfg_args)

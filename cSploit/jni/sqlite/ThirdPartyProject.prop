@@ -1,0 +1,10 @@
+# Copyright 2010 Google Inc. All Rights Reserved.
+#Fri Jul 16 10:03:09 PDT 2010
+currentVersion=3.6.17
+version=3.5.9
+isNative=true
+feedurl=http\://www.sqlite.org/changes.html
+name=sqlite
+keywords=sqlite
+onDevice=true
+homepage=http\://www.sqlite.org/

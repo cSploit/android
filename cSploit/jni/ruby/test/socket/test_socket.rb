@@ -105,11 +105,15 @@ class TestSocket < Test::Unit::TestCase
     49152 + rand(65535-49152+1)
   end
 
+  def errors_addrinuse
+    [Errno::EADDRINUSE]
+  end
+
   def test_tcp_server_sockets
     port = random_port
     begin
       sockets = Socket.tcp_server_sockets(port)
-    rescue Errno::EADDRINUSE
+    rescue *errors_addrinuse
       return # not test failure
     end
     begin
@@ -271,8 +275,32 @@ class TestSocket < Test::Unit::TestCase
 
     Socket.udp_server_sockets(0) {|sockets|
       famlies = {}
-      sockets.each {|s| famlies[s.local_address.afamily] = true }
-      ip_addrs.reject! {|ai| !famlies[ai.afamily] }
+      sockets.each {|s| famlies[s.local_address.afamily] = s }
+      ip_addrs.reject! {|ai|
+        s = famlies[ai.afamily]
+        next true unless s
+        case RUBY_PLATFORM
+        when /linux/
+          if ai.ip_address.include?('%') and
+            (`uname -r`[/[0-9.]+/].split('.').map(&:to_i) <=> [2,6,18]) <= 0
+            # Cent OS 5.6 (2.6.18-238.19.1.el5xen) doesn't correctly work
+            # sendmsg with pktinfo for link-local ipv6 addresses
+            next true
+          end
+        when /freebsd/
+          if ifr_name = ai.ip_address[/%(.*)/, 1]
+            # FreeBSD 9.0 with default setting (ipv6_activate_all_interfaces
+            # is not YES) sets IFDISABLED to interfaces which don't have
+            # global IPv6 address.
+            # Link-local IPv6 addresses on those interfaces don't work.
+            ulSIOCGIFINFO_IN6 = -1068996244
+            bIFDISABLED = 4
+            in6_ifreq = ifr_name
+            s.ioctl(ulSIOCGIFINFO_IN6, in6_ifreq)
+            next true if in6_ifreq.unpack('A16L6').last[bIFDISABLED-1] == 1
+          end
+        end
+      }
       skipped = false
       begin
         port = sockets.first.local_address.ip_port
@@ -404,6 +432,97 @@ class TestSocket < Test::Unit::TestCase
     t = stamp.timestamp
     assert_match(pat, t.strftime("%Y-%m-%d"))
     assert_equal(stamp.data[-8,8].unpack("Q")[0], t.subsec * 2**64)
+  end
+
+  def test_closed_read
+    require 'timeout'
+    require 'socket'
+    bug4390 = '[ruby-core:35203]'
+    server = TCPServer.new("localhost", 0)
+    serv_thread = Thread.new {server.accept}
+    begin sleep(0.1) end until serv_thread.stop?
+    sock = TCPSocket.new("localhost", server.addr[1])
+    client_thread = Thread.new do
+      sock.readline
+    end
+    begin sleep(0.1) end until client_thread.stop?
+    Timeout.timeout(1) do
+      sock.close
+      sock = nil
+      assert_raise(IOError, bug4390) {client_thread.join}
+    end
+  ensure
+    server.close
+  end
+
+  def test_connect_in_rescue
+    serv = Addrinfo.tcp(nil, 0).listen
+    addr = serv.connect_address
+    begin
+      raise "dummy error"
+    rescue
+      s = addr.connect
+      assert(!s.closed?)
+    end
+  ensure
+    serv.close if serv && !serv.closed?
+    s.close if s && !s.closed?
+  end
+
+  def test_bind_in_rescue
+    begin
+      raise "dummy error"
+    rescue
+      s = Addrinfo.tcp(nil, 0).bind
+      assert(!s.closed?)
+    end
+  ensure
+    s.close if s && !s.closed?
+  end
+
+  def test_listen_in_rescue
+    begin
+      raise "dummy error"
+    rescue
+      s = Addrinfo.tcp(nil, 0).listen
+      assert(!s.closed?)
+    end
+  ensure
+    s.close if s && !s.closed?
+  end
+
+  def test_udp_server_sockets_in_rescue
+    begin
+      raise "dummy error"
+    rescue
+      ss = Socket.udp_server_sockets(0)
+      ss.each {|s|
+        assert(!s.closed?)
+      }
+    end
+  ensure
+    if ss
+      ss.each {|s|
+        s.close if !s.closed?
+      }
+    end
+  end
+
+  def test_tcp_server_sockets_in_rescue
+    begin
+      raise "dummy error"
+    rescue
+      ss = Socket.tcp_server_sockets(0)
+      ss.each {|s|
+        assert(!s.closed?)
+      }
+    end
+  ensure
+    if ss
+      ss.each {|s|
+        s.close if !s.closed?
+      }
+    end
   end
 
 end if defined?(Socket)

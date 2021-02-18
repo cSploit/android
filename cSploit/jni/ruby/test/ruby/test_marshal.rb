@@ -431,7 +431,7 @@ class TestMarshal < Test::Unit::TestCase
       m = Marshal.dump(o)
     }
     o2 = Marshal.load(m)
-    assert_equal(STDIN, o.stdin)
+    assert_equal(STDIN, o2.stdin)
   end
 
   def test_marshal_string_encoding
@@ -454,5 +454,51 @@ class TestMarshal < Test::Unit::TestCase
     o2 = Marshal.load(m)
     assert_equal(o1, o2)
   end
-  
+
+  class PrivateClass
+    def initialize(foo)
+      @foo = foo
+    end
+    attr_reader :foo
+  end
+  private_constant :PrivateClass
+
+  def test_marshal_private_class
+    o1 = PrivateClass.new("test")
+    o2 = Marshal.load(Marshal.dump(o1))
+    assert_equal(o1.class, o2.class)
+    assert_equal(o1.foo, o2.foo)
+  end
+
+  def test_marshal_complex
+    assert_raise(ArgumentError){Marshal.load("\x04\bU:\fComplex[\x05")}
+    assert_raise(ArgumentError){Marshal.load("\x04\bU:\fComplex[\x06i\x00")}
+    assert_equal(Complex(1, 2), Marshal.load("\x04\bU:\fComplex[\ai\x06i\a"))
+    assert_raise(ArgumentError){Marshal.load("\x04\bU:\fComplex[\bi\x00i\x00i\x00")}
+  end
+
+  def test_marshal_rational
+    assert_raise(ArgumentError){Marshal.load("\x04\bU:\rRational[\x05")}
+    assert_raise(ArgumentError){Marshal.load("\x04\bU:\rRational[\x06i\x00")}
+    assert_equal(Rational(1, 2), Marshal.load("\x04\bU:\rRational[\ai\x06i\a"))
+    assert_raise(ArgumentError){Marshal.load("\x04\bU:\rRational[\bi\x00i\x00i\x00")}
+  end
+
+  class TestClass
+  end
+
+  module TestModule
+  end
+
+  def test_marshal_load_should_not_taint_classes
+    bug7325 = '[ruby-core:49198]'
+    for c in [TestClass, TestModule]
+      assert(!c.tainted?)
+      assert(!c.untrusted?)
+      c2 = Marshal.load(Marshal.dump(c).taint.untrust)
+      assert_same(c, c2)
+      assert(!c.tainted?, bug7325)
+      assert(!c.untrusted?, bug7325)
+    end
+  end
 end

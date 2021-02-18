@@ -14,6 +14,7 @@
 #include "ruby/ruby.h"
 #include "ruby/io.h"
 #include "ruby/util.h"
+#include "internal.h"
 #include "vm_core.h"
 
 #include <stdio.h>
@@ -28,6 +29,9 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
+#ifdef HAVE_PROCESS_H
+#include <process.h>
+#endif
 
 #include <time.h>
 #include <ctype.h>
@@ -38,8 +42,6 @@
 #ifndef EXIT_FAILURE
 #define EXIT_FAILURE 1
 #endif
-
-struct timeval rb_time_interval(VALUE);
 
 #ifdef HAVE_SYS_WAIT_H
 # include <sys/wait.h>
@@ -108,9 +110,11 @@ static VALUE rb_cProcessTms;
 
 #ifdef BROKEN_SETREUID
 #define setreuid ruby_setreuid
+int setreuid(rb_uid_t ruid, rb_uid_t euid);
 #endif
 #ifdef BROKEN_SETREGID
 #define setregid ruby_setregid
+int setregid(rb_gid_t rgid, rb_gid_t egid);
 #endif
 
 #if defined(HAVE_44BSD_SETUID) || defined(__MacOS_X__)
@@ -120,17 +124,6 @@ static VALUE rb_cProcessTms;
 #if !defined(USE_SETREGID) && !defined(BROKEN_SETREGID)
 #define OBSOLETE_SETREGID 1
 #endif
-#endif
-
-#if SIZEOF_RLIM_T == SIZEOF_INT
-# define RLIM2NUM(v) UINT2NUM(v)
-# define NUM2RLIM(v) NUM2UINT(v)
-#elif SIZEOF_RLIM_T == SIZEOF_LONG
-# define RLIM2NUM(v) ULONG2NUM(v)
-# define NUM2RLIM(v) NUM2ULONG(v)
-#elif SIZEOF_RLIM_T == SIZEOF_LONG_LONG
-# define RLIM2NUM(v) ULL2NUM(v)
-# define NUM2RLIM(v) NUM2ULL(v)
 #endif
 
 #define preserving_errno(stmts) \
@@ -310,6 +303,10 @@ pst_message(VALUE str, rb_pid_t pid, int status)
  *     stat.to_s   -> string
  *
  *  Show pid and exit status as a string.
+ *
+ *    system("false")
+ *    p $?.to_s         #=> "pid 12766 exit 1"
+ *
  */
 
 static VALUE
@@ -333,6 +330,10 @@ pst_to_s(VALUE st)
  *     stat.inspect   -> string
  *
  *  Override the inspection method.
+ *
+ *    system("false")
+ *    p $?.inspect #=> "#<Process::Status: pid 12861 exit 1>"
+ *
  */
 
 static VALUE
@@ -837,9 +838,9 @@ proc_wait2(int argc, VALUE *argv)
  *
  *  <em>produces</em>:
  *
- *     [[27434, #<Process::Status: pid=27434,exited(0)>],
- *      [27433, #<Process::Status: pid=27433,exited(1)>],
- *      [27432, #<Process::Status: pid=27432,exited(2)>]]
+ *     [[30982, #<Process::Status: pid 30982 exit 0>],
+ *      [30979, #<Process::Status: pid 30979 exit 1>],
+ *      [30976, #<Process::Status: pid 30976 exit 2>]]
  */
 
 static VALUE
@@ -978,16 +979,63 @@ proc_detach(VALUE obj, VALUE pid)
 char *strtok();
 #endif
 
-void rb_thread_stop_timer_thread(void);
-void rb_thread_start_timer_thread(void);
-void rb_thread_reset_timer_thread(void);
-
 static int forked_child = 0;
 
-#define before_exec() \
-    (rb_enable_interrupt(), (void)(forked_child ? 0 : (rb_thread_stop_timer_thread(), 1)))
-#define after_exec() \
-  (rb_thread_reset_timer_thread(), rb_thread_start_timer_thread(), forked_child = 0, rb_disable_interrupt())
+#ifdef SIGPIPE
+static RETSIGTYPE (*saved_sigpipe_handler)(int) = 0;
+#endif
+
+#if defined(POSIX_SIGNAL)
+# define signal(a,b) posix_signal((a),(b))
+#endif
+
+#ifdef SIGPIPE
+static RETSIGTYPE sig_do_nothing(int sig)
+{
+}
+#endif
+
+static void before_exec(void)
+{
+    /*
+     * signalmask is inherited across exec() and almost system commands don't
+     * work if signalmask is blocked.
+     */
+    rb_enable_interrupt();
+
+#ifdef SIGPIPE
+    /*
+     * Some OS commands don't initialize signal handler properly. Thus we have
+     * to reset signal handler before exec(). Otherwise, system() and similar
+     * child process interaction might fail. (e.g. ruby -e "system 'yes | ls'")
+     * [ruby-dev:12261]
+     */
+    saved_sigpipe_handler = signal(SIGPIPE, sig_do_nothing);
+#endif
+
+    if (!forked_child) {
+	/*
+	 * On Mac OS X 10.5.x (Leopard) or earlier, exec() may return ENOTSUPP
+	 * if the process have multiple threads. Therefore we have to kill
+	 * internal threads temporary. [ruby-core: 10583]
+	 */
+	rb_thread_stop_timer_thread(0);
+    }
+}
+
+static void after_exec(void)
+{
+    rb_thread_reset_timer_thread();
+    rb_thread_start_timer_thread();
+
+#ifdef SIGPIPE
+    signal(SIGPIPE, saved_sigpipe_handler);
+#endif
+
+    forked_child = 0;
+    rb_disable_interrupt();
+}
+
 #define before_fork() before_exec()
 #define after_fork() (GET_THREAD()->thrown_errinfo = 0, after_exec())
 
@@ -1003,10 +1051,32 @@ security(const char *str)
     }
 }
 
+#ifdef HAVE_FORK
+#define try_with_sh(prog, argv) ((saved_errno == ENOEXEC) ? exec_with_sh((prog), (argv)) : (void)0)
+static void
+exec_with_sh(const char *prog, char **argv)
+{
+    *argv = (char *)prog;
+    *--argv = (char *)"sh";
+    execv("/bin/sh", argv);
+}
+#define ARGV_COUNT(n) ((n)+1)
+#else
+#define try_with_sh(prog, argv) (void)0
+#define ARGV_COUNT(n) (n)
+#endif
+#define ARGV_SIZE(n) (sizeof(char*) * ARGV_COUNT(n))
+#define ALLOC_ARGV(n, v) ALLOCV_N(char*, (v), ARGV_COUNT(n))
+#define ALLOC_ARGV_WITH_STR(n, v, s, l) \
+    (char **)(((s) = ALLOCV_N(char, (v), ARGV_SIZE(n) + (l)) + ARGV_SIZE(n)) - ARGV_SIZE(n))
+
 static int
 proc_exec_v(char **argv, const char *prog)
 {
     char fbuf[MAXPATHLEN];
+#if defined(__EMX__) || defined(OS2)
+    char **new_argv = NULL;
+#endif
 
     if (!prog)
 	prog = argv[0];
@@ -1022,16 +1092,15 @@ proc_exec_v(char **argv, const char *prog)
 	char *extension;
 
 	if ((extension = strrchr(prog, '.')) != NULL && STRCASECMP(extension, ".bat") == 0) {
-	    char **new_argv;
 	    char *p;
 	    int n;
 
 	    for (n = 0; argv[n]; n++)
 		/* no-op */;
-	    new_argv = ALLOCA_N(char*, n + 2);
+	    new_argv = ALLOC_N(char*, n + 2);
 	    for (; n > 0; n--)
 		new_argv[n + 1] = argv[n];
-	    new_argv[1] = strcpy(ALLOCA_N(char, strlen(argv[0]) + 1), argv[0]);
+	    new_argv[1] = strcpy(ALLOC_N(char, strlen(argv[0]) + 1), argv[0]);
 	    for (p = new_argv[1]; *p != '\0'; p++)
 		if (*p == '/')
 		    *p = '\\';
@@ -1047,7 +1116,13 @@ proc_exec_v(char **argv, const char *prog)
 #endif /* __EMX__ */
     before_exec();
     execv(prog, argv);
-    preserving_errno(after_exec());
+    preserving_errno(try_with_sh(prog, argv); after_exec());
+#if defined(__EMX__) || defined(OS2)
+    if (new_argv) {
+	xfree(new_argv[0]);
+	xfree(new_argv);
+    }
+#endif
     return -1;
 }
 
@@ -1056,15 +1131,18 @@ rb_proc_exec_n(int argc, VALUE *argv, const char *prog)
 {
     char **args;
     int i;
+    int ret = -1;
+    VALUE v;
 
-    args = ALLOCA_N(char*, argc+1);
+    args = ALLOC_ARGV(argc+1, v);
     for (i=0; i<argc; i++) {
 	args[i] = RSTRING_PTR(argv[i]);
     }
     args[i] = 0;
     if (args[0]) {
-	return proc_exec_v(args, prog);
+	ret = proc_exec_v(args, prog);
     }
+    ALLOCV_END(v);
     return -1;
 }
 
@@ -1075,6 +1153,8 @@ rb_proc_exec(const char *str)
     const char *s = str;
     char *ss, *t;
     char **argv, **a;
+    VALUE v;
+    int ret = -1;
 #endif
 
     while (*str && ISSPACE(*str))
@@ -1084,6 +1164,7 @@ rb_proc_exec(const char *str)
     before_exec();
     rb_w32_spawn(P_OVERLAY, (char *)str, 0);
     after_exec();
+    return -1;
 #else
     for (s=str; *s; s++) {
 	if (ISSPACE(*s)) {
@@ -1115,8 +1196,7 @@ rb_proc_exec(const char *str)
 	    return -1;
 	}
     }
-    a = argv = ALLOCA_N(char*, (s-str)/2+2);
-    ss = ALLOCA_N(char, s-str+1);
+    a = argv = ALLOC_ARGV_WITH_STR((s-str)/2+2, v, ss, s-str+1);
     memcpy(ss, str, s-str);
     ss[s-str] = '\0';
     if ((*a++ = strtok(ss, " \t")) != 0) {
@@ -1126,20 +1206,47 @@ rb_proc_exec(const char *str)
 	*a = NULL;
     }
     if (argv[0]) {
-	return proc_exec_v(argv, 0);
+	ret = proc_exec_v(argv, 0);
     }
-    errno = ENOENT;
+    else {
+	errno = ENOENT;
+    }
+    ALLOCV_END(v);
+    return ret;
 #endif	/* _WIN32 */
-    return -1;
 }
+
+enum {
+    EXEC_OPTION_PGROUP,
+    EXEC_OPTION_RLIMIT,
+    EXEC_OPTION_UNSETENV_OTHERS,
+    EXEC_OPTION_ENV,
+    EXEC_OPTION_CHDIR,
+    EXEC_OPTION_UMASK,
+    EXEC_OPTION_DUP2,
+    EXEC_OPTION_CLOSE,
+    EXEC_OPTION_OPEN,
+    EXEC_OPTION_DUP2_CHILD,
+    EXEC_OPTION_CLOSE_OTHERS,
+    EXEC_OPTION_NEW_PGROUP
+};
 
 #if defined(_WIN32)
 #define HAVE_SPAWNV 1
 #endif
 
 #if !defined(HAVE_FORK) && defined(HAVE_SPAWNV)
+# define USE_SPAWNV 1
+#else
+# define USE_SPAWNV 0
+#endif
+#ifndef P_NOWAIT
+# define P_NOWAIT _P_NOWAIT
+#endif
+
+#if USE_SPAWNV
 #if defined(_WIN32)
-#define proc_spawn_v(argv, prog) rb_w32_aspawn(P_NOWAIT, prog, argv)
+#define proc_spawn_v(argv, prog) rb_w32_aspawn(P_NOWAIT, (prog), (argv))
 #else
 static rb_pid_t
 proc_spawn_v(char **argv, char *prog)
@@ -1155,31 +1262,49 @@ proc_spawn_v(char **argv, char *prog)
 	return -1;
 
     before_exec();
-    status = spawnv(P_WAIT, prog, argv);
+    status = spawnv(P_NOWAIT, prog, (const char **)argv);
+    if (status == -1 && errno == ENOEXEC) {
+	*argv = (char *)prog;
+	*--argv = (char *)"sh";
+	status = spawnv(P_NOWAIT, "/bin/sh", (const char **)argv);
+	after_exec();
+	if (status == -1) errno = ENOEXEC;
+    }
     rb_last_status_set(status == -1 ? 127 : status, 0);
-    after_exec();
     return status;
 }
 #endif
 
 static rb_pid_t
-proc_spawn_n(int argc, VALUE *argv, VALUE prog)
+proc_spawn_n(int argc, VALUE *argv, VALUE prog, VALUE options)
 {
     char **args;
     int i;
+    VALUE v;
+    rb_pid_t pid = -1;
 
-    args = ALLOCA_N(char*, argc + 1);
+    args = ALLOC_ARGV(argc + 1, v);
     for (i = 0; i < argc; i++) {
 	args[i] = RSTRING_PTR(argv[i]);
     }
     args[i] = (char*) 0;
-    if (args[0])
-	return proc_spawn_v(args, prog ? RSTRING_PTR(prog) : 0);
-    return -1;
+    if (args[0]) {
+#if defined(_WIN32)
+	DWORD flags = 0;
+	if (RTEST(rb_ary_entry(options, EXEC_OPTION_NEW_PGROUP))) {
+	    flags = CREATE_NEW_PROCESS_GROUP;
+	}
+	pid = rb_w32_aspawn_flags(P_NOWAIT, prog ? RSTRING_PTR(prog) : 0, args, flags);
+#else
+	pid = proc_spawn_v(args, prog ? RSTRING_PTR(prog) : 0);
+#endif
+    }
+    ALLOCV_END(v);
+    return pid;
 }
 
 #if defined(_WIN32)
-#define proc_spawn(str) rb_w32_spawn(P_NOWAIT, str, 0)
+#define proc_spawn(str) rb_w32_spawn(P_NOWAIT, (str), 0)
 #else
 static rb_pid_t
 proc_spawn(char *str)
@@ -1188,26 +1313,28 @@ proc_spawn(char *str)
     char *s, *t;
     char **argv, **a;
     rb_pid_t status;
+    VALUE v;
 
     for (s = str; *s; s++) {
 	if (*s != ' ' && !ISALPHA(*s) && strchr("*?{}[]<>()~&|\\$;'`\"\n",*s)) {
 	    char *shell = dln_find_exe_r("sh", 0, fbuf, sizeof(fbuf));
 	    before_exec();
-	    status = shell?spawnl(P_WAIT,shell,"sh","-c",str,(char*)NULL):system(str);
+	    status = spawnl(P_NOWAIT, (shell ? shell : "/bin/sh"), "sh", "-c", str, (char*)NULL);
 	    rb_last_status_set(status == -1 ? 127 : status, 0);
 	    after_exec();
 	    return status;
 	}
     }
-    a = argv = ALLOCA_N(char*, (s - str) / 2 + 2);
-    s = ALLOCA_N(char, s - str + 1);
+    a = argv = ALLOC_ARGV_WITH_STR((s - str) / 2 + 2, v, s, s - str + 1);
     strcpy(s, str);
     if (*a++ = strtok(s, " \t")) {
 	while (t = strtok(NULL, " \t"))
 	    *a++ = t;
 	*a = NULL;
     }
-    return argv[0] ? proc_spawn_v(argv, 0) : -1;
+    status = argv[0] ? proc_spawn_v(argv, 0) : -1;
+    ALLOCV_END(v);
+    return status;
 }
 #endif
 #endif
@@ -1219,22 +1346,8 @@ hide_obj(VALUE obj)
     return obj;
 }
 
-enum {
-    EXEC_OPTION_PGROUP,
-    EXEC_OPTION_RLIMIT,
-    EXEC_OPTION_UNSETENV_OTHERS,
-    EXEC_OPTION_ENV,
-    EXEC_OPTION_CHDIR,
-    EXEC_OPTION_UMASK,
-    EXEC_OPTION_DUP2,
-    EXEC_OPTION_CLOSE,
-    EXEC_OPTION_OPEN,
-    EXEC_OPTION_DUP2_CHILD,
-    EXEC_OPTION_CLOSE_OTHERS
-};
-
 static VALUE
-check_exec_redirect_fd(VALUE v)
+check_exec_redirect_fd(VALUE v, int iskey)
 {
     VALUE tmp;
     int fd;
@@ -1266,6 +1379,11 @@ check_exec_redirect_fd(VALUE v)
       wrong:
         rb_raise(rb_eArgError, "negative file descriptor");
     }
+#ifdef _WIN32
+    else if (fd >= 3 && iskey) {
+        rb_raise(rb_eArgError, "wrong file descriptor (%d)", fd);
+    }
+#endif
     return INT2FIX(fd);
 }
 
@@ -1303,7 +1421,7 @@ check_exec_redirect(VALUE key, VALUE val, VALUE options)
         break;
 
       case T_FILE:
-        val = check_exec_redirect_fd(val);
+        val = check_exec_redirect_fd(val, 0);
         /* fall through */
       case T_FIXNUM:
         index = EXEC_OPTION_DUP2;
@@ -1315,7 +1433,7 @@ check_exec_redirect(VALUE key, VALUE val, VALUE options)
         if (RARRAY_LEN(val) == 2 && SYMBOL_P(path) &&
             SYM2ID(path) == rb_intern("child")) {
             index = EXEC_OPTION_DUP2_CHILD;
-            param = check_exec_redirect_fd(rb_ary_entry(val, 1));
+            param = check_exec_redirect_fd(rb_ary_entry(val, 1), 0);
         }
         else {
             index = EXEC_OPTION_OPEN;
@@ -1339,7 +1457,7 @@ check_exec_redirect(VALUE key, VALUE val, VALUE options)
         path = val;
         FilePathValue(path);
         if (TYPE(key) == T_FILE)
-            key = check_exec_redirect_fd(key);
+            key = check_exec_redirect_fd(key, 1);
         if (FIXNUM_P(key) && (FIX2INT(key) == 1 || FIX2INT(key) == 2))
             flags = INT2NUM(O_WRONLY|O_CREAT|O_TRUNC);
         else
@@ -1359,21 +1477,21 @@ check_exec_redirect(VALUE key, VALUE val, VALUE options)
         rb_ary_store(options, index, ary);
     }
     if (TYPE(key) != T_ARRAY) {
-        VALUE fd = check_exec_redirect_fd(key);
+        VALUE fd = check_exec_redirect_fd(key, !NIL_P(param));
         rb_ary_push(ary, hide_obj(rb_assoc_new(fd, param)));
     }
     else {
         int i, n=0;
         for (i = 0 ; i < RARRAY_LEN(key); i++) {
             VALUE v = RARRAY_PTR(key)[i];
-            VALUE fd = check_exec_redirect_fd(v);
+            VALUE fd = check_exec_redirect_fd(v, !NIL_P(param));
             rb_ary_push(ary, hide_obj(rb_assoc_new(fd, param)));
             n++;
         }
     }
 }
 
-#ifdef RLIM2NUM
+#if defined(HAVE_SETRLIMIT) && defined(NUM2RLIM)
 static int rlimit_type_by_lname(const char *name);
 #endif
 
@@ -1382,7 +1500,7 @@ rb_exec_arg_addopt(struct rb_exec_arg *e, VALUE key, VALUE val)
 {
     VALUE options = e->options;
     ID id;
-#ifdef RLIM2NUM
+#if defined(HAVE_SETRLIMIT) && defined(NUM2RLIM)
     int rtype;
 #endif
 
@@ -1411,7 +1529,17 @@ rb_exec_arg_addopt(struct rb_exec_arg *e, VALUE key, VALUE val)
         }
         else
 #endif
-#ifdef RLIM2NUM
+#ifdef _WIN32
+        if (id == rb_intern("new_pgroup")) {
+            if (!NIL_P(rb_ary_entry(options, EXEC_OPTION_NEW_PGROUP))) {
+                rb_raise(rb_eArgError, "new_pgroup option specified twice");
+            }
+            val = RTEST(val) ? Qtrue : Qfalse;
+            rb_ary_store(options, EXEC_OPTION_NEW_PGROUP, val);
+        }
+        else
+#endif
+#if defined(HAVE_SETRLIMIT) && defined(NUM2RLIM)
         if (strncmp("rlimit_", rb_id2name(id), 7) == 0 &&
             (rtype = rlimit_type_by_lname(rb_id2name(id)+7)) != -1) {
             VALUE ary = rb_ary_entry(options, EXEC_OPTION_RLIMIT);
@@ -1456,7 +1584,7 @@ rb_exec_arg_addopt(struct rb_exec_arg *e, VALUE key, VALUE val)
                                   hide_obj(rb_str_dup(val)));
         }
         else if (id == rb_intern("umask")) {
-            mode_t cmask = NUM2LONG(val);
+	    mode_t cmask = NUM2MODET(val);
             if (!NIL_P(rb_ary_entry(options, EXEC_OPTION_UMASK))) {
                 rb_raise(rb_eArgError, "umask option specified twice");
             }
@@ -1515,8 +1643,8 @@ check_exec_fds(VALUE options)
 {
     VALUE h = rb_hash_new();
     VALUE ary;
-    int index, i;
-    int maxhint = -1;
+    int index, maxhint = -1;
+    long i;
 
     for (index = EXEC_OPTION_DUP2; index <= EXEC_OPTION_DUP2_CHILD; index++) {
         ary = rb_ary_entry(options, index);
@@ -1821,16 +1949,28 @@ redirect_dup(int oldfd)
     ttyprintf("dup(%d) => %d\n", oldfd, ret);
     return ret;
 }
+#else
+#define redirect_dup(oldfd) dup(oldfd)
+#endif
 
+#if defined(DEBUG_REDIRECT) || defined(_WIN32)
 static int
 redirect_dup2(int oldfd, int newfd)
 {
     int ret;
     ret = dup2(oldfd, newfd);
+    if (newfd >= 0 && newfd <= 2)
+	SetStdHandle(newfd == 0 ? STD_INPUT_HANDLE : newfd == 1 ? STD_OUTPUT_HANDLE : STD_ERROR_HANDLE, (HANDLE)rb_w32_get_osfhandle(newfd));
+#if defined(DEBUG_REDIRECT)
     ttyprintf("dup2(%d, %d)\n", oldfd, newfd);
+#endif
     return ret;
 }
+#else
+#define redirect_dup2(oldfd, newfd) dup2((oldfd), (newfd))
+#endif
 
+#if defined(DEBUG_REDIRECT)
 static int
 redirect_close(int fd)
 {
@@ -1850,10 +1990,8 @@ redirect_open(const char *pathname, int flags, mode_t perm)
 }
 
 #else
-#define redirect_dup(oldfd) dup(oldfd)
-#define redirect_dup2(oldfd, newfd) dup2(oldfd, newfd)
 #define redirect_close(fd) close(fd)
-#define redirect_open(pathname, flags, perm) open(pathname, flags, perm)
+#define redirect_open(pathname, flags, perm) open((pathname), (flags), (perm))
 #endif
 
 static int
@@ -1868,6 +2006,7 @@ save_redirect_fd(int fd, VALUE save, char *errmsg, size_t errmsg_buflen)
             ERRMSG("dup");
             return -1;
         }
+        rb_update_max_fd(save_fd);
         newary = rb_ary_entry(save, EXEC_OPTION_DUP2);
         if (NIL_P(newary)) {
             newary = hide_obj(rb_ary_new());
@@ -1984,6 +2123,7 @@ run_exec_dup2(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
                 ERRMSG("dup2");
                 goto fail;
             }
+            rb_update_max_fd(pairs[j].newfd);
             pairs[j].oldfd = -1;
             j = pairs[j].older_index;
             if (j != -1)
@@ -2022,6 +2162,7 @@ run_exec_dup2(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
                 ERRMSG("dup");
                 goto fail;
             }
+            rb_update_max_fd(extra_fd);
         }
         else {
             ret = redirect_dup2(pairs[i].oldfd, extra_fd);
@@ -2029,6 +2170,7 @@ run_exec_dup2(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
                 ERRMSG("dup2");
                 goto fail;
             }
+            rb_update_max_fd(extra_fd);
         }
         pairs[i].oldfd = extra_fd;
         j = pairs[i].older_index;
@@ -2039,6 +2181,7 @@ run_exec_dup2(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
                 ERRMSG("dup2");
                 goto fail;
             }
+            rb_update_max_fd(ret);
             pairs[j].oldfd = -1;
             j = pairs[j].older_index;
         }
@@ -2062,7 +2205,8 @@ run_exec_dup2(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
 static int
 run_exec_close(VALUE ary, char *errmsg, size_t errmsg_buflen)
 {
-    int i, ret;
+    long i;
+    int ret;
 
     for (i = 0; i < RARRAY_LEN(ary); i++) {
         VALUE elt = RARRAY_PTR(ary)[i];
@@ -2079,7 +2223,8 @@ run_exec_close(VALUE ary, char *errmsg, size_t errmsg_buflen)
 static int
 run_exec_open(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
 {
-    int i, ret;
+    long i;
+    int ret;
 
     for (i = 0; i < RARRAY_LEN(ary);) {
         VALUE elt = RARRAY_PTR(ary)[i];
@@ -2094,6 +2239,7 @@ run_exec_open(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
             ERRMSG("open");
             return -1;
         }
+        rb_update_max_fd(fd2);
         while (i < RARRAY_LEN(ary) &&
                (elt = RARRAY_PTR(ary)[i], RARRAY_PTR(elt)[1] == param)) {
             fd = FIX2INT(RARRAY_PTR(elt)[0]);
@@ -2108,6 +2254,7 @@ run_exec_open(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
                     ERRMSG("dup2");
                     return -1;
                 }
+                rb_update_max_fd(fd);
             }
             i++;
         }
@@ -2125,7 +2272,9 @@ run_exec_open(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
 static int
 run_exec_dup2_child(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
 {
-    int i, ret;
+    long i;
+    int ret;
+
     for (i = 0; i < RARRAY_LEN(ary); i++) {
         VALUE elt = RARRAY_PTR(ary)[i];
         int newfd = FIX2INT(RARRAY_PTR(elt)[0]);
@@ -2138,6 +2287,7 @@ run_exec_dup2_child(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
             ERRMSG("dup2");
             return -1;
         }
+        rb_update_max_fd(newfd);
     }
     return 0;
 }
@@ -2168,11 +2318,11 @@ run_exec_pgroup(VALUE obj, VALUE save, char *errmsg, size_t errmsg_buflen)
 }
 #endif
 
-#ifdef RLIM2NUM
+#if defined(HAVE_SETRLIMIT) && defined(RLIM2NUM)
 static int
 run_exec_rlimit(VALUE ary, VALUE save, char *errmsg, size_t errmsg_buflen)
 {
-    int i;
+    long i;
     for (i = 0; i < RARRAY_LEN(ary); i++) {
         VALUE elt = RARRAY_PTR(ary)[i];
         int rtype = NUM2INT(RARRAY_PTR(elt)[0]);
@@ -2230,7 +2380,7 @@ rb_run_exec_options_err(const struct rb_exec_arg *e, struct rb_exec_arg *s, char
     }
 #endif
 
-#ifdef RLIM2NUM
+#if defined(HAVE_SETRLIMIT) && defined(RLIM2NUM)
     obj = rb_ary_entry(options, EXEC_OPTION_RLIMIT);
     if (!NIL_P(obj)) {
         if (run_exec_rlimit(obj, soptions, errmsg, errmsg_buflen) == -1)
@@ -2246,7 +2396,7 @@ rb_run_exec_options_err(const struct rb_exec_arg *e, struct rb_exec_arg *s, char
 
     obj = rb_ary_entry(options, EXEC_OPTION_ENV);
     if (!NIL_P(obj)) {
-        int i;
+        long i;
         save_env(soptions);
         for (i = 0; i < RARRAY_LEN(obj); i++) {
             VALUE pair = RARRAY_PTR(obj)[i];
@@ -2275,10 +2425,10 @@ rb_run_exec_options_err(const struct rb_exec_arg *e, struct rb_exec_arg *s, char
 
     obj = rb_ary_entry(options, EXEC_OPTION_UMASK);
     if (!NIL_P(obj)) {
-        mode_t mask = NUM2LONG(obj);
+        mode_t mask = NUM2MODET(obj);
         mode_t oldmask = umask(mask); /* never fail */
         if (!NIL_P(soptions))
-            rb_ary_store(soptions, EXEC_OPTION_UMASK, LONG2NUM(oldmask));
+            rb_ary_store(soptions, EXEC_OPTION_UMASK, MODET2NUM(oldmask));
     }
 
     obj = rb_ary_entry(options, EXEC_OPTION_DUP2);
@@ -2404,6 +2554,7 @@ move_fds_to_avoid_crash(int *fdp, int n, VALUE fds)
             ret = fcntl(fdp[i], F_DUPFD, min);
             if (ret == -1)
                 return -1;
+            rb_update_max_fd(ret);
             close(fdp[i]);
             fdp[i] = ret;
         }
@@ -2429,6 +2580,25 @@ pipe_nocrash(int filedes[2], VALUE fds)
     }
     return ret;
 }
+
+struct chfunc_protect_t {
+    int (*chfunc)(void*, char *, size_t);
+    void *arg;
+    char *errmsg;
+    size_t buflen;
+};
+
+static VALUE
+chfunc_protect(VALUE arg)
+{
+    struct chfunc_protect_t *p = (struct chfunc_protect_t *)arg;
+
+    return (VALUE)(*p->chfunc)(p->arg, p->errmsg, p->buflen);
+}
+
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
 
 /*
  * Forks child process, and returns the process ID in the parent
@@ -2461,6 +2631,7 @@ rb_fork_err(int *status, int (*chfunc)(void*, char *, size_t), void *charg, VALU
     int err, state = 0;
 #ifdef FD_CLOEXEC
     int ep[2];
+    VALUE io = Qnil;
 #endif
 
 #define prefork() (		\
@@ -2507,19 +2678,31 @@ rb_fork_err(int *status, int (*chfunc)(void*, char *, size_t), void *charg, VALU
     if (!pid) {
         forked_child = 1;
 	if (chfunc) {
+	    struct chfunc_protect_t arg;
+	    arg.chfunc = chfunc;
+	    arg.arg = charg;
+	    arg.errmsg = errmsg;
+	    arg.buflen = errmsg_buflen;
 #ifdef FD_CLOEXEC
 	    close(ep[0]);
 #endif
-	    if (!(*chfunc)(charg, errmsg, errmsg_buflen)) _exit(EXIT_SUCCESS);
+	    if (!(int)rb_protect(chfunc_protect, (VALUE)&arg, &state)) _exit(EXIT_SUCCESS);
 #ifdef FD_CLOEXEC
+	    if (write(ep[1], &state, sizeof(state)) == sizeof(state) && state) {
+		VALUE errinfo = rb_errinfo();
+		io = rb_io_fdopen(ep[1], O_WRONLY|O_BINARY, NULL);
+		rb_marshal_dump(errinfo, io);
+		rb_io_flush(io);
+	    }
 	    err = errno;
 	    if (write(ep[1], &err, sizeof(err)) < 0) err = errno;
             if (errmsg && 0 < errmsg_buflen) {
                 errmsg[errmsg_buflen-1] = '\0';
                 errmsg_buflen = strlen(errmsg);
 		if (errmsg_buflen > 0 &&write(ep[1], errmsg, errmsg_buflen) < 0)
-                  err = errno;
+		    err = errno;
             }
+	    if (!NIL_P(io)) rb_io_close(io);
 #endif
 #if EXIT_SUCCESS == 127
 	    _exit(EXIT_FAILURE);
@@ -2532,25 +2715,37 @@ rb_fork_err(int *status, int (*chfunc)(void*, char *, size_t), void *charg, VALU
 #ifdef FD_CLOEXEC
     if (pid && chfunc) {
 	ssize_t size;
+	VALUE exc = Qnil;
 	close(ep[1]);
-	if ((size = read(ep[0], &err, sizeof(err))) < 0) {
+	if ((read(ep[0], &state, sizeof(state))) == sizeof(state) && state) {
+	    io = rb_io_fdopen(ep[0], O_RDONLY|O_BINARY, NULL);
+	    exc = rb_marshal_load(io);
+	    rb_set_errinfo(exc);
+	}
+#define READ_FROM_CHILD(ptr, len) \
+	(NIL_P(io) ? read(ep[0], (ptr), (len)) : rb_io_bufread(io, (ptr), (len)))
+	if ((size = READ_FROM_CHILD(&err, sizeof(err))) < 0) {
 	    err = errno;
 	}
         if (size == sizeof(err) &&
             errmsg && 0 < errmsg_buflen) {
-            ssize_t ret;
-            ret = read(ep[0], errmsg, errmsg_buflen-1);
+	    ssize_t ret = READ_FROM_CHILD(errmsg, errmsg_buflen-1);
             if (0 <= ret) {
                 errmsg[ret] = '\0';
             }
         }
-	close(ep[0]);
-	if (size) {
+	if (NIL_P(io))
+	    close(ep[0]);
+	else
+	    rb_io_close(io);
+	if (state || size) {
 	    if (status) {
+		*status = state;
 		rb_protect(proc_syswait, (VALUE)pid, status);
 	    }
 	    else {
 		rb_syswait(pid);
+		if (state) rb_exc_raise(exc);
 	    }
 	    errno = err;
 	    return -1;
@@ -2784,8 +2979,6 @@ rb_f_exit(int argc, VALUE *argv)
 VALUE
 rb_f_abort(int argc, VALUE *argv)
 {
-    extern void ruby_error_print(void);
-
     rb_secure(4);
     if (argc == 0) {
 	if (!NIL_P(GET_THREAD()->errinfo)) {
@@ -2804,11 +2997,6 @@ rb_f_abort(int argc, VALUE *argv)
     }
     return Qnil;		/* not reached */
 }
-
-
-#if defined(POSIX_SIGNAL)
-# define signal(a,b) posix_signal(a,b)
-#endif
 
 void
 rb_syswait(rb_pid_t pid)
@@ -2868,16 +3056,16 @@ static rb_pid_t
 rb_spawn_process(struct rb_exec_arg *earg, VALUE prog, char *errmsg, size_t errmsg_buflen)
 {
     rb_pid_t pid;
-#if defined HAVE_FORK || !defined HAVE_SPAWNV
+#if !USE_SPAWNV
     int status;
 #endif
-#if !defined HAVE_FORK
+#if !defined HAVE_FORK || USE_SPAWNV
     struct rb_exec_arg sarg;
     int argc;
     VALUE *argv;
 #endif
 
-#if defined HAVE_FORK
+#if defined HAVE_FORK && !USE_SPAWNV
     pid = rb_fork_err(&status, rb_exec_atfork, earg, earg->redirect_fds, errmsg, errmsg_buflen);
 #else
     if (rb_run_exec_options_err(earg, &sarg, errmsg, errmsg_buflen) < 0) {
@@ -2892,7 +3080,7 @@ rb_spawn_process(struct rb_exec_arg *earg, VALUE prog, char *errmsg, size_t errm
 	pid = proc_spawn(RSTRING_PTR(prog));
     }
     else {
-	pid = proc_spawn_n(argc, argv, prog);
+	pid = proc_spawn_n(argc, argv, prog, earg->options);
     }
 #  if defined(_WIN32)
     if (pid == -1)
@@ -3027,6 +3215,9 @@ rb_f_system(int argc, VALUE *argv)
  *        :pgroup => true or 0 : make a new process group
  *        :pgroup => pgid      : join to specified process group
  *        :pgroup => nil       : don't change the process group (default)
+ *      create new process group: Windows only
+ *        :new_pgroup => true  : the new process is the root process of a new process group
+ *        :new_pgroup => false : don't create a new process group (default)
  *      resource limit: resourcename is core, cpu, data, etc.  See Process.setrlimit.
  *        :rlimit_resourcename => limit
  *        :rlimit_resourcename => [cur_limit, max_limit]
@@ -3066,6 +3257,7 @@ rb_f_system(int argc, VALUE *argv)
  *  If a hash is given as +options+,
  *  it specifies
  *  process group,
+ *  create new process group,
  *  resource limit,
  *  current directory,
  *  umask and
@@ -3086,6 +3278,17 @@ rb_f_system(int argc, VALUE *argv)
  *
  *    pid = spawn(command, :pgroup=>true) # process leader
  *    pid = spawn(command, :pgroup=>10) # belongs to the process group 10
+ *
+ *  The <code>:new_pgroup</code> key in +options+ specifies to pass
+ *  +CREATE_NEW_PROCESS_GROUP+ flag to <code>CreateProcessW()</code> that is
+ *  Windows API. This option is only for Windows.
+ *  true means the new process is the root process of the new process group.
+ *  The new process has CTRL+C disabled. This flag is necessary for
+ *  <code>Process.kill(:SIGINT, pid)</code> on the subprocess.
+ *  :new_pgroup is false by default.
+ *
+ *    pid = spawn(command, :new_pgroup=>true)  # new process group
+ *    pid = spawn(command, :new_pgroup=>false) # same process group
  *
  *  The <code>:rlimit_</code><em>foo</em> key specifies a resource limit.
  *  <em>foo</em> should be one of resource types such as <code>core</code>.
@@ -3449,6 +3652,7 @@ ruby_setsid(void)
     if (ret == -1) return -1;
 
     if ((fd = open("/dev/tty", O_RDWR)) >= 0) {
+        rb_update_max_fd(fd);
 	ioctl(fd, TIOCNOTTY, NULL);
 	close(fd);
     }
@@ -3528,83 +3732,114 @@ proc_setpriority(VALUE obj, VALUE which, VALUE who, VALUE prio)
 #define proc_setpriority rb_f_notimplement
 #endif
 
-#if defined(RLIM2NUM)
+#if defined(HAVE_SETRLIMIT) && defined(NUM2RLIM)
 static int
 rlimit_resource_name2int(const char *name, int casetype)
 {
-    size_t len = strlen(name);
-    if (16 < len) return -1;
-    if (casetype == 1) {
-        size_t i;
-        char *name2 = ALLOCA_N(char, len+1);
-        for (i = 0; i < len; i++) {
-            if (!ISLOWER(name[i]))
-                return -1;
-            name2[i] = TOUPPER(name[i]);
-        }
-        name2[len] = '\0';
-        name = name2;
-    }
+    int resource;
+    const char *p;
+#define RESCHECK(r) \
+    do { \
+        if (STRCASECMP(name, #r) == 0) { \
+            resource = RLIMIT_##r; \
+            goto found; \
+        } \
+    } while (0)
 
-    switch (*name) {
+    switch (TOUPPER(*name)) {
       case 'A':
 #ifdef RLIMIT_AS
-        if (strcmp(name, "AS") == 0) return RLIMIT_AS;
+        RESCHECK(AS);
 #endif
         break;
 
       case 'C':
 #ifdef RLIMIT_CORE
-        if (strcmp(name, "CORE") == 0) return RLIMIT_CORE;
+        RESCHECK(CORE);
 #endif
 #ifdef RLIMIT_CPU
-        if (strcmp(name, "CPU") == 0) return RLIMIT_CPU;
+        RESCHECK(CPU);
 #endif
         break;
 
       case 'D':
 #ifdef RLIMIT_DATA
-        if (strcmp(name, "DATA") == 0) return RLIMIT_DATA;
+        RESCHECK(DATA);
 #endif
         break;
 
       case 'F':
 #ifdef RLIMIT_FSIZE
-        if (strcmp(name, "FSIZE") == 0) return RLIMIT_FSIZE;
+        RESCHECK(FSIZE);
 #endif
         break;
 
       case 'M':
 #ifdef RLIMIT_MEMLOCK
-        if (strcmp(name, "MEMLOCK") == 0) return RLIMIT_MEMLOCK;
+        RESCHECK(MEMLOCK);
+#endif
+#ifdef RLIMIT_MSGQUEUE
+        RESCHECK(MSGQUEUE);
 #endif
         break;
 
       case 'N':
 #ifdef RLIMIT_NOFILE
-        if (strcmp(name, "NOFILE") == 0) return RLIMIT_NOFILE;
+        RESCHECK(NOFILE);
 #endif
 #ifdef RLIMIT_NPROC
-        if (strcmp(name, "NPROC") == 0) return RLIMIT_NPROC;
+        RESCHECK(NPROC);
+#endif
+#ifdef RLIMIT_NICE
+        RESCHECK(NICE);
 #endif
         break;
 
       case 'R':
 #ifdef RLIMIT_RSS
-        if (strcmp(name, "RSS") == 0) return RLIMIT_RSS;
+        RESCHECK(RSS);
+#endif
+#ifdef RLIMIT_RTPRIO
+        RESCHECK(RTPRIO);
+#endif
+#ifdef RLIMIT_RTTIME
+        RESCHECK(RTTIME);
 #endif
         break;
 
       case 'S':
 #ifdef RLIMIT_STACK
-        if (strcmp(name, "STACK") == 0) return RLIMIT_STACK;
+        RESCHECK(STACK);
 #endif
 #ifdef RLIMIT_SBSIZE
-        if (strcmp(name, "SBSIZE") == 0) return RLIMIT_SBSIZE;
+        RESCHECK(SBSIZE);
+#endif
+#ifdef RLIMIT_SIGPENDING
+        RESCHECK(SIGPENDING);
 #endif
         break;
     }
     return -1;
+
+  found:
+    switch (casetype) {
+      case 0:
+        for (p = name; *p; p++)
+            if (!ISUPPER(*p))
+                return -1;
+        break;
+
+      case 1:
+        for (p = name; *p; p++)
+            if (!ISLOWER(*p))
+                return -1;
+        break;
+
+      default:
+        rb_bug("unexpected casetype");
+    }
+    return resource;
+#undef RESCHECK
 }
 
 static int
@@ -3748,17 +3983,22 @@ proc_getrlimit(VALUE obj, VALUE resource)
  *  The available resources are OS dependent.
  *  Ruby may support following resources.
  *
+ *  [AS] total available memory (bytes) (SUSv3, NetBSD, FreeBSD, OpenBSD but 4.4BSD-Lite)
  *  [CORE] core size (bytes) (SUSv3)
  *  [CPU] CPU time (seconds) (SUSv3)
  *  [DATA] data segment (bytes) (SUSv3)
  *  [FSIZE] file size (bytes) (SUSv3)
- *  [NOFILE] file descriptors (number) (SUSv3)
- *  [STACK] stack size (bytes) (SUSv3)
- *  [AS] total available memory (bytes) (SUSv3, NetBSD, FreeBSD, OpenBSD but 4.4BSD-Lite)
  *  [MEMLOCK] total size for mlock(2) (bytes) (4.4BSD, GNU/Linux)
+ *  [MSGQUEUE] allocation for POSIX message queues (bytes) (GNU/Linux)
+ *  [NICE] ceiling on process's nice(2) value (number) (GNU/Linux)
+ *  [NOFILE] file descriptors (number) (SUSv3)
  *  [NPROC] number of processes for the user (number) (4.4BSD, GNU/Linux)
  *  [RSS] resident memory size (bytes) (4.2BSD, GNU/Linux)
+ *  [RTPRIO] ceiling on the process's real-time priority (number) (GNU/Linux)
+ *  [RTTIME] CPU time for real-time process (us) (GNU/Linux)
  *  [SBSIZE] all socket buffers (bytes) (NetBSD, FreeBSD)
+ *  [SIGPENDING] number of queued signals allowed (signals) (GNU/Linux)
+ *  [STACK] stack size (bytes) (SUSv3)
  *
  *  _cur_limit_ and _max_limit_ may be
  *  <code>:INFINITY</code>, <code>"INFINITY"</code> or
@@ -3769,7 +4009,7 @@ proc_getrlimit(VALUE obj, VALUE resource)
  *  corresponding symbols and strings too.
  *  See system setrlimit(2) manual for details.
  *
- *  The following example raise the soft limit of core size to
+ *  The following example raises the soft limit of core size to
  *  the hard limit to try to make core dump possible.
  *
  *    Process.setrlimit(:CORE, Process.getrlimit(:CORE)[1])
@@ -4021,11 +4261,11 @@ static rb_uid_t SAVED_USER_ID = -1;
 int
 setreuid(rb_uid_t ruid, rb_uid_t euid)
 {
-    if (ruid != -1 && ruid != getuid()) {
-	if (euid == -1) euid = geteuid();
+    if (ruid != (rb_uid_t)-1 && ruid != getuid()) {
+	if (euid == (rb_uid_t)-1) euid = geteuid();
 	if (setuid(ruid) < 0) return -1;
     }
-    if (euid != -1 && euid != geteuid()) {
+    if (euid != (rb_uid_t)-1 && euid != geteuid()) {
 	if (seteuid(euid) < 0) return -1;
     }
     return 0;
@@ -4116,10 +4356,12 @@ p_uid_change_privilege(VALUE obj, VALUE id)
 	SAVED_USER_ID = uid;
 #elif defined(HAVE_SETREUID) && !defined(OBSOLETE_SETREUID)
 	if (SAVED_USER_ID == uid) {
-	    if (setreuid((getuid() == uid)? -1: uid,
-			 (geteuid() == uid)? -1: uid) < 0) rb_sys_fail(0);
+	    if (setreuid((getuid() == uid)? (rb_uid_t)-1: uid,
+			 (geteuid() == uid)? (rb_uid_t)-1: uid) < 0)
+		rb_sys_fail(0);
 	} else if (getuid() != uid) {
-	    if (setreuid(uid, (geteuid() == uid)? -1: uid) < 0) rb_sys_fail(0);
+	    if (setreuid(uid, (geteuid() == uid)? (rb_uid_t)-1: uid) < 0)
+		rb_sys_fail(0);
 	    SAVED_USER_ID = uid;
 	} else if (/* getuid() == uid && */ geteuid() != uid) {
 	    if (setreuid(geteuid(), uid) < 0) rb_sys_fail(0);
@@ -4384,7 +4626,51 @@ proc_setgid(VALUE obj, VALUE id)
 #endif
 
 
-static int maxgroups = 32;
+#if defined(HAVE_SETGROUPS) || defined(HAVE_GETGROUPS)
+/*
+ * Maximum supplementary groups are platform dependent.
+ * FWIW, 65536 is enough big for our supported OSs.
+ *
+ * OS Name			max groups
+ * -----------------------------------------------
+ * Linux Kernel >= 2.6.3	65536
+ * Linux Kernel < 2.6.3		   32
+ * IBM AIX 5.2			   64
+ * IBM AIX 5.3 ... 6.1		  128
+ * IBM AIX 7.1			  128 (can be configured to be up to 2048)
+ * OpenBSD, NetBSD		   16
+ * FreeBSD < 8.0		   16
+ * FreeBSD >=8.0		 1023
+ * Darwin (Mac OS X)		   16
+ * Sun Solaris 7,8,9,10		   16
+ * Sun Solaris 11 / OpenSolaris	 1024
+ * HP-UX			   20
+ * Windows			 1015
+ */
+#define RB_MAX_GROUPS (65536)
+static int _maxgroups = -1;
+static int get_sc_ngroups_max(void)
+{
+#ifdef _SC_NGROUPS_MAX
+    return (int)sysconf(_SC_NGROUPS_MAX);
+#elif defined(NGROUPS_MAX)
+    return (int)NGROUPS_MAX;
+#else
+    return -1;
+#endif
+}
+static int maxgroups(void)
+{
+    if (_maxgroups < 0) {
+	_maxgroups = get_sc_ngroups_max();
+	if (_maxgroups < 0)
+	    _maxgroups = RB_MAX_GROUPS;
+    }
+
+    return _maxgroups;
+}
+#endif
+
 
 
 #ifdef HAVE_GETGROUPS
@@ -4406,9 +4692,13 @@ proc_getgroups(VALUE obj)
     int i, ngroups;
     rb_gid_t *groups;
 
-    groups = ALLOCA_N(rb_gid_t, maxgroups);
+    ngroups = getgroups(0, NULL);
+    if (ngroups == -1)
+	rb_sys_fail(0);
 
-    ngroups = getgroups(maxgroups, groups);
+    groups = ALLOCA_N(rb_gid_t, ngroups);
+
+    ngroups = getgroups(ngroups, groups);
     if (ngroups == -1)
 	rb_sys_fail(0);
 
@@ -4440,19 +4730,26 @@ proc_getgroups(VALUE obj)
 static VALUE
 proc_setgroups(VALUE obj, VALUE ary)
 {
-    size_t ngroups, i;
+    int ngroups, i;
     rb_gid_t *groups;
-    struct group *gr;
+#ifdef HAVE_GETGRNAM_R
+    long getgr_buf_len = sysconf(_SC_GETGR_R_SIZE_MAX);
+    char* getgr_buf;
+
+    if (getgr_buf_len < 0)
+	getgr_buf_len = 4096;
+    getgr_buf = ALLOCA_N(char, getgr_buf_len);
+#endif
 
     Check_Type(ary, T_ARRAY);
 
-    ngroups = RARRAY_LEN(ary);
-    if (ngroups > (size_t)maxgroups)
-	rb_raise(rb_eArgError, "too many groups, %u max", maxgroups);
+    ngroups = RARRAY_LENINT(ary);
+    if (ngroups > maxgroups())
+	rb_raise(rb_eArgError, "too many groups, %d max", maxgroups());
 
     groups = ALLOCA_N(rb_gid_t, ngroups);
 
-    for (i = 0; i < ngroups && i < (size_t)RARRAY_LEN(ary); i++) {
+    for (i = 0; i < ngroups; i++) {
 	VALUE g = RARRAY_PTR(ary)[i];
 
 	if (FIXNUM_P(g)) {
@@ -4460,21 +4757,33 @@ proc_setgroups(VALUE obj, VALUE ary)
 	}
 	else {
 	    VALUE tmp = rb_check_string_type(g);
+	    struct group grp;
+	    struct group *p;
+	    int ret;
 
 	    if (NIL_P(tmp)) {
 		groups[i] = NUM2GIDT(g);
 	    }
 	    else {
-		gr = getgrnam(RSTRING_PTR(tmp));
-		if (gr == NULL)
+		const char *grpname = StringValueCStr(tmp);
+
+#ifdef HAVE_GETGRNAM_R
+		ret = getgrnam_r(grpname, &grp, getgr_buf, getgr_buf_len, &p);
+		if (ret)
+		    rb_sys_fail("getgrnam_r");
+#else
+		p = getgrnam(grpname);
+#endif
+		if (p == NULL) {
 		    rb_raise(rb_eArgError,
 			     "can't find group for %s", RSTRING_PTR(tmp));
-		groups[i] = gr->gr_gid;
+		}
+		groups[i] = p->gr_gid;
 	    }
 	}
     }
 
-    if (setgroups((int)ngroups, groups) == -1) /* ngroups <= maxgroups */
+    if (setgroups(ngroups, groups) == -1) /* ngroups <= maxgroups */
 	rb_sys_fail(0);
 
     return proc_getgroups(obj);
@@ -4514,7 +4823,7 @@ proc_initgroups(VALUE obj, VALUE uname, VALUE base_grp)
 #define proc_initgroups rb_f_notimplement
 #endif
 
-
+#if defined(_SC_NGROUPS_MAX) || defined(NGROUPS_MAX)
 /*
  *  call-seq:
  *     Process.maxgroups   -> fixnum
@@ -4528,10 +4837,13 @@ proc_initgroups(VALUE obj, VALUE uname, VALUE base_grp)
 static VALUE
 proc_getmaxgroups(VALUE obj)
 {
-    return INT2FIX(maxgroups);
+    return INT2FIX(maxgroups());
 }
+#else
+#define proc_getmaxgroups rb_f_notimplement
+#endif
 
-
+#ifdef HAVE_SETGROUPS
 /*
  *  call-seq:
  *     Process.maxgroups= fixnum   -> fixnum
@@ -4543,21 +4855,28 @@ proc_getmaxgroups(VALUE obj)
 static VALUE
 proc_setmaxgroups(VALUE obj, VALUE val)
 {
-    int ngroups = FIX2UINT(val);
+    int ngroups = FIX2INT(val);
+    int ngroups_max = get_sc_ngroups_max();
 
-    if (ngroups > 4096)
-	ngroups = 4096;
+    if (ngroups <= 0)
+	rb_raise(rb_eArgError, "maxgroups %d shold be positive", ngroups);
 
-    maxgroups = ngroups;
+    if (ngroups > RB_MAX_GROUPS)
+	ngroups = RB_MAX_GROUPS;
 
-    return INT2FIX(maxgroups);
+    if (ngroups_max > 0 && ngroups > ngroups_max)
+	ngroups = ngroups_max;
+
+    _maxgroups = ngroups;
+
+    return INT2FIX(_maxgroups);
 }
+#else
+#define proc_setmaxgroups rb_f_notimplement
+#endif
 
 #if defined(HAVE_DAEMON) || (defined(HAVE_FORK) && defined(HAVE_SETSID))
-#ifndef HAVE_DAEMON
 static int rb_daemon(int nochdir, int noclose);
-#define daemon(nochdir, noclose) rb_daemon(nochdir, noclose)
-#endif
 
 /*
  *  call-seq:
@@ -4583,53 +4902,51 @@ proc_daemon(int argc, VALUE *argv)
     rb_scan_args(argc, argv, "02", &nochdir, &noclose);
 
     prefork();
-    before_fork();
-    n = daemon(RTEST(nochdir), RTEST(noclose));
-    after_fork();
+    n = rb_daemon(RTEST(nochdir), RTEST(noclose));
     if (n < 0) rb_sys_fail("daemon");
     return INT2FIX(n);
 }
 
-#ifndef HAVE_DAEMON
 static int
 rb_daemon(int nochdir, int noclose)
 {
-    int n, err = 0;
+    int err = 0;
+#ifdef HAVE_DAEMON
+    before_fork();
+    err = daemon(nochdir, noclose);
+    after_fork();
+    rb_thread_atfork();
+#else
+    int n;
 
-    switch (rb_fork(0, 0, 0, Qnil)) {
-      case -1:
-	rb_sys_fail("daemon");
-      case 0:
-	break;
-      default:
-	_exit(EXIT_SUCCESS);
+#define fork_daemon() \
+    switch (rb_fork(0, 0, 0, Qnil)) { \
+      case -1: return -1; \
+      case 0:  rb_thread_atfork(); break; \
+      default: _exit(EXIT_SUCCESS); \
     }
 
-    proc_setsid();
+    fork_daemon();
+
+    if (setsid() < 0) return -1;
 
     /* must not be process-leader */
-    switch (rb_fork(0, 0, 0, Qnil)) {
-      case -1:
-	return -1;
-      case 0:
-	break;
-      default:
-	_exit(EXIT_SUCCESS);
-    }
+    fork_daemon();
 
     if (!nochdir)
 	err = chdir("/");
 
     if (!noclose && (n = open("/dev/null", O_RDWR, 0)) != -1) {
+        rb_update_max_fd(n);
 	(void)dup2(n, 0);
 	(void)dup2(n, 1);
 	(void)dup2(n, 2);
 	if (n > 2)
 	    (void)close (n);
     }
+#endif
     return err;
 }
-#endif
 #else
 #define proc_daemon rb_f_notimplement
 #endif
@@ -4650,11 +4967,11 @@ static rb_gid_t SAVED_GROUP_ID = -1;
 int
 setregid(rb_gid_t rgid, rb_gid_t egid)
 {
-    if (rgid != -1 && rgid != getgid()) {
-	if (egid == -1) egid = getegid();
+    if (rgid != (rb_gid_t)-1 && rgid != getgid()) {
+	if (egid == (rb_gid_t)-1) egid = getegid();
 	if (setgid(rgid) < 0) return -1;
     }
-    if (egid != -1 && egid != getegid()) {
+    if (egid != (rb_gid_t)-1 && egid != getegid()) {
 	if (setegid(egid) < 0) return -1;
     }
     return 0;
@@ -4746,10 +5063,12 @@ p_gid_change_privilege(VALUE obj, VALUE id)
 	SAVED_GROUP_ID = gid;
 #elif defined(HAVE_SETREGID) && !defined(OBSOLETE_SETREGID)
 	if (SAVED_GROUP_ID == gid) {
-	    if (setregid((getgid() == gid)? -1: gid,
-			 (getegid() == gid)? -1: gid) < 0) rb_sys_fail(0);
+	    if (setregid((getgid() == gid)? (rb_uid_t)-1: gid,
+			 (getegid() == gid)? (rb_uid_t)-1: gid) < 0)
+		rb_sys_fail(0);
 	} else if (getgid() != gid) {
-	    if (setregid(gid, (getegid() == gid)? -1: gid) < 0) rb_sys_fail(0);
+	    if (setregid(gid, (getegid() == gid)? (rb_uid_t)-1: gid) < 0)
+		rb_sys_fail(0);
 	    SAVED_GROUP_ID = gid;
 	} else if (/* getgid() == gid && */ getegid() != gid) {
 	    if (setregid(getegid(), gid) < 0) rb_sys_fail(0);
@@ -5389,12 +5708,12 @@ p_gid_switch(VALUE obj)
  *  call-seq:
  *     Process.times   -> aStructTms
  *
- *  Returns a <code>Tms</code> structure (see <code>Struct::Tms</code>
- *  on page 388) that contains user and system CPU times for this
- *  process.
+ *  Returns a <code>Tms</code> structure (see <code>Struct::Tms</code>)
+ *  that contains user and system CPU times for this process,
+ *  and also for children processes.
  *
  *     t = Process.times
- *     [ t.utime, t.stime ]   #=> [0.0, 0.02]
+ *     [ t.utime, t.stime, t.cutime, t.cstime ]   #=> [0.0, 0.02, 0.00, 0.00]
  */
 
 VALUE
@@ -5455,13 +5774,17 @@ Init_process(void)
     rb_mProcess = rb_define_module("Process");
 
 #ifdef WNOHANG
+    /* see Process.wait */
     rb_define_const(rb_mProcess, "WNOHANG", INT2FIX(WNOHANG));
 #else
+    /* see Process.wait */
     rb_define_const(rb_mProcess, "WNOHANG", INT2FIX(0));
 #endif
 #ifdef WUNTRACED
+    /* see Process.wait */
     rb_define_const(rb_mProcess, "WUNTRACED", INT2FIX(WUNTRACED));
 #else
+    /* see Process.wait */
     rb_define_const(rb_mProcess, "WUNTRACED", INT2FIX(0));
 #endif
 
@@ -5515,62 +5838,150 @@ Init_process(void)
     rb_define_module_function(rb_mProcess, "setpriority", proc_setpriority, 3);
 
 #ifdef HAVE_GETPRIORITY
+    /* see Process.setpriority */
     rb_define_const(rb_mProcess, "PRIO_PROCESS", INT2FIX(PRIO_PROCESS));
+    /* see Process.setpriority */
     rb_define_const(rb_mProcess, "PRIO_PGRP", INT2FIX(PRIO_PGRP));
+    /* see Process.setpriority */
     rb_define_const(rb_mProcess, "PRIO_USER", INT2FIX(PRIO_USER));
 #endif
 
     rb_define_module_function(rb_mProcess, "getrlimit", proc_getrlimit, 1);
     rb_define_module_function(rb_mProcess, "setrlimit", proc_setrlimit, -1);
-#ifdef RLIM2NUM
+#if defined(RLIM2NUM) && defined(RLIM_INFINITY)
     {
         VALUE inf = RLIM2NUM(RLIM_INFINITY);
 #ifdef RLIM_SAVED_MAX
 	{
 	    VALUE v = RLIM_INFINITY == RLIM_SAVED_MAX ? inf : RLIM2NUM(RLIM_SAVED_MAX);
+	    /* see Process.setrlimit */
 	    rb_define_const(rb_mProcess, "RLIM_SAVED_MAX", v);
 	}
 #endif
+	/* see Process.setrlimit */
         rb_define_const(rb_mProcess, "RLIM_INFINITY", inf);
 #ifdef RLIM_SAVED_CUR
 	{
 	    VALUE v = RLIM_INFINITY == RLIM_SAVED_CUR ? inf : RLIM2NUM(RLIM_SAVED_CUR);
+	    /* see Process.setrlimit */
 	    rb_define_const(rb_mProcess, "RLIM_SAVED_CUR", v);
 	}
 #endif
     }
+#ifdef RLIMIT_AS
+    /* Maximum size of the process's virtual memory (address space) in bytes.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
+    rb_define_const(rb_mProcess, "RLIMIT_AS", INT2FIX(RLIMIT_AS));
+#endif
 #ifdef RLIMIT_CORE
+    /* Maximum size of the core file.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
     rb_define_const(rb_mProcess, "RLIMIT_CORE", INT2FIX(RLIMIT_CORE));
 #endif
 #ifdef RLIMIT_CPU
+    /* CPU time limit in seconds.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
     rb_define_const(rb_mProcess, "RLIMIT_CPU", INT2FIX(RLIMIT_CPU));
 #endif
 #ifdef RLIMIT_DATA
+    /* Maximum size of the process's data segment.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
     rb_define_const(rb_mProcess, "RLIMIT_DATA", INT2FIX(RLIMIT_DATA));
 #endif
 #ifdef RLIMIT_FSIZE
+    /* Maximum size of files that the process may create.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
     rb_define_const(rb_mProcess, "RLIMIT_FSIZE", INT2FIX(RLIMIT_FSIZE));
 #endif
-#ifdef RLIMIT_NOFILE
-    rb_define_const(rb_mProcess, "RLIMIT_NOFILE", INT2FIX(RLIMIT_NOFILE));
-#endif
-#ifdef RLIMIT_STACK
-    rb_define_const(rb_mProcess, "RLIMIT_STACK", INT2FIX(RLIMIT_STACK));
-#endif
-#ifdef RLIMIT_AS
-    rb_define_const(rb_mProcess, "RLIMIT_AS", INT2FIX(RLIMIT_AS));
-#endif
 #ifdef RLIMIT_MEMLOCK
+    /* Maximum number of bytes of memory that may be locked into RAM.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
     rb_define_const(rb_mProcess, "RLIMIT_MEMLOCK", INT2FIX(RLIMIT_MEMLOCK));
 #endif
+#ifdef RLIMIT_MSGQUEUE
+    /* Specifies the limit on the number of bytes that can be allocated
+     * for POSIX message queues for the real user ID of the calling process.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
+    rb_define_const(rb_mProcess, "RLIMIT_MSGQUEUE", INT2FIX(RLIMIT_MSGQUEUE));
+#endif
+#ifdef RLIMIT_NICE
+    /* Specifies a ceiling to which the process's nice value can be raised.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
+    rb_define_const(rb_mProcess, "RLIMIT_NICE", INT2FIX(RLIMIT_NICE));
+#endif
+#ifdef RLIMIT_NOFILE
+    /* Specifies a value one greater than the maximum file descriptor
+     * number that can be opened by this process.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
+    rb_define_const(rb_mProcess, "RLIMIT_NOFILE", INT2FIX(RLIMIT_NOFILE));
+#endif
 #ifdef RLIMIT_NPROC
+    /* The maximum number of processes that can be created for the
+     * real user ID of the calling process.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
     rb_define_const(rb_mProcess, "RLIMIT_NPROC", INT2FIX(RLIMIT_NPROC));
 #endif
 #ifdef RLIMIT_RSS
+    /* Specifies the limit (in pages) of the process's resident set.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
     rb_define_const(rb_mProcess, "RLIMIT_RSS", INT2FIX(RLIMIT_RSS));
 #endif
+#ifdef RLIMIT_RTPRIO
+    /* Specifies a ceiling on the real-time priority that may be set for this process.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
+    rb_define_const(rb_mProcess, "RLIMIT_RTPRIO", INT2FIX(RLIMIT_RTPRIO));
+#endif
+#ifdef RLIMIT_RTTIME
+    /* Specifies limit on CPU time this process scheduled under a real-time
+     * scheduling policy can consume.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
+    rb_define_const(rb_mProcess, "RLIMIT_RTTIME", INT2FIX(RLIMIT_RTTIME));
+#endif
 #ifdef RLIMIT_SBSIZE
+    /* Maximum size of the socket buffer.
+     */
     rb_define_const(rb_mProcess, "RLIMIT_SBSIZE", INT2FIX(RLIMIT_SBSIZE));
+#endif
+#ifdef RLIMIT_SIGPENDING
+    /* Specifies a limit on the number of signals that may be queued for
+     * the real user ID of the calling process.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
+    rb_define_const(rb_mProcess, "RLIMIT_SIGPENDING", INT2FIX(RLIMIT_SIGPENDING));
+#endif
+#ifdef RLIMIT_STACK
+    /* Maximum size of the stack, in bytes.
+     *
+     * see the system getrlimit(2) manual for details.
+     */
+    rb_define_const(rb_mProcess, "RLIMIT_STACK", INT2FIX(RLIMIT_STACK));
 #endif
 #endif
 

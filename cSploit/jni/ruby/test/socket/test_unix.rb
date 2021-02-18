@@ -5,7 +5,10 @@ end
 
 require "test/unit"
 require "tempfile"
+require "timeout"
 require "tmpdir"
+require "thread"
+require "io/nonblock"
 
 class TestSocket_UNIXSocket < Test::Unit::TestCase
   def test_fd_passing
@@ -100,6 +103,39 @@ class TestSocket_UNIXSocket < Test::Unit::TestCase
     }
   ensure
     io_ary.each {|io| io.close if !io.closed? }
+  end
+
+  def test_fd_passing_race_condition
+    r1, w = IO.pipe
+    s1, s2 = UNIXSocket.pair
+    s1.nonblock = s2.nonblock = true
+    lock = Mutex.new
+    nr = 0
+    x = 2
+    y = 1000
+    begin
+      s1.send_io(nil)
+    rescue NotImplementedError
+      assert_raise(NotImplementedError) { s2.recv_io }
+    rescue TypeError
+      thrs = x.times.map do
+        Thread.new do
+          y.times do
+            s2.recv_io.close
+            lock.synchronize { nr += 1 }
+          end
+          true
+        end
+      end
+      (x * y).times { s1.send_io r1 }
+      assert_equal([true]*x, thrs.map { |t| t.value })
+      assert_equal x * y, nr
+    ensure
+      s1.close
+      s2.close
+      w.close
+      r1.close
+    end
   end
 
   def test_sendmsg
@@ -289,8 +325,11 @@ class TestSocket_UNIXSocket < Test::Unit::TestCase
     assert_raise(ArgumentError) { UNIXServer.new("a" * 300) }
   end
 
-  def test_nul
-    assert_raise(ArgumentError) { Socket.sockaddr_un("a\0b") }
+  def test_abstract_namespace
+    return if /linux/ !~ RUBY_PLATFORM
+    addr = Socket.pack_sockaddr_un("\0foo")
+    assert_match(/\0foo\z/, addr)
+    assert_equal("\0foo", Socket.unpack_sockaddr_un(addr))
   end
 
   def test_dgram_pair
@@ -308,6 +347,28 @@ class TestSocket_UNIXSocket < Test::Unit::TestCase
   ensure
     s1.close if s1
     s2.close if s2
+  end
+
+  def test_dgram_pair_sendrecvmsg_errno_set
+    s1, s2 = to_close = UNIXSocket.pair(Socket::SOCK_DGRAM)
+    pipe = IO.pipe
+    to_close.concat(pipe)
+    set_errno = lambda do
+      begin
+        pipe[0].read_nonblock(1)
+        fail
+      rescue => e
+        assert(IO::WaitReadable === e)
+      end
+    end
+    Timeout.timeout(10) do
+      set_errno.call
+      assert_equal(2, s1.sendmsg("HI"))
+      set_errno.call
+      assert_equal("HI", s2.recvmsg[0])
+    end
+  ensure
+    to_close.each(&:close) if to_close
   end
 
   def test_epipe # [ruby-dev:34619]
@@ -470,6 +531,71 @@ class TestSocket_UNIXSocket < Test::Unit::TestCase
       rescue NotImplementedError
       end
     }
+  end
+
+  def test_abstract_unix_server
+    return if /linux/ !~ RUBY_PLATFORM
+    name = "\0ruby-test_unix"
+    s0 = nil
+    UNIXServer.open(name) {|s|
+      assert_equal(name, s.local_address.unix_path)
+      s0 = s
+      UNIXSocket.open(name) {|c|
+        sock = s.accept
+        begin
+          assert_equal(name, c.remote_address.unix_path)
+        ensure
+          sock.close
+        end
+      }
+    }
+    assert(s0.closed?)
+  end
+
+  def test_abstract_unix_socket_econnrefused
+    return if /linux/ !~ RUBY_PLATFORM
+    name = "\0ruby-test_unix"
+    assert_raise(Errno::ECONNREFUSED) do
+      UNIXSocket.open(name) {}
+    end
+  end
+
+  def test_abstract_unix_server_socket
+    return if /linux/ !~ RUBY_PLATFORM
+    name = "\0ruby-test_unix"
+    s0 = nil
+    Socket.unix_server_socket(name) {|s|
+      assert_equal(name, s.local_address.unix_path)
+      s0 = s
+      Socket.unix(name) {|c|
+        sock, = s.accept
+        begin
+          assert_equal(name, c.remote_address.unix_path)
+        ensure
+          sock.close
+        end
+      }
+    }
+    assert(s0.closed?)
+  end
+
+  def test_autobind
+    return if /linux/ !~ RUBY_PLATFORM
+    s0 = nil
+    Socket.unix_server_socket("") {|s|
+      name = s.local_address.unix_path
+      assert_match(/\A\0[0-9a-f]{5}\z/, name)
+      s0 = s
+      Socket.unix(name) {|c|
+        sock, = s.accept
+        begin
+          assert_equal(name, c.remote_address.unix_path)
+        ensure
+          sock.close
+        end
+      }
+    }
+    assert(s0.closed?)
   end
 
 end if defined?(UNIXSocket) && /cygwin/ !~ RUBY_PLATFORM

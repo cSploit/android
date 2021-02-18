@@ -10,6 +10,7 @@
 **********************************************************************/
 
 #include "ruby/ruby.h"
+#include "internal.h"
 
 VALUE rb_cStruct;
 static ID id_members;
@@ -151,7 +152,7 @@ static VALUE (*const ref_func[])(VALUE) = {
 static void
 rb_struct_modify(VALUE s)
 {
-    if (OBJ_FROZEN(s)) rb_error_frozen("Struct");
+    rb_check_frozen(s);
     if (!OBJ_UNTRUSTED(s) && rb_safe_level() >= 4)
        rb_raise(rb_eSecurityError, "Insecure: can't modify Struct");
 }
@@ -240,12 +241,10 @@ rb_struct_define_without_accessor(const char *class_name, VALUE super, rb_alloc_
     VALUE klass;
     va_list ar;
     VALUE members;
-    long i;
     char *name;
 
     members = rb_ary_new2(0);
     va_start(ar, alloc);
-    i = 0;
     while ((name = va_arg(ar, char*)) != NULL) {
         rb_ary_push(members, ID2SYM(rb_intern(name)));
     }

@@ -22,10 +22,9 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#include <csploit/list.h>
-#include <csploit/control.h>
-#include <csploit/logger.h>
-
+#include "list.h"
+#include "control.h"
+#include "logger.h"
 #include "reaper.h"
 
 struct graveyard graveyard;

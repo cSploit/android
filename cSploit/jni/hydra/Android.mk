@@ -1,9 +1,9 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_CFLAGS:= -O3 -DLIBOPENSSL -DLIBIDN -DHAVE_PR29_H -DHAVE_PCRE \
-               -DLIBNCP -DLIBPOSTGRES -DLIBSVN -DLIBSSH -DNO_RINDEX \
-               -DHAVE_MATH_H -DOPENSSL_NO_DEPRECATED -DNO_RSA_LEGACY \
+LOCAL_CFLAGS:= -O3 -DLIBOPENSSL -DLIBFIREBIRD -DLIBIDN -DHAVE_PR29_H -DHAVE_PCRE \
+               -DLIBMYSQLCLIENT -DLIBNCP -DLIBPOSTGRES -DLIBSVN -DLIBSSH -DNO_RINDEX \
+               -DHAVE_MATH_H -DHAVE_MYSQL_H -DOPENSSL_NO_DEPRECATED -DNO_RSA_LEGACY \
                -fdata-sections -ffunction-sections          
 
 LOCAL_LDFLAGS:=-Wl,--gc-sections
@@ -13,8 +13,10 @@ LOCAL_C_INCLUDES:= \
 	external/openssl/include\
 	external/libssh/include\
 	external/libidn/lib\
+	external/libmysqlclient/include\
 	external/subversion/subversion/include\
 	external/apr/include\
+	external/firebird/include\
 	external/libncp/include\
 	external/libpcre
 	
@@ -40,8 +42,6 @@ LOCAL_SRC_FILES:= \
 	hydra-irc.c\
 	hydra-ldap.c\
 	hydra-mod.c\
-	hydra-memcached.c\
-	hydra-mongodb.c\
 	hydra-mssql.c\
 	hydra-mysql.c\
 	hydra-ncp.c\
@@ -58,7 +58,6 @@ LOCAL_SRC_FILES:= \
 	hydra-rexec.c\
 	hydra-rlogin.c\
 	hydra-rsh.c\
-	hydra-rtsp.c\
 	hydra-s7-300.c\
 	hydra-sapr3.c\
 	hydra-sip.c\
@@ -79,7 +78,9 @@ LOCAL_SRC_FILES:= \
 	sasl.c
 
 LOCAL_STATIC_LIBRARIES := \
+	libfbclient \
 	libidn \
+	libmysqlclient \
 	libncp \
 	libpcre \
 	libpcrecpp \
@@ -90,15 +91,14 @@ LOCAL_STATIC_LIBRARIES := \
 	libapr-1 \
 	libaprutil-1 \
 	libiconv\
-	libneon\
-	libcrypto_static\
-	libmemcached
+	libneon
 						
 LOCAL_SHARED_LIBRARIES := \
+	libcrypto\
+	libssl\
 	libsqlite\
-	libexpat\
-	libssl
-
+	libexpat
+					
 LOCAL_MODULE:= hydra
 
 include $(BUILD_EXECUTABLE)

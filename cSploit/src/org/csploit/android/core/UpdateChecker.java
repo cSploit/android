@@ -75,8 +75,8 @@ public class UpdateChecker extends Thread
 
     if(checkApp && UpdateService.isUpdateAvailable())
       send(UPDATE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteVersion());
-    else if(checkCore && UpdateService.isCoreUpdateAvailable())
-      send(CORE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteCoreVersion());
+    //else if(checkCore && UpdateService.isCoreUpdateAvailable())
+    //  send(CORE_AVAILABLE, AVAILABLE_VERSION, UpdateService.getRemoteCoreVersion());
     else if(checkRuby && UpdateService.isRubyUpdateAvailable())
       send(RUBY_AVAILABLE);
     else if(checkMsf && UpdateService.isMsfUpdateAvailable()) {

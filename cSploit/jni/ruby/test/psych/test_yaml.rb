@@ -2,7 +2,8 @@
 #												vim:sw=4:ts=4
 # $Id$
 #
-require_relative 'helper'
+require 'psych/helper'
+require 'ostruct'
 
 # [ruby-core:01946]
 module Psych_Tests
@@ -12,6 +13,23 @@ end
 class Psych_Unit_Tests < Psych::TestCase
     def teardown
         Psych.domain_types.clear
+    end
+
+    def test_y_method
+      assert_raises(NoMethodError) do
+        OpenStruct.new.y 1
+      end
+    end
+
+    def test_syck_compat
+      time = Time.utc(2010, 10, 10)
+      yaml = Psych.dump time
+      assert_match "2010-10-10 00:00:00.000000000 Z", yaml
+    end
+
+    # [ruby-core:34969]
+    def test_regexp_with_n
+        assert_cycle(Regexp.new('',0,'n'))
     end
 	#
 	# Tests modified from 00basic.t in Psych.pm

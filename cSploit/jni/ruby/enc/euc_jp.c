@@ -71,7 +71,7 @@ static const signed char trans[][0x100] = {
     /* c */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     /* d */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     /* e */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* f */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, F 
+    /* f */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, F
   },
   { /* S1   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
     /* 0 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
@@ -89,7 +89,7 @@ static const signed char trans[][0x100] = {
     /* c */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
     /* d */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
     /* e */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A,
-    /* f */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, F 
+    /* f */ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, F
   },
   { /* S2   0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
     /* 0 */ F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F,
@@ -107,7 +107,7 @@ static const signed char trans[][0x100] = {
     /* c */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     /* d */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     /* e */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-    /* f */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, F 
+    /* f */ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, F
   },
 
 };
@@ -154,9 +154,10 @@ static int
 code_to_mbclen(OnigCodePoint code, OnigEncoding enc ARG_UNUSED)
 {
   if (ONIGENC_IS_CODE_ASCII(code)) return 1;
-  else if (code > 0xffffff) return 0;
-  else if ((code & 0xff0000) >= 0x800000) return 3;
-  else if ((code &   0xff00) >= 0x8000) return 2;
+  else if (code > 0xffffff)
+      return ONIGERR_TOO_BIG_WIDE_CHAR_VALUE;
+  else if (code & 0x800000) return 3;
+  else if (code & 0x8000) return 2;
   else
     return ONIGERR_INVALID_CODE_POINT_VALUE;
 }
@@ -192,8 +193,8 @@ code_to_mbc(OnigCodePoint code, UChar *buf, OnigEncoding enc)
 #if 1
   if (enclen(enc, buf, p) != (p - buf))
     return ONIGERR_INVALID_CODE_POINT_VALUE;
-#endif  
-  return p - buf;
+#endif
+  return (int)(p - buf);
 }
 
 static int
@@ -274,8 +275,8 @@ init_property_list(void)
 {
   int r;
 
-  PROPERTY_LIST_ADD_PROP("Hiragana", CR_Hiragana);
-  PROPERTY_LIST_ADD_PROP("Katakana", CR_Katakana);
+  PROPERTY_LIST_ADD_PROP("hiragana", CR_Hiragana);
+  PROPERTY_LIST_ADD_PROP("katakana", CR_Katakana);
   PropertyInited = 1;
 
  end:
@@ -286,14 +287,20 @@ static int
 property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
 {
   st_data_t ctype;
+  UChar *s, *e;
 
   PROPERTY_LIST_INIT_CHECK;
 
-  if (onig_st_lookup_strend(PropertyNameTable, p, end, &ctype) == 0) {
-    return onigenc_minimum_property_name_to_ctype(enc, p, end);
+  s = e = ALLOCA_N(UChar, end-p+1);
+  for (; p < end; p++) {
+    *e++ = ONIGENC_ASCII_CODE_TO_LOWER_CASE(*p);
   }
 
-  return ctype;
+  if (onig_st_lookup_strend(PropertyNameTable, s, e, &ctype) == 0) {
+    return onigenc_minimum_property_name_to_ctype(enc, s, e);
+  }
+
+  return (int)ctype;
 }
 
 static int
@@ -367,6 +374,7 @@ OnigEncodingDefine(euc_jp, EUC_JP) = {
  * MIBenum: 18
  * Link: http://www.iana.org/assignments/character-sets
  * Link: http://home.m05.itscom.net/numa/cde/sjis-euc/sjis-euc.html
+ * Link: http://home.m05.itscom.net/numa/uocjleE.pdf
  */
 ENC_ALIAS("eucJP", "EUC-JP") /* UI-OSF Application Platform Profile for Japanese Environment Version 1.1 */
 
@@ -381,6 +389,8 @@ ENC_ALIAS("euc-jp-ms", "eucJP-ms")
 
 /*
  * Name: CP51932
+ * MIBenum: 2108
+ * Link: http://www.iana.org/assignments/charset-reg/CP51932
  * Link: http://search.cpan.org/src/NARUSE/Encode-EUCJPMS-0.07/ucm/cp51932.ucm
  * Link: http://legacy-encoding.sourceforge.jp/wiki/index.php?cp51932
  * Link: http://msyk.at.webry.info/200511/article_2.html

@@ -18,17 +18,21 @@
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
-
-/* \summary: Apple IP-over-IEEE 1394 printer */
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-ap1394.c,v 1.3.2.1 2005/07/07 01:24:33 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include <tcpdump-stdinc.h>
 
-#include "netdissect.h"
-#include "extract.h"
+#include <stdio.h>
+#include <pcap.h>
+
+#include "interface.h"
 #include "addrtoname.h"
 #include "ethertype.h"
 
@@ -49,34 +53,25 @@ struct firewire_header {
  */
 #define FIREWIRE_HDRLEN		18
 
-static const char *
-fwaddr_string(netdissect_options *ndo, const u_char *addr)
-{
-	return (linkaddr_string(ndo, addr, LINKADDR_IEEE1394, FIREWIRE_EUI64_LEN));
-}
-
 static inline void
-ap1394_hdr_print(netdissect_options *ndo, register const u_char *bp, u_int length)
+ap1394_hdr_print(register const u_char *bp, u_int length)
 {
 	register const struct firewire_header *fp;
-	uint16_t firewire_type;
-
 	fp = (const struct firewire_header *)bp;
 
-	ND_PRINT((ndo, "%s > %s",
-		     fwaddr_string(ndo, fp->firewire_shost),
-		     fwaddr_string(ndo, fp->firewire_dhost)));
+	(void)printf("%s > %s",
+		     linkaddr_string(fp->firewire_dhost, FIREWIRE_EUI64_LEN),
+		     linkaddr_string(fp->firewire_shost, FIREWIRE_EUI64_LEN));
 
-	firewire_type = EXTRACT_16BITS(&fp->firewire_type);
-	if (!ndo->ndo_qflag) {
-		ND_PRINT((ndo, ", ethertype %s (0x%04x)",
-			       tok2str(ethertype_values,"Unknown", firewire_type),
-                               firewire_type));
+	if (!qflag) {
+		(void)printf(", ethertype %s (0x%04x)",
+			       tok2str(ethertype_values,"Unknown", ntohs(fp->firewire_type)),
+                               ntohs(fp->firewire_type));	      
         } else {
-                ND_PRINT((ndo, ", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", firewire_type)));
+                (void)printf(", %s", tok2str(ethertype_values,"Unknown Ethertype (0x%04x)", ntohs(fp->firewire_type)));  
         }
 
-	ND_PRINT((ndo, ", length %u: ", length));
+	(void)printf(", length %u: ", length);
 }
 
 /*
@@ -86,40 +81,39 @@ ap1394_hdr_print(netdissect_options *ndo, register const u_char *bp, u_int lengt
  * is the number of bytes actually captured.
  */
 u_int
-ap1394_if_print(netdissect_options *ndo, const struct pcap_pkthdr *h, const u_char *p)
+ap1394_if_print(const struct pcap_pkthdr *h, const u_char *p)
 {
 	u_int length = h->len;
 	u_int caplen = h->caplen;
-	const struct firewire_header *fp;
+	struct firewire_header *fp;
 	u_short ether_type;
-	struct lladdr_info src, dst;
+	u_short extracted_ether_type;
 
 	if (caplen < FIREWIRE_HDRLEN) {
-		ND_PRINT((ndo, "[|ap1394]"));
+		printf("[|ap1394]");
 		return FIREWIRE_HDRLEN;
 	}
 
-	if (ndo->ndo_eflag)
-		ap1394_hdr_print(ndo, p, length);
+	if (eflag)
+		ap1394_hdr_print(p, length);
 
 	length -= FIREWIRE_HDRLEN;
 	caplen -= FIREWIRE_HDRLEN;
-	fp = (const struct firewire_header *)p;
+	fp = (struct firewire_header *)p;
 	p += FIREWIRE_HDRLEN;
 
-	ether_type = EXTRACT_16BITS(&fp->firewire_type);
-	src.addr = fp->firewire_shost;
-	src.addr_string = fwaddr_string;
-	dst.addr = fp->firewire_dhost;
-	dst.addr_string = fwaddr_string;
-	if (ethertype_print(ndo, ether_type, p, length, caplen, &src, &dst) == 0) {
-		/* ether_type not known, print raw packet */
-		if (!ndo->ndo_eflag)
-			ap1394_hdr_print(ndo, (const u_char *)fp, length + FIREWIRE_HDRLEN);
+	ether_type = ntohs(fp->firewire_type);
 
-		if (!ndo->ndo_suppress_default_print)
-			ND_DEFAULTPRINT(p, caplen);
-	}
+	extracted_ether_type = 0;
+	if (ether_encap_print(ether_type, p, length, caplen,
+	    &extracted_ether_type) == 0) {
+		/* ether_type not known, print raw packet */
+		if (!eflag)
+			ap1394_hdr_print((u_char *)fp, length + FIREWIRE_HDRLEN);
+
+		if (!suppress_default_print)
+			default_print(p, caplen);
+	} 
 
 	return FIREWIRE_HDRLEN;
 }

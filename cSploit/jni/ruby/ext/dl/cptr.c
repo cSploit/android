@@ -7,21 +7,47 @@
 #include <ctype.h>
 #include "dl.h"
 
+#ifdef PRIsVALUE
+# define RB_OBJ_CLASSNAME(obj) rb_obj_class(obj)
+# define RB_OBJ_STRING(obj) (obj)
+#else
+# define PRIsVALUE "s"
+# define RB_OBJ_CLASSNAME(obj) rb_obj_classname(obj)
+# define RB_OBJ_STRING(obj) StringValueCStr(obj)
+#endif
+
 VALUE rb_cDLCPtr;
 
 static inline freefunc_t
-get_freefunc(VALUE func)
+get_freefunc(VALUE func, volatile VALUE *wrap)
 {
+    VALUE addrnum;
     if (NIL_P(func)) {
+	*wrap = 0;
 	return NULL;
     }
     if (rb_dlcfunc_kind_p(func)) {
+	*wrap = func;
 	return (freefunc_t)(VALUE)RCFUNC_DATA(func)->ptr;
     }
-    return (freefunc_t)(VALUE)NUM2PTR(rb_Integer(func));
+    addrnum = rb_Integer(func);
+    *wrap = (addrnum != func) ? func : 0;
+    return (freefunc_t)(VALUE)NUM2PTR(addrnum);
 }
 
 static ID id_to_ptr;
+
+static void
+dlptr_mark(void *ptr)
+{
+    struct ptr_data *data = ptr;
+    if (data->wrap[0]) {
+	rb_gc_mark(data->wrap[0]);
+    }
+    if (data->wrap[1]) {
+	rb_gc_mark(data->wrap[1]);
+    }
+}
 
 static void
 dlptr_free(void *ptr)
@@ -43,7 +69,7 @@ dlptr_memsize(const void *ptr)
 
 static const rb_data_type_t dlptr_data_type = {
     "dl/ptr",
-    {0, dlptr_free, dlptr_memsize,},
+    {dlptr_mark, dlptr_free, dlptr_memsize,},
 };
 
 void
@@ -135,27 +161,22 @@ rb_dlptr_s_allocate(VALUE klass)
 static VALUE
 rb_dlptr_initialize(int argc, VALUE argv[], VALUE self)
 {
-    VALUE ptr, sym, size;
+    VALUE ptr, sym, size, wrap = 0, funcwrap = 0;
     struct ptr_data *data;
     void *p = NULL;
     freefunc_t f = NULL;
     long s = 0;
 
-    switch (rb_scan_args(argc, argv, "12", &ptr, &size, &sym)) {
-      case 1:
-	p = (void*)(NUM2PTR(rb_Integer(ptr)));
-	break;
-      case 2:
-	p = (void*)(NUM2PTR(rb_Integer(ptr)));
+    if (rb_scan_args(argc, argv, "12", &ptr, &size, &sym) >= 1) {
+	VALUE addrnum = rb_Integer(ptr);
+	if (addrnum != ptr) wrap = ptr;
+	p = NUM2PTR(addrnum);
+    }
+    if (argc >= 2) {
 	s = NUM2LONG(size);
-	break;
-      case 3:
-	p = (void*)(NUM2PTR(rb_Integer(ptr)));
-	s = NUM2LONG(size);
-	f = get_freefunc(sym);
-	break;
-      default:
-	rb_bug("rb_dlptr_initialize");
+    }
+    if (argc >= 3) {
+	f = get_freefunc(sym, &funcwrap);
     }
 
     if (p) {
@@ -164,6 +185,8 @@ rb_dlptr_initialize(int argc, VALUE argv[], VALUE self)
 	    /* Free previous memory. Use of inappropriate initialize may cause SEGV. */
 	    (*(data->free))(data->ptr);
 	}
+	data->wrap[0] = wrap;
+	data->wrap[1] = funcwrap;
 	data->ptr  = p;
 	data->size = s;
 	data->free = f;
@@ -185,7 +208,7 @@ rb_dlptr_initialize(int argc, VALUE argv[], VALUE self)
 static VALUE
 rb_dlptr_s_malloc(int argc, VALUE argv[], VALUE klass)
 {
-    VALUE size, sym, obj;
+    VALUE size, sym, obj, wrap = 0;
     long s;
     freefunc_t f;
 
@@ -196,13 +219,14 @@ rb_dlptr_s_malloc(int argc, VALUE argv[], VALUE klass)
 	break;
       case 2:
 	s = NUM2LONG(size);
-	f = get_freefunc(sym);
+	f = get_freefunc(sym, &wrap);
 	break;
       default:
 	rb_bug("rb_dlptr_s_malloc");
     }
 
     obj = rb_dlptr_malloc(s,f);
+    if (wrap) RPTR_DATA(obj)->wrap[1] = wrap;
 
     return obj;
 }
@@ -289,7 +313,7 @@ rb_dlptr_free_set(VALUE self, VALUE val)
     struct ptr_data *data;
 
     TypedData_Get_Struct(self, struct ptr_data, &dlptr_data_type, data);
-    data->free = get_freefunc(val);
+    data->free = get_freefunc(val, &data->wrap[1]);
 
     return Qnil;
 }
@@ -385,12 +409,10 @@ static VALUE
 rb_dlptr_inspect(VALUE self)
 {
     struct ptr_data *data;
-    char str[1024];
 
     TypedData_Get_Struct(self, struct ptr_data, &dlptr_data_type, data);
-    snprintf(str, 1023, "#<%s:%p ptr=%p size=%ld free=%p>",
-	     rb_class2name(CLASS_OF(self)), data, data->ptr, data->size, data->free);
-    return rb_str_new2(str);
+    return rb_sprintf("#<%"PRIsVALUE":%p ptr=%p size=%ld free=%p>",
+		      RB_OBJ_CLASSNAME(self), data, data->ptr, data->size, data->free);
 }
 
 /*
@@ -487,16 +509,19 @@ rb_dlptr_aref(int argc, VALUE argv[], VALUE self)
     VALUE arg0, arg1;
     VALUE retval = Qnil;
     size_t offset, len;
+    struct ptr_data *data;
 
+    TypedData_Get_Struct(self, struct ptr_data, &dlptr_data_type, data);
+    if (!data->ptr) rb_raise(rb_eDLError, "NULL pointer dereference");
     switch( rb_scan_args(argc, argv, "11", &arg0, &arg1) ){
       case 1:
 	offset = NUM2ULONG(arg0);
-	retval = INT2NUM(*((char*)RPTR_DATA(self)->ptr + offset));
+	retval = INT2NUM(*((char *)data->ptr + offset));
 	break;
       case 2:
 	offset = NUM2ULONG(arg0);
 	len    = NUM2ULONG(arg1);
-	retval = rb_tainted_str_new((char *)RPTR_DATA(self)->ptr + offset, len);
+	retval = rb_tainted_str_new((char *)data->ptr + offset, len);
 	break;
       default:
 	rb_bug("rb_dlptr_aref()");
@@ -520,17 +545,20 @@ rb_dlptr_aset(int argc, VALUE argv[], VALUE self)
     VALUE retval = Qnil;
     size_t offset, len;
     void *mem;
+    struct ptr_data *data;
 
+    TypedData_Get_Struct(self, struct ptr_data, &dlptr_data_type, data);
+    if (!data->ptr) rb_raise(rb_eDLError, "NULL pointer dereference");
     switch( rb_scan_args(argc, argv, "21", &arg0, &arg1, &arg2) ){
       case 2:
 	offset = NUM2ULONG(arg0);
-	((char*)RPTR_DATA(self)->ptr)[offset] = NUM2UINT(arg1);
+	((char*)data->ptr)[offset] = NUM2UINT(arg1);
 	retval = arg1;
 	break;
       case 3:
 	offset = NUM2ULONG(arg0);
 	len    = NUM2ULONG(arg1);
-	if( TYPE(arg2) == T_STRING ){
+	if (RB_TYPE_P(arg2, T_STRING)) {
 	    mem = StringValuePtr(arg2);
 	}
 	else if( rb_obj_is_kind_of(arg2, rb_cDLCPtr) ){
@@ -539,7 +567,7 @@ rb_dlptr_aset(int argc, VALUE argv[], VALUE self)
 	else{
 	    mem    = NUM2PTR(arg2);
 	}
-	memcpy((char *)RPTR_DATA(self)->ptr + offset, mem, len);
+	memcpy((char *)data->ptr + offset, mem, len);
 	retval = arg2;
 	break;
       default:
@@ -582,7 +610,7 @@ rb_dlptr_size_get(VALUE self)
 static VALUE
 rb_dlptr_s_to_ptr(VALUE self, VALUE val)
 {
-    VALUE ptr;
+    VALUE ptr, wrap = val, vptr;
 
     if (RTEST(rb_obj_is_kind_of(val, rb_cIO))){
 	rb_io_t *fptr;
@@ -595,20 +623,22 @@ rb_dlptr_s_to_ptr(VALUE self, VALUE val)
 	char *str = StringValuePtr(val);
 	ptr = rb_dlptr_new(str, RSTRING_LEN(val), NULL);
     }
-    else if (rb_respond_to(val, id_to_ptr)){
-	VALUE vptr = rb_funcall(val, id_to_ptr, 0);
+    else if ((vptr = rb_check_funcall(val, id_to_ptr, 0, 0)) != Qundef){
 	if (rb_obj_is_kind_of(vptr, rb_cDLCPtr)){
 	    ptr = vptr;
+	    wrap = 0;
 	}
 	else{
 	    rb_raise(rb_eDLError, "to_ptr should return a CPtr object");
 	}
     }
     else{
-	ptr = rb_dlptr_new(NUM2PTR(rb_Integer(val)), 0, NULL);
+	VALUE num = rb_Integer(val);
+	if (num == val) wrap = 0;
+	ptr = rb_dlptr_new(NUM2PTR(num), 0, NULL);
     }
     OBJ_INFECT(ptr, val);
-    rb_iv_set(ptr, "wrapping", val);
+    if (wrap) RPTR_DATA(ptr)->wrap[0] = wrap;
     return ptr;
 }
 
@@ -617,6 +647,11 @@ Init_dlptr(void)
 {
     id_to_ptr = rb_intern("to_ptr");
 
+    /* Document-class: DL::CPtr
+     *
+     * CPtr is a class to handle C pointers
+     *
+     */
     rb_cDLCPtr = rb_define_class_under(rb_mDL, "CPtr", rb_cObject);
     rb_define_alloc_func(rb_cDLCPtr, rb_dlptr_s_allocate);
     rb_define_singleton_method(rb_cDLCPtr, "malloc", rb_dlptr_s_malloc, -1);
@@ -646,5 +681,9 @@ Init_dlptr(void)
     rb_define_method(rb_cDLCPtr, "size", rb_dlptr_size_get, 0);
     rb_define_method(rb_cDLCPtr, "size=", rb_dlptr_size_set, 1);
 
+    /*  Document-const: NULL
+     *
+     * A NULL pointer
+     */
     rb_define_const(rb_mDL, "NULL", rb_dlptr_new(0, 0, 0));
 }

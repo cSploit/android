@@ -1,0 +1,39 @@
+progs.patch:
+
+Fixup sources under the apps/ directory that are not built under the android environment.
+
+
+handshake_cutthrough.patch
+
+Enables SSL3+ clients to send application data immediately following the
+Finished message even when negotiating full-handshakes.  With this patch,
+clients can negotiate SSL connections in 1-RTT even when performing
+full-handshakes.
+
+jsse.patch
+
+Support for JSSE implementation based on OpenSSL.
+
+channelid.patch
+
+Implements TLS Channel ID support as both a client and a server.
+See http://tools.ietf.org/html/draft-balfanz-tls-channelid-00.
+
+eng_dyn_dirs.patch
+
+Fixes the case of having multiple DIR_ADD commands sent to eng_dyn
+
+fix_clang_build.patch
+
+Fixes the Clang based build.
+
+tls12_digests.patch
+
+Fixes a bug with handling TLS 1.2 and digest functions for DSA and ECDSA
+keys.
+
+alpn.patch
+
+This change adds support for ALPN in OpenSSL. ALPN is the IETF
+blessed version of NPN and we'll be supporting both ALPN and NPN for
+some time yet.

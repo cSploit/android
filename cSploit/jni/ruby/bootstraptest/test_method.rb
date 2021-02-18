@@ -402,6 +402,10 @@ m(1,2,*ary,&b)
 $result
 }
 
+# aset and splat
+assert_equal '4', %q{class Foo;def []=(a,b,c,d);end;end;Foo.new[1,*a=[2,3]]=4}
+assert_equal '4', %q{class Foo;def []=(a,b,c,d);end;end;def m(&blk)Foo.new[1,*a=[2,3],&blk]=4;end;m{}}
+
 # post test
 assert_equal %q{[1, 2, :o1, :o2, [], 3, 4, NilClass, nil, nil]}, %q{
 def m(m1, m2, o1=:o1, o2=:o2, *r, p1, p2, &b)
@@ -914,7 +918,7 @@ assert_equal %q{[:ok, :ok, :ok, :ok, :ok, :ok, :ng, :ng]}, %q{
 
   o1 = c1.new
   o2 = c2.new
-  
+
   test{o1.m}
   test{o2.mm}
   test{o1.send :m}
@@ -1074,7 +1078,7 @@ assert_equal '[1, 2, [3, 4]]', %q{
   def regular(a, b, *c)
     [a, b, c]
   end
-  regular(*[], 1, *[], *[2, 3], *[], 4) 
+  regular(*[], 1, *[], *[2, 3], *[], 4)
 }, '[ruby-core:19413]'
 
 assert_equal '[1, [:foo, 3, 4, :foo]]', %q{
@@ -1093,7 +1097,7 @@ assert_equal '["B", "A"]', %q{
   end
 
   class B < A
-    define_method(:m) do    
+    define_method(:m) do
       ['B', super()]
     end
   end
@@ -1175,3 +1179,8 @@ assert_equal 'ok', %q{
     'ok'
   end
 }
+assert_equal 'ok', %q{
+  [0][0, &proc{}] += 21
+  'ok'
+}, '[ruby-core:30534]'
+

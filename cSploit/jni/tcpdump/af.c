@@ -12,18 +12,23 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Original code by Hannes Gredler (hannes@gredler.at)
+ * Original code by Hannes Gredler (hannes@juniper.net)
  */
+
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/af.c,v 1.3.2.1 2007/02/26 13:33:17 hannes Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
-#include "netdissect.h"
+#include <tcpdump-stdinc.h>
+#include "interface.h"
 #include "af.h"
 
-const struct tok af_values[] = {
+struct tok af_values[] = {
     { 0,                      "Reserved"},
     { AFNUM_INET,             "IPv4"},
     { AFNUM_INET6,            "IPv6"},
@@ -45,7 +50,7 @@ const struct tok af_values[] = {
     { 0, NULL},
 };
 
-const struct tok bsd_af_values[] = {
+struct tok bsd_af_values[] = {
     { BSD_AFNUM_INET, "IPv4" },
     { BSD_AFNUM_NS, "NS" },
     { BSD_AFNUM_ISO, "ISO" },

@@ -1,3 +1,4 @@
+/* @(#) $Header: /tcpdump/master/tcpdump/ip.h,v 1.11.2.1 2007/09/14 01:30:02 guy Exp $ (LBL) */
 /*
  * Copyright (c) 1982, 1986, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -33,9 +34,6 @@
  *	@(#)ip.h	8.2 (Berkeley) 6/1/94
  */
 
-#ifndef netdissect_ip_h
-#define netdissect_ip_h
-
 /*
  * Definitions for internet protocol version 4.
  * Per RFC 791, September 1981.
@@ -50,20 +48,20 @@
  * against negative integers quite easily, and fail in subtle ways.
  */
 struct ip {
-	nd_uint8_t	ip_vhl;		/* header length, version */
+	u_int8_t	ip_vhl;		/* header length, version */
 #define IP_V(ip)	(((ip)->ip_vhl & 0xf0) >> 4)
 #define IP_HL(ip)	((ip)->ip_vhl & 0x0f)
-	nd_uint8_t	ip_tos;		/* type of service */
-	nd_uint16_t	ip_len;		/* total length */
-	nd_uint16_t	ip_id;		/* identification */
-	nd_uint16_t	ip_off;		/* fragment offset field */
+	u_int8_t	ip_tos;		/* type of service */
+	u_int16_t	ip_len;		/* total length */
+	u_int16_t	ip_id;		/* identification */
+	u_int16_t	ip_off;		/* fragment offset field */
 #define	IP_DF 0x4000			/* dont fragment flag */
 #define	IP_MF 0x2000			/* more fragments flag */
 #define	IP_OFFMASK 0x1fff		/* mask for fragmenting bits */
-	nd_uint8_t	ip_ttl;		/* time to live */
-	nd_uint8_t	ip_p;		/* protocol */
-	nd_uint16_t	ip_sum;		/* checksum */
-	nd_ipv4		ip_src,ip_dst;	/* source and dest address */
+	u_int8_t	ip_ttl;		/* time to live */
+	u_int8_t	ip_p;		/* protocol */
+	u_int16_t	ip_sum;		/* checksum */
+	struct	in_addr ip_src,ip_dst;	/* source and dest address */
 };
 
 #define	IP_MAXPACKET	65535		/* maximum packet size */
@@ -123,17 +121,17 @@ struct ip {
  * Time stamp option structure.
  */
 struct	ip_timestamp {
-	nd_uint8_t	ipt_code;	/* IPOPT_TS */
-	nd_uint8_t	ipt_len;	/* size of structure (variable) */
-	nd_uint8_t	ipt_ptr;	/* index of current entry */
-	nd_uint8_t	ipt_oflwflg;	/* flags, overflow counter */
+	u_int8_t	ipt_code;	/* IPOPT_TS */
+	u_int8_t	ipt_len;	/* size of structure (variable) */
+	u_int8_t	ipt_ptr;	/* index of current entry */
+	u_int8_t	ipt_oflwflg;	/* flags, overflow counter */
 #define IPTS_OFLW(ip)	(((ipt)->ipt_oflwflg & 0xf0) >> 4)
 #define IPTS_FLG(ip)	((ipt)->ipt_oflwflg & 0x0f)
 	union ipt_timestamp {
-		nd_uint32_t ipt_time[1];
+		u_int32_t ipt_time[1];
 		struct	ipt_ta {
-			nd_ipv4 ipt_addr;
-			nd_uint32_t ipt_time;
+			struct in_addr ipt_addr;
+			u_int32_t ipt_time;
 		} ipt_ta[1];
 	} ipt_timestamp;
 };
@@ -161,4 +159,6 @@ struct	ip_timestamp {
 #define	IPTTLDEC	1		/* subtracted when forwarding */
 
 #define	IP_MSS		576		/* default maximum segment size */
-#endif /* netdissect_ip_h */
+
+/* in print-ip.c */
+extern u_int32_t ip_finddst(const struct ip *);

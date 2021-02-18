@@ -171,6 +171,7 @@ class TestRand < Test::Unit::TestCase
   def test_shuffle
     srand(0)
     assert_equal([1,4,2,5,3], [1,2,3,4,5].shuffle)
+    assert_equal([1,4,2,5,3], [1,2,3,4,5].shuffle(random: Random.new(0)))
   end
 
   def test_big_seed
@@ -339,26 +340,44 @@ END
   end
 
   def test_random_bytes
-    r = Random.new(0)
+    assert_random_bytes(Random.new(0))
+  end
+
+  def assert_random_bytes(r)
     assert_equal("", r.bytes(0))
     assert_equal("\xAC".force_encoding("ASCII-8BIT"), r.bytes(1))
-    assert_equal("/\xAA\xC4\x97u\xA6\x16\xB7\xC0\xCC".force_encoding("ASCII-8BIT"),                                                                                                                              r.bytes(10))
+    assert_equal("/\xAA\xC4\x97u\xA6\x16\xB7\xC0\xCC".force_encoding("ASCII-8BIT"),
+                 r.bytes(10))
   end
 
   def test_random_range
+    srand(0)
     r = Random.new(0)
-    %w(9 5 8).each {|w| assert_equal(w.to_i, r.rand(5..9)) }
-    %w(-237 731 383).each {|w| assert_equal(w.to_i, r.rand(-1000..1000)) }
+    %w(9 5 8).each {|w|
+      assert_equal(w.to_i, rand(5..9))
+      assert_equal(w.to_i, r.rand(5..9))
+    }
+    %w(-237 731 383).each {|w|
+      assert_equal(w.to_i, rand(-1000..1000))
+      assert_equal(w.to_i, r.rand(-1000..1000))
+    }
     %w(1267650600228229401496703205382
        1267650600228229401496703205384
        1267650600228229401496703205383).each do |w|
+      assert_equal(w.to_i, rand(2**100+5..2**100+9))
       assert_equal(w.to_i, r.rand(2**100+5..2**100+9))
     end
+
+    v = rand(3.1..4)
+    assert_instance_of(Float, v, '[ruby-core:24679]')
+    assert_include(3.1..4, v)
+
     v = r.rand(3.1..4)
     assert_instance_of(Float, v, '[ruby-core:24679]')
-    assert_includes(3.1..4, v)
+    assert_include(3.1..4, v)
 
     now = Time.now
+    assert_equal(now, rand(now..now))
     assert_equal(now, r.rand(now..now))
   end
 
@@ -378,6 +397,8 @@ END
     assert_in_delta(1.7151893663724195, r.rand(1.0...2.0), 0.0001, '[ruby-core:24655]')
     assert_in_delta(7.027633760716439, r.rand(1.0...11.0), 0.0001, '[ruby-core:24655]')
     assert_in_delta(3.0897663659937937, r.rand(2.0...4.0), 0.0001, '[ruby-core:24655]')
+
+    assert_nothing_raised {r.rand(-Float::MAX..Float::MAX)}
   end
 
   def test_random_equal
@@ -394,12 +415,41 @@ END
 
   def test_fork_shuffle
     pid = fork do
-        (1..10).to_a.shuffle
-        raise 'default seed is not set' if srand == 0
+      (1..10).to_a.shuffle
+      raise 'default seed is not set' if srand == 0
     end
     p2, st = Process.waitpid2(pid)
     assert(st.success?, "#{st.inspect}")
   rescue NotImplementedError, ArgumentError
+  end
+
+  def assert_fork_status(n, mesg, &block)
+    IO.pipe do |r, w|
+      (1..n).map do
+        p1 = fork {w.puts(block.call.to_s)}
+        _, st = Process.waitpid2(p1)
+        assert_send([st, :success?], mesg)
+        r.gets.strip
+      end
+    end
+  end
+
+  def test_rand_reseed_on_fork
+    bug5661 = '[ruby-core:41209]'
+
+    assert_fork_status(1, bug5661) {Random.rand(4)}
+    r1, r2 = *assert_fork_status(2, bug5661) {Random.rand}
+    assert_not_equal(r1, r2, bug5661)
+
+    assert_fork_status(1, bug5661) {rand(4)}
+    r1, r2 = *assert_fork_status(2, bug5661) {rand}
+    assert_not_equal(r1, r2, bug5661)
+
+    stable = Random.new
+    assert_fork_status(1, bug5661) {stable.rand(4)}
+    r1, r2 = *assert_fork_status(2, bug5661) {stable.rand}
+    assert_equal(r1, r2, bug5661)
+  rescue NotImplementedError
   end
 
   def test_seed

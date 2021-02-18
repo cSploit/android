@@ -17,11 +17,12 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <assert.h>
-#include <csploit/sorted_arraylist.h>
-#include <csploit/logger.h>
+
+#include "logger.h"
 
 #include "ifinfo.h"
 #include "host.h"
@@ -29,7 +30,7 @@
 #include "event.h"
 #include "prober.h"
 #include "resolver.h"
-
+#include "sorted_arraylist.h"
 
 struct hosts_data hosts;
 
@@ -55,7 +56,7 @@ struct host *get_host(uint32_t ip) {
 struct host *create_host(uint32_t ip, uint8_t *mac, char *name) {
   struct host *h;
   
-  h = (struct host *) malloc(sizeof(struct host));
+  h = malloc(sizeof(struct host));
   
   if(!h) {
     print( ERROR, "malloc: %s", strerror(errno));
@@ -168,7 +169,7 @@ void on_host_found(uint8_t *mac, uint32_t ip, char *name, char lstatus) {
   if(e_type == NONE)
     return;
   
-  e = (struct event *) malloc(sizeof(struct event));
+  e = malloc(sizeof(struct event));
   
   if(!e) {
     print( ERROR, "malloc: %s", strerror(errno));

@@ -120,7 +120,7 @@ extern char *getenv();
 extern char *strchr();
 #endif
 
-#define range(low, item, hi)	max(low, min(item, hi))
+#define range(low, item, hi)	max((low), min((item), (hi)))
 
 #undef min	/* just in case */
 
@@ -170,8 +170,8 @@ max(int a, int b)
 static size_t
 rb_strftime_with_timespec(char *s, size_t maxsize, const char *format, const struct vtm *vtm, VALUE timev, struct timespec *ts, int gmt)
 {
-	char *endp = s + maxsize;
-	char *start = s;
+	const char *const endp = s + maxsize;
+	const char *const start = s;
 	const char *sp, *tp;
 	auto char tbuf[100];
 	long off;
@@ -182,6 +182,9 @@ rb_strftime_with_timespec(char *s, size_t maxsize, const char *format, const str
 	char padding;
 	enum {LEFT, CHCASE, LOWER, UPPER, LOCALE_O, LOCALE_E};
 #define BIT_OF(n) (1U<<(n))
+#ifdef MAILHEADER_EXT
+	int sign;
+#endif
 
 	/* various tables, useful in North America */
 	static const char days_l[][10] = {
@@ -210,12 +213,12 @@ rb_strftime_with_timespec(char *s, size_t maxsize, const char *format, const str
 			if (precision > 0 || flags & (BIT_OF(LOCALE_E)|BIT_OF(LOCALE_O))) \
 				goto unknown; \
 		} while (0)
-#define NEEDS(n) do if (s + (n) >= endp - 1) goto err; while (0)
+#define NEEDS(n) do if (s >= endp || (n) >= endp - s - 1) goto err; while (0)
 #define FILL_PADDING(i) do { \
-	if (!(flags & BIT_OF(LEFT)) && precision > i) { \
+	if (!(flags & BIT_OF(LEFT)) && precision > (i)) { \
 		NEEDS(precision); \
-		memset(s, padding ? padding : ' ', precision - i); \
-		s += precision - i; \
+		memset(s, padding ? padding : ' ', precision - (i)); \
+		s += precision - (i); \
 	} \
 	else { \
 		NEEDS(i); \
@@ -227,16 +230,17 @@ rb_strftime_with_timespec(char *s, size_t maxsize, const char *format, const str
 			if (precision <= 0) precision = (def_prec); \
 			if (flags & BIT_OF(LEFT)) precision = 1; \
 			l = snprintf(s, endp - s, \
-				     ((padding == '0' || (!padding && def_pad == '0')) ? "%0*"fmt : "%*"fmt), \
-				     precision, val); \
+				     ((padding == '0' || (!padding && (def_pad) == '0')) ? "%0*"fmt : "%*"fmt), \
+				     precision, (val)); \
 			if (l < 0) goto err; \
 			s += l; \
 		} while (0)
 #define STRFTIME(fmt) \
 		do { \
-			i = rb_strftime_with_timespec(s, endp - s, fmt, vtm, timev, ts, gmt); \
+			i = rb_strftime_with_timespec(s, endp - s, (fmt), vtm, timev, ts, gmt); \
 			if (!i) return 0; \
 			if (precision > i) {\
+				NEEDS(precision); \
 				memmove(s + precision - i, s, i);\
 				memset(s, padding ? padding : ' ', precision - i); \
 				s += precision;	\
@@ -255,8 +259,8 @@ rb_strftime_with_timespec(char *s, size_t maxsize, const char *format, const str
                                 if (precision <= 0) precision = (def_prec); \
                                 if (flags & BIT_OF(LEFT)) precision = 1; \
                                 args[0] = INT2FIX(precision); \
-                                args[1] = val; \
-                                if (padding == '0' || (!padding && def_pad == '0')) \
+                                args[1] = (val); \
+                                if (padding == '0' || (!padding && (def_pad) == '0')) \
                                         result = rb_str_format(2, args, rb_str_new2("%0*"fmt)); \
                                 else \
                                         result = rb_str_format(2, args, rb_str_new2("%*"fmt)); \
@@ -472,12 +476,16 @@ rb_strftime_with_timespec(char *s, size_t maxsize, const char *format, const str
 			}
 			if (off < 0) {
 				off = -off;
-				*s++ = '-';
+				sign = -1;
 			} else {
-				*s++ = '+';
+				sign = +1;
 			}
-			i = snprintf(s, endp - s, (padding == ' ' ? "%*ld" : "%.*ld"), precision, off / 3600);
+			i = snprintf(s, endp - s, (padding == ' ' ? "%+*ld" : "%+.*ld"),
+				     precision + 1, sign * (off / 3600));
 			if (i < 0) goto err;
+			if (sign < 0 && off < 3600) {
+				*(padding == ' ' ? s + i - 2 : s) = '-';
+			}
 			s += i;
                         off = off % 3600;
                         if (1 <= colons)
@@ -613,7 +621,13 @@ rb_strftime_with_timespec(char *s, size_t maxsize, const char *format, const str
                                         yv = sub(yv, INT2FIX(1));
 
                                 if (*format == 'G') {
-                                        FMTV('0', 1, "d", yv);
+                                        if (FIXNUM_P(yv)) {
+                                                const long y = FIX2LONG(yv);
+                                                FMT('0', 0 <= y ? 4 : 5, "ld", y);
+                                        }
+                                        else {
+                                                FMTV('0', 4, "d", yv);
+                                        }
                                 }
                                 else {
                                         yv = mod(yv, INT2FIX(100));
@@ -679,17 +693,15 @@ rb_strftime_with_timespec(char *s, size_t maxsize, const char *format, const str
                                 subsec = div(subsec, INT2FIX(1));
 
                                 if (FIXNUM_P(subsec)) {
-                                        int l;
-                                        l = snprintf(s, endp - s, "%0*ld", precision, FIX2LONG(subsec));
+                                        (void)snprintf(s, endp - s, "%0*ld", precision, FIX2LONG(subsec));
                                         s += precision;
                                 }
                                 else {
                                         VALUE args[2], result;
-                                        size_t l;
                                         args[0] = INT2FIX(precision);
                                         args[1] = subsec;
                                         result = rb_str_format(2, args, rb_str_new2("%0*d"));
-                                        l = strlcpy(s, StringValueCStr(result), endp-s);
+                                        (void)strlcpy(s, StringValueCStr(result), endp-s);
                                         s += precision;
                                 }
 			}

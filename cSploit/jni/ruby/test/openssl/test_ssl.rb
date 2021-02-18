@@ -1,163 +1,28 @@
-begin
-  require "openssl"
-  require_relative "utils.rb"
-rescue LoadError
-end
-require "rbconfig"
-require "socket"
-require "test/unit"
-require_relative '../ruby/envutil'
+require_relative "utils"
 
 if defined?(OpenSSL)
 
-class OpenSSL::TestSSL < Test::Unit::TestCase
-  RUBY = EnvUtil.rubybin
-  SSL_SERVER = File.join(File.dirname(__FILE__), "ssl_server.rb")
-  PORT = 20443
-  ITERATIONS = ($0 == __FILE__) ? 100 : 10
-
-  def setup
-    @ca_key  = OpenSSL::TestUtils::TEST_KEY_RSA2048
-    @svr_key = OpenSSL::TestUtils::TEST_KEY_RSA1024
-    @cli_key = OpenSSL::TestUtils::TEST_KEY_DSA256
-    @ca  = OpenSSL::X509::Name.parse("/DC=org/DC=ruby-lang/CN=CA")
-    @svr = OpenSSL::X509::Name.parse("/DC=org/DC=ruby-lang/CN=localhost")
-    @cli = OpenSSL::X509::Name.parse("/DC=org/DC=ruby-lang/CN=localhost")
-
-    now = Time.at(Time.now.to_i)
-    ca_exts = [
-      ["basicConstraints","CA:TRUE",true],
-      ["keyUsage","cRLSign,keyCertSign",true],
-    ]
-    ee_exts = [
-      ["keyUsage","keyEncipherment,digitalSignature",true],
-    ]
-    @ca_cert  = issue_cert(@ca, @ca_key, 1, now, now+3600, ca_exts,
-                           nil, nil, OpenSSL::Digest::SHA1.new)
-    @svr_cert = issue_cert(@svr, @svr_key, 2, now, now+1800, ee_exts,
-                           @ca_cert, @ca_key, OpenSSL::Digest::SHA1.new)
-    @cli_cert = issue_cert(@cli, @cli_key, 3, now, now+1800, ee_exts,
-                           @ca_cert, @ca_key, OpenSSL::Digest::SHA1.new)
-    @server = nil
-  end
-
-  def teardown
-  end
-
-  def issue_cert(*arg)
-    OpenSSL::TestUtils.issue_cert(*arg)
-  end
-
-  def issue_crl(*arg)
-    OpenSSL::TestUtils.issue_crl(*arg)
-  end
-
-  def readwrite_loop(ctx, ssl)
-    while line = ssl.gets
-      if line =~ /^STARTTLS$/
-        ssl.accept
-        next
-      end
-      ssl.write(line)
-    end
-  rescue OpenSSL::SSL::SSLError
-  rescue IOError
-  ensure
-    ssl.close rescue nil
-  end
-
-  def server_loop(ctx, ssls, server_proc)
-    loop do
-      ssl = nil
-      begin
-        ssl = ssls.accept
-      rescue OpenSSL::SSL::SSLError
-      	retry
-      end
-
-      Thread.start do
-        Thread.current.abort_on_exception = true
-        server_proc.call(ctx, ssl)
-      end
-    end
-  rescue Errno::EBADF, IOError, Errno::EINVAL, Errno::ECONNABORTED, Errno::ENOTSOCK
-  end
-
-  def start_server(port0, verify_mode, start_immediately, args = {}, &block)
-    ctx_proc = args[:ctx_proc]
-    server_proc = args[:server_proc]
-    server_proc ||= method(:readwrite_loop)
-
-    store = OpenSSL::X509::Store.new
-    store.add_cert(@ca_cert)
-    store.purpose = OpenSSL::X509::PURPOSE_SSL_CLIENT
-    ctx = OpenSSL::SSL::SSLContext.new
-    ctx.cert_store = store
-    #ctx.extra_chain_cert = [ ca_cert ]
-    ctx.cert = @svr_cert
-    ctx.key = @svr_key
-    ctx.verify_mode = verify_mode
-    ctx_proc.call(ctx) if ctx_proc
-
-    Socket.do_not_reverse_lookup = true
-    tcps = nil
-    port = port0
-    begin
-      tcps = TCPServer.new("127.0.0.1", port)
-    rescue Errno::EADDRINUSE
-      port += 1
-      retry
-    end
-
-    ssls = OpenSSL::SSL::SSLServer.new(tcps, ctx)
-    ssls.start_immediately = start_immediately
-
-    begin
-      server = Thread.new do
-        Thread.current.abort_on_exception = true
-        server_loop(ctx, ssls, server_proc)
-      end
-
-      $stderr.printf("%s started: pid=%d port=%d\n", SSL_SERVER, pid, port) if $DEBUG
-
-      block.call(server, port.to_i)
-    ensure
-      begin
-        begin
-          tcps.shutdown
-        rescue Errno::ENOTCONN
-          # when `Errno::ENOTCONN: Socket is not connected' on some platforms,
-          # call #close instead of #shutdown.
-          tcps.close
-          tcps = nil
-        end if (tcps)
-        if (server)
-          server.join(5)
-          if server.alive?
-            server.kill
-            server.join
-            flunk("TCPServer was closed and SSLServer is still alive") unless $!
-          end
-        end
-      ensure
-        tcps.close if (tcps)
-      end
-    end
-  end
-
-  def starttls(ssl)
-    ssl.puts("STARTTLS")
-
-    sleep 1   # When this line is eliminated, process on Cygwin blocks
-              # forever at ssl.connect. But I don't know why it does.
-
-    ssl.connect
-  end
-
+class OpenSSL::TestSSL < OpenSSL::SSLTestCase
   def test_ctx_setup
     ctx = OpenSSL::SSL::SSLContext.new
     assert_equal(ctx.setup, true)
     assert_equal(ctx.setup, nil)
+  end
+
+  def test_ctx_setup_no_compression
+    ctx = OpenSSL::SSL::SSLContext.new
+    ctx.options = OpenSSL::SSL::OP_ALL | OpenSSL::SSL::OP_NO_COMPRESSION
+    assert_equal(ctx.setup, true)
+    assert_equal(ctx.setup, nil)
+    assert_equal(OpenSSL::SSL::OP_NO_COMPRESSION,
+                 ctx.options & OpenSSL::SSL::OP_NO_COMPRESSION)
+  end if defined?(OpenSSL::SSL::OP_NO_COMPRESSION)
+
+  def test_not_started_session
+    skip "non socket argument of SSLSocket.new is not supported on this platform" if /mswin|mingw/ =~ RUBY_PLATFORM
+    open(__FILE__) do |f|
+      assert_nil OpenSSL::SSL::SSLSocket.new(f).cert
+    end
   end
 
   def test_ssl_read_nonblock
@@ -279,6 +144,28 @@ class OpenSSL::TestSSL < Test::Unit::TestCase
     }
   end
 
+  def test_client_ca
+    ctx_proc = Proc.new do |ctx|
+      ctx.client_ca = [@ca_cert]
+    end
+
+    vflag = OpenSSL::SSL::VERIFY_PEER|OpenSSL::SSL::VERIFY_FAIL_IF_NO_PEER_CERT
+    start_server(PORT, vflag, true, :ctx_proc => ctx_proc){|server, port|
+      ctx = OpenSSL::SSL::SSLContext.new
+      client_ca_from_server = nil
+      ctx.client_cert_cb = Proc.new do |sslconn|
+        client_ca_from_server = sslconn.client_ca
+        [@cli_cert, @cli_key]
+      end
+      sock = TCPSocket.new("127.0.0.1", port)
+      ssl = OpenSSL::SSL::SSLSocket.new(sock, ctx)
+      ssl.sync_close = true
+      ssl.connect
+      assert_equal([@ca], client_ca_from_server)
+      ssl.close
+    }
+  end
+
   def test_starttls
     start_server(PORT, OpenSSL::SSL::VERIFY_NONE, false){|server, port|
       sock = TCPSocket.new("127.0.0.1", port)
@@ -286,12 +173,13 @@ class OpenSSL::TestSSL < Test::Unit::TestCase
       ssl.sync_close = true
       str = "x" * 1000 + "\n"
 
-      ITERATIONS.times{
-        ssl.puts(str)
-        assert_equal(str, ssl.gets)
-      }
-
-      starttls(ssl)
+      OpenSSL::TestUtils.silent do
+        ITERATIONS.times{
+          ssl.puts(str)
+          assert_equal(str, ssl.gets)
+        }
+        starttls(ssl)
+      end
 
       ITERATIONS.times{
         ssl.puts(str)
@@ -356,6 +244,26 @@ class OpenSSL::TestSSL < Test::Unit::TestCase
       ssl = OpenSSL::SSL::SSLSocket.new(sock, ctx)
       assert_raise(OpenSSL::SSL::SSLError){ ssl.connect }
       assert_equal(OpenSSL::X509::V_ERR_APPLICATION_VERIFICATION, ssl.verify_result)
+    }
+  end
+
+  def test_exception_in_verify_callback_is_ignored
+    start_server(PORT, OpenSSL::SSL::VERIFY_NONE, true){|server, port|
+      sock = TCPSocket.new("127.0.0.1", port)
+      ctx = OpenSSL::SSL::SSLContext.new
+      ctx.set_params(
+        :verify_callback => Proc.new do |preverify_ok, store_ctx|
+          store_ctx.error = OpenSSL::X509::V_OK
+          raise RuntimeError
+        end
+      )
+      ssl = OpenSSL::SSL::SSLSocket.new(sock, ctx)
+      OpenSSL::TestUtils.silent do
+        # SSLError, not RuntimeError
+        assert_raise(OpenSSL::SSL::SSLError) { ssl.connect }
+      end
+      assert_equal(OpenSSL::X509::V_ERR_CERT_REJECTED, ssl.verify_result)
+      ssl.close
     }
   end
 
@@ -443,126 +351,33 @@ class OpenSSL::TestSSL < Test::Unit::TestCase
     }
   end
 
-  def test_client_session
-    last_session = nil
-    start_server(PORT, OpenSSL::SSL::VERIFY_NONE, true) do |server, port|
-      2.times do
-        sock = TCPSocket.new("127.0.0.1", port)
-        # Debian's openssl 0.9.8g-13 failed at assert(ssl.session_reused?),
-        # when use default SSLContext. [ruby-dev:36167]
-        ctx = OpenSSL::SSL::SSLContext.new("TLSv1")
-        ssl = OpenSSL::SSL::SSLSocket.new(sock, ctx)
-        ssl.sync_close = true
-        ssl.session = last_session if last_session
-        ssl.connect
-
-        session = ssl.session
-        if last_session
-          assert(ssl.session_reused?)
-
-          if session.respond_to?(:id)
-            assert_equal(session.id, last_session.id)
-          end
-          assert_equal(session.to_pem, last_session.to_pem)
-          assert_equal(session.to_der, last_session.to_der)
-          # Older version of OpenSSL may not be consistent.  Look up which versions later.
-          assert_equal(session.to_text, last_session.to_text)
-        else
-          assert(!ssl.session_reused?)
-        end
-        last_session = session
-
-        str = "x" * 100 + "\n"
-        ssl.puts(str)
-        assert_equal(str, ssl.gets)
-
-        ssl.close
-      end
+  def test_verify_certificate_identity
+    [true, false].each do |criticality|
+      cert = create_null_byte_SAN_certificate(criticality)
+      assert_equal(false, OpenSSL::SSL.verify_certificate_identity(cert, 'www.example.com'))
+      assert_equal(true,  OpenSSL::SSL.verify_certificate_identity(cert, "www.example.com\0.evil.com"))
+      assert_equal(false, OpenSSL::SSL.verify_certificate_identity(cert, '192.168.7.255'))
+      assert_equal(true,  OpenSSL::SSL.verify_certificate_identity(cert, '192.168.7.1'))
+      assert_equal(false, OpenSSL::SSL.verify_certificate_identity(cert, '13::17'))
+      assert_equal(true,  OpenSSL::SSL.verify_certificate_identity(cert, '13:0:0:0:0:0:0:17'))
     end
   end
 
-  def test_server_session
-    connections = 0
-    saved_session = nil
-
-    ctx_proc = Proc.new do |ctx, ssl|
-# add test for session callbacks here
-    end
-
-    server_proc = Proc.new do |ctx, ssl|
-      session = ssl.session
-      stats = ctx.session_cache_stats
-
-      case connections
-      when 0
-        assert_equal(stats[:cache_num], 1)
-        assert_equal(stats[:cache_hits], 0)
-        assert_equal(stats[:cache_misses], 0)
-        assert(!ssl.session_reused?)
-      when 1
-        assert_equal(stats[:cache_num], 1)
-        assert_equal(stats[:cache_hits], 1)
-        assert_equal(stats[:cache_misses], 0)
-        assert(ssl.session_reused?)
-        ctx.session_remove(session)
-        saved_session = session
-      when 2
-        assert_equal(stats[:cache_num], 1)
-        assert_equal(stats[:cache_hits], 1)
-        assert_equal(stats[:cache_misses], 1)
-        assert(!ssl.session_reused?)
-        ctx.session_add(saved_session)
-      when 3
-        assert_equal(stats[:cache_num], 2)
-        assert_equal(stats[:cache_hits], 2)
-        assert_equal(stats[:cache_misses], 1)
-        assert(ssl.session_reused?)
-        ctx.flush_sessions(Time.now + 5000)
-      when 4
-        assert_equal(stats[:cache_num], 1)
-        assert_equal(stats[:cache_hits], 2)
-        assert_equal(stats[:cache_misses], 2)
-        assert(!ssl.session_reused?)
-        ctx.session_add(saved_session)
-      end
-      connections += 1
-
-      readwrite_loop(ctx, ssl)
-    end
-
-    first_session = nil
-    start_server(PORT, OpenSSL::SSL::VERIFY_NONE, true, :ctx_proc => ctx_proc, :server_proc => server_proc) do |server, port|
-      10.times do |i|
-        sock = TCPSocket.new("127.0.0.1", port)
-        ctx = OpenSSL::SSL::SSLContext.new
-        if defined?(OpenSSL::SSL::OP_NO_TICKET)
-          # disable RFC4507 support
-          ctx.options = OpenSSL::SSL::OP_NO_TICKET
-        end
-        ssl = OpenSSL::SSL::SSLSocket.new(sock, ctx)
-        ssl.sync_close = true
-        ssl.session = first_session if first_session
-        ssl.connect
-
-        session = ssl.session
-        if first_session
-          case i
-          when 1; assert(ssl.session_reused?)
-          when 2; assert(!ssl.session_reused?)
-          when 3; assert(ssl.session_reused?)
-          when 4; assert(!ssl.session_reused?)
-          when 5..10; assert(ssl.session_reused?)
-          end
-        end
-        first_session ||= session
-
-        str = "x" * 100 + "\n"
-        ssl.puts(str)
-        assert_equal(str, ssl.gets)
-
-        ssl.close
-      end
-    end
+  # Create NULL byte SAN certificate
+  def create_null_byte_SAN_certificate(critical = false)
+    ef = OpenSSL::X509::ExtensionFactory.new
+    cert = OpenSSL::X509::Certificate.new
+    cert.subject = OpenSSL::X509::Name.parse "/DC=some/DC=site/CN=Some Site"
+    ext = ef.create_ext('subjectAltName', 'DNS:placeholder,IP:192.168.7.1,IP:13::17', critical)
+    ext_asn1 = OpenSSL::ASN1.decode(ext.to_der)
+    san_list_der = ext_asn1.value.reduce(nil) { |memo,val| val.tag == 4 ? val.value : memo }
+    san_list_asn1 = OpenSSL::ASN1.decode(san_list_der)
+    san_list_asn1.value[0].value = "www.example.com\0.evil.com"
+    pos = critical ? 2 : 1
+    ext_asn1.value[pos].value = san_list_asn1.to_der
+    real_ext = OpenSSL::X509::Extension.new ext_asn1
+    cert.add_extension(real_ext)
+    cert
   end
 
   def test_tlsext_hostname
@@ -608,6 +423,77 @@ class OpenSSL::TestSSL < Test::Unit::TestCase
       end
     end
   end
+
+  def test_multibyte_read_write
+    #German a umlaut
+    auml = [%w{ C3 A4 }.join('')].pack('H*')
+    auml.force_encoding(Encoding::UTF_8)
+
+    [10, 1000, 100000].each {|i|
+      str = nil
+      num_written = nil
+      server_proc = Proc.new {|ctx, ssl|
+        cmp = ssl.read
+        raw_size = cmp.size
+        cmp.force_encoding(Encoding::UTF_8)
+        assert_equal(str, cmp)
+        assert_equal(num_written, raw_size)
+        ssl.close
+      }
+      start_server(PORT, OpenSSL::SSL::VERIFY_NONE, true, :server_proc => server_proc){|server, port|
+        sock = TCPSocket.new("127.0.0.1", port)
+        ssl = OpenSSL::SSL::SSLSocket.new(sock)
+        ssl.sync_close = true
+        ssl.connect
+        str = auml * i
+        num_written = ssl.write(str)
+        ssl.close
+      }
+    }
+  end
+
+  def test_unset_OP_ALL
+    ctx_proc = Proc.new { |ctx|
+      ctx.options = OpenSSL::SSL::OP_ALL & ~OpenSSL::SSL::OP_DONT_INSERT_EMPTY_FRAGMENTS
+    }
+    start_server(PORT, OpenSSL::SSL::VERIFY_NONE, true, :ctx_proc => ctx_proc){|server, port|
+      sock = TCPSocket.new("127.0.0.1", port)
+      ssl = OpenSSL::SSL::SSLSocket.new(sock)
+      ssl.sync_close = true
+      ssl.connect
+      ssl.puts('hello')
+      assert_equal("hello\n", ssl.gets)
+      ssl.close
+    }
+  end
+
+  def test_invalid_shutdown_by_gc
+    assert_nothing_raised {
+      start_server(PORT, OpenSSL::SSL::VERIFY_NONE, true){|server, port|
+        10.times {
+          sock = TCPSocket.new("127.0.0.1", port)
+          ssl = OpenSSL::SSL::SSLSocket.new(sock)
+          GC.start
+          ssl.connect
+          sock.close
+        }
+      }
+    }
+  end
+
+  def test_close_after_socket_close
+    start_server(PORT, OpenSSL::SSL::VERIFY_NONE, true){|server, port|
+      sock = TCPSocket.new("127.0.0.1", port)
+      ssl = OpenSSL::SSL::SSLSocket.new(sock)
+      ssl.sync_close = true
+      ssl.connect
+      sock.close
+      assert_nothing_raised do
+        ssl.close
+      end
+    }
+  end
+
 end
 
 end

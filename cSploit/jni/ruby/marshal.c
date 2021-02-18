@@ -14,6 +14,7 @@
 #include "ruby/st.h"
 #include "ruby/util.h"
 #include "ruby/encoding.h"
+#include "internal.h"
 
 #include <math.h>
 #ifdef HAVE_FLOAT_H
@@ -25,7 +26,7 @@
 
 #define BITSPERSHORT (2*CHAR_BIT)
 #define SHORTMASK ((1<<BITSPERSHORT)-1)
-#define SHORTDN(x) RSHIFT(x,BITSPERSHORT)
+#define SHORTDN(x) RSHIFT((x),BITSPERSHORT)
 
 #if SIZEOF_SHORT == SIZEOF_BDIGITS
 #define SHORTLEN(x) (x)
@@ -81,8 +82,6 @@ shortlen(long len, BDIGIT *ds)
 static ID s_dump, s_load, s_mdump, s_mload;
 static ID s_dump_data, s_load_data, s_alloc, s_call;
 static ID s_getbyte, s_read, s_write, s_binmode;
-
-ID rb_id_encoding(void);
 
 typedef struct {
     VALUE newclass;
@@ -246,7 +245,7 @@ w_bytes(const char *s, long n, struct dump_arg *arg)
     w_nbyte(s, n, arg);
 }
 
-#define w_cstr(s, arg) w_bytes(s, strlen(s), arg)
+#define w_cstr(s, arg) w_bytes((s), strlen(s), (arg))
 
 static void
 w_short(int x, struct dump_arg *arg)
@@ -419,7 +418,7 @@ w_symbol(ID id, struct dump_arg *arg)
     else {
 	sym = rb_id2str(id);
 	if (!sym) {
-	    rb_raise(rb_eTypeError, "can't dump anonymous ID %ld", id);
+	    rb_raise(rb_eTypeError, "can't dump anonymous ID %"PRIdVALUE, id);
 	}
 	encidx = rb_enc_get_index(sym);
 	if (encidx == rb_usascii_encindex() ||
@@ -590,7 +589,7 @@ w_object(VALUE obj, struct dump_arg *arg, int limit)
     st_table *ivtbl = 0;
     st_data_t num;
     int hasiv = 0;
-#define has_ivars(obj, ivtbl) ((ivtbl = rb_generic_ivar_table(obj)) != 0 || \
+#define has_ivars(obj, ivtbl) (((ivtbl) = rb_generic_ivar_table(obj)) != 0 || \
 			       (!SPECIAL_CONST_P(obj) && !ENCODING_IS_ASCII8BIT(obj)))
 
     if (limit == 0) {
@@ -825,7 +824,7 @@ w_object(VALUE obj, struct dump_arg *arg, int limit)
 
 		if (!rb_respond_to(obj, s_dump_data)) {
 		    rb_raise(rb_eTypeError,
-			     "no marshal_dump is defined for class %s",
+			     "no _dump_data is defined for class %s",
 			     rb_obj_classname(obj));
 		}
 		v = rb_funcall(obj, s_dump_data, 0);
@@ -864,7 +863,7 @@ clear_dump_arg(struct dump_arg *arg)
 
 /*
  * call-seq:
- *      dump( obj [, anIO] , limit=--1 ) -> anIO
+ *      dump( obj [, anIO] , limit=-1 ) -> anIO
  *
  * Serializes obj and all descendant objects. If anIO is
  * specified, the serialized data will be written to it, otherwise the
@@ -876,7 +875,7 @@ clear_dump_arg(struct dump_arg *arg)
  *       def initialize(str)
  *         @str = str
  *       end
- *       def sayHello
+ *       def say_hello
  *         @str
  *       end
  *     end
@@ -886,7 +885,7 @@ clear_dump_arg(struct dump_arg *arg)
  *     o = Klass.new("hello\n")
  *     data = Marshal.dump(o)
  *     obj = Marshal.load(data)
- *     obj.sayHello   #=> "hello\n"
+ *     obj.say_hello  #=> "hello\n"
  *
  * Marshal can't dump following objects:
  * * anonymous Class/Module.
@@ -1002,7 +1001,7 @@ static const rb_data_type_t load_arg_data = {
     {mark_load_arg, free_load_arg, memsize_load_arg,},
 };
 
-#define r_entry(v, arg) r_entry0(v, (arg)->data->num_entries, arg)
+#define r_entry(v, arg) r_entry0((v), (arg)->data->num_entries, (arg))
 static VALUE r_entry0(VALUE v, st_index_t num, struct load_arg *arg);
 static VALUE r_object(struct load_arg *arg);
 static ID r_symbol(struct load_arg *arg);
@@ -1137,11 +1136,11 @@ id2encidx(ID id, VALUE val)
 static ID
 r_symlink(struct load_arg *arg)
 {
-    ID id;
+    st_data_t id;
     long num = r_long(arg);
 
     if (st_lookup(arg->symbols, num, &id)) {
-	return id;
+	return (ID)id;
     }
     rb_raise(rb_eArgError, "bad symbol");
 }
@@ -1215,7 +1214,8 @@ r_entry0(VALUE v, st_index_t num, struct load_arg *arg)
     else {
         st_insert(arg->data, num, (st_data_t)v);
     }
-    if (arg->infection) {
+    if (arg->infection &&
+	TYPE(v) != T_CLASS && TYPE(v) != T_MODULE) {
 	FL_SET(v, arg->infection);
 	if ((VALUE)real_obj != Qundef)
 	    FL_SET((VALUE)real_obj, arg->infection);

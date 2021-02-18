@@ -27,18 +27,17 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include <csploit/message.h>
-#include <csploit/buffer.h>
-#include <csploit/sequence.h>
-#include <csploit/io.h>
-#include <csploit/logger.h>
-
 #include "child.h"
 #include "handler.h"
+#include "message.h"
 #include "reaper.h"
 #include "command.h"
+#include "buffer.h"
 #include "connection.h"
+#include "sequence.h"
 #include "handler.h"
+#include "io.h"
+#include "logger.h"
 
 #define MIN(a, b) (a < b ? a : b)
 

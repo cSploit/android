@@ -276,7 +276,7 @@ strdup_with_null(OnigEncoding enc, UChar* s, UChar* end)
 
 static UChar*
 strcat_capa(UChar* dest, UChar* dest_end, const UChar* src, const UChar* src_end,
-	      int capa)
+	      size_t capa)
 {
   UChar* r;
 
@@ -293,7 +293,7 @@ strcat_capa(UChar* dest, UChar* dest_end, const UChar* src, const UChar* src_end
 /* dest on static area */
 static UChar*
 strcat_capa_from_static(UChar* dest, UChar* dest_end,
-			const UChar* src, const UChar* src_end, int capa)
+			const UChar* src, const UChar* src_end, size_t capa)
 {
   UChar* r;
 
@@ -579,7 +579,7 @@ onig_number_of_names(regex_t* reg)
   NameTable* t = (NameTable* )reg->name_table;
 
   if (IS_NOT_NULL(t))
-    return t->num_entries;
+    return (int)t->num_entries;
   else
     return 0;
 }
@@ -1450,7 +1450,7 @@ onig_node_str_cat(Node* node, const UChar* s, const UChar* end)
 
 	CHECK_NULL_RETURN_MEMERR(p);
 	NSTR(node)->s    = p;
-	NSTR(node)->capa = capa;
+	NSTR(node)->capa = (int)capa;
       }
     }
     else {
@@ -1744,13 +1744,18 @@ add_code_range_to_buf0(BBuf** pbuf, ScanEnv* env, OnigCodePoint from, OnigCodePo
     else
       bound = x;
   }
+  /* data[(low-1)*2+1] << from <= data[low*2]
+   * data[(high-1)*2+1] <= to << data[high*2]
+   */
 
   inc_n = low + 1 - high;
   if (n + inc_n > ONIG_MAX_MULTI_BYTE_RANGES_NUM)
     return ONIGERR_TOO_MANY_MULTI_BYTE_RANGES;
 
   if (inc_n != 1) {
-    if (checkdup && to >= data[low*2]) CC_DUP_WARN(env);
+    if (checkdup && from <= data[low*2+1]
+	&& (data[low*2] <= from  || data[low*2+1] <= to))
+	CC_DUP_WARN(env);
     if (from > data[low*2])
       from = data[low*2];
     if (to < data[(high - 1)*2 + 1])
@@ -2006,7 +2011,7 @@ and_cclass(CClassNode* dest, CClassNode* cc, ScanEnv* env)
 {
   OnigEncoding enc = env->enc;
   int r, not1, not2;
-  BBuf *buf1, *buf2, *pbuf;
+  BBuf *buf1, *buf2, *pbuf = 0;
   BitSetRef bsr1, bsr2;
   BitSet bs1, bs2;
 
@@ -2041,17 +2046,16 @@ and_cclass(CClassNode* dest, CClassNode* cc, ScanEnv* env)
     else {
       r = and_code_range_buf(buf1, not1, buf2, not2, &pbuf, env);
       if (r == 0 && not1 != 0) {
-	BBuf *tbuf;
+	BBuf *tbuf = 0;
 	r = not_code_range_buf(enc, pbuf, &tbuf, env);
-	if (r != 0) {
-	  bbuf_free(pbuf);
-	  return r;
-	}
 	bbuf_free(pbuf);
 	pbuf = tbuf;
       }
     }
-    if (r != 0) return r;
+    if (r != 0) {
+	bbuf_free(pbuf);
+	return r;
+    }
 
     dest->mbuf = pbuf;
     bbuf_free(buf1);
@@ -2065,7 +2069,7 @@ or_cclass(CClassNode* dest, CClassNode* cc, ScanEnv* env)
 {
   OnigEncoding enc = env->enc;
   int r, not1, not2;
-  BBuf *buf1, *buf2, *pbuf;
+  BBuf *buf1, *buf2, *pbuf = 0;
   BitSetRef bsr1, bsr2;
   BitSet bs1, bs2;
 
@@ -2100,17 +2104,16 @@ or_cclass(CClassNode* dest, CClassNode* cc, ScanEnv* env)
     else {
       r = or_code_range_buf(enc, buf1, not1, buf2, not2, &pbuf, env);
       if (r == 0 && not1 != 0) {
-	BBuf *tbuf;
+	BBuf *tbuf = 0;
 	r = not_code_range_buf(enc, pbuf, &tbuf, env);
-	if (r != 0) {
-	  bbuf_free(pbuf);
-	  return r;
-	}
 	bbuf_free(pbuf);
 	pbuf = tbuf;
       }
     }
-    if (r != 0) return r;
+    if (r != 0) {
+	bbuf_free(pbuf);
+	return r;
+    }
 
     dest->mbuf = pbuf;
     bbuf_free(buf1);
@@ -4488,7 +4491,7 @@ parse_char_class(Node** np, OnigToken* tok, UChar** src, UChar* end,
 
 	if (IS_SYNTAX_BV(env->syntax, ONIG_SYN_ALLOW_DOUBLE_RANGE_OP_IN_CC)) {
 	  CC_ESC_WARN(env, (UChar* )"-");
-	  goto sb_char;   /* [0-9-a] is allowed as [0-9\-a] */
+	  goto range_end_val; /* [0-9-a] is allowed as [0-9\-a] */
 	}
 	r = ONIGERR_UNMATCHED_RANGE_SPECIFIER_IN_CHAR_CLASS;
 	goto err;

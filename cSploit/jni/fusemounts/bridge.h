@@ -24,20 +24,20 @@
  * opened files and found sources directories.
  */
 typedef struct bridge {
-  
-  ///< the directory where the fs is mounted on
-  char *mountpoint;
-  ///< the file descriptor of the opened file
-  int fd;
-  ///< the name of the file opened over mountpoint
-  char *fname;
-  ///< the size of @fname
-  size_t flen;
-  ///< the path of the source directory
-  char *source;
-  
-  struct bridge *next;
-  
+	
+	///< the directory where the fs is mounted on
+	char *mountpoint;
+	///< the file descriptor of the opened file
+	int fd;
+	///< the name of the file opened over mountpoint
+	char *fname;
+	///< the size of @fname
+	size_t flen;
+	///< the path of the source directory
+	char *source;
+	
+	struct bridge *next;
+	
 } bridge_t;
 
 bridge_t *create_bridge();

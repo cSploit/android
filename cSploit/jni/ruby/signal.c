@@ -16,29 +16,37 @@
 #include <signal.h>
 #include <stdio.h>
 #include <errno.h>
+#include "ruby_atomic.h"
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
 
-#ifdef _WIN32
-typedef LONG rb_atomic_t;
+#if !defined(_WIN32) && !defined(HAVE_GCC_ATOMIC_BUILTINS)
+rb_atomic_t
+ruby_atomic_exchange(rb_atomic_t *ptr, rb_atomic_t val)
+{
+    rb_atomic_t old = *ptr;
+    *ptr = val;
+    return old;
+}
 
-# define ATOMIC_TEST(var) InterlockedExchange(&(var), 0)
-# define ATOMIC_SET(var, val) InterlockedExchange(&(var), (val))
-# define ATOMIC_INC(var) InterlockedIncrement(&(var))
-# define ATOMIC_DEC(var) InterlockedDecrement(&(var))
-
-#else
-typedef int rb_atomic_t;
-
-# define ATOMIC_TEST(var) ((var) ? ((var) = 0, 1) : 0)
-# define ATOMIC_SET(var, val) ((var) = (val))
-# define ATOMIC_INC(var) (++(var))
-# define ATOMIC_DEC(var) (--(var))
+rb_atomic_t
+ruby_atomic_compare_and_swap(rb_atomic_t *ptr, rb_atomic_t cmp,
+			     rb_atomic_t newval)
+{
+    rb_atomic_t old = *ptr;
+    if (old == cmp) {
+	*ptr = newval;
+    }
+    return old;
+}
 #endif
 
 #if defined(__BEOS__) || defined(__HAIKU__)
 #undef SIGBUS
 #endif
 
-#if defined HAVE_SIGPROCMASK || defined HAVE_SIGSETMASK
+#ifdef HAVE_PTHREAD_SIGMASK
 #define USE_TRAP_MASK 1
 #else
 #define USE_TRAP_MASK 0
@@ -343,11 +351,12 @@ VALUE
 rb_f_kill(int argc, VALUE *argv)
 {
 #ifndef HAS_KILLPG
-#define killpg(pg, sig) kill(-(pg), sig)
+#define killpg(pg, sig) kill(-(pg), (sig))
 #endif
     int negative = 0;
     int sig;
     int i;
+    volatile VALUE str;
     const char *s;
 
     rb_secure(2);
@@ -365,11 +374,11 @@ rb_f_kill(int argc, VALUE *argv)
 
       case T_STRING:
 	s = RSTRING_PTR(argv[0]);
+      str_signal:
 	if (s[0] == '-') {
 	    negative++;
 	    s++;
 	}
-      str_signal:
 	if (strncmp("SIG", s, 3) == 0)
 	    s += 3;
 	if((sig = signm2signo(s)) == 0)
@@ -380,17 +389,13 @@ rb_f_kill(int argc, VALUE *argv)
 	break;
 
       default:
-        {
-	    VALUE str;
-
-	    str = rb_check_string_type(argv[0]);
-	    if (!NIL_P(str)) {
-		s = RSTRING_PTR(str);
-		goto str_signal;
-	    }
-	    rb_raise(rb_eArgError, "bad signal type %s",
-		     rb_obj_classname(argv[0]));
+	str = rb_check_string_type(argv[0]);
+	if (!NIL_P(str)) {
+	    s = RSTRING_PTR(str);
+	    goto str_signal;
 	}
+	rb_raise(rb_eArgError, "bad signal type %s",
+		 rb_obj_classname(argv[0]));
 	break;
     }
 
@@ -432,29 +437,22 @@ typedef RETSIGTYPE ruby_sigaction_t(int);
 #ifdef POSIX_SIGNAL
 
 #ifdef USE_SIGALTSTACK
-#ifdef SIGSTKSZ
-#define ALT_STACK_SIZE (SIGSTKSZ*2)
-#else
-#define ALT_STACK_SIZE (4*1024)
-#endif
 /* alternate stack for SIGSEGV */
 void
 rb_register_sigaltstack(rb_thread_t *th)
 {
     stack_t newSS, oldSS;
 
-    if (th->altstack) return;
+    if (!th->altstack)
+	rb_bug("rb_register_sigaltstack: th->altstack not initialized\n");
 
-    newSS.ss_sp = th->altstack = malloc(ALT_STACK_SIZE);
-    if (newSS.ss_sp == NULL)
-	/* should handle error */
-	rb_bug("rb_register_sigaltstack. malloc error\n");
+    newSS.ss_sp = th->altstack;
     newSS.ss_size = ALT_STACK_SIZE;
     newSS.ss_flags = 0;
 
     sigaltstack(&newSS, &oldSS); /* ignore error. */
 }
-#endif
+#endif /* USE_SIGALTSTACK */
 
 static sighandler_t
 ruby_signal(int signum, sighandler_t handler)
@@ -466,7 +464,7 @@ ruby_signal(int signum, sighandler_t handler)
 #endif
 
     sigemptyset(&sigact.sa_mask);
-#ifdef SA_SIGINFO
+#ifdef USE_SIGALTSTACK
     sigact.sa_sigaction = (ruby_sigaction_t*)handler;
     sigact.sa_flags = SA_SIGINFO;
 #else
@@ -479,7 +477,7 @@ ruby_signal(int signum, sighandler_t handler)
 	sigact.sa_flags |= SA_NOCLDWAIT;
 #endif
 #if defined(SA_ONSTACK) && defined(USE_SIGALTSTACK)
-    if (signum == SIGSEGV)
+    if (signum == SIGSEGV || signum == SIGBUS)
 	sigact.sa_flags |= SA_ONSTACK;
 #endif
     if (sigaction(signum, &sigact, &old) < 0) {
@@ -497,7 +495,7 @@ posix_signal(int signum, sighandler_t handler)
 }
 
 #else /* !POSIX_SIGNAL */
-#define ruby_signal(sig,handler) (/* rb_trap_accept_nativethreads[sig] = 0,*/ signal((sig),(handler)))
+#define ruby_signal(sig,handler) (/* rb_trap_accept_nativethreads[(sig)] = 0,*/ signal((sig),(handler)))
 #if 0 /* def HAVE_NATIVETHREAD */
 static sighandler_t
 ruby_nativethread_signal(int signum, sighandler_t handler)
@@ -516,6 +514,7 @@ sighandler(int sig)
 {
     ATOMIC_INC(signal_buff.cnt[sig]);
     ATOMIC_INC(signal_buff.size);
+    rb_thread_wakeup_timer_thread();
 #if !defined(BSD_SIGNAL) && !defined(POSIX_SIGNAL)
     ruby_signal(sig, sighandler);
 #endif
@@ -528,11 +527,7 @@ rb_signal_buff_size(void)
 }
 
 #if USE_TRAP_MASK
-# ifdef HAVE_SIGPROCMASK
 static sigset_t trap_last_mask;
-# else
-static int trap_last_mask;
-# endif
 #endif
 
 #if HAVE_PTHREAD_H
@@ -566,60 +561,87 @@ rb_get_next_signal(void)
 {
     int i, sig = 0;
 
-    for (i=1; i<RUBY_NSIG; i++) {
-	if (signal_buff.cnt[i] > 0) {
-	    rb_disable_interrupt();
-	    {
-		ATOMIC_DEC(signal_buff.cnt[i]);
-		ATOMIC_DEC(signal_buff.size);
+    if (signal_buff.size != 0) {
+	for (i=1; i<RUBY_NSIG; i++) {
+	    if (signal_buff.cnt[i] > 0) {
+		rb_disable_interrupt();
+		{
+		    ATOMIC_DEC(signal_buff.cnt[i]);
+		    ATOMIC_DEC(signal_buff.size);
+		}
+		rb_enable_interrupt();
+		sig = i;
+		break;
 	    }
-	    rb_enable_interrupt();
-	    sig = i;
-	    break;
 	}
     }
     return sig;
 }
 
+
+#ifdef USE_SIGALTSTACK
+static void
+check_stack_overflow(const void *addr)
+{
+    int ruby_stack_overflowed_p(const rb_thread_t *, const void *);
+    NORETURN(void ruby_thread_stack_overflow(rb_thread_t *th));
+    rb_thread_t *th = GET_THREAD();
+    if (ruby_stack_overflowed_p(th, addr)) {
+	ruby_thread_stack_overflow(th);
+    }
+}
+#define CHECK_STACK_OVERFLOW() check_stack_overflow(info->si_addr)
+#else
+#define CHECK_STACK_OVERFLOW() (void)0
+#endif
+
 #ifdef SIGBUS
 static RETSIGTYPE
-sigbus(int sig)
+sigbus(int sig SIGINFO_ARG)
 {
+/*
+ * Mac OS X makes KERN_PROTECTION_FAILURE when thread touch guard page.
+ * and it's delivered as SIGBUS instaed of SIGSEGV to userland. It's crazy
+ * wrong IMHO. but anyway we have to care it. Sigh.
+ */
+#if defined __APPLE__
+    CHECK_STACK_OVERFLOW();
+#endif
     rb_bug("Bus Error");
 }
 #endif
 
 #ifdef SIGSEGV
+static void ruby_abort(void)
+{
+#ifdef __sun
+    /* Solaris's abort() is async signal unsafe. Of course, it is not
+     *  POSIX compliant.
+     */
+    raise(SIGABRT);
+#else
+    abort();
+#endif
+
+}
+
 static int segv_received = 0;
+extern int ruby_disable_gc_stress;
+
 static RETSIGTYPE
 sigsegv(int sig SIGINFO_ARG)
 {
-#ifdef USE_SIGALTSTACK
-    int ruby_stack_overflowed_p(const rb_thread_t *, const void *);
-    NORETURN(void ruby_thread_stack_overflow(rb_thread_t *th));
-    rb_thread_t *th = GET_THREAD();
-    if (ruby_stack_overflowed_p(th, info->si_addr)) {
-	ruby_thread_stack_overflow(th);
-    }
-#endif
     if (segv_received) {
-	fprintf(stderr, "SEGV received in SEGV handler\n");
-	exit(EXIT_FAILURE);
+	char msg[] = "SEGV received in SEGV handler\n";
+	write(2, msg, sizeof(msg));
+	ruby_abort();
     }
-    else {
-	extern int ruby_disable_gc_stress;
-	segv_received = 1;
-	ruby_disable_gc_stress = 1;
-	rb_bug("Segmentation fault");
-    }
-}
-#endif
 
-#ifdef SIGPIPE
-static RETSIGTYPE
-sigpipe(int sig)
-{
-    /* do nothing */
+    CHECK_STACK_OVERFLOW();
+
+    segv_received = 1;
+    ruby_disable_gc_stress = 1;
+    rb_bug("Segmentation fault");
 }
 #endif
 
@@ -686,11 +708,7 @@ rb_signal_exec(rb_thread_t *th, int sig)
 
 struct trap_arg {
 #if USE_TRAP_MASK
-# ifdef HAVE_SIGPROCMASK
     sigset_t mask;
-# else
-    int mask;
-# endif
 #endif
     int sig;
     sighandler_t func;
@@ -725,7 +743,7 @@ default_handler(int sig)
         break;
 #ifdef SIGBUS
       case SIGBUS:
-        func = sigbus;
+        func = (sighandler_t)sigbus;
         break;
 #endif
 #ifdef SIGSEGV
@@ -738,7 +756,7 @@ default_handler(int sig)
 #endif
 #ifdef SIGPIPE
       case SIGPIPE:
-        func = sigpipe;
+        func = SIG_IGN;
         break;
 #endif
       default:
@@ -870,11 +888,7 @@ trap(struct trap_arg *arg)
     vm->trap_list[sig].safe = rb_safe_level();
     /* enable at least specified signal. */
 #if USE_TRAP_MASK
-#ifdef HAVE_SIGPROCMASK
     sigdelset(&arg->mask, sig);
-#else
-    arg->mask &= ~sigmask(sig);
-#endif
 #endif
     return oldcmd;
 }
@@ -953,11 +967,15 @@ sig_trap(int argc, VALUE *argv)
 	rb_raise(rb_eSecurityError, "Insecure: tainted signal trap");
     }
 #if USE_TRAP_MASK
-    /* disable interrupt */
-    sigfillset(&arg.mask);
-    pthread_sigmask(SIG_BLOCK, &arg.mask, &arg.mask);
+    {
+      sigset_t fullmask;
 
-    return rb_ensure(trap, (VALUE)&arg, trap_ensure, (VALUE)&arg);
+      /* disable interrupt */
+      sigfillset(&fullmask);
+      pthread_sigmask(SIG_BLOCK, &fullmask, &arg.mask);
+
+      return rb_ensure(trap, (VALUE)&arg, trap_ensure, (VALUE)&arg);
+    }
 #else
     return trap(&arg);
 #endif
@@ -1001,17 +1019,12 @@ init_sigchld(int sig)
 {
     sighandler_t oldfunc;
 #if USE_TRAP_MASK
-# ifdef HAVE_SIGPROCMASK
     sigset_t mask;
-# else
-    int mask;
-# endif
-#endif
+    sigset_t fullmask;
 
-#if USE_TRAP_MASK
     /* disable interrupt */
-    sigfillset(&mask);
-    pthread_sigmask(SIG_BLOCK, &mask, &mask);
+    sigfillset(&fullmask);
+    pthread_sigmask(SIG_BLOCK, &fullmask, &mask);
 #endif
 
     oldfunc = ruby_signal(sig, SIG_DFL);
@@ -1041,8 +1054,9 @@ ruby_sig_finalize(void)
 }
 
 
-#ifdef RUBY_DEBUG_ENV
 int ruby_enable_coredump = 0;
+#ifndef RUBY_DEBUG_ENV
+#define ruby_enable_coredump 0
 #endif
 
 /*
@@ -1116,22 +1130,19 @@ Init_signal(void)
     install_sighandler(SIGUSR2, sighandler);
 #endif
 
-#ifdef RUBY_DEBUG_ENV
-    if (!ruby_enable_coredump)
-#endif
-    {
+    if (!ruby_enable_coredump) {
 #ifdef SIGBUS
-    install_sighandler(SIGBUS, sigbus);
+	install_sighandler(SIGBUS, (sighandler_t)sigbus);
 #endif
 #ifdef SIGSEGV
 # ifdef USE_SIGALTSTACK
-    rb_register_sigaltstack(GET_THREAD());
+	rb_register_sigaltstack(GET_THREAD());
 # endif
-    install_sighandler(SIGSEGV, (sighandler_t)sigsegv);
+	install_sighandler(SIGSEGV, (sighandler_t)sigsegv);
 #endif
     }
 #ifdef SIGPIPE
-    install_sighandler(SIGPIPE, sigpipe);
+    install_sighandler(SIGPIPE, SIG_IGN);
 #endif
 
 #if defined(SIGCLD)

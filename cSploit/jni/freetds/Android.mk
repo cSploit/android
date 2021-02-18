@@ -62,9 +62,10 @@ LOCAL_SRC_FILES:= \
 	src/dblib/xact.c\
 	src/dblib/dbpivot.c
 LOCAL_STATIC_LIBRARIES:= \
-	libiconv\
-	libssl_static\
-	libcrypto_static
+	libiconv
+LOCAL_SHARED_LIBRARIES:= \
+	libssl\
+	libcrypto
 LOCAL_MODULE := libsybdb
 
 include $(BUILD_STATIC_LIBRARY)

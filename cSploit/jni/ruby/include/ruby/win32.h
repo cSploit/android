@@ -34,6 +34,9 @@ extern "C" {
 #if defined(__cplusplus) && defined(_MSC_VER)
 extern "C++" {			/* template without extern "C++" */
 #endif
+#if !defined(_WIN64) && !defined(WIN32)
+#define WIN32
+#endif
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #if defined(__cplusplus) && defined(_MSC_VER)
@@ -98,6 +101,9 @@ typedef unsigned int uintptr_t;
 #ifndef __MINGW32__
 # define mode_t int
 #endif
+#ifdef HAVE_UNISTD_H
+# include <unistd.h>
+#endif
 
 #ifdef WIN95
 extern DWORD rb_w32_osid(void);
@@ -120,6 +126,7 @@ extern DWORD rb_w32_osid(void);
 #undef fputchar
 #undef utime
 #undef lseek
+#undef stat
 #undef fstat
 #define getc(_stream)		rb_w32_getc(_stream)
 #define getchar()		rb_w32_getc(stdin)
@@ -143,6 +150,7 @@ extern DWORD rb_w32_osid(void);
 #define getppid()		rb_w32_getppid()
 #define sleep(x)		rb_w32_Sleep((x)*1000)
 #define Sleep(msec)		(void)rb_w32_Sleep(msec)
+#define fstati64(fd,st) 	rb_w32_fstati64(fd,st)
 #ifdef __BORLANDC__
 #define creat(p, m)		_creat(p, m)
 #define eof()			_eof()
@@ -151,7 +159,6 @@ extern DWORD rb_w32_osid(void);
 #define tell(h)			_tell(h)
 #define _open			_sopen
 #define sopen			_sopen
-#define _fstati64(fd,st)	rb_w32_fstati64(fd,st)
 #undef fopen
 #define fopen(p, m)		rb_w32_fopen(p, m)
 #undef fdopen
@@ -178,7 +185,7 @@ extern DWORD rb_w32_osid(void);
 #if SIZEOF_OFF_T == 8
 #define off_t __int64
 #define stat stati64
-#define fstat(fd,st)		_fstati64(fd,st)
+#define fstat(fd,st)		fstati64(fd,st)
 #if defined(__BORLANDC__)
 #define stati64(path, st) rb_w32_stati64(path, st)
 #elif !defined(_MSC_VER) || RT_VER < 80
@@ -189,7 +196,6 @@ extern DWORD rb_w32_osid(void);
 #else
 #define stati64 _stat64
 #define _stat64(path, st) rb_w32_stati64(path, st)
-#define _fstati64 _fstat64
 #endif
 #else
 #define stat(path,st)		rb_w32_stat(path,st)
@@ -228,7 +234,7 @@ struct msghdr {
 extern int    rb_w32_cmdvector(const char *, char ***);
 extern rb_pid_t  rb_w32_pipe_exec(const char *, const char *, int, int *, int *);
 extern int    flock(int fd, int oper);
-extern int    rb_w32_has_cancel_io(void);
+extern int    rb_w32_io_cancelable_p(int);
 extern int    rb_w32_is_socket(int);
 extern int    WSAAPI rb_w32_accept(int, struct sockaddr *, int *);
 extern int    WSAAPI rb_w32_bind(int, const struct sockaddr *, int);
@@ -267,6 +273,8 @@ extern int    rb_w32_urename(const char *, const char *);
 extern char **rb_w32_get_environ(void);
 extern void   rb_w32_free_environ(char **);
 extern int    rb_w32_map_errno(DWORD);
+extern char * WSAAPI rb_w32_inet_ntop(int,void *,char *,size_t);
+extern DWORD  rb_w32_osver(void);
 
 extern int chown(const char *, int, int);
 extern int rb_w32_uchown(const char *, int, int);
@@ -276,6 +284,7 @@ extern int gettimeofday(struct timeval *, struct timezone *);
 extern rb_pid_t waitpid (rb_pid_t, int *, int);
 extern rb_pid_t rb_w32_spawn(int, const char *, const char*);
 extern rb_pid_t rb_w32_aspawn(int, const char *, char *const *);
+extern rb_pid_t rb_w32_aspawn_flags(int, const char *, char *const *, DWORD);
 extern int kill(int, int);
 extern int fcntl(int, int, ...);
 extern rb_pid_t rb_w32_getpid(void);
@@ -295,9 +304,10 @@ extern int rb_w32_stati64(const char *, struct stati64 *);
 extern int rb_w32_ustati64(const char *, struct stati64 *);
 extern int rb_w32_access(const char *, int);
 extern int rb_w32_uaccess(const char *, int);
+extern char rb_w32_fd_is_text(int);
+extern int rb_w32_fstati64(int, struct stati64 *);
 
 #ifdef __BORLANDC__
-extern int rb_w32_fstati64(int, struct stati64 *);
 extern off_t _lseeki64(int, off_t, int);
 extern FILE *rb_w32_fopen(const char *, const char *);
 extern FILE *rb_w32_fdopen(int, const char *);
@@ -305,6 +315,20 @@ extern FILE *rb_w32_fsopen(const char *, const char *, int);
 #endif
 
 #include <float.h>
+
+#if defined _MSC_VER && _MSC_VER >= 1800 && defined INFINITY
+#pragma warning(push)
+#pragma warning(disable:4756)
+static inline float
+rb_infinity_float(void)
+{
+    return INFINITY;
+}
+#pragma warning(pop)
+#undef INFINITY
+#define INFINITY rb_infinity_float()
+#endif
+
 #if !defined __MINGW32__ || defined __NO_ISOCEXT
 #ifndef isnan
 #define isnan(x) _isnan(x)
@@ -376,11 +400,43 @@ scalb(double a, long b)
 //
 
 #define SUFFIX
+
+extern int 	 rb_w32_ftruncate(int fd, off_t length);
+extern int 	 rb_w32_truncate(const char *path, off_t length);
+extern off_t	 rb_w32_ftello(FILE *stream);
+extern int 	 rb_w32_fseeko(FILE *stream, off_t offset, int whence);
+
+#undef HAVE_FTRUNCATE
+#define HAVE_FTRUNCATE 1
+#if defined HAVE_FTRUNCATE64
+#define ftruncate ftruncate64
+#else
 #define ftruncate rb_w32_ftruncate
-extern int       truncate(const char *path, off_t length);
-extern int       ftruncate(int fd, off_t length);
-extern int       fseeko(FILE *stream, off_t offset, int whence);
-extern off_t     ftello(FILE *stream);
+#endif
+
+#undef HAVE_TRUNCATE
+#define HAVE_TRUNCATE 1
+#if defined HAVE_TRUNCATE64
+#define truncate truncate64
+#else
+#define truncate rb_w32_truncate
+#endif
+
+#undef HAVE_FSEEKO
+#define HAVE_FSEEKO 1
+#if defined HAVE_FSEEKO64
+#define fseeko fseeko64
+#else
+#define fseeko rb_w32_fseeko
+#endif
+
+#undef HAVE_FTELLO
+#define HAVE_FTELLO 1
+#if defined HAVE_FTELLO64
+#define ftello ftello64
+#else
+#define ftello rb_w32_ftello
+#endif
 
 //
 // stubs
@@ -533,7 +589,22 @@ extern char *rb_w32_strerror(int);
 #define O_NONBLOCK 1
 
 #undef FD_SET
-#define FD_SET(f, s)		rb_w32_fdset(f, s)
+#define FD_SET(fd, set)	do {\
+    unsigned int i;\
+    SOCKET s = _get_osfhandle(fd);\
+\
+    for (i = 0; i < (set)->fd_count; i++) {\
+        if ((set)->fd_array[i] == s) {\
+            break;\
+        }\
+    }\
+    if (i == (set)->fd_count) {\
+        if ((set)->fd_count < FD_SETSIZE) {\
+            (set)->fd_array[i] = s;\
+            (set)->fd_count++;\
+        }\
+    }\
+} while(0)
 
 #undef FD_CLR
 #define FD_CLR(f, s)		rb_w32_fdclr(f, s)
@@ -542,6 +613,9 @@ extern char *rb_w32_strerror(int);
 #define FD_ISSET(f, s)		rb_w32_fdisset(f, s)
 
 #ifdef RUBY_EXPORT
+#undef inet_ntop
+#define inet_ntop(f,a,n,l)      rb_w32_inet_ntop(f,a,n,l)
+
 #undef accept
 #define accept(s, a, l)		rb_w32_accept(s, a, l)
 
@@ -650,13 +724,14 @@ int  rb_w32_wopen(const WCHAR *, int, ...);
 int  rb_w32_close(int);
 int  rb_w32_fclose(FILE*);
 int  rb_w32_pipe(int[2]);
-size_t rb_w32_read(int, void *, size_t);
-size_t rb_w32_write(int, const void *, size_t);
+ssize_t rb_w32_read(int, void *, size_t);
+ssize_t rb_w32_write(int, const void *, size_t);
 int  rb_w32_utime(const char *, const struct utimbuf *);
 int  rb_w32_uutime(const char *, const struct utimbuf *);
-long rb_w32_write_console(unsigned long, int);
+long rb_w32_write_console(uintptr_t, int);	/* use uintptr_t instead of VALUE because it's not defined yet here */
 int  WINAPI rb_w32_Sleep(unsigned long msec);
 int  rb_w32_wait_events_blocking(HANDLE *events, int num, DWORD timeout);
+int  rb_w32_time_subtract(struct timeval *rest, const struct timeval *wait);
 
 /*
 == ***CAUTION***
@@ -672,11 +747,41 @@ uintptr_t rb_w32_asynchronize(asynchronous_func_t func, uintptr_t self, int argc
 #pragma GCC visibility pop
 #endif
 
+#ifdef __MINGW_ATTRIB_PURE
+/* get rid of bugs in math.h of mingw */
+#define frexp(_X, _Y) __extension__ ({\
+    int intpart_frexp_bug = intpart_frexp_bug;\
+    double result_frexp_bug = frexp((_X), &intpart_frexp_bug);\
+    *(_Y) = intpart_frexp_bug;\
+    result_frexp_bug;\
+})
+#define modf(_X, _Y) __extension__ ({\
+    double intpart_modf_bug = intpart_modf_bug;\
+    double result_modf_bug = modf((_X), &intpart_modf_bug);\
+    *(_Y) = intpart_modf_bug;\
+    result_modf_bug;\
+})
+#endif
+
 #if defined(__cplusplus)
 #if 0
 { /* satisfy cc-mode */
 #endif
 }  /* extern "C" { */
+#endif
+
+#ifdef __MINGW64__
+/*
+ * Use powl() instead of broken pow() of x86_64-w64-mingw32.
+ * This workaround will fix test failures in test_bignum.rb,
+ * test_fixnum.rb and test_float.rb etc.
+ */
+static inline double
+rb_w32_pow(double x, double y)
+{
+    return powl(x, y);
+}
+#define pow rb_w32_pow
 #endif
 
 #endif /* RUBY_WIN32_H */

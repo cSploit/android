@@ -1,4 +1,5 @@
 require 'test/unit'
+require_relative 'envutil'
 
 class TestProc < Test::Unit::TestCase
   def setup
@@ -140,11 +141,50 @@ class TestProc < Test::Unit::TestCase
     method(:m2).to_proc
   end
 
+  def m1(var)
+    var
+  end
+
+  def m_block_given?
+    m1(block_given?)
+  end
+
   # [yarv-dev:777] block made by Method#to_proc
   def test_method_to_proc
     b = block()
     assert_equal "OK", b.call
     assert_instance_of(Binding, b.binding, '[ruby-core:25589]')
+  end
+
+  def test_block_given_method
+    m = method(:m_block_given?)
+    assert(!m.call, "without block")
+    assert(m.call {}, "with block")
+    assert(!m.call, "without block second")
+  end
+
+  def test_block_given_method_to_proc
+    bug8341 = '[Bug #8341]'
+    m = method(:m_block_given?).to_proc
+    assert(!m.call, "#{bug8341} without block")
+    assert(m.call {}, "#{bug8341} with block")
+    assert(!m.call, "#{bug8341} without block second")
+  end
+
+  def test_block_persist_between_calls
+    bug8341 = '[Bug #8341]'
+    o = Object.new
+    def o.m1(top=true)
+      if top
+        [block_given?, @m.call(false)]
+      else
+        block_given?
+      end
+    end
+    m = o.method(:m1).to_proc
+    o.instance_variable_set(:@m, m)
+    assert_equal([true, false], m.call {}, "#{bug8341} nested with block")
+    assert_equal([false, false], m.call, "#{bug8341} nested without block")
   end
 
   def test_curry
@@ -787,9 +827,45 @@ class TestProc < Test::Unit::TestCase
   end
 
   def test_splat_without_respond_to
-    def (obj = Object.new).respond_to?(m); false end
+    def (obj = Object.new).respond_to?(m,*); false end
     [obj].each do |a, b|
       assert_equal([obj, nil], [a, b], '[ruby-core:24139]')
     end
+  end
+
+  def test_curry_with_trace
+    bug3751 = '[ruby-core:31871]'
+    set_trace_func(proc {})
+    test_curry
+  ensure
+    set_trace_func(nil)
+  end
+
+  def test_block_propagation
+    bug3792 = '[ruby-core:32075]'
+    c = Class.new do
+      def foo
+        yield
+      end
+    end
+
+    o = c.new
+    f = :foo.to_proc
+    assert_nothing_raised(LocalJumpError, bug3792) {
+      assert_equal('bar', f.(o) {'bar'}, bug3792)
+    }
+    assert_nothing_raised(LocalJumpError, bug3792) {
+      assert_equal('zot', o.method(:foo).to_proc.() {'zot'}, bug3792)
+    }
+  end
+
+  def test_overriden_lambda
+    bug8345 = '[ruby-core:54687] [Bug #8345]'
+    assert_normal_exit('def lambda; end; method(:puts).to_proc', bug8345)
+  end
+
+  def test_overriden_proc
+    bug8345 = '[ruby-core:54688] [Bug #8345]'
+    assert_normal_exit('def proc; end; ->{}.curry', bug8345)
   end
 end

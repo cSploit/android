@@ -36,25 +36,30 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* \summary: IPv4 mobility printer */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#ifndef lint
+static const char rcsid[] _U_ =
+     "@(#) $Header: /tcpdump/master/tcpdump/print-mobile.c,v 1.15 2004/03/24 01:58:14 guy Exp $";
+#endif
 
-#include "netdissect.h"
+#include <tcpdump-stdinc.h>
+
+#include <stdio.h>
+
+#include "interface.h"
 #include "addrtoname.h"
-#include "extract.h"
+#include "extract.h"		/* must come after interface.h */
 
 #define MOBILE_SIZE (8)
 
 struct mobile_ip {
-	uint16_t proto;
-	uint16_t hcheck;
-	uint32_t odst;
-	uint32_t osrc;
+	u_int16_t proto;
+	u_int16_t hcheck;
+	u_int32_t odst;
+	u_int32_t osrc;
 };
 
 #define OSRC_PRES	0x0080	/* old source is present */
@@ -63,41 +68,42 @@ struct mobile_ip {
  * Deencapsulate and print a mobile-tunneled IP datagram
  */
 void
-mobile_print(netdissect_options *ndo, const u_char *bp, u_int length)
+mobile_print(const u_char *bp, u_int length)
 {
+	const u_char *cp = bp +8 ;
 	const struct mobile_ip *mob;
-	struct cksum_vec vec[1];
 	u_short proto,crc;
 	u_char osp =0;			/* old source address present */
 
 	mob = (const struct mobile_ip *)bp;
 
-	if (length < MOBILE_SIZE || !ND_TTEST(*mob)) {
-		ND_PRINT((ndo, "[|mobile]"));
+	if (length < MOBILE_SIZE || !TTEST(*mob)) {
+		fputs("[|mobile]", stdout);
 		return;
 	}
-	ND_PRINT((ndo, "mobile: "));
+	fputs("mobile: ", stdout);
 
 	proto = EXTRACT_16BITS(&mob->proto);
 	crc =  EXTRACT_16BITS(&mob->hcheck);
 	if (proto & OSRC_PRES) {
 		osp=1;
+		cp +=4 ;
 	}
 
 	if (osp)  {
-		ND_PRINT((ndo, "[S] "));
-		if (ndo->ndo_vflag)
-			ND_PRINT((ndo, "%s ", ipaddr_string(ndo, &mob->osrc)));
+		fputs("[S] ",stdout);
+		if (vflag)
+			(void)printf("%s ",ipaddr_string(&mob->osrc));
 	} else {
-		ND_PRINT((ndo, "[] "));
+		fputs("[] ",stdout);
 	}
-	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, "> %s ", ipaddr_string(ndo, &mob->odst)));
-		ND_PRINT((ndo, "(oproto=%d)", proto>>8));
+	if (vflag) {
+		(void)printf("> %s ",ipaddr_string(&mob->odst));
+		(void)printf("(oproto=%d)",proto>>8);
 	}
-	vec[0].ptr = (const uint8_t *)(const void *)mob;
-	vec[0].len = osp ? 12 : 8;
-	if (in_cksum(vec, 1)!=0) {
-		ND_PRINT((ndo, " (bad checksum %d)", crc));
+	if (in_cksum((u_short *)mob, osp ? 12 : 8, 0)!=0) {
+		(void)printf(" (bad checksum %d)",crc);
 	}
+
+	return;
 }

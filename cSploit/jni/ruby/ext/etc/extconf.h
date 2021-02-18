@@ -1,0 +1,9 @@
+#ifndef EXTCONF_H
+#define EXTCONF_H
+#define HAVE_GETLOGIN 1
+#define SYSCONFDIR "/system/etc"
+#define HAVE_STRUCT_PASSWD_PW_PASSWD 1
+#define HAVE_ST_PW_PASSWD 1
+#define HAVE_STRUCT_GROUP_GR_PASSWD 1
+#define HAVE_ST_GR_PASSWD 1
+#endif

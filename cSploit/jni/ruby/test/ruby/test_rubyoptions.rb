@@ -2,9 +2,26 @@ require 'test/unit'
 
 require 'tmpdir'
 require 'tempfile'
+require 'pathname'
+
 require_relative 'envutil'
 
 class TestRubyOptions < Test::Unit::TestCase
+  def write_file(filename, content)
+    File.open(filename, "w") {|f|
+      f << content
+    }
+  end
+
+  def with_tmpchdir
+    Dir.mktmpdir {|d|
+      d = Pathname.new(d).realpath.to_s
+      Dir.chdir(d) {
+        yield d
+      }
+    }
+  end
+
   def test_source_file
     assert_in_out_err([], "", [], [])
   end
@@ -57,13 +74,14 @@ class TestRubyOptions < Test::Unit::TestCase
   end
 
   def test_debug
-    assert_in_out_err(%w(-de) + ["p $DEBUG"], "", %w(true), [])
+    assert_in_out_err(["--disable-gems", "-de", "p $DEBUG"], "", %w(true), [])
 
-    assert_in_out_err(%w(--debug -e) + ["p $DEBUG"], "", %w(true), [])
+    assert_in_out_err(["--disable-gems", "--debug", "-e", "p $DEBUG"],
+                      "", %w(true), [])
   end
 
   def test_verbose
-    assert_in_out_err(%w(-vve) + [""]) do |r, e|
+    assert_in_out_err(["-vve", ""]) do |r, e|
       assert_match(/^ruby #{RUBY_VERSION}(?:[p ]|dev).*? \[#{RUBY_PLATFORM}\]$/, r.join)
       assert_equal RUBY_DESCRIPTION, r.join.chomp
       assert_equal([], e)
@@ -124,6 +142,8 @@ class TestRubyOptions < Test::Unit::TestCase
     require "pp"
     assert_in_out_err(%w(-r pp -e) + ["pp 1"], "", %w(1), [])
     assert_in_out_err(%w(-rpp -e) + ["pp 1"], "", %w(1), [])
+    assert_in_out_err(%w(-ep\ 1 -r), "", %w(1), [])
+    assert_in_out_err(%w(-r), "", [], [])
   rescue LoadError
   end
 
@@ -207,10 +227,10 @@ class TestRubyOptions < Test::Unit::TestCase
     assert_in_out_err([], "", [], /invalid switch in RUBYOPT: -e \(RuntimeError\)/)
 
     ENV['RUBYOPT'] = '-T1'
-    assert_in_out_err([], "", [], /no program input from stdin allowed in tainted mode \(SecurityError\)/)
+    assert_in_out_err(["--disable-gems"], "", [], /no program input from stdin allowed in tainted mode \(SecurityError\)/)
 
     ENV['RUBYOPT'] = '-T4'
-    assert_in_out_err([], "", [], /no program input from stdin allowed in tainted mode \(SecurityError\)/)
+    assert_in_out_err(["--disable-gems"], "", [], /no program input from stdin allowed in tainted mode \(SecurityError\)/)
 
     ENV['RUBYOPT'] = '-Eus-ascii -KN'
     assert_in_out_err(%w(-Eutf-8 -KU), "p '\u3042'") do |r, e|
@@ -271,6 +291,12 @@ class TestRubyOptions < Test::Unit::TestCase
       assert_equal("\"\u3042\"", r.join.force_encoding(Encoding::UTF_8))
       assert_equal([], e)
     end
+
+    bug4118 = '[ruby-dev:42680]'
+    assert_in_out_err(%w[], "#!/bin/sh\n""#!shebang\n""#!ruby\n""puts __LINE__\n",
+                      %w[4], [], bug4118)
+    assert_in_out_err(%w[-x], "#!/bin/sh\n""#!shebang\n""#!ruby\n""puts __LINE__\n",
+                      %w[4], [], bug4118)
   end
 
   def test_sflag
@@ -313,6 +339,31 @@ class TestRubyOptions < Test::Unit::TestCase
     err = ["#{t.path}:2: warning: mismatched indentations at 'end' with 'begin' at 1"]
     assert_in_out_err(["-w", t.path], "", [], err)
     assert_in_out_err(["-wr", t.path, "-e", ""], "", [], err)
+
+    t.open
+    t.puts "# -*- warn-indent: false -*-"
+    t.puts "begin"
+    t.puts " end"
+    t.close
+    assert_in_out_err(["-w", t.path], "", [], [], '[ruby-core:25442]')
+
+    err = ["#{t.path}:4: warning: mismatched indentations at 'end' with 'begin' at 3"]
+    t.open
+    t.puts "# -*- warn-indent: false -*-"
+    t.puts "# -*- warn-indent: true -*-"
+    t.puts "begin"
+    t.puts " end"
+    t.close
+    assert_in_out_err(["-w", t.path], "", [], err, '[ruby-core:25442]')
+
+    err = ["#{t.path}:4: warning: mismatched indentations at 'end' with 'begin' at 2"]
+    t.open
+    t.puts "# -*- warn-indent: true -*-"
+    t.puts "begin"
+    t.puts "# -*- warn-indent: false -*-"
+    t.puts " end"
+    t.close
+    assert_in_out_err(["-w", t.path], "", [], [], '[ruby-core:25442]')
   ensure
     t.close(true) if t
   end
@@ -366,6 +417,20 @@ class TestRubyOptions < Test::Unit::TestCase
     }
   end
 
+  def test_set_program_name
+    skip "platform dependent feature" if /linux|freebsd|netbsd|openbsd|darwin/ !~ RUBY_PLATFORM
+
+    with_tmpchdir do
+      write_file("test-script", "$0 = 'hello world'; sleep 60")
+
+      pid = spawn(EnvUtil.rubybin, "test-script")
+      sleep 0.1
+      ps = `ps -p #{pid} -o command`
+      assert_match(/hello world/, ps)
+      Process.kill :KILL, pid
+    end
+  end
+
   def test_segv_test
     opts = {}
     if /mswin|mingw/ =~ RUBY_PLATFORM
@@ -378,9 +443,8 @@ class TestRubyOptions < Test::Unit::TestCase
       %r(\A
       -e:(?:1:)?\s\[BUG\]\sSegmentation\sfault\n
       #{ Regexp.quote(RUBY_DESCRIPTION) }\n\n
-      --\scontrol\sframe\s----------\n
+      --\sControl\sframe\sinformation\s-+\n
       (?:c:.*\n)*
-      ---------------------------\n
       (?:
       --\sRuby\slevel\sbacktrace\sinformation\s----------------------------------------\n
       -e:1:in\s\`<main>\'\n
@@ -391,6 +455,7 @@ class TestRubyOptions < Test::Unit::TestCase
         --\sC\slevel\sbacktrace\sinformation\s-------------------------------------------\n
         (?:(?:.*\s)?\[0x\h+\]\n)*\n
       )?
+      (?m:.*)
       \[NOTE\]\n
       You\smay\shave\sencountered\sa\sbug\sin\sthe\sRuby\sinterpreter\sor\sextension\slibraries.\n
       Bug\sreports\sare\swelcome.\n
@@ -423,6 +488,20 @@ class TestRubyOptions < Test::Unit::TestCase
     assert_in_out_err(["-we", "def foo\n  eval('a=1')\nend"], "", [], [], feature3446)
     assert_in_out_err(["-we", "1.times do\n  a=1\nend"], "", [], [], feature3446)
     assert_in_out_err(["-we", "def foo\n  1.times do\n    a=1\n  end\nend"], "", [], ["-e:3: warning: assigned but unused variable - a"], feature3446)
+    assert_in_out_err(["-we", "def foo\n""  1.times do |a| end\n""end"], "", [], [])
+    bug7408 = '[ruby-core:49659]'
+    assert_in_out_err(["-we", "def foo\n  a=1\n :a\nend"], "", [], ["-e:2: warning: assigned but unused variable - a"], bug7408)
+  end
+
+  def test_shadowing_variable
+    bug4130 = '[ruby-dev:42718]'
+    assert_in_out_err(["-we", "def foo\n""  a=1\n""  1.times do |a| end\n""  a\n""end"],
+                      "", [], ["-e:3: warning: shadowing outer local variable - a"], bug4130)
+    assert_in_out_err(["-we", "def foo\n""  a=1\n""  1.times do |a| end\n""end"],
+                      "", [],
+                      ["-e:3: warning: shadowing outer local variable - a",
+                       "-e:2: warning: assigned but unused variable - a",
+                      ], bug4130)
   end
 
   def test_script_from_stdin
@@ -435,21 +514,25 @@ class TestRubyOptions < Test::Unit::TestCase
     require 'timeout'
     result = nil
     IO.pipe {|r, w|
-      PTY.open {|m, s|
-	m.echo = false
-	m.print("\C-d")
-	pid = spawn(EnvUtil.rubybin, :in => s, :out => w)
-	w.close
-	assert_nothing_raised('[ruby-dev:37798]') do
-	  result = Timeout.timeout(3) {r.read}
-	end
-	Process.wait pid
-      }
+      begin
+        PTY.open {|m, s|
+          s.echo = false
+          m.print("\C-d")
+          pid = spawn(EnvUtil.rubybin, :in => s, :out => w)
+          w.close
+          assert_nothing_raised('[ruby-dev:37798]') do
+            result = Timeout.timeout(3) {r.read}
+          end
+          Process.wait pid
+        }
+      rescue RuntimeError
+        skip $!
+      end
     }
     assert_equal("", result, '[ruby-dev:37798]')
     IO.pipe {|r, w|
       PTY.open {|m, s|
-	m.echo = false
+	s.echo = false
 	pid = spawn(EnvUtil.rubybin, :in => s, :out => w)
 	w.close
 	m.print("$stdin.read; p $stdin.gets\n\C-d")
@@ -460,5 +543,26 @@ class TestRubyOptions < Test::Unit::TestCase
       }
     }
     assert_equal("\"zzz\\n\"\n", result, '[ruby-core:30910]')
+  end
+
+  def test_unmatching_glob
+    bug3851 = '[ruby-core:32478]'
+    a = "a[foo"
+    Dir.mktmpdir do |dir|
+      open(File.join(dir, a), "w") {|f| f.puts("p 42")}
+      assert_in_out_err(["-C", dir, a], "", ["42"], [], bug3851)
+      File.unlink(File.join(dir, a))
+      assert_in_out_err(["-C", dir, a], "", [], /LoadError/, bug3851)
+    end
+  end
+
+  def test_pflag_gsub
+    bug7157 = '[ruby-core:47967]'
+    assert_in_out_err(['-p', '-e', 'gsub(/t.*/){"TEST"}'], %[test], %w[TEST], [], bug7157)
+  end
+
+  def test_pflag_sub
+    bug7157 = '[ruby-core:47967]'
+    assert_in_out_err(['-p', '-e', 'sub(/t.*/){"TEST"}'], %[test], %w[TEST], [], bug7157)
   end
 end

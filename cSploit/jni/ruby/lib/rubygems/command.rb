@@ -146,14 +146,22 @@ class Gem::Command
   end
 
   ##
-  #
   # Display to the user that a gem couldn't be found and reasons why
-  def show_lookup_failure(gem_name, version, errors=nil)
+
+  def show_lookup_failure(gem_name, version, errors, domain)
     if errors and !errors.empty?
       alert_error "Could not find a valid gem '#{gem_name}' (#{version}), here is why:"
       errors.each { |x| say "          #{x.wordy}" }
     else
       alert_error "Could not find a valid gem '#{gem_name}' (#{version}) in any repository"
+    end
+
+    unless domain == :local then # HACK
+      suggestions = Gem::SpecFetcher.fetcher.suggest_gems_from_name gem_name
+
+      unless suggestions.empty?
+        alert_error "Possible alternatives: #{suggestions.join(", ")}"
+      end
     end
   end
 
@@ -168,7 +176,7 @@ class Gem::Command
             "Please specify at least one gem name (e.g. gem build GEMNAME)"
     end
 
-    gem_names = args.select { |arg| arg !~ /^-/ }
+    args.select { |arg| arg !~ /^-/ }
   end
 
   ##
@@ -396,10 +404,12 @@ class Gem::Command
       end
     end
 
-    @parser.separator nil
-    @parser.separator "  Summary:"
-    wrap(@summary, 80 - 4).split("\n").each do |line|
-      @parser.separator "    #{line.strip}"
+    if @summary then
+      @parser.separator nil
+      @parser.separator "  Summary:"
+      wrap(@summary, 80 - 4).split("\n").each do |line|
+        @parser.separator "    #{line.strip}"
+      end
     end
 
     if description then
@@ -430,7 +440,7 @@ class Gem::Command
     @parser.separator "  #{header}Options:"
 
     option_list.each do |args, handler|
-      dashes = args.select { |arg| arg =~ /^-/ }
+      args.select { |arg| arg =~ /^-/ }
       @parser.on(*args) do |value|
         handler.call(value, @options)
       end

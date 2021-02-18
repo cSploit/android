@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-require_relative 'helper'
+require 'psych/helper'
 
 module Psych
   class TestEncoding < TestCase
@@ -31,6 +31,79 @@ module Psych
       @emitter = Psych::Emitter.new @buffer
     end
 
+    def test_transcode_shiftjis
+      str = "こんにちは！"
+      loaded = Psych.load("--- こんにちは！".encode('SHIFT_JIS'))
+      assert_equal str, loaded
+    end
+
+    def test_transcode_utf16le
+      str = "こんにちは！"
+      loaded = Psych.load("--- こんにちは！".encode('UTF-16LE'))
+      assert_equal str, loaded
+    end
+
+    def test_transcode_utf16be
+      str = "こんにちは！"
+      loaded = Psych.load("--- こんにちは！".encode('UTF-16BE'))
+      assert_equal str, loaded
+    end
+
+    def test_io_shiftjis
+      t = Tempfile.new(['shiftjis', 'yml'], :encoding => 'SHIFT_JIS')
+      t.write '--- こんにちは！'
+      t.close
+
+      # If the external encoding isn't utf8, utf16le, or utf16be, we cannot
+      # process the file.
+      File.open(t.path, 'r', :encoding => 'SHIFT_JIS') do |f|
+        assert_raises Psych::SyntaxError do
+          Psych.load(f)
+        end
+      end
+
+      t.close(true)
+    end
+
+    def test_io_utf16le
+      t = Tempfile.new(['utf16le', 'yml'])
+      t.binmode
+      t.write '--- こんにちは！'.encode('UTF-16LE')
+      t.close
+
+      File.open(t.path, 'rb', :encoding => 'UTF-16LE') do |f|
+        assert_equal "こんにちは！", Psych.load(f)
+      end
+
+      t.close(true)
+    end
+
+    def test_io_utf16be
+      t = Tempfile.new(['utf16be', 'yml'])
+      t.binmode
+      t.write '--- こんにちは！'.encode('UTF-16BE')
+      t.close
+
+      File.open(t.path, 'rb', :encoding => 'UTF-16BE') do |f|
+        assert_equal "こんにちは！", Psych.load(f)
+      end
+
+      t.close(true)
+    end
+
+    def test_io_utf8
+      t = Tempfile.new(['utf8', 'yml'])
+      t.binmode
+      t.write '--- こんにちは！'.encode('UTF-8')
+      t.close
+
+      File.open(t.path, 'rb', :encoding => 'UTF-8') do |f|
+        assert_equal "こんにちは！", Psych.load(f)
+      end
+
+      t.close(true)
+    end
+
     def test_emit_alias
       @emitter.start_stream Psych::Parser::UTF8
       @emitter.start_document [], [], true
@@ -38,6 +111,22 @@ module Psych
         @emitter.alias 'ドラえもん'.encode('EUC-JP')
       end
       assert_match(/alias value/, e.message)
+    end
+
+    def test_to_yaml_is_valid
+      ext_before = Encoding.default_external
+      int_before = Encoding.default_internal
+
+      Encoding.default_external = Encoding::US_ASCII
+      Encoding.default_internal = nil
+
+      s = "こんにちは！"
+      # If no encoding is specified, use UTF-8
+      assert_equal Encoding::UTF_8, Psych.dump(s).encoding
+      assert_equal s, Psych.load(Psych.dump(s))
+    ensure
+      Encoding.default_external = ext_before
+      Encoding.default_internal = int_before
     end
 
     def test_start_mapping

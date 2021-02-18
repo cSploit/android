@@ -28,17 +28,19 @@
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @(#) $Header: /tcpdump/master/libpcap/atmuni31.h,v 1.1 2002/07/11 09:06:32 guy Exp $ (LBL)
  */
 
 /* Based on UNI3.1 standard by ATM Forum */
 
 /* ATM traffic types based on VPI=0 and (the following VCI */
-#define VCI_PPC			0x05	/* Point-to-point signal msg */
-#define VCI_BCC			0x02	/* Broadcast signal msg */
-#define VCI_OAMF4SC		0x03	/* Segment OAM F4 flow cell */
-#define VCI_OAMF4EC		0x04	/* End-to-end OAM F4 flow cell */
-#define VCI_METAC		0x01	/* Meta signal msg */
-#define VCI_ILMIC		0x10	/* ILMI msg */
+#define PPC			0x05	/* Point-to-point signal msg */
+#define BCC			0x02	/* Broadcast signal msg */
+#define OAMF4SC			0x03	/* Segment OAM F4 flow cell */
+#define OAMF4EC			0x04	/* End-to-end OAM F4 flow cell */
+#define METAC			0x01	/* Meta signal msg */
+#define ILMIC			0x10	/* ILMI msg */
 
 /* Q.2931 signalling messages */
 #define CALL_PROCEED		0x02	/* call proceeding */
@@ -76,7 +78,7 @@
 #define PROTO_POS       0	/* offset of protocol discriminator */
 #define CALL_REF_POS    2	/* offset of call reference value */
 #define MSG_TYPE_POS    5	/* offset of message type */
-#define MSG_LEN_POS     7	/* offset of message length */
+#define MSG_LEN_POS     7	/* offset of mesage length */
 #define IE_BEGIN_POS    9	/* offset of first information element */
 
 /* format of signalling messages */

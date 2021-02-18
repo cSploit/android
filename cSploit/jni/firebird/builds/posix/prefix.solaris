@@ -1,0 +1,96 @@
+#
+# Compiler settings for Solaris with Sun Studio 12, CC
+#    Works for all hosts that SS Pro supports (e.g. sparc, amd64, i386)
+#    Works for 32/64 bit builds, depends on CFLAGS/CXXFLAGS
+
+# Before attempting the Solaris build, you must export necessary
+# CFLAGS and CXXFLAGS to be picked up by the configure process and
+# subsequent build. Make sure CC is in the path!
+#
+# for 64-bit Solaris Sparc build
+#    export CC=cc
+#    export CXX=CC
+#    export CFLAGS="-m64"
+#    export CXXFLAGS=$CFLAGS
+#
+# for 64-bit Solaris on AMD64 build
+#    export CC=cc
+#    export CXX=CC
+#    export CFLAGS="-m64"
+#    export CXXFLAGS=$CFLAGS
+
+# History
+# 30-Dec-2002  nmcc FB2 initial working build on Solaris8 with gcc 3.2.1
+# 07-Apr-2005  kkuznetsov starting moving to sparc 64
+# 20-Mar-2009  refresh for Sun Studio 12 Update 1, Solaris 10
+# 22-Jun-2009  tested ok with Sun Studio 12, Solaris 9
+#              tested Sun Studio 10, too old!!!
+
+# Useful predefined macros from Sun Studio
+# __SUNPRO_CC, indicates the release number of the compiler, e.g. 0x590
+
+# These macros are predefined by both Sun Studio and g++ when appropriate.
+# No need to define again.
+# __amd64
+# __i386
+# __sparc
+# __sun
+# __unix
+
+# Flags shared by production and debug build
+# -m32 | -m64, specify memory model. -m64 means LP64, -m32 means ILP32
+#   -m64 is default on Intel/AMD architecture, -m32 default on sparc
+#   -m64 is sufficient to create 64-bit targets on most(?) platforms
+# -KPIC, use to compile source files when building a shared library.
+# -bBinding, specify library binding for linking. Can be symbolic, dynamic, or static
+# -features=extensions, allow non-standard C++ commonly accepted by other compilers
+# -D_POSIX_C_SOURCE, we are conformant to this posix version
+# -D__EXTENSIONS__, access all interfaces and headers not in conflict with posix version
+# -D_POSIX_THREAD_SEMANTICS, enable threading extensions
+# -erroff=nothrowneww, suppress warning for redefined new with different
+#   exception specification
+# -D_REENTRANT is added by -mt switch, explicit definition not needed
+# -mt, to use POSIX threads, link with -mt -lpthread. -mt is necessary b/c
+#   libC and libCrun need libthread for a multithreaded application
+COMMON_FLAGS= -DSOLARIS -DBSD_COMP -D__EXTENSIONS__ \
+	-D_POSIX_THREAD_SEMANTICS -D_POSIX_THREAD_PRIO_INHERIT -D_POSIX_C_SOURCE=199506L \
+	-KPIC $(CAS_OPTIONS) \
+	-erroff=wvarhidemem $(ATOMIC_OPTIONS)
+
+# if we keep sfio this needs to be set by configure (or move in to extern directory)
+# must use full sfio not stdio emulation to get file handle number fix
+#SFIO_DIR=$(SRC_ROOT)/../../../sfio/sfio_2002
+#SFIO_DIR=/data01/fb-dev/sfio/sfio_2002
+#SFIO_FLAGS= -DSFIO -I$(SFIO_DIR)/include
+#SFIO_LDFLAGS= -L$(SFIO)/lib
+
+#these come from configure --with-sfio=/path/to/sfio
+SFIO_DIR=@SFIO_DIR@
+SFIO_FLAGS=@SFIO_FLAGS@
+SFIO_LDFLAGS=@SFIO_LDFLAGS@
+
+# Production flags
+# -O, optimize, implies -O3 in Sun Studio 12
+# -xO2, optimize level 2, safer than -xO3
+# -xlibmil, inline select libm library routines for optimization
+# -xlibmopt -fround=nearest, use optimized math routines
+PROD_FLAGS= -xbuiltin=%all -xO2 -xlibmil \
+	$(COMMON_FLAGS) $(SFIO_FLAGS)
+
+# Debug flags
+# -xport64=implicit, warn about 32-bit to 64-bit funny stuff, sign extension
+# +w, warn about code that may have "unintended consequences." How nice!
+# +w2, all of +w plus warnings about technical violations and portability
+# -xs, copy all debug information into the executable
+DEV_FLAGS= -g -xs \
+	$(COMMON_FLAGS) $(SFIO_FLAGS)
+
+LIB_PLATFORM_RPATH= -R $(1)
+LIB_LINK_SONAME= -h $(1)
+LIB_LINK_MAPFILE= -M $(1)
+
+# link options for Solaris linker, /usr/ccs/bin/ld
+EXE_LINK_OPTIONS+= -library=no%Cstd,Crun
+LIB_LINK_OPTIONS= $(LDFLAGS) $(THR_FLAGS) -G -library=no%Cstd,Crun 
+
+UNDEF_PLATFORM=

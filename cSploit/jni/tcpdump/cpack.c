@@ -33,13 +33,13 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <netdissect-stdinc.h>
+#include <tcpdump-stdinc.h>
 
 #include "cpack.h"
 #include "extract.h"
 
-const uint8_t *
-cpack_next_boundary(const uint8_t *buf, const uint8_t *p, size_t alignment)
+static u_int8_t *
+cpack_next_boundary(u_int8_t *buf, u_int8_t *p, size_t alignment)
 {
 	size_t misalignment = (size_t)(p - buf) % alignment;
 
@@ -53,10 +53,10 @@ cpack_next_boundary(const uint8_t *buf, const uint8_t *p, size_t alignment)
  * wordsize bytes remain in the buffer after the boundary.  Otherwise,
  * return a pointer to the boundary.
  */
-const uint8_t *
+static u_int8_t *
 cpack_align_and_reserve(struct cpack_state *cs, size_t wordsize)
 {
-	const uint8_t *next;
+	u_int8_t *next;
 
 	/* Ensure alignment. */
 	next = cpack_next_boundary(cs->c_buf, cs->c_next, wordsize);
@@ -68,19 +68,8 @@ cpack_align_and_reserve(struct cpack_state *cs, size_t wordsize)
 	return next;
 }
 
-/* Advance by N bytes without returning them. */
 int
-cpack_advance(struct cpack_state *cs, const size_t toskip)
-{
-	/* No space left? */
-	if (cs->c_next - cs->c_buf + toskip > cs->c_len)
-		return -1;
-	cs->c_next += toskip;
-	return 0;
-}
-
-int
-cpack_init(struct cpack_state *cs, const uint8_t *buf, size_t buflen)
+cpack_init(struct cpack_state *cs, u_int8_t *buf, size_t buflen)
 {
 	memset(cs, 0, sizeof(*cs));
 
@@ -93,55 +82,55 @@ cpack_init(struct cpack_state *cs, const uint8_t *buf, size_t buflen)
 
 /* Unpack a 64-bit unsigned integer. */
 int
-cpack_uint64(struct cpack_state *cs, uint64_t *u)
+cpack_uint64(struct cpack_state *cs, u_int64_t *u)
 {
-	const uint8_t *next;
+	u_int8_t *next;
 
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
 	*u = EXTRACT_LE_64BITS(next);
 
-	/* Move pointer past the uint64_t. */
+	/* Move pointer past the u_int64_t. */
 	cs->c_next = next + sizeof(*u);
 	return 0;
 }
 
 /* Unpack a 32-bit unsigned integer. */
 int
-cpack_uint32(struct cpack_state *cs, uint32_t *u)
+cpack_uint32(struct cpack_state *cs, u_int32_t *u)
 {
-	const uint8_t *next;
+	u_int8_t *next;
 
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
 	*u = EXTRACT_LE_32BITS(next);
 
-	/* Move pointer past the uint32_t. */
+	/* Move pointer past the u_int32_t. */
 	cs->c_next = next + sizeof(*u);
 	return 0;
 }
 
 /* Unpack a 16-bit unsigned integer. */
 int
-cpack_uint16(struct cpack_state *cs, uint16_t *u)
+cpack_uint16(struct cpack_state *cs, u_int16_t *u)
 {
-	const uint8_t *next;
+	u_int8_t *next;
 
 	if ((next = cpack_align_and_reserve(cs, sizeof(*u))) == NULL)
 		return -1;
 
 	*u = EXTRACT_LE_16BITS(next);
 
-	/* Move pointer past the uint16_t. */
+	/* Move pointer past the u_int16_t. */
 	cs->c_next = next + sizeof(*u);
 	return 0;
 }
 
 /* Unpack an 8-bit unsigned integer. */
 int
-cpack_uint8(struct cpack_state *cs, uint8_t *u)
+cpack_uint8(struct cpack_state *cs, u_int8_t *u)
 {
 	/* No space left? */
 	if ((size_t)(cs->c_next - cs->c_buf) >= cs->c_len)
@@ -149,7 +138,7 @@ cpack_uint8(struct cpack_state *cs, uint8_t *u)
 
 	*u = *cs->c_next;
 
-	/* Move pointer past the uint8_t. */
+	/* Move pointer past the u_int8_t. */
 	cs->c_next++;
 	return 0;
 }

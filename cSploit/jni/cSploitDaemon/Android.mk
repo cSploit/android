@@ -25,7 +25,7 @@ LOCAL_LDFLAGS:= -Wl,-export-dynamic -rdynamic
 LOCAL_STATIC_LIBRARIES:= cSploitCommon_static
 
 LOCAL_C_INCLUDES:= \
-  cSploitCommon/include
+  cSploitCommon/
   
 LOCAL_SRC_FILES:= $(wildcard $(LOCAL_PATH)/*.c)
 

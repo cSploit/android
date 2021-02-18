@@ -49,14 +49,10 @@ extern "C" {
 #pragma GCC visibility push(default)
 #endif
 
-#define scan_oct(s,l,e) (int)ruby_scan_oct(s,l,e)
+#define scan_oct(s,l,e) ((int)ruby_scan_oct((s),(l),(e)))
 unsigned long ruby_scan_oct(const char *, size_t, size_t *);
-#define scan_hex(s,l,e) (int)ruby_scan_hex(s,l,e)
+#define scan_hex(s,l,e) ((int)ruby_scan_hex((s),(l),(e)))
 unsigned long ruby_scan_hex(const char *, size_t, size_t *);
-
-#if defined(__CYGWIN32__) || defined(_WIN32)
-void ruby_add_suffix(VALUE str, const char *suffix);
-#endif
 
 void ruby_qsort(void *, const size_t, const size_t,
 		int (*)(const void *, const void *, void *), void *);
@@ -65,7 +61,7 @@ void ruby_setenv(const char *, const char *);
 void ruby_unsetenv(const char *);
 #undef setenv
 #undef unsetenv
-#define setenv(name,val) ruby_setenv(name,val)
+#define setenv(name,val) ruby_setenv((name),(val))
 #define unsetenv(name,val) ruby_unsetenv(name);
 
 char *ruby_strdup(const char *);
@@ -77,7 +73,7 @@ char *ruby_getcwd(void);
 
 double ruby_strtod(const char *, char **);
 #undef strtod
-#define strtod(s,e) ruby_strtod(s,e)
+#define strtod(s,e) ruby_strtod((s),(e))
 
 #if defined _MSC_VER && _MSC_VER >= 1300
 #pragma warning(push)

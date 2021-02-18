@@ -15,13 +15,13 @@
 typedef long OFFSET;
 typedef unsigned long lindex_t;
 typedef unsigned long dindex_t;
-typedef rb_num_t GENTRY;
+typedef VALUE GENTRY;
 typedef rb_iseq_t *ISEQ;
 
 #ifdef  COLLECT_USAGE_ANALYSIS
 #define USAGE_ANALYSIS_INSN(insn)           vm_analysis_insn(insn)
-#define USAGE_ANALYSIS_OPERAND(insn, n, op) vm_analysis_operand(insn, n, (VALUE)op)
-#define USAGE_ANALYSIS_REGISTER(reg, s)     vm_analysis_register(reg, s)
+#define USAGE_ANALYSIS_OPERAND(insn, n, op) vm_analysis_operand((insn), (n), (VALUE)(op))
+#define USAGE_ANALYSIS_REGISTER(reg, s)     vm_analysis_register((reg), (s))
 #else
 #define USAGE_ANALYSIS_INSN(insn)		/* none */
 #define USAGE_ANALYSIS_OPERAND(insn, n, op)	/* none */
@@ -136,7 +136,7 @@ error !
   {
 
 #define END_INSNS_DISPATCH()    \
-      rb_bug("unknown insn: %ld", GET_CURRENT_INSN());   \
+      rb_bug("unknown insn: %"PRIdVALUE, GET_CURRENT_INSN());   \
   }   /* end of while loop */   \
 
 #define NEXT_INSN() TC_DISPATCH(__NEXT_INSN__)

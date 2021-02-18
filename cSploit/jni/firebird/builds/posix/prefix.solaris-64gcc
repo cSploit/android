@@ -1,0 +1,68 @@
+#
+# Compiler settings for Solaris (Sparc - 64 )
+#
+# This file is processed by configure and the output written to
+# gen/make.platform which is included in src directory makefiles 
+# before other common make files ie: make.[rules|defaults|shared.variables]
+#
+
+# 30-Dec-2002  nmcc FB2 initial working build on Solaris8 with gcc 3.2.1
+# 07-Apr-2005  kkuznetsov starting moving to sparc 64
+
+#-Dsparc -D__sparc__ -D__sparc -D__arch64__ -Acpu=sparc64 -Amachine=sparcv9 -D__sparcv9   -mptr64 -mstack-bias -mno-v8plus -mcpu=v9
+#
+
+# Firebird defines specific to Solaris (and x86) build
+CFLAGS_COMMON= -DSOLARIS -DBSD_COMP -Dsparc
+
+# compile flags for GCC compiler
+COMMON_GCC_FLAGS=  -MMD -fPIC -m64   -D__sparcv9   -mptr64 -mstack-bias -mno-v8plus -mcpu=v9 
+DEBUG_GCC_FLAGS=  -gstabs+ -g3 -Wall -Wno-switch -Wcast-align -Wno-non-virtual-dtor
+#switch to dbx accoding SF gdb 64 bits mailfunction
+
+PROD_GCC_FLAGS= -mcpu=ultrasparc -mtune=ultrasparc -O3
+
+# compile flags for SUNWspro/Forte compiler - untested nmcc dec2002
+COMMON_FORTE_FLAGS= -Xt -xstrconst -mt -K PIC
+DEBUG_FORTE_FLAGS=  -v -g
+PROD_FORTE_FLAGS= -O2 -w
+
+# pick up local flags specified an configure time
+# if you have CFLAGS set as env var when running configure they will
+# end up here, unset them before running make or they will be duplicated.
+LOCAL_CFLAGS=@CFLAGS@
+LOCAL_CPPFLAGS=@CPPFLAGS@
+LOCAL_LDFLAGS=@LDFLAGS@
+
+# don't clear cflags here as some module makefiles set it (BOOTBUILD) before this 
+# file is included but not all so cflags get duplicated when compiling some modules
+
+# if we keep sfio this needs to be set by configure (or move in to extern directory)
+# must use full sfio not stdio emulation to get file handle number fix
+#SFIO_DIR=$(SRC_ROOT)/../../../sfio/sfio_2002
+#SFIO_DIR=/data01/fb-dev/sfio/sfio_2002
+#SFIO_FLAGS= -DSFIO -I$(SFIO_DIR)/include
+#SFIO_LDFLAGS= -L$(SFIO)/lib
+
+#these come from configure --with-sfio=/path/to/sfio
+SFIO_DIR=@SFIO_DIR@
+SFIO_FLAGS=@SFIO_FLAGS@
+SFIO_LDFLAGS=@SFIO_LDFLAGS@
+
+PROD_FLAGS= $(CFLAGS_COMMON) $(SFIO_FLAGS) $(COMMON_GCC_FLAGS) $(PROD_GCC_FLAGS) \
+      $(LOCAL_CFLAGS)
+
+DEV_FLAGS= $(CFLAGS_COMMON) $(SFIO_FLAGS) $(COMMON_GCC_FLAGS) $(DEBUG_GCC_FLAGS) \
+      $(LOCAL_CFLAGS)
+
+
+LIB_LINK_OPTIONS= -G
+
+LIB_PLATFORM_RPATH=-R $(1)
+LIB_LINK_SONAME=-h $(1)
+LIB_LINK_MAPFILE= -Xlinker -M$(1)
+
+LD=g++
+LDFLAGS=-m64 
+#/usr/local/lib/gcc-lib/sparc-sun-solaris2.9/3.3.2/sparcv9/gmon.o
+#gmon.o is a work-a-round of SF Compile Farm gcc 3.3.2 (undefined symbol _mcount)

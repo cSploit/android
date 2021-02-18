@@ -1,0 +1,52 @@
+#! /bin/sh
+# Copyright (c) 1996 S.u.S.E. GmbH Fuerth, Germany.  All rights reserved.
+#
+# Author: Florian La Roche <florian@suse.de>, 1996
+#	  Werner Fink <werner@suse.de>, 1996
+#	  Wolfram Pienkoss <wp@bszh.de>, 1996-2000
+#
+# /sbin/init.d/ipx
+#
+
+. /etc/rc.config
+
+# Determine the base and follow a runlevel link name.
+base=${0##*/}
+link=${base#*[SK][0-9][0-9]}
+
+# Force execution if not called by a runlevel directory.
+test $link = $base && START_IPX=yes
+test "$START_IPX" = yes || exit 0
+
+# The echo return value for success (defined in /etc/rc.config).
+return=$rc_done
+
+case "$1" in
+    start)
+	echo -n "Starting the IPX protocol."
+	/usr/bin/ipx_configure --auto_interface=on --auto_primary=on
+#	/usr/bin/ipx_internal_net add 41426001 1
+#	/usr/bin/ipx_interface add eth0 EtherII 0x64284142
+#	/usr/sbin/ipxd -l /var/log/ipxd.log
+	echo -e "$return"
+	;;
+    stop)
+	echo -n "Shutting down the IPX protocol."
+	umount -a -t ncpfs
+#	killproc -TERM /usr/sbin/ipxd
+	/usr/bin/ipx_configure --auto_interface=off --auto_primary=off
+	/usr/bin/ipx_interface delall
+	echo -e "$return"
+	;;
+    restart)
+	## If first returns OK call the second, if first or
+	## second command fails, set echo return value.
+	$0 stop && $0 start || return=$rc_failed
+	;;
+    *)
+	echo "Usage: $0 {start|stop|restart}"
+	exit 1
+esac
+
+test "$return" = "$rc_done" || exit 1
+exit 0

@@ -27,19 +27,19 @@
  * @return a pointer to the new `bridge_t` or NULL
  */
 bridge_t *create_bridge() {
-  
-  bridge_t *res;
-  
-  res=malloc(sizeof(bridge_t));
-  
-  if(res) {
-    res->mountpoint = NULL;
-    res->fd = -1;
-    res->fname = NULL;
-    res->source = NULL;
-    res->next = NULL;
-  }
-  return res;
+	
+	bridge_t *res;
+	
+	res=malloc(sizeof(bridge_t));
+	
+	if(res) {
+		res->mountpoint = NULL;
+		res->fd = -1;
+		res->fname = NULL;
+		res->source = NULL;
+		res->next = NULL;
+	}
+	return res;
 }
 
 /**
@@ -49,17 +49,17 @@ bridge_t *create_bridge() {
  * @return the modified list
  */
 bridge_t *add_bridge(bridge_t *list, bridge_t *elem) {
-  
-  bridge_t *tmp;
-  
-  if(list==NULL)
-    return elem;
-  
-  for(tmp=list;tmp->next;tmp=tmp->next);
-  
-  tmp->next = elem;
-  
-  return list;
+	
+	bridge_t *tmp;
+	
+	if(list==NULL)
+		return elem;
+	
+	for(tmp=list;tmp->next;tmp=tmp->next);
+	
+	tmp->next = elem;
+	
+	return list;
 }
 
 /**
@@ -69,23 +69,23 @@ bridge_t *add_bridge(bridge_t *list, bridge_t *elem) {
  * @return the modified list
  */
 bridge_t *del_bridge(bridge_t *list, bridge_t *elem) {
-  
-  bridge_t *tmp;
-  
-  if(list==NULL)
-    return NULL;
-  
-  if(elem == list) {
-    return list->next;
-  }
-  
-  for(tmp=list;tmp->next!=elem&&tmp->next;tmp=tmp->next);
-  
-  if(!tmp->next)
-    return list;
-  
-  tmp->next = elem->next;
-  return list;
+	
+	bridge_t *tmp;
+	
+	if(list==NULL)
+		return NULL;
+	
+	if(elem == list) {
+		return list->next;
+	}
+	
+	for(tmp=list;tmp->next!=elem&&tmp->next;tmp=tmp->next);
+	
+	if(!tmp->next)
+		return list;
+	
+	tmp->next = elem->next;
+	return list;
 }
 
 /**
@@ -93,18 +93,18 @@ bridge_t *del_bridge(bridge_t *list, bridge_t *elem) {
  * @param elem the `bridge_t` to free
  */
 void free_bridge(bridge_t *elem) {
-  
-  if(elem==NULL)
-    return;
-  if(elem->mountpoint)
-    free(elem->mountpoint);
-  if(elem->fd >= 0)
-    close(elem->fd);
-  if(elem->fname)
-    free(elem->fname);
-  if(elem->source)
-    free(elem->source);
-  free(elem);
+	
+	if(elem==NULL)
+		return;
+	if(elem->mountpoint)
+		free(elem->mountpoint);
+	if(elem->fd >= 0)
+		close(elem->fd);
+	if(elem->fname)
+		free(elem->fname);
+	if(elem->source)
+		free(elem->source);
+	free(elem);
 }
 
 /**
@@ -112,10 +112,10 @@ void free_bridge(bridge_t *elem) {
  * @param list the list to free
  */
 void free_bridge_list(bridge_t *list) {
-  bridge_t *tmp1,*tmp2;
-  
-  for(tmp1=list;tmp1;tmp1=tmp2) {
-    tmp2=tmp1->next;
-    free_bridge(tmp1);
-  }
+	bridge_t *tmp1,*tmp2;
+	
+	for(tmp1=list;tmp1;tmp1=tmp2) {
+		tmp2=tmp1->next;
+		free_bridge(tmp1);
+	}
 }

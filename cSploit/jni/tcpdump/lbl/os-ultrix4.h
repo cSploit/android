@@ -17,6 +17,8 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * @(#) $Header: /tcpdump/master/tcpdump/lbl/os-ultrix4.h,v 1.19.1.1 1999/10/07 23:47:13 mcr Exp $ (LBL)
  */
 
 /* Prototypes missing in Ultrix 4 */
@@ -34,3 +36,4 @@ int	ioctl(int, int, caddr_t);
 int	pfopen(char *, int);
 int	setlinebuf(FILE *);
 int	socket(int, int, int);
+int	strcasecmp(const char *, const char *);

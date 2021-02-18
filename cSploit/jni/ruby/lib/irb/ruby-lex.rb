@@ -148,7 +148,7 @@ class RubyLex
     end
     c = c2 unless c
     @rests.unshift c #c =
-      @seek -= 1
+    @seek -= 1
     if c == "\n"
       @line_no -= 1
       if idx = @readed.reverse.index("\n")
@@ -239,7 +239,7 @@ class RubyLex
 	    end
 	  end
 	  if @line != "\n"
-      @line.force_encoding(@io.encoding)
+            @line.force_encoding(@io.encoding)
 	    yield @line, @exp_line_no
 	  end
 	  break unless l
@@ -677,7 +677,7 @@ class RubyLex
 	@continue = true
 	Token(TkSPACE)
       else
-	ungetc
+	read_escape
 	Token("\\")
       end
     end
@@ -1046,7 +1046,7 @@ class RubyLex
       while ch = getc
 	if @quoted == ch and nest == 0
 	  break
-	elsif ch == "#" and peek(0) == "{"
+	elsif @ltype != "'" && ch == "#" && peek(0) == "{"
 	  identify_string_dvar
 	elsif @ltype != "'" && @ltype != "]" && @ltype != ":" and ch == "#"
 	  subtype = true
@@ -1068,7 +1068,7 @@ class RubyLex
 	end
       end
       if @ltype == "/"
-	if peek(0) =~ /i|m|x|o|e|s|u|n/
+        while /[imxoesun]/ =~ peek(0)
 	  getc
 	end
       end
@@ -1100,7 +1100,7 @@ class RubyLex
       @indent = 0
       @indent_stack = []
       @lex_state = EXPR_BEG
-      
+
       loop do
 	@continue = false
 	prompt
@@ -1119,7 +1119,7 @@ class RubyLex
       @quoted = reserve_quoted
     end
   end
-  
+
   def identify_comment
     @ltype = "#"
 

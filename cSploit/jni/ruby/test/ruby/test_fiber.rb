@@ -189,5 +189,52 @@ class TestFiber < Test::Unit::TestCase
       f1.transfer
     }, '[ruby-dev:40833]'
   end
+
+  def test_resume_root_fiber
+    assert_raise(FiberError) do
+      Thread.new do
+        Fiber.current.resume
+      end.join
+    end
+  end
+
+  def test_gc_root_fiber
+    bug4612 = '[ruby-core:35891]'
+
+    assert_normal_exit %q{
+      require 'fiber'
+      GC.stress = true
+      Thread.start{ Fiber.current; nil }.join
+      GC.start
+    }, bug4612
+  end
+
+  def test_no_valid_cfp
+    bug5083 = '[ruby-dev:44208]'
+    error = assert_raise(RuntimeError) do
+      Fiber.new(&Module.method(:nesting)).resume
+    end
+    assert_equal("Can't call on top of Fiber or Thread", error.message, bug5083)
+    error = assert_raise(RuntimeError) do
+      Fiber.new(&Module.method(:undef_method)).resume(:to_s)
+    end
+    assert_equal("Can't call on top of Fiber or Thread", error.message, bug5083)
+  end
+
+  def test_fork_from_fiber
+    begin
+      Process.fork{}
+    rescue NotImplementedError
+      return
+    end
+    bug5700 = '[ruby-core:41456]'
+    pid = nil
+    assert_nothing_raised(bug5700) do
+      Fiber.new{ pid = fork {} }.resume
+    end
+    pid, status = Process.waitpid2(pid)
+    assert_equal(0, status.exitstatus, bug5700)
+    assert_equal(false, status.signaled?, bug5700)
+  end
 end
 

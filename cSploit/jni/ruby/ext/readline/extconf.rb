@@ -19,36 +19,45 @@ def have_readline_func(func)
   return have_func(func, $readline_headers)
 end
 
+def have_readline_macro(macro)
+  return have_macro(macro, $readline_headers)
+end
+
 dir_config('curses')
 dir_config('ncurses')
 dir_config('termcap')
 dir_config("readline")
 enable_libedit = enable_config("libedit")
-$readline_extra_check = (proc {|src| src << <<EOS} unless enable_config("readline-v6"))
-#if RL_VERSION_MAJOR >= 6
-#error GPLv2 incompatible
-#endif
-EOS
 
 have_library("user32", nil) if /cygwin/ === RUBY_PLATFORM
 have_library("ncurses", "tgetnum") ||
   have_library("termcap", "tgetnum") ||
   have_library("curses", "tgetnum")
 
-if enable_libedit
+case enable_libedit
+when true
+  # --enable-libedit
   unless (have_readline_header("editline/readline.h") ||
           have_readline_header("readline/readline.h")) &&
           have_library("edit", "readline")
-    exit
+    raise "libedit not found"
+  end
+when false
+  # --disable-libedit
+  unless ((have_readline_header("readline/readline.h") &&
+           have_readline_header("readline/history.h")) &&
+           have_library("readline", "readline"))
+    raise "readline not found"
   end
 else
+  # does not specify
   unless ((have_readline_header("readline/readline.h") &&
            have_readline_header("readline/history.h")) &&
            (have_library("readline", "readline") ||
             have_library("edit", "readline"))) ||
             (have_readline_header("editline/readline.h") &&
              have_library("edit", "readline"))
-    exit
+    raise "readline nor libedit not found"
   end
 end
 
@@ -84,4 +93,6 @@ have_readline_func("rl_emacs_editing_mode")
 have_readline_func("replace_history_entry")
 have_readline_func("remove_history")
 have_readline_func("clear_history")
+have_readline_macro("RL_PROMPT_START_IGNORE")
+have_readline_macro("RL_PROMPT_END_IGNORE")
 create_makefile("readline")

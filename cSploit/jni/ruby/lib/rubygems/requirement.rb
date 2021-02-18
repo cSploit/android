@@ -4,6 +4,15 @@ require "rubygems/version"
 # A Requirement is a set of one or more version restrictions. It supports a
 # few (<tt>=, !=, >, <, >=, <=, ~></tt>) different restriction operators.
 
+# REFACTOR: The fact that a requirement is singular or plural is kind of
+# awkward. Is Requirement the right name for this? Or should it be one
+# [op, number] pair, and we call the list of requirements something else?
+# Since a Requirement is held by a Dependency, maybe this should be made
+# singular and the list aspect should be pulled up into Dependency?
+
+require "rubygems/version"
+require "rubygems/deprecate"
+
 class Gem::Requirement
   include Comparable
 
@@ -14,7 +23,7 @@ class Gem::Requirement
     "<"  =>  lambda { |v, r| v < r  },
     ">=" =>  lambda { |v, r| v >= r },
     "<=" =>  lambda { |v, r| v <= r },
-    "~>" =>  lambda { |v, r| v = v.release; v >= r && v < r.bump }
+    "~>" =>  lambda { |v, r| v >= r && v.release < r.bump }
   }
 
   quoted  = OPS.keys.map { |k| Regexp.quote k }.join "|"
@@ -102,7 +111,7 @@ class Gem::Requirement
   end
 
   def as_list # :nodoc:
-    requirements.map { |op, version| "#{op} #{version}" }
+    requirements.map { |op, version| "#{op} #{version}" }.sort
   end
 
   def hash # :nodoc:
@@ -110,11 +119,27 @@ class Gem::Requirement
   end
 
   def marshal_dump # :nodoc:
+    fix_syck_default_key_in_requirements
+
     [@requirements]
   end
 
   def marshal_load array # :nodoc:
     @requirements = array[0]
+
+    fix_syck_default_key_in_requirements
+  end
+
+  def yaml_initialize(tag, vals) # :nodoc:
+    vals.each do |ivar, val|
+      instance_variable_set "@#{ivar}", val
+    end
+
+    fix_syck_default_key_in_requirements
+  end
+
+  def init_with coder # :nodoc:
+    yaml_initialize coder.tag, coder.map
   end
 
   def prerelease?
@@ -131,7 +156,20 @@ class Gem::Requirement
   # True if +version+ satisfies this Requirement.
 
   def satisfied_by? version
-    requirements.all? { |op, rv| OPS[op].call version, rv }
+    # #28965: syck has a bug with unquoted '=' YAML.loading as YAML::DefaultKey
+    requirements.all? { |op, rv| (OPS[op] || OPS["="]).call version, rv }
+  end
+
+  alias :=== :satisfied_by?
+  alias :=~ :satisfied_by?
+
+  ##
+  # True if the requirement will not always match the latest version.
+
+  def specific?
+    return true if @requirements.length > 1 # GIGO, > 1, > 2 is silly
+
+    not %w[> >=].include? @requirements.first.first # grab the operator
   end
 
   def to_s # :nodoc:
@@ -140,6 +178,19 @@ class Gem::Requirement
 
   def <=> other # :nodoc:
     to_s <=> other.to_s
+  end
+
+  private
+
+  def fix_syck_default_key_in_requirements
+    Gem.load_yaml
+
+    # Fixup the Syck DefaultKey bug
+    @requirements.each do |r|
+      if r[0].kind_of? Gem::SyckDefaultKey
+        r[0] = "="
+      end
+    end
   end
 end
 

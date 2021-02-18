@@ -52,8 +52,6 @@ static void usage(void);
 
 int main(int argc, char **argv)
 {
-  struct ares_options options;
-  int optmask = 0;
   ares_channel channel;
   int status, nfds, c, addr_family = AF_INET;
   fd_set read_fds, write_fds;
@@ -67,8 +65,6 @@ int main(int argc, char **argv)
   WSAStartup(wVersionRequested, &wsaData);
 #endif
 
-  memset(&options, 0, sizeof(options));
-
   status = ares_library_init(ARES_LIB_INIT_ALL);
   if (status != ARES_SUCCESS)
     {
@@ -76,7 +72,7 @@ int main(int argc, char **argv)
       return 1;
     }
 
-  while ((c = ares_getopt(argc,argv,"dt:hs:")) != -1)
+  while ((c = ares_getopt(argc,argv,"dt:h")) != -1)
     {
       switch (c)
         {
@@ -85,19 +81,11 @@ int main(int argc, char **argv)
           dbug_init();
 #endif
           break;
-        case 's':
-          optmask |= ARES_OPT_DOMAINS;
-          options.ndomains = 1;
-          options.domains = malloc(options.ndomains * sizeof(char *));
-          options.domains[0] = strdup(optarg);
-          break;
         case 't':
           if (!strcasecmp(optarg,"a"))
             addr_family = AF_INET;
           else if (!strcasecmp(optarg,"aaaa"))
             addr_family = AF_INET6;
-          else if (!strcasecmp(optarg,"u"))
-            addr_family = AF_UNSPEC;
           else
             usage();
           break;
@@ -113,7 +101,7 @@ int main(int argc, char **argv)
   if (argc < 1)
     usage();
 
-  status = ares_init_options(&channel, &options, optmask);
+  status = ares_init(&channel);
   if (status != ARES_SUCCESS)
     {
       fprintf(stderr, "ares_init: %s\n", ares_strerror(status));
@@ -197,6 +185,6 @@ static void callback(void *arg, int status, int timeouts, struct hostent *host)
 
 static void usage(void)
 {
-  fprintf(stderr, "usage: ahost [-t {a|aaaa|u}] {host|addr} ...\n");
+  fprintf(stderr, "usage: ahost [-t {a|aaaa}] {host|addr} ...\n");
   exit(1);
 }

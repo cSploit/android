@@ -23,15 +23,14 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <csploit/logger.h>
-#include <csploit/list.h>
-#include <csploit/control.h>
-#include <csploit/message.h>
-#include <csploit/control_messages.h>
-
+#include "logger.h"
+#include "list.h"
+#include "control.h"
+#include "message.h"
 #include "connection.h"
 #include "reaper.h"
 #include "child.h"
+#include "control_messages.h"
 #include "controller.h"
 
 struct connection_list connections;

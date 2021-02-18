@@ -19,26 +19,29 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-/* \summary: Domain Name System (DNS) printer */
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-domain.c,v 1.89.2.8 2007/02/13 19:19:27 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include <tcpdump-stdinc.h>
 
 #include "nameser.h"
 
+#include <stdio.h>
 #include <string.h>
 
-#include "netdissect.h"
+#include "interface.h"
 #include "addrtoname.h"
-#include "addrtostr.h"
-#include "extract.h"
+#include "extract.h"                    /* must come after interface.h */
 
 static const char *ns_ops[] = {
 	"", " inv_q", " stat", " op3", " notify", " update", " op6", " op7",
-	" op8", " updateA", " updateD", " updateDA",
+	" op8", " updataA", " updateD", " updateDA",
 	" updateM", " updateMA", " zoneInit", " zoneRef",
 };
 
@@ -51,12 +54,11 @@ static const char *ns_resp[] = {
 
 /* skip over a domain name */
 static const u_char *
-ns_nskip(netdissect_options *ndo,
-         register const u_char *cp)
+ns_nskip(register const u_char *cp)
 {
 	register u_char i;
 
-	if (!ND_TTEST2(*cp, 1))
+	if (!TTEST2(*cp, 1))
 		return (NULL);
 	i = *cp++;
 	while (i) {
@@ -67,7 +69,7 @@ ns_nskip(netdissect_options *ndo,
 
 			if ((i & ~INDIR_MASK) != EDNS0_ELT_BITLABEL)
 				return(NULL); /* unknown ELT */
-			if (!ND_TTEST2(*cp, 1))
+			if (!TTEST2(*cp, 1))
 				return (NULL);
 			if ((bitlen = *cp++) == 0)
 				bitlen = 256;
@@ -75,7 +77,7 @@ ns_nskip(netdissect_options *ndo,
 			cp += bytelen;
 		} else
 			cp += i;
-		if (!ND_TTEST2(*cp, 1))
+		if (!TTEST2(*cp, 1))
 			return (NULL);
 		i = *cp++;
 	}
@@ -84,14 +86,13 @@ ns_nskip(netdissect_options *ndo,
 
 /* print a <domain-name> */
 static const u_char *
-blabel_print(netdissect_options *ndo,
-             const u_char *cp)
+blabel_print(const u_char *cp)
 {
 	int bitlen, slen, b;
 	const u_char *bitp, *lim;
 	char tc;
 
-	if (!ND_TTEST2(*cp, 1))
+	if (!TTEST2(*cp, 1))
 		return(NULL);
 	if ((bitlen = *cp) == 0)
 		bitlen = 256;
@@ -99,43 +100,42 @@ blabel_print(netdissect_options *ndo,
 	lim = cp + 1 + slen;
 
 	/* print the bit string as a hex string */
-	ND_PRINT((ndo, "\\[x"));
+	printf("\\[x");
 	for (bitp = cp + 1, b = bitlen; bitp < lim && b > 7; b -= 8, bitp++) {
-		ND_TCHECK(*bitp);
-		ND_PRINT((ndo, "%02x", *bitp));
+		TCHECK(*bitp);
+		printf("%02x", *bitp);
 	}
 	if (b > 4) {
-		ND_TCHECK(*bitp);
+		TCHECK(*bitp);
 		tc = *bitp++;
-		ND_PRINT((ndo, "%02x", tc & (0xff << (8 - b))));
+		printf("%02x", tc & (0xff << (8 - b)));
 	} else if (b > 0) {
-		ND_TCHECK(*bitp);
+		TCHECK(*bitp);
 		tc = *bitp++;
-		ND_PRINT((ndo, "%1x", ((tc >> 4) & 0x0f) & (0x0f << (4 - b))));
+		printf("%1x", ((tc >> 4) & 0x0f) & (0x0f << (4 - b)));
 	}
-	ND_PRINT((ndo, "/%d]", bitlen));
+	printf("/%d]", bitlen);
 	return lim;
 trunc:
-	ND_PRINT((ndo, ".../%d]", bitlen));
+	printf(".../%d]", bitlen);
 	return NULL;
 }
 
 static int
-labellen(netdissect_options *ndo,
-         const u_char *cp)
+labellen(const u_char *cp)
 {
 	register u_int i;
 
-	if (!ND_TTEST2(*cp, 1))
+	if (!TTEST2(*cp, 1))
 		return(-1);
 	i = *cp;
 	if ((i & INDIR_MASK) == EDNS0_MASK) {
 		int bitlen, elt;
 		if ((elt = (i & ~INDIR_MASK)) != EDNS0_ELT_BITLABEL) {
-			ND_PRINT((ndo, "<ELT %d>", elt));
+			printf("<ELT %d>", elt);
 			return(-1);
 		}
-		if (!ND_TTEST2(*(cp + 1), 1))
+		if (!TTEST2(*(cp + 1), 1))
 			return(-1);
 		if ((bitlen = *(cp + 1)) == 0)
 			bitlen = 256;
@@ -144,108 +144,105 @@ labellen(netdissect_options *ndo,
 		return(i);
 }
 
-const u_char *
-ns_nprint(netdissect_options *ndo,
-          register const u_char *cp, register const u_char *bp)
+static const u_char *
+ns_nprint(register const u_char *cp, register const u_char *bp)
 {
 	register u_int i, l;
 	register const u_char *rp = NULL;
 	register int compress = 0;
+	int chars_processed;
 	int elt;
-	u_int offset, max_offset;
+	int data_size = snapend - bp;
 
-	if ((l = labellen(ndo, cp)) == (u_int)-1)
+	if ((l = labellen(cp)) == (u_int)-1)
 		return(NULL);
-	if (!ND_TTEST2(*cp, 1))
+	if (!TTEST2(*cp, 1))
 		return(NULL);
-	max_offset = (u_int)(cp - bp);
+	chars_processed = 1;
 	if (((i = *cp++) & INDIR_MASK) != INDIR_MASK) {
 		compress = 0;
 		rp = cp + l;
 	}
 
 	if (i != 0)
-		while (i && cp < ndo->ndo_snapend) {
+		while (i && cp < snapend) {
 			if ((i & INDIR_MASK) == INDIR_MASK) {
 				if (!compress) {
 					rp = cp + 1;
 					compress = 1;
 				}
-				if (!ND_TTEST2(*cp, 1))
+				if (!TTEST2(*cp, 1))
 					return(NULL);
-				offset = (((i << 8) | *cp) & 0x3fff);
-				/*
-				 * This must move backwards in the packet.
-				 * No RFC explicitly says that, but BIND's
-				 * name decompression code requires it,
-				 * as a way of preventing infinite loops
-				 * and other bad behavior, and it's probably
-				 * what was intended (compress by pointing
-				 * to domain name suffixes already seen in
-				 * the packet).
-				 */
-				if (offset >= max_offset) {
-					ND_PRINT((ndo, "<BAD PTR>"));
+				cp = bp + (((i << 8) | *cp) & 0x3fff);
+				if ((l = labellen(cp)) == (u_int)-1)
 					return(NULL);
-				}
-				max_offset = offset;
-				cp = bp + offset;
-				if ((l = labellen(ndo, cp)) == (u_int)-1)
-					return(NULL);
-				if (!ND_TTEST2(*cp, 1))
+				if (!TTEST2(*cp, 1))
 					return(NULL);
 				i = *cp++;
+				chars_processed++;
+
+				/*
+				 * If we've looked at every character in
+				 * the message, this pointer will make
+				 * us look at some character again,
+				 * which means we're looping.
+				 */
+				if (chars_processed >= data_size) {
+					printf("<LOOP>");
+					return (NULL);
+				}
 				continue;
 			}
 			if ((i & INDIR_MASK) == EDNS0_MASK) {
 				elt = (i & ~INDIR_MASK);
 				switch(elt) {
 				case EDNS0_ELT_BITLABEL:
-					if (blabel_print(ndo, cp) == NULL)
+					if (blabel_print(cp) == NULL)
 						return (NULL);
 					break;
 				default:
 					/* unknown ELT */
-					ND_PRINT((ndo, "<ELT %d>", elt));
+					printf("<ELT %d>", elt);
 					return(NULL);
 				}
 			} else {
-				if (fn_printn(ndo, cp, l, ndo->ndo_snapend))
+				if (fn_printn(cp, l, snapend))
 					return(NULL);
 			}
 
 			cp += l;
-			ND_PRINT((ndo, "."));
-			if ((l = labellen(ndo, cp)) == (u_int)-1)
+			chars_processed += l;
+			putchar('.');
+			if ((l = labellen(cp)) == (u_int)-1)
 				return(NULL);
-			if (!ND_TTEST2(*cp, 1))
+			if (!TTEST2(*cp, 1))
 				return(NULL);
 			i = *cp++;
+			chars_processed++;
 			if (!compress)
 				rp += l + 1;
 		}
 	else
-		ND_PRINT((ndo, "."));
+		putchar('.');
 	return (rp);
 }
 
 /* print a <character-string> */
 static const u_char *
-ns_cprint(netdissect_options *ndo,
-          register const u_char *cp)
+ns_cprint(register const u_char *cp)
 {
 	register u_int i;
 
-	if (!ND_TTEST2(*cp, 1))
+	if (!TTEST2(*cp, 1))
 		return (NULL);
 	i = *cp++;
-	if (fn_printn(ndo, cp, i, ndo->ndo_snapend))
+	if (fn_printn(cp, i, snapend))
 		return (NULL);
 	return (cp + i);
 }
 
 /* http://www.iana.org/assignments/dns-parameters */
-const struct tok ns_type2str[] = {
+struct tok ns_type2str[] = {
 	{ T_A,		"A" },			/* RFC 1035 */
 	{ T_NS,		"NS" },			/* RFC 1035 */
 	{ T_MD,		"MD" },			/* RFC 1035 */
@@ -310,7 +307,7 @@ const struct tok ns_type2str[] = {
 	{ 0,		NULL }
 };
 
-const struct tok ns_class2str[] = {
+struct tok ns_class2str[] = {
 	{ C_IN,		"IN" },		/* Not used */
 	{ C_CHAOS,	"CHAOS" },
 	{ C_HS,		"HS" },
@@ -320,21 +317,20 @@ const struct tok ns_class2str[] = {
 
 /* print a query */
 static const u_char *
-ns_qprint(netdissect_options *ndo,
-          register const u_char *cp, register const u_char *bp, int is_mdns)
+ns_qprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 {
 	register const u_char *np = cp;
 	register u_int i, class;
 
-	cp = ns_nskip(ndo, cp);
+	cp = ns_nskip(cp);
 
-	if (cp == NULL || !ND_TTEST2(*cp, 4))
+	if (cp == NULL || !TTEST2(*cp, 4))
 		return(NULL);
 
 	/* print the qtype */
 	i = EXTRACT_16BITS(cp);
 	cp += 2;
-	ND_PRINT((ndo, " %s", tok2str(ns_type2str, "Type%d", i)));
+	printf(" %s", tok2str(ns_type2str, "Type%d", i));
 	/* print the qclass (if it's not IN) */
 	i = EXTRACT_16BITS(cp);
 	cp += 2;
@@ -343,34 +339,36 @@ ns_qprint(netdissect_options *ndo,
 	else
 		class = i;
 	if (class != C_IN)
-		ND_PRINT((ndo, " %s", tok2str(ns_class2str, "(Class %d)", class)));
+		printf(" %s", tok2str(ns_class2str, "(Class %d)", class));
 	if (is_mdns) {
-		ND_PRINT((ndo, i & C_QU ? " (QU)" : " (QM)"));
+		if (i & C_QU)
+			printf(" (QU)");
+		else
+			printf(" (QM)");
 	}
 
-	ND_PRINT((ndo, "? "));
-	cp = ns_nprint(ndo, np, bp);
+	fputs("? ", stdout);
+	cp = ns_nprint(np, bp);
 	return(cp ? cp + 4 : NULL);
 }
 
 /* print a reply */
 static const u_char *
-ns_rprint(netdissect_options *ndo,
-          register const u_char *cp, register const u_char *bp, int is_mdns)
+ns_rprint(register const u_char *cp, register const u_char *bp, int is_mdns)
 {
 	register u_int i, class, opt_flags = 0;
 	register u_short typ, len;
 	register const u_char *rp;
 
-	if (ndo->ndo_vflag) {
-		ND_PRINT((ndo, " "));
-		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
+	if (vflag) {
+		putchar(' ');
+		if ((cp = ns_nprint(cp, bp)) == NULL)
 			return NULL;
 	} else
-		cp = ns_nskip(ndo, cp);
+		cp = ns_nskip(cp);
 
-	if (cp == NULL || !ND_TTEST2(*cp, 10))
-		return (ndo->ndo_snapend);
+	if (cp == NULL || !TTEST2(*cp, 10))
+		return (snapend);
 
 	/* print the type/qtype */
 	typ = EXTRACT_16BITS(cp);
@@ -383,43 +381,34 @@ ns_rprint(netdissect_options *ndo,
 	else
 		class = i;
 	if (class != C_IN && typ != T_OPT)
-		ND_PRINT((ndo, " %s", tok2str(ns_class2str, "(Class %d)", class)));
+		printf(" %s", tok2str(ns_class2str, "(Class %d)", class));
 	if (is_mdns) {
 		if (i & C_CACHE_FLUSH)
-			ND_PRINT((ndo, " (Cache flush)"));
+			printf(" (Cache flush)");
 	}
 
-	if (typ == T_OPT) {
-		/* get opt flags */
-		cp += 2;
+	/* ignore ttl */
+	cp += 2;
+	/* if T_OPT, save opt_flags */
+	if (typ == T_OPT)
 		opt_flags = EXTRACT_16BITS(cp);
-		/* ignore rest of ttl field */
-		cp += 2;
-	} else if (ndo->ndo_vflag > 2) {
-		/* print ttl */
-		ND_PRINT((ndo, " ["));
-		unsigned_relts_print(ndo, EXTRACT_32BITS(cp));
-		ND_PRINT((ndo, "]"));
-		cp += 4;
-	} else {
-		/* ignore ttl */
-		cp += 4;
-	}
+	/* ignore rest of ttl */
+	cp += 2;
 
 	len = EXTRACT_16BITS(cp);
 	cp += 2;
 
 	rp = cp + len;
 
-	ND_PRINT((ndo, " %s", tok2str(ns_type2str, "Type%d", typ)));
-	if (rp > ndo->ndo_snapend)
+	printf(" %s", tok2str(ns_type2str, "Type%d", typ));
+	if (rp > snapend)
 		return(NULL);
 
 	switch (typ) {
 	case T_A:
-		if (!ND_TTEST2(*cp, sizeof(struct in_addr)))
+		if (!TTEST2(*cp, sizeof(struct in_addr)))
 			return(NULL);
-		ND_PRINT((ndo, " %s", intoa(htonl(EXTRACT_32BITS(cp)))));
+		printf(" %s", ipaddr_string(cp));
 		break;
 
 	case T_NS:
@@ -428,145 +417,139 @@ ns_rprint(netdissect_options *ndo,
 #ifdef T_DNAME
 	case T_DNAME:
 #endif
-		ND_PRINT((ndo, " "));
-		if (ns_nprint(ndo, cp, bp) == NULL)
+		putchar(' ');
+		if (ns_nprint(cp, bp) == NULL)
 			return(NULL);
 		break;
 
 	case T_SOA:
-		if (!ndo->ndo_vflag)
+		if (!vflag)
 			break;
-		ND_PRINT((ndo, " "));
-		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
+		putchar(' ');
+		if ((cp = ns_nprint(cp, bp)) == NULL)
 			return(NULL);
-		ND_PRINT((ndo, " "));
-		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
+		putchar(' ');
+		if ((cp = ns_nprint(cp, bp)) == NULL)
 			return(NULL);
-		if (!ND_TTEST2(*cp, 5 * 4))
+		if (!TTEST2(*cp, 5 * 4))
 			return(NULL);
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+		printf(" %u", EXTRACT_32BITS(cp));
 		cp += 4;
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+		printf(" %u", EXTRACT_32BITS(cp));
 		cp += 4;
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+		printf(" %u", EXTRACT_32BITS(cp));
 		cp += 4;
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+		printf(" %u", EXTRACT_32BITS(cp));
 		cp += 4;
-		ND_PRINT((ndo, " %u", EXTRACT_32BITS(cp)));
+		printf(" %u", EXTRACT_32BITS(cp));
 		cp += 4;
 		break;
 	case T_MX:
-		ND_PRINT((ndo, " "));
-		if (!ND_TTEST2(*cp, 2))
+		putchar(' ');
+		if (!TTEST2(*cp, 2))
 			return(NULL);
-		if (ns_nprint(ndo, cp + 2, bp) == NULL)
+		if (ns_nprint(cp + 2, bp) == NULL)
 			return(NULL);
-		ND_PRINT((ndo, " %d", EXTRACT_16BITS(cp)));
+		printf(" %d", EXTRACT_16BITS(cp));
 		break;
 
 	case T_TXT:
 		while (cp < rp) {
-			ND_PRINT((ndo, " \""));
-			cp = ns_cprint(ndo, cp);
+			printf(" \"");
+			cp = ns_cprint(cp);
 			if (cp == NULL)
 				return(NULL);
-			ND_PRINT((ndo, "\""));
+			putchar('"');
 		}
 		break;
 
 	case T_SRV:
-		ND_PRINT((ndo, " "));
-		if (!ND_TTEST2(*cp, 6))
+		putchar(' ');
+		if (!TTEST2(*cp, 6))
 			return(NULL);
-		if (ns_nprint(ndo, cp + 6, bp) == NULL)
+		if (ns_nprint(cp + 6, bp) == NULL)
 			return(NULL);
-		ND_PRINT((ndo, ":%d %d %d", EXTRACT_16BITS(cp + 4),
-			EXTRACT_16BITS(cp), EXTRACT_16BITS(cp + 2)));
+		printf(":%d %d %d", EXTRACT_16BITS(cp + 4),
+			EXTRACT_16BITS(cp), EXTRACT_16BITS(cp + 2));
 		break;
 
+#ifdef INET6
 	case T_AAAA:
-	    {
-		char ntop_buf[INET6_ADDRSTRLEN];
-
-		if (!ND_TTEST2(*cp, sizeof(struct in6_addr)))
+		if (!TTEST2(*cp, sizeof(struct in6_addr)))
 			return(NULL);
-		ND_PRINT((ndo, " %s",
-		    addrtostr6(cp, ntop_buf, sizeof(ntop_buf))));
-
+		printf(" %s", ip6addr_string(cp));
 		break;
-	    }
 
 	case T_A6:
 	    {
 		struct in6_addr a;
 		int pbit, pbyte;
-		char ntop_buf[INET6_ADDRSTRLEN];
 
-		if (!ND_TTEST2(*cp, 1))
+		if (!TTEST2(*cp, 1))
 			return(NULL);
 		pbit = *cp;
 		pbyte = (pbit & ~7) / 8;
 		if (pbit > 128) {
-			ND_PRINT((ndo, " %u(bad plen)", pbit));
+			printf(" %u(bad plen)", pbit);
 			break;
 		} else if (pbit < 128) {
-			if (!ND_TTEST2(*(cp + 1), sizeof(a) - pbyte))
+			if (!TTEST2(*(cp + 1), sizeof(a) - pbyte))
 				return(NULL);
 			memset(&a, 0, sizeof(a));
 			memcpy(&a.s6_addr[pbyte], cp + 1, sizeof(a) - pbyte);
-			ND_PRINT((ndo, " %u %s", pbit,
-			    addrtostr6(&a, ntop_buf, sizeof(ntop_buf))));
+			printf(" %u %s", pbit, ip6addr_string(&a));
 		}
 		if (pbit > 0) {
-			ND_PRINT((ndo, " "));
-			if (ns_nprint(ndo, cp + 1 + sizeof(a) - pbyte, bp) == NULL)
+			putchar(' ');
+			if (ns_nprint(cp + 1 + sizeof(a) - pbyte, bp) == NULL)
 				return(NULL);
 		}
 		break;
 	    }
+#endif /*INET6*/
 
 	case T_OPT:
-		ND_PRINT((ndo, " UDPsize=%u", class));
+		printf(" UDPsize=%u", class);
 		if (opt_flags & 0x8000)
-			ND_PRINT((ndo, " DO"));
+			printf(" OK");
 		break;
 
 	case T_UNSPECA:		/* One long string */
-		if (!ND_TTEST2(*cp, len))
+		if (!TTEST2(*cp, len))
 			return(NULL);
-		if (fn_printn(ndo, cp, len, ndo->ndo_snapend))
+		if (fn_printn(cp, len, snapend))
 			return(NULL);
 		break;
 
 	case T_TSIG:
 	    {
-		if (cp + len > ndo->ndo_snapend)
+		if (cp + len > snapend)
 			return(NULL);
-		if (!ndo->ndo_vflag)
+		if (!vflag)
 			break;
-		ND_PRINT((ndo, " "));
-		if ((cp = ns_nprint(ndo, cp, bp)) == NULL)
+		putchar(' ');
+		if ((cp = ns_nprint(cp, bp)) == NULL)
 			return(NULL);
 		cp += 6;
-		if (!ND_TTEST2(*cp, 2))
+		if (!TTEST2(*cp, 2))
 			return(NULL);
-		ND_PRINT((ndo, " fudge=%u", EXTRACT_16BITS(cp)));
+		printf(" fudge=%u", EXTRACT_16BITS(cp));
 		cp += 2;
-		if (!ND_TTEST2(*cp, 2))
+		if (!TTEST2(*cp, 2))
 			return(NULL);
-		ND_PRINT((ndo, " maclen=%u", EXTRACT_16BITS(cp)));
+		printf(" maclen=%u", EXTRACT_16BITS(cp));
 		cp += 2 + EXTRACT_16BITS(cp);
-		if (!ND_TTEST2(*cp, 2))
+		if (!TTEST2(*cp, 2))
 			return(NULL);
-		ND_PRINT((ndo, " origid=%u", EXTRACT_16BITS(cp)));
+		printf(" origid=%u", EXTRACT_16BITS(cp));
 		cp += 2;
-		if (!ND_TTEST2(*cp, 2))
+		if (!TTEST2(*cp, 2))
 			return(NULL);
-		ND_PRINT((ndo, " error=%u", EXTRACT_16BITS(cp)));
+		printf(" error=%u", EXTRACT_16BITS(cp));
 		cp += 2;
-		if (!ND_TTEST2(*cp, 2))
+		if (!TTEST2(*cp, 2))
 			return(NULL);
-		ND_PRINT((ndo, " otherlen=%u", EXTRACT_16BITS(cp)));
+		printf(" otherlen=%u", EXTRACT_16BITS(cp));
 		cp += 2;
 	    }
 	}
@@ -574,16 +557,15 @@ ns_rprint(netdissect_options *ndo,
 }
 
 void
-ns_print(netdissect_options *ndo,
-         register const u_char *bp, u_int length, int is_mdns)
+ns_print(register const u_char *bp, u_int length, int is_mdns)
 {
 	register const HEADER *np;
 	register int qdcount, ancount, nscount, arcount;
 	register const u_char *cp;
-	uint16_t b2;
+	u_int16_t b2;
 
 	np = (const HEADER *)bp;
-	ND_TCHECK(*np);
+	TCHECK(*np);
 	/* get the byte-order right */
 	qdcount = EXTRACT_16BITS(&np->qdcount);
 	ancount = EXTRACT_16BITS(&np->ancount);
@@ -592,65 +574,65 @@ ns_print(netdissect_options *ndo,
 
 	if (DNS_QR(np)) {
 		/* this is a response */
-		ND_PRINT((ndo, "%d%s%s%s%s%s%s",
+		printf("%d%s%s%s%s%s%s",
 			EXTRACT_16BITS(&np->id),
 			ns_ops[DNS_OPCODE(np)],
 			ns_resp[DNS_RCODE(np)],
 			DNS_AA(np)? "*" : "",
 			DNS_RA(np)? "" : "-",
 			DNS_TC(np)? "|" : "",
-			DNS_AD(np)? "$" : ""));
+			DNS_AD(np)? "$" : "");
 
 		if (qdcount != 1)
-			ND_PRINT((ndo, " [%dq]", qdcount));
+			printf(" [%dq]", qdcount);
 		/* Print QUESTION section on -vv */
 		cp = (const u_char *)(np + 1);
 		while (qdcount--) {
 			if (qdcount < EXTRACT_16BITS(&np->qdcount) - 1)
-				ND_PRINT((ndo, ","));
-			if (ndo->ndo_vflag > 1) {
-				ND_PRINT((ndo, " q:"));
-				if ((cp = ns_qprint(ndo, cp, bp, is_mdns)) == NULL)
+				putchar(',');
+			if (vflag > 1) {
+				fputs(" q:", stdout);
+				if ((cp = ns_qprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
 			} else {
-				if ((cp = ns_nskip(ndo, cp)) == NULL)
+				if ((cp = ns_nskip(cp)) == NULL)
 					goto trunc;
 				cp += 4;	/* skip QTYPE and QCLASS */
 			}
 		}
-		ND_PRINT((ndo, " %d/%d/%d", ancount, nscount, arcount));
+		printf(" %d/%d/%d", ancount, nscount, arcount);
 		if (ancount--) {
-			if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+			if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 				goto trunc;
-			while (cp < ndo->ndo_snapend && ancount--) {
-				ND_PRINT((ndo, ","));
-				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+			while (cp < snapend && ancount--) {
+				putchar(',');
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
 			}
 		}
 		if (ancount > 0)
 			goto trunc;
 		/* Print NS and AR sections on -vv */
-		if (ndo->ndo_vflag > 1) {
-			if (cp < ndo->ndo_snapend && nscount--) {
-				ND_PRINT((ndo, " ns:"));
-				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+		if (vflag > 1) {
+			if (cp < snapend && nscount--) {
+				fputs(" ns:", stdout);
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
-				while (cp < ndo->ndo_snapend && nscount--) {
-					ND_PRINT((ndo, ","));
-					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+				while (cp < snapend && nscount--) {
+					putchar(',');
+					if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 						goto trunc;
 				}
 			}
 			if (nscount > 0)
 				goto trunc;
-			if (cp < ndo->ndo_snapend && arcount--) {
-				ND_PRINT((ndo, " ar:"));
-				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+			if (cp < snapend && arcount--) {
+				fputs(" ar:", stdout);
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
-				while (cp < ndo->ndo_snapend && arcount--) {
-					ND_PRINT((ndo, ","));
-					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+				while (cp < snapend && arcount--) {
+					putchar(',');
+					if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 						goto trunc;
 				}
 			}
@@ -660,39 +642,39 @@ ns_print(netdissect_options *ndo,
 	}
 	else {
 		/* this is a request */
-		ND_PRINT((ndo, "%d%s%s%s", EXTRACT_16BITS(&np->id), ns_ops[DNS_OPCODE(np)],
+		printf("%d%s%s%s", EXTRACT_16BITS(&np->id), ns_ops[DNS_OPCODE(np)],
 		    DNS_RD(np) ? "+" : "",
-		    DNS_CD(np) ? "%" : ""));
+		    DNS_CD(np) ? "%" : "");
 
 		/* any weirdness? */
-		b2 = EXTRACT_16BITS(((const u_short *)np)+1);
+		b2 = EXTRACT_16BITS(((u_short *)np)+1);
 		if (b2 & 0x6cf)
-			ND_PRINT((ndo, " [b2&3=0x%x]", b2));
+			printf(" [b2&3=0x%x]", b2);
 
 		if (DNS_OPCODE(np) == IQUERY) {
 			if (qdcount)
-				ND_PRINT((ndo, " [%dq]", qdcount));
+				printf(" [%dq]", qdcount);
 			if (ancount != 1)
-				ND_PRINT((ndo, " [%da]", ancount));
+				printf(" [%da]", ancount);
 		}
 		else {
 			if (ancount)
-				ND_PRINT((ndo, " [%da]", ancount));
+				printf(" [%da]", ancount);
 			if (qdcount != 1)
-				ND_PRINT((ndo, " [%dq]", qdcount));
+				printf(" [%dq]", qdcount);
 		}
 		if (nscount)
-			ND_PRINT((ndo, " [%dn]", nscount));
+			printf(" [%dn]", nscount);
 		if (arcount)
-			ND_PRINT((ndo, " [%dau]", arcount));
+			printf(" [%dau]", arcount);
 
 		cp = (const u_char *)(np + 1);
 		if (qdcount--) {
-			cp = ns_qprint(ndo, cp, (const u_char *)np, is_mdns);
+			cp = ns_qprint(cp, (const u_char *)np, is_mdns);
 			if (!cp)
 				goto trunc;
-			while (cp < ndo->ndo_snapend && qdcount--) {
-				cp = ns_qprint(ndo, (const u_char *)cp,
+			while (cp < snapend && qdcount--) {
+				cp = ns_qprint((const u_char *)cp,
 					       (const u_char *)np,
 					       is_mdns);
 				if (!cp)
@@ -703,37 +685,37 @@ ns_print(netdissect_options *ndo,
 			goto trunc;
 
 		/* Print remaining sections on -vv */
-		if (ndo->ndo_vflag > 1) {
+		if (vflag > 1) {
 			if (ancount--) {
-				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
-				while (cp < ndo->ndo_snapend && ancount--) {
-					ND_PRINT((ndo, ","));
-					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+				while (cp < snapend && ancount--) {
+					putchar(',');
+					if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 						goto trunc;
 				}
 			}
 			if (ancount > 0)
 				goto trunc;
-			if (cp < ndo->ndo_snapend && nscount--) {
-				ND_PRINT((ndo, " ns:"));
-				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+			if (cp < snapend && nscount--) {
+				fputs(" ns:", stdout);
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
-				while (nscount-- && cp < ndo->ndo_snapend) {
-					ND_PRINT((ndo, ","));
-					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+				while (nscount-- && cp < snapend) {
+					putchar(',');
+					if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 						goto trunc;
 				}
 			}
 			if (nscount > 0)
 				goto trunc;
-			if (cp < ndo->ndo_snapend && arcount--) {
-				ND_PRINT((ndo, " ar:"));
-				if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+			if (cp < snapend && arcount--) {
+				fputs(" ar:", stdout);
+				if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 					goto trunc;
-				while (cp < ndo->ndo_snapend && arcount--) {
-					ND_PRINT((ndo, ","));
-					if ((cp = ns_rprint(ndo, cp, bp, is_mdns)) == NULL)
+				while (cp < snapend && arcount--) {
+					putchar(',');
+					if ((cp = ns_rprint(cp, bp, is_mdns)) == NULL)
 						goto trunc;
 				}
 			}
@@ -741,9 +723,10 @@ ns_print(netdissect_options *ndo,
 				goto trunc;
 		}
 	}
-	ND_PRINT((ndo, " (%d)", length));
+	printf(" (%d)", length);
 	return;
 
   trunc:
-	ND_PRINT((ndo, "[|domain]"));
+	printf("[|domain]");
+	return;
 }

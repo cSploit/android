@@ -1743,6 +1743,24 @@ cat >>confdefs.h <<_EOF
 _EOF
 ])
 
+
+dnl CARES_CONFIGURE_LONG
+dnl -------------------------------------------------
+dnl Find out the size of long as reported by sizeof() and define
+dnl CARES_SIZEOF_LONG as appropriate to be used in template file
+dnl ares_build.h.in to properly configure the library.
+dnl The size of long is a build time characteristic and as such
+dnl must be recorded in ares_build.h
+
+AC_DEFUN([CARES_CONFIGURE_LONG], [
+  if test -z "$ac_cv_sizeof_long" ||
+    test "$ac_cv_sizeof_long" -eq "0"; then
+    AC_MSG_ERROR([cannot find out size of long.])
+  fi
+  CARES_DEFINE_UNQUOTED([CARES_SIZEOF_LONG], [$ac_cv_sizeof_long])
+])
+
+
 dnl CARES_CONFIGURE_ARES_SOCKLEN_T
 dnl -------------------------------------------------
 dnl Find out suitable ares_socklen_t data type definition and size, making

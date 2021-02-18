@@ -20,10 +20,6 @@
    ((__GNUC__ > (major)) ||  \
     (__GNUC__ == (major) && __GNUC_MINOR__ > (minor)) || \
     (__GNUC__ == (major) && __GNUC_MINOR__ == (minor) && __GNUC_PATCHLEVEL__ >= (patchlevel))))
-
-#define SIZE16 2
-#define SIZE32 4
-
 #if SIZEOF_SHORT != 2 || SIZEOF_LONG != 4
 # define NATINT_PACK
 #endif
@@ -148,61 +144,35 @@ TOKEN_PASTE(swap,x)(xtype z)		\
 # endif
 #endif
 
-#if SIZEOF_FLOAT == 4
-# ifdef HAVE_UINT32_T
-#  define swapf(x)	swap32(x)
-#  define FLOAT_SWAPPER	uint32_t
-# else	/* SIZEOF_FLOAT == 4 but undivide by known size of int */
-   define_swapx(f,float)
-# endif
-#else	/* SIZEOF_FLOAT != 4 */
-  define_swapx(f,float)
-#endif	/* #if SIZEOF_FLOAT == 4 */
+#if SIZEOF_FLOAT == 4 && defined(HAVE_INT32_T)
+#   define swapf(x)	swap32(x)
+#   define FLOAT_SWAPPER	uint32_t
+#else
+    define_swapx(f,float)
+#endif
 
-#if SIZEOF_DOUBLE == 8
-# ifdef HAVE_UINT64_T	/* SIZEOF_DOUBLE == 8 == SIZEOF_UINT64_T */
-#  define swapd(x)	swap64(x)
-#  define DOUBLE_SWAPPER	uint64_t
-# else
-#  if SIZEOF_LONG == 4	/* SIZEOF_DOUBLE == 8 && 4 == SIZEOF_LONG */
+#if SIZEOF_DOUBLE == 8 && defined(HAVE_INT64_T)
+#   define swapd(x)	swap64(x)
+#   define DOUBLE_SWAPPER	uint64_t
+#elif SIZEOF_DOUBLE == 8 && defined(HAVE_INT32_T)
     static double
     swapd(const double d)
     {
 	double dtmp = d;
-	unsigned long utmp[2];
-	unsigned long utmp0;
+	uint32_t utmp[2];
+	uint32_t utmp0;
 
 	utmp[0] = 0; utmp[1] = 0;
 	memcpy(utmp,&dtmp,sizeof(double));
 	utmp0 = utmp[0];
-	utmp[0] = swapl(utmp[1]);
-	utmp[1] = swapl(utmp0);
+	utmp[0] = swap32(utmp[1]);
+	utmp[1] = swap32(utmp0);
 	memcpy(&dtmp,utmp,sizeof(double));
 	return dtmp;
     }
-#  elif SIZEOF_SHORT == 4	/* SIZEOF_DOUBLE == 8 && 4 == SIZEOF_SHORT */
-    static double
-    swapd(const double d)
-    {
-	double dtmp = d;
-	unsigned short utmp[2];
-	unsigned short utmp0;
-
-	utmp[0] = 0; utmp[1] = 0;
-	memcpy(utmp,&dtmp,sizeof(double));
-	utmp0 = utmp[0];
-	utmp[0] = swaps(utmp[1]);
-	utmp[1] = swaps(utmp0);
-	memcpy(&dtmp,utmp,sizeof(double));
-	return dtmp;
-    }
-#  else	/* SIZEOF_DOUBLE == 8 but undivide by known size of int */
+#else
     define_swapx(d, double)
-#  endif
-# endif	/* #if SIZEOF_LONG == 8 */
-#else	/* SIZEOF_DOUBLE != 8 */
-  define_swapx(d, double)
-#endif	/* #if SIZEOF_DOUBLE == 8 */
+#endif
 
 #undef define_swapx
 
@@ -217,22 +187,22 @@ TOKEN_PASTE(swap,x)(xtype z)		\
 
 #ifdef FLOAT_SWAPPER
 # define FLOAT_CONVWITH(y)	FLOAT_SWAPPER y;
-# define HTONF(x,y)	(memcpy(&y,&x,sizeof(float)),	\
-			 y = rb_htonf((FLOAT_SWAPPER)y),	\
-			 memcpy(&x,&y,sizeof(float)),	\
-			 x)
-# define HTOVF(x,y)	(memcpy(&y,&x,sizeof(float)),	\
-			 y = rb_htovf((FLOAT_SWAPPER)y),	\
-			 memcpy(&x,&y,sizeof(float)),	\
-			 x)
-# define NTOHF(x,y)	(memcpy(&y,&x,sizeof(float)),	\
-			 y = rb_ntohf((FLOAT_SWAPPER)y),	\
-			 memcpy(&x,&y,sizeof(float)),	\
-			 x)
-# define VTOHF(x,y)	(memcpy(&y,&x,sizeof(float)),	\
-			 y = rb_vtohf((FLOAT_SWAPPER)y),	\
-			 memcpy(&x,&y,sizeof(float)),	\
-			 x)
+# define HTONF(x,y)	(memcpy(&(y),&(x),sizeof(float)),	\
+			 (y) = rb_htonf((FLOAT_SWAPPER)(y)),	\
+			 memcpy(&(x),&(y),sizeof(float)),	\
+			 (x))
+# define HTOVF(x,y)	(memcpy(&(y),&(x),sizeof(float)),	\
+			 (y) = rb_htovf((FLOAT_SWAPPER)(y)),	\
+			 memcpy(&(x),&(y),sizeof(float)),	\
+			 (x))
+# define NTOHF(x,y)	(memcpy(&(y),&(x),sizeof(float)),	\
+			 (y) = rb_ntohf((FLOAT_SWAPPER)(y)),	\
+			 memcpy(&(x),&(y),sizeof(float)),	\
+			 (x))
+# define VTOHF(x,y)	(memcpy(&(y),&(x),sizeof(float)),	\
+			 (y) = rb_vtohf((FLOAT_SWAPPER)(y)),	\
+			 memcpy(&(x),&(y),sizeof(float)),	\
+			 (x))
 #else
 # define FLOAT_CONVWITH(y)
 # define HTONF(x,y)	rb_htonf(x)
@@ -243,22 +213,22 @@ TOKEN_PASTE(swap,x)(xtype z)		\
 
 #ifdef DOUBLE_SWAPPER
 # define DOUBLE_CONVWITH(y)	DOUBLE_SWAPPER y;
-# define HTOND(x,y)	(memcpy(&y,&x,sizeof(double)),	\
-			 y = rb_htond((DOUBLE_SWAPPER)y),	\
-			 memcpy(&x,&y,sizeof(double)),	\
-			 x)
-# define HTOVD(x,y)	(memcpy(&y,&x,sizeof(double)),	\
-			 y = rb_htovd((DOUBLE_SWAPPER)y),	\
-			 memcpy(&x,&y,sizeof(double)),	\
-			 x)
-# define NTOHD(x,y)	(memcpy(&y,&x,sizeof(double)),	\
-			 y = rb_ntohd((DOUBLE_SWAPPER)y),	\
-			 memcpy(&x,&y,sizeof(double)),	\
-			 x)
-# define VTOHD(x,y)	(memcpy(&y,&x,sizeof(double)),	\
-			 y = rb_vtohd((DOUBLE_SWAPPER)y),	\
-			 memcpy(&x,&y,sizeof(double)),	\
-			 x)
+# define HTOND(x,y)	(memcpy(&(y),&(x),sizeof(double)),	\
+			 (y) = rb_htond((DOUBLE_SWAPPER)(y)),	\
+			 memcpy(&(x),&(y),sizeof(double)),	\
+			 (x))
+# define HTOVD(x,y)	(memcpy(&(y),&(x),sizeof(double)),	\
+			 (y) = rb_htovd((DOUBLE_SWAPPER)(y)),	\
+			 memcpy(&(x),&(y),sizeof(double)),	\
+			 (x))
+# define NTOHD(x,y)	(memcpy(&(y),&(x),sizeof(double)),	\
+			 (y) = rb_ntohd((DOUBLE_SWAPPER)(y)),	\
+			 memcpy(&(x),&(y),sizeof(double)),	\
+			 (x))
+# define VTOHD(x,y)	(memcpy(&(y),&(x),sizeof(double)),	\
+			 (y) = rb_vtohd((DOUBLE_SWAPPER)(y)),	\
+			 memcpy(&(x),&(y),sizeof(double)),	\
+			 (x))
 #else
 # define DOUBLE_CONVWITH(y)
 # define HTOND(x,y)	rb_htond(x)
@@ -280,7 +250,6 @@ num2i32(VALUE x)
     return 0;			/* not reached */
 }
 
-#define QUAD_SIZE 8
 #define MAX_INTEGER_PACK_SIZE 8
 /* #define FORCE_BIG_PACK */
 
@@ -325,7 +294,7 @@ static unsigned long utf8_to_uv(const char*,long*);
  *      L         | Integer | 32-bit unsigned, native endian (uint32_t)
  *      Q         | Integer | 64-bit unsigned, native endian (uint64_t)
  *                |         |
- *      c         | Integer | 8-bit signed (char)
+ *      c         | Integer | 8-bit signed (signed char)
  *      s         | Integer | 16-bit signed, native endian (int16_t)
  *      l         | Integer | 32-bit signed, native endian (int32_t)
  *      q         | Integer | 64-bit signed, native endian (int64_t)
@@ -338,6 +307,20 @@ static unsigned long utf8_to_uv(const char*,long*);
  *      i, i_, i! | Integer | signed int, native endian
  *      l_, l!    | Integer | signed long, native endian
  *                |         |
+ *      S> L> Q>  | Integer | same as the directives without ">" except
+ *      s> l> q>  |         | big endian
+ *      S!> I!>   |         | (available since Ruby 1.9.3)
+ *      L!>       |         | "S>" is same as "n"
+ *      s!> i!>   |         | "L>" is same as "N"
+ *      l!>       |         |
+ *                |         |
+ *      S< L< Q<  | Integer | same as the directives without "<" except
+ *      s< l< q<  |         | little endian
+ *      S!< I!<   |         | (available since Ruby 1.9.3)
+ *      L!<       |         | "S<" is same as "v"
+ *      s!< i!<   |         | "L<" is same as "V"
+ *      l!<       |         |
+ *                |         |
  *      n         | Integer | 16-bit unsigned, network (big-endian) byte order
  *      N         | Integer | 32-bit unsigned, network (big-endian) byte order
  *      v         | Integer | 16-bit unsigned, VAX (little-endian) byte order
@@ -345,7 +328,7 @@ static unsigned long utf8_to_uv(const char*,long*);
  *                |         |
  *      U         | Integer | UTF-8 character
  *      w         | Integer | BER-compressed integer
- *                
+ *
  *   Float        |         |
  *   Directive    |         | Meaning
  *   ---------------------------------------------------------------------------
@@ -355,7 +338,7 @@ static unsigned long utf8_to_uv(const char*,long*);
  *      e         | Float   | single-precision, little-endian byte order
  *      G         | Float   | double-precision, network (big-endian) byte order
  *      g         | Float   | single-precision, network (big-endian) byte order
- *                
+ *
  *   String       |         |
  *   Directive    |         | Meaning
  *   ---------------------------------------------------------------------------
@@ -372,7 +355,7 @@ static unsigned long utf8_to_uv(const char*,long*);
  *                |         | (if count is 0, no line feed are added, see RFC 4648)
  *      P         | String  | pointer to a structure (fixed-length string)
  *      p         | String  | pointer to a null-terminated string
- *                
+ *
  *   Misc.        |         |
  *   Directive    |         | Meaning
  *   ---------------------------------------------------------------------------
@@ -410,6 +393,7 @@ pack_pack(VALUE ary, VALUE fmt)
 #define NEXTFROM (items-- > 0 ? RARRAY_PTR(ary)[idx++] : TOO_FEW)
 
     while (p < pend) {
+	int explicit_endian = 0;
 	if (RSTRING_PTR(fmt) + RSTRING_LEN(fmt) != pend) {
 	    rb_raise(rb_eRuntimeError, "format string modified");
 	}
@@ -425,19 +409,39 @@ pack_pack(VALUE ary, VALUE fmt)
 	    }
 	    continue;
 	}
-        if (*p == '_' || *p == '!') {
-	    static const char natstr[] = "sSiIlL";
 
-	    if (strchr(natstr, type)) {
+	{
+	    static const char natstr[] = "sSiIlL";
+	    static const char endstr[] = "sSiIlLqQ";
+
+          modifiers:
+	    switch (*p) {
+	      case '_':
+	      case '!':
+		if (strchr(natstr, type)) {
 #ifdef NATINT_PACK
-		natint = 1;
+		    natint = 1;
 #endif
-		p++;
-	    }
-	    else {
-		rb_raise(rb_eArgError, "'%c' allowed only after types %s", *p, natstr);
+		    p++;
+		}
+		else {
+		    rb_raise(rb_eArgError, "'%c' allowed only after types %s", *p, natstr);
+		}
+		goto modifiers;
+
+	      case '<':
+	      case '>':
+		if (!strchr(endstr, type)) {
+		    rb_raise(rb_eArgError, "'%c' allowed only after types %s", *p, endstr);
+		}
+		if (explicit_endian) {
+		    rb_raise(rb_eRangeError, "Can't use both '<' and '>'");
+		}
+		explicit_endian = *p++;
+		goto modifiers;
 	    }
 	}
+
 	if (*p == '*') {	/* set data length */
 	    len = strchr("@Xxu", type) ? 0
                 : strchr("PMm", type) ? 1
@@ -681,13 +685,13 @@ pack_pack(VALUE ary, VALUE fmt)
 
 	  case 'q':		/* signed quad (64bit) int */
             signed_p = 1;
-            integer_size = 8;
+	    integer_size = 8;
             bigendian_p = BIGENDIAN_P();
             goto pack_integer;
 
 	  case 'Q':		/* unsigned quad (64bit) int */
             signed_p = 0;
-            integer_size = 8;
+	    integer_size = 8;
             bigendian_p = BIGENDIAN_P();
             goto pack_integer;
 
@@ -716,6 +720,10 @@ pack_pack(VALUE ary, VALUE fmt)
             goto pack_integer;
 
           pack_integer:
+	    if (explicit_endian) {
+		bigendian_p = explicit_endian == '>';
+	    }
+
             switch (integer_size) {
 #if defined(HAVE_INT16_T) && !defined(FORCE_BIG_PACK)
               case SIZEOF_INT16_T:
@@ -1178,16 +1186,16 @@ hex2num(char c)
 
 #define PACK_LENGTH_ADJUST_SIZE(sz) do {	\
     tmp_len = 0;				\
-    if (len > (long)((send-s)/sz)) {		\
+    if (len > (long)((send-s)/(sz))) {		\
         if (!star) {				\
-	    tmp_len = len-(send-s)/sz;		\
+	    tmp_len = len-(send-s)/(sz);		\
         }					\
-	len = (send-s)/sz;			\
+	len = (send-s)/(sz);			\
     }						\
 } while (0)
 
 #define PACK_ITEM_ADJUST() do { \
-    if (tmp_len > 0) \
+    if (tmp_len > 0 && !block_p) \
 	rb_ary_store(ary, RARRAY_LEN(ary)+tmp_len-1, Qnil); \
 } while (0)
 
@@ -1251,6 +1259,20 @@ infected_str_new(const char *ptr, long len, VALUE str)
  *      i, i_, i! | Integer | signed int, native endian
  *      l_, l!    | Integer | signed long, native endian
  *                |         |
+ *      S> L> Q>  | Integer | same as the directives without ">" except
+ *      s> l> q>  |         | big endian
+ *      S!> I!>   |         | (available since Ruby 1.9.3)
+ *      L!> Q!>   |         | "S>" is same as "n"
+ *      s!> i!>   |         | "L>" is same as "N"
+ *      l!> q!>   |         |
+ *                |         |
+ *      S< L< Q<  | Integer | same as the directives without "<" except
+ *      s< l< q<  |         | little endian
+ *      S!< I!<   |         | (available since Ruby 1.9.3)
+ *      L!< Q!<   |         | "S<" is same as "v"
+ *      s!< i!<   |         | "L<" is same as "V"
+ *      l!< q!<   |         |
+ *                |         |
  *      n         | Integer | 16-bit unsigned, network (big-endian) byte order
  *      N         | Integer | 32-bit unsigned, network (big-endian) byte order
  *      v         | Integer | 16-bit unsigned, VAX (little-endian) byte order
@@ -1258,7 +1280,7 @@ infected_str_new(const char *ptr, long len, VALUE str)
  *                |         |
  *      U         | Integer | UTF-8 character
  *      w         | Integer | BER-compressed integer (see Array.pack)
- *                
+ *
  *   Float        |         |
  *   Directive    | Returns | Meaning
  *   -----------------------------------------------------------------
@@ -1268,7 +1290,7 @@ infected_str_new(const char *ptr, long len, VALUE str)
  *      e         | Float   | single-precision, little-endian byte order
  *      G         | Float   | double-precision, network (big-endian) byte order
  *      g         | Float   | single-precision, network (big-endian) byte order
- *                
+ *
  *   String       |         |
  *   Directive    | Returns | Meaning
  *   -----------------------------------------------------------------
@@ -1285,7 +1307,7 @@ infected_str_new(const char *ptr, long len, VALUE str)
  *                |         | base64 encoded string (RFC 4648) if followed by 0
  *      P         | String  | pointer to a structure (fixed-length string)
  *      p         | String  | pointer to a null-terminated string
- *                
+ *
  *   Misc.        |         |
  *   Directive    | Returns | Meaning
  *   -----------------------------------------------------------------
@@ -1328,6 +1350,7 @@ pack_unpack(VALUE str, VALUE fmt)
 
     ary = block_p ? Qnil : rb_ary_new();
     while (p < pend) {
+	int explicit_endian = 0;
 	type = *p++;
 #ifdef NATINT_PACK
 	natint = 0;
@@ -1340,20 +1363,41 @@ pack_unpack(VALUE str, VALUE fmt)
 	    }
 	    continue;
 	}
-	star = 0;
-	if (*p == '_' || *p == '!') {
-	    static const char natstr[] = "sSiIlL";
 
-	    if (strchr(natstr, type)) {
+	star = 0;
+	{
+	    static const char natstr[] = "sSiIlL";
+	    static const char endstr[] = "sSiIlLqQ";
+
+          modifiers:
+	    switch (*p) {
+	      case '_':
+	      case '!':
+
+		if (strchr(natstr, type)) {
 #ifdef NATINT_PACK
-		natint = 1;
+		    natint = 1;
 #endif
-		p++;
-	    }
-	    else {
-		rb_raise(rb_eArgError, "'%c' allowed only after types %s", *p, natstr);
+		    p++;
+		}
+		else {
+		    rb_raise(rb_eArgError, "'%c' allowed only after types %s", *p, natstr);
+		}
+		goto modifiers;
+
+	      case '<':
+	      case '>':
+		if (!strchr(endstr, type)) {
+		    rb_raise(rb_eArgError, "'%c' allowed only after types %s", *p, endstr);
+		}
+		if (explicit_endian) {
+		    rb_raise(rb_eRangeError, "Can't use both '<' and '>'");
+		}
+		explicit_endian = *p++;
+		goto modifiers;
 	    }
 	}
+
 	if (p >= pend)
 	    len = 1;
 	else if (*p == '*') {
@@ -1551,13 +1595,13 @@ pack_unpack(VALUE str, VALUE fmt)
 
 	  case 'q':
 	    signed_p = 1;
-	    integer_size = QUAD_SIZE;
+	    integer_size = 8;
 	    bigendian_p = BIGENDIAN_P();
 	    goto unpack_integer;
 
 	  case 'Q':
 	    signed_p = 0;
-	    integer_size = QUAD_SIZE;
+	    integer_size = 8;
 	    bigendian_p = BIGENDIAN_P();
 	    goto unpack_integer;
 
@@ -1586,6 +1630,10 @@ pack_unpack(VALUE str, VALUE fmt)
 	    goto unpack_integer;
 
 	  unpack_integer:
+	    if (explicit_endian) {
+		bigendian_p = explicit_endian == '>';
+	    }
+
 	    switch (integer_size) {
 #if defined(HAVE_INT16_T) && !defined(FORCE_BIG_PACK)
 	      case SIZEOF_INT16_T:
@@ -1781,7 +1829,7 @@ pack_unpack(VALUE str, VALUE fmt)
 	    PACK_LENGTH_ADJUST_SIZE(sizeof(float));
 	    while (len-- > 0) {
 	        float tmp;
-		FLOAT_CONVWITH(ftmp;)
+		FLOAT_CONVWITH(ftmp);
 
 		memcpy(&tmp, s, sizeof(float));
 		s += sizeof(float);
@@ -1955,7 +2003,7 @@ pack_unpack(VALUE str, VALUE fmt)
 	  case 'M':
 	    {
 		VALUE buf = infected_str_new(0, send - s, str);
-		char *ptr = RSTRING_PTR(buf);
+		char *ptr = RSTRING_PTR(buf), *ss = s;
 		int c1, c2;
 
 		while (s < send) {
@@ -1974,9 +2022,11 @@ pack_unpack(VALUE str, VALUE fmt)
 			*ptr++ = *s;
 		    }
 		    s++;
+		    ss = s;
 		}
 		rb_str_set_len(buf, ptr - RSTRING_PTR(buf));
-		ENCODING_CODERANGE_SET(buf, rb_usascii_encindex(), ENC_CODERANGE_7BIT);
+		rb_str_buf_cat(buf, ss, send-ss);
+		ENCODING_CODERANGE_SET(buf, rb_ascii8bit_encindex(), ENC_CODERANGE_VALID);
 		UNPACK_PUSH(buf);
 	    }
 	    break;

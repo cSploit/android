@@ -1,3 +1,4 @@
+/* @(#) $Header: /tcpdump/master/tcpdump/rpc_msg.h,v 1.1.2.1 2005/04/27 21:44:07 guy Exp $ (LBL) */
 /*
  * Sun RPC is a product of Sun Microsystems, Inc. and is provided for
  * unrestricted use provided that this legend is included on all tape
@@ -38,7 +39,7 @@
  * Copyright (C) 1984, Sun Microsystems, Inc.
  */
 
-#define SUNRPC_MSG_VERSION	((uint32_t) 2)
+#define SUNRPC_MSG_VERSION	((u_int32_t) 2)
 
 /*
  * Bottom up definition of an rpc message.
@@ -78,13 +79,13 @@ enum sunrpc_reject_stat {
  * Reply to an rpc request that was rejected by the server.
  */
 struct sunrpc_rejected_reply {
-	uint32_t		 rj_stat;	/* enum reject_stat */
+	u_int32_t		 rj_stat;	/* enum reject_stat */
 	union {
 		struct {
-			uint32_t low;
-			uint32_t high;
+			u_int32_t low;
+			u_int32_t high;
 		} RJ_versions;
-		uint32_t RJ_why;  /* enum auth_stat - why authentication did not work */
+		u_int32_t RJ_why;  /* enum auth_stat - why authentication did not work */
 	} ru;
 #define	rj_vers	ru.RJ_versions
 #define	rj_why	ru.RJ_why
@@ -94,7 +95,7 @@ struct sunrpc_rejected_reply {
  * Body of a reply to an rpc request.
  */
 struct sunrpc_reply_body {
-	uint32_t	rp_stat;		/* enum reply_stat */
+	u_int32_t	rp_stat;		/* enum reply_stat */
 	struct sunrpc_rejected_reply rp_reject;	/* if rejected */
 };
 
@@ -102,10 +103,10 @@ struct sunrpc_reply_body {
  * Body of an rpc request call.
  */
 struct sunrpc_call_body {
-	uint32_t cb_rpcvers;	/* must be equal to two */
-	uint32_t cb_prog;
-	uint32_t cb_vers;
-	uint32_t cb_proc;
+	u_int32_t cb_rpcvers;	/* must be equal to two */
+	u_int32_t cb_prog;
+	u_int32_t cb_vers;
+	u_int32_t cb_proc;
 	struct sunrpc_opaque_auth cb_cred;
 	/* followed by opaque verifier */
 };
@@ -114,8 +115,8 @@ struct sunrpc_call_body {
  * The rpc message
  */
 struct sunrpc_msg {
-	uint32_t		rm_xid;
-	uint32_t		rm_direction;	/* enum msg_type */
+	u_int32_t		rm_xid;
+	u_int32_t		rm_direction;	/* enum msg_type */
 	union {
 		struct sunrpc_call_body RM_cmb;
 		struct sunrpc_reply_body RM_rmb;

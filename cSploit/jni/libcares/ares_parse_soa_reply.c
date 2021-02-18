@@ -86,10 +86,7 @@ ares_parse_soa_reply(const unsigned char *abuf, int alen,
   /* allocate result struct */
   soa = ares_malloc_data(ARES_DATATYPE_SOA_REPLY);
   if (!soa)
-    {
-      status = ARES_ENOMEM;
-      goto failed_stat;
-    }
+    return ARES_ENOMEM;
 
   /* nsname */
   status = ares__expand_name_for_response(aptr, abuf, alen, &soa->nsname, &len);

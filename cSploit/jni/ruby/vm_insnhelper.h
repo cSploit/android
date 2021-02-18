@@ -93,14 +93,14 @@ extern VALUE ruby_vm_const_missing_count;
 
 #ifdef COLLECT_USAGE_ANALYSIS
 #define USAGE_ANALYSIS_REGISTER_HELPER(a, b, v) \
-  (USAGE_ANALYSIS_REGISTER(a, b), (v))
+  (USAGE_ANALYSIS_REGISTER((a), (b)), (v))
 #else
 #define USAGE_ANALYSIS_REGISTER_HELPER(a, b, v) (v)
 #endif
 
 /* PC */
 #define GET_PC()           (USAGE_ANALYSIS_REGISTER_HELPER(0, 0, REG_PC))
-#define SET_PC(x)          (REG_PC = (USAGE_ANALYSIS_REGISTER_HELPER(0, 1, x)))
+#define SET_PC(x)          (REG_PC = (USAGE_ANALYSIS_REGISTER_HELPER(0, 1, (x))))
 #define GET_CURRENT_INSN() (*GET_PC())
 #define GET_OPERAND(n)     (GET_PC()[(n)])
 #define ADD_PC(n)          (SET_PC(REG_PC + (n)))
@@ -134,8 +134,8 @@ extern VALUE ruby_vm_const_missing_count;
 
 #define GET_PREV_DFP(dfp)                ((VALUE *)((dfp)[0] & ~0x03))
 
-#define GET_GLOBAL(entry)       rb_gvar_get((struct rb_global_entry*)entry)
-#define SET_GLOBAL(entry, val)  rb_gvar_set((struct rb_global_entry*)entry, val)
+#define GET_GLOBAL(entry)       rb_gvar_get((struct rb_global_entry*)(entry))
+#define SET_GLOBAL(entry, val)  rb_gvar_set((struct rb_global_entry*)(entry), (val))
 
 #define GET_CONST_INLINE_CACHE(dst) ((IC) * (GET_PC() + (dst) + 2))
 
@@ -151,13 +151,16 @@ extern VALUE ruby_vm_const_missing_count;
 
 #define COPY_CREF(c1, c2) do {  \
   NODE *__tmp_c2 = (c2); \
-  c1->nd_clss = __tmp_c2->nd_clss; \
-  c1->nd_visi = __tmp_c2->nd_visi;\
-  c1->nd_next = __tmp_c2->nd_next; \
+  (c1)->nd_clss = __tmp_c2->nd_clss; \
+  (c1)->nd_visi = __tmp_c2->nd_visi;\
+  (c1)->nd_next = __tmp_c2->nd_next; \
+  if (__tmp_c2->flags & NODE_FL_CREF_PUSHED_BY_EVAL) { \
+      (c1)->flags |= NODE_FL_CREF_PUSHED_BY_EVAL; \
+  } \
 } while (0)
 
 #define CALL_METHOD(num, blockptr, flag, id, me, recv) do { \
-    VALUE v = vm_call_method(th, GET_CFP(), num, blockptr, flag, id, me, recv); \
+    VALUE v = vm_call_method(th, GET_CFP(), (num), (blockptr), (flag), (id), (me), (recv)); \
     if (v == Qundef) { \
 	RESTORE_REGS(); \
 	NEXT_INSN(); \
@@ -182,7 +185,7 @@ extern VALUE ruby_vm_const_missing_count;
 
 /* optimize insn */
 #define FIXNUM_2_P(a, b) ((a) & (b) & 1)
-#define BASIC_OP_UNREDEFINED_P(op) (LIKELY(ruby_vm_redefined_flag[op] == 0))
+#define BASIC_OP_UNREDEFINED_P(op) (LIKELY(ruby_vm_redefined_flag[(op)] == 0))
 #define HEAP_CLASS_OF(obj) RBASIC(obj)->klass
 
 #ifndef USE_IC_FOR_SPECIALIZED_METHOD
@@ -193,16 +196,25 @@ extern VALUE ruby_vm_const_missing_count;
 
 #define CALL_SIMPLE_METHOD(num, id, recv) do { \
     VALUE klass = CLASS_OF(recv); \
-    CALL_METHOD(num, 0, 0, id, vm_method_search(id, klass, ic), recv); \
+    CALL_METHOD((num), 0, 0, (id), vm_method_search((id), klass, ic), (recv)); \
 } while (0)
 
 #else
 
 #define CALL_SIMPLE_METHOD(num, id, recv) do { \
     VALUE klass = CLASS_OF(recv); \
-    CALL_METHOD(num, 0, 0, id, rb_method_entry(klass, id), recv); \
+    CALL_METHOD((num), 0, 0, (id), rb_method_entry(klass, (id)), (recv)); \
 } while (0)
 
 #endif
+
+static VALUE ruby_vm_global_state_version = 1;
+
+#define GET_VM_STATE_VERSION() (ruby_vm_global_state_version)
+#define INC_VM_STATE_VERSION() do { \
+    ruby_vm_global_state_version = (ruby_vm_global_state_version + 1); \
+    if (ruby_vm_global_state_version == 0) vm_clear_all_cache(); \
+} while (0)
+static void vm_clear_all_cache(void);
 
 #endif /* RUBY_INSNHELPER_H */

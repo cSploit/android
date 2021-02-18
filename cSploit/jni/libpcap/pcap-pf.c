@@ -22,8 +22,13 @@
  *	Extraction/creation by Jeffrey Mogul, DECWRL
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/libpcap/pcap-pf.c,v 1.91.2.2 2005/05/03 18:54:37 guy Exp $ (LBL)";
+#endif
+
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <sys/types.h>
@@ -48,6 +53,7 @@ struct rtentry;
 #include <netinet/tcp.h>
 #include <netinet/tcpip.h>
 
+#include <ctype.h>
 #include <errno.h>
 #include <netdb.h>
 #include <stdio.h>
@@ -56,7 +62,7 @@ struct rtentry;
 #include <unistd.h>
 
 /*
- * Make "pcap.h" not include "pcap/bpf.h"; we are going to include the
+ * Make "pcap.h" not include "pcap-bpf.h"; we are going to include the
  * native OS version, as we need various BPF ioctls from it.
  */
 #define PCAP_DONT_INCLUDE_PCAP_BPF_H
@@ -67,24 +73,6 @@ struct rtentry;
 #ifdef HAVE_OS_PROTO_H
 #include "os-proto.h"
 #endif
-
-/*
- * FDDI packets are padded to make everything line up on a nice boundary.
- */
-#define       PCAP_FDDIPAD 3
-
-/*
- * Private data for capturing on Ultrix and DEC OSF/1^WDigital UNIX^W^W
- * Tru64 UNIX packetfilter devices.
- */
-struct pcap_pf {
-	int	filtering_in_kernel; /* using kernel filter */
-	u_long	TotPkts;	/* can't oflow for 79 hrs on ether */
-	u_long	TotAccepted;	/* count accepted by filter */
-	u_long	TotDrops;	/* count of dropped packets */
-	long	TotMissed;	/* missed by i/f during this run */
-	long	OrigMissed;	/* missed by i/f before this run */
-};
 
 static int pcap_setfilter_pf(pcap_t *, struct bpf_program *);
 
@@ -99,13 +87,18 @@ static int pcap_setfilter_pf(pcap_t *, struct bpf_program *);
 static int
 pcap_read_pf(pcap_t *pc, int cnt, pcap_handler callback, u_char *user)
 {
-	struct pcap_pf *pf = pc->priv;
 	register u_char *p, *bp;
+	struct bpf_insn *fcode;
 	register int cc, n, buflen, inc;
 	register struct enstamp *sp;
+#ifdef LBL_ALIGN
 	struct enstamp stamp;
-	register u_int pad;
+#endif
+#ifdef PCAP_FDDIPAD
+	register int pad;
+#endif
 
+	fcode = pc->md.use_bpf ? NULL : pc->fcode.bf_insns;
  again:
 	cc = pc->cc;
 	if (cc == 0) {
@@ -124,18 +117,20 @@ pcap_read_pf(pcap_t *pc, int cnt, pcap_handler callback, u_char *user)
 				(void)lseek(pc->fd, 0L, SEEK_SET);
 				goto again;
 			}
-			pcap_fmt_errmsg_for_errno(pc->errbuf,
-			    sizeof(pc->errbuf), errno, "pf read");
+			snprintf(pc->errbuf, sizeof(pc->errbuf), "pf read: %s",
+				pcap_strerror(errno));
 			return (-1);
 		}
-		bp = (u_char *)pc->buffer + pc->offset;
+		bp = pc->buffer + pc->offset;
 	} else
 		bp = pc->bp;
 	/*
 	 * Loop through each packet.
 	 */
 	n = 0;
+#ifdef PCAP_FDDIPAD
 	pad = pc->fddipad;
+#endif
 	while (cc > 0) {
 		/*
 		 * Has "pcap_breakloop()" been called?
@@ -161,10 +156,12 @@ pcap_read_pf(pcap_t *pc, int cnt, pcap_handler callback, u_char *user)
 			    "pf short read (%d)", cc);
 			return (-1);
 		}
+#ifdef LBL_ALIGN
 		if ((long)bp & 3) {
 			sp = &stamp;
 			memcpy((char *)sp, (char *)bp, sizeof(*sp));
 		} else
+#endif
 			sp = (struct enstamp *)bp;
 		if (sp->ens_stamplen != sizeof(*sp)) {
 			snprintf(pc->errbuf, sizeof(pc->errbuf),
@@ -182,34 +179,41 @@ pcap_read_pf(pcap_t *pc, int cnt, pcap_handler callback, u_char *user)
 		inc = ENALIGN(buflen + sp->ens_stamplen);
 		cc -= inc;
 		bp += inc;
-		pf->TotPkts++;
-		pf->TotDrops += sp->ens_dropped;
-		pf->TotMissed = sp->ens_ifoverflows;
-		if (pf->OrigMissed < 0)
-			pf->OrigMissed = pf->TotMissed;
+		pc->md.TotPkts++;
+		pc->md.TotDrops += sp->ens_dropped;
+		pc->md.TotMissed = sp->ens_ifoverflows;
+		if (pc->md.OrigMissed < 0)
+			pc->md.OrigMissed = pc->md.TotMissed;
 
 		/*
 		 * Short-circuit evaluation: if using BPF filter
-		 * in kernel, no need to do it now - we already know
-		 * the packet passed the filter.
+		 * in kernel, no need to do it now.
 		 *
+#ifdef PCAP_FDDIPAD
 		 * Note: the filter code was generated assuming
 		 * that pc->fddipad was the amount of padding
 		 * before the header, as that's what's required
 		 * in the kernel, so we run the filter before
 		 * skipping that padding.
+#endif
 		 */
-		if (pf->filtering_in_kernel ||
-		    pcap_filter(pc->fcode.bf_insns, p, sp->ens_count, buflen)) {
+		if (fcode == NULL ||
+		    bpf_filter(fcode, p, sp->ens_count, buflen)) {
 			struct pcap_pkthdr h;
-			pf->TotAccepted++;
+			pc->md.TotAccepted++;
 			h.ts = sp->ens_tstamp;
+#ifdef PCAP_FDDIPAD
 			h.len = sp->ens_count - pad;
+#else
+			h.len = sp->ens_count;
+#endif
+#ifdef PCAP_FDDIPAD
 			p += pad;
 			buflen -= pad;
+#endif
 			h.caplen = buflen;
 			(*callback)(user, &h, p);
-			if (++n >= cnt && !PACKET_COUNT_IS_UNLIMITED(cnt)) {
+			if (++n >= cnt && cnt > 0) {
 				pc->cc = cc;
 				pc->bp = bp;
 				return (n);
@@ -221,23 +225,22 @@ pcap_read_pf(pcap_t *pc, int cnt, pcap_handler callback, u_char *user)
 }
 
 static int
-pcap_inject_pf(pcap_t *p, const void *buf, int size)
+pcap_inject_pf(pcap_t *p, const void *buf, size_t size)
 {
 	int ret;
 
 	ret = write(p->fd, buf, size);
 	if (ret == -1) {
-		pcap_fmt_errmsg_for_errno(p->errbuf, PCAP_ERRBUF_SIZE,
-		    errno, "send");
+		snprintf(p->errbuf, PCAP_ERRBUF_SIZE, "send: %s",
+		    pcap_strerror(errno));
 		return (-1);
 	}
 	return (ret);
-}
+}                           
 
 static int
 pcap_stats_pf(pcap_t *p, struct pcap_stat *ps)
 {
-	struct pcap_pf *pf = p->priv;
 
 	/*
 	 * If packet filtering is being done in the kernel:
@@ -256,7 +259,7 @@ pcap_stats_pf(pcap_t *p, struct pcap_stat *ps)
 	 *	full.
 	 *
 	 *	"ps_ifdrop" counts packets dropped by the network
-	 *	interface (regardless of whether they would have passed
+	 *	inteface (regardless of whether they would have passed
 	 *	the input filter, of course).
 	 *
 	 * If packet filtering is not being done in the kernel:
@@ -268,37 +271,44 @@ pcap_stats_pf(pcap_t *p, struct pcap_stat *ps)
 	 *	the userland filter.
 	 *
 	 *	"ps_ifdrop" counts packets dropped by the network
-	 *	interface (regardless of whether they would have passed
+	 *	inteface (regardless of whether they would have passed
 	 *	the input filter, of course).
 	 *
 	 * These statistics don't include packets not yet read from
 	 * the kernel by libpcap, but they may include packets not
 	 * yet read from libpcap by the application.
 	 */
-	ps->ps_recv = pf->TotAccepted;
-	ps->ps_drop = pf->TotDrops;
-	ps->ps_ifdrop = pf->TotMissed - pf->OrigMissed;
+	ps->ps_recv = p->md.TotAccepted;
+	ps->ps_drop = p->md.TotDrops;
+	ps->ps_ifdrop = p->md.TotMissed - p->md.OrigMissed;
 	return (0);
 }
 
 /*
- * We include the OS's <net/bpf.h>, not our "pcap/bpf.h", so we probably
+ * We include the OS's <net/bpf.h>, not our "pcap-bpf.h", so we probably
  * don't get DLT_DOCSIS defined.
  */
 #ifndef DLT_DOCSIS
 #define DLT_DOCSIS	143
 #endif
 
-static int
-pcap_activate_pf(pcap_t *p)
+pcap_t *
+pcap_open_live(const char *device, int snaplen, int promisc, int to_ms,
+    char *ebuf)
 {
-	struct pcap_pf *pf = p->priv;
+	pcap_t *p;
 	short enmode;
 	int backlog = -1;	/* request the most */
 	struct enfilter Filter;
 	struct endevp devparams;
-	int err;
 
+	p = (pcap_t *)malloc(sizeof(*p));
+	if (p == NULL) {
+		snprintf(ebuf, PCAP_ERRBUF_SIZE,
+		    "pcap_open_live: %s", pcap_strerror(errno));
+		return (0);
+	}
+	memset(p, 0, sizeof(*p));
 	/*
 	 * Initially try a read/write open (to allow the inject
 	 * method to work).  If that fails due to permission
@@ -317,49 +327,23 @@ pcap_activate_pf(pcap_t *p)
 	 * its argument, even though it takes a "char *" rather than a
 	 * "const char *" as its first argument.  That appears to be
 	 * the case, at least on Digital UNIX 4.0.
-	 *
-	 * XXX - is there an error that means "no such device"?  Is
-	 * there one that means "that device doesn't support pf"?
 	 */
-	p->fd = pfopen(p->opt.device, O_RDWR);
+	p->fd = pfopen(device, O_RDWR);
 	if (p->fd == -1 && errno == EACCES)
-		p->fd = pfopen(p->opt.device, O_RDONLY);
+		p->fd = pfopen(device, O_RDONLY);
 	if (p->fd < 0) {
-		if (errno == EACCES) {
-			snprintf(p->errbuf, PCAP_ERRBUF_SIZE,
-			    "pf open: %s: Permission denied\n"
-"your system may not be properly configured; see the packetfilter(4) man page",
-			    p->opt.device);
-			err = PCAP_ERROR_PERM_DENIED;
-		} else {
-			pcap_fmt_errmsg_for_errno(p->errbuf, PCAP_ERRBUF_SIZE,
-			    errno, "pf open: %s", p->opt.device);
-			err = PCAP_ERROR;
-		}
+		snprintf(ebuf, PCAP_ERRBUF_SIZE, "pf open: %s: %s\n\
+your system may not be properly configured; see the packetfilter(4) man page\n",
+			device, pcap_strerror(errno));
 		goto bad;
 	}
-
-	/*
-	 * Turn a negative snapshot value (invalid), a snapshot value of
-	 * 0 (unspecified), or a value bigger than the normal maximum
-	 * value, into the maximum allowed value.
-	 *
-	 * If some application really *needs* a bigger snapshot
-	 * length, we should just increase MAXIMUM_SNAPLEN.
-	 */
-	if (p->snapshot <= 0 || p->snapshot > MAXIMUM_SNAPLEN)
-		p->snapshot = MAXIMUM_SNAPLEN;
-
-	pf->OrigMissed = -1;
-	enmode = ENTSTAMP|ENNONEXCL;
-	if (!p->opt.immediate)
-		enmode |= ENBATCH;
-	if (p->opt.promisc)
+	p->md.OrigMissed = -1;
+	enmode = ENTSTAMP|ENBATCH|ENNONEXCL;
+	if (promisc)
 		enmode |= ENPROMISC;
 	if (ioctl(p->fd, EIOCMBIS, (caddr_t)&enmode) < 0) {
-		pcap_fmt_errmsg_for_errno(p->errbuf, PCAP_ERRBUF_SIZE,
-		    errno, "EIOCMBIS");
-		err = PCAP_ERROR;
+		snprintf(ebuf, PCAP_ERRBUF_SIZE, "EIOCMBIS: %s",
+		    pcap_strerror(errno));
 		goto bad;
 	}
 #ifdef	ENCOPYALL
@@ -369,16 +353,14 @@ pcap_activate_pf(pcap_t *p)
 #endif
 	/* set the backlog */
 	if (ioctl(p->fd, EIOCSETW, (caddr_t)&backlog) < 0) {
-		pcap_fmt_errmsg_for_errno(p->errbuf, PCAP_ERRBUF_SIZE,
-		    errno, "EIOCSETW");
-		err = PCAP_ERROR;
+		snprintf(ebuf, PCAP_ERRBUF_SIZE, "EIOCSETW: %s",
+		    pcap_strerror(errno));
 		goto bad;
 	}
 	/* discover interface type */
 	if (ioctl(p->fd, EIOCDEVP, (caddr_t)&devparams) < 0) {
-		pcap_fmt_errmsg_for_errno(p->errbuf, PCAP_ERRBUF_SIZE,
-		    errno, "EIOCDEVP");
-		err = PCAP_ERROR;
+		snprintf(ebuf, PCAP_ERRBUF_SIZE, "EIOCDEVP: %s",
+		    pcap_strerror(errno));
 		goto bad;
 	}
 	/* HACK: to compile prior to Ultrix 4.2 */
@@ -459,54 +441,51 @@ pcap_activate_pf(pcap_t *p)
 		 * framing", there's not much we can do, as that
 		 * doesn't specify a particular type of header.
 		 */
-		snprintf(p->errbuf, PCAP_ERRBUF_SIZE,
-		    "unknown data-link type %u", devparams.end_dev_type);
-		err = PCAP_ERROR;
+		snprintf(ebuf, PCAP_ERRBUF_SIZE, "unknown data-link type %u",
+		    devparams.end_dev_type);
 		goto bad;
 	}
 	/* set truncation */
+#ifdef PCAP_FDDIPAD
 	if (p->linktype == DLT_FDDI) {
 		p->fddipad = PCAP_FDDIPAD;
 
 		/* packetfilter includes the padding in the snapshot */
-		p->snapshot += PCAP_FDDIPAD;
+		snaplen += PCAP_FDDIPAD;
 	} else
 		p->fddipad = 0;
-	if (ioctl(p->fd, EIOCTRUNCATE, (caddr_t)&p->snapshot) < 0) {
-		pcap_fmt_errmsg_for_errno(p->errbuf, PCAP_ERRBUF_SIZE,
-		    errno, "EIOCTRUNCATE");
-		err = PCAP_ERROR;
+#endif
+	if (ioctl(p->fd, EIOCTRUNCATE, (caddr_t)&snaplen) < 0) {
+		snprintf(ebuf, PCAP_ERRBUF_SIZE, "EIOCTRUNCATE: %s",
+		    pcap_strerror(errno));
 		goto bad;
 	}
+	p->snapshot = snaplen;
 	/* accept all packets */
 	memset(&Filter, 0, sizeof(Filter));
 	Filter.enf_Priority = 37;	/* anything > 2 */
 	Filter.enf_FilterLen = 0;	/* means "always true" */
 	if (ioctl(p->fd, EIOCSETF, (caddr_t)&Filter) < 0) {
-		pcap_fmt_errmsg_for_errno(p->errbuf, PCAP_ERRBUF_SIZE,
-		    errno, "EIOCSETF");
-		err = PCAP_ERROR;
+		snprintf(ebuf, PCAP_ERRBUF_SIZE, "EIOCSETF: %s",
+		    pcap_strerror(errno));
 		goto bad;
 	}
 
-	if (p->opt.timeout != 0) {
+	if (to_ms != 0) {
 		struct timeval timeout;
-		timeout.tv_sec = p->opt.timeout / 1000;
-		timeout.tv_usec = (p->opt.timeout * 1000) % 1000000;
+		timeout.tv_sec = to_ms / 1000;
+		timeout.tv_usec = (to_ms * 1000) % 1000000;
 		if (ioctl(p->fd, EIOCSRTIMEOUT, (caddr_t)&timeout) < 0) {
-			pcap_fmt_errmsg_for_errno(p->errbuf, PCAP_ERRBUF_SIZE,
-			    errno, "EIOCSRTIMEOUT");
-			err = PCAP_ERROR;
+			snprintf(ebuf, PCAP_ERRBUF_SIZE, "EIOCSRTIMEOUT: %s",
+				pcap_strerror(errno));
 			goto bad;
 		}
 	}
 
 	p->bufsize = BUFSPACE;
-	p->buffer = malloc(p->bufsize + p->offset);
+	p->buffer = (u_char*)malloc(p->bufsize + p->offset);
 	if (p->buffer == NULL) {
-		pcap_fmt_errmsg_for_errno(p->errbuf, PCAP_ERRBUF_SIZE,
-		    errno, "malloc");
-		err = PCAP_ERROR;
+		strlcpy(ebuf, pcap_strerror(errno), PCAP_ERRBUF_SIZE);
 		goto bad;
 	}
 
@@ -523,68 +502,30 @@ pcap_activate_pf(pcap_t *p)
 	p->getnonblock_op = pcap_getnonblock_fd;
 	p->setnonblock_op = pcap_setnonblock_fd;
 	p->stats_op = pcap_stats_pf;
+	p->close_op = pcap_close_common;
 
-	return (0);
- bad:
-	pcap_cleanup_live_common(p);
-	return (err);
-}
-
-pcap_t *
-pcap_create_interface(const char *device _U_, char *ebuf)
-{
-	pcap_t *p;
-
-	p = PCAP_CREATE_COMMON(ebuf, struct pcap_pf);
-	if (p == NULL)
-		return (NULL);
-
-	p->activate_op = pcap_activate_pf;
 	return (p);
-}
-
-/*
- * XXX - is there an error from pfopen() that means "no such device"?
- * Is there one that means "that device doesn't support pf"?
- */
-static int
-can_be_bound(const char *name _U_)
-{
-	return (1);
-}
-
-static int
-get_if_flags(const char *name _U_, bpf_u_int32 *flags _U_, char *errbuf _U_)
-{
+ bad:
+	if (p->fd >= 0)
+		close(p->fd);
 	/*
-	 * Nothing we can do other than mark loopback devices as "the
-	 * connected/disconnected status doesn't apply".
-	 *
-	 * XXX - is there a way to find out whether an adapter has
-	 * something plugged into it?
+	 * Get rid of any link-layer type list we allocated.
 	 */
-	if (*flags & PCAP_IF_LOOPBACK) {
-		/*
-		 * Loopback devices aren't wireless, and "connected"/
-		 * "disconnected" doesn't apply to them.
-		 */
-		*flags |= PCAP_IF_CONNECTION_STATUS_NOT_APPLICABLE;
-		return (0);
-	}
-	return (0);
+	if (p->dlt_list != NULL)
+		free(p->dlt_list);
+	free(p);
+	return (NULL);
 }
 
 int
-pcap_platform_finddevs(pcap_if_list_t *devlistp, char *errbuf)
+pcap_platform_finddevs(pcap_if_t **alldevsp, char *errbuf)
 {
-	return (pcap_findalldevs_interfaces(devlistp, errbuf, can_be_bound,
-	    get_if_flags));
+	return (0);
 }
 
 static int
 pcap_setfilter_pf(pcap_t *p, struct bpf_program *fp)
 {
-	struct pcap_pf *pf = p->priv;
 	struct bpf_version bv;
 
 	/*
@@ -607,8 +548,8 @@ pcap_setfilter_pf(pcap_t *p, struct bpf_program *fp)
 			 * Yes.  Try to install the filter.
 			 */
 			if (ioctl(p->fd, BIOCSETF, (caddr_t)fp) < 0) {
-				pcap_fmt_errmsg_for_errno(p->errbuf,
-				    sizeof(p->errbuf), errno, "BIOCSETF");
+				snprintf(p->errbuf, sizeof(p->errbuf),
+				    "BIOCSETF: %s", pcap_strerror(errno));
 				return (-1);
 			}
 
@@ -626,7 +567,7 @@ pcap_setfilter_pf(pcap_t *p, struct bpf_program *fp)
 			 * a window to annoy the user.
 			 */
 			fprintf(stderr, "tcpdump: Using kernel BPF filter\n");
-			pf->filtering_in_kernel = 1;
+			p->md.use_bpf = 1;
 
 			/*
 			 * Discard any previously-received packets,
@@ -664,15 +605,6 @@ pcap_setfilter_pf(pcap_t *p, struct bpf_program *fp)
 	 * a warning of some sort.
 	 */
 	fprintf(stderr, "tcpdump: Filtering in user process\n");
-	pf->filtering_in_kernel = 0;
+	p->md.use_bpf = 0;
 	return (0);
-}
-
-/*
- * Libpcap version string.
- */
-const char *
-pcap_lib_version(void)
-{
-	return (PCAP_VERSION_STRING);
 }

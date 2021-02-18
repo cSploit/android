@@ -17,6 +17,8 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * @(#) $Header: /tcpdump/master/libpcap/lbl/os-sunos4.h,v 1.32.1.1 1999/10/07 23:46:41 mcr Exp $ (LBL)
  */
 
 /* Prototypes missing in SunOS 4 */
@@ -65,6 +67,7 @@ int	fchmod(int, int);
 int	fchown(int, int, int);
 void	endgrent(void);
 void	endpwent(void);
+void	endservent(void);
 #ifdef __STDC__
 struct	ether_addr;
 #endif
@@ -145,6 +148,7 @@ int	select(int, fd_set *, fd_set *, fd_set *, struct timeval *);
 int	setpgrp(int, int);
 void	setpwent(void);
 int	setrlimit(int, struct rlimit *);
+void	setservent(int);
 int	setsockopt(int, int, int, char *, int);
 int	shutdown(int, int);
 int	sigblock(int);

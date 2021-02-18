@@ -16,7 +16,7 @@ warn_printf(const char *fmt, ...)
 }
 
 #define warn_print(x) rb_write_error(x)
-#define warn_print2(x,l) rb_write_error2(x,l)
+#define warn_print2(x,l) rb_write_error2((x),(l))
 
 static void
 error_pos(void)
@@ -37,8 +37,6 @@ error_pos(void)
 	}
     }
 }
-
-VALUE rb_check_backtrace(VALUE);
 
 static VALUE
 get_backtrace(VALUE info)

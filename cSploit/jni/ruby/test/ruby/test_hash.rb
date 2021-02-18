@@ -1,5 +1,6 @@
 require 'test/unit'
 require 'continuation'
+require_relative "envutil"
 
 class TestHash < Test::Unit::TestCase
 
@@ -116,6 +117,12 @@ class TestHash < Test::Unit::TestCase
 
   end
 
+  def test_self_initialize_copy
+    h = @cls[1=>2]
+    h.instance_eval {initialize_copy(h)}
+    assert_equal(2, h[1])
+  end
+
   def test_AREF # '[]'
     t = Time.now
     h = @cls[
@@ -144,8 +151,6 @@ class TestHash < Test::Unit::TestCase
     assert_equal('nil',    h1[nil])
     assert_equal(nil,      h1['nil'])
     assert_equal(:default, h1['koala'])
-
-
   end
 
   def test_ASET # '[]='
@@ -373,14 +378,20 @@ class TestHash < Test::Unit::TestCase
   end
 
   def test_fetch
-    assert_raise(KeyError) { @cls[].fetch(1) }
-    assert_raise(KeyError) { @h.fetch('gumby') }
     assert_equal('gumbygumby', @h.fetch('gumby') {|k| k * 2 })
     assert_equal('pokey', @h.fetch('gumby', 'pokey'))
 
     assert_equal('one', @h.fetch(1))
     assert_equal(nil, @h.fetch('nil'))
     assert_equal('nil', @h.fetch(nil))
+  end
+
+  def test_fetch_error
+    assert_raise(KeyError) { @cls[].fetch(1) }
+    assert_raise(KeyError) { @h.fetch('gumby') }
+    e = assert_raise(KeyError) { @h.fetch('gumby'*20) }
+    assert_match(/key not found: "gumbygumby/, e.message)
+    assert_match(/\.\.\.\z/, e.message)
   end
 
   def test_key2?
@@ -803,6 +814,9 @@ class TestHash < Test::Unit::TestCase
 
   def test_hash2
     assert_kind_of(Integer, {}.hash)
+    h = {1=>2}
+    h.shift
+    assert_equal({}.hash, h.hash, '[ruby-core:38650]')
   end
 
   def test_update2
@@ -890,7 +904,7 @@ class TestHash < Test::Unit::TestCase
     assert_equal({x=>1}.hash, {x=>1}.hash)
 
     o = Object.new
-    def o.hash; 2<<100; end
+    def o.hash; 2 << 100; end
     assert_equal({x=>1}.hash, {x=>1}.hash)
   end
 
@@ -903,5 +917,40 @@ class TestHash < Test::Unit::TestCase
     assert_nothing_raised { h[h] = :foo }
     h.rehash
     assert_equal(:foo, h[h])
+  end
+
+  def test_inverse_hash
+    feature4262 = '[ruby-core:34334]'
+    [{1=>2}, {123=>"abc"}].each do |h|
+      assert_not_equal(h.hash, h.invert.hash, feature4262)
+    end
+  end
+
+  def test_exception_in_rehash
+    bug9187 = '[ruby-core:58728] [Bug #9187]'
+
+    prepare = <<-EOS
+    class Foo
+      def initialize
+        @raise = false
+      end
+
+      def hash
+        raise if @raise
+        @raise = true
+        return 0
+      end
+    end
+    EOS
+
+    code = <<-EOS
+    h = {Foo.new => true}
+    10_0000.times do
+      h.rehash rescue nil
+    end
+    GC.start
+    EOS
+
+    assert_no_memory_leak([], prepare, code, bug9187)
   end
 end

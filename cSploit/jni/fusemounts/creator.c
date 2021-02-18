@@ -31,34 +31,34 @@
 #include "creator.h"
 
 bridge_t *open_unique_files(bridge_t *list) {
-  
-  bridge_t  *b,
-            *b1,
-            *b2;
-  char      *fullname;
-        
-  for(b=list;b;b=b->next) {
-    fullname = tempnam(b->mountpoint, NULL);
-    if(fullname) {
-      b->fname = strdup(basename(fullname));
-      b->flen = strlen(b->fname);
-      b->fd = open(fullname, O_CREAT | O_RDWR, S_IRWXU);
-      unlink(fullname);
-      free(fullname);
-    }
-  }
-  
-  for(b=NULL,b1=list;b1;b1=b2) {
-    b2=b1->next;
-    if(b1->fd < 0) {
-      if(b)
-        b->next=b2;
-      else
-        list = b2;
-      free_bridge(b1);
-    } else {
-      b = b1;
-    }
-  }
-  return list;
+	
+	bridge_t 	*b,
+						*b1,
+						*b2;
+	char      *fullname;
+				
+	for(b=list;b;b=b->next) {
+		fullname = tempnam(b->mountpoint, NULL);
+		if(fullname) {
+			b->fname = strdup(basename(fullname));
+			b->flen = strlen(b->fname);
+			b->fd = open(fullname, O_CREAT | O_RDWR, S_IRWXU);
+			unlink(fullname);
+			free(fullname);
+		}
+	}
+	
+	for(b=NULL,b1=list;b1;b1=b2) {
+		b2=b1->next;
+		if(b1->fd < 0) {
+			if(b)
+				b->next=b2;
+			else
+				list = b2;
+			free_bridge(b1);
+		} else {
+			b = b1;
+		}
+	}
+	return list;
 }

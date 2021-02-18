@@ -118,6 +118,7 @@ vm_call0(rb_thread_t* th, VALUE recv, VALUE id, int argc, const VALUE *argv,
 
 	RB_GC_GUARD(new_args);
 	rb_ary_unshift(new_args, ID2SYM(id));
+	th->passed_block = blockptr;
 	return rb_funcall2(recv, idMethodMissing,
 			   argc+1, RARRAY_PTR(new_args));
       }
@@ -203,7 +204,7 @@ stack_check(void)
 }
 
 static inline rb_method_entry_t *rb_search_method_entry(VALUE recv, ID mid);
-static inline int rb_method_call_status(rb_thread_t *th, rb_method_entry_t *me, call_type scope, VALUE self);
+static inline int rb_method_call_status(rb_thread_t *th, const rb_method_entry_t *me, call_type scope, VALUE self);
 #define NOEX_OK NOEX_NOSUPER
 
 /*!
@@ -265,12 +266,29 @@ check_funcall_failed(struct rescue_funcall_args *args, VALUE e)
 static VALUE
 check_funcall(VALUE recv, ID mid, int argc, VALUE *argv)
 {
-    rb_method_entry_t *me = rb_search_method_entry(recv, mid);
+    VALUE klass = CLASS_OF(recv);
+    const rb_method_entry_t *me;
     rb_thread_t *th = GET_THREAD();
-    int call_status = rb_method_call_status(th, me, CALL_FCALL, Qundef);
+    int call_status;
 
+    me = rb_method_entry(klass, idRespond_to);
+    if (me && !(me->flag & NOEX_BASIC)) {
+	VALUE args[2];
+	int arity = rb_method_entry_arity(me);
+
+	if (arity < 1 || arity > 3) arity = 2;
+
+	args[0] = ID2SYM(mid);
+	args[1] = Qtrue;
+	if (!RTEST(vm_call0(th, recv, idRespond_to, arity, args, me))) {
+	    return Qundef;
+	}
+    }
+
+    me = rb_search_method_entry(recv, mid);
+    call_status = rb_method_call_status(th, me, CALL_FCALL, Qundef);
     if (call_status != NOEX_OK) {
-	if (rb_method_basic_definition_p(CLASS_OF(recv), idMethodMissing)) {
+	if (rb_method_basic_definition_p(klass, idMethodMissing)) {
 	    return Qundef;
 	}
 	else {
@@ -375,7 +393,7 @@ rb_search_method_entry(VALUE recv, ID mid)
 }
 
 static inline int
-rb_method_call_status(rb_thread_t *th, rb_method_entry_t *me, call_type scope, VALUE self)
+rb_method_call_status(rb_thread_t *th, const rb_method_entry_t *me, call_type scope, VALUE self)
 {
     VALUE klass;
     ID oid;
@@ -459,12 +477,12 @@ NORETURN(static void raise_method_missing(rb_thread_t *th, int argc, const VALUE
  *  values.
  *
  *     class Roman
- *       def romanToInt(str)
+ *       def roman_to_int(str)
  *         # ...
  *       end
  *       def method_missing(methId)
  *         str = methId.id2name
- *         romanToInt(str)
+ *         roman_to_int(str)
  *       end
  *     end
  *
@@ -547,6 +565,7 @@ method_missing(VALUE obj, ID id, int argc, const VALUE *argv, int call_status)
 {
     VALUE *nargv, result, argv_ary = 0;
     rb_thread_t *th = GET_THREAD();
+    const rb_block_t *blockptr = th->passed_block;
 
     th->method_missing_reason = call_status;
     th->passed_block = 0;
@@ -572,6 +591,7 @@ method_missing(VALUE obj, ID id, int argc, const VALUE *argv, int call_status)
     if (rb_method_basic_definition_p(CLASS_OF(obj) , idMethodMissing)) {
 	raise_method_missing(th, argc+1, nargv, obj, call_status | NOEX_MISSING);
     }
+    th->passed_block = blockptr;
     result = rb_funcall2(obj, idMethodMissing, argc + 1, nargv);
     if (argv_ary) rb_ary_clear(argv_ary);
     return result;
@@ -619,10 +639,11 @@ rb_funcall(VALUE recv, ID mid, int n, ...)
 {
     VALUE *argv;
     va_list ar;
-    va_init_list(ar, n);
 
     if (n > 0) {
 	long i;
+
+	va_init_list(ar, n);
 
 	argv = ALLOCA_N(VALUE, n);
 
@@ -662,6 +683,31 @@ rb_funcall2(VALUE recv, ID mid, int argc, const VALUE *argv)
 VALUE
 rb_funcall3(VALUE recv, ID mid, int argc, const VALUE *argv)
 {
+    return rb_call(recv, mid, argc, argv, CALL_PUBLIC);
+}
+
+VALUE
+rb_funcall_passing_block(VALUE recv, ID mid, int argc, const VALUE *argv)
+{
+    PASS_PASSED_BLOCK_TH(GET_THREAD());
+
+    return rb_call(recv, mid, argc, argv, CALL_PUBLIC);
+}
+
+VALUE
+rb_funcall_with_block(VALUE recv, ID mid, int argc, const VALUE *argv, VALUE pass_procval)
+{
+    if (!NIL_P(pass_procval)) {
+	rb_thread_t *th = GET_THREAD();
+	rb_block_t *block = 0;
+
+	rb_proc_t *pass_proc;
+	GetProcPtr(pass_procval, pass_proc);
+	block = &pass_proc->block;
+
+	th->passed_block = block;
+    }
+
     return rb_call(recv, mid, argc, argv, CALL_PUBLIC);
 }
 
@@ -1006,7 +1052,8 @@ eval_string_with_cref(VALUE self, VALUE src, VALUE scope, NODE *cref, const char
 	th->base_block = 0;
 
 	if (0) {		/* for debug */
-	    printf("%s\n", RSTRING_PTR(rb_iseq_disasm(iseqval)));
+	    VALUE disasm = rb_iseq_disasm(iseqval);
+	    printf("%s\n", StringValuePtr(disasm));
 	}
 
 	/* save new env */
@@ -1028,7 +1075,6 @@ eval_string_with_cref(VALUE self, VALUE src, VALUE scope, NODE *cref, const char
 	    VALUE errinfo = th->errinfo;
 	    if (strcmp(file, "(eval)") == 0) {
 		VALUE mesg, errat, bt2;
-		extern VALUE rb_get_backtrace(VALUE info);
 		ID id_mesg;
 
 		CONST_ID(id_mesg, "mesg");
@@ -1072,12 +1118,12 @@ eval_string(VALUE self, VALUE src, VALUE scope, const char *file, int line)
  *  optional <em>filename</em> and <em>lineno</em> parameters are
  *  present, they will be used when reporting syntax errors.
  *
- *     def getBinding(str)
+ *     def get_binding(str)
  *       return binding
  *     end
  *     str = "hello"
  *     eval "str + ' Fred'"                      #=> "hello Fred"
- *     eval "str + ' Fred'", getBinding("bye")   #=> "bye Fred"
+ *     eval "str + ' Fred'", get_binding("bye")  #=> "bye Fred"
  */
 
 VALUE
@@ -1183,7 +1229,7 @@ rb_eval_cmd(VALUE cmd, VALUE arg, int level)
     POP_TAG();
 
     rb_set_safe_level_force(safe);
-    if (state) rb_vm_jump_tag_but_local_jump(state, val);
+    if (state) JUMP_TAG(state);
     return val;
 }
 
@@ -1429,6 +1475,7 @@ rb_throw_obj(VALUE tag, VALUE value)
     }
     if (!tt) {
 	VALUE desc = rb_inspect(tag);
+	RB_GC_GUARD(desc);
 	rb_raise(rb_eArgError, "uncaught throw %s", RSTRING_PTR(desc));
     }
     rb_trap_restore_mask();

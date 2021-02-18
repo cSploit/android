@@ -5,7 +5,13 @@
 #++
 
 require 'rubygems'
-require 'rubygems/security'
+
+# forward-declare
+
+module Gem::Security # :nodoc:
+  class Policy # :nodoc:
+  end
+end
 
 ##
 # Mixin methods for install and update options for Gem::Commands
@@ -17,8 +23,12 @@ module Gem::InstallUpdateOptions
 
   def add_install_update_options
     OptionParser.accept Gem::Security::Policy do |value|
+      require 'rubygems/security'
+
       value = Gem::Security::Policies[value]
-      raise OptionParser::InvalidArgument, value if value.nil?
+      valid = Gem::Security::Policies.keys.sort
+      message = "#{value} (#{valid.join ', '} are valid)"
+      raise OptionParser::InvalidArgument, message if value.nil?
       value
     end
 
@@ -56,10 +66,6 @@ module Gem::InstallUpdateOptions
                'Force gem to install, bypassing dependency',
                'checks') do |value, options|
       options[:force] = value
-    end
-
-    add_option(:"Install/Update", '-t', '--[no-]test',
-               'Ignored; just for compatiblity') do |value, options|
     end
 
     add_option(:"Install/Update", '-w', '--[no-]wrappers',
@@ -102,6 +108,12 @@ module Gem::InstallUpdateOptions
                 "Install any additional development",
                 "dependencies") do |value, options|
       options[:development] = true
+    end
+
+    add_option(:"Install/Update", "--conservative",
+                "Don't attempt to upgrade gems already",
+                "meeting version requirement") do |value, options|
+      options[:conservative] = true
     end
   end
 

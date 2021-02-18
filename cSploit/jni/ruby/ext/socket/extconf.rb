@@ -1,7 +1,9 @@
 require 'mkmf'
 
+$INCFLAGS << " -I$(topdir) -I$(top_srcdir)"
+
 case RUBY_PLATFORM
-when /(ms|bcc)win32|mingw/
+when /(ms|bcc)win(32|64)|mingw/
   test_func = "WSACleanup"
   have_library("ws2_32", "WSACleanup")
   $defs << "-DHAVE_SOCKETPAIR"
@@ -22,6 +24,12 @@ else
   have_library("socket", "socket")
 end
 
+if /darwin/ =~ RUBY_PLATFORM
+  # For IPv6 extension header access on OS X 10.7+ [Bug #8517]
+  $CFLAGS << " -D__APPLE_USE_RFC_3542"
+end
+
+headers = []
 unless $mswin or $bccwin or $mingw
   headers = %w<sys/types.h netdb.h string.h sys/socket.h netinet/in.h>
 end
@@ -117,13 +125,137 @@ if !have_macro("IPPROTO_IPV6", headers) && have_const("IPPROTO_IPV6", headers)
   }
 end
 
-if (have_func("sendmsg") | have_func("recvmsg")) && /64-darwin/ !~ RUBY_PLATFORM
-  # CMSG_ macros are broken on 64bit darwin, because of use of __DARWIN_ALIGN.
+if have_func("sendmsg") | have_func("recvmsg")
   have_struct_member('struct msghdr', 'msg_control', ['sys/types.h', 'sys/socket.h'])
   have_struct_member('struct msghdr', 'msg_accrights', ['sys/types.h', 'sys/socket.h'])
 end
 
+if (CROSS_COMPILING and RUBY_PLATFORM =~ /androideabi/) or
+checking_for("recvmsg() with MSG_PEEK allocate file descriptors") {try_run(cpp_include(headers) + <<'EOF')}
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/socket.h>
+#include <sys/un.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[])
+{
+    int ps[2], sv[2];
+    int ret;
+    ssize_t ss;
+    int s_fd, r_fd;
+    struct msghdr s_msg, r_msg;
+    union {
+        struct cmsghdr hdr;
+        char dummy[CMSG_SPACE(sizeof(int))];
+    } s_cmsg, r_cmsg;
+    struct iovec s_iov, r_iov;
+    char s_buf[1], r_buf[1];
+    struct stat s_statbuf, r_statbuf;
+
+    ret = pipe(ps);
+    if (ret == -1) { perror("pipe"); exit(EXIT_FAILURE); }
+
+    s_fd = ps[0];
+
+    ret = socketpair(AF_UNIX, SOCK_DGRAM, 0, sv);
+    if (ret == -1) { perror("socketpair"); exit(EXIT_FAILURE); }
+
+    s_msg.msg_name = NULL;
+    s_msg.msg_namelen = 0;
+    s_msg.msg_iov = &s_iov;
+    s_msg.msg_iovlen = 1;
+    s_msg.msg_control = &s_cmsg;
+    s_msg.msg_controllen = CMSG_SPACE(sizeof(int));;
+    s_msg.msg_flags = 0;
+
+    s_iov.iov_base = &s_buf;
+    s_iov.iov_len = sizeof(s_buf);
+
+    s_buf[0] = 'a';
+
+    s_cmsg.hdr.cmsg_len = CMSG_LEN(sizeof(int));
+    s_cmsg.hdr.cmsg_level = SOL_SOCKET;
+    s_cmsg.hdr.cmsg_type = SCM_RIGHTS;
+    memcpy(CMSG_DATA(&s_cmsg.hdr), (char *)&s_fd, sizeof(int));
+
+    ss = sendmsg(sv[0], &s_msg, 0);
+    if (ss == -1) { perror("sendmsg"); exit(EXIT_FAILURE); }
+
+    r_msg.msg_name = NULL;
+    r_msg.msg_namelen = 0;
+    r_msg.msg_iov = &r_iov;
+    r_msg.msg_iovlen = 1;
+    r_msg.msg_control = &r_cmsg;
+    r_msg.msg_controllen = CMSG_SPACE(sizeof(int));
+    r_msg.msg_flags = 0;
+
+    r_iov.iov_base = &r_buf;
+    r_iov.iov_len = sizeof(r_buf);
+
+    r_buf[0] = '0';
+
+    memset(&r_cmsg, 0xff, CMSG_SPACE(sizeof(int)));
+
+    ss = recvmsg(sv[1], &r_msg, MSG_PEEK);
+    if (ss == -1) { perror("recvmsg"); exit(EXIT_FAILURE); }
+
+    if (ss != 1) {
+        fprintf(stderr, "unexpected return value from recvmsg: %ld\n", (long)ss);
+        exit(EXIT_FAILURE);
+    }
+    if (r_buf[0] != 'a') {
+        fprintf(stderr, "unexpected return data from recvmsg: 0x%02x\n", r_buf[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    if (r_msg.msg_controllen < CMSG_LEN(sizeof(int))) {
+        fprintf(stderr, "unexpected: r_msg.msg_controllen < CMSG_LEN(sizeof(int)) not hold: %ld\n",
+                (long)r_msg.msg_controllen);
+        exit(EXIT_FAILURE);
+    }
+    if (r_cmsg.hdr.cmsg_len < CMSG_LEN(sizeof(int))) {
+        fprintf(stderr, "unexpected: r_cmsg.hdr.cmsg_len < CMSG_LEN(sizeof(int)) not hold: %ld\n",
+                (long)r_cmsg.hdr.cmsg_len);
+        exit(EXIT_FAILURE);
+    }
+    memcpy((char *)&r_fd, CMSG_DATA(&r_cmsg.hdr), sizeof(int));
+
+    if (r_fd < 0) {
+        fprintf(stderr, "negative r_fd: %d\n", r_fd);
+        exit(EXIT_FAILURE);
+    }
+
+    if (r_fd == s_fd) {
+        fprintf(stderr, "r_fd and s_fd is same: %d\n", r_fd);
+        exit(EXIT_FAILURE);
+    }
+
+    ret = fstat(s_fd, &s_statbuf);
+    if (ret == -1) { perror("fstat(s_fd)"); exit(EXIT_FAILURE); }
+
+    ret = fstat(r_fd, &r_statbuf);
+    if (ret == -1) { perror("fstat(r_fd)"); exit(EXIT_FAILURE); }
+
+    if (s_statbuf.st_dev != r_statbuf.st_dev ||
+        s_statbuf.st_ino != r_statbuf.st_ino) {
+        fprintf(stderr, "dev/ino doesn't match: s_fd:%ld/%ld r_fd:%ld/%ld\n",
+                (long)s_statbuf.st_dev, (long)s_statbuf.st_ino,
+                (long)r_statbuf.st_dev, (long)r_statbuf.st_ino);
+        exit(EXIT_FAILURE);
+    }
+
+    return EXIT_SUCCESS;
+}
+EOF
+  $defs << "-DFD_PASSING_WORK_WITH_RECVMSG_MSG_PEEK"
+end
+
 getaddr_info_ok = (enable_config("wide-getaddrinfo") && :wide) ||
+	(CROSS_COMPILING and RUBY_PLATFORM =~ /androideabi/ && :os) ||
   (checking_for("wide getaddrinfo") {try_run(<<EOF)} && :os)
 #{cpp_include(headers)}
 #include <stdlib.h>
@@ -302,12 +434,13 @@ if getaddr_info_ok == :wide or
   $objs += ["getaddrinfo.#{$OBJEXT}"]
   $objs += ["getnameinfo.#{$OBJEXT}"]
   $defs << "-DGETADDRINFO_EMU"
-  have_func("inet_ntop") or have_func("inet_ntoa")
-  have_func("inet_pton") or have_func("inet_aton")
-  have_func("getservbyport")
-  have_header("arpa/nameser.h")
-  have_header("resolv.h")
 end
+
+have_func("inet_ntop") or have_func("inet_ntoa")
+have_func("inet_pton") or have_func("inet_aton")
+have_func("getservbyport")
+have_header("arpa/nameser.h")
+have_header("resolv.h")
 
 have_header("ifaddrs.h")
 have_func("getifaddrs")
@@ -324,13 +457,19 @@ end
 
 have_header("sys/un.h")
 have_header("sys/uio.h")
-have_type("struct in_pktinfo", headers) {|src|
-  src.sub(%r'^/\*top\*/', '\1'"\n#if defined(IPPROTO_IP) && defined(IP_PKTINFO)") <<
-  "#else\n" << "#error\n" << ">>>>>> no in_pktinfo <<<<<<\n" << "#endif\n"
+	                                                                     
+
+# workaround for recent Windows SDK
+$defs << "-DIPPROTO_IPV6=IPPROTO_IPV6" if $defs.include?("-DHAVE_CONST_IPPROTO_IPV6") && !have_macro("IPPROTO_IPV6")
+$defs << "-DIPPROTO_IP=IPPROTO_IP" if $defs.include?("-DHAVE_CONST_IPPROTO_IP") && !have_macro("IPPROTO_IP")
+	                                                                     
+have_type("struct in_pktinfo", headers, $defs.join(" ")) {|src|
+	src.sub(%r'^/\*top\*/', '\1'"\n#if defined(IPPROTO_IP) && defined(IP_PKTINFO)") <<
+	"#else\n" << "#error\n" << ">>>>>> no in_pktinfo <<<<<<\n" << "#endif\n"
 } and have_struct_member("struct in_pktinfo", "ipi_spec_dst", headers)
-have_type("struct in6_pktinfo", headers) {|src|
-  src.sub(%r'^/\*top\*/', '\1'"\n#if defined(IPPROTO_IPV6) && defined(IPV6_PKTINFO)") <<
-  "#else\n" << "#error\n" << ">>>>>> no in6_pktinfo <<<<<<\n" << "#endif\n"
+have_type("struct in6_pktinfo", headers, $defs.join(" ")) {|src|
+	src.sub(%r'^/\*top\*/', '\1'"\n#if defined(IPPROTO_IPV6) && defined(IPV6_PKTINFO)") <<
+	"#else\n" << "#error\n" << ">>>>>> no in6_pktinfo <<<<<<\n" << "#endif\n"
 }
 
 have_type("struct sockcred", headers)
@@ -341,8 +480,11 @@ have_func("getpeereid")
 have_header("ucred.h", headers)
 have_func("getpeerucred")
 
-# workaround for recent Windows SDK
-$defs << "-DIPPROTO_IPV6=IPPROTO_IPV6" if $defs.include?("-DHAVE_CONST_IPPROTO_IPV6") && !have_macro("IPPROTO_IPV6")
+have_func("if_indextoname")
+
+have_type("struct ip_mreq", headers) # 4.4BSD
+have_type("struct ip_mreqn", headers) # Linux 2.4
+have_type("struct ipv6_mreq", headers) # RFC 3493
 
 $distcleanfiles << "constants.h" << "constdefs.*"
 

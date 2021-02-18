@@ -131,7 +131,8 @@ module REXML
       xml_decl().version
     end
 
-    # @return the XMLDecl encoding of this document as a String.
+    # @return the XMLDecl encoding of this document as an
+    # Encoding object.
     # If no XMLDecl has been set, returns the default encoding.
     def encoding
       xml_decl().encoding
@@ -164,7 +165,7 @@ module REXML
     #   Document.new("<a><b/></a>").serialize( tr )
     #
     # output::
-    #	  output an object which supports '<< string'; this is where the
+    #     output an object which supports '<< string'; this is where the
     #   document will be written.
     # indent::
     #   An integer.  If -1, no indenting will be used; otherwise, the
@@ -183,7 +184,7 @@ module REXML
     #   that IE's limited abilities can handle.  This hack inserts a space
     #   before the /> on empty tags.  Defaults to false
     def write( output=$stdout, indent=-1, transitive=false, ie_hack=false )
-      if xml_decl.encoding != "UTF-8" && !output.kind_of?(Output)
+      if xml_decl.encoding != 'UTF-8' && !output.kind_of?(Output)
         output = Output.new( output, xml_decl.encoding )
       end
       formatter = if indent > -1
@@ -214,6 +215,20 @@ module REXML
     # Get the entity expansion limit. By default the limit is set to 10000.
     def Document::entity_expansion_limit
       return @@entity_expansion_limit
+    end
+
+    # Set the entity expansion limit. By default the limit is set to 10240.
+    #
+    # Deprecated. Use REXML.entity_expansion_text_limit= instead.
+    def Document::entity_expansion_text_limit=( val )
+      REXML.entity_expansion_text_limit = val
+    end
+
+    # Get the entity expansion limit. By default the limit is set to 10240.
+    #
+    # Deprecated. Use REXML.entity_expansion_text_limit instead.
+    def Document::entity_expansion_text_limit
+      return REXML.entity_expansion_text_limit
     end
 
     attr_reader :entity_expansion_count

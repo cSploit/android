@@ -16,14 +16,13 @@
 #include "gc.h"
 #include "ruby/vm.h"
 #include "ruby/encoding.h"
+#include "internal.h"
+#include "vm_core.h"
 
 #define numberof(array) (int)(sizeof(array) / sizeof((array)[0]))
 
-VALUE proc_invoke(VALUE, VALUE, VALUE, VALUE);
-VALUE rb_binding_new(void);
 NORETURN(void rb_raise_jump(VALUE));
 
-ID rb_frame_callee(void);
 VALUE rb_eLocalJumpError;
 VALUE rb_eSysStackError;
 
@@ -33,13 +32,6 @@ VALUE rb_eSysStackError;
 #include "eval_jump.c"
 
 /* initialize ruby */
-
-void rb_clear_trace_func(void);
-void rb_thread_stop_timer_thread(void);
-
-void rb_call_inits(void);
-void Init_heap(void);
-void Init_BareVM(void);
 
 void
 ruby_init(void)
@@ -68,8 +60,6 @@ ruby_init(void)
     }
     GET_VM()->running = 1;
 }
-
-extern void rb_clear_trace_func(void);
 
 void *
 ruby_options(int argc, char **argv)
@@ -118,8 +108,6 @@ ruby_finalize(void)
     ruby_finalize_1();
 }
 
-void rb_thread_stop_timer_thread(void);
-
 int
 ruby_cleanup(volatile int ex)
 {
@@ -127,8 +115,6 @@ ruby_cleanup(volatile int ex)
     volatile VALUE errs[2];
     rb_thread_t *th = GET_THREAD();
     int nerr;
-    void rb_threadptr_interrupt(rb_thread_t *th);
-    void rb_threadptr_check_signal(rb_thread_t *mth);
 
     rb_threadptr_interrupt(th);
     rb_threadptr_check_signal(th);
@@ -159,8 +145,22 @@ ruby_cleanup(volatile int ex)
     th->errinfo = errs[1];
     ex = error_handle(ex);
     ruby_finalize_1();
+
+    /* unlock again if finalizer took mutexes. */
+    rb_threadptr_unlock_all_locking_mutexes(GET_THREAD());
     POP_TAG();
-    rb_thread_stop_timer_thread();
+    rb_thread_stop_timer_thread(1);
+
+#if EXIT_SUCCESS != 0 || EXIT_FAILURE != 1
+    switch (ex) {
+#if EXIT_SUCCESS != 0
+      case 0: ex = EXIT_SUCCESS; break;
+#endif
+#if EXIT_FAILURE != 1
+      case 1: ex = EXIT_FAILURE; break;
+#endif
+    }
+#endif
 
     state = 0;
     for (nerr = 0; nerr < numberof(errs); ++nerr) {
@@ -172,30 +172,20 @@ ruby_cleanup(volatile int ex)
 	if (TYPE(err) == T_NODE) continue;
 
 	if (rb_obj_is_kind_of(err, rb_eSystemExit)) {
-	    return sysexit_status(err);
+	    ex = sysexit_status(err);
+	    break;
 	}
 	else if (rb_obj_is_kind_of(err, rb_eSignal)) {
 	    VALUE sig = rb_iv_get(err, "signo");
 	    state = NUM2INT(sig);
 	    break;
 	}
-	else if (ex == 0) {
-	    ex = 1;
+	else if (ex == EXIT_SUCCESS) {
+	    ex = EXIT_FAILURE;
 	}
     }
     ruby_vm_destruct(GET_VM());
     if (state) ruby_default_signal(state);
-
-#if EXIT_SUCCESS != 0 || EXIT_FAILURE != 1
-    switch (ex) {
-#if EXIT_SUCCESS != 0
-      case 0: return EXIT_SUCCESS;
-#endif
-#if EXIT_FAILURE != 1
-      case 1: return EXIT_FAILURE;
-#endif
-    }
-#endif
 
     return ex;
 }
@@ -296,15 +286,23 @@ rb_mod_nesting(void)
 /*
  *  call-seq:
  *     Module.constants   -> array
+ *     Module.constants(inherited)   -> array
  *
- *  Returns an array of the names of all constants defined in the
- *  system. This list includes the names of all modules and classes.
+ *  In the first form, returns an array of the names of all
+ *  constants accessible from the point of call.
+ *  This list includes the names of all modules and classes
+ *  defined in the global scope.
  *
- *     p Module.constants.sort[1..5]
+ *     Module.constants.first(4)
+ *        # => [:ARGF, :ARGV, :ArgumentError, :Array]
  *
- *  <em>produces:</em>
+ *     Module.constants.include?(:SEEK_SET)   # => false
  *
- *     ["ARGV", "ArgumentError", "Array", "Bignum", "Binding"]
+ *     class IO
+ *       Module.constants.include?(:SEEK_SET) # => true
+ *     end
+ *
+ *  The second form calls the instance method +constants+.
  */
 
 static VALUE
@@ -315,13 +313,14 @@ rb_mod_s_constants(int argc, VALUE *argv, VALUE mod)
     VALUE cbase = 0;
     void *data = 0;
 
-    if (argc > 0) {
-	return rb_mod_constants(argc, argv, rb_cModule);
+    if (argc > 0 || mod != rb_cModule) {
+	return rb_mod_constants(argc, argv, mod);
     }
 
     while (cref) {
 	klass = cref->nd_clss;
-	if (!NIL_P(klass)) {
+	if (!(cref->flags & NODE_FL_CREF_PUSHED_BY_EVAL) &&
+	    !NIL_P(klass)) {
 	    data = rb_mod_const_at(cref->nd_clss, data);
 	    if (!cbase) {
 		cbase = klass;
@@ -369,8 +368,10 @@ setup_exception(rb_thread_t *th, int tag, volatile VALUE mesg)
     const char *file;
     volatile int line = 0;
 
-    if (NIL_P(mesg))
+    if (NIL_P(mesg)) {
 	mesg = th->errinfo;
+	if (INTERNAL_EXCEPTION_P(mesg)) JUMP_TAG(TAG_FATAL);
+    }
     if (NIL_P(mesg)) {
 	mesg = rb_exc_new(rb_eRuntimeError, 0, 0);
     }
@@ -751,12 +752,27 @@ rb_ensure(VALUE (*b_proc)(ANYARGS), VALUE data1, VALUE (*e_proc)(ANYARGS), VALUE
     return result;
 }
 
+static const rb_method_entry_t *
+method_entry_of_iseq(rb_control_frame_t *cfp, rb_iseq_t *iseq)
+{
+    rb_thread_t *th = GET_THREAD();
+    rb_control_frame_t *cfp_limit;
+
+    cfp_limit = (rb_control_frame_t *)(th->stack + th->stack_size);
+    while (cfp_limit > cfp) {
+	if (cfp->iseq == iseq)
+	    return cfp->me;
+	cfp = RUBY_VM_PREVIOUS_CONTROL_FRAME(cfp);
+    }
+    return 0;
+}
+
 static ID
 frame_func_id(rb_control_frame_t *cfp)
 {
+    const rb_method_entry_t *me_local;
     rb_iseq_t *iseq = cfp->iseq;
-    if (!iseq) {
-	if (!cfp->me) return 0;
+    if (cfp->me) {
 	return cfp->me->def->original_id;
     }
     while (iseq) {
@@ -764,6 +780,11 @@ frame_func_id(rb_control_frame_t *cfp)
 	    NODE *ifunc = (NODE *)iseq;
 	    if (ifunc->nd_aid) return ifunc->nd_aid;
 	    return rb_intern("<ifunc>");
+	}
+	me_local = method_entry_of_iseq(cfp, iseq);
+	if (me_local) {
+	    cfp->me = me_local;
+	    return me_local->def->original_id;
 	}
 	if (iseq->defined_method_id) {
 	    return iseq->defined_method_id;
@@ -968,9 +989,6 @@ top_include(int argc, VALUE *argv, VALUE self)
     return rb_mod_include(argc, argv, rb_cObject);
 }
 
-VALUE rb_f_trace_var();
-VALUE rb_f_untrace_var();
-
 static VALUE *
 errinfo_place(rb_thread_t *th)
 {
@@ -1123,12 +1141,8 @@ Init_eval(void)
 
     rb_undef_method(rb_cClass, "module_function");
 
-    {
-	extern void Init_vm_eval(void);
-	extern void Init_eval_method(void);
-	Init_vm_eval();
-	Init_eval_method();
-    }
+    Init_vm_eval();
+    Init_eval_method();
 
     rb_define_singleton_method(rb_cModule, "nesting", rb_mod_nesting, 0);
     rb_define_singleton_method(rb_cModule, "constants", rb_mod_s_constants, -1);

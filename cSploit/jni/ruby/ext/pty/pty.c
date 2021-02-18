@@ -122,6 +122,9 @@ char	MasterDevice[] = "/dev/pty%s",
 
 static VALUE eChildExited;
 
+/* Returns the exit status of the child for which PTY#check
+ * raised this exception
+ */
 static VALUE
 echild_status(VALUE self)
 {
@@ -134,18 +137,6 @@ struct pty_info {
 };
 
 static void getDevice(int*, int*, char [DEVICELEN], int);
-
-struct exec_info {
-    int argc;
-    VALUE *argv;
-};
-
-static VALUE
-pty_exec(VALUE v)
-{
-    struct exec_info *arg = (struct exec_info *)v;
-    return rb_f_exec(arg->argc, arg->argv);
-}
 
 struct child_info {
     int master, slave;
@@ -163,12 +154,12 @@ chfunc(void *data, char *errbuf, size_t errbuf_len)
     int argc = carg->argc;
     VALUE *argv = carg->argv;
 
-    struct exec_info arg;
-    int status;
 #define ERROR_EXIT(str) do { \
-	strlcpy(errbuf, str, errbuf_len); \
+	strlcpy(errbuf, (str), errbuf_len); \
 	return -1; \
     } while (0)
+
+    rb_thread_atfork_before_exec();
 
     /*
      * Set free from process group and controlling terminal
@@ -186,6 +177,7 @@ chfunc(void *data, char *errbuf, size_t errbuf_len)
     {
         int i = open("/dev/tty", O_RDONLY);
         if (i < 0) ERROR_EXIT("/dev/tty");
+        rb_update_max_fd(i);
         if (ioctl(i, TIOCNOTTY, (char *)0))
             ERROR_EXIT("ioctl(TIOCNOTTY)");
         close(i);
@@ -207,6 +199,7 @@ chfunc(void *data, char *errbuf, size_t errbuf_len)
     if (slave < 0) {
         ERROR_EXIT("open: pty slave");
     }
+    rb_update_max_fd(slave);
     close(master);
 #endif
     dup2(slave,0);
@@ -217,11 +210,8 @@ chfunc(void *data, char *errbuf, size_t errbuf_len)
     seteuid(getuid());
 #endif
 
-    arg.argc = argc;
-    arg.argv = argv;
-    rb_protect(pty_exec, (VALUE)&arg, &status);
-    sleep(1);
-    return -1;
+    rb_f_exec(argc, argv);
+    return 0;
 #undef ERROR_EXIT
 }
 
@@ -301,6 +291,7 @@ get_device_once(int *master, int *slave, char SlaveName[DEVICELEN], int nomesg, 
     sigemptyset(&dfl.sa_mask);
 
     if ((masterfd = posix_openpt(O_RDWR|O_NOCTTY)) == -1) goto error;
+    rb_update_max_fd(masterfd);
     if (sigaction(SIGCHLD, &dfl, &old) == -1) goto error;
     if (grantpt(masterfd) == -1) goto grantpt_error;
     if (sigaction(SIGCHLD, &old, NULL) == -1) goto error;
@@ -308,6 +299,7 @@ get_device_once(int *master, int *slave, char SlaveName[DEVICELEN], int nomesg, 
     if ((slavedevice = ptsname(masterfd)) == NULL) goto error;
     if (no_mesg(slavedevice, nomesg) == -1) goto error;
     if ((slavefd = open(slavedevice, O_RDWR|O_NOCTTY, 0)) == -1) goto error;
+    rb_update_max_fd(slavefd);
 
 #if defined I_PUSH && !defined linux
     if (ioctl(slavefd, I_PUSH, "ptem") == -1) goto error;
@@ -339,6 +331,8 @@ get_device_once(int *master, int *slave, char SlaveName[DEVICELEN], int nomesg, 
 	if (!fail) return -1;
 	rb_raise(rb_eRuntimeError, "openpty() failed");
     }
+    rb_update_max_fd(*master);
+    rb_update_max_fd(*slave);
     if (no_mesg(SlaveName, nomesg) == -1) {
 	if (!fail) return -1;
 	rb_raise(rb_eRuntimeError, "can't chmod slave pty");
@@ -354,8 +348,11 @@ get_device_once(int *master, int *slave, char SlaveName[DEVICELEN], int nomesg, 
 	if (!fail) return -1;
 	rb_raise(rb_eRuntimeError, "_getpty() failed");
     }
+    rb_update_max_fd(*master);
 
     *slave = open(name, O_RDWR);
+    /* error check? */
+    rb_update_max_fd(*slave);
     strlcpy(SlaveName, name, DEVICELEN);
 
     return 0;
@@ -369,6 +366,7 @@ get_device_once(int *master, int *slave, char SlaveName[DEVICELEN], int nomesg, 
     extern int grantpt(int);
 
     if((masterfd = open("/dev/ptmx", O_RDWR, 0)) == -1) goto error;
+    rb_update_max_fd(masterfd);
     s = signal(SIGCHLD, SIG_DFL);
     if(grantpt(masterfd) == -1) goto error;
     signal(SIGCHLD, s);
@@ -376,6 +374,7 @@ get_device_once(int *master, int *slave, char SlaveName[DEVICELEN], int nomesg, 
     if((slavedevice = ptsname(masterfd)) == NULL) goto error;
     if (no_mesg(slavedevice, nomesg) == -1) goto error;
     if((slavefd = open(slavedevice, O_RDWR, 0)) == -1) goto error;
+    rb_update_max_fd(slavefd);
 #if defined I_PUSH && !defined linux
     if(ioctl(slavefd, I_PUSH, "ptem") == -1) goto error;
     if(ioctl(slavefd, I_PUSH, "ldterm") == -1) goto error;
@@ -399,9 +398,11 @@ get_device_once(int *master, int *slave, char SlaveName[DEVICELEN], int nomesg, 
     for (p = deviceNo; *p != NULL; p++) {
 	snprintf(MasterName, sizeof MasterName, MasterDevice, *p);
 	if ((masterfd = open(MasterName,O_RDWR,0)) >= 0) {
+            rb_update_max_fd(masterfd);
 	    *master = masterfd;
 	    snprintf(SlaveName, DEVICELEN, SlaveDevice, *p);
 	    if ((slavefd = open(SlaveName,O_RDWR,0)) >= 0) {
+                rb_update_max_fd(slavefd);
 		*slave = slavefd;
 		if (chown(SlaveName, getuid(), getgid()) != 0) goto error;
 		if (chmod(SlaveName, nomesg ? 0600 : 0622) != 0) goto error;
@@ -443,20 +444,28 @@ pty_close_pty(VALUE assoc)
 
 /*
  * call-seq:
- *   PTY.open   => [master_io, slave_file]
- *   PTY.open {|master_io, slave_file| ... }    => block value
+ *   PTY.open => [master_io, slave_file]
+ *   PTY.open {|master_io, slave_file| ... } => block value
  *
  * Allocates a pty (pseudo-terminal).
  *
- * It returns an array which contains an IO object and a File object.
- * The former is the master of the pty.
- * The latter is the slave of the pty.
+ * In the non-block form, returns a two element array, <tt>[master_io,
+ * slave_file]</tt>.
  *
- * If a block is given, it yields the array instead of return.
- * The value of the block is returned.
- * master_io and slave_file is closed when return if they are not closed.
+ * In the block form, yields two arguments <tt>master_io, slave_file</tt>
+ * and the value of the block is returned from +open+.
  *
- * The path name of the terminal device can be gotten by slave_file.path.
+ * The IO and File are both closed after the block completes if they haven't
+ * been already closed.
+ *
+ * The arguments in both forms are:
+ *
+ * <tt>master_io</tt>:: the master of the pty, as an IO.
+ * <tt>slave_file</tt>:: the slave of the pty, as a File.  The path to the
+ *                       terminal device is available via
+ *                       <tt>slave_file.path</tt>
+ *
+ * === Example
  *
  *   PTY.open {|m, s|
  *     p m      #=> #<IO:masterpty:/dev/pts/1>
@@ -480,7 +489,8 @@ pty_close_pty(VALUE assoc)
  *   w.puts "144"
  *   p m.gets #=> "144: 2 2 2 2 3 3\n"
  *   w.close
- *   # The result of read operation when pty slave is closed is platform dependnet.
+ *   # The result of read operation when pty slave is closed is platform
+ *   # dependent.
  *   ret = begin
  *           m.gets          # FreeBSD returns nil.
  *         rescue Errno::EIO # GNU/Linux raises EIO.
@@ -528,24 +538,34 @@ pty_detach_process(struct pty_info *info)
 
 /*
  * call-seq:
- *   PTY.spawn(command...) {|r, w, pid| ... }   => nil
- *   PTY.spawn(command...)                      => r, w, pid
- *   PTY.getpty(command...) {|r, w, pid| ... }  => nil
- *   PTY.getpty(command...)                     => r, w, pid
+ *   PTY.spawn(command_line)  { |r, w, pid| ... }
+ *   PTY.spawn(command_line)  => [r, w, pid]
+ *   PTY.spawn(command, args, ...)  { |r, w, pid| ... }
+ *   PTY.spawn(command, args, ...)  => [r, w, pid]
+ *   PTY.getpty(command_line)  { |r, w, pid| ... }
+ *   PTY.getpty(command_line)  => [r, w, pid]
+ *   PTY.getpty(command, args, ...)  { |r, w, pid| ... }
+ *   PTY.getpty(command, args, ...)  => [r, w, pid]
  *
- * spawns the specified command on a newly allocated pty.
+ * Spawns the specified command on a newly allocated pty.
  *
- * The command's controlling tty is set to the slave device of the pty.
- * Also its standard input/output/error is redirected to the slave device.
+ * The command's controlling tty is set to the slave device of the pty
+ * and its standard input/output/error is redirected to the slave device.
  *
- * PTY.spawn returns two IO objects and PID.
- * PID is the process ID of the command.
- * The two IO objects are connected to the master device of the pty.
- * The first IO object is opened as read mode and
- * The second is opened as write mode.
+ * <tt>command_line</tt>:: The full command line to run
+ * <tt>command</tt>:: The command to run, as a String.
+ * <tt>args</tt>:: Zero or more arguments, as Strings, representing
+ *                 the arguments to +command+
  *
- * If a block is given, two IO objects and PID is yielded.
+ * In the non-block form this returns an array of size three,
+ * <tt>[r, w, pid]</tt>.  In the block form the block will be called with
+ * these as arguments, <tt>|r,w,pid|</tt>:
  *
+ * +r+:: An IO that can be read from that contains the command's
+ *       standard output and standard error
+ * +w+:: An IO that can be written to that is the command's
+ *       standard input
+ * +pid+:: The process identifier for the command.
  */
 static VALUE
 pty_getpty(int argc, VALUE *argv, VALUE self)
@@ -570,6 +590,7 @@ pty_getpty(int argc, VALUE *argv, VALUE self)
     wfptr->fd = dup(info.fd);
     if (wfptr->fd == -1)
         rb_sys_fail("dup()");
+    rb_update_max_fd(wfptr->fd);
     wfptr->pathv = rfptr->pathv;
 
     res = rb_ary_new2(3);
@@ -588,7 +609,7 @@ static void
 raise_from_check(pid_t pid, int status)
 {
     const char *state;
-    char buf[1024];
+    VALUE msg;
     VALUE exc;
 
 #if defined(WIFSTOPPED)
@@ -606,20 +627,27 @@ raise_from_check(pid_t pid, int status)
     else {
 	state = "exited";
     }
-    snprintf(buf, sizeof(buf), "pty - %s: %ld", state, (long)pid);
-    exc = rb_exc_new2(eChildExited, buf);
+    msg = rb_sprintf("pty - %s: %ld", state, (long)pid);
+    exc = rb_exc_new3(eChildExited, msg);
     rb_iv_set(exc, "status", rb_last_status_get());
     rb_exc_raise(exc);
 }
 
 /*
  * call-seq:
- *   PTY.check(pid[, raise=false])   => Process::Status or nil
+ *   PTY.check(pid, raise = false) => Process::Status or nil
+ *   PTY.check(pid, true)          => nil or raises PTY::ChildExited
  *
- * checks the status of the child process specified by _pid_, and
- * returns +nil+ if the process is still alive and active.  Otherwise,
- * returns +Process::Status+ about the process if _raise_ is false, or
- * +PTY::ChildExited+ exception is raised.
+ * Checks the status of the child process specified by +pid+.
+ * Returns +nil+ if the process is still alive.  If the process
+ * is not alive, will return a <tt>Process::Status</tt> or raise
+ * a <tt>PTY::ChildExited</tt> (if +raise+ was true).
+ *
+ * +pid+:: The process id of the process to check
+ * +raise+:: If true and the process identified by +pid+ is no longer
+ *           alive a <tt>PTY::ChildExited</tt> is raised.
+ *
+ * Returns nil or a <tt>Process::Status</tt> when +raise+ is false.
  */
 static VALUE
 pty_check(int argc, VALUE *argv, VALUE self)
@@ -630,7 +658,7 @@ pty_check(int argc, VALUE *argv, VALUE self)
 
     rb_scan_args(argc, argv, "11", &pid, &exc);
     cpid = rb_waitpid(NUM2PIDT(pid), &status, WNOHANG|WUNTRACED);
-    if (cpid == -1) return Qnil;
+    if (cpid == -1 || cpid == 0) return Qnil;
 
     if (!RTEST(exc)) return rb_last_status_get();
     raise_from_check(cpid, status);
@@ -638,6 +666,20 @@ pty_check(int argc, VALUE *argv, VALUE self)
 }
 
 static VALUE cPTY;
+
+/*
+ * Document-class: PTY::ChildExited
+ *
+ * Thrown when PTY#check is called for a pid that represents a process that
+ * has exited.
+ */
+
+/*
+ * Document-class: PTY
+ *
+ * Creates and managed pseudo terminals (PTYs).  See also
+ * http://en.wikipedia.org/wiki/Pseudo_terminal
+ */
 
 void
 Init_pty()

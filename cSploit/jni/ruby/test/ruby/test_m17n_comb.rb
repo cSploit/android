@@ -286,7 +286,7 @@ class TestM17NComb < Test::Unit::TestCase
       assert_strenc(a(s), s.encoding, "%s".force_encoding(s.encoding) % s)
       if !s.empty? # xxx
         t = enccall(a("%s"), :%, s)
-        assert_strenc(a(s), s.encoding, t)
+        assert_strenc(a(s), (a('')+s).encoding, t)
       end
     }
   end
@@ -633,13 +633,9 @@ class TestM17NComb < Test::Unit::TestCase
   def test_str_casecmp
     combination(STRINGS, STRINGS) {|s1, s2|
       #puts "#{encdump(s1)}.casecmp(#{encdump(s2)})"
-      begin
-        r = s1.casecmp(s2)
-      rescue ArgumentError
-        assert(!s1.valid_encoding? || !s2.valid_encoding?)
-        next
-      end
-      #assert_equal(s1.upcase <=> s2.upcase, r)
+      next unless s1.valid_encoding? && s2.valid_encoding? && Encoding.compatible?(s1, s2)
+      r = s1.casecmp(s2)
+      assert_equal(s1.upcase <=> s2.upcase, r)
     }
   end
 
@@ -781,7 +777,17 @@ class TestM17NComb < Test::Unit::TestCase
   end
 
   def test_str_crypt
+    begin
+      # glibc 2.16 or later denies salt contained other than [0-9A-Za-z./] #7312
+      glibcver = `#{RbConfig::CONFIG["libdir"]}/libc.so.6`[/\AGNU C Library.*version ([0-9.]+)/, 1].split('.').map(&:to_i)
+      strict_crypt = (glibcver <=> [2, 16]) > -1
+    rescue
+    end
+
     combination(STRINGS, STRINGS) {|str, salt|
+      if strict_crypt
+        next unless salt.ascii_only? && /\A[0-9a-zA-Z.\/]+\z/ =~ salt
+      end
       if a(salt).length < 2
         assert_raise(ArgumentError) { str.crypt(salt) }
         next
@@ -1031,7 +1037,7 @@ class TestM17NComb < Test::Unit::TestCase
         t1.insert(nth, s2)
         slen = s2.length
         assert_equal(t1[nth-slen+1,slen], s2, "t=#{encdump s1}; t.insert(#{nth},#{encdump s2}); t")
-      rescue Encoding::CompatibilityError, IndexError => e
+      rescue Encoding::CompatibilityError, IndexError
       end
     }
   end
@@ -1095,7 +1101,7 @@ class TestM17NComb < Test::Unit::TestCase
         if s1.valid_encoding?
           assert_raise(Encoding::CompatibilityError) { s1.scan(s2) }
         else
-          assert_raise(ArgumentError, /invalid byte sequence/) { s1.scan(s2) }
+          assert_match(/invalid byte sequence/, assert_raise(ArgumentError) { s1.scan(s2) }.message)
         end
         next
       end

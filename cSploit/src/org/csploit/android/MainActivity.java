@@ -59,6 +59,7 @@ import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
 import org.csploit.android.core.UpdateChecker;
 import org.csploit.android.core.UpdateService;
+import org.csploit.android.core.ToolsInstaller;
 import org.csploit.android.events.Event;
 import org.csploit.android.gui.dialogs.AboutDialog;
 import org.csploit.android.gui.dialogs.ConfirmDialog;
@@ -388,7 +389,10 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     }
 
     if (!coreInstalled) {
-      UPDATE_MESSAGE = getString(R.string.missing_core_update);
+      //UPDATE_MESSAGE = getString(R.string.missing_core_update);
+      new ToolsInstaller(getApplication().getApplicationContext()).install();
+      System.reloadTools();
+      onCoreUpdated();
     } else if (!coreBeating) {
       UPDATE_MESSAGE = getString(R.string.heart_attack_update);
     } else if (!isWifiAvailable) {

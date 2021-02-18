@@ -236,4 +236,41 @@ class TestClass < Test::Unit::TestCase
     copy.send(:include, mod)
     assert_equal("mod#foo", copy.new.foo)
   end
+
+  def test_nested_class_removal
+    assert_normal_exit('File.__send__(:remove_const, :Stat); at_exit{File.stat(".")}; GC.start')
+  end
+
+  class PrivateClass
+  end
+  private_constant :PrivateClass
+
+  def test_redefine_private_class
+    assert_raise(NameError) do
+      eval("class ::TestClass::PrivateClass; end")
+    end
+    eval <<-END
+      class ::TestClass
+        class PrivateClass
+          def foo; 42; end
+        end
+      end
+    END
+    assert_equal(42, PrivateClass.new.foo)
+  end
+
+  def test_cannot_reinitialize_class_with_initialize_copy # [ruby-core:50869]
+    assert_in_out_err([], <<-RUBY, ["Object"], [])
+      class Class
+        def initialize_copy(*); super; end
+      end
+
+      class A; end
+      class B; end
+
+      A.send(:initialize_copy, Class.new(B)) rescue nil
+
+      p A.superclass
+    RUBY
+  end
 end

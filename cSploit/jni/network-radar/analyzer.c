@@ -15,19 +15,14 @@
  * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
-
 #include <string.h>
 #include <errno.h>
 #include <assert.h>
 
-#include <csploit/list.h>
-#include <csploit/logger.h>
-
+#include "list.h"
 #include "analyzer.h"
 #include "netdefs.h"
+#include "logger.h"
 #include "prober.h"
 #include "ifinfo.h"
 #include "host.h"

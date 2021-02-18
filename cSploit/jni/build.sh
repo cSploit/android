@@ -148,7 +148,7 @@ copy_jni_libs() {
   echo -n "[jni] copying libs to java project..."
   
   for abi in $abis; do
-    javaLibs=$(readlink -fm ../src/main/jniLibs/${abi}/)
+    javaLibs=$(readlink -fm ../src/org/csploit/android/jniLibs/${abi}/)
     bins=$(readlink -fm ../libs/${abi})
     
     { test -d "${javaLibs}" || mkdir -p "${javaLibs}" ;} >&3 2>&1 || die

@@ -25,7 +25,7 @@ LOCAL_CFLAGS:= -Wall -Werror -DHAVE_NET_ETHERNET_H -DHAVE_LINUX_IF_ETHER_H \
 LOCAL_STATIC_LIBRARIES:= cSploitCommon_static cares
 
 LOCAL_C_INCLUDES:= \
-  cSploitCommon/include\
+  cSploitCommon/\
   libcares/
   
 LOCAL_SRC_FILES:= $(wildcard $(LOCAL_PATH)/*.c)

@@ -36,12 +36,13 @@ HMAC_CTX_copy(HMAC_CTX *out, HMAC_CTX *in)
 #endif /* NO_HMAC */
 
 #if !defined(HAVE_X509_STORE_SET_EX_DATA)
-
 int X509_STORE_set_ex_data(X509_STORE *str, int idx, void *data)
 {
     return CRYPTO_set_ex_data(&str->ex_data, idx, data);
 }
+#endif
 
+#if !defined(HAVE_X509_STORE_GET_EX_DATA)
 void *X509_STORE_get_ex_data(X509_STORE *str, int idx)
 {
     return CRYPTO_get_ex_data(&str->ex_data, idx);
@@ -341,3 +342,98 @@ PEM_def_callback(char *buf, int num, int w, void *key)
 }
 #endif
 
+#if !defined(HAVE_ASN1_PUT_EOC)
+int
+ASN1_put_eoc(unsigned char **pp)
+{
+    unsigned char *p = *pp;
+    *p++ = 0;
+    *p++ = 0;
+    *pp = p;
+    return 2;
+}
+#endif
+
+#if !defined(HAVE_BN_GENERATE_PRIME) && defined(HAVE_BN_GENERATE_PRIME_EX)
+BIGNUM *BN_generate_prime(BIGNUM *ret, int bits, int safe,
+	const BIGNUM *add, const BIGNUM *rem,
+	void (*callback)(int,int,void *), void *cb_arg)
+	{
+	BN_GENCB cb;
+	BIGNUM *rnd=NULL;
+	int found = 0;
+
+	BN_GENCB_set_old(&cb, callback, cb_arg);
+
+	if (ret == NULL)
+		{
+		if ((rnd=BN_new()) == NULL) goto err;
+		}
+	else
+		rnd=ret;
+	if(!BN_generate_prime_ex(rnd, bits, safe, add, rem, &cb))
+		goto err;
+
+	/* we have a prime :-) */
+	found = 1;
+err:
+	if (!found && (ret == NULL) && (rnd != NULL)) BN_free(rnd);
+	return(found ? rnd : NULL);
+	}
+#endif
+
+#if !defined(HAVE_BN_IS_PRIME) && defined(HAVE_BN_IS_PRIME_EX)
+int BN_is_prime(const BIGNUM *a, int checks, void (*callback)(int,int,void *),
+	BN_CTX *ctx_passed, void *cb_arg)
+	{
+	BN_GENCB cb;
+	BN_GENCB_set_old(&cb, callback, cb_arg);
+	return BN_is_prime_ex(a, checks, ctx_passed, &cb);
+	}
+#endif
+
+#if !defined(HAVE_BN_IS_PRIME_FASTTEST) && defined(HAVE_BN_IS_PRIME_FASTTEST_EX)
+int BN_is_prime_fasttest(const BIGNUM *a, int checks,
+		void (*callback)(int,int,void *),
+		BN_CTX *ctx_passed, void *cb_arg,
+		int do_trial_division)
+	{
+	BN_GENCB cb;
+	BN_GENCB_set_old(&cb, callback, cb_arg);
+	return BN_is_prime_fasttest_ex(a, checks, ctx_passed,
+				do_trial_division, &cb);
+	}
+#endif
+
+#if !defined(HAVE_RSA_GENERATE_KEY) && defined(HAVE_RSA_GENERATE_KEY_EX)
+RSA *RSA_generate_key(int bits, unsigned long e_value,
+	     void (*callback)(int,int,void *), void *cb_arg)
+	{
+	BN_GENCB cb;
+	int i;
+	RSA *rsa = RSA_new();
+	BIGNUM *e = BN_new();
+
+	if(!rsa || !e) goto err;
+
+	/* The problem is when building with 8, 16, or 32 BN_ULONG,
+	 * unsigned long can be larger */
+	for (i=0; i<(int)sizeof(unsigned long)*8; i++)
+		{
+		if (e_value & (1UL<<i))
+			if (BN_set_bit(e,i) == 0)
+				goto err;
+		}
+
+	BN_GENCB_set_old(&cb, callback, cb_arg);
+
+	if(RSA_generate_key_ex(rsa, bits, e, &cb)) {
+		BN_free(e);
+		return rsa;
+	}
+err:
+	if(e) BN_free(e);
+	if(rsa) RSA_free(rsa);
+	return 0;
+	}
+#endif

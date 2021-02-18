@@ -1,7 +1,4 @@
-require 'openssl'
-require "test/unit"
-require 'tempfile'
-require File.join(File.dirname(__FILE__), "utils.rb")
+require_relative 'utils'
 
 class OpenSSL::TestConfig < Test::Unit::TestCase
   def setup
@@ -19,9 +16,10 @@ __EOD__
   end
 
   def test_constants
-    assert(defined?(OpenSSL::Config::DEFAULT_CONFIG_FILE))
+    config_file = OpenSSL::Config::DEFAULT_CONFIG_FILE
+    skip "DEFAULT_CONFIG_FILE may return a wrong path on your platforms. [Bug #6830]" unless File.readable?(config_file)
     assert_nothing_raised do
-      OpenSSL::Config.load(OpenSSL::Config::DEFAULT_CONFIG_FILE)
+      OpenSSL::Config.load(config_file)
     end
   end
 
@@ -265,11 +263,12 @@ __EOC__
     c['foo'] = [['key', 'value']]
     c.freeze
 
-    # [ruby-core:18377]
+    bug = '[ruby-core:18377]'
     # RuntimeError for 1.9, TypeError for 1.8
-    assert_raise(TypeError, /frozen/) do
+    e = assert_raise(TypeError, bug) do
       c['foo'] = [['key', 'wrong']]
     end
+    assert_match(/can't modify/, e.message, bug)
   end
 
   def test_dup
@@ -287,4 +286,4 @@ __EOC__
     @it['newsection'] = {'a' => 'b'}
     assert_not_equal(@it.sections.sort, c.sections.sort)
   end
-end
+end if defined?(OpenSSL)

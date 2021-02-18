@@ -5,15 +5,25 @@ static VALUE CEncoding_UTF_8;
 static ID i_encoding, i_encode;
 #endif
 
+#ifdef PRIsVALUE
+# define RB_OBJ_CLASSNAME(obj) rb_obj_class(obj)
+# define RB_OBJ_STRING(obj) (obj)
+#else
+# define PRIsVALUE "s"
+# define RB_OBJ_CLASSNAME(obj) rb_obj_classname(obj)
+# define RB_OBJ_STRING(obj) StringValueCStr(obj)
+#endif
+
 static VALUE mJSON, mExt, mGenerator, cState, mGeneratorMethods, mObject,
-             mHash, mArray, mInteger, mFloat, mString, mString_Extend,
+             mHash, mArray, mFixnum, mBignum, mFloat, mString, mString_Extend,
              mTrueClass, mFalseClass, mNilClass, eGeneratorError,
-             eNestingError, CRegexp_MULTILINE, CJSON_SAFE_STATE_PROTOTYPE;
+             eNestingError, CRegexp_MULTILINE, CJSON_SAFE_STATE_PROTOTYPE,
+             i_SAFE_STATE_PROTOTYPE;
 
 static ID i_to_s, i_to_json, i_new, i_indent, i_space, i_space_before,
           i_object_nl, i_array_nl, i_max_nesting, i_allow_nan, i_ascii_only,
-          i_pack, i_unpack, i_create_id, i_extend, i_key_p, i_aref, i_send,
-          i_respond_to_p, i_match;
+          i_quirks_mode, i_pack, i_unpack, i_create_id, i_extend, i_key_p,
+          i_aref, i_send, i_respond_to_p, i_match, i_keys, i_depth, i_dup;
 
 /*
  * Copyright 2001-2004 Unicode, Inc.
@@ -61,7 +71,7 @@ static const char trailingBytesForUTF8[256] = {
  * in a UTF-8 sequence.
  */
 static const UTF32 offsetsFromUTF8[6] = { 0x00000000UL, 0x00003080UL, 0x000E2080UL,
-		     0x03C82080UL, 0xFA082080UL, 0x82082080UL };
+    0x03C82080UL, 0xFA082080UL, 0x82082080UL };
 
 /*
  * Utility routine to tell whether a sequence of bytes is legal UTF-8.
@@ -73,7 +83,7 @@ static const UTF32 offsetsFromUTF8[6] = { 0x00000000UL, 0x00003080UL, 0x000E2080
  * If presented with a length > 4, this returns 0.  The Unicode
  * definition of UTF-8 goes up to 4-byte sequences.
  */
-static unsigned char isLegalUTF8(const UTF8 *source, int length)
+static unsigned char isLegalUTF8(const UTF8 *source, unsigned long length)
 {
     UTF8 a;
     const UTF8 *srcptr = source+length;
@@ -222,7 +232,7 @@ static void convert_UTF8_to_JSON_ASCII(FBuffer *buffer, VALUE string)
 static void convert_UTF8_to_JSON(FBuffer *buffer, VALUE string)
 {
     const char *ptr = RSTRING_PTR(string), *p;
-    int len = RSTRING_LEN(string), start = 0, end = 0;
+    unsigned long len = RSTRING_LEN(string), start = 0, end = 0;
     const char *escape = NULL;
     int escape_len;
     unsigned char c;
@@ -283,7 +293,7 @@ static void convert_UTF8_to_JSON(FBuffer *buffer, VALUE string)
     fbuffer_append(buffer, ptr + start, end - start);
 }
 
-static char *fstrndup(const char *ptr, int len) {
+static char *fstrndup(const char *ptr, unsigned long len) {
   char *result;
   if (len <= 0) return NULL;
   result = ALLOC_N(char, len);
@@ -301,7 +311,7 @@ static FBuffer *fbuffer_alloc()
     return fb;
 }
 
-static FBuffer *fbuffer_alloc_with_length(unsigned int initial_length)
+static FBuffer *fbuffer_alloc_with_length(unsigned long initial_length)
 {
     FBuffer *fb;
     assert(initial_length > 0);
@@ -322,9 +332,9 @@ static void fbuffer_clear(FBuffer *fb)
     fb->len = 0;
 }
 
-static void fbuffer_inc_capa(FBuffer *fb, unsigned int requested)
+static void fbuffer_inc_capa(FBuffer *fb, unsigned long requested)
 {
-    unsigned int required;
+    unsigned long required;
 
     if (!fb->ptr) {
         fb->ptr = ALLOC_N(char, fb->initial_length);
@@ -339,13 +349,23 @@ static void fbuffer_inc_capa(FBuffer *fb, unsigned int requested)
     }
 }
 
-static void fbuffer_append(FBuffer *fb, const char *newstr, unsigned int len)
+static void fbuffer_append(FBuffer *fb, const char *newstr, unsigned long len)
 {
     if (len > 0) {
         fbuffer_inc_capa(fb, len);
         MEMCPY(fb->ptr + fb->len, newstr, char, len);
         fb->len += len;
     }
+}
+
+static void fbuffer_append_str(FBuffer *fb, VALUE str)
+{
+    const char *newstr = StringValuePtr(str);
+    unsigned long len = RSTRING_LEN(str);
+
+    RB_GC_GUARD(str);
+
+    fbuffer_append(fb, newstr, len);
 }
 
 static void fbuffer_append_char(FBuffer *fb, char newchr)
@@ -364,7 +384,7 @@ static void freverse(char *start, char *end)
     }
 }
 
-static int fltoa(long number, char *buf)
+static long fltoa(long number, char *buf)
 {
     static char digits[] = "0123456789";
     long sign = number;
@@ -380,13 +400,13 @@ static int fltoa(long number, char *buf)
 static void fbuffer_append_long(FBuffer *fb, long number)
 {
     char buf[20];
-    int len = fltoa(number, buf);
+    unsigned long len = fltoa(number, buf);
     fbuffer_append(fb, buf, len);
 }
 
 static FBuffer *fbuffer_dup(FBuffer *fb)
 {
-    int len = fb->len;
+    unsigned long len = fb->len;
     FBuffer *result;
 
     if (len > 0) {
@@ -411,37 +431,28 @@ static FBuffer *fbuffer_dup(FBuffer *fb)
  */
 
 /*
- * call-seq: to_json(state = nil, depth = 0)
+ * call-seq: to_json(state = nil)
  *
  * Returns a JSON string containing a JSON object, that is generated from
  * this Hash instance.
  * _state_ is a JSON::State object, that can also be used to configure the
  * produced JSON string output further.
- * _depth_ is used to find out nesting depth, to indent accordingly.
  */
 static VALUE mHash_to_json(int argc, VALUE *argv, VALUE self)
 {
-    VALUE state, depth;
-
-    rb_scan_args(argc, argv, "02", &state, &depth);
-    state = cState_from_state_s(cState, state);
-    return cState_partial_generate(state, self, depth);
+    GENERATE_JSON(object);
 }
 
 /*
- * call-seq: to_json(state = nil, depth = 0)
+ * call-seq: to_json(state = nil)
  *
  * Returns a JSON string containing a JSON array, that is generated from
  * this Array instance.
  * _state_ is a JSON::State object, that can also be used to configure the
  * produced JSON string output further.
- * _depth_ is used to find out nesting depth, to indent accordingly.
  */
 static VALUE mArray_to_json(int argc, VALUE *argv, VALUE self) {
-    VALUE state, depth;
-    rb_scan_args(argc, argv, "02", &state, &depth);
-    state = cState_from_state_s(cState, state);
-    return cState_partial_generate(state, self, depth);
+    GENERATE_JSON(array);
 }
 
 /*
@@ -449,12 +460,19 @@ static VALUE mArray_to_json(int argc, VALUE *argv, VALUE self) {
  *
  * Returns a JSON string representation for this Integer number.
  */
-static VALUE mInteger_to_json(int argc, VALUE *argv, VALUE self)
+static VALUE mFixnum_to_json(int argc, VALUE *argv, VALUE self)
 {
-    VALUE state, depth;
-    rb_scan_args(argc, argv, "02", &state, &depth);
-    state = cState_from_state_s(cState, state);
-    return cState_partial_generate(state, self, depth);
+    GENERATE_JSON(fixnum);
+}
+
+/*
+ * call-seq: to_json(*)
+ *
+ * Returns a JSON string representation for this Integer number.
+ */
+static VALUE mBignum_to_json(int argc, VALUE *argv, VALUE self)
+{
+    GENERATE_JSON(bignum);
 }
 
 /*
@@ -464,10 +482,7 @@ static VALUE mInteger_to_json(int argc, VALUE *argv, VALUE self)
  */
 static VALUE mFloat_to_json(int argc, VALUE *argv, VALUE self)
 {
-    VALUE state, depth;
-    rb_scan_args(argc, argv, "02", &state, &depth);
-    state = cState_from_state_s(cState, state);
-    return cState_partial_generate(state, self, depth);
+    GENERATE_JSON(float);
 }
 
 /*
@@ -489,10 +504,7 @@ static VALUE mString_included_s(VALUE self, VALUE modul) {
  */
 static VALUE mString_to_json(int argc, VALUE *argv, VALUE self)
 {
-    VALUE state, depth;
-    rb_scan_args(argc, argv, "02", &state, &depth);
-    state = cState_from_state_s(cState, state);
-    return cState_partial_generate(state, self, depth);
+    GENERATE_JSON(string);
 }
 
 /*
@@ -547,10 +559,7 @@ static VALUE mString_Extend_json_create(VALUE self, VALUE o)
  */
 static VALUE mTrueClass_to_json(int argc, VALUE *argv, VALUE self)
 {
-    VALUE state, depth;
-    rb_scan_args(argc, argv, "02", &state, &depth);
-    state = cState_from_state_s(cState, state);
-    return cState_partial_generate(state, self, depth);
+    GENERATE_JSON(true);
 }
 
 /*
@@ -560,22 +569,17 @@ static VALUE mTrueClass_to_json(int argc, VALUE *argv, VALUE self)
  */
 static VALUE mFalseClass_to_json(int argc, VALUE *argv, VALUE self)
 {
-    VALUE state, depth;
-    rb_scan_args(argc, argv, "02", &state, &depth);
-    state = cState_from_state_s(cState, state);
-    return cState_partial_generate(state, self, depth);
+    GENERATE_JSON(false);
 }
 
 /*
  * call-seq: to_json(*)
  *
+ * Returns a JSON string for nil: 'null'.
  */
 static VALUE mNilClass_to_json(int argc, VALUE *argv, VALUE self)
 {
-    VALUE state, depth;
-    rb_scan_args(argc, argv, "02", &state, &depth);
-    state = cState_from_state_s(cState, state);
-    return cState_partial_generate(state, self, depth);
+    GENERATE_JSON(null);
 }
 
 /*
@@ -587,12 +591,12 @@ static VALUE mNilClass_to_json(int argc, VALUE *argv, VALUE self)
  */
 static VALUE mObject_to_json(int argc, VALUE *argv, VALUE self)
 {
-    VALUE state, depth;
+    VALUE state;
     VALUE string = rb_funcall(self, i_to_s, 0);
-    rb_scan_args(argc, argv, "02", &state, &depth);
+    rb_scan_args(argc, argv, "01", &state);
     Check_Type(string, T_STRING);
     state = cState_from_state_s(cState, state);
-    return cState_partial_generate(state, string, depth);
+    return cState_partial_generate(state, string);
 }
 
 static void State_free(JSON_Generator_State *state)
@@ -611,6 +615,7 @@ static void State_free(JSON_Generator_State *state)
 static JSON_Generator_State *State_allocate()
 {
     JSON_Generator_State *state = ALLOC(JSON_Generator_State);
+    MEMZERO(state, JSON_Generator_State, 1);
     return state;
 }
 
@@ -638,7 +643,7 @@ static VALUE cState_configure(VALUE self, VALUE opts)
     opts = tmp;
     tmp = rb_hash_aref(opts, ID2SYM(i_indent));
     if (RTEST(tmp)) {
-        int len;
+        unsigned long len;
         Check_Type(tmp, T_STRING);
         len = RSTRING_LEN(tmp);
         state->indent = fstrndup(RSTRING_PTR(tmp), len);
@@ -646,7 +651,7 @@ static VALUE cState_configure(VALUE self, VALUE opts)
     }
     tmp = rb_hash_aref(opts, ID2SYM(i_space));
     if (RTEST(tmp)) {
-        int len;
+        unsigned long len;
         Check_Type(tmp, T_STRING);
         len = RSTRING_LEN(tmp);
         state->space = fstrndup(RSTRING_PTR(tmp), len);
@@ -654,7 +659,7 @@ static VALUE cState_configure(VALUE self, VALUE opts)
     }
     tmp = rb_hash_aref(opts, ID2SYM(i_space_before));
     if (RTEST(tmp)) {
-        int len;
+        unsigned long len;
         Check_Type(tmp, T_STRING);
         len = RSTRING_LEN(tmp);
         state->space_before = fstrndup(RSTRING_PTR(tmp), len);
@@ -662,7 +667,7 @@ static VALUE cState_configure(VALUE self, VALUE opts)
     }
     tmp = rb_hash_aref(opts, ID2SYM(i_array_nl));
     if (RTEST(tmp)) {
-        int len;
+        unsigned long len;
         Check_Type(tmp, T_STRING);
         len = RSTRING_LEN(tmp);
         state->array_nl = fstrndup(RSTRING_PTR(tmp), len);
@@ -670,7 +675,7 @@ static VALUE cState_configure(VALUE self, VALUE opts)
     }
     tmp = rb_hash_aref(opts, ID2SYM(i_object_nl));
     if (RTEST(tmp)) {
-        int len;
+        unsigned long len;
         Check_Type(tmp, T_STRING);
         len = RSTRING_LEN(tmp);
         state->object_nl = fstrndup(RSTRING_PTR(tmp), len);
@@ -687,10 +692,23 @@ static VALUE cState_configure(VALUE self, VALUE opts)
             state->max_nesting = 0;
         }
     }
+    tmp = ID2SYM(i_depth);
+    state->depth = 0;
+    if (option_given_p(opts, tmp)) {
+        VALUE depth = rb_hash_aref(opts, tmp);
+        if (RTEST(depth)) {
+            Check_Type(depth, T_FIXNUM);
+            state->depth = FIX2LONG(depth);
+        } else {
+            state->depth = 0;
+        }
+    }
     tmp = rb_hash_aref(opts, ID2SYM(i_allow_nan));
     state->allow_nan = RTEST(tmp);
     tmp = rb_hash_aref(opts, ID2SYM(i_ascii_only));
     state->ascii_only = RTEST(tmp);
+    tmp = rb_hash_aref(opts, ID2SYM(i_quirks_mode));
+    state->quirks_mode = RTEST(tmp);
     return self;
 }
 
@@ -711,7 +729,9 @@ static VALUE cState_to_h(VALUE self)
     rb_hash_aset(result, ID2SYM(i_array_nl), rb_str_new(state->array_nl, state->array_nl_len));
     rb_hash_aset(result, ID2SYM(i_allow_nan), state->allow_nan ? Qtrue : Qfalse);
     rb_hash_aset(result, ID2SYM(i_ascii_only), state->ascii_only ? Qtrue : Qfalse);
+    rb_hash_aset(result, ID2SYM(i_quirks_mode), state->quirks_mode ? Qtrue : Qfalse);
     rb_hash_aset(result, ID2SYM(i_max_nesting), LONG2FIX(state->max_nesting));
+    rb_hash_aset(result, ID2SYM(i_depth), LONG2FIX(state->depth));
     return result;
 }
 
@@ -730,165 +750,185 @@ static VALUE cState_aref(VALUE self, VALUE name)
     }
 }
 
-static void generate_json(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj, long depth)
+static void generate_json_object(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj)
+{
+    char *object_nl = state->object_nl;
+    long object_nl_len = state->object_nl_len;
+    char *indent = state->indent;
+    long indent_len = state->indent_len;
+    long max_nesting = state->max_nesting;
+    char *delim = FBUFFER_PTR(state->object_delim);
+    long delim_len = FBUFFER_LEN(state->object_delim);
+    char *delim2 = FBUFFER_PTR(state->object_delim2);
+    long delim2_len = FBUFFER_LEN(state->object_delim2);
+    long depth = ++state->depth;
+    int i, j;
+    VALUE key, key_to_s, keys;
+    if (max_nesting != 0 && depth > max_nesting) {
+        fbuffer_free(buffer);
+        rb_raise(eNestingError, "nesting of %ld is too deep", --state->depth);
+    }
+    fbuffer_append_char(buffer, '{');
+    keys = rb_funcall(obj, i_keys, 0);
+    for(i = 0; i < RARRAY_LEN(keys); i++) {
+        if (i > 0) fbuffer_append(buffer, delim, delim_len);
+        if (object_nl) {
+            fbuffer_append(buffer, object_nl, object_nl_len);
+        }
+        if (indent) {
+            for (j = 0; j < depth; j++) {
+                fbuffer_append(buffer, indent, indent_len);
+            }
+        }
+        key = rb_ary_entry(keys, i);
+        key_to_s = rb_funcall(key, i_to_s, 0);
+        Check_Type(key_to_s, T_STRING);
+        generate_json(buffer, Vstate, state, key_to_s);
+        fbuffer_append(buffer, delim2, delim2_len);
+        generate_json(buffer, Vstate, state, rb_hash_aref(obj, key));
+    }
+    depth = --state->depth;
+    if (object_nl) {
+        fbuffer_append(buffer, object_nl, object_nl_len);
+        if (indent) {
+            for (j = 0; j < depth; j++) {
+                fbuffer_append(buffer, indent, indent_len);
+            }
+        }
+    }
+    fbuffer_append_char(buffer, '}');
+}
+
+static void generate_json_array(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj)
+{
+    char *array_nl = state->array_nl;
+    long array_nl_len = state->array_nl_len;
+    char *indent = state->indent;
+    long indent_len = state->indent_len;
+    long max_nesting = state->max_nesting;
+    char *delim = FBUFFER_PTR(state->array_delim);
+    long delim_len = FBUFFER_LEN(state->array_delim);
+    long depth = ++state->depth;
+    int i, j;
+    if (max_nesting != 0 && depth > max_nesting) {
+        fbuffer_free(buffer);
+        rb_raise(eNestingError, "nesting of %ld is too deep", --state->depth);
+    }
+    fbuffer_append_char(buffer, '[');
+    if (array_nl) fbuffer_append(buffer, array_nl, array_nl_len);
+    for(i = 0; i < RARRAY_LEN(obj); i++) {
+        if (i > 0) fbuffer_append(buffer, delim, delim_len);
+        if (indent) {
+            for (j = 0; j < depth; j++) {
+                fbuffer_append(buffer, indent, indent_len);
+            }
+        }
+        generate_json(buffer, Vstate, state, rb_ary_entry(obj, i));
+    }
+    state->depth = --depth;
+    if (array_nl) {
+        fbuffer_append(buffer, array_nl, array_nl_len);
+        if (indent) {
+            for (j = 0; j < depth; j++) {
+                fbuffer_append(buffer, indent, indent_len);
+            }
+        }
+    }
+    fbuffer_append_char(buffer, ']');
+}
+
+static void generate_json_string(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj)
+{
+    fbuffer_append_char(buffer, '"');
+#ifdef HAVE_RUBY_ENCODING_H
+    obj = rb_funcall(obj, i_encode, 1, CEncoding_UTF_8);
+#endif
+    if (state->ascii_only) {
+        convert_UTF8_to_JSON_ASCII(buffer, obj);
+    } else {
+        convert_UTF8_to_JSON(buffer, obj);
+    }
+    fbuffer_append_char(buffer, '"');
+}
+
+static void generate_json_null(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj)
+{
+    fbuffer_append(buffer, "null", 4);
+}
+
+static void generate_json_false(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj)
+{
+    fbuffer_append(buffer, "false", 5);
+}
+
+static void generate_json_true(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj)
+{
+    fbuffer_append(buffer, "true", 4);
+}
+
+static void generate_json_fixnum(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj)
+{
+    fbuffer_append_long(buffer, FIX2LONG(obj));
+}
+
+static void generate_json_bignum(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj)
+{
+    VALUE tmp = rb_funcall(obj, i_to_s, 0);
+    fbuffer_append_str(buffer, tmp);
+}
+
+static void generate_json_float(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj)
+{
+    double value = RFLOAT_VALUE(obj);
+    char allow_nan = state->allow_nan;
+    VALUE tmp = rb_funcall(obj, i_to_s, 0);
+    if (!allow_nan) {
+        if (isinf(value)) {
+            fbuffer_free(buffer);
+            rb_raise(eGeneratorError, "%u: %"PRIsVALUE" not allowed in JSON", __LINE__, RB_OBJ_STRING(tmp));
+        } else if (isnan(value)) {
+            fbuffer_free(buffer);
+            rb_raise(eGeneratorError, "%u: %"PRIsVALUE" not allowed in JSON", __LINE__, RB_OBJ_STRING(tmp));
+        }
+    }
+    fbuffer_append_str(buffer, tmp);
+}
+
+static void generate_json(FBuffer *buffer, VALUE Vstate, JSON_Generator_State *state, VALUE obj)
 {
     VALUE tmp;
-    switch (TYPE(obj)) {
-        case T_HASH:
-            {
-                char *object_nl = state->object_nl;
-                long object_nl_len = state->object_nl_len;
-                char *indent = state->indent;
-                long indent_len = state->indent_len;
-                long max_nesting = state->max_nesting;
-                char *delim = FBUFFER_PTR(state->object_delim);
-                long delim_len = FBUFFER_LEN(state->object_delim);
-                char *delim2 = FBUFFER_PTR(state->object_delim2);
-                long delim2_len = FBUFFER_LEN(state->object_delim2);
-                int i, j;
-                VALUE key, key_to_s, keys;
-                depth++;
-                if (max_nesting != 0 && depth > max_nesting) {
-                    fbuffer_free(buffer);
-                    rb_raise(eNestingError, "nesting of %ld is too deep", depth);
-                }
-                fbuffer_append_char(buffer, '{');
-                keys = rb_funcall(obj, rb_intern("keys"), 0);
-                for(i = 0; i < RARRAY_LEN(keys); i++) {
-                    if (i > 0) fbuffer_append(buffer, delim, delim_len);
-                    if (object_nl) {
-                        fbuffer_append(buffer, object_nl, object_nl_len);
-                    }
-                    if (indent) {
-                        for (j = 0; j < depth; j++) {
-                            fbuffer_append(buffer, indent, indent_len);
-                        }
-                    }
-                    key = rb_ary_entry(keys, i);
-                    key_to_s = rb_funcall(key, i_to_s, 0);
-                    Check_Type(key_to_s, T_STRING);
-                    generate_json(buffer, Vstate, state, key_to_s, depth);
-                    fbuffer_append(buffer, delim2, delim2_len);
-                    generate_json(buffer, Vstate, state, rb_hash_aref(obj, key), depth);
-                }
-                depth--;
-                if (object_nl) {
-                    fbuffer_append(buffer, object_nl, object_nl_len);
-                    if (indent) {
-                        for (j = 0; j < depth; j++) {
-                            fbuffer_append(buffer, indent, indent_len);
-                        }
-                    }
-                }
-                fbuffer_append_char(buffer, '}');
-            }
-            break;
-        case T_ARRAY:
-            {
-                char *array_nl = state->array_nl;
-                long array_nl_len = state->array_nl_len;
-                char *indent = state->indent;
-                long indent_len = state->indent_len;
-                long max_nesting = state->max_nesting;
-                char *delim = FBUFFER_PTR(state->array_delim);
-                long delim_len = FBUFFER_LEN(state->array_delim);
-                int i, j;
-                depth++;
-                if (max_nesting != 0 && depth > max_nesting) {
-                    fbuffer_free(buffer);
-                    rb_raise(eNestingError, "nesting of %ld is too deep", depth);
-                }
-                fbuffer_append_char(buffer, '[');
-                if (array_nl) fbuffer_append(buffer, array_nl, array_nl_len);
-                for(i = 0; i < RARRAY_LEN(obj); i++) {
-                    if (i > 0) fbuffer_append(buffer, delim, delim_len);
-                    if (indent) {
-                        for (j = 0; j < depth; j++) {
-                            fbuffer_append(buffer, indent, indent_len);
-                        }
-                    }
-                    generate_json(buffer, Vstate, state, rb_ary_entry(obj, i), depth);
-                }
-                depth--;
-                if (array_nl) {
-                    fbuffer_append(buffer, array_nl, array_nl_len);
-                    if (indent) {
-                        for (j = 0; j < depth; j++) {
-                            fbuffer_append(buffer, indent, indent_len);
-                        }
-                    }
-                }
-                fbuffer_append_char(buffer, ']');
-            }
-            break;
-        case T_STRING:
-            fbuffer_append_char(buffer, '"');
-#ifdef HAVE_RUBY_ENCODING_H
-            obj = rb_funcall(obj, i_encode, 1, CEncoding_UTF_8);
-#endif
-            if (state->ascii_only) {
-                convert_UTF8_to_JSON_ASCII(buffer, obj);
-            } else {
-                convert_UTF8_to_JSON(buffer, obj);
-            }
-            fbuffer_append_char(buffer, '"');
-            break;
-        case T_NIL:
-            fbuffer_append(buffer, "null", 4);
-            break;
-        case T_FALSE:
-            fbuffer_append(buffer, "false", 5);
-            break;
-        case T_TRUE:
-            fbuffer_append(buffer, "true", 4);
-            break;
-        case T_FIXNUM:
-            fbuffer_append_long(buffer, FIX2LONG(obj));
-            break;
-        case T_BIGNUM:
-            tmp = rb_funcall(obj, i_to_s, 0);
-            fbuffer_append(buffer, RSTRING_PAIR(tmp));
-            break;
-        case T_FLOAT:
-            {
-                double value = RFLOAT_VALUE(obj);
-                char allow_nan = state->allow_nan;
-                tmp = rb_funcall(obj, i_to_s, 0);
-                if (!allow_nan) {
-                    if (isinf(value)) {
-                        fbuffer_free(buffer);
-                        rb_raise(eGeneratorError, "%u: %s not allowed in JSON", __LINE__, StringValueCStr(tmp));
-                    } else if (isnan(value)) {
-                        fbuffer_free(buffer);
-                        rb_raise(eGeneratorError, "%u: %s not allowed in JSON", __LINE__, StringValueCStr(tmp));
-                    }
-                }
-                fbuffer_append(buffer, RSTRING_PAIR(tmp));
-            }
-            break;
-        default:
-            if (rb_respond_to(obj, i_to_json)) {
-                tmp = rb_funcall(obj, i_to_json, 2, Vstate, INT2FIX(depth + 1));
-                Check_Type(tmp, T_STRING);
-                fbuffer_append(buffer, RSTRING_PAIR(tmp));
-            } else {
-                tmp = rb_funcall(obj, i_to_s, 0);
-                Check_Type(tmp, T_STRING);
-                generate_json(buffer, Vstate, state, tmp, depth + 1);
-            }
-            break;
+    VALUE klass = CLASS_OF(obj);
+    if (klass == rb_cHash) {
+        generate_json_object(buffer, Vstate, state, obj);
+    } else if (klass == rb_cArray) {
+        generate_json_array(buffer, Vstate, state, obj);
+    } else if (klass == rb_cString) {
+        generate_json_string(buffer, Vstate, state, obj);
+    } else if (obj == Qnil) {
+        generate_json_null(buffer, Vstate, state, obj);
+    } else if (obj == Qfalse) {
+        generate_json_false(buffer, Vstate, state, obj);
+    } else if (obj == Qtrue) {
+        generate_json_true(buffer, Vstate, state, obj);
+    } else if (klass == rb_cFixnum) {
+        generate_json_fixnum(buffer, Vstate, state, obj);
+    } else if (klass == rb_cBignum) {
+        generate_json_bignum(buffer, Vstate, state, obj);
+    } else if (klass == rb_cFloat) {
+        generate_json_float(buffer, Vstate, state, obj);
+    } else if (rb_respond_to(obj, i_to_json)) {
+        tmp = rb_funcall(obj, i_to_json, 1, Vstate);
+        Check_Type(tmp, T_STRING);
+        fbuffer_append_str(buffer, tmp);
+    } else {
+        tmp = rb_funcall(obj, i_to_s, 0);
+        Check_Type(tmp, T_STRING);
+        generate_json(buffer, Vstate, state, tmp);
     }
 }
 
-/*
- * call-seq: partial_generate(obj)
- *
- * Generates a part of a JSON document from object +obj+ and returns the
- * result.
- */
-static VALUE cState_partial_generate(VALUE self, VALUE obj, VALUE depth)
+static FBuffer *cState_prepare_buffer(VALUE self)
 {
-    VALUE result;
     FBuffer *buffer = fbuffer_alloc();
     GET_STATE(self);
 
@@ -913,12 +953,23 @@ static VALUE cState_partial_generate(VALUE self, VALUE obj, VALUE depth)
     }
     fbuffer_append_char(state->array_delim, ',');
     if (state->array_nl) fbuffer_append(state->array_delim, state->array_nl, state->array_nl_len);
+    return buffer;
+}
 
-    generate_json(buffer, self, state, obj, NIL_P(depth) ? 0 : FIX2INT(depth));
-    result = rb_str_new(FBUFFER_PAIR(buffer));
-    fbuffer_free(buffer);
+static VALUE fbuffer_to_s(FBuffer *fb)
+{
+    VALUE result = rb_str_new(FBUFFER_PAIR(fb));
+    fbuffer_free(fb);
     FORCE_UTF8(result);
     return result;
+}
+
+static VALUE cState_partial_generate(VALUE self, VALUE obj)
+{
+    FBuffer *buffer = cState_prepare_buffer(self);
+    GET_STATE(self);
+    generate_json(buffer, self, state, obj);
+    return fbuffer_to_s(buffer);
 }
 
 /*
@@ -930,13 +981,16 @@ static VALUE cState_partial_generate(VALUE self, VALUE obj, VALUE depth)
  */
 static VALUE cState_generate(VALUE self, VALUE obj)
 {
-    VALUE result = cState_partial_generate(self, obj, Qnil);
+    VALUE result = cState_partial_generate(self, obj);
     VALUE re, args[2];
-    args[0] = rb_str_new2("\\A\\s*(?:\\[.*\\]|\\{.*\\})\\s*\\Z");
-    args[1] = CRegexp_MULTILINE;
-    re = rb_class_new_instance(2, args, rb_cRegexp);
-    if (NIL_P(rb_funcall(re, i_match, 1, result))) {
-        rb_raise(eGeneratorError, "only generation of JSON objects or arrays allowed");
+    GET_STATE(self);
+    if (!state->quirks_mode) {
+        args[0] = rb_str_new2("\\A\\s*(?:\\[.*\\]|\\{.*\\})\\s*\\Z");
+        args[1] = CRegexp_MULTILINE;
+        re = rb_class_new_instance(2, args, rb_cRegexp);
+        if (NIL_P(rb_funcall(re, i_match, 1, result))) {
+            rb_raise(eGeneratorError, "only generation of JSON objects or arrays allowed");
+        }
     }
     return result;
 }
@@ -956,12 +1010,13 @@ static VALUE cState_generate(VALUE self, VALUE obj)
  * * *allow_nan*: true if NaN, Infinity, and -Infinity should be
  *   generated, otherwise an exception is thrown, if these values are
  *   encountered. This options defaults to false.
+ * * *quirks_mode*: Enables quirks_mode for parser, that is for example
+ *   generating single JSON values instead of documents is possible.
  */
 static VALUE cState_initialize(int argc, VALUE *argv, VALUE self)
 {
     VALUE opts;
     GET_STATE(self);
-    MEMZERO(state, JSON_Generator_State, 1);
     state->max_nesting = 19;
     rb_scan_args(argc, argv, "01", &opts);
     if (!NIL_P(opts)) cState_configure(self, opts);
@@ -978,6 +1033,7 @@ static VALUE cState_init_copy(VALUE obj, VALUE orig)
 {
     JSON_Generator_State *objState, *origState;
 
+    if (obj == orig) return obj;
     Data_Get_Struct(obj, JSON_Generator_State, objState);
     Data_Get_Struct(orig, JSON_Generator_State, origState);
     if (!objState) rb_raise(rb_eArgError, "unallocated JSON::State");
@@ -1009,9 +1065,9 @@ static VALUE cState_from_state_s(VALUE self, VALUE opts)
         return rb_funcall(self, i_new, 1, opts);
     } else {
         if (NIL_P(CJSON_SAFE_STATE_PROTOTYPE)) {
-            CJSON_SAFE_STATE_PROTOTYPE = rb_const_get(mJSON, rb_intern("SAFE_STATE_PROTOTYPE"));
+            CJSON_SAFE_STATE_PROTOTYPE = rb_const_get(mJSON, i_SAFE_STATE_PROTOTYPE);
         }
-        return CJSON_SAFE_STATE_PROTOTYPE;
+        return rb_funcall(CJSON_SAFE_STATE_PROTOTYPE, i_dup, 0);
     }
 }
 
@@ -1033,16 +1089,20 @@ static VALUE cState_indent(VALUE self)
  */
 static VALUE cState_indent_set(VALUE self, VALUE indent)
 {
+    unsigned long len;
     GET_STATE(self);
     Check_Type(indent, T_STRING);
-    if (RSTRING_LEN(indent) == 0) {
+    len = RSTRING_LEN(indent);
+    if (len == 0) {
         if (state->indent) {
             ruby_xfree(state->indent);
             state->indent = NULL;
+            state->indent_len = 0;
         }
     } else {
         if (state->indent) ruby_xfree(state->indent);
         state->indent = strdup(RSTRING_PTR(indent));
+        state->indent_len = len;
     }
     return Qnil;
 }
@@ -1067,16 +1127,20 @@ static VALUE cState_space(VALUE self)
  */
 static VALUE cState_space_set(VALUE self, VALUE space)
 {
+    unsigned long len;
     GET_STATE(self);
     Check_Type(space, T_STRING);
-    if (RSTRING_LEN(space) == 0) {
+    len = RSTRING_LEN(space);
+    if (len == 0) {
         if (state->space) {
             ruby_xfree(state->space);
             state->space = NULL;
+            state->space_len = 0;
         }
     } else {
         if (state->space) ruby_xfree(state->space);
         state->space = strdup(RSTRING_PTR(space));
+        state->space_len = len;
     }
     return Qnil;
 }
@@ -1099,16 +1163,20 @@ static VALUE cState_space_before(VALUE self)
  */
 static VALUE cState_space_before_set(VALUE self, VALUE space_before)
 {
+    unsigned long len;
     GET_STATE(self);
     Check_Type(space_before, T_STRING);
-    if (RSTRING_LEN(space_before) == 0) {
+    len = RSTRING_LEN(space_before);
+    if (len == 0) {
         if (state->space_before) {
             ruby_xfree(state->space_before);
             state->space_before = NULL;
+            state->space_before_len = 0;
         }
     } else {
         if (state->space_before) ruby_xfree(state->space_before);
         state->space_before = strdup(RSTRING_PTR(space_before));
+        state->space_before_len = len;
     }
     return Qnil;
 }
@@ -1133,9 +1201,11 @@ static VALUE cState_object_nl(VALUE self)
  */
 static VALUE cState_object_nl_set(VALUE self, VALUE object_nl)
 {
+    unsigned long len;
     GET_STATE(self);
     Check_Type(object_nl, T_STRING);
-    if (RSTRING_LEN(object_nl) == 0) {
+    len = RSTRING_LEN(object_nl);
+    if (len == 0) {
         if (state->object_nl) {
             ruby_xfree(state->object_nl);
             state->object_nl = NULL;
@@ -1143,6 +1213,7 @@ static VALUE cState_object_nl_set(VALUE self, VALUE object_nl)
     } else {
         if (state->object_nl) ruby_xfree(state->object_nl);
         state->object_nl = strdup(RSTRING_PTR(object_nl));
+        state->object_nl_len = len;
     }
     return Qnil;
 }
@@ -1165,9 +1236,11 @@ static VALUE cState_array_nl(VALUE self)
  */
 static VALUE cState_array_nl_set(VALUE self, VALUE array_nl)
 {
+    unsigned long len;
     GET_STATE(self);
     Check_Type(array_nl, T_STRING);
-    if (RSTRING_LEN(array_nl) == 0) {
+    len = RSTRING_LEN(array_nl);
+    if (len == 0) {
         if (state->array_nl) {
             ruby_xfree(state->array_nl);
             state->array_nl = NULL;
@@ -1175,6 +1248,7 @@ static VALUE cState_array_nl_set(VALUE self, VALUE array_nl)
     } else {
         if (state->array_nl) ruby_xfree(state->array_nl);
         state->array_nl = strdup(RSTRING_PTR(array_nl));
+        state->array_nl_len = len;
     }
     return Qnil;
 }
@@ -1242,6 +1316,53 @@ static VALUE cState_ascii_only_p(VALUE self)
 }
 
 /*
+ * call-seq: quirks_mode?
+ *
+ * Returns true, if quirks mode is enabled. Otherwise returns false.
+ */
+static VALUE cState_quirks_mode_p(VALUE self)
+{
+    GET_STATE(self);
+    return state->quirks_mode ? Qtrue : Qfalse;
+}
+
+/*
+ * call-seq: quirks_mode=(enable)
+ *
+ * If set to true, enables the quirks_mode mode.
+ */
+static VALUE cState_quirks_mode_set(VALUE self, VALUE enable)
+{
+    GET_STATE(self);
+    state->quirks_mode = RTEST(enable);
+    return Qnil;
+}
+
+/*
+ * call-seq: depth
+ *
+ * This integer returns the current depth of data structure nesting.
+ */
+static VALUE cState_depth(VALUE self)
+{
+    GET_STATE(self);
+    return LONG2FIX(state->depth);
+}
+
+/*
+ * call-seq: depth=(depth)
+ *
+ * This sets the maximum level of data structure nesting in the generated JSON
+ * to the integer depth, max_nesting = 0 if no maximum should be checked.
+ */
+static VALUE cState_depth_set(VALUE self, VALUE depth)
+{
+    GET_STATE(self);
+    Check_Type(depth, T_FIXNUM);
+    return state->depth = FIX2LONG(depth);
+}
+
+/*
  *
  */
 void Init_generator()
@@ -1275,11 +1396,16 @@ void Init_generator()
     rb_define_method(cState, "check_circular?", cState_check_circular_p, 0);
     rb_define_method(cState, "allow_nan?", cState_allow_nan_p, 0);
     rb_define_method(cState, "ascii_only?", cState_ascii_only_p, 0);
+    rb_define_method(cState, "quirks_mode?", cState_quirks_mode_p, 0);
+    rb_define_method(cState, "quirks_mode", cState_quirks_mode_p, 0);
+    rb_define_method(cState, "quirks_mode=", cState_quirks_mode_set, 1);
+    rb_define_method(cState, "depth", cState_depth, 0);
+    rb_define_method(cState, "depth=", cState_depth_set, 1);
     rb_define_method(cState, "configure", cState_configure, 1);
+    rb_define_alias(cState, "merge", "configure");
     rb_define_method(cState, "to_h", cState_to_h, 0);
     rb_define_method(cState, "[]", cState_aref, 1);
     rb_define_method(cState, "generate", cState_generate, 1);
-    rb_define_method(cState, "partial_generate", cState_partial_generate, 1);
 
     mGeneratorMethods = rb_define_module_under(mGenerator, "GeneratorMethods");
     mObject = rb_define_module_under(mGeneratorMethods, "Object");
@@ -1288,8 +1414,10 @@ void Init_generator()
     rb_define_method(mHash, "to_json", mHash_to_json, -1);
     mArray = rb_define_module_under(mGeneratorMethods, "Array");
     rb_define_method(mArray, "to_json", mArray_to_json, -1);
-    mInteger = rb_define_module_under(mGeneratorMethods, "Integer");
-    rb_define_method(mInteger, "to_json", mInteger_to_json, -1);
+    mFixnum = rb_define_module_under(mGeneratorMethods, "Fixnum");
+    rb_define_method(mFixnum, "to_json", mFixnum_to_json, -1);
+    mBignum = rb_define_module_under(mGeneratorMethods, "Bignum");
+    rb_define_method(mBignum, "to_json", mBignum_to_json, -1);
     mFloat = rb_define_module_under(mGeneratorMethods, "Float");
     rb_define_method(mFloat, "to_json", mFloat_to_json, -1);
     mString = rb_define_module_under(mGeneratorMethods, "String");
@@ -1318,6 +1446,8 @@ void Init_generator()
     i_max_nesting = rb_intern("max_nesting");
     i_allow_nan = rb_intern("allow_nan");
     i_ascii_only = rb_intern("ascii_only");
+    i_quirks_mode = rb_intern("quirks_mode");
+    i_depth = rb_intern("depth");
     i_pack = rb_intern("pack");
     i_unpack = rb_intern("unpack");
     i_create_id = rb_intern("create_id");
@@ -1327,10 +1457,13 @@ void Init_generator()
     i_send = rb_intern("__send__");
     i_respond_to_p = rb_intern("respond_to?");
     i_match = rb_intern("match");
+    i_keys = rb_intern("keys");
+    i_dup = rb_intern("dup");
 #ifdef HAVE_RUBY_ENCODING_H
     CEncoding_UTF_8 = rb_funcall(rb_path2class("Encoding"), rb_intern("find"), 1, rb_str_new2("utf-8"));
     i_encoding = rb_intern("encoding");
     i_encode = rb_intern("encode");
 #endif
+    i_SAFE_STATE_PROTOTYPE = rb_intern("SAFE_STATE_PROTOTYPE");
     CJSON_SAFE_STATE_PROTOTYPE = Qnil;
 }

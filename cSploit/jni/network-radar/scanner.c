@@ -22,9 +22,8 @@
 #include <unistd.h>
 #include <math.h>
 
-#include <csploit/logger.h>
-
 #include "netdefs.h"
+#include "logger.h"
 #include "prober.h"
 #include "ifinfo.h"
 #include "host.h"

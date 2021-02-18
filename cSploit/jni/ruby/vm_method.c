@@ -1,5 +1,5 @@
 /*
- * This file is included by vm.h
+ * This file is included by vm.c
  */
 
 #define CACHE_SIZE 0x800
@@ -13,6 +13,7 @@ static ID removed, singleton_removed, undefined, singleton_undefined;
 static ID added, singleton_added, attached;
 
 struct cache_entry {		/* method hash table. */
+    VALUE filled_version;        /* filled state version */
     ID mid;			/* method's id */
     VALUE klass;		/* receiver's class */
     rb_method_entry_t *me;
@@ -22,82 +23,41 @@ static struct cache_entry cache[CACHE_SIZE];
 #define ruby_running (GET_VM()->running)
 /* int ruby_running = 0; */
 
-void
-rb_clear_cache(void)
+static void
+vm_clear_global_method_cache(void)
 {
     struct cache_entry *ent, *end;
 
-    rb_vm_change_state();
-
-    if (!ruby_running)
-	return;
     ent = cache;
     end = ent + CACHE_SIZE;
     while (ent < end) {
-	ent->me = 0;
-	ent->mid = 0;
+	ent->filled_version = 0;
 	ent++;
     }
+}
+
+void
+rb_clear_cache(void)
+{
+    rb_vm_change_state();
 }
 
 static void
 rb_clear_cache_for_undef(VALUE klass, ID id)
 {
-    struct cache_entry *ent, *end;
-
     rb_vm_change_state();
-
-    if (!ruby_running)
-	return;
-    ent = cache;
-    end = ent + CACHE_SIZE;
-    while (ent < end) {
-	if ((ent->me && ent->me->klass == klass) && ent->mid == id) {
-	    ent->me = 0;
-	    ent->mid = 0;
-	}
-	ent++;
-    }
 }
 
 static void
 rb_clear_cache_by_id(ID id)
 {
-    struct cache_entry *ent, *end;
-
     rb_vm_change_state();
-
-    if (!ruby_running)
-	return;
-    ent = cache;
-    end = ent + CACHE_SIZE;
-    while (ent < end) {
-	if (ent->mid == id) {
-	    ent->me = 0;
-	    ent->mid = 0;
-	}
-	ent++;
-    }
 }
 
 void
 rb_clear_cache_by_class(VALUE klass)
 {
-    struct cache_entry *ent, *end;
-
     rb_vm_change_state();
-
-    if (!ruby_running)
-	return;
-    ent = cache;
-    end = ent + CACHE_SIZE;
-    while (ent < end) {
-	if (ent->klass == klass || (ent->me && ent->me->klass == klass)) {
-	    ent->me = 0;
-	    ent->mid = 0;
-	}
-	ent++;
-    }
 }
 
 VALUE
@@ -126,13 +86,27 @@ rb_add_method_cfunc(VALUE klass, ID mid, VALUE (*func)(ANYARGS), int argc, rb_me
     }
 }
 
-static void
+void
 rb_unlink_method_entry(rb_method_entry_t *me)
 {
     struct unlinked_method_entry_list_entry *ume = ALLOC(struct unlinked_method_entry_list_entry);
     ume->me = me;
     ume->next = GET_VM()->unlinked_method_entry_list;
     GET_VM()->unlinked_method_entry_list = ume;
+}
+
+void
+rb_gc_mark_unlinked_live_method_entries(void *pvm)
+{
+    rb_vm_t *vm = pvm;
+    struct unlinked_method_entry_list_entry *ume = vm->unlinked_method_entry_list;
+
+    while (ume) {
+	if (ume->me->mark) {
+	    rb_mark_method_entry(ume->me);
+	}
+	ume = ume->next;
+    }
 }
 
 void
@@ -211,10 +185,8 @@ rb_method_entry_make(VALUE klass, ID mid, rb_method_type_t type,
 		rb_class2name(rb_ivar_get(klass, attached)));
 	mid = ID_ALLOCATOR;
     }
-    if (OBJ_FROZEN(klass)) {
-	rb_error_frozen("class/module");
-    }
 
+    rb_check_frozen(klass);
     mtbl = RCLASS_M_TBL(klass);
 
     /* check re-definition */
@@ -230,7 +202,6 @@ rb_method_entry_make(VALUE klass, ID mid, rb_method_type_t type,
 	    old_def->alias_count == 0 &&
 	    old_def->type != VM_METHOD_TYPE_UNDEF &&
 	    old_def->type != VM_METHOD_TYPE_ZSUPER) {
-	    extern rb_iseq_t *rb_proc_get_iseq(VALUE proc, int *is_proc);
 	    rb_iseq_t *iseq = 0;
 
 	    rb_warning("method redefined; discarding old %s", rb_id2name(mid));
@@ -284,10 +255,10 @@ rb_method_entry_make(VALUE klass, ID mid, rb_method_type_t type,
 
 #define CALL_METHOD_HOOK(klass, hook, mid) do {		\
 	const VALUE arg = ID2SYM(mid);			\
-	VALUE recv_class = klass;			\
-	ID hook_id = hook;				\
-	if (FL_TEST(klass, FL_SINGLETON)) {		\
-	    recv_class = rb_ivar_get(klass, attached);	\
+	VALUE recv_class = (klass);			\
+	ID hook_id = (hook);				\
+	if (FL_TEST((klass), FL_SINGLETON)) {		\
+	    recv_class = rb_ivar_get((klass), attached);	\
 	    hook_id = singleton_##hook;			\
 	}						\
 	rb_funcall2(recv_class, hook_id, 1, &arg);	\
@@ -347,7 +318,9 @@ rb_add_method(VALUE klass, ID mid, rb_method_type_t type, void *opts, rb_method_
       default:
 	rb_bug("rb_add_method: unsupported method type (%d)\n", type);
     }
-    method_added(klass, mid);
+    if (type != VM_METHOD_TYPE_UNDEF) {
+	method_added(klass, mid);
+    }
     return me;
 }
 
@@ -422,6 +395,7 @@ rb_method_entry_get_without_cache(VALUE klass, ID id)
     if (ruby_running) {
 	struct cache_entry *ent;
 	ent = cache + EXPR1(klass, id);
+	ent->filled_version = GET_VM_STATE_VERSION();
 	ent->klass = klass;
 
 	if (UNDEFINED_METHOD_ENTRY_P(me)) {
@@ -444,7 +418,8 @@ rb_method_entry(VALUE klass, ID id)
     struct cache_entry *ent;
 
     ent = cache + EXPR1(klass, id);
-    if (ent->mid == id && ent->klass == klass) {
+    if (ent->filled_version == GET_VM_STATE_VERSION() &&
+	ent->mid == id && ent->klass == klass) {
 	return ent->me;
     }
 
@@ -454,7 +429,7 @@ rb_method_entry(VALUE klass, ID id)
 static void
 remove_method(VALUE klass, ID mid)
 {
-    st_data_t data;
+    st_data_t key, data;
     rb_method_entry_t *me = 0;
 
     if (klass == rb_cObject) {
@@ -463,8 +438,7 @@ remove_method(VALUE klass, ID mid)
     if (rb_safe_level() >= 4 && !OBJ_UNTRUSTED(klass)) {
 	rb_raise(rb_eSecurityError, "Insecure: can't remove method");
     }
-    if (OBJ_FROZEN(klass))
-	rb_error_frozen("class/module");
+    rb_check_frozen(klass);
     if (mid == object_id || mid == id__send__ || mid == idInitialize) {
 	rb_warn("removing `%s' may cause serious problems", rb_id2name(mid));
     }
@@ -475,7 +449,8 @@ remove_method(VALUE klass, ID mid)
 	rb_name_error(mid, "method `%s' not defined in %s",
 		      rb_id2name(mid), rb_class2name(klass));
     }
-    st_delete(RCLASS_M_TBL(klass), &mid, &data);
+    key = (st_data_t)mid;
+    st_delete(RCLASS_M_TBL(klass), &key, &data);
 
     rb_vm_check_redefinition_opt_method(me);
     rb_clear_cache_for_undef(klass, mid);
@@ -988,6 +963,11 @@ set_method_visibility(VALUE self, int argc, VALUE *argv, rb_method_flag_t ex)
 {
     int i;
     secure_visibility(self);
+
+    if (argc == 0) {
+	rb_warning("%s with no argument is just ignored", rb_id2name(rb_frame_callee()));
+    }
+
     for (i = 0; i < argc; i++) {
 	rb_export_method(self, rb_to_id(argv[i]), ex);
     }
@@ -1151,20 +1131,20 @@ top_private(int argc, VALUE *argv)
  *     end
  *     class Cls
  *       include Mod
- *       def callOne
+ *       def call_one
  *         one
  *       end
  *     end
  *     Mod.one     #=> "This is one"
  *     c = Cls.new
- *     c.callOne   #=> "This is one"
+ *     c.call_one  #=> "This is one"
  *     module Mod
  *       def one
  *         "This is the new one"
  *       end
  *     end
  *     Mod.one     #=> "This is one"
- *     c.callOne   #=> "This is the new one"
+ *     c.call_one  #=> "This is the new one"
  */
 
 static VALUE
@@ -1293,7 +1273,7 @@ obj_respond_to(int argc, VALUE *argv, VALUE obj)
  *  See #respond_to?.
  */
 static VALUE
-obj_respond_to_missing(VALUE obj, VALUE priv)
+obj_respond_to_missing(VALUE obj, VALUE mid, VALUE priv)
 {
     return Qfalse;
 }

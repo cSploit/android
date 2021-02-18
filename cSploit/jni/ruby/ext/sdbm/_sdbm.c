@@ -30,18 +30,23 @@
 
 #ifdef BSD42
 #define SEEK_SET	L_SET
-#define	memset(s,c,n)	bzero(s, n)		/* only when c is zero */
-#define	memcpy(s1,s2,n)	bcopy(s2, s1, n)
-#define	memcmp(s1,s2,n)	bcmp(s1,s2,n)
+#define	memset(s,c,n)	bzero((s), (n))		/* only when c is zero */
+#define	memcpy(s1,s2,n)	bcopy((s2), (s1), (n))
+#define	memcmp(s1,s2,n)	bcmp((s1),(s2),(n))
 #endif
 
 /*
  * important tuning parms (hah)
  */
 
-#define SEEDUPS		/* always detect duplicates */
-#define BADMESS		/* generate a message for worst case:
+#ifndef SEEDUPS
+#define SEEDUPS 1	/* always detect duplicates */
+#endif
+#ifndef BADMESS
+#define BADMESS 1	/* generate a message for worst case:
 			   cannot make room after SPLTMAX splits */
+#endif
+
 /*
  * misc
  */
@@ -55,8 +60,8 @@
 #define GET_SHORT(p, i)	(((unsigned)((unsigned char *)(p))[(i)*2] << 8) + (((unsigned char *)(p))[(i)*2 + 1]))
 #define PUT_SHORT(p, i, s) (((unsigned char *)(p))[(i)*2] = (unsigned char)((s) >> 8), ((unsigned char *)(p))[(i)*2 + 1] = (unsigned char)(s))
 #else
-#define GET_SHORT(p, i)	((p)[i])
-#define PUT_SHORT(p, i, s)	((p)[i] = (s))
+#define GET_SHORT(p, i)	((p)[(i)])
+#define PUT_SHORT(p, i, s)	((p)[(i)] = (s))
 #endif
 
 /*#include "pair.h"*/
@@ -67,7 +72,7 @@ static int   delpair proto((char *, datum));
 static int   chkpage proto((char *));
 static datum getnkey proto((char *, int));
 static void  splpage proto((char *, char *, long));
-#ifdef SEEDUPS
+#if SEEDUPS
 static int   duppair proto((char *, datum));
 #endif
 
@@ -150,7 +155,7 @@ sdbm_open(register char *file, register int flags, register int mode)
 	register DBM *db;
 	register char *dirname;
 	register char *pagname;
-	register int n;
+	register size_t n;
 
 	if (file == NULL || !*file)
 		return errno = EINVAL, (DBM *) NULL;
@@ -159,7 +164,7 @@ sdbm_open(register char *file, register int flags, register int mode)
  */
 	n = strlen(file) * 2 + strlen(DIRFEXT) + strlen(PAGFEXT) + 2;
 
-	if ((dirname = malloc((unsigned) n)) == NULL)
+	if ((dirname = malloc(n)) == NULL)
 		return errno = ENOMEM, (DBM *) NULL;
 /*
  * build the file names
@@ -302,7 +307,7 @@ sdbm_store(register DBM *db, datum key, datum val, int flags)
  */
 		if (flags == DBM_REPLACE)
 			(void) delpair(db->pagbuf, key);
-#ifdef SEEDUPS
+#if SEEDUPS
 		else if (duppair(db->pagbuf, key))
 			return 1;
 #endif
@@ -421,8 +426,8 @@ makroom(register DBM *db, long int hash, int need)
  * if we are here, this is real bad news. After SPLTMAX splits,
  * we still cannot fit the key. say goodnight.
  */
-#ifdef BADMESS
-	(void) write(2, "sdbm: cannot insert after SPLTMAX attempts.\n", 44);
+#if BADMESS
+	(void) (write(2, "sdbm: cannot insert after SPLTMAX attempts.\n", 44) < 0);
 #endif
 	return 0;
 
@@ -698,7 +703,7 @@ getpair(char *pag, datum key)
 	return val;
 }
 
-#ifdef SEEDUPS
+#if SEEDUPS
 static int
 duppair(char *pag, datum key)
 {
@@ -750,9 +755,9 @@ delpair(char *pag, datum key)
 		register int m;
 		register char *dst = pag + (i == 1 ? PBLKSIZ : GET_SHORT(ino,i - 1));
 		register char *src = pag + GET_SHORT(ino,i + 1);
-		register int   zoo = dst - src;
+		register ptrdiff_t   zoo = dst - src;
 
-		debug(("free-up %d ", zoo));
+		debug(("free-up %"PRIdPTRDIFF" ", zoo));
 /*
  * shift data/keys down
  */

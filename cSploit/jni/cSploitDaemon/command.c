@@ -31,17 +31,15 @@
 #include <stddef.h>
 
 #include "cSploitd.h"
-
-#include <csploit/logger.h>
-#include <csploit/message.h>
-#include <csploit/sequence.h>
-#include <csploit/control_messages.h>
-#include <csploit/str_array.h>
-
+#include "logger.h"
+#include "handler.h"
+#include "message.h"
 #include "child.h"
 #include "connection.h"
 #include "command.h"
-#include "handler.h"
+#include "sequence.h"
+#include "control_messages.h"
+#include "str_array.h"
 
 /**
  * @brief notify the command receiver that a chid printed a line on it's stderr.

@@ -17,10 +17,12 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * @(#) $Header: /tcpdump/master/tcpdump/pcap-missing.h,v 1.2.2.1 2005/06/03 22:10:16 guy Exp $ (LBL)
  */
 
-#ifndef netdissect_pcap_missing_h
-#define netdissect_pcap_missing_h
+#ifndef tcpdump_pcap_missing_h
+#define tcpdump_pcap_missing_h
 
 /*
  * Declarations of functions that might be missing from libpcap.
@@ -46,4 +48,13 @@ extern const char *pcap_datalink_val_to_description(int);
 extern long pcap_dump_ftell(pcap_dumper_t *);
 #endif
 
-#endif /* netdissect_pcap_missing_h */
+#endif
+
+
+
+
+
+
+
+
+

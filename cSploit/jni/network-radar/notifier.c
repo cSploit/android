@@ -23,7 +23,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include <csploit/logger.h>
+#include "logger.h"
 
 #include "event.h"
 #include "host.h"

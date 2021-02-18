@@ -2,7 +2,6 @@ language: c
 before_script:
   - wget "https://github.com/cSploit/common/archive/master.zip" -O ../common.zip
   - (cd .. ; unzip -q common.zip ; mv common-master cSploitCommon )
-  - (cd ../cSploitCommon; autoreconf -i; ./configure && make && sudo make install )
 install:
   - sudo apt-get install libpcap-dev libc-ares-dev
-script: autoreconf -i; ./configure && make
+script: make

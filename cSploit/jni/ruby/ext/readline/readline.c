@@ -40,13 +40,27 @@
 #include <unistd.h>
 #endif
 
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
+
 static VALUE mReadline;
 
 #define EDIT_LINE_LIBRARY_VERSION "EditLine wrapper"
+#ifndef USE_INSERT_IGNORE_ESCAPE
+# if !defined(HAVE_EDITLINE_READLINE_H) && defined(HAVE_RL_PROMPT_START_IGNORE) && defined(HAVE_RL_PROMPT_END_IGNORE)
+#  define USE_INSERT_IGNORE_ESCAPE 1
+# else
+#  define USE_INSERT_IGNORE_ESCAPE 0
+# endif
+#endif
 
 #define COMPLETION_PROC "completion_proc"
 #define COMPLETION_CASE_FOLD "completion_case_fold"
 static ID completion_proc, completion_case_fold;
+#if USE_INSERT_IGNORE_ESCAPE
+static ID id_orig_prompt, id_last_prompt;
+#endif
 
 #ifndef HAVE_RL_FILENAME_COMPLETION_FUNCTION
 # define rl_filename_completion_function filename_completion_function
@@ -59,13 +73,17 @@ static ID completion_proc, completion_case_fold;
 #endif
 
 static int (*history_get_offset_func)(int);
+static int (*history_replace_offset_func)(int);
+#ifdef HAVE_RL_COMPLETION_APPEND_CHARACTER
+static int readline_completion_append_character;
+#endif
 
 static char **readline_attempted_completion_function(const char *text,
                                                      int start, int end);
 
 #define OutputStringValue(str) do {\
     SafeStringValue(str);\
-    str = rb_str_conv_enc(str, rb_enc_get(str), rb_locale_encoding());\
+    (str) = rb_str_conv_enc((str), rb_enc_get(str), rb_locale_encoding());\
 } while (0)\
 
 
@@ -121,6 +139,34 @@ readline_getc(FILE *input)
     if (!readline_instream) return rl_getc(input);
     GetOpenFile(readline_instream, ifp);
     if (rl_instream != ifp->stdio_file) return rl_getc(input);
+#if defined(_WIN32)
+    {
+        INPUT_RECORD ir;
+        int n;
+        static int prior_key = '0';
+        for (;;) {
+            if (prior_key > 0xff) {
+                prior_key = rl_getc(ifp->stdio_file);
+                return prior_key;
+            }
+            if (PeekConsoleInput((HANDLE)_get_osfhandle(ifp->fd), &ir, 1, &n)) {
+                if (n == 1) {
+                    if (ir.EventType == KEY_EVENT && ir.Event.KeyEvent.bKeyDown) {
+                        prior_key = rl_getc(ifp->stdio_file);
+                        return prior_key;
+                    } else {
+                        ReadConsoleInput((HANDLE)_get_osfhandle(ifp->fd), &ir, 1, &n);
+                    }
+                } else {
+                    HANDLE h = (HANDLE)_get_osfhandle(ifp->fd);
+                    rb_w32_wait_events(&h, 1, INFINITE);
+                }
+            } else {
+                break;
+            }
+        }
+    }
+#endif
     c = rb_funcall(readline_instream, id_getbyte, 0, 0);
     if (NIL_P(c)) return EOF;
     return NUM2CHR(c);
@@ -135,19 +181,93 @@ readline_event(void)
 #if BUSY_WAIT
     rb_thread_schedule();
 #else
-    fd_set rset;
-
-    FD_ZERO(&rset);
-    FD_SET(fileno(rl_instream), &rset);
-    rb_thread_select(fileno(rl_instream) + 1, &rset, NULL, NULL, NULL);
+    rb_wait_for_single_fd(fileno(rl_instream), RB_WAITFD_IN, NULL);
     return 0;
 #endif
+}
+#endif
+
+#if USE_INSERT_IGNORE_ESCAPE
+static VALUE
+insert_ignore_escape(VALUE self, VALUE prompt)
+{
+    VALUE last_prompt, orig_prompt = rb_attr_get(self, id_orig_prompt);
+    int ignoring = 0;
+    const char *s0, *s, *e;
+    long len;
+    static const char ignore_code[2] = {RL_PROMPT_START_IGNORE, RL_PROMPT_END_IGNORE};
+
+    prompt = rb_str_new_shared(prompt);
+    last_prompt = rb_attr_get(self, id_last_prompt);
+    if (orig_prompt == prompt) return last_prompt;
+    len = RSTRING_LEN(prompt);
+    if (NIL_P(last_prompt)) {
+	last_prompt = rb_str_tmp_new(len);
+    }
+
+    s = s0 = RSTRING_PTR(prompt);
+    e = s0 + len;
+    rb_str_set_len(last_prompt, 0);
+    while (s < e && *s) {
+	switch (*s) {
+	  case RL_PROMPT_START_IGNORE:
+	    ignoring = -1;
+	    rb_str_cat(last_prompt, s0, ++s - s0);
+	    s0 = s;
+	    break;
+	  case RL_PROMPT_END_IGNORE:
+	    ignoring = 0;
+	    rb_str_cat(last_prompt, s0, ++s - s0);
+	    s0 = s;
+	    break;
+	  case '\033':
+	    if (++s < e && *s == '[') {
+		rb_str_cat(last_prompt, s0, s - s0 - 1);
+		s0 = s - 1;
+		while (++s < e && *s) {
+		    if (ISALPHA(*s)) {
+			if (!ignoring) {
+			    ignoring = 1;
+			    rb_str_cat(last_prompt, ignore_code+0, 1);
+			}
+			rb_str_cat(last_prompt, s0, ++s - s0);
+			s0 = s;
+			break;
+		    }
+		    else if (!('0' <= *s && *s <= '9' || *s == ';')) {
+			break;
+		    }
+		}
+	    }
+	    break;
+	  default:
+	    if (ignoring > 0) {
+		ignoring = 0;
+		rb_str_cat(last_prompt, ignore_code+1, 1);
+	    }
+	    s++;
+	    break;
+	}
+    }
+    if (ignoring > 0) {
+	ignoring = 0;
+	rb_str_cat(last_prompt, ignore_code+1, 1);
+    }
+    rb_str_cat(last_prompt, s0, s - s0);
+
+    rb_ivar_set(self, id_orig_prompt, prompt);
+    rb_ivar_set(self, id_last_prompt, last_prompt);
+
+    return last_prompt;
 }
 #endif
 
 static VALUE
 readline_get(VALUE prompt)
 {
+#ifdef HAVE_RL_COMPLETION_APPEND_CHARACTER
+    readline_completion_append_character = rl_completion_append_character;
+#endif
     return (VALUE)readline((char *)prompt);
 }
 
@@ -248,15 +368,31 @@ readline_readline(int argc, VALUE *argv, VALUE self)
     rb_secure(4);
     if (rb_scan_args(argc, argv, "02", &tmp, &add_hist) > 0) {
 	OutputStringValue(tmp);
+#if USE_INSERT_IGNORE_ESCAPE
+	tmp = insert_ignore_escape(self, tmp);
+	rb_str_locktmp(tmp);
+#endif
 	prompt = RSTRING_PTR(tmp);
     }
 
     if (!isatty(fileno(rl_instream)) && errno == EBADF) rb_raise(rb_eIOError, "closed stdin");
+    if (rl_outstream) {
+	struct stat stbuf;
+	int fd = fileno(rl_outstream);
+	if (fd < 0 || fstat(fd, &stbuf) != 0) {
+	    rb_raise(rb_eIOError, "closed stdout");
+	}
+    }
 
 #ifdef _WIN32
     rl_prep_terminal(1);
 #endif
     buff = (char*)rb_protect(readline_get, (VALUE)prompt, &status);
+#if USE_INSERT_IGNORE_ESCAPE
+    if (prompt) {
+	rb_str_unlocktmp(tmp);
+    }
+#endif
     if (status) {
 #if defined HAVE_RL_CLEANUP_AFTER_SIGNAL
         /* restore terminal mode and signal handler*/
@@ -336,15 +472,71 @@ readline_s_set_output(VALUE self, VALUE output)
  * call-seq:
  *   Readline.completion_proc = proc
  *
- * Specifies a Proc object +proc+ to determine completion behavior. It
- * should take input-string, and return an array of completion
- * candidates.
+ * Specifies a Proc object +proc+ to determine completion behavior.  It
+ * should take input string and return an array of completion candidates.
  *
- * Set default if +proc+ is nil.
+ * The default completion is used if +proc+ is nil.
  *
- * Raises ArgumentError exception if +proc+ does not respond to call method.
+ * The String that is passed to the Proc depends on the
+ * Readline.completer_word_break_characters property.  By default the word
+ * under the cursor is passed to the Proc.  For example, if the input is "foo
+ * bar" then only "bar" would be passed to the completion Proc.
  *
- * Raises SecurityError exception if $SAFE is 4.
+ * Upon successful completion the Readline.completion_append_character will be
+ * appended to the input so the user can start working on their next argument.
+ *
+ * = Examples
+ *
+ * == Completion for a Static List
+ *
+ *   require 'readline'
+ *
+ *   LIST = [
+ *     'search', 'download', 'open',
+ *     'help', 'history', 'quit',
+ *     'url', 'next', 'clear',
+ *     'prev', 'past'
+ *   ].sort
+ *
+ *   comp = proc { |s| LIST.grep(/^#{Regexp.escape(s)}/) }
+ *
+ *   Readline.completion_append_character = " "
+ *   Readline.completion_proc = comp
+ *
+ *   while line = Readline.readline('> ', true)
+ *     p line
+ *   end
+ *
+ * == Completion For Directory Contents
+ *
+ *   require 'readline'
+ *
+ *   Readline.completion_append_character = " "
+ *   Readline.completion_proc = Proc.new do |str|
+ *     Dir[str+'*'].grep(/^#{Regexp.escape(str)}/)
+ *   end
+ *
+ *   while line = Readline.readline('> ', true)
+ *     p line
+ *   end
+ *
+ * = Autocomplete strategies
+ *
+ * When working with auto-complete there are some strategies that work well.
+ * To get some ideas you can take a look at the
+ * completion.rb[http://svn.ruby-lang.org/repos/ruby/trunk/lib/irb/completion.rb]
+ * file for irb.
+ *
+ * The common strategy is to take a list of possible completions and filter it
+ * down to those completions that start with the user input.  In the above
+ * examples Enumerator.grep is used.  The input is escaped to prevent Regexp
+ * special characters from interfering with the matching.
+ *
+ * It may also be helpful to use the Abbrev library to generate completions.
+ *
+ * Raises ArgumentError if +proc+ does not respond to the call method.
+ *
+ * Raises SecurityError if $SAFE is 4.
  */
 static VALUE
 readline_s_set_completion_proc(VALUE self, VALUE proc)
@@ -426,7 +618,7 @@ readline_s_get_line_buffer(VALUE self)
     rb_secure(4);
     if (rl_line_buffer == NULL)
 	return Qnil;
-    return rb_tainted_str_new2(rl_line_buffer);
+    return rb_locale_str_new_cstr(rl_line_buffer);
 }
 #else
 #define readline_s_get_line_buffer rb_f_notimplement
@@ -463,24 +655,34 @@ readline_attempted_completion_function(const char *text, int start, int end)
     char **result;
     int case_fold;
     long i, matches;
+    rb_encoding *enc;
+    VALUE encobj;
 
     proc = rb_attr_get(mReadline, completion_proc);
     if (NIL_P(proc))
 	return NULL;
+#ifdef HAVE_RL_COMPLETION_APPEND_CHARACTER
+    rl_completion_append_character = readline_completion_append_character;
+#endif
 #ifdef HAVE_RL_ATTEMPTED_COMPLETION_OVER
     rl_attempted_completion_over = 1;
 #endif
     case_fold = RTEST(rb_attr_get(mReadline, completion_case_fold));
     ary = rb_funcall(proc, rb_intern("call"), 1, rb_locale_str_new_cstr(text));
-    if (TYPE(ary) != T_ARRAY)
+    if (!RB_TYPE_P(ary, T_ARRAY))
 	ary = rb_Array(ary);
     matches = RARRAY_LEN(ary);
-    if (matches == 0)
-	return NULL;
-    result = ALLOC_N(char *, matches + 2);
+    if (matches == 0) return NULL;
+    result = (char**)malloc((matches + 2)*sizeof(char*));
+    if (result == NULL) rb_raise(rb_eNoMemError, "failed to allocate memory");
+    enc = rb_locale_encoding();
+    encobj = rb_enc_from_encoding(enc);
     for (i = 0; i < matches; i++) {
 	temp = rb_obj_as_string(RARRAY_PTR(ary)[i]);
-	result[i + 1] = ALLOC_N(char, RSTRING_LEN(temp) + 1);
+	StringValueCStr(temp);	/* must be NUL-terminated */
+	rb_enc_check(encobj, temp);
+	result[i + 1] = (char*)malloc(RSTRING_LEN(temp) + 1);
+	if (result[i + 1]  == NULL) rb_memerror();
 	strcpy(result[i + 1], RSTRING_PTR(temp));
     }
     result[matches + 1] = NULL;
@@ -489,28 +691,27 @@ readline_attempted_completion_function(const char *text, int start, int end)
         result[0] = strdup(result[1]);
     }
     else {
-	register int i = 1;
-	int low = 100000;
+	const char *result1 = result[1];
+	long low = strlen(result1);
 
-	while (i < matches) {
-	    register int c1, c2, si;
+	for (i = 1; i < matches; ++i) {
+	    register int c1, c2;
+	    long i1, i2, l2;
+	    int n1, n2;
+	    const char *p2 = result[i + 1];
 
-	    if (case_fold) {
-		for (si = 0;
-		     (c1 = TOLOWER(result[i][si])) &&
-			 (c2 = TOLOWER(result[i + 1][si]));
-		     si++)
-		    if (c1 != c2) break;
-	    } else {
-		for (si = 0;
-		     (c1 = result[i][si]) &&
-			 (c2 = result[i + 1][si]);
-		     si++)
-		    if (c1 != c2) break;
+	    l2 = strlen(p2);
+	    for (i1 = i2 = 0; i1 < low && i2 < l2; i1 += n1, i2 += n2) {
+		c1 = rb_enc_codepoint_len(result1 + i1, result1 + low, &n1, enc);
+		c2 = rb_enc_codepoint_len(p2 + i2, p2 + l2, &n2, enc);
+		if (case_fold) {
+		    c1 = rb_tolower(c1);
+		    c2 = rb_tolower(c2);
+		}
+		if (c1 != c2) break;
 	    }
 
-	    if (low > si) low = si;
-	    i++;
+	    low = i1;
 	}
 	result[0] = ALLOC_N(char, low + 1);
 	strncpy(result[0], result[1], low);
@@ -1125,7 +1326,7 @@ hist_set(VALUE self, VALUE index, VALUE str)
         i += history_length;
     }
     if (i >= 0) {
-	entry = replace_history_entry(i, RSTRING_PTR(str), NULL);
+	entry = replace_history_entry(history_replace_offset_func(i), RSTRING_PTR(str), NULL);
     }
     if (entry == NULL) {
 	rb_raise(rb_eIndexError, "invalid index");
@@ -1320,6 +1521,16 @@ Init_readline()
     /* Allow conditional parsing of the ~/.inputrc file. */
     rl_readline_name = (char *)"Ruby";
 
+#if defined HAVE_RL_GETC_FUNCTION
+    /* libedit check rl_getc_function only when rl_initialize() is called, */
+    /* and using_history() call rl_initialize(). */
+    /* This assignment should be placed before using_history() */
+    rl_getc_function = readline_getc;
+    id_getbyte = rb_intern_const("getbyte");
+#elif defined HAVE_RL_EVENT_HOOK
+    rl_event_hook = readline_event;
+#endif
+
     using_history();
 
     completion_proc = rb_intern(COMPLETION_PROC);
@@ -1383,6 +1594,11 @@ Init_readline()
     rb_define_singleton_method(mReadline, "refresh_line",
 			       readline_s_refresh_line, 0);
 
+#if USE_INSERT_IGNORE_ESCAPE
+    CONST_ID(id_orig_prompt, "orig_prompt");
+    CONST_ID(id_last_prompt, "last_prompt");
+#endif
+
     history = rb_obj_alloc(rb_cObject);
     rb_extend_object(history, rb_mEnumerable);
     rb_define_singleton_method(history,"to_s", hist_to_s, 0);
@@ -1425,6 +1641,7 @@ Init_readline()
      */
     rb_define_const(mReadline, "USERNAME_COMPLETION_PROC", ucomp);
     history_get_offset_func = history_get_offset_history_base;
+    history_replace_offset_func = history_get_offset_0;
 #if defined HAVE_RL_LIBRARY_VERSION
     version = rb_str_new_cstr(rl_library_version);
 #if defined HAVE_CLEAR_HISTORY || defined HAVE_REMOVE_HISTORY
@@ -1434,7 +1651,12 @@ Init_readline()
 	if (history_get(history_get_offset_func(0)) == NULL) {
 	    history_get_offset_func = history_get_offset_0;
 	}
-#if !defined HAVE_CLEAR_HISTORY
+#ifdef HAVE_REPLACE_HISTORY_ENTRY
+	if (replace_history_entry(0, "a", NULL) == NULL) {
+	    history_replace_offset_func = history_get_offset_history_base;
+	}
+#endif
+#ifdef HAVE_CLEAR_HISTORY
 	clear_history();
 #else
 	{
@@ -1454,18 +1676,10 @@ Init_readline()
     rb_define_const(mReadline, "VERSION", version);
 
     rl_attempted_completion_function = readline_attempted_completion_function;
-#if defined HAVE_RL_GETC_FUNCTION
-    rl_getc_function = readline_getc;
-    id_getbyte = rb_intern_const("getbyte");
-#elif defined HAVE_RL_EVENT_HOOK
-    rl_event_hook = readline_event;
-#endif
 #ifdef HAVE_RL_CATCH_SIGNALS
     rl_catch_signals = 0;
-#endif
-#ifdef HAVE_RL_CATCH_SIGWINCH
-    rl_catch_sigwinch = 0;
-#endif
+#endif 
+
 #ifdef HAVE_RL_CLEAR_SIGNALS
     rl_clear_signals();
 #endif

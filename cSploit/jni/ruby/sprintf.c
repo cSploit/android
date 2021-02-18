@@ -30,9 +30,7 @@ static void fmt_setup(char*,size_t,int,int,int,int);
 static char*
 remove_sign_bits(char *str, int base)
 {
-    char *s, *t;
-
-    s = t = str;
+    char *t = str;
 
     if (base == 16) {
 	while (*t == 'f') {
@@ -94,13 +92,13 @@ sign_bits(int base, const char *p)
 
 #define PUSH(s, l) do { \
     CHECK(l);\
-    memcpy(&buf[blen], s, l);\
+    memcpy(&buf[blen], (s), (l));\
     blen += (l);\
 } while (0)
 
 #define FILL(c, l) do { \
     CHECK(l);\
-    memset(&buf[blen], c, l);\
+    memset(&buf[blen], (c), (l));\
     blen += (l);\
 } while (0)
 
@@ -112,29 +110,29 @@ sign_bits(int base, const char *p)
     (posarg = nextarg++, GETNTHARG(posarg)))
 
 #define GETPOSARG(n) (posarg > 0 ? \
-    (rb_raise(rb_eArgError, "numbered(%d) after unnumbered(%d)", n, posarg), 0) : \
+    (rb_raise(rb_eArgError, "numbered(%d) after unnumbered(%d)", (n), posarg), 0) : \
     posarg == -2 ? \
-    (rb_raise(rb_eArgError, "numbered(%d) after named", n), 0) : \
-    ((n < 1) ? (rb_raise(rb_eArgError, "invalid index - %d$", n), 0) : \
+    (rb_raise(rb_eArgError, "numbered(%d) after named", (n)), 0) : \
+    (((n) < 1) ? (rb_raise(rb_eArgError, "invalid index - %d$", (n)), 0) : \
 	       (posarg = -1, GETNTHARG(n))))
 
 #define GETNTHARG(nth) \
-    ((nth >= argc) ? (rb_raise(rb_eArgError, "too few arguments"), 0) : argv[nth])
+    (((nth) >= argc) ? (rb_raise(rb_eArgError, "too few arguments"), 0) : argv[(nth)])
 
 #define GETNAMEARG(id, name, len) ( \
     posarg > 0 ? \
     (rb_raise(rb_eArgError, "named%.*s after unnumbered(%d)", (len), (name), posarg), 0) : \
     posarg == -1 ? \
     (rb_raise(rb_eArgError, "named%.*s after numbered", (len), (name)), 0) :	\
-    (posarg = -2, rb_hash_lookup2(get_hash(&hash, argc, argv), id, Qundef)))
+    (posarg = -2, rb_hash_lookup2(get_hash(&hash, argc, argv), (id), Qundef)))
 
 #define GETNUM(n, val) \
     for (; p < end && rb_enc_isdigit(*p, enc); p++) {	\
-	int next_n = 10 * n + (*p - '0'); \
-        if (next_n / 10 != n) {\
+	int next_n = 10 * (n) + (*p - '0'); \
+        if (next_n / 10 != (n)) {\
 	    rb_raise(rb_eArgError, #val " too big"); \
 	} \
-	n = next_n; \
+	(n) = next_n; \
     } \
     if (p >= end) { \
 	rb_raise(rb_eArgError, "malformed format string - %%*[0-9]"); \
@@ -143,7 +141,7 @@ sign_bits(int base, const char *p)
 #define GETASTER(val) do { \
     t = p++; \
     n = 0; \
-    GETNUM(n, val); \
+    GETNUM(n, (val)); \
     if (*p == '$') { \
 	tmp = GETPOSARG(n); \
     } \
@@ -151,7 +149,7 @@ sign_bits(int base, const char *p)
 	tmp = GETARG(); \
 	p = t; \
     } \
-    val = NUM2INT(tmp); \
+    (val) = NUM2INT(tmp); \
 } while (0)
 
 static VALUE
@@ -422,13 +420,13 @@ get_hash(volatile VALUE *hash, int argc, const VALUE *argv)
  *     sprintf("%u", -123)                        #=> "-123"
  *
  *  For more complex formatting, Ruby supports a reference by name.
- *  %<name>s style uses format style, but ${name} style doesn't.
+ *  %<name>s style uses format style, but %{name} style doesn't.
  *
  *  Exapmles:
- *    sprintf("%<foo>d : %<bar>f" % { :foo => 1, :bar => 2 })
+ *    sprintf("%<foo>d : %<bar>f", { :foo => 1, :bar => 2 })
  *      #=> 1 : 2.000000
- *    sprintf("%d %{foo}" % { :foo => 'bar' })
- *      # => "%d bar"
+ *    sprintf("%{foo}f", { :foo => 1 })
+ *      # => "1f"
  */
 
 VALUE
@@ -643,6 +641,7 @@ rb_str_format(int argc, const VALUE *argv, VALUE fmt)
 			rb_raise(rb_eArgError, "%%c requires a character");
 		    }
 		    c = rb_enc_codepoint_len(RSTRING_PTR(tmp), RSTRING_END(tmp), &n, enc);
+		    RB_GC_GUARD(tmp);
 		}
 		else {
 		    c = NUM2INT(val);
@@ -713,6 +712,7 @@ rb_str_format(int argc, const VALUE *argv, VALUE fmt)
 			}
 			CHECK(len);
 			memcpy(&buf[blen], RSTRING_PTR(str), len);
+			RB_GC_GUARD(str);
 			blen += len;
 			if (flags&FMINUS) {
 			    CHECK(width);
@@ -725,6 +725,7 @@ rb_str_format(int argc, const VALUE *argv, VALUE fmt)
 		    }
 		}
 		PUSH(RSTRING_PTR(str), len);
+		RB_GC_GUARD(str);
 		rb_enc_associate(result, enc);
 	    }
 	    break;
@@ -738,7 +739,6 @@ rb_str_format(int argc, const VALUE *argv, VALUE fmt)
 	  case 'B':
 	  case 'u':
 	    {
-		volatile VALUE tmp1;
 		volatile VALUE val = GETARG();
 		char fbuf[32], nbuf[64], *s;
 		const char *prefix = 0;
@@ -746,7 +746,7 @@ rb_str_format(int argc, const VALUE *argv, VALUE fmt)
 		char sc = 0;
 		long v = 0;
 		int base, bignum = 0;
-		int len, pos;
+		int len;
 
 		switch (*p) {
 		  case 'd':
@@ -889,7 +889,7 @@ rb_str_format(int argc, const VALUE *argv, VALUE fmt)
 			    val = rb_big_clone(val);
 			    rb_big_2comp(val);
 			}
-			tmp1 = tmp = rb_big2str0(val, base, RBIGNUM_SIGN(val));
+			tmp = rb_big2str0(val, base, RBIGNUM_SIGN(val));
 			s = RSTRING_PTR(tmp);
 			if (*s == '-') {
 			    dots = 1;
@@ -910,7 +910,6 @@ rb_str_format(int argc, const VALUE *argv, VALUE fmt)
 		    len = rb_long2int(RSTRING_END(tmp) - s);
 		}
 
-		pos = -1;
 		if (dots) {
 		    prec -= 2;
 		    width -= 2;
@@ -984,6 +983,7 @@ rb_str_format(int argc, const VALUE *argv, VALUE fmt)
 		    }
 		}
 		PUSH(s, len);
+		RB_GC_GUARD(tmp);
 		CHECK(width);
 		while (width-- > 0) {
 		    buf[blen++] = ' ';
@@ -1068,6 +1068,7 @@ rb_str_format(int argc, const VALUE *argv, VALUE fmt)
     }
 
   sprint_exit:
+    RB_GC_GUARD(fmt);
     /* XXX - We cannot validate the number of arguments if (digit)$ style used.
      */
     if (posarg >= 0 && nextarg < argc) {
@@ -1121,6 +1122,10 @@ fmt_setup(char *buf, size_t size, int c, int flags, int width, int prec)
 #  define quad_t LONG_LONG
 #  define u_quad_t unsigned LONG_LONG
 # endif
+#elif SIZEOF_LONG != SIZEOF_LONG_LONG && SIZEOF_LONG_LONG == 8
+# define _HAVE_SANE_QUAD_
+# define quad_t LONG_LONG
+# define u_quad_t unsigned LONG_LONG
 #endif
 #define FLOATING_POINT 1
 #define BSD__dtoa ruby_dtoa

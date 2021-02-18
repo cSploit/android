@@ -22,13 +22,11 @@ class TestLambdaParameters < Test::Unit::TestCase
     assert_raise(ArgumentError) { ->(a,b){ }.call(1,2,3) }
   end
 
-end
-
-__END__
   def test_lambda_as_iterator
     a = 0
     2.times(&->(_){ a += 1 })
     assert_equal(a, 2)
+    assert_raise(ArgumentError) {1.times(&->(){ a += 1 })}
   end
 
   def test_call_rest_args
@@ -64,5 +62,12 @@ __END__
 
   def foo
     assert_equal(nil, ->(&b){ b }.call)
+  end
+
+  def test_in_basic_object
+    bug5966 = '[ruby-core:42349]'
+    called = false
+    BasicObject.new.instance_eval {->() {called = true}.()}
+    assert_equal(true, called, bug5966)
   end
 end

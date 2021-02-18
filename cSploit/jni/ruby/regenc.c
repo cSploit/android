@@ -732,8 +732,9 @@ onigenc_mbn_is_mbc_ambiguous(OnigEncoding enc, OnigCaseFoldType flag,
 extern int
 onigenc_mb2_code_to_mbclen(OnigCodePoint code, OnigEncoding enc ARG_UNUSED)
 {
-  if ((code & 0xff00) != 0) return 2;
-  else return 1;
+  if (code <= 0xff) return 1;
+  if (code <= 0xffff) return 2;
+  return ONIGERR_TOO_BIG_WIDE_CHAR_VALUE;
 }
 
 extern int
@@ -811,7 +812,7 @@ onigenc_minimum_property_name_to_ctype(OnigEncoding enc, UChar* p, UChar* end)
   len = onigenc_strlen(enc, p, end);
   for (pbe = (pb = PBS) + sizeof(PBS)/sizeof(PBS[0]); pb < pbe; ++pb) {
     if (len == pb->len &&
-        onigenc_with_ascii_strncmp(enc, p, end, pb->name, pb->len) == 0)
+        STRNCASECMP((char *)p, (char *)pb->name, len) == 0)
       return pb->ctype;
   }
 

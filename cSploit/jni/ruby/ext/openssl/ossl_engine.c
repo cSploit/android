@@ -13,20 +13,20 @@
 #if defined(OSSL_ENGINE_ENABLED)
 
 #define WrapEngine(klass, obj, engine) do { \
-    if (!engine) { \
+    if (!(engine)) { \
 	ossl_raise(rb_eRuntimeError, "ENGINE wasn't initialized."); \
     } \
-    obj = Data_Wrap_Struct(klass, 0, ENGINE_free, engine); \
+    (obj) = Data_Wrap_Struct((klass), 0, ENGINE_free, (engine)); \
 } while(0)
 #define GetEngine(obj, engine) do { \
-    Data_Get_Struct(obj, ENGINE, engine); \
-    if (!engine) { \
+    Data_Get_Struct((obj), ENGINE, (engine)); \
+    if (!(engine)) { \
         ossl_raise(rb_eRuntimeError, "ENGINE wasn't initialized."); \
     } \
 } while (0)
 #define SafeGetEngine(obj, engine) do { \
-    OSSL_Check_Kind(obj, cEngine); \
-    GetPKCS7(obj, engine); \
+    OSSL_Check_Kind((obj), cEngine); \
+    GetPKCS7((obj), (engine)); \
 } while (0)
 
 /*
@@ -115,7 +115,11 @@ ossl_engine_s_engines(VALUE klass)
 
     ary = rb_ary_new();
     for(e = ENGINE_get_first(); e; e = ENGINE_get_next(e)){
-        WrapEngine(klass, obj, e);
+	/* Need a ref count of two here because of ENGINE_free being
+	 * called internally by OpenSSL when moving to the next ENGINE
+	 * and by us when releasing the ENGINE reference */
+	ENGINE_up_ref(e);
+	WrapEngine(klass, obj, e);
         rb_ary_push(ary, obj);
     }
 
@@ -343,18 +347,11 @@ ossl_engine_get_cmds(VALUE self)
 static VALUE
 ossl_engine_inspect(VALUE self)
 {
-    VALUE str;
-    const char *cname = rb_class2name(rb_obj_class(self));
+    ENGINE *e;
 
-    str = rb_str_new2("#<");
-    rb_str_cat2(str, cname);
-    rb_str_cat2(str, " id=\"");
-    rb_str_append(str, ossl_engine_get_id(self));
-    rb_str_cat2(str, "\" name=\"");
-    rb_str_append(str, ossl_engine_get_name(self));
-    rb_str_cat2(str, "\">");
-
-    return str;
+    GetEngine(self, e);
+    return rb_sprintf("#<%"PRIsVALUE" id=\"%s\" name=\"%s\">",
+		      RB_OBJ_CLASSNAME(self), ENGINE_get_id(e), ENGINE_get_name(e));
 }
 
 #define DefEngineConst(x) rb_define_const(cEngine, #x, INT2NUM(ENGINE_##x))

@@ -43,11 +43,14 @@ if $mingw
   have_library("wsock32")
   have_library("gdi32")
 end
-result = have_header("openssl/ssl.h")
-result &&= %w[crypto libeay32].any? {|lib| have_library(lib, "OpenSSL_add_all_digests")}
-result &&= %w[ssl ssleay32].any? {|lib| have_library(lib, "SSL_library_init")}
-if !result
-  unless pkg_config("openssl") and have_header("openssl/ssl.h")
+
+result = pkg_config("openssl") && have_header("openssl/ssl.h")
+
+unless result
+  result = have_header("openssl/ssl.h")
+  result &&= %w[crypto libeay32].any? {|lib| have_library(lib, "OpenSSL_add_all_digests")}
+  result &&= %w[ssl ssleay32].any? {|lib| have_library(lib, "SSL_library_init")}
+  unless result
     message "=== Checking for required stuff failed. ===\n"
     message "Makefile wasn't created. Fix the errors above.\n"
     exit 1
@@ -55,19 +58,25 @@ if !result
 end
 
 unless have_header("openssl/conf_api.h")
-  message "OpenSSL 0.9.6 or later required.\n"
-  exit 1
+  raise "OpenSSL 0.9.6 or later required."
 end
 
 %w"rb_str_set_len rb_block_call".each {|func| have_func(func, "ruby.h")}
 
 message "=== Checking for OpenSSL features... ===\n"
 have_func("ERR_peek_last_error")
+have_func("ASN1_put_eoc")
 have_func("BN_mod_add")
 have_func("BN_mod_sqr")
 have_func("BN_mod_sub")
 have_func("BN_pseudo_rand_range")
 have_func("BN_rand_range")
+have_func("BN_generate_prime")
+have_func("BN_generate_prime_ex")
+have_func("BN_is_prime")
+have_func("BN_is_prime_ex")
+have_func("BN_is_prime_fasttest")
+have_func("BN_is_prime_fasttest_ex")
 have_func("CONF_get1_default_config_file")
 have_func("EVP_CIPHER_CTX_copy")
 have_func("EVP_CIPHER_CTX_set_padding")
@@ -85,18 +94,24 @@ have_func("HMAC_CTX_init")
 have_func("PEM_def_callback")
 have_func("PKCS5_PBKDF2_HMAC")
 have_func("PKCS5_PBKDF2_HMAC_SHA1")
+have_func("RSA_generate_key")
+have_func("RSA_generate_key_ex")
 have_func("X509V3_set_nconf")
 have_func("X509V3_EXT_nconf_nid")
 have_func("X509_CRL_add0_revoked")
 have_func("X509_CRL_set_issuer_name")
 have_func("X509_CRL_set_version")
 have_func("X509_CRL_sort")
+have_func("X509_NAME_hash_old")
 have_func("X509_STORE_get_ex_data")
 have_func("X509_STORE_set_ex_data")
 have_func("OBJ_NAME_do_all_sorted")
 have_func("SSL_SESSION_get_id")
 have_func("SSL_SESSION_cmp")
 have_func("OPENSSL_cleanse")
+have_func("SSLv2_method")
+have_func("SSLv2_server_method")
+have_func("SSLv2_client_method")
 unless have_func("SSL_set_tlsext_host_name", ['openssl/ssl.h'])
   have_macro("SSL_set_tlsext_host_name", ['openssl/ssl.h']) && $defs.push("-DHAVE_SSL_SET_TLSEXT_HOST_NAME")
 end

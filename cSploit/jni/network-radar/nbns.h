@@ -355,48 +355,52 @@ struct nbns_resource_tail {
 
 /// flags after a name node entry ( RFC 1002 4.2.18 )
 struct nbns_node_name_tail {
-  uint8_t flags;
-  uint8_t reserved;
-} __attribute__((__packed__));
+  /**
+   * @brief Group Name Flag.
+   * 
+   * If one (1) then the name is a GROUP NetBIOS name.
+   * If zero (0) then it is a UNIQUE NetBIOS name.
+   */
+  uint16_t group:1;
+  
+  /**
+   * @brief Owner Node Type
+   * 
+   * @see ::NBNS_NAME_FLAG_B_NODE
+   * @see ::NBNS_NAME_FLAG_P_NODE
+   * @see ::NBNS_NAME_FLAG_M_NODE
+   */
+  uint16_t node:2;
+  
+  /**
+   * @brief Deregister Flag.
+   * If one (1) then this name is in the process of being deleted.
+   */
+  uint16_t deregister:1;
+  
+  /**
+   * @brief Conflict Flag.
+   * If one (1) then name on this node is in conflict.
+   */
+  uint16_t conflict:1;
 
-/**
- * @brief Group Name Flag.
- * 
- * If one (1) then the name is a GROUP NetBIOS name.
- * If zero (0) then it is a UNIQUE NetBIOS name.
- */
-#define NBNS_NODE_NAME_TAIL_GROUP       0x80
-/**
- * @brief Owner Node Type
- * 
- * @see ::NBNS_NAME_FLAG_B_NODE
- * @see ::NBNS_NAME_FLAG_P_NODE
- * @see ::NBNS_NAME_FLAG_M_NODE
- */
-#define NBNS_NODE_NAME_TAIL_NODE        0x60
-/**
- * @brief Deregister Flag.
- * If one (1) then this name is in the process of being deleted.
- */
-#define NBNS_NODE_NAME_TAIL_DEREGISTER  0x10
-/**
- * @brief Conflict Flag.
- * If one (1) then name on this node is in conflict.
- */
-#define NBNS_NODE_NAME_TAIL_CONFLICT    0x08
-/**
- * @brief Active Name Flag.
- * 
- * All entries have this flag set to one (1).
- */
-#define NBNS_NODE_NAME_TAIL_ACTIVE      0x04
-/**
- * @brief Permanent Name Flag.
- * 
- * If one (1) then entry is for the permanent node name.
- * Flag is zero (0) for all other names.
- */
-#define NBNS_NODE_NAME_TAIL_PERMANENT   0x02
+  /**
+   * @brief Active Name Flag.
+   * 
+   * All entries have this flag set to one (1).
+   */  
+  uint16_t active:1;
+  
+  /**
+   * @brief Permanent Name Flag.
+   * 
+   * If one (1) then entry is for the permanent node name.
+   * Flag is zero (0) for all other names.
+   */
+  uint16_t permanent:1;
+
+  uint16_t reserved:9;
+} __attribute__((__packed__));
 
 #define NBNS_NBSTATREQ_LEN 50
 

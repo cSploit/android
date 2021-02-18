@@ -127,6 +127,12 @@
 # include <errno.h>
 #endif
 
+#if __GNUC__ >= 3
+#define UNINITIALIZED_VAR(x) x = x
+#else
+#define UNINITIALIZED_VAR(x) x
+#endif
+
 /*
  * NB: to fit things in six character monocase externals, the stdio
  * code uses the prefix `__s' for stdio objects, typically followed
@@ -362,7 +368,7 @@ static char *
 BSD__uqtoa(register u_quad_t val, char *endp, int base, int octzero, const char *xdigs)
 {
 	register char *cp = endp;
-	register long sval;
+	register quad_t sval;
 
 	/*
 	 * Handle the three cases separately, in the hope of getting
@@ -483,14 +489,19 @@ BSD__ultoa(register u_long val, char *endp, int base, int octzero, const char *x
 
 #ifdef FLOATING_POINT
 #include <math.h>
+#include <float.h>
 /* #include "floatio.h" */
 
 #ifndef MAXEXP
-# define MAXEXP 1024
+# if DBL_MAX_10_EXP > -DBL_MIN_10_EXP
+#   define MAXEXP (DBL_MAX_10_EXP)
+# else
+#   define MAXEXP (-DBL_MIN_10_EXP)
+# endif
 #endif
 
 #ifndef MAXFRACT
-# define MAXFRACT 64
+# define MAXFRACT (MAXEXP*10/3)
 #endif
 
 #define	BUF		(MAXEXP+MAXFRACT+1)	/* + decimal point */
@@ -541,11 +552,12 @@ BSD_vfprintf(FILE *fp, const char *fmt0, va_list ap)
 	int expt;		/* integer value of exponent */
 	int expsize = 0;	/* character count for expstr */
 	int ndig = 0;		/* actual number of digits returned by cvt */
+	int fprec = 0;		/* floating point precision */
 	char expstr[7];		/* buffer for exponent string */
 #endif
-	u_long	ulval;		/* integer arguments %[diouxX] */
+	u_long UNINITIALIZED_VAR(ulval); /* integer arguments %[diouxX] */
 #ifdef _HAVE_SANE_QUAD_
-	u_quad_t uqval;		/* %q integers */
+	u_quad_t UNINITIALIZED_VAR(uqval); /* %q integers */
 #endif /* _HAVE_SANE_QUAD_ */
 	int base;		/* base for [diouxX] conversion */
 	int dprec;		/* a copy of prec if [diouxX], 0 otherwise */
@@ -591,10 +603,10 @@ BSD_vfprintf(FILE *fp, const char *fmt0, va_list ap)
 #define	PAD(howmany, with) { \
 	if ((n = (howmany)) > 0) { \
 		while (n > PADSIZE) { \
-			PRINT(with, PADSIZE); \
+			PRINT((with), PADSIZE); \
 			n -= PADSIZE; \
 		} \
-		PRINT(with, n); \
+		PRINT((with), n); \
 	} \
 }
 #if SIZEOF_LONG > SIZEOF_INT
@@ -605,10 +617,10 @@ BSD_vfprintf(FILE *fp, const char *fmt0, va_list ap)
 	    errno = ENOMEM; \
 	    goto error; \
 	} \
-	if (ln > 0) PAD((int)ln, with); \
+	if (ln > 0) PAD((int)ln, (with)); \
 }
 #else
-#define PAD_L(howmany, with) PAD(howmany, with)
+#define PAD_L(howmany, with) PAD((howmany), (with))
 #endif
 #define	FLUSH() { \
 	if (uio.uio_resid && BSD__sprint(fp, &uio)) \
@@ -752,6 +764,26 @@ reswitch:	switch (ch) {
 			flags |= QUADINT;
 			goto rflag;
 #endif /* _HAVE_SANE_QUAD_ */
+#ifdef _WIN32
+		case 'I':
+			if (*fmt == '3' && *(fmt + 1) == '2') {
+			    fmt += 2;
+			    flags |= LONGINT;
+			}
+#ifdef _HAVE_SANE_QUAD_
+			else if (*fmt == '6' && *(fmt + 1) == '4') {
+			    fmt += 2;
+			    flags |= QUADINT;
+			}
+#endif
+			else
+#if defined(_HAVE_SANE_QUAD_) && SIZEOF_SIZE_T == SIZEOF_LONG_LONG
+			    flags |= QUADINT;
+#else
+			    flags |= LONGINT;
+#endif
+			goto rflag;
+#endif
 		case 'c':
 			cp = buf;
 			*buf = (char)va_arg(ap, int);
@@ -784,15 +816,18 @@ reswitch:	switch (ch) {
 #ifdef FLOATING_POINT
 		case 'a':
 		case 'A':
-			if (prec >= 0)
+			if (prec > 0) {
+				flags |= ALT;
 				prec++;
+				fprec = prec;
+			}
 			goto fp_begin;
 		case 'e':		/* anomalous precision */
 		case 'E':
 			if (prec != 0)
 				flags |= ALT;
 			prec = (prec == -1) ?
-				DEFPREC + 1 : prec + 1;
+				DEFPREC + 1 : (fprec = prec + 1);
 			/* FALLTHROUGH */
 			goto fp_begin;
 		case 'f':		/* always print trailing zeroes */
@@ -802,6 +837,8 @@ reswitch:	switch (ch) {
 		case 'G':
 			if (prec == -1)
 				prec = DEFPREC;
+			else
+				fprec = prec;
 fp_begin:		_double = va_arg(ap, double);
 			/* do this before tricky precision changes */
 			if (isinf(_double)) {
@@ -817,7 +854,7 @@ fp_begin:		_double = va_arg(ap, double);
 				break;
 			}
 			flags |= FPT;
-			cp = cvt(_double, prec, flags, &softsign,
+			cp = cvt(_double, (prec < MAXFRACT ? prec : MAXFRACT), flags, &softsign,
 				&expt, ch, &ndig, buf);
 			if (ch == 'g' || ch == 'G') {
 				if (expt <= -4 || (expt > prec && expt > 1))
@@ -826,16 +863,20 @@ fp_begin:		_double = va_arg(ap, double);
 					ch = 'g';
 			}
 			if (ch == 'a' || ch == 'A') {
+				flags |= HEXPREFIX;
 				--expt;
 				expsize = exponent(expstr, expt, ch + 'p' - 'a');
+				ch += 'x' - 'a';
 				size = expsize + ndig;
+				if (ndig > 1 || flags & ALT)
+					++size; /* floating point */
 			}
 			else if (ch <= 'e') {	/* 'e' or 'E' fmt */
 				--expt;
 				expsize = exponent(expstr, expt, ch);
 				size = expsize + ndig;
 				if (ndig > 1 || flags & ALT)
-					++size;
+					++fprec, ++size;
 			} else if (ch == 'f') {		/* f fmt */
 				if (expt > 0) {
 					size = expt;
@@ -843,6 +884,8 @@ fp_begin:		_double = va_arg(ap, double);
 						size += prec + 1;
 				} else if (!prec) { /* "0" */
 					size = 1;
+					if (flags & ALT)
+						size += 1;
 				} else	/* "0.X" */
 					size = prec + 2;
 			} else if (expt >= ndig) {	/* fixed g fmt */
@@ -893,7 +936,7 @@ fp_begin:		_double = va_arg(ap, double);
 			 */
 			prec = (int)(sizeof(void*)*CHAR_BIT/4);
 #ifdef _HAVE_LLP64_
-			uqval = (u_long)va_arg(ap, void *);
+			uqval = (u_quad_t)va_arg(ap, void *);
 			flags = (flags) | QUADINT | HEXPREFIX;
 #else
 			ulval = (u_long)va_arg(ap, void *);
@@ -1023,7 +1066,7 @@ number:			if ((dprec = prec) >= 0)
 long_len:
 		if (sign)
 			fieldsz++;
-		else if (flags & HEXPREFIX)
+		if (flags & HEXPREFIX)
 			fieldsz += 2;
 		realsz = dprec > fieldsz ? dprec : fieldsz;
 
@@ -1034,7 +1077,8 @@ long_len:
 		/* prefix */
 		if (sign) {
 			PRINT(&sign, 1);
-		} else if (flags & HEXPREFIX) {
+		}
+		if (flags & HEXPREFIX) {
 			ox[0] = '0';
 			ox[1] = ch;
 			PRINT(ox, 2);
@@ -1048,7 +1092,7 @@ long_len:
 		PAD_L(dprec - fieldsz, zeroes);
 		if (sign)
 			fieldsz--;
-		else if (flags & HEXPREFIX)
+		if (flags & HEXPREFIX)
 			fieldsz -= 2;
 
 		/* the string or number proper */
@@ -1056,17 +1100,15 @@ long_len:
 		if ((flags & FPT) == 0) {
 			PRINT(cp, fieldsz);
 		} else {	/* glue together f_p fragments */
-			if (ch == 'a' || ch == 'A') {
-				ox[0] = '0';
-				ox[1] = ch + ('x' - 'a');
-				PRINT(ox, 2);
+			if (flags & HEXPREFIX) {
 				if (ndig > 1 || flags & ALT) {
 					ox[2] = *cp++;
 					ox[3] = '.';
 					PRINT(ox+2, 2);
-					PRINT(cp, ndig-1);
+					if (ndig > 0) PRINT(cp, ndig-1);
 				} else	/* XpYYY */
 					PRINT(cp, 1);
+				PAD(fprec-ndig, zeroes);
 				PRINT(expstr, expsize);
 			}
 			else if (ch >= 'f') {	/* 'f' or 'g' */
@@ -1077,7 +1119,8 @@ long_len:
 						PRINT("0", 1);
 					} else {
 						PRINT("0.", 2);
-						PAD(ndig - 1, zeroes);
+						PAD((ndig >= fprec ? ndig - 1 : fprec - (ch != 'f')),
+						    zeroes);
 					}
 				} else if (expt == 0 && ndig == 0 && (flags & ALT) == 0) {
 					PRINT("0", 1);
@@ -1085,6 +1128,8 @@ long_len:
 					PRINT("0.", 2);
 					PAD(-expt, zeroes);
 					PRINT(cp, ndig);
+					if (flags & ALT)
+						PAD(fprec - ndig + (ch == 'f' ? expt : 0), zeroes);
 				} else if (expt >= ndig) {
 					PRINT(cp, ndig);
 					PAD(expt - ndig, zeroes);
@@ -1095,6 +1140,8 @@ long_len:
 					cp += expt;
 					PRINT(".", 1);
 					PRINT(cp, ndig-expt);
+					if (flags & ALT)
+						PAD(fprec - ndig + (ch == 'f' ? expt : 0), zeroes);
 				}
 			} else {	/* 'e' or 'E' */
 				if (ndig > 1 || flags & ALT) {
@@ -1106,6 +1153,7 @@ long_len:
 					} else	/* 0.[0..] */
 						/* __dtoa irregularity */
 						PAD(ndig - 1, zeroes);
+					if (flags & ALT) PAD(fprec - ndig - 1, zeroes);
 				} else	/* XeYYY */
 					PRINT(cp, 1);
 				PRINT(expstr, expsize);
@@ -1165,6 +1213,7 @@ cvt(value, ndigits, flags, sign, decpt, ch, length, buf)
 	else {
 	    digits = BSD__dtoa(value, mode, ndigits, decpt, &dsgn, &rve);
 	}
+	buf[0] = 0; /* rve - digits may be 0 */
 	memcpy(buf, digits, rve - digits);
 	xfree(digits);
 	rve = buf + (rve - digits);
@@ -1176,8 +1225,6 @@ cvt(value, ndigits, flags, sign, decpt, ch, length, buf)
 				*decpt = -ndigits + 1;
 			bp += *decpt;
 		}
-		if (value == 0)	/* kludge for __dtoa irregularity */
-			rve = bp;
 		while (rve < bp)
 			*rve++ = '0';
 	}
@@ -1191,7 +1238,7 @@ exponent(p0, exp, fmtch)
 	int exp, fmtch;
 {
 	register char *p, *t;
-	char expbuf[MAXEXP];
+	char expbuf[2 + (MAXEXP < 1000 ? 3 : MAXEXP < 10000 ? 4 : 5)]; /* >= 2 + ceil(log10(MAXEXP)) */
 
 	p = p0;
 	*p++ = fmtch;
@@ -1201,13 +1248,13 @@ exponent(p0, exp, fmtch)
 	}
 	else
 		*p++ = '+';
-	t = expbuf + MAXEXP;
+	t = expbuf + sizeof(expbuf);
 	if (exp > 9) {
 		do {
 			*--t = to_char(exp % 10);
 		} while ((exp /= 10) > 9);
 		*--t = to_char(exp);
-		for (; t < expbuf + MAXEXP; *p++ = *t++);
+		for (; t < expbuf + sizeof(expbuf); *p++ = *t++);
 	}
 	else {
 		if (fmtch & 15) *p++ = '0'; /* other than p or P */

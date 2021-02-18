@@ -11,20 +11,20 @@
 #include "ossl.h"
 
 #define WrapX509Req(klass, obj, req) do { \
-    if (!req) { \
+    if (!(req)) { \
 	ossl_raise(rb_eRuntimeError, "Req wasn't initialized!"); \
     } \
-    obj = Data_Wrap_Struct(klass, 0, X509_REQ_free, req); \
+    (obj) = Data_Wrap_Struct((klass), 0, X509_REQ_free, (req)); \
 } while (0)
 #define GetX509Req(obj, req) do { \
-    Data_Get_Struct(obj, X509_REQ, req); \
-    if (!req) { \
+    Data_Get_Struct((obj), X509_REQ, (req)); \
+    if (!(req)) { \
 	ossl_raise(rb_eRuntimeError, "Req wasn't initialized!"); \
     } \
 } while (0)
 #define SafeGetX509Req(obj, req) do { \
-    OSSL_Check_Kind(obj, cX509Req); \
-    GetX509Req(obj, req); \
+    OSSL_Check_Kind((obj), cX509Req); \
+    GetX509Req((obj), (req)); \
 } while (0)
 
 /*
@@ -110,7 +110,7 @@ ossl_x509req_initialize(int argc, VALUE *argv, VALUE self)
     req = PEM_read_bio_X509_REQ(in, &x, NULL, NULL);
     DATA_PTR(self) = x;
     if (!req) {
-	(void)BIO_reset(in);
+	OSSL_BIO_reset(in);
 	req = d2i_X509_REQ_bio(in, &x);
 	DATA_PTR(self) = x;
     }
@@ -171,7 +171,7 @@ ossl_x509req_to_der(VALUE self)
 
     GetX509Req(self, req);
     if ((len = i2d_X509_REQ(req, NULL)) <= 0)
-	ossl_raise(eX509CertError, NULL);
+	ossl_raise(eX509ReqError, NULL);
     str = rb_str_new(0, len);
     p = (unsigned char *)RSTRING_PTR(str);
     if (i2d_X509_REQ(req, &p) <= 0)

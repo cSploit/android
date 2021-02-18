@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1998-2004  Hannes Gredler <hannes@gredler.at>
+ * Copyright (c) 1998-2004  Hannes Gredler <hannes@tcpdump.org>
  *      The TCPDUMP project
  *
  * Redistribution and use in source and binary forms, with or without
@@ -14,20 +14,25 @@
  * FOR A PARTICULAR PURPOSE.
  */
 
-/* \summary: Syslog protocol printer */
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-syslog.c,v 1.1 2004/10/29 11:42:53 hannes Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include <tcpdump-stdinc.h>
 
-#include "netdissect.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "interface.h"
 #include "extract.h"
+#include "addrtoname.h"
 
-static const char tstr[] = "[|syslog]";
-
-/*
+/* 
  * tokenlists and #defines taken from Ethereal - Network traffic analyzer
  * by Gerald Combs <gerald@ethereal.com>
  */
@@ -77,12 +82,11 @@ static const struct tok syslog_facility_values[] = {
 };
 
 void
-syslog_print(netdissect_options *ndo,
-             register const u_char *pptr, register u_int len)
+syslog_print(register const u_char *pptr, register u_int len)
 {
-    uint16_t msg_off = 0;
-    uint16_t pri = 0;
-    uint16_t facility,severity;
+    u_int16_t msg_off = 0;
+    u_int16_t pri = 0;
+    u_int16_t facility,severity;
 
     /* extract decimal figures that are
      * encapsulated within < > tags
@@ -90,57 +94,70 @@ syslog_print(netdissect_options *ndo,
      * severity and facility values
      */
 
-    ND_TCHECK2(*pptr, 1);
+    if (!TTEST2(*pptr, 1))
+        goto trunc;
+
     if (*(pptr+msg_off) == '<') {
         msg_off++;
-        ND_TCHECK2(*(pptr + msg_off), 1);
+
+        if (!TTEST2(*(pptr+msg_off), 1))
+            goto trunc;
+
         while ( *(pptr+msg_off) >= '0' &&
                 *(pptr+msg_off) <= '9' &&
                 msg_off <= SYSLOG_MAX_DIGITS) {
+
+            if (!TTEST2(*(pptr+msg_off), 1))
+                goto trunc;
+
             pri = pri * 10 + (*(pptr+msg_off) - '0');
             msg_off++;
-            ND_TCHECK2(*(pptr + msg_off), 1);
+
+            if (!TTEST2(*(pptr+msg_off), 1))
+                goto trunc;
+
+        if (*(pptr+msg_off) == '>')
+            msg_off++;
         }
-        if (*(pptr+msg_off) != '>') {
-            ND_PRINT((ndo, "%s", tstr));
-            return;
-        }
-        msg_off++;
     } else {
-        ND_PRINT((ndo, "%s", tstr));
+        printf("[|syslog]");
         return;
     }
 
     facility = (pri & SYSLOG_FACILITY_MASK) >> 3;
     severity = pri & SYSLOG_SEVERITY_MASK;
 
-    if (ndo->ndo_vflag < 1 )
+    
+    if (vflag < 1 )
     {
-        ND_PRINT((ndo, "SYSLOG %s.%s, length: %u",
+        printf("SYSLOG %s.%s, length: %u",
                tok2str(syslog_facility_values, "unknown (%u)", facility),
                tok2str(syslog_severity_values, "unknown (%u)", severity),
-               len));
+               len);
         return;
     }
-
-    ND_PRINT((ndo, "SYSLOG, length: %u\n\tFacility %s (%u), Severity %s (%u)\n\tMsg: ",
+       
+    printf("SYSLOG, length: %u\n\tFacility %s (%u), Severity %s (%u)\n\tMsg: ",
            len,
            tok2str(syslog_facility_values, "unknown (%u)", facility),
            facility,
            tok2str(syslog_severity_values, "unknown (%u)", severity),
-           severity));
+           severity);
 
     /* print the syslog text in verbose mode */
     for (; msg_off < len; msg_off++) {
-        ND_TCHECK2(*(pptr + msg_off), 1);
-        safeputchar(ndo, *(pptr + msg_off));
+        if (!TTEST2(*(pptr+msg_off), 1))
+            goto trunc;
+        safeputchar(*(pptr+msg_off));        
     }
 
-    if (ndo->ndo_vflag > 1)
-        print_unknown_data(ndo, pptr, "\n\t", len);
-
+    if (vflag > 1) {
+        if(!print_unknown_data(pptr,"\n\t",len))
+            return;
+    }
+    
     return;
 
 trunc:
-    ND_PRINT((ndo, "%s", tstr));
+        printf("[|syslog]");
 }

@@ -27,28 +27,4 @@
 *.i*86
 *.x86_64
 *.hex
-
-# autotools
-/Makefile
-/Makefile.in
-/aclocal.m4
-/autom4te.cache/
-/config.*
-/configure
-/depcomp
-/install-sh
-/libtool
-/ltmain.sh
-/m4/
-/missing
-/stamp-h?
-.deps/
-.dirstamp
-.libs/
-*.l[ao]
-*.[ao]
-*~
-/compile
-
-# binary target
 network-radar

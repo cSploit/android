@@ -4,17 +4,8 @@
 # See LICENSE.txt for permissions.
 #++
 
-require 'find'
-
-require 'digest'
 require 'rubygems/format'
 require 'rubygems/installer'
-
-begin
-  gem 'test-unit'
-rescue Gem::LoadError
-  # Ignore - use the test-unit library that's part of the standard library
-end
 
 ##
 # Validator performs various gem file and gem database validation
@@ -22,6 +13,11 @@ end
 class Gem::Validator
 
   include Gem::UserInteraction
+
+  def initialize
+    require 'find'
+    require 'digest'
+  end
 
   ##
   # Given a gem file's contents, validates against its own MD5 checksum
@@ -92,7 +88,7 @@ class Gem::Validator
       next unless gems.include? gem_spec.name unless gems.empty?
 
       install_dir = gem_spec.installation_path
-      gem_path = File.join install_dir, "cache", gem_spec.file_name
+      gem_path = Gem.cache_gem(gem_spec.file_name, install_dir)
       spec_path = File.join install_dir, "specifications", gem_spec.spec_name
       gem_directory = gem_spec.full_gem_path
 
@@ -163,79 +159,6 @@ class Gem::Validator
     end
 
     errors
-  end
-
-=begin
-  if RUBY_VERSION < '1.9' then
-    class TestRunner
-      def initialize(suite, ui)
-        @suite = suite
-        @ui = ui
-      end
-
-      def self.run(suite, ui)
-        require 'test/unit/ui/testrunnermediator'
-        return new(suite, ui).start
-      end
-
-      def start
-        @mediator = Test::Unit::UI::TestRunnerMediator.new(@suite)
-        @mediator.add_listener(Test::Unit::TestResult::FAULT, &method(:add_fault))
-        return @mediator.run_suite
-      end
-
-      def add_fault(fault)
-        if Gem.configuration.verbose then
-          @ui.say fault.long_display
-        end
-      end
-    end
-
-    autoload :TestRunner, 'test/unit/ui/testrunnerutilities'
-  end
-=end
-
-  ##
-  # Runs unit tests for a given gem specification
-
-  def unit_test(gem_spec)
-    start_dir = Dir.pwd
-    Dir.chdir(gem_spec.full_gem_path)
-    $: << gem_spec.full_gem_path
-    # XXX: why do we need this gem_spec when we've already got 'spec'?
-    test_files = gem_spec.test_files
-
-    if test_files.empty? then
-      say "There are no unit tests to run for #{gem_spec.full_name}"
-      return nil
-    end
-
-    gem gem_spec.name, "= #{gem_spec.version.version}"
-
-    test_files.each do |f| require f end
-
-=begin
-    if RUBY_VERSION < '1.9' then
-      suite = Test::Unit::TestSuite.new("#{gem_spec.name}-#{gem_spec.version}")
-
-      ObjectSpace.each_object(Class) do |klass|
-        suite << klass.suite if (klass < Test::Unit::TestCase)
-      end
-
-      result = TestRunner.run suite, ui
-
-      alert_error result.to_s unless result.passed?
-    else
-      result = MiniTest::Unit.new
-      result.run
-    end
-=end
-    result = MiniTest::Unit.new
-    result.run
-
-    result
-  ensure
-    Dir.chdir(start_dir)
   end
 
   def remove_leading_dot_dir(path)

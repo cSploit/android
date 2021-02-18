@@ -58,7 +58,8 @@ def interactive str
 end
 
 def version_up
-  d = Date.today
+  d = DateTime.now
+  d = d.new_offset(Rational(9,24)) # we need server locale (i.e. japanese) time
   system *%w'svn revert version.h'
   v, p = version
 
@@ -111,7 +112,7 @@ def tag intv_p = false
 end
 
 def default_merge_branch
-  /branches\/ruby_1_8_/ =~ IO.binread(".svn/entries", 100) ? 'branches/ruby_1_8' : 'trunk'
+  %r{^URL: .*/branches/ruby_1_8_} =~ `svn info` ? 'branches/ruby_1_8' : 'trunk'
 end
 
 case ARGV[0]

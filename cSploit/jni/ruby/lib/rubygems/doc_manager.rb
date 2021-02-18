@@ -4,7 +4,6 @@
 # See LICENSE.txt for permissions.
 #++
 
-require 'fileutils'
 require 'rubygems'
 
 ##
@@ -77,7 +76,7 @@ class Gem::DocManager
       :formatter => RDoc::RI::Formatter,
     }
 
-    driver = RDoc::RI::Driver.new(options).class_cache
+    RDoc::RI::Driver.new(options).class_cache
   end
 
   ##
@@ -85,8 +84,9 @@ class Gem::DocManager
   # RDoc (template etc.) as a String.
 
   def initialize(spec, rdoc_args="")
+    require 'fileutils'
     @spec = spec
-    @doc_dir = File.join(spec.installation_path, "doc", spec.full_name)
+    @doc_dir = spec.doc_dir
     @rdoc_args = rdoc_args.nil? ? [] : rdoc_args.split
   end
 
@@ -162,10 +162,10 @@ class Gem::DocManager
   def run_rdoc(*args)
     args << @spec.rdoc_options
     args << self.class.configured_args
-    args << '--quiet'
     args << @spec.require_paths.clone
     args << @spec.extra_rdoc_files
     args << '--title' << "#{@spec.full_name} Documentation"
+    args << '--quiet'
     args = args.flatten.map do |arg| arg.to_s end
 
     if self.class.rdoc_version >= Gem::Version.new('2.4.0') then
@@ -175,6 +175,8 @@ class Gem::DocManager
       args.delete '--one-file'
       # HACK more
     end
+
+    debug_args = args.dup
 
     r = RDoc::RDoc.new
 
@@ -188,13 +190,15 @@ class Gem::DocManager
     rescue Errno::EACCES => e
       dirname = File.dirname e.message.split("-")[1].strip
       raise Gem::FilePermissionError.new(dirname)
-    rescue RuntimeError => ex
+    rescue Interrupt => e
+      raise e
+    rescue Exception => ex
       alert_error "While generating documentation for #{@spec.full_name}"
       ui.errs.puts "... MESSAGE:   #{ex}"
-      ui.errs.puts "... RDOC args: #{args.join(' ')}"
+      ui.errs.puts "... RDOC args: #{debug_args.join(' ')}"
       ui.errs.puts "\t#{ex.backtrace.join "\n\t"}" if
-      Gem.configuration.backtrace
-      ui.errs.puts "(continuing with the rest of the installation)"
+        Gem.configuration.backtrace
+      terminate_interaction 1
     ensure
       Dir.chdir old_pwd
     end
@@ -214,25 +218,24 @@ class Gem::DocManager
   # Remove RDoc and RI documentation
 
   def uninstall_doc
-    raise Gem::FilePermissionError.new(@spec.installation_path) unless
-    File.writable? @spec.installation_path
+    base_dir = @spec.base_dir
+    raise Gem::FilePermissionError.new base_dir unless File.writable? base_dir
 
-    original_name = [
+    # TODO: ok... that's twice... ugh
+    old_name = [
       @spec.name, @spec.version, @spec.original_platform].join '-'
 
-    doc_dir = File.join @spec.installation_path, 'doc', @spec.full_name
+    doc_dir = @spec.doc_dir
     unless File.directory? doc_dir then
-      doc_dir = File.join @spec.installation_path, 'doc', original_name
+      doc_dir = File.join File.dirname(doc_dir), old_name
+    end
+
+    ri_dir = @spec.ri_dir
+    unless File.directory? ri_dir then
+      ri_dir = File.join File.dirname(ri_dir), old_name
     end
 
     FileUtils.rm_rf doc_dir
-
-    ri_dir = File.join @spec.installation_path, 'ri', @spec.full_name
-
-    unless File.directory? ri_dir then
-      ri_dir = File.join @spec.installation_path, 'ri', original_name
-    end
-
     FileUtils.rm_rf ri_dir
   end
 

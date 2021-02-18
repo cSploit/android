@@ -28,68 +28,68 @@
 
 
 int main() {
-  pid_t *handlers;
-  bridge_t *list, *b;
-  int max_mountpoint_len, max_source_len, len, ret;
-  
-  list = NULL;
-  handlers = NULL;
-  max_mountpoint_len = max_source_len = 0;
-  
-  ret = 1;
-  
-  if(geteuid()) {
-    fprintf(stderr, "got r00t?\n");
-    goto exit;
-  }
-  
-  handlers = find_handlers();
-  
-  if(!handlers) {
-    fprintf(stderr, "no FUSE handlers found\n");
-    goto exit;
-  }
-  
-  list = find_mountpoints();
-  
-  if(!list) {
-    fprintf(stderr, "cannot find FUSE mountpoints\n");
-    goto exit;
-  }
-  
-  list = open_unique_files(list);
-  
-  if(!list) {
-    fprintf(stderr, "cannot create files\n");
-    goto exit;
-  }
-  
-  list = find_sources(list, handlers);
-  
-  if(!list) {
-    fprintf(stderr, "cannot find source paths\n");
-    goto exit;
-  }
-  
-  for(b=list;b;b=b->next) {
-    if(max_mountpoint_len < (len = strlen(b->mountpoint)))
-      max_mountpoint_len = len;
-    if(max_source_len < (len = strlen(b->source)))
-      max_source_len = len;
-  }
-  
-  for(b=list;b;b=b->next) {
-    printf("%-*s %-*s\n", max_source_len, b->source, max_mountpoint_len, b->mountpoint);
-  }
-  
-  ret = 0;
-  
-  exit:
-  
-  if(handlers)
-    free(handlers);
-  
-  free_bridge_list(list);
-  
-  return ret;
+	pid_t *handlers;
+	bridge_t *list, *b;
+	int max_mountpoint_len, max_source_len, len, ret;
+	
+	list = NULL;
+	handlers = NULL;
+	max_mountpoint_len = max_source_len = 0;
+	
+	ret = 1;
+	
+	if(geteuid()) {
+		fprintf(stderr, "got r00t?\n");
+		goto exit;
+	}
+	
+	handlers = find_handlers();
+	
+	if(!handlers) {
+		fprintf(stderr, "no FUSE handlers found\n");
+		goto exit;
+	}
+	
+	list = find_mountpoints();
+	
+	if(!list) {
+		fprintf(stderr, "cannot find FUSE mountpoints\n");
+		goto exit;
+	}
+	
+	list = open_unique_files(list);
+	
+	if(!list) {
+		fprintf(stderr, "cannot create files\n");
+		goto exit;
+	}
+	
+	list = find_sources(list, handlers);
+	
+	if(!list) {
+		fprintf(stderr, "cannot find source paths\n");
+		goto exit;
+	}
+	
+	for(b=list;b;b=b->next) {
+		if(max_mountpoint_len < (len = strlen(b->mountpoint)))
+			max_mountpoint_len = len;
+		if(max_source_len < (len = strlen(b->source)))
+			max_source_len = len;
+	}
+	
+	for(b=list;b;b=b->next) {
+		printf("%-*s %-*s\n", max_source_len, b->source, max_mountpoint_len, b->mountpoint);
+	}
+	
+	ret = 0;
+	
+	exit:
+	
+	if(handlers)
+		free(handlers);
+	
+	free_bridge_list(list);
+	
+	return ret;
 }

@@ -10,6 +10,7 @@
 **********************************************************************/
 
 #include "ruby/ruby.h"
+#include "internal.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -180,188 +181,7 @@ ruby_strtoul(const char *str, char **endptr, int base)
 #endif
 
 #ifndef S_ISDIR
-#   define S_ISDIR(m) ((m & S_IFMT) == S_IFDIR)
-#endif
-
-#if defined(__CYGWIN32__) || defined(_WIN32)
-/*
- *  Copyright (c) 1993, Intergraph Corporation
- *
- *  You may distribute under the terms of either the GNU General Public
- *  License or the Artistic License, as specified in the perl README file.
- *
- *  Various Unix compatibility functions and NT specific functions.
- *
- *  Some of this code was derived from the MSDOS port(s) and the OS/2 port.
- *
- */
-
-
-/*
- * Suffix appending for in-place editing under MS-DOS and OS/2 (and now NT!).
- *
- * Here are the rules:
- *
- * Style 0:  Append the suffix exactly as standard perl would do it.
- *           If the filesystem groks it, use it.  (HPFS will always
- *           grok it.  So will NTFS. FAT will rarely accept it.)
- *
- * Style 1:  The suffix begins with a '.'.  The extension is replaced.
- *           If the name matches the original name, use the fallback method.
- *
- * Style 2:  The suffix is a single character, not a '.'.  Try to add the
- *           suffix to the following places, using the first one that works.
- *               [1] Append to extension.
- *               [2] Append to filename,
- *               [3] Replace end of extension,
- *               [4] Replace end of filename.
- *           If the name matches the original name, use the fallback method.
- *
- * Style 3:  Any other case:  Ignore the suffix completely and use the
- *           fallback method.
- *
- * Fallback method:  Change the extension to ".$$$".  If that matches the
- *           original name, then change the extension to ".~~~".
- *
- * If filename is more than 1000 characters long, we die a horrible
- * death.  Sorry.
- *
- * The filename restriction is a cheat so that we can use buf[] to store
- * assorted temporary goo.
- *
- * Examples, assuming style 0 failed.
- *
- * suffix = ".bak" (style 1)
- *                foo.bar => foo.bak
- *                foo.bak => foo.$$$	(fallback)
- *                makefile => makefile.bak
- * suffix = ".$$$" (style 1)
- *                foo.$$$ => foo.~~~	(fallback)
- *
- * suffix = "~" (style 2)
- *                foo.c => foo.c~
- *                foo.c~ => foo.c~~
- *                foo.c~~ => foo~.c~~
- *                foo~.c~~ => foo~~.c~~
- *                foo~~~~~.c~~ => foo~~~~~.$$$ (fallback)
- *
- *                foo.pas => foo~.pas
- *                makefile => makefile.~
- *                longname.fil => longname.fi~
- *                longname.fi~ => longnam~.fi~
- *                longnam~.fi~ => longnam~.$$$
- *
- */
-
-
-static int valid_filename(const char *s);
-
-static const char suffix1[] = ".$$$";
-static const char suffix2[] = ".~~~";
-
-#define strEQ(s1,s2) (strcmp(s1,s2) == 0)
-
-extern const char *ruby_find_basename(const char *, long *, long *);
-extern const char *ruby_find_extname(const char *, long *);
-
-void
-ruby_add_suffix(VALUE str, const char *suffix)
-{
-    long baselen;
-    long extlen = strlen(suffix);
-    long slen;
-    char buf[1024];
-    const char *name;
-    const char *ext;
-    long len;
-
-    name = StringValueCStr(str);
-    slen = strlen(name);
-    if (slen > (long)(sizeof(buf) - 1))
-	rb_fatal("Cannot do inplace edit on long filename (%ld characters)",
-		 slen);
-
-    /* Style 0 */
-    rb_str_cat(str, suffix, extlen);
-    if (valid_filename(RSTRING_PTR(str))) return;
-
-    /* Fooey, style 0 failed.  Fix str before continuing. */
-    rb_str_resize(str, slen);
-    name = StringValueCStr(str);
-    ext = ruby_find_extname(name, &len);
-
-    if (*suffix == '.') {        /* Style 1 */
-	if (ext) {
-	    if (strEQ(ext, suffix)) {
-		extlen = sizeof(suffix1) - 1; /* suffix2 must be same length */
-		suffix = strEQ(suffix, suffix1) ? suffix2 : suffix1;
-	    }
-	    slen = ext - name;
-	}
-	rb_str_resize(str, slen);
-	rb_str_cat(str, suffix, extlen);
-    }
-    else {
-	char *p = buf, *q;
-	strncpy(buf, name, slen);
-	if (ext)
-	    p += (ext - name);
-	else
-	    p += slen;
-	p[len] = '\0';
-	if (suffix[1] == '\0') {  /* Style 2 */
-	    q = (char *)ruby_find_basename(buf, &baselen, 0);
-	    if (len <= 3) {
-		if (len == 0 && baselen >= 8 && p + 3 <= buf + sizeof(buf)) p[len++] = '.'; /* DOSISH */
-		p[len] = *suffix;
-		p[++len] = '\0';
-	    }
-	    else if (q && baselen < 8) {
-		q += baselen;
-		*q++ = *suffix;
-		if (ext) {
-		    strncpy(q, ext, ext - name);
-		    q[ext - name + 1] = '\0';
-		}
-		else
-		    *q = '\0';
-	    }
-	    else if (len == 4 && p[3] != *suffix)
-		p[3] = *suffix;
-	    else if (baselen == 8 && q[7] != *suffix)
-		q[7] = *suffix;
-	    else
-		goto fallback;
-	}
-	else { /* Style 3:  Panic */
-	  fallback:
-	    (void)memcpy(p, !ext || strEQ(ext, suffix1) ? suffix2 : suffix1, 5);
-	}
-	rb_str_resize(str, strlen(buf));
-	memcpy(RSTRING_PTR(str), buf, RSTRING_LEN(str));
-    }
-}
-
-static int
-valid_filename(const char *s)
-{
-    int fd;
-
-    /*
-    // It doesn't exist, so see if we can open it.
-    */
-
-    if ((fd = open(s, O_CREAT|O_EXCL, 0666)) >= 0) {
-	close(fd);
-	unlink(s);	/* don't leave it laying around */
-	return 1;
-    }
-    else if (errno == EEXIST) {
-	/* if the file exists, then it's a valid filename! */
-	return 1;
-    }
-    return 0;
-}
+#   define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
 #endif
 
 
@@ -373,12 +193,12 @@ valid_filename(const char *s)
 #define D ((int*)d)
 
 #define mmprepare(base, size) do {\
- if (((long)base & (0x3)) == 0)\
-   if (size >= 16) mmkind = 1;\
-   else            mmkind = 0;\
- else              mmkind = -1;\
- high = (size & (~0xf));\
- low  = (size &  0x0c);\
+ if (((VALUE)(base) & (0x3)) == 0)\
+   if ((size) >= 16) mmkind = 1;\
+   else              mmkind = 0;\
+ else                mmkind = -1;\
+ high = ((size) & (~0xf));\
+ low  = ((size) &  0x0c);\
 } while (0)\
 
 #define mmarg mmkind, size, high, low
@@ -443,11 +263,11 @@ static void mmrot3_(register char *a, register char *b, register char *c, int mm
 
 typedef struct { char *LL, *RR; } stack_node; /* Stack structure for L,l,R,r */
 #define PUSH(ll,rr) do { top->LL = (ll); top->RR = (rr); ++top; } while (0)  /* Push L,l,R,r */
-#define POP(ll,rr)  do { --top; ll = top->LL; rr = top->RR; } while (0)      /* Pop L,l,R,r */
+#define POP(ll,rr)  do { --top; (ll) = top->LL; (rr) = top->RR; } while (0)      /* Pop L,l,R,r */
 
-#define med3(a,b,c) ((*cmp)(a,b,d)<0 ?                                   \
-                       ((*cmp)(b,c,d)<0 ? b : ((*cmp)(a,c,d)<0 ? c : a)) : \
-                       ((*cmp)(b,c,d)>0 ? b : ((*cmp)(a,c,d)<0 ? a : c)))
+#define med3(a,b,c) ((*cmp)((a),(b),d)<0 ?                                   \
+                       ((*cmp)((b),(c),d)<0 ? (b) : ((*cmp)((a),(c),d)<0 ? (c) : (a))) : \
+                       ((*cmp)((b),(c),d)>0 ? (b) : ((*cmp)((a),(c),d)<0 ? (a) : (c))))
 
 void
 ruby_qsort(void* base, const size_t nel, const size_t size,
@@ -458,7 +278,9 @@ ruby_qsort(void* base, const size_t nel, const size_t size,
   char *L = base;                    	/* left end of current region */
   char *R = (char*)base + size*(nel-1); /* right end of current region */
   size_t chklim = 63;                   /* threshold of ordering element check */
-  stack_node stack[32], *top = stack;   /* 32 is enough for 32bit CPU */
+  enum {size_bits = sizeof(size) * CHAR_BIT};
+  stack_node stack[size_bits];          /* enough for size_t size */
+  stack_node *top = stack;
   int mmkind;
   size_t high, low, n;
 
@@ -839,7 +661,7 @@ ruby_getcwd(void)
 
 #ifdef DEBUG
 #include "stdio.h"
-#define Bug(x) {fprintf(stderr, "%s\n", x); exit(1);}
+#define Bug(x) {fprintf(stderr, "%s\n", (x)); exit(EXIT_FAILURE);}
 #endif
 
 #include "stdlib.h"
@@ -853,6 +675,11 @@ ruby_getcwd(void)
 extern void *MALLOC(size_t);
 #else
 #define MALLOC malloc
+#endif
+#ifdef FREE
+extern void FREE(void*);
+#else
+#define FREE free
 #endif
 
 #ifndef Omit_Private_Memory
@@ -924,24 +751,24 @@ typedef union { double d; ULong L[2]; } U;
 
 #ifdef YES_ALIAS
 typedef double double_u;
-#  define dval(x) x
+#  define dval(x) (x)
 #  ifdef IEEE_LITTLE_ENDIAN
-#    define word0(x) (((ULong *)&x)[1])
-#    define word1(x) (((ULong *)&x)[0])
+#    define word0(x) (((ULong *)&(x))[1])
+#    define word1(x) (((ULong *)&(x))[0])
 #  else
-#    define word0(x) (((ULong *)&x)[0])
-#    define word1(x) (((ULong *)&x)[1])
+#    define word0(x) (((ULong *)&(x))[0])
+#    define word1(x) (((ULong *)&(x))[1])
 #  endif
 #else
 typedef U double_u;
 #  ifdef IEEE_LITTLE_ENDIAN
-#    define word0(x) (x.L[1])
-#    define word1(x) (x.L[0])
+#    define word0(x) ((x).L[1])
+#    define word1(x) ((x).L[0])
 #  else
-#    define word0(x) (x.L[0])
-#    define word1(x) (x.L[1])
+#    define word0(x) ((x).L[0])
+#    define word1(x) ((x).L[1])
 #  endif
-#  define dval(x) (x.d)
+#  define dval(x) ((x).d)
 #endif
 
 /* The following definition of Storeinc is appropriate for MIPS processors.
@@ -949,11 +776,11 @@ typedef U double_u;
  * #define Storeinc(a,b,c) (*a++ = b << 16 | c & 0xffff)
  */
 #if defined(IEEE_LITTLE_ENDIAN) + defined(VAX) + defined(__arm__)
-#define Storeinc(a,b,c) (((unsigned short *)a)[1] = (unsigned short)b, \
-((unsigned short *)a)[0] = (unsigned short)c, a++)
+#define Storeinc(a,b,c) (((unsigned short *)(a))[1] = (unsigned short)(b), \
+((unsigned short *)(a))[0] = (unsigned short)(c), (a)++)
 #else
-#define Storeinc(a,b,c) (((unsigned short *)a)[0] = (unsigned short)b, \
-((unsigned short *)a)[1] = (unsigned short)c, a++)
+#define Storeinc(a,b,c) (((unsigned short *)(a))[0] = (unsigned short)(b), \
+((unsigned short *)(a))[1] = (unsigned short)(c), (a)++)
 #endif
 
 /* #define P DBL_MANT_DIG */
@@ -1076,12 +903,12 @@ typedef U double_u;
 #endif
 
 #ifdef RND_PRODQUOT
-#define rounded_product(a,b) a = rnd_prod(a, b)
-#define rounded_quotient(a,b) a = rnd_quot(a, b)
+#define rounded_product(a,b) ((a) = rnd_prod((a), (b)))
+#define rounded_quotient(a,b) ((a) = rnd_quot((a), (b)))
 extern double rnd_prod(double, double), rnd_quot(double, double);
 #else
-#define rounded_product(a,b) a *= b
-#define rounded_quotient(a,b) a /= b
+#define rounded_product(a,b) ((a) *= (b))
+#define rounded_quotient(a,b) ((a) /= (b))
 #endif
 
 #define Big0 (Frac_mask1 | Exp_msk1*(DBL_MAX_EXP+Bias-1))
@@ -1144,7 +971,7 @@ Balloc(int k)
 #endif
 
     ACQUIRE_DTOA_LOCK(0);
-    if ((rv = freelist[k]) != 0) {
+    if (k <= Kmax && (rv = freelist[k]) != 0) {
         freelist[k] = rv->next;
     }
     else {
@@ -1154,7 +981,7 @@ Balloc(int k)
 #else
         len = (sizeof(Bigint) + (x-1)*sizeof(ULong) + sizeof(double) - 1)
                 /sizeof(double);
-        if (pmem_next - private_mem + len <= PRIVATE_mem) {
+        if (k <= Kmax && pmem_next - private_mem + len <= PRIVATE_mem) {
             rv = (Bigint*)pmem_next;
             pmem_next += len;
         }
@@ -1173,6 +1000,10 @@ static void
 Bfree(Bigint *v)
 {
     if (v) {
+        if (v->k > Kmax) {
+            FREE(v);
+            return;
+        }
         ACQUIRE_DTOA_LOCK(0);
         v->next = freelist[v->k];
         freelist[v->k] = v;
@@ -1180,8 +1011,8 @@ Bfree(Bigint *v)
     }
 }
 
-#define Bcopy(x,y) memcpy((char *)&x->sign, (char *)&y->sign, \
-y->wds*sizeof(Long) + 2*sizeof(int))
+#define Bcopy(x,y) memcpy((char *)&(x)->sign, (char *)&(y)->sign, \
+(y)->wds*sizeof(Long) + 2*sizeof(int))
 
 static Bigint *
 multadd(Bigint *b, int m, int a)   /* multiply by m and add a */
@@ -2122,18 +1953,38 @@ break2:
 	    static const char hexdigit[] = "0123456789abcdef0123456789ABCDEF";
 	    s0 = ++s;
 	    adj = 0;
+	    aadj = 1.0;
+	    nd0 = -4;
 
-	    while (*++s && (s1 = strchr(hexdigit, *s))) {
-		adj *= 16;
-		adj += (s1 - hexdigit) & 15;
+	    if (!*++s || !(s1 = strchr(hexdigit, *s))) goto ret0;
+	    while (*s == '0') s++;
+	    if ((s1 = strchr(hexdigit, *s)) != NULL) {
+		do {
+		    adj += aadj * ((s1 - hexdigit) & 15);
+		    nd0 += 4;
+		    aadj /= 16;
+		} while (*++s && (s1 = strchr(hexdigit, *s)));
 	    }
 
 	    if (*s == '.') {
-		aadj = 1.;
-		while (*++s && (s1 = strchr(hexdigit, *s))) {
-		    aadj /= 16;
-		    adj += aadj * ((s1 - hexdigit) & 15);
+		dsign = 1;
+		if (!*++s || !(s1 = strchr(hexdigit, *s))) goto ret0;
+		if (nd0 < 0) {
+		    while (*s == '0') {
+			s++;
+			nd0 -= 4;
+		    }
 		}
+		for (; *s && (s1 = strchr(hexdigit, *s)); ++s) {
+		    adj += aadj * ((s1 - hexdigit) & 15);
+		    if ((aadj /= 16) == 0.0) {
+			while (strchr(hexdigit, *++s));
+			break;
+		    }
+		}
+	    }
+	    else {
+		dsign = 0;
 	    }
 
 	    if (*s == 'P' || *s == 'p') {
@@ -2141,16 +1992,26 @@ break2:
 		if (abs(dsign) == 1) s++;
 		else dsign = 1;
 
-		for (nd = 0; (c = *s) >= '0' && c <= '9'; s++) {
+		nd = 0;
+		c = *s;
+		if (c < '0' || '9' < c) goto ret0;
+		do {
 		    nd *= 10;
 		    nd += c;
 		    nd -= '0';
-		}
-		dval(rv) = ldexp(adj, nd * dsign);
+		    c = *++s;
+		    /* Float("0x0."+("0"*267)+"1fp2095") */
+		    if (nd + dsign * nd0 > 2095) {
+			while ('0' <= c && c <= '9') c = *++s;
+			break;
+		    }
+		} while ('0' <= c && c <= '9');
+		nd0 += nd * dsign;
 	    }
 	    else {
-		dval(rv) = adj;
+		if (dsign) goto ret0;
 	    }
+	    dval(rv) = ldexp(adj, nd0);
 	    goto ret;
 	}
         nz0 = 1;
@@ -2203,6 +2064,7 @@ break2:
         for (; c >= '0' && c <= '9'; c = *++s) {
 have_dig:
             nz++;
+            if (nf > DBL_DIG * 4) continue;
             if (c -= '0') {
                 nf += nz;
                 for (i = 1; i < nz; i++)
@@ -3129,7 +2991,7 @@ nrv_alloc(const char *s, char **rve, size_t n)
     return rv;
 }
 
-#define rv_strdup(s, rve) nrv_alloc(s, rve, strlen(s)+1)
+#define rv_strdup(s, rve) nrv_alloc((s), (rve), strlen(s)+1)
 
 #ifndef MULTIPLE_THREADS
 /* freedtoa(s) must be used to free values s returned by dtoa
@@ -3904,9 +3766,9 @@ ruby_each_words(const char *str, void (*func)(const char*, int, void*), void *ar
 #define	DBL_ADJ	(DBL_MAX_EXP - 2)
 #define	SIGFIGS	((DBL_MANT_DIG + 3) / 4 + 1)
 #define dexp_get(u) ((int)(word0(u) >> Exp_shift) & ~Exp_msk1)
-#define dexp_set(u,v) (word0(u) = (((int)(word0(u)) & ~Exp_mask) | (v << Exp_shift)))
-#define dmanh_get(u) ((int)(word0(u) & Frac_mask))
-#define dmanl_get(u) ((int)word1(u))
+#define dexp_set(u,v) (word0(u) = (((int)(word0(u)) & ~Exp_mask) | ((v) << Exp_shift)))
+#define dmanh_get(u) ((uint32_t)(word0(u) & Frac_mask))
+#define dmanl_get(u) ((uint32_t)word1(u))
 
 
 /*
@@ -3979,15 +3841,18 @@ ruby_hdtoa(double d, const char *xdigs, int ndigits, int *decpt, int *sign,
 	 * enough space for all the digits.
 	 */
 	bufsize = (ndigits > 0) ? ndigits : SIGFIGS;
-	s0 = rv_alloc(bufsize);
+	s0 = rv_alloc(bufsize+1);
 
 	/* Round to the desired number of digits. */
 	if (SIGFIGS > ndigits && ndigits > 0) {
 		float redux = 1.0f;
+		volatile double d;
 		int offset = 4 * ndigits + DBL_MAX_EXP - 4 - DBL_MANT_DIG;
 		dexp_set(u, offset);
-		u.d += redux;
-		u.d -= redux;
+		d = u.d;
+		d += redux;
+		d -= redux;
+		u.d = d;
 		*decpt += dexp_get(u) - offset;
 	}
 

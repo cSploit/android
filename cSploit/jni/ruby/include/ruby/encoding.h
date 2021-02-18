@@ -62,12 +62,12 @@ extern "C" {
 #define ENC_CODERANGE_ASCIIONLY(obj) (ENC_CODERANGE(obj) == ENC_CODERANGE_7BIT)
 #define ENC_CODERANGE_SET(obj,cr) (RBASIC(obj)->flags = \
 				   (RBASIC(obj)->flags & ~ENC_CODERANGE_MASK) | (cr))
-#define ENC_CODERANGE_CLEAR(obj) ENC_CODERANGE_SET(obj,0)
+#define ENC_CODERANGE_CLEAR(obj) ENC_CODERANGE_SET((obj),0)
 
 /* assumed ASCII compatibility */
 #define ENC_CODERANGE_AND(a, b) \
-    (a == ENC_CODERANGE_7BIT ? b : \
-     a == ENC_CODERANGE_VALID ? (b == ENC_CODERANGE_7BIT ? ENC_CODERANGE_VALID : b) : \
+    ((a) == ENC_CODERANGE_7BIT ? (b) : \
+     (a) == ENC_CODERANGE_VALID ? ((b) == ENC_CODERANGE_7BIT ? ENC_CODERANGE_VALID : (b)) : \
      ENC_CODERANGE_UNKNOWN)
 
 #define ENCODING_CODERANGE_SET(obj, encindex, cr) \
@@ -104,6 +104,7 @@ long rb_enc_strlen(const char*, const char*, rb_encoding*);
 char* rb_enc_nth(const char*, const char*, long, rb_encoding*);
 VALUE rb_obj_encoding(VALUE);
 VALUE rb_enc_str_buf_cat(VALUE str, const char *ptr, long len, rb_encoding *enc);
+VALUE rb_enc_uint_chr(unsigned int code, rb_encoding *enc);
 
 VALUE rb_external_str_new_with_enc(const char *ptr, long len, rb_encoding *);
 VALUE rb_str_export_to_enc(VALUE, rb_encoding *);
@@ -148,33 +149,34 @@ unsigned int rb_enc_codepoint_len(const char *p, const char *e, int *len, rb_enc
 unsigned int rb_enc_codepoint(const char *p, const char *e, rb_encoding *enc);
 /* overriding macro */
 #define rb_enc_codepoint(p,e,enc) rb_enc_codepoint_len((p),(e),0,(enc))
-#define rb_enc_mbc_to_codepoint(p, e, enc) ONIGENC_MBC_TO_CODE(enc,(UChar*)(p),(UChar*)(e))
+#define rb_enc_mbc_to_codepoint(p, e, enc) ONIGENC_MBC_TO_CODE((enc),(UChar*)(p),(UChar*)(e))
 
 /* -> codelen>0 or raise exception */
 int rb_enc_codelen(int code, rb_encoding *enc);
 
 /* code,ptr,encoding -> write buf */
-#define rb_enc_mbcput(c,buf,enc) ONIGENC_CODE_TO_MBC(enc,c,(UChar*)(buf))
+#define rb_enc_mbcput(c,buf,enc) ONIGENC_CODE_TO_MBC((enc),(c),(UChar*)(buf))
 
 /* start, ptr, end, encoding -> prev_char */
-#define rb_enc_prev_char(s,p,e,enc) (char *)onigenc_get_prev_char_head(enc,(UChar*)(s),(UChar*)(p),(UChar*)(e))
+#define rb_enc_prev_char(s,p,e,enc) ((char *)onigenc_get_prev_char_head((enc),(UChar*)(s),(UChar*)(p),(UChar*)(e)))
 /* start, ptr, end, encoding -> next_char */
-#define rb_enc_left_char_head(s,p,e,enc) (char *)onigenc_get_left_adjust_char_head(enc,(UChar*)(s),(UChar*)(p),(UChar*)(e))
-#define rb_enc_right_char_head(s,p,e,enc) (char *)onigenc_get_right_adjust_char_head(enc,(UChar*)(s),(UChar*)(p),(UChar*)(e))
+#define rb_enc_left_char_head(s,p,e,enc) ((char *)onigenc_get_left_adjust_char_head((enc),(UChar*)(s),(UChar*)(p),(UChar*)(e)))
+#define rb_enc_right_char_head(s,p,e,enc) ((char *)onigenc_get_right_adjust_char_head((enc),(UChar*)(s),(UChar*)(p),(UChar*)(e)))
+#define rb_enc_step_back(s,p,e,n,enc) ((char *)onigenc_step_back((enc),(UChar*)(s),(UChar*)(p),(UChar*)(e),(int)(n)))
 
 /* ptr, ptr, encoding -> newline_or_not */
-#define rb_enc_is_newline(p,end,enc)  ONIGENC_IS_MBC_NEWLINE(enc,(UChar*)(p),(UChar*)(end))
+#define rb_enc_is_newline(p,end,enc)  ONIGENC_IS_MBC_NEWLINE((enc),(UChar*)(p),(UChar*)(end))
 
-#define rb_enc_isctype(c,t,enc) ONIGENC_IS_CODE_CTYPE(enc,c,t)
+#define rb_enc_isctype(c,t,enc) ONIGENC_IS_CODE_CTYPE((enc),(c),(t))
 #define rb_enc_isascii(c,enc) ONIGENC_IS_CODE_ASCII(c)
-#define rb_enc_isalpha(c,enc) ONIGENC_IS_CODE_ALPHA(enc,c)
-#define rb_enc_islower(c,enc) ONIGENC_IS_CODE_LOWER(enc,c)
-#define rb_enc_isupper(c,enc) ONIGENC_IS_CODE_UPPER(enc,c)
-#define rb_enc_ispunct(c,enc) ONIGENC_IS_CODE_PUNCT(enc,c)
-#define rb_enc_isalnum(c,enc) ONIGENC_IS_CODE_ALNUM(enc,c)
-#define rb_enc_isprint(c,enc) ONIGENC_IS_CODE_PRINT(enc,c)
-#define rb_enc_isspace(c,enc) ONIGENC_IS_CODE_SPACE(enc,c)
-#define rb_enc_isdigit(c,enc) ONIGENC_IS_CODE_DIGIT(enc,c)
+#define rb_enc_isalpha(c,enc) ONIGENC_IS_CODE_ALPHA((enc),(c))
+#define rb_enc_islower(c,enc) ONIGENC_IS_CODE_LOWER((enc),(c))
+#define rb_enc_isupper(c,enc) ONIGENC_IS_CODE_UPPER((enc),(c))
+#define rb_enc_ispunct(c,enc) ONIGENC_IS_CODE_PUNCT((enc),(c))
+#define rb_enc_isalnum(c,enc) ONIGENC_IS_CODE_ALNUM((enc),(c))
+#define rb_enc_isprint(c,enc) ONIGENC_IS_CODE_PRINT((enc),(c))
+#define rb_enc_isspace(c,enc) ONIGENC_IS_CODE_SPACE((enc),(c))
+#define rb_enc_isdigit(c,enc) ONIGENC_IS_CODE_DIGIT((enc),(c))
 
 #define rb_enc_asciicompat(enc) (rb_enc_mbminlen(enc)==1 && !rb_enc_dummy_p(enc))
 
@@ -209,6 +211,12 @@ void rb_enc_set_default_external(VALUE encoding);
 void rb_enc_set_default_internal(VALUE encoding);
 VALUE rb_locale_charmap(VALUE klass);
 long rb_memsearch(const void*,long,const void*,long,rb_encoding*);
+char *rb_enc_path_next(const char *,const char *,rb_encoding*);
+char *rb_enc_path_skip_prefix(const char *,const char *,rb_encoding*);
+char *rb_enc_path_last_separator(const char *,const char *,rb_encoding*);
+char *rb_enc_path_end(const char *,const char *,rb_encoding*);
+const char *ruby_enc_find_basename(const char *name, long *baselen, long *alllen, rb_encoding *enc);
+const char *ruby_enc_find_extname(const char *name, long *len, rb_encoding *enc);
 
 RUBY_EXTERN VALUE rb_cEncoding;
 #define ENC_DUMMY_FLAG (1<<24)
@@ -242,6 +250,7 @@ typedef struct rb_econv_t rb_econv_t;
 VALUE rb_str_encode(VALUE str, VALUE to, int ecflags, VALUE ecopts);
 int rb_econv_has_convpath_p(const char* from_encoding, const char* to_encoding);
 
+int rb_econv_prepare_options(VALUE opthash, VALUE *ecopts, int ecflags);
 int rb_econv_prepare_opts(VALUE opthash, VALUE *ecopts);
 
 rb_econv_t *rb_econv_open(const char *source_encoding, const char *destination_encoding, int ecflags);
@@ -301,6 +310,9 @@ void rb_econv_binmode(rb_econv_t *ec);
 #define ECONV_UNDEF_HEX_CHARREF                 0x00000030
 
 #define ECONV_DECORATOR_MASK                    0x0000ff00
+#define ECONV_NEWLINE_DECORATOR_MASK            0x00003f00
+#define ECONV_NEWLINE_DECORATOR_READ_MASK       0x00000f00
+#define ECONV_NEWLINE_DECORATOR_WRITE_MASK      0x00003000
 
 #define ECONV_UNIVERSAL_NEWLINE_DECORATOR       0x00000100
 #define ECONV_CRLF_NEWLINE_DECORATOR            0x00001000
@@ -310,6 +322,12 @@ void rb_econv_binmode(rb_econv_t *ec);
 
 #define ECONV_STATEFUL_DECORATOR_MASK           0x00f00000
 #define ECONV_XML_ATTR_QUOTE_DECORATOR          0x00100000
+
+#if defined(RUBY_TEST_CRLF_ENVIRONMENT) || defined(_WIN32)
+#define ECONV_DEFAULT_NEWLINE_DECORATOR ECONV_CRLF_NEWLINE_DECORATOR
+#else
+#define ECONV_DEFAULT_NEWLINE_DECORATOR 0
+#endif
 
 /* end of flags for rb_econv_open */
 

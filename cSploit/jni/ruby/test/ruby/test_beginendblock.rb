@@ -14,7 +14,7 @@ class TestBeginEndBlock < Test::Unit::TestCase
     ruby = EnvUtil.rubybin
     target = File.join(DIR, 'beginmainend.rb')
     result = IO.popen([ruby, target]){|io|io.read}
-    assert_equal(%w(b1 b2-1 b2 main b3-1 b3 b4 e1 e4 e3 e2 e4-2 e4-1 e1-1 e4-1-1), result.split)
+    assert_equal(%w(b1 b2-1 b2 main b3-1 b3 b4 e1 e1-1 e4 e4-2 e4-1 e4-1-1 e3 e2), result.split)
 
     input = Tempfile.new(self.class.name)
     inputpath = input.path
@@ -123,5 +123,50 @@ EOW
     }
     assert_match(/e1/, out)
     assert_match(/e6/, out)
+  end
+
+  def test_nested_at_exit
+    t = Tempfile.new(["test_nested_at_exit_", ".rb"])
+    t.puts "at_exit { puts :outer0 }"
+    t.puts "at_exit { puts :outer1_begin; at_exit { puts :inner1 }; puts :outer1_end }"
+    t.puts "at_exit { puts :outer2_begin; at_exit { puts :inner2 }; puts :outer2_end }"
+    t.puts "at_exit { puts :outer3 }"
+    t.flush
+
+    expected = [ "outer3",
+                 "outer2_begin",
+                 "outer2_end",
+                 "inner2",
+                 "outer1_begin",
+                 "outer1_end",
+                 "inner1",
+                 "outer0" ]
+
+    assert_in_out_err(t.path, "", expected, [], "[ruby-core:35237]")
+    t.close
+  end
+
+  def test_rescue_at_exit
+    bug5218 = '[ruby-core:43173][Bug #5218]'
+    cmd = [
+      "raise 'X' rescue nil",
+      "nil",
+      "exit(42)",
+    ]
+    %w[at_exit END].each do |ex|
+      out, err, status = EnvUtil.invoke_ruby(cmd.map {|s|["-e", "#{ex} {#{s}}"]}.flatten, "", true, true)
+      assert_equal(["", "", 42], [out, err, status.exitstatus], "#{bug5218}: #{ex}")
+    end
+  end
+
+  def test_callcc_at_exit
+    bug9110 = '[ruby-core:58329][Bug #9110]'
+    script = <<EOS
+require "continuation"
+c = nil
+at_exit { c.call }
+at_exit { callcc {|_c| c = _c } }
+EOS
+    assert_normal_exit(script, bug9110)
   end
 end

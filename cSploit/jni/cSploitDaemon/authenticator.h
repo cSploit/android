@@ -18,7 +18,7 @@
 #ifndef AUTHENTICATOR_H
 #define AUTHENTICATOR_H
 
-#include <csploit/list.h>
+#include "list.h"
 
 typedef struct login {
   node *next;

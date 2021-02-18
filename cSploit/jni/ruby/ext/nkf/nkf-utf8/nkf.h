@@ -165,7 +165,7 @@ void  setbinmode(FILE *fp)
 #  define HAVE_LOCALE_H
 # endif
 #else
-# ifndef HAVE_LANGINFO_H
+# if !defined(HAVE_LANGINFO_H) && !defined(__BIONIC__)
 #  define HAVE_LANGINFO_H
 # endif
 # ifndef HAVE_LOCALE_H

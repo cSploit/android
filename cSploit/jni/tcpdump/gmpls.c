@@ -1,4 +1,4 @@
-/*
+/* 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
  * distributions retain the above copyright notice and this paragraph
@@ -10,20 +10,24 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Original code by Hannes Gredler (hannes@gredler.at)
+ * Original code by Hannes Gredler (hannes@juniper.net)
  */
+
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/gmpls.c,v 1.5.2.1 2005/05/19 06:44:02 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include <tcpdump-stdinc.h>
 
-#include "netdissect.h"
-#include "gmpls.h"
+#include "interface.h"
 
 /* rfc3471 */
-const struct tok gmpls_link_prot_values[] = {
+struct tok gmpls_link_prot_values[] = {
     { 0x01, "Extra Traffic"},
     { 0x02, "Unprotected"},
     { 0x04, "Shared"},
@@ -36,27 +40,20 @@ const struct tok gmpls_link_prot_values[] = {
 };
 
 /* rfc3471 */
-const struct tok gmpls_switch_cap_values[] = {
-    { GMPLS_PSC1, "Packet-Switch Capable-1"},
-    { GMPLS_PSC2, "Packet-Switch Capable-2"},
-    { GMPLS_PSC3, "Packet-Switch Capable-3"},
-    { GMPLS_PSC4, "Packet-Switch Capable-4"},
-    { GMPLS_L2SC, "Layer-2 Switch Capable"},
-    { GMPLS_TSC, "Time-Division-Multiplex"},
-    { GMPLS_LSC, "Lambda-Switch Capable"},
-    { GMPLS_FSC, "Fiber-Switch Capable"},
-    { 0, NULL }
-};
-
-/* rfc4205 */
-const struct tok gmpls_switch_cap_tsc_indication_values[] = {
-    { 0, "Standard SONET/SDH" },
-    { 1, "Arbitrary SONET/SDH" },
+struct tok gmpls_switch_cap_values[] = {
+    { 1,	"Packet-Switch Capable-1"},
+    { 2,	"Packet-Switch Capable-2"},
+    { 3,	"Packet-Switch Capable-3"},
+    { 4,	"Packet-Switch Capable-4"},
+    { 51,	"Layer-2 Switch Capable"},
+    { 100,	"Time-Division-Multiplex"},
+    { 150,	"Lambda-Switch Capable"},
+    { 200,	"Fiber-Switch Capable"},
     { 0, NULL }
 };
 
 /* rfc3471 */
-const struct tok gmpls_encoding_values[] = {
+struct tok gmpls_encoding_values[] = {
     { 1,    "Packet"},
     { 2,    "Ethernet V2/DIX"},
     { 3,    "ANSI/ETSI PDH"},
@@ -72,7 +69,7 @@ const struct tok gmpls_encoding_values[] = {
 };
 
 /* rfc3471 */
-const struct tok gmpls_payload_values[] = {
+struct tok gmpls_payload_values[] = {
     {  0,   "Unknown"},
     {  1,   "Reserved"},
     {  2,   "Reserved"},
@@ -136,22 +133,22 @@ const struct tok gmpls_payload_values[] = {
     { 0, NULL }
 };
 
-/*
- * Link Type values used by LMP Service Discovery (specifically, the Client
+/* 
+ * Link Type values used by LMP Service Discovery (specifically, the Client 
  * Port Service Attributes Object). See UNI 1.0 section 9.4.2 for details.
  */
-const struct tok lmp_sd_service_config_cpsa_link_type_values[] = {
+struct tok lmp_sd_service_config_cpsa_link_type_values[] = {
     { 5, "SDH ITU-T G.707"},
     { 6, "SONET ANSI T1.105"},
     { 0, NULL}
 };
 
-/*
- * Signal Type values for SDH links used by LMP Service Discovery (specifically,
- * the Client Port Service Attributes Object). See UNI 1.0 section 9.4.2 for
+/* 
+ * Signal Type values for SDH links used by LMP Service Discovery (specifically, 
+ * the Client Port Service Attributes Object). See UNI 1.0 section 9.4.2 for 
  * details.
  */
-const struct tok lmp_sd_service_config_cpsa_signal_type_sdh_values[] = {
+struct tok lmp_sd_service_config_cpsa_signal_type_sdh_values[] = {
     { 5,  "VC-3"},
     { 6,  "VC-4"},
     { 7,  "STM-0"},
@@ -163,12 +160,12 @@ const struct tok lmp_sd_service_config_cpsa_signal_type_sdh_values[] = {
     { 0, NULL}
 };
 
-/*
- * Signal Type values for SONET links used by LMP Service Discovery (specifically,
- * the Client Port Service Attributes Object). See UNI 1.0 section 9.4.2 for
+/* 
+ * Signal Type values for SONET links used by LMP Service Discovery (specifically, 
+ * the Client Port Service Attributes Object). See UNI 1.0 section 9.4.2 for 
  * details.
  */
-const struct tok lmp_sd_service_config_cpsa_signal_type_sonet_values[] = {
+struct tok lmp_sd_service_config_cpsa_signal_type_sonet_values[] = {
     { 5,  "STS-1 SPE"},
     { 6,  "STS-3c SPE"},
     { 7,  "STS-1"},
@@ -181,10 +178,10 @@ const struct tok lmp_sd_service_config_cpsa_signal_type_sonet_values[] = {
 };
 
 #define DIFFSERV_BC_MODEL_RDM           0   /* draft-ietf-tewg-diff-te-proto-07 */
-#define DIFFSERV_BC_MODEL_MAM           1   /* draft-ietf-tewg-diff-te-proto-07 */
+#define DIFFSERV_BC_MODEL_MAM           1   /* draft-ietf-tewg-diff-te-proto-07 */ 
 #define DIFFSERV_BC_MODEL_EXTD_MAM      254 /* experimental */
 
-const struct tok diffserv_te_bc_values[] = {
+struct tok diffserv_te_bc_values[] = {
     {  DIFFSERV_BC_MODEL_RDM, "Russian dolls"},
     {  DIFFSERV_BC_MODEL_MAM, "Maximum allocation"},
     {  DIFFSERV_BC_MODEL_EXTD_MAM, "Maximum allocation with E-LSP support"},

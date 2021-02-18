@@ -66,36 +66,52 @@ class TestRipper::ScannerEvents < Test::Unit::TestCase
                   [[2, 0], :on_tstring_content, "heredoc\n"],
                   [[3, 0], :on_heredoc_end, "EOS"]],
                  Ripper.lex("<<EOS\nheredoc\nEOS")
+    assert_equal [[[1, 0], :on_heredoc_beg, "<<EOS"],
+                  [[1, 5], :on_nl, "\n"],
+                  [[2, 0], :on_heredoc_end, "EOS"]],
+                 Ripper.lex("<<EOS\nEOS"),
+                 "bug#4543"
     assert_equal [[[1, 0], :on_regexp_beg, "/"],
-                  [[1, 1], :on_tstring_content, "foo\n"],
-                  [[2, 0], :on_tstring_content, "bar"],
+                  [[1, 1], :on_tstring_content, "foo\nbar"],
                   [[2, 3], :on_regexp_end, "/"]],
                  Ripper.lex("/foo\nbar/")
+    assert_equal [[[1, 0], :on_regexp_beg, "/"],
+                  [[1, 1], :on_tstring_content, "foo\n\u3020"],
+                  [[2, 3], :on_regexp_end, "/"]],
+                 Ripper.lex("/foo\n\u3020/")
+    assert_equal [[[1, 0], :on_tstring_beg, "'"],
+                  [[1, 1], :on_tstring_content, "foo\n\xe3\x80\xa0"],
+                  [[2, 3], :on_tstring_end, "'"]],
+                 Ripper.lex("'foo\n\xe3\x80\xa0'")
+    assert_equal [[[1, 0], :on_tstring_beg, "'"],
+                  [[1, 1], :on_tstring_content, "\u3042\n\u3044"],
+                  [[2, 3], :on_tstring_end, "'"]],
+                 Ripper.lex("'\u3042\n\u3044'")
   end
 
   def test_location
-    validate_location ""
-    validate_location " "
-    validate_location "@"
-    validate_location "\n"
-    validate_location "\r\n"
-    validate_location "\n\n\n\n\n\r\n\n\n"
-    validate_location "\n;\n;\n;\n;\n"
-    validate_location "nil"
-    validate_location "@ivar"
-    validate_location "1;2;3"
-    validate_location "1\n2\n3"
-    validate_location "1\n2\n3\n"
-    validate_location "def m(a) nil end"
-    validate_location "if true then false else nil end"
-    validate_location "BEGIN{print nil}"
-    validate_location "%w(a b\nc\r\nd \ne )"
-    validate_location %Q["a\nb\r\nc"]
-    validate_location "print(<<EOS)\nheredoc\nEOS\n"
-    validate_location "print(<<-\"EOS\")\nheredoc\n     EOS\n"
+    assert_location ""
+    assert_location " "
+    assert_location ":"
+    assert_location "\n"
+    assert_location "\r\n"
+    assert_location "\n\n\n\n\n\r\n\n\n"
+    assert_location "\n;\n;\n;\n;\n"
+    assert_location "nil"
+    assert_location "@ivar"
+    assert_location "1;2;3"
+    assert_location "1\n2\n3"
+    assert_location "1\n2\n3\n"
+    assert_location "def m(a) nil end"
+    assert_location "if true then false else nil end"
+    assert_location "BEGIN{print nil}"
+    assert_location "%w(a b\nc\r\nd \ne )"
+    assert_location %Q["a\nb\r\nc"]
+    assert_location "print(<<""EOS)\nheredoc\nEOS\n"
+    assert_location "print(<<-\"EOS\")\nheredoc\n     EOS\n"
   end
 
-  def validate_location(src)
+  def assert_location(src)
     buf = ''
     Ripper.lex(src).each do |pos, type, tok|
       line, col = *pos
@@ -534,6 +550,12 @@ class TestRipper::ScannerEvents < Test::Unit::TestCase
                  scan('tstring_content', '"abc#{1}def"')
     assert_equal ['sym'],
                  scan('tstring_content', ':"sym"')
+    assert_equal ['a b c'],
+                 scan('tstring_content', ':"a b c"'),
+                 "bug#4544"
+    assert_equal ["a\nb\nc"],
+                 scan('tstring_content', ":'a\nb\nc'"),
+                 "bug#4544"
   end
 
   def test_tstring_end
@@ -635,11 +657,21 @@ class TestRipper::ScannerEvents < Test::Unit::TestCase
                  scan('tstring_content', "<<EOS\nhere\ndoc \nEOS \n")
     assert_equal ["heredoc\n\tEOS \n"],
                  scan('tstring_content', "<<-EOS\nheredoc\n\tEOS \n")
+    bug7255 = '[ruby-core:48703]'
+    assert_equal ["there\n""heredoc", "\n"],
+                 scan('tstring_content', "<<""EOS\n""there\n""heredoc\#{foo}\nEOS"),
+                 bug7255
+    assert_equal ["there\n""heredoc", "\n"],
+                 scan('tstring_content', "<<""EOS\n""there\n""heredoc\#@foo\nEOS"),
+                 bug7255
   end
 
   def test_heredoc_end
     assert_equal [],
                  scan('heredoc_end', '')
+    assert_equal ["EOS"],
+                 scan('heredoc_end', "<<EOS\nEOS"),
+                 "bug#4543"
     assert_equal ["EOS"],
                  scan('heredoc_end', "<<EOS\nheredoc\nEOS")
     assert_equal ["EOS\n"],
@@ -791,8 +823,8 @@ class TestRipper::ScannerEvents < Test::Unit::TestCase
   def test_CHAR
     assert_equal [],
                  scan('CHAR', "")
-    assert_equal ["@"],
-                 scan('CHAR', "@")
+    assert_equal ["?a"],
+                 scan('CHAR', "?a")
     assert_equal [],
                  scan('CHAR', "@ivar")
   end

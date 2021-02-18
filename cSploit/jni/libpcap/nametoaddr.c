@@ -22,111 +22,56 @@
  * These functions are not time critical.
  */
 
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/libpcap/nametoaddr.c,v 1.77.2.4 2007/06/11 09:52:05 guy Exp $ (LBL)";
+#endif
+
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
-#ifdef DECNETLIB
-#include <sys/types.h>
-#include <netdnet/dnetdb.h>
+#ifdef WIN32
+#include <pcap-stdinc.h>
+
+#else /* WIN32 */
+
+#include <sys/param.h>
+#include <sys/types.h>				/* concession to AIX */
+#include <sys/socket.h>
+#include <sys/time.h>
+
+#include <netinet/in.h>
+#endif /* WIN32 */
+
+/*
+ * XXX - why was this included even on UNIX?
+ */
+#ifdef __MINGW32__
+#include "IP6_misc.h"
 #endif
 
-#ifdef _WIN32
-  #include <winsock2.h>
-  #include <ws2tcpip.h>
+#ifndef WIN32
+#ifdef HAVE_ETHER_HOSTTON
+/*
+ * XXX - do we need any of this if <netinet/if_ether.h> doesn't declare
+ * ether_hostton()?
+ */
+#ifdef HAVE_NETINET_IF_ETHER_H
+struct mbuf;		/* Squelch compiler warnings on some platforms for */
+struct rtentry;		/* declarations in <net/if.h> */
+#include <net/if.h>	/* for "struct ifnet" in "struct arpcom" on Solaris */
+#include <netinet/if_ether.h>
+#endif /* HAVE_NETINET_IF_ETHER_H */
+#ifdef NETINET_ETHER_H_DECLARES_ETHER_HOSTTON
+#include <netinet/ether.h>
+#endif /* NETINET_ETHER_H_DECLARES_ETHER_HOSTTON */
+#endif /* HAVE_ETHER_HOSTTON */
+#include <arpa/inet.h>
+#include <netdb.h>
+#endif /* WIN32 */
 
-  #ifdef INET6
-    /*
-     * To quote the MSDN page for getaddrinfo() at
-     *
-     *    https://msdn.microsoft.com/en-us/library/windows/desktop/ms738520(v=vs.85).aspx
-     *
-     * "Support for getaddrinfo on Windows 2000 and older versions
-     * The getaddrinfo function was added to the Ws2_32.dll on Windows XP and
-     * later. To execute an application that uses this function on earlier
-     * versions of Windows, then you need to include the Ws2tcpip.h and
-     * Wspiapi.h files. When the Wspiapi.h include file is added, the
-     * getaddrinfo function is defined to the WspiapiGetAddrInfo inline
-     * function in the Wspiapi.h file. At runtime, the WspiapiGetAddrInfo
-     * function is implemented in such a way that if the Ws2_32.dll or the
-     * Wship6.dll (the file containing getaddrinfo in the IPv6 Technology
-     * Preview for Windows 2000) does not include getaddrinfo, then a
-     * version of getaddrinfo is implemented inline based on code in the
-     * Wspiapi.h header file. This inline code will be used on older Windows
-     * platforms that do not natively support the getaddrinfo function."
-     *
-     * We use getaddrinfo(), so we include Wspiapi.h here.
-     */
-    #include <wspiapi.h>
-  #endif /* INET6 */
-#else /* _WIN32 */
-  #include <sys/param.h>
-  #include <sys/types.h>
-  #include <sys/socket.h>
-  #include <sys/time.h>
-
-  #include <netinet/in.h>
-
-  #ifdef HAVE_ETHER_HOSTTON
-    #if defined(NET_ETHERNET_H_DECLARES_ETHER_HOSTTON)
-      /*
-       * OK, just include <net/ethernet.h>.
-       */
-      #include <net/ethernet.h>
-    #elif defined(NETINET_ETHER_H_DECLARES_ETHER_HOSTTON)
-      /*
-       * OK, just include <netinet/ether.h>
-       */
-      #include <netinet/ether.h>
-    #elif defined(SYS_ETHERNET_H_DECLARES_ETHER_HOSTTON)
-      /*
-       * OK, just include <sys/ethernet.h>
-       */
-      #include <sys/ethernet.h>
-    #elif defined(ARPA_INET_H_DECLARES_ETHER_HOSTTON)
-      /*
-       * OK, just include <arpa/inet.h>
-       */
-      #include <arpa/inet.h>
-    #elif defined(NETINET_IF_ETHER_H_DECLARES_ETHER_HOSTTON)
-      /*
-       * OK, include <netinet/if_ether.h>, after all the other stuff we
-       * need to include or define for its benefit.
-       */
-      #define NEED_NETINET_IF_ETHER_H
-    #else
-      /*
-       * We'll have to declare it ourselves.
-       * If <netinet/if_ether.h> defines struct ether_addr, include
-       * it.  Otherwise, define it ourselves.
-       */
-      #ifdef HAVE_STRUCT_ETHER_ADDR
-        #define NEED_NETINET_IF_ETHER_H
-      #else /* HAVE_STRUCT_ETHER_ADDR */
-	struct ether_addr {
-		unsigned char ether_addr_octet[6];
-	};
-      #endif /* HAVE_STRUCT_ETHER_ADDR */
-    #endif /* what declares ether_hostton() */
-
-    #ifdef NEED_NETINET_IF_ETHER_H
-      #include <net/if.h>	/* Needed on some platforms */
-      #include <netinet/in.h>	/* Needed on some platforms */
-      #include <netinet/if_ether.h>
-    #endif /* NEED_NETINET_IF_ETHER_H */
-
-    #ifndef HAVE_DECL_ETHER_HOSTTON
-      /*
-       * No header declares it, so declare it ourselves.
-       */
-      extern int ether_hostton(const char *, struct ether_addr *);
-    #endif /* !defined(HAVE_DECL_ETHER_HOSTTON) */
-  #endif /* HAVE_ETHER_HOSTTON */
-
-  #include <arpa/inet.h>
-  #include <netdb.h>
-#endif /* _WIN32 */
-
+#include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -134,11 +79,8 @@
 
 #include "pcap-int.h"
 
-#include "diag-control.h"
-
 #include "gencode.h"
-#include <pcap/namedb.h>
-#include "nametoaddr.h"
+#include <pcap-namedb.h>
 
 #ifdef HAVE_OS_PROTO_H
 #include "os-proto.h"
@@ -149,10 +91,11 @@
 #define NTOHS(x) (x) = ntohs(x)
 #endif
 
+static inline int xdtoi(int);
+
 /*
  *  Convert host name to internet address.
  *  Return 0 upon failure.
- *  XXX - not thread-safe; don't use it inside libpcap.
  */
 bpf_u_int32 **
 pcap_nametoaddr(const char *name)
@@ -163,23 +106,7 @@ pcap_nametoaddr(const char *name)
 	bpf_u_int32 **p;
 	struct hostent *hp;
 
-	/*
-	 * gethostbyname() is deprecated on Windows, perhaps because
-	 * it's not thread-safe, or because it doesn't support IPv6,
-	 * or both.
-	 *
-	 * We deprecate pcap_nametoaddr() on all platforms because
-	 * it's not thread-safe; we supply it for backwards compatibility,
-	 * so suppress the deprecation warning.  We could, I guess,
-	 * use getaddrinfo() and construct the array ourselves, but
-	 * that's probably not worth the effort, as that wouldn't make
-	 * this thread-safe - we can't change the API to require that
-	 * our caller free the address array, so we still have to reuse
-	 * a local array.
-	 */
-DIAG_OFF_DEPRECATION
 	if ((hp = gethostbyname(name)) != NULL) {
-DIAG_ON_DEPRECATION
 #ifndef h_addr
 		hlist[0] = (bpf_u_int32 *)hp->h_addr;
 		NTOHL(hp->h_addr);
@@ -194,6 +121,7 @@ DIAG_ON_DEPRECATION
 		return 0;
 }
 
+#ifdef INET6
 struct addrinfo *
 pcap_nametoaddrinfo(const char *name)
 {
@@ -210,110 +138,29 @@ pcap_nametoaddrinfo(const char *name)
 	else
 		return res;
 }
+#endif /*INET6*/
 
 /*
  *  Convert net name to internet address.
  *  Return 0 upon failure.
- *  XXX - not guaranteed to be thread-safe!  See below for platforms
- *  on which it is thread-safe and on which it isn't.
  */
-#if defined(_WIN32) || defined(__CYGWIN__)
-bpf_u_int32
-pcap_nametonetaddr(const char *name _U_)
-{
-	/*
-	 * There's no "getnetbyname()" on Windows.
-	 *
-	 * XXX - I guess we could use the BSD code to read
-	 * C:\Windows\System32\drivers\etc/networks, assuming
-	 * that's its home on all the versions of Windows
-	 * we use, but that file probably just has the loopback
-	 * network on 127/24 on 99 44/100% of Windows machines.
-	 *
-	 * (Heck, these days it probably just has that on 99 44/100%
-	 * of *UN*X* machines.)
-	 */
-	return 0;
-}
-#else /* _WIN32 */
 bpf_u_int32
 pcap_nametonetaddr(const char *name)
 {
-	/*
-	 * UN*X.
-	 */
+#ifndef WIN32
 	struct netent *np;
-  #if defined(HAVE_LINUX_GETNETBYNAME_R)
-	/*
-	 * We have Linux's reentrant getnetbyname_r().
-	 */
-	struct netent result_buf;
-	char buf[1024];	/* arbitrary size */
-	int h_errnoval;
-	int err;
 
-	/*
-	 * Apparently, the man page at
-	 *
-	 *    http://man7.org/linux/man-pages/man3/getnetbyname_r.3.html
-	 *
-	 * lies when it says
-	 *
-	 *    If the function call successfully obtains a network record,
-	 *    then *result is set pointing to result_buf; otherwise, *result
-	 *    is set to NULL.
-	 *
-	 * and, in fact, at least in some versions of GNU libc, it does
-	 * *not* always get set if getnetbyname_r() succeeds.
-	 */
-	np = NULL;
- 	err = getnetbyname_r(name, &result_buf, buf, sizeof buf, &np,
-	    &h_errnoval);
-	if (err != 0) {
-		/*
-		 * XXX - dynamically allocate the buffer, and make it
-		 * bigger if we get ERANGE back?
-		 */
-		return 0;
-	}
-  #elif defined(HAVE_SOLARIS_IRIX_GETNETBYNAME_R)
-	/*
-	 * We have Solaris's and IRIX's reentrant getnetbyname_r().
-	 */
-	struct netent result_buf;
-	char buf[1024];	/* arbitrary size */
-
-	np = getnetbyname_r(name, &result_buf, buf, (int)sizeof buf);
-  #elif defined(HAVE_AIX_GETNETBYNAME_R)
-	/*
-	 * We have AIX's reentrant getnetbyname_r().
-	 */
-	struct netent result_buf;
-	struct netent_data net_data;
-
-	if (getnetbyname_r(name, &result_buf, &net_data) == -1)
-		np = NULL;
-	else
-		np = &result_buf;
-  #else
- 	/*
- 	 * We don't have any getnetbyname_r(); either we have a
- 	 * getnetbyname() that uses thread-specific data, in which
- 	 * case we're thread-safe (sufficiently recent FreeBSD,
- 	 * sufficiently recent Darwin-based OS, sufficiently recent
- 	 * HP-UX, sufficiently recent Tru64 UNIX), or we have the
- 	 * traditional getnetbyname() (everything else, including
- 	 * current NetBSD and OpenBSD), in which case we're not
- 	 * thread-safe.
- 	 */
-	np = getnetbyname(name);
-  #endif
-	if (np != NULL)
+	if ((np = getnetbyname(name)) != NULL)
 		return np->n_net;
 	else
 		return 0;
+#else
+	/*
+	 * There's no "getnetbyname()" on Windows.
+	 */
+	return 0;
+#endif
 }
-#endif /* _WIN32 */
 
 /*
  * Convert a port name to its port and protocol numbers.
@@ -323,113 +170,20 @@ pcap_nametonetaddr(const char *name)
 int
 pcap_nametoport(const char *name, int *port, int *proto)
 {
-	struct addrinfo hints, *res, *ai;
-	int error;
-	struct sockaddr_in *in4;
-#ifdef INET6
-	struct sockaddr_in6 *in6;
-#endif
+	struct servent *sp;
 	int tcp_port = -1;
 	int udp_port = -1;
 
 	/*
-	 * We check for both TCP and UDP in case there are
-	 * ambiguous entries.
-	 */
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_protocol = IPPROTO_TCP;
-	error = getaddrinfo(NULL, name, &hints, &res);
-	if (error != 0) {
-		if (error != EAI_NONAME &&
-		    error != EAI_SERVICE) {
-			/*
-			 * This is a real error, not just "there's
-			 * no such service name".
-			 * XXX - this doesn't return an error string.
-			 */
-			return 0;
-		}
-	} else {
-		/*
-		 * OK, we found it.  Did it find anything?
-		 */
-		for (ai = res; ai != NULL; ai = ai->ai_next) {
-			/*
-			 * Does it have an address?
-			 */
-			if (ai->ai_addr != NULL) {
-				/*
-				 * Yes.  Get a port number; we're done.
-				 */
-				if (ai->ai_addr->sa_family == AF_INET) {
-					in4 = (struct sockaddr_in *)ai->ai_addr;
-					tcp_port = ntohs(in4->sin_port);
-					break;
-				}
-#ifdef INET6
-				if (ai->ai_addr->sa_family == AF_INET6) {
-					in6 = (struct sockaddr_in6 *)ai->ai_addr;
-					tcp_port = ntohs(in6->sin6_port);
-					break;
-				}
-#endif
-			}
-		}
-		freeaddrinfo(res);
-	}
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = PF_UNSPEC;
-	hints.ai_socktype = SOCK_DGRAM;
-	hints.ai_protocol = IPPROTO_UDP;
-	error = getaddrinfo(NULL, name, &hints, &res);
-	if (error != 0) {
-		if (error != EAI_NONAME &&
-		    error != EAI_SERVICE) {
-			/*
-			 * This is a real error, not just "there's
-			 * no such service name".
-			 * XXX - this doesn't return an error string.
-			 */
-			return 0;
-		}
-	} else {
-		/*
-		 * OK, we found it.  Did it find anything?
-		 */
-		for (ai = res; ai != NULL; ai = ai->ai_next) {
-			/*
-			 * Does it have an address?
-			 */
-			if (ai->ai_addr != NULL) {
-				/*
-				 * Yes.  Get a port number; we're done.
-				 */
-				if (ai->ai_addr->sa_family == AF_INET) {
-					in4 = (struct sockaddr_in *)ai->ai_addr;
-					udp_port = ntohs(in4->sin_port);
-					break;
-				}
-#ifdef INET6
-				if (ai->ai_addr->sa_family == AF_INET6) {
-					in6 = (struct sockaddr_in6 *)ai->ai_addr;
-					udp_port = ntohs(in6->sin6_port);
-					break;
-				}
-#endif
-			}
-		}
-		freeaddrinfo(res);
-	}
-
-	/*
 	 * We need to check /etc/services for ambiguous entries.
-	 * If we find an ambiguous entry, and it has the
+	 * If we find the ambiguous entry, and it has the
 	 * same port number, change the proto to PROTO_UNDEF
 	 * so both TCP and UDP will be checked.
 	 */
+	sp = getservbyname(name, "tcp");
+	if (sp != NULL) tcp_port = ntohs(sp->s_port);
+	sp = getservbyname(name, "udp");
+	if (sp != NULL) udp_port = ntohs(sp->s_port);
 	if (tcp_port >= 0) {
 		*port = tcp_port;
 		*proto = IPPROTO_TCP;
@@ -495,7 +249,6 @@ pcap_nametoportrange(const char *name, int *port1, int *port2, int *proto)
 			free(cpy);
 			return 0;
 		}
-		free(cpy);
 
 		if (*proto != save_proto)
 			*proto = PROTO_UNDEF;
@@ -508,62 +261,12 @@ pcap_nametoportrange(const char *name, int *port1, int *port2, int *proto)
 	return 1;
 }
 
-/*
- * XXX - not guaranteed to be thread-safe!  See below for platforms
- * on which it is thread-safe and on which it isn't.
- */
 int
 pcap_nametoproto(const char *str)
 {
 	struct protoent *p;
-  #if defined(HAVE_LINUX_GETNETBYNAME_R)
-	/*
-	 * We have Linux's reentrant getprotobyname_r().
-	 */
-	struct protoent result_buf;
-	char buf[1024];	/* arbitrary size */
-	int err;
 
-	err = getprotobyname_r(str, &result_buf, buf, sizeof buf, &p);
-	if (err != 0) {
-		/*
-		 * XXX - dynamically allocate the buffer, and make it
-		 * bigger if we get ERANGE back?
-		 */
-		return 0;
-	}
-  #elif defined(HAVE_SOLARIS_IRIX_GETNETBYNAME_R)
-	/*
-	 * We have Solaris's and IRIX's reentrant getprotobyname_r().
-	 */
-	struct protoent result_buf;
-	char buf[1024];	/* arbitrary size */
-
-	p = getprotobyname_r(str, &result_buf, buf, (int)sizeof buf);
-  #elif defined(HAVE_AIX_GETNETBYNAME_R)
-	/*
-	 * We have AIX's reentrant getprotobyname_r().
-	 */
-	struct protoent result_buf;
-	struct protoent_data proto_data;
-
-	if (getprotobyname_r(str, &result_buf, &proto_data) == -1)
-		p = NULL;
-	else
-		p = &result_buf;
-  #else
- 	/*
- 	 * We don't have any getprotobyname_r(); either we have a
- 	 * getprotobyname() that uses thread-specific data, in which
- 	 * case we're thread-safe (sufficiently recent FreeBSD,
- 	 * sufficiently recent Darwin-based OS, sufficiently recent
- 	 * HP-UX, sufficiently recent Tru64 UNIX, Windows), or we have
-	 * the traditional getprotobyname() (everything else, including
- 	 * current NetBSD and OpenBSD), in which case we're not
- 	 * thread-safe.
- 	 */
 	p = getprotobyname(str);
-  #endif
 	if (p != 0)
 		return p->p_proto;
 	else
@@ -577,33 +280,30 @@ struct eproto {
 	u_short p;
 };
 
-/*
- * Static data base of ether protocol types.
- * tcpdump used to import this, and it's declared as an export on
- * Debian, at least, so make it a public symbol, even though we
- * don't officially export it by declaring it in a header file.
- * (Programs *should* do this themselves, as tcpdump now does.)
- *
- * We declare it here, right before defining it, to squelch any
- * warnings we might get from compilers about the lack of a
- * declaration.
- */
-PCAP_API struct eproto eproto_db[];
-PCAP_API_DEF struct eproto eproto_db[] = {
-	{ "aarp", ETHERTYPE_AARP },
-	{ "arp", ETHERTYPE_ARP },
-	{ "atalk", ETHERTYPE_ATALK },
-	{ "decnet", ETHERTYPE_DN },
+/* Static data base of ether protocol types. */
+struct eproto eproto_db[] = {
+	{ "pup", ETHERTYPE_PUP },
+	{ "xns", ETHERTYPE_NS },
 	{ "ip", ETHERTYPE_IP },
 #ifdef INET6
 	{ "ip6", ETHERTYPE_IPV6 },
 #endif
-	{ "lat", ETHERTYPE_LAT },
-	{ "loopback", ETHERTYPE_LOOPBACK },
+	{ "arp", ETHERTYPE_ARP },
+	{ "rarp", ETHERTYPE_REVARP },
+	{ "sprite", ETHERTYPE_SPRITE },
 	{ "mopdl", ETHERTYPE_MOPDL },
 	{ "moprc", ETHERTYPE_MOPRC },
-	{ "rarp", ETHERTYPE_REVARP },
+	{ "decnet", ETHERTYPE_DN },
+	{ "lat", ETHERTYPE_LAT },
 	{ "sca", ETHERTYPE_SCA },
+	{ "lanbridge", ETHERTYPE_LANBRIDGE },
+	{ "vexp", ETHERTYPE_VEXP },
+	{ "vprod", ETHERTYPE_VPROD },
+	{ "atalk", ETHERTYPE_ATALK },
+	{ "atalkarp", ETHERTYPE_AARP },
+	{ "loopback", ETHERTYPE_LOOPBACK },
+	{ "decdts", ETHERTYPE_DECDTS },
+	{ "decdns", ETHERTYPE_DECDNS },
 	{ (char *)0, 0 }
 };
 
@@ -644,16 +344,17 @@ pcap_nametollc(const char *s)
 	return PROTO_UNDEF;
 }
 
-/* Hex digit to 8-bit unsigned integer. */
-static inline u_char
-xdtoi(u_char c)
+/* Hex digit to integer. */
+static inline int
+xdtoi(c)
+	register int c;
 {
-	if (c >= '0' && c <= '9')
-		return (u_char)(c - '0');
-	else if (c >= 'a' && c <= 'f')
-		return (u_char)(c - 'a' + 10);
+	if (isdigit(c))
+		return c - '0';
+	else if (islower(c))
+		return c - 'a' + 10;
 	else
-		return (u_char)(c - 'A' + 10);
+		return c - 'A' + 10;
 }
 
 int
@@ -664,17 +365,10 @@ __pcap_atoin(const char *s, bpf_u_int32 *addr)
 
 	*addr = 0;
 	len = 0;
-	for (;;) {
+	while (1) {
 		n = 0;
-		while (*s && *s != '.') {
-			if (n > 25) {
-				/* The result will be > 255 */
-				return -1;
-			}
+		while (*s && *s != '.')
 			n = n * 10 + *s++ - '0';
-		}
-		if (n > 255)
-			return -1;
 		*addr <<= 8;
 		*addr |= n & 0xff;
 		len += 8;
@@ -695,7 +389,7 @@ __pcap_atodn(const char *s, bpf_u_int32 *addr)
 	u_int node, area;
 
 	if (sscanf(s, "%d.%d", &area, &node) != 2)
-		return(0);
+		bpf_error("malformed decnet address '%s'", s);
 
 	*addr = (area << AREASHIFT) & AREAMASK;
 	*addr |= (node & NODEMASK);
@@ -704,32 +398,22 @@ __pcap_atodn(const char *s, bpf_u_int32 *addr)
 }
 
 /*
- * Convert 's', which can have the one of the forms:
- *
- *	"xx:xx:xx:xx:xx:xx"
- *	"xx.xx.xx.xx.xx.xx"
- *	"xx-xx-xx-xx-xx-xx"
- *	"xxxx.xxxx.xxxx"
- *	"xxxxxxxxxxxx"
- *
- * (or various mixes of ':', '.', and '-') into a new
+ * Convert 's' which has the form "xx:xx:xx:xx:xx:xx" into a new
  * ethernet address.  Assumes 's' is well formed.
  */
 u_char *
 pcap_ether_aton(const char *s)
 {
 	register u_char *ep, *e;
-	register u_char d;
+	register u_int d;
 
 	e = ep = (u_char *)malloc(6);
-	if (e == NULL)
-		return (NULL);
 
 	while (*s) {
-		if (*s == ':' || *s == '.' || *s == '-')
+		if (*s == ':')
 			s += 1;
 		d = xdtoi(*s++);
-		if (PCAP_ISXDIGIT(*s)) {
+		if (isxdigit((unsigned char)*s)) {
 			d <<= 4;
 			d |= xdtoi(*s++);
 		}
@@ -740,11 +424,7 @@ pcap_ether_aton(const char *s)
 }
 
 #ifndef HAVE_ETHER_HOSTTON
-/*
- * Roll our own.
- * XXX - not thread-safe, because pcap_next_etherent() isn't thread-
- * safe!  Needs a mutex or a thread-safe pcap_next_etherent().
- */
+/* Roll our own */
 u_char *
 pcap_ether_hostton(const char *name)
 {
@@ -776,10 +456,17 @@ pcap_ether_hostton(const char *name)
 	return (NULL);
 }
 #else
-/*
- * Use the OS-supplied routine.
- * This *should* be thread-safe; the API doesn't have a static buffer.
- */
+
+#if !defined(HAVE_DECL_ETHER_HOSTTON) || !HAVE_DECL_ETHER_HOSTTON
+#ifndef HAVE_STRUCT_ETHER_ADDR
+struct ether_addr {
+	unsigned char ether_addr_octet[6];
+};
+#endif
+extern int ether_hostton(const char *, struct ether_addr *);
+#endif
+
+/* Use the os supplied routines */
 u_char *
 pcap_ether_hostton(const char *name)
 {
@@ -796,25 +483,23 @@ pcap_ether_hostton(const char *name)
 }
 #endif
 
-/*
- * XXX - not guaranteed to be thread-safe!
- */
-int
-#ifdef	DECNETLIB
-__pcap_nametodnaddr(const char *name, u_short *res)
+u_short
+__pcap_nametodnaddr(const char *name)
 {
+#ifdef	DECNETLIB
 	struct nodeent *getnodebyname();
 	struct nodeent *nep;
+	unsigned short res;
 
 	nep = getnodebyname(name);
 	if (nep == ((struct nodeent *)0))
-		return(0);
+		bpf_error("unknown decnet host name '%s'\n", name);
 
-	memcpy((char *)res, (char *)nep->n_addr, sizeof(unsigned short));
-	return(1);
+	memcpy((char *)&res, (char *)nep->n_addr, sizeof(unsigned short));
+	return(res);
 #else
-__pcap_nametodnaddr(const char *name _U_, u_short *res _U_)
-{
+	bpf_error("decnet name support not included, '%s' cannot be translated\n",
+		name);
 	return(0);
 #endif
 }

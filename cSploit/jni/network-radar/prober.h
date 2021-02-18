@@ -22,8 +22,7 @@
 #endif
 
 #include "netdefs.h"
-
-#include <csploit/control.h>
+#include "control.h"
 
 int init_prober();
 

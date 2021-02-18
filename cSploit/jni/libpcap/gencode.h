@@ -17,9 +17,9 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * @(#) $Header: /tcpdump/master/libpcap/gencode.h,v 1.60.2.11 2007/06/11 09:52:04 guy Exp $ (LBL)
  */
-
-#include "pcap/funcattrs.h"
 
 /*
  * ATM support:
@@ -54,6 +54,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+
+#ifndef HAVE___ATTRIBUTE__
+#define __attribute__(x)
+#endif /* HAVE___ATTRIBUTE__ */
 
 /* Address qualifiers. */
 
@@ -113,14 +117,14 @@
 #define Q_ISIS_L2       32
 /* PDU types */
 #define Q_ISIS_IIH      33
-#define Q_ISIS_SNP      34
-#define Q_ISIS_CSNP     35
-#define Q_ISIS_PSNP     36
-#define Q_ISIS_LSP      37
+#define Q_ISIS_LAN_IIH  34
+#define Q_ISIS_PTP_IIH  35
+#define Q_ISIS_SNP      36
+#define Q_ISIS_CSNP     37
+#define Q_ISIS_PSNP     38
+#define Q_ISIS_LSP      39
 
-#define Q_RADIO		38
-
-#define Q_CARP		39
+#define Q_RADIO		40
 
 /* Directional qualifiers. */
 
@@ -128,12 +132,6 @@
 #define Q_DST		2
 #define Q_OR		3
 #define Q_AND		4
-#define Q_ADDR1		5
-#define Q_ADDR2		6
-#define Q_ADDR3		7
-#define Q_ADDR4		8
-#define Q_RA		9
-#define Q_TA		10
 
 #define Q_DEFAULT	0
 #define Q_UNDEF		255
@@ -157,7 +155,7 @@
 #define A_CONNECTACK	44	/* Connect Ack message */
 #define A_RELEASE	45	/* Release message */
 #define A_RELEASE_DONE	46	/* Release message */
-
+ 
 /* ATM field types */
 #define A_VPI		51
 #define A_VCI		52
@@ -180,34 +178,20 @@
 #define M_LSSU		23	/* LSSU */
 #define M_MSU		24	/* MSU */
 
-/* MTP2 HSL types */
-#define MH_FISU		25	/* FISU for HSL */
-#define MH_LSSU		26	/* LSSU */
-#define MH_MSU		27	/* MSU */
-
 /* MTP3 field types */
 #define M_SIO		1
 #define M_OPC		2
 #define M_DPC		3
 #define M_SLS		4
 
-/* MTP3 field types in case of MTP2 HSL */
-#define MH_SIO		5
-#define MH_OPC		6
-#define MH_DPC		7
-#define MH_SLS		8
-
 
 struct slist;
 
-/*
- * A single statement, corresponding to an instruction in a block.
- */
 struct stmt {
-	int code;		/* opcode */
-	struct slist *jt;	/* only for relative jump in block */
-	struct slist *jf;	/* only for relative jump in block */
-	bpf_u_int32 k;		/* k field */
+	int code;
+	struct slist *jt;	/*only for relative jump in block*/
+	struct slist *jf;	/*only for relative jump in block*/
+	bpf_int32 k;
 };
 
 struct slist {
@@ -234,53 +218,38 @@ typedef bpf_u_int32 *uset;
  */
 #define N_ATOMS (BPF_MEMWORDS+2)
 
-/*
- * Control flow graph of a program.
- * This corresponds to an edge in the CFG.
- * It's a directed graph, so an edge has a predecessor and a successor.
- */
 struct edge {
-	u_int id;
-	int code;		/* opcode for branch corresponding to this edge */
+	int id;
+	int code;
 	uset edom;
-	struct block *succ;	/* successor vertex */
-	struct block *pred;	/* predecessor vertex */
+	struct block *succ;
+	struct block *pred;
 	struct edge *next;	/* link list of incoming edges for a node */
 };
 
-/*
- * A block is a vertex in the CFG.
- * It has a list of statements, with the final statement being a
- * branch to successor blocks.
- */
 struct block {
-	u_int id;
+	int id;
 	struct slist *stmts;	/* side effect stmts */
 	struct stmt s;		/* branch stmt */
 	int mark;
-	u_int longjt;		/* jt branch requires long jump */
-	u_int longjf;		/* jf branch requires long jump */
+	int longjt;		/* jt branch requires long jump */
+	int longjf;		/* jf branch requires long jump */
 	int level;
 	int offset;
 	int sense;
-	struct edge et;		/* edge corresponding to the jt branch */
-	struct edge ef;		/* edge corresponding to the jf branch */
+	struct edge et;
+	struct edge ef;
 	struct block *head;
 	struct block *link;	/* link field used by optimizer */
 	uset dom;
 	uset closure;
-	struct edge *in_edges;	/* first edge in the set (linked list) of edges with this as a successor */
+	struct edge *in_edges;
 	atomset def, kill;
 	atomset in_use;
 	atomset out_use;
-	int oval;		/* value ID for value tested in branch stmt */
-	bpf_u_int32 val[N_ATOMS];
+	int oval;
+	int val[N_ATOMS];
 };
-
-/*
- * A value of 0 for val[i] means the value is unknown.
- */
-#define VAL_UNKNOWN	0
 
 struct arth {
 	struct block *b;	/* protocol checks */
@@ -295,108 +264,69 @@ struct qual {
 	unsigned char pad;
 };
 
-struct _compiler_state;
-
-typedef struct _compiler_state compiler_state_t;
-
-struct arth *gen_loadi(compiler_state_t *, bpf_u_int32);
-struct arth *gen_load(compiler_state_t *, int, struct arth *, bpf_u_int32);
-struct arth *gen_loadlen(compiler_state_t *);
-struct arth *gen_neg(compiler_state_t *, struct arth *);
-struct arth *gen_arth(compiler_state_t *, int, struct arth *, struct arth *);
+struct arth *gen_loadi(int);
+struct arth *gen_load(int, struct arth *, int);
+struct arth *gen_loadlen(void);
+struct arth *gen_neg(struct arth *);
+struct arth *gen_arth(int, struct arth *, struct arth *);
 
 void gen_and(struct block *, struct block *);
 void gen_or(struct block *, struct block *);
 void gen_not(struct block *);
 
-struct block *gen_scode(compiler_state_t *, const char *, struct qual);
-struct block *gen_ecode(compiler_state_t *, const char *, struct qual);
-struct block *gen_acode(compiler_state_t *, const char *, struct qual);
-struct block *gen_mcode(compiler_state_t *, const char *, const char *,
-    bpf_u_int32, struct qual);
+struct block *gen_scode(const char *, struct qual);
+struct block *gen_ecode(const u_char *, struct qual);
+struct block *gen_acode(const u_char *, struct qual);
+struct block *gen_mcode(const char *, const char *, int, struct qual);
 #ifdef INET6
-struct block *gen_mcode6(compiler_state_t *, const char *, const char *,
-    bpf_u_int32, struct qual);
+struct block *gen_mcode6(const char *, const char *, int, struct qual);
 #endif
-struct block *gen_ncode(compiler_state_t *, const char *, bpf_u_int32,
-    struct qual);
-struct block *gen_proto_abbrev(compiler_state_t *, int);
-struct block *gen_relation(compiler_state_t *, int, struct arth *,
-    struct arth *, int);
-struct block *gen_less(compiler_state_t *, int);
-struct block *gen_greater(compiler_state_t *, int);
-struct block *gen_byteop(compiler_state_t *, int, int, bpf_u_int32);
-struct block *gen_broadcast(compiler_state_t *, int);
-struct block *gen_multicast(compiler_state_t *, int);
-struct block *gen_ifindex(compiler_state_t *, int);
-struct block *gen_inbound(compiler_state_t *, int);
+struct block *gen_ncode(const char *, bpf_u_int32, struct qual);
+struct block *gen_proto_abbrev(int);
+struct block *gen_relation(int, struct arth *, struct arth *, int);
+struct block *gen_less(int);
+struct block *gen_greater(int);
+struct block *gen_byteop(int, int, int);
+struct block *gen_broadcast(int);
+struct block *gen_multicast(int);
+struct block *gen_inbound(int);
 
-struct block *gen_llc(compiler_state_t *);
-struct block *gen_llc_i(compiler_state_t *);
-struct block *gen_llc_s(compiler_state_t *);
-struct block *gen_llc_u(compiler_state_t *);
-struct block *gen_llc_s_subtype(compiler_state_t *, bpf_u_int32);
-struct block *gen_llc_u_subtype(compiler_state_t *, bpf_u_int32);
+struct block *gen_vlan(int);
+struct block *gen_mpls(int);
 
-struct block *gen_vlan(compiler_state_t *, bpf_u_int32, int);
-struct block *gen_mpls(compiler_state_t *, bpf_u_int32, int);
+struct block *gen_pppoed(void);
+struct block *gen_pppoes(void);
 
-struct block *gen_pppoed(compiler_state_t *);
-struct block *gen_pppoes(compiler_state_t *, bpf_u_int32, int);
+struct block *gen_atmfield_code(int atmfield, bpf_int32 jvalue, bpf_u_int32 jtype, int reverse);
+struct block *gen_atmtype_abbrev(int type);
+struct block *gen_atmmulti_abbrev(int type);
 
-struct block *gen_geneve(compiler_state_t *, bpf_u_int32, int);
+struct block *gen_mtp2type_abbrev(int type);
+struct block *gen_mtp3field_code(int mtp3field, bpf_u_int32 jvalue, bpf_u_int32 jtype, int reverse);
 
-struct block *gen_atmfield_code(compiler_state_t *, int, bpf_u_int32,
-    int, int);
-struct block *gen_atmtype_abbrev(compiler_state_t *, int);
-struct block *gen_atmmulti_abbrev(compiler_state_t *, int);
+struct block *gen_pf_ifname(const char *);
+struct block *gen_pf_rnr(int);
+struct block *gen_pf_srnr(int);
+struct block *gen_pf_ruleset(char *);
+struct block *gen_pf_reason(int);
+struct block *gen_pf_action(int);
+struct block *gen_pf_dir(int);
 
-struct block *gen_mtp2type_abbrev(compiler_state_t *, int);
-struct block *gen_mtp3field_code(compiler_state_t *, int, bpf_u_int32,
-    int, int);
+void bpf_optimize(struct block **);
+void bpf_error(const char *, ...)
+    __attribute__((noreturn, format (printf, 1, 2)));
 
-struct block *gen_pf_ifname(compiler_state_t *, const char *);
-struct block *gen_pf_rnr(compiler_state_t *, int);
-struct block *gen_pf_srnr(compiler_state_t *, int);
-struct block *gen_pf_ruleset(compiler_state_t *, char *);
-struct block *gen_pf_reason(compiler_state_t *, int);
-struct block *gen_pf_action(compiler_state_t *, int);
+void finish_parse(struct block *);
+char *sdup(const char *);
 
-struct block *gen_p80211_type(compiler_state_t *, bpf_u_int32, bpf_u_int32);
-struct block *gen_p80211_fcdir(compiler_state_t *, bpf_u_int32);
-
-/*
- * Representation of a program as a tree of blocks, plus current mark.
- * A block is marked if only if its mark equals the current mark.
- * Rather than traverse the code array, marking each item, 'cur_mark'
- * is incremented.  This automatically makes each element unmarked.
- */
-#define isMarked(icp, p) ((p)->mark == (icp)->cur_mark)
-#define unMarkAll(icp) (icp)->cur_mark += 1
-#define Mark(icp, p) ((p)->mark = (icp)->cur_mark)
-
-struct icode {
-	struct block *root;
-	int cur_mark;
-};
-
-int bpf_optimize(struct icode *, char *);
-void bpf_set_error(compiler_state_t *, const char *, ...)
-    PCAP_PRINTFLIKE(2, 3);
-
-int finish_parse(compiler_state_t *, struct block *);
-char *sdup(compiler_state_t *, const char *);
-
-struct bpf_insn *icode_to_fcode(struct icode *, struct block *, u_int *,
-    char *);
+struct bpf_insn *icode_to_fcode(struct block *, int *);
+int pcap_parse(void);
+void lex_init(const char *);
+void lex_cleanup(void);
 void sappend(struct slist *, struct slist *);
-
-/*
- * Older versions of Bison don't put this declaration in
- * grammar.h.
- */
-int pcap_parse(void *, compiler_state_t *);
 
 /* XXX */
 #define JT(b)  ((b)->et.succ)
 #define JF(b)  ((b)->ef.succ)
+
+extern int no_optimize;

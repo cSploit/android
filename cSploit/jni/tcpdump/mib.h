@@ -8,7 +8,7 @@
 
 /* parse problem: new name "mib" for mgmt.mib(1) ignored */
 /* parse problem: no parent for 0.nullSpecific(0) */
-static struct obj
+struct obj
 _proteon_obj = {
 	"proteon", 1, 0,
 	NULL, NULL

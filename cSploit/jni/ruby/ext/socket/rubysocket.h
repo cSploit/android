@@ -4,6 +4,7 @@
 #include "ruby/ruby.h"
 #include "ruby/io.h"
 #include "ruby/util.h"
+#include "internal.h"
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -138,6 +139,16 @@ struct sockaddr_storage {
 };
 #endif
 
+#if defined __APPLE__ && defined __MACH__
+/*
+ * CMSG_ macros are broken on 64bit darwin, because __DARWIN_ALIGN
+ * aligns up to __darwin_size_t which is 64bit, but CMSG_DATA is
+ * 32bit-aligned.
+ */
+#undef __DARWIN_ALIGNBYTES
+#define __DARWIN_ALIGNBYTES (sizeof(unsigned int) - 1)
+#endif
+
 #if defined(_AIX)
 #ifndef CMSG_SPACE
 # define CMSG_SPACE(len) (_CMSG_ALIGN(sizeof(struct cmsghdr)) + _CMSG_ALIGN(len))
@@ -187,6 +198,7 @@ int Rconnect();
 #include "constdefs.h"
 
 #define BLOCKING_REGION(func, arg) (long)rb_thread_blocking_region((func), (arg), RUBY_UBF_IO, 0)
+#define BLOCKING_REGION_FD(func, arg) (long)rb_thread_io_blocking_region((func), (arg), (arg)->fd)
 
 #define SockAddrStringValue(v) rsock_sockaddr_string_value(&(v))
 #define SockAddrStringValuePtr(v) rsock_sockaddr_string_value_ptr(&(v))
@@ -221,8 +233,9 @@ VALUE rsock_make_hostent(VALUE host, struct addrinfo *addr, VALUE (*ipaddr)(stru
 int rsock_revlookup_flag(VALUE revlookup, int *norevlookup);
 
 #ifdef HAVE_SYS_UN_H
-const char* rsock_unixpath(struct sockaddr_un *sockaddr, socklen_t len);
+VALUE rsock_unixpath_str(struct sockaddr_un *sockaddr, socklen_t len);
 VALUE rsock_unixaddr(struct sockaddr_un *sockaddr, socklen_t len);
+socklen_t rsock_unix_sockaddr_len(VALUE path);
 #endif
 
 int rsock_socket(int domain, int type, int proto);
@@ -276,7 +289,7 @@ VALUE rsock_bsock_recvmsg_nonblock(int argc, VALUE *argv, VALUE sock);
 #endif
 
 #ifdef HAVE_ST_MSG_CONTROL
-void rsock_discard_cmsg_resource(struct msghdr *mh);
+void rsock_discard_cmsg_resource(struct msghdr *mh, int msg_peek_p);
 #endif
 
 void rsock_init_basicsocket(void);

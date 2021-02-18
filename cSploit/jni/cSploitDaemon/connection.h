@@ -20,9 +20,9 @@
 
 #include <pthread.h>
 
-#include <csploit/list.h>
-#include <csploit/control.h>
-#include <csploit/msgqueue.h>
+#include "list.h"
+#include "control.h"
+#include "msgqueue.h"
 
 /// internal struct for manage connection data.
 typedef struct conn_node {

@@ -19,8 +19,8 @@
 
 #include <stdint.h>
 
-#include <csploit/list.h>
-#include <csploit/control.h>
+#include "list.h"
+#include "control.h"
 
 #define NONE         0x00
 #define NEW_MAC      0x01

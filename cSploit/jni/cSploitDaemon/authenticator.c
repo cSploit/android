@@ -25,17 +25,16 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <csploit/logger.h>
-#include <csploit/list.h>
-#include <csploit/control.h>
-#include <csploit/message.h>
-#include <csploit/buffer.h>
-#include <csploit/control_messages.h>
-#include <csploit/sequence.h>
-#include <csploit/str_array.h>
-
+#include "logger.h"
+#include "list.h"
+#include "control.h"
 #include "connection.h"
+#include "message.h"
 #include "controller.h"
+#include "buffer.h"
+#include "control_messages.h"
+#include "sequence.h"
+#include "str_array.h"
 
 #include "authenticator.h"
 

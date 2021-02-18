@@ -20,9 +20,9 @@
 #ifndef CHILD_H
 #define CHILD_H
 
-#include <csploit/list.h>
-#include <csploit/control.h>
-#include <csploit/buffer.h>
+#include "list.h"
+#include "control.h"
+#include "buffer.h"
 
 struct handler;
 struct conn_node;

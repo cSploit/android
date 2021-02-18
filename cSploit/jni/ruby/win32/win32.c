@@ -63,7 +63,7 @@
 
 #define TO_SOCKET(x)	_get_osfhandle(x)
 
-static struct ChildRecord *CreateChild(const char *, const char *, SECURITY_ATTRIBUTES *, HANDLE, HANDLE, HANDLE);
+static struct ChildRecord *CreateChild(const WCHAR *, const WCHAR *, SECURITY_ATTRIBUTES *, HANDLE, HANDLE, HANDLE, DWORD);
 static int has_redirection(const char *);
 int rb_w32_wait_events(HANDLE *events, int num, DWORD timeout);
 static int rb_w32_open_osfhandle(intptr_t osfhandle, int flags);
@@ -252,7 +252,7 @@ rb_w32_osid(void)
 }
 #endif
 
-static DWORD
+DWORD
 rb_w32_osver(void)
 {
     return osver.dwMajorVersion;
@@ -450,18 +450,37 @@ regulate_path(WCHAR *path)
     }
 }
 
+static FARPROC
+get_proc_address(const char *module, const char *func, HANDLE *mh)
+{
+    HANDLE h;
+    FARPROC ptr;
+
+    if (mh)
+	h = LoadLibrary(module);
+    else
+	h = GetModuleHandle(module);
+    if (!h)
+	return NULL;
+
+    ptr = GetProcAddress(h, func);
+    if (mh) {
+	if (ptr)
+	    *mh = h;
+	else
+	    FreeLibrary(h);
+    }
+    return ptr;
+}
+
 static UINT
 get_system_directory(WCHAR *path, UINT len)
 {
-    HANDLE hKernel = GetModuleHandle("kernel32.dll");
-
-    if (hKernel) {
-	typedef UINT WINAPI wgetdir_func(WCHAR*, UINT);
-	FARPROC ptr = GetProcAddress(hKernel, "GetSystemWindowsDirectoryW");
-	if (ptr) {
-	    return (*(wgetdir_func *)ptr)(path, len);
-	}
-    }
+    typedef UINT WINAPI wgetdir_func(WCHAR*, UINT);
+    FARPROC ptr =
+	get_proc_address("kernel32", "GetSystemWindowsDirectoryW", NULL);
+    if (ptr)
+	return (*(wgetdir_func *)ptr)(path, len);
     return GetWindowsDirectoryW(path, len);
 }
 
@@ -559,18 +578,11 @@ init_env(void)
 typedef BOOL (WINAPI *cancel_io_t)(HANDLE);
 static cancel_io_t cancel_io = NULL;
 
-int
-rb_w32_has_cancel_io(void)
-{
-    return cancel_io != NULL;
-}
-
 static void
 init_func(void)
 {
     if (!cancel_io)
-	cancel_io = (cancel_io_t)GetProcAddress(GetModuleHandle("kernel32"),
-						"CancelIo");
+	cancel_io = (cancel_io_t)get_proc_address("kernel32", "CancelIo", NULL);
 }
 
 static void init_stdhandle(void);
@@ -656,6 +668,8 @@ rb_w32_sysinit(int *argc, char ***argv)
     _set_invalid_parameter_handler(invalid_parameter);
     _RTC_SetErrorFunc(rtc_error_handler);
     set_pioinfo_extra();
+#else
+    SetErrorMode(SEM_FAILCRITICALERRORS|SEM_NOGPFAULTERRORBOX);
 #endif
 
     get_version();
@@ -836,6 +850,8 @@ is_internal_cmd(const char *cmd, int nt)
     do {
 	if (!(c = *cmd++)) return 0;
     } while (isspace(c));
+    if (c == '@')
+	return 1;
     while (isalpha(c)) {
 	*b++ = tolower(c);
 	if (b == cmdname + sizeof(cmdname)) return 0;
@@ -948,8 +964,8 @@ join_argv(char *cmd, char *const *argv, BOOL escape)
 # define MAXPATHLEN 512
 #endif
 
-#define STRNDUPA(ptr, src, len) \
-    (((char *)memcpy(((ptr) = ALLOCA_N(char, (len) + 1)), (src), (len)))[len] = 0)
+#define STRNDUPV(ptr, v, src, len)					\
+    (((char *)memcpy(((ptr) = ALLOCV((v), (len) + 1)), (src), (len)))[len] = 0)
 
 static int
 check_spawn_mode(int mode)
@@ -987,12 +1003,11 @@ child_result(struct ChildRecord *child, int mode)
 }
 
 static struct ChildRecord *
-CreateChild(const char *cmd, const char *prog, SECURITY_ATTRIBUTES *psa,
-	    HANDLE hInput, HANDLE hOutput, HANDLE hError)
+CreateChild(const WCHAR *cmd, const WCHAR *prog, SECURITY_ATTRIBUTES *psa,
+	    HANDLE hInput, HANDLE hOutput, HANDLE hError, DWORD dwCreationFlags)
 {
     BOOL fRet;
-    DWORD  dwCreationFlags;
-    STARTUPINFO aStartupInfo;
+    STARTUPINFOW aStartupInfo;
     PROCESS_INFORMATION aProcessInformation;
     SECURITY_ATTRIBUTES sa;
     struct ChildRecord *child;
@@ -1015,9 +1030,9 @@ CreateChild(const char *cmd, const char *prog, SECURITY_ATTRIBUTES *psa,
 	psa = &sa;
     }
 
-    memset(&aStartupInfo, 0, sizeof (STARTUPINFO));
-    memset(&aProcessInformation, 0, sizeof (PROCESS_INFORMATION));
-    aStartupInfo.cb = sizeof (STARTUPINFO);
+    memset(&aStartupInfo, 0, sizeof(aStartupInfo));
+    memset(&aProcessInformation, 0, sizeof(aProcessInformation));
+    aStartupInfo.cb = sizeof(aStartupInfo);
     aStartupInfo.dwFlags = STARTF_USESTDHANDLES;
     if (hInput) {
 	aStartupInfo.hStdInput  = hInput;
@@ -1038,12 +1053,18 @@ CreateChild(const char *cmd, const char *prog, SECURITY_ATTRIBUTES *psa,
 	aStartupInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
     }
 
-    dwCreationFlags = (NORMAL_PRIORITY_CLASS);
+    dwCreationFlags |= NORMAL_PRIORITY_CLASS;
+
+    if (lstrlenW(cmd) > 32767) {
+	child->pid = 0;		/* release the slot */
+	errno = E2BIG;
+	return NULL;
+    }
 
     RUBY_CRITICAL({
-	fRet = CreateProcess(prog, (char *)cmd, psa, psa,
-			     psa->bInheritHandle, dwCreationFlags, NULL, NULL,
-			     &aStartupInfo, &aProcessInformation);
+	fRet = CreateProcessW(prog, (WCHAR *)cmd, psa, psa,
+			      psa->bInheritHandle, dwCreationFlags, NULL, NULL,
+			      &aStartupInfo, &aProcessInformation);
 	errno = map_errno(GetLastError());
     });
 
@@ -1077,12 +1098,26 @@ is_batch(const char *cmd)
     return 0;
 }
 
+static UINT filecp(void);
+static WCHAR *mbstr_to_wstr(UINT, const char *, int, long *);
+static char *wstr_to_mbstr(UINT, const WCHAR *, int, long *);
+#define acp_to_wstr(str, plen) mbstr_to_wstr(CP_ACP, str, -1, plen)
+#define wstr_to_acp(str, plen) wstr_to_mbstr(CP_ACP, str, -1, plen)
+#define filecp_to_wstr(str, plen) mbstr_to_wstr(filecp(), str, -1, plen)
+#define wstr_to_filecp(str, plen) wstr_to_mbstr(filecp(), str, -1, plen)
+#define utf8_to_wstr(str, plen) mbstr_to_wstr(CP_UTF8, str, -1, plen)
+#define wstr_to_utf8(str, plen) wstr_to_mbstr(CP_UTF8, str, -1, plen)
+
 rb_pid_t
 rb_w32_spawn(int mode, const char *cmd, const char *prog)
 {
     char fbuf[MAXPATHLEN];
     char *p = NULL;
     const char *shell = NULL;
+    WCHAR *wcmd, *wshell;
+    rb_pid_t ret;
+    VALUE v = 0;
+    VALUE v2 = 0;
 
     if (check_spawn_mode(mode)) return -1;
 
@@ -1100,7 +1135,7 @@ rb_w32_spawn(int mode, const char *cmd, const char *prog)
 	int nt;
 	while (ISSPACE(*cmd)) cmd++;
 	if ((shell = getenv("RUBYSHELL")) && (redir = has_redirection(cmd))) {
-	    char *tmp = ALLOCA_N(char, strlen(shell) + strlen(cmd) + sizeof(" -c ") + 2);
+	    char *tmp = ALLOCV(v, strlen(shell) + strlen(cmd) + sizeof(" -c ") + 2);
 	    sprintf(tmp, "%s -c \"%s\"", shell, cmd);
 	    cmd = tmp;
 	}
@@ -1108,8 +1143,7 @@ rb_w32_spawn(int mode, const char *cmd, const char *prog)
 		 (nt = !is_command_com(shell),
 		  (redir < 0 ? has_redirection(cmd) : redir) ||
 		  is_internal_cmd(cmd, nt))) {
-	    char *tmp = ALLOCA_N(char, strlen(shell) + strlen(cmd) + sizeof(" /c ")
-				 + (nt ? 2 : 0));
+	    char *tmp = ALLOCV(v, strlen(shell) + strlen(cmd) + sizeof(" /c ") + (nt ? 2 : 0));
 	    sprintf(tmp, nt ? "%s /c \"%s\"" : "%s /c %s", shell, cmd);
 	    cmd = tmp;
 	}
@@ -1123,14 +1157,14 @@ rb_w32_spawn(int mode, const char *cmd, const char *prog)
 		}
 		if ((unsigned char)*prog == quote) {
 		    len = prog++ - cmd - 1;
-		    STRNDUPA(p, cmd + 1, len);
+		    STRNDUPV(p, v2, cmd + 1, len);
 		    shell = p;
 		    break;
 		}
 		if (quote) continue;
 		if (ISSPACE(*prog) || strchr("<>|*?\"", *prog)) {
 		    len = prog - cmd;
-		    STRNDUPA(p, cmd, len);
+		    STRNDUPV(p, v2, cmd, len);
 		    shell = p;
 		    break;
 		}
@@ -1146,13 +1180,13 @@ rb_w32_spawn(int mode, const char *cmd, const char *prog)
 		    p = fbuf;
 		}
 		else if (shell != p && strchr(shell, '/')) {
-		    STRNDUPA(p, shell, len);
+		    STRNDUPV(p, v2, shell, len);
 		    shell = p;
 		}
 		if (p) translate_char(p, '/', '\\');
 		if (is_batch(shell)) {
 		    int alen = strlen(prog);
-		    cmd = p = ALLOCA_N(char, len + alen + (quote ? 2 : 0) + 1);
+		    cmd = p = ALLOCV(v, len + alen + (quote ? 2 : 0) + 1);
 		    if (quote) *p++ = '"';
 		    memcpy(p, shell, len);
 		    p += len;
@@ -1164,17 +1198,29 @@ rb_w32_spawn(int mode, const char *cmd, const char *prog)
 	}
     }
 
-    return child_result(CreateChild(cmd, shell, NULL, NULL, NULL, NULL), mode);
+    /* assume ACP */
+    wcmd = cmd ? acp_to_wstr(cmd, NULL) : NULL;
+    if (v) ALLOCV_END(v);
+    wshell = shell ? acp_to_wstr(shell, NULL) : NULL;
+    if (v2) ALLOCV_END(v2);
+
+    ret = child_result(CreateChild(wcmd, wshell, NULL, NULL, NULL, NULL, 0), mode);
+    free(wshell);
+    free(wcmd);
+    return ret;
 }
 
 rb_pid_t
-rb_w32_aspawn(int mode, const char *prog, char *const *argv)
+rb_w32_aspawn_flags(int mode, const char *prog, char *const *argv, DWORD flags)
 {
     int c_switch = 0;
     size_t len;
     BOOL ntcmd = FALSE, tmpnt;
     const char *shell;
     char *cmd, fbuf[MAXPATHLEN];
+    WCHAR *wcmd, *wprog;
+    rb_pid_t ret;
+    VALUE v = 0;
 
     if (check_spawn_mode(mode)) return -1;
 
@@ -1195,7 +1241,7 @@ rb_w32_aspawn(int mode, const char *prog, char *const *argv)
 	if (len < sizeof(fbuf))
 	    strlcpy(cmd = fbuf, prog, sizeof(fbuf));
 	else
-	    STRNDUPA(cmd, prog, len);
+	    STRNDUPV(cmd, v, prog, len);
 	translate_char(cmd, '/', '\\');
 	prog = cmd;
     }
@@ -1207,7 +1253,7 @@ rb_w32_aspawn(int mode, const char *prog, char *const *argv)
 	if (c_switch) len += 3;
 	else ++argv;
 	if (argv[0]) len += join_argv(NULL, argv, ntcmd);
-	cmd = ALLOCA_N(char, len);
+	cmd = ALLOCV(v, len);
 	join_argv(cmd, progs, ntcmd);
 	if (c_switch) strlcat(cmd, " /c", len);
 	if (argv[0]) join_argv(cmd + strlcat(cmd, " ", len), argv, ntcmd);
@@ -1215,13 +1261,28 @@ rb_w32_aspawn(int mode, const char *prog, char *const *argv)
     }
     else {
 	len = join_argv(NULL, argv, FALSE);
-	cmd = ALLOCA_N(char, len);
+	cmd = ALLOCV(v, len);
 	join_argv(cmd, argv, FALSE);
     }
 
-    return child_result(CreateChild(cmd, prog, NULL, NULL, NULL, NULL), mode);
+    /* assume ACP */
+    wcmd = cmd ? acp_to_wstr(cmd, NULL) : NULL;
+    if (v) ALLOCV_END(v);
+    wprog = prog ? acp_to_wstr(prog, NULL) : NULL;
+
+    ret = child_result(CreateChild(wcmd, wprog, NULL, NULL, NULL, NULL, flags), mode);
+    free(wprog);
+    free(wcmd);
+    return ret;
 }
 
+rb_pid_t
+rb_w32_aspawn(int mode, const char *prog, char *const *argv)
+{
+    return rb_w32_aspawn_flags(mode, prog, argv, 0);
+}
+
+/* License: Artistic or GPL */
 typedef struct _NtCmdLineElement {
     struct _NtCmdLineElement *next;
     char *str;
@@ -1284,7 +1345,7 @@ cmdglob(NtCmdLineElement *patt, NtCmdLineElement **tail)
     return tail;
 }
 
-// 
+//
 // Check a command string to determine if it has I/O redirection
 // characters that require it to be executed by a command interpreter
 //
@@ -1314,6 +1375,7 @@ has_redirection(const char *cmd)
 	  case '>':
 	  case '<':
 	  case '|':
+	  case '&':
 	  case '\n':
 	    if (!quote)
 		return TRUE;
@@ -1344,7 +1406,7 @@ skipspace(char *ptr)
     return ptr;
 }
 
-int 
+int
 rb_w32_cmdvector(const char *cmd, char ***vec)
 {
     int globbing, len;
@@ -1372,9 +1434,9 @@ rb_w32_cmdvector(const char *cmd, char ***vec)
     //
     // Ok, parse the command line, building a list of CmdLineElements.
     // When we've finished, and it's an input command (meaning that it's
-    // the processes argv), we'll do globing and then build the argument 
+    // the processes argv), we'll do globing and then build the argument
     // vector.
-    // The outer loop does one interation for each element seen. 
+    // The outer loop does one interation for each element seen.
     // The inner loop does one interation for each character in the element.
     //
 
@@ -1411,7 +1473,7 @@ rb_w32_cmdvector(const char *cmd, char ***vec)
 	      case '?':
 	      case '[':
 	      case '{':
-		// 
+		//
 		// record the fact that this element has a wildcard character
 		// N.B. Don't glob if inside a single quoted string
 		//
@@ -1425,7 +1487,7 @@ rb_w32_cmdvector(const char *cmd, char ***vec)
 	      case '\"':
 		//
 		// if we're already in a string, see if this is the
-		// terminating close-quote. If it is, we're finished with 
+		// terminating close-quote. If it is, we're finished with
 		// the string, but not neccessarily with the element.
 		// If we're not already in a string, start one.
 		//
@@ -1461,7 +1523,7 @@ rb_w32_cmdvector(const char *cmd, char ***vec)
 	if (done) --len;
 
 	//
-	// if it's an input vector element and it's enclosed by quotes, 
+	// if it's an input vector element and it's enclosed by quotes,
 	// we can remove them.
 	//
 
@@ -1523,10 +1585,10 @@ rb_w32_cmdvector(const char *cmd, char ***vec)
     }
 
     //
-    // Almost done! 
+    // Almost done!
     // Count up the elements, then allocate space for a vector of pointers
     // (argv) and a string table for the elements.
-    // 
+    //
 
     for (elements = 0, strsz = 0, curr = cmdhead; curr; curr = curr->next) {
 	elements++;
@@ -1546,7 +1608,7 @@ rb_w32_cmdvector(const char *cmd, char ***vec)
 	for (vptr = *vec; *vptr; ++vptr);
 	return vptr - *vec;
     }
-    
+
     //
     // make vptr point to the start of the buffer
     // and ptr point to the area we'll consider the string table.
@@ -1587,7 +1649,7 @@ rb_w32_cmdvector(const char *cmd, char ***vec)
 //
 // The idea here is to read all the directory names into a string table
 // (separated by nulls) and when one of the other dir functions is called
-// return the pointer to the current file name. 
+// return the pointer to the current file name.
 //
 
 #define GetBit(bits, i) ((bits)[(i) / CHAR_BIT] &  (1 << (i) % CHAR_BIT))
@@ -1605,12 +1667,13 @@ open_dir_handle(const WCHAR *filename, WIN32_FIND_DATAW *fd)
     WCHAR *scanname;
     WCHAR *p;
     int len;
+    VALUE v;
 
     //
     // Create the search pattern
     //
     len = lstrlenW(filename);
-    scanname = ALLOCA_N(WCHAR, len + sizeof(wildcard) / sizeof(WCHAR));
+    scanname = ALLOCV_N(WCHAR, v, len + sizeof(wildcard) / sizeof(WCHAR));
     lstrcpyW(scanname, filename);
     p = CharPrevW(scanname, scanname + len);
     if (*p == L'/' || *p == L'\\' || *p == L':')
@@ -1622,6 +1685,7 @@ open_dir_handle(const WCHAR *filename, WIN32_FIND_DATAW *fd)
     // do the FindFirstFile call
     //
     fh = FindFirstFileW(scanname, fd);
+    ALLOCV_END(v);
     if (fh == INVALID_HANDLE_VALUE) {
 	errno = map_errno(GetLastError());
     }
@@ -1629,14 +1693,30 @@ open_dir_handle(const WCHAR *filename, WIN32_FIND_DATAW *fd)
 }
 
 static DIR *
-opendir_internal(HANDLE fh, WIN32_FIND_DATAW *fd)
+opendir_internal(WCHAR *wpath, const char *filename)
 {
+    struct stati64 sbuf;
+    WIN32_FIND_DATAW fd;
+    HANDLE fh;
     DIR *p;
     long len;
     long idx;
     WCHAR *tmpW;
     char *tmp;
 
+    //
+    // check to see if we've got a directory
+    //
+    if (wstati64(wpath, &sbuf) < 0) {
+	return NULL;
+    }
+    if (!(sbuf.st_mode & S_IFDIR) &&
+	(!ISALPHA(filename[0]) || filename[1] != ':' || filename[2] != '\0' ||
+	 ((1 << ((filename[0] & 0x5f) - 'A')) & GetLogicalDrives()) == 0)) {
+	errno = ENOTDIR;
+	return NULL;
+    }
+    fh = open_dir_handle(wpath, &fd);
     if (fh == INVALID_HANDLE_VALUE) {
 	return NULL;
     }
@@ -1657,11 +1737,11 @@ opendir_internal(HANDLE fh, WIN32_FIND_DATAW *fd)
     // of the previous string found.
     //
     do {
-	len = lstrlenW(fd->cFileName) + 1;
+	len = lstrlenW(fd.cFileName) + 1;
 
 	//
 	// bump the string table size by enough for the
-	// new name and it's null terminator 
+	// new name and it's null terminator
 	//
 	tmpW = realloc(p->start, (idx + len) * sizeof(WCHAR));
 	if (!tmpW) {
@@ -1673,7 +1753,7 @@ opendir_internal(HANDLE fh, WIN32_FIND_DATAW *fd)
 	}
 
 	p->start = tmpW;
-	memcpy(&p->start[idx], fd->cFileName, len * sizeof(WCHAR));
+	memcpy(&p->start[idx], fd.cFileName, len * sizeof(WCHAR));
 
 	if (p->nfiles % DIRENT_PER_CHAR == 0) {
 	    tmp = realloc(p->bits, p->nfiles / DIRENT_PER_CHAR + 1);
@@ -1682,62 +1762,45 @@ opendir_internal(HANDLE fh, WIN32_FIND_DATAW *fd)
 	    p->bits = tmp;
 	    p->bits[p->nfiles / DIRENT_PER_CHAR] = 0;
 	}
-	if (fd->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+	if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
 	    SetBit(p->bits, BitOfIsDir(p->nfiles));
-	if (fd->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
+	if (fd.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT)
 	    SetBit(p->bits, BitOfIsRep(p->nfiles));
 
 	p->nfiles++;
 	idx += len;
-    } while (FindNextFileW(fh, fd));
+    } while (FindNextFileW(fh, &fd));
     FindClose(fh);
     p->size = idx;
     p->curr = p->start;
     return p;
 }
 
-static char *
-wstr_to_filecp(const WCHAR *wstr, long *plen)
+static inline UINT
+filecp(void)
 {
     UINT cp = AreFileApisANSI() ? CP_ACP : CP_OEMCP;
+    return cp;
+}
+
+static char *
+wstr_to_mbstr(UINT cp, const WCHAR *wstr, int clen, long *plen)
+{
     char *ptr;
-    int len = WideCharToMultiByte(cp, 0, wstr, -1, NULL, 0, NULL, NULL) - 1;
+    int len = WideCharToMultiByte(cp, 0, wstr, clen, NULL, 0, NULL, NULL) - 1;
     if (!(ptr = malloc(len + 1))) return 0;
-    WideCharToMultiByte(cp, 0, wstr, -1, ptr, len + 1, NULL, NULL);
+    WideCharToMultiByte(cp, 0, wstr, clen, ptr, len + 1, NULL, NULL);
     if (plen) *plen = len;
     return ptr;
 }
 
 static WCHAR *
-filecp_to_wstr(const char *str, long *plen)
-{
-    UINT cp = AreFileApisANSI() ? CP_ACP : CP_OEMCP;
-    WCHAR *ptr;
-    int len = MultiByteToWideChar(cp, 0, str, -1, NULL, 0) - 1;
-    if (!(ptr = malloc(sizeof(WCHAR) * (len + 1)))) return 0;
-    MultiByteToWideChar(cp, 0, str, -1, ptr, len + 1);
-    if (plen) *plen = len;
-    return ptr;
-}
-
-static char *
-wstr_to_utf8(const WCHAR *wstr, long *plen)
-{
-    char *ptr;
-    int len = WideCharToMultiByte(CP_UTF8, 0, wstr, -1, NULL, 0, NULL, NULL) - 1;
-    if (!(ptr = malloc(len + 1))) return 0;
-    WideCharToMultiByte(CP_UTF8, 0, wstr, -1, ptr, len + 1, NULL, NULL);
-    if (plen) *plen = len;
-    return ptr;
-}
-
-static WCHAR *
-utf8_to_wstr(const char *str, long *plen)
+mbstr_to_wstr(UINT cp, const char *str, int clen, long *plen)
 {
     WCHAR *ptr;
-    int len = MultiByteToWideChar(CP_UTF8, 0, str, -1, NULL, 0) - 1;
+    int len = MultiByteToWideChar(cp, 0, str, clen, NULL, 0) - 1;
     if (!(ptr = malloc(sizeof(WCHAR) * (len + 1)))) return 0;
-    MultiByteToWideChar(CP_UTF8, 0, str, -1, ptr, len + 1);
+    MultiByteToWideChar(cp, 0, str, clen, ptr, len + 1);
     if (plen) *plen = len;
     return ptr;
 }
@@ -1745,32 +1808,25 @@ utf8_to_wstr(const char *str, long *plen)
 DIR *
 rb_w32_opendir(const char *filename)
 {
-    struct stati64 sbuf;
-    WIN32_FIND_DATAW fd;
-    HANDLE fh;
-    WCHAR *wpath;
-
-    if (!(wpath = filecp_to_wstr(filename, NULL)))
+    DIR *ret;
+    WCHAR *wpath = filecp_to_wstr(filename, NULL);
+    if (!wpath)
 	return NULL;
-
-    //
-    // check to see if we've got a directory
-    //
-    if (wstati64(wpath, &sbuf) < 0) {
-	free(wpath);
-	return NULL;
-    }
-    if (!(sbuf.st_mode & S_IFDIR) &&
-	(!ISALPHA(filename[0]) || filename[1] != ':' || filename[2] != '\0' ||
-	 ((1 << ((filename[0] & 0x5f) - 'A')) & GetLogicalDrives()) == 0)) {
-	free(wpath);
-	errno = ENOTDIR;
-	return NULL;
-    }
-
-    fh = open_dir_handle(wpath, &fd);
+    ret = opendir_internal(wpath, filename);
     free(wpath);
-    return opendir_internal(fh, &fd);
+    return ret;
+}
+
+DIR *
+rb_w32_uopendir(const char *filename)
+{
+    DIR *ret;
+    WCHAR *wpath = utf8_to_wstr(filename, NULL);
+    if (!wpath)
+	return NULL;
+    ret = opendir_internal(wpath, filename);
+    free(wpath);
+    return ret;
 }
 
 //
@@ -1875,7 +1931,8 @@ readdir_internal(DIR *dirp, BOOL (*conv)(const WCHAR *, struct direct *, rb_enco
 
 	return &(dirp->dirstr);
 
-    } else
+    }
+    else
 	return NULL;
 }
 
@@ -2026,6 +2083,15 @@ set_pioinfo_extra(void)
 #define FDEV			0x40	/* file handle refers to device */
 #define FTEXT			0x80	/* file handle is in text mode */
 
+static int is_socket(SOCKET);
+static int is_console(SOCKET);
+
+int
+rb_w32_io_cancelable_p(int fd)
+{
+    return cancel_io != NULL && (is_socket(TO_SOCKET(fd)) || !is_console(TO_SOCKET(fd)));
+}
+
 static int
 rb_w32_open_osfhandle(intptr_t osfhandle, int flags)
 {
@@ -2047,7 +2113,7 @@ rb_w32_open_osfhandle(intptr_t osfhandle, int flags)
 
     /* attempt to allocate a C Runtime file handle */
     hF = CreateFile("NUL", 0, 0, NULL, OPEN_ALWAYS, 0, NULL);
-    fh = _open_osfhandle((long)hF, 0);
+    fh = _open_osfhandle((intptr_t)hF, 0);
     CloseHandle(hF);
     if (fh == -1) {
 	errno = EMFILE;		/* too many open files */
@@ -2074,7 +2140,7 @@ init_stdhandle(void)
     int keep = 0;
 #define open_null(fd)						\
     (((nullfd < 0) ?						\
-      (nullfd = open("NUL", O_RDWR|O_BINARY)) : 0),		\
+      (nullfd = open("NUL", O_RDWR)) : 0),		\
      ((nullfd == (fd)) ? (keep = 1) : dup2(nullfd, fd)),	\
      (fd))
 
@@ -2087,14 +2153,8 @@ init_stdhandle(void)
     if (fileno(stdout) < 0) {
 	stdout->_file = open_null(1);
     }
-    else {
-	setmode(fileno(stdout), O_BINARY);
-    }
     if (fileno(stderr) < 0) {
 	stderr->_file = open_null(2);
-    }
-    else {
-	setmode(fileno(stderr), O_BINARY);
     }
     if (nullfd >= 0 && !keep) close(nullfd);
     setvbuf(stderr, NULL, _IONBF, 0);
@@ -2141,7 +2201,7 @@ rb_w32_is_socket(int fd)
 }
 
 //
-// Since the errors returned by the socket error function 
+// Since the errors returned by the socket error function
 // WSAGetLastError() are not known by the library routine strerror
 // we have to roll our own.
 //
@@ -2167,7 +2227,26 @@ rb_w32_strerror(int e)
     if (e < 0 || e > sys_nerr) {
 	if (e < 0)
 	    e = GetLastError();
+#if WSAEWOULDBLOCK != EWOULDBLOCK
+	else if (e >= EADDRINUSE && e <= EWOULDBLOCK) {
+	    static int s = -1;
+	    int i;
+	    if (s < 0)
+		for (s = 0; s < (int)(sizeof(errmap)/sizeof(*errmap)); s++)
+		    if (errmap[s].winerr == WSAEWOULDBLOCK)
+			break;
+	    for (i = s; i < (int)(sizeof(errmap)/sizeof(*errmap)); i++)
+		if (errmap[i].err == e) {
+		    e = errmap[i].winerr;
+		    break;
+		}
+	}
+#endif
 	if (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
+			  FORMAT_MESSAGE_IGNORE_INSERTS, &source, e,
+			  MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+			  buffer, sizeof(buffer), NULL) == 0 &&
+	    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM |
 			  FORMAT_MESSAGE_IGNORE_INSERTS, &source, e, 0,
 			  buffer, sizeof(buffer), NULL) == 0)
 	    strlcpy(buffer, "Unknown Error", sizeof(buffer));
@@ -2222,7 +2301,7 @@ getegid(void)
 
 int
 setuid(rb_uid_t uid)
-{ 
+{
     return (uid == ROOT_UID ? 0 : -1);
 }
 
@@ -2243,25 +2322,10 @@ ioctl(int i, int u, ...)
     return -1;
 }
 
-#undef FD_SET
-
 void
 rb_w32_fdset(int fd, fd_set *set)
 {
-    unsigned int i;
-    SOCKET s = TO_SOCKET(fd);
-
-    for (i = 0; i < set->fd_count; i++) {
-        if (set->fd_array[i] == s) {
-            return;
-        }
-    }
-    if (i == set->fd_count) {
-        if (set->fd_count < FD_SETSIZE) {
-            set->fd_array[i] = s;
-            set->fd_count++;
-        }
-    }
+    FD_SET(fd, set);
 }
 
 #undef FD_CLR
@@ -2294,9 +2358,37 @@ rb_w32_fdisset(int fd, fd_set *set)
     return ret;
 }
 
+void
+rb_w32_fd_copy(rb_fdset_t *dst, const fd_set *src, int max)
+{
+    max = min(src->fd_count, (UINT)max);
+    if ((UINT)dst->capa < (UINT)max) {
+	dst->capa = (src->fd_count / FD_SETSIZE + 1) * FD_SETSIZE;
+	dst->fdset = xrealloc(dst->fdset, sizeof(unsigned int) + sizeof(SOCKET) * dst->capa);
+    }
+
+    memcpy(dst->fdset->fd_array, src->fd_array,
+	   max * sizeof(src->fd_array[0]));
+    dst->fdset->fd_count = src->fd_count;
+}
+
+/* License: Ruby's */
+void
+rb_w32_fd_dup(rb_fdset_t *dst, const rb_fdset_t *src)
+{
+    if ((UINT)dst->capa < src->fdset->fd_count) {
+	dst->capa = (src->fdset->fd_count / FD_SETSIZE + 1) * FD_SETSIZE;
+	dst->fdset = xrealloc(dst->fdset, sizeof(unsigned int) + sizeof(SOCKET) * dst->capa);
+    }
+
+    memcpy(dst->fdset->fd_array, src->fdset->fd_array,
+	   src->fdset->fd_count * sizeof(src->fdset->fd_array[0]));
+    dst->fdset->fd_count = src->fdset->fd_count;
+}
+
 //
 // Networking trampolines
-// These are used to avoid socket startup/shutdown overhead in case 
+// These are used to avoid socket startup/shutdown overhead in case
 // the socket routines aren't used.
 //
 
@@ -2306,34 +2398,41 @@ static int
 extract_fd(rb_fdset_t *dst, fd_set *src, int (*func)(SOCKET))
 {
     unsigned int s = 0;
-    if (!src || !dst) return 0;
+    unsigned int m = 0;
+    if (!src) return 0;
 
     while (s < src->fd_count) {
         SOCKET fd = src->fd_array[s];
 
-	if (!func || (*func)(fd)) { /* move it to dst */
-	    unsigned int d;
+	if (!func || (*func)(fd)) {
+	    if (dst) { /* move it to dst */
+		unsigned int d;
 
-	    for (d = 0; d < dst->fdset->fd_count; d++) {
-		if (dst->fdset->fd_array[d] == fd)
-		    break;
-	    }
-	    if (d == dst->fdset->fd_count) {
-		if ((int)dst->fdset->fd_count >= dst->capa) {
-		    dst->capa = (dst->fdset->fd_count / FD_SETSIZE + 1) * FD_SETSIZE;
-		    dst->fdset = xrealloc(dst->fdset, sizeof(unsigned int) + sizeof(SOCKET) * dst->capa);
+		for (d = 0; d < dst->fdset->fd_count; d++) {
+		    if (dst->fdset->fd_array[d] == fd)
+			break;
 		}
-		dst->fdset->fd_array[dst->fdset->fd_count++] = fd;
+		if (d == dst->fdset->fd_count) {
+		    if ((int)dst->fdset->fd_count >= dst->capa) {
+			dst->capa = (dst->fdset->fd_count / FD_SETSIZE + 1) * FD_SETSIZE;
+			dst->fdset = xrealloc(dst->fdset, sizeof(unsigned int) + sizeof(SOCKET) * dst->capa);
+		    }
+		    dst->fdset->fd_array[dst->fdset->fd_count++] = fd;
+		}
+		memmove(
+		    &src->fd_array[s],
+		    &src->fd_array[s+1],
+		    sizeof(src->fd_array[0]) * (--src->fd_count - s));
 	    }
-	    memmove(
-		&src->fd_array[s],
-		&src->fd_array[s+1], 
-		sizeof(src->fd_array[0]) * (--src->fd_count - s));
+	    else {
+		m++;
+		s++;
+	    }
 	}
 	else s++;
     }
 
-    return dst->fdset->fd_count;
+    return dst ? dst->fdset->fd_count : m;
 }
 
 static int
@@ -2430,6 +2529,12 @@ is_readable_console(SOCKET sock) /* call this for console only */
 }
 
 static int
+is_invalid_handle(SOCKET sock)
+{
+    return (HANDLE)sock == INVALID_HANDLE_VALUE;
+}
+
+static int
 do_select(int nfds, fd_set *rd, fd_set *wr, fd_set *ex,
             struct timeval *timeout)
 {
@@ -2456,8 +2561,12 @@ do_select(int nfds, fd_set *rd, fd_set *wr, fd_set *ex,
     return r;
 }
 
-static inline int
-subtract(struct timeval *rest, const struct timeval *wait)
+/*
+ * rest -= wait
+ * return 0 if rest is smaller than wait.
+ */
+int
+rb_w32_time_subtract(struct timeval *rest, const struct timeval *wait)
 {
     if (rest->tv_sec < wait->tv_sec) {
 	return 0;
@@ -2489,9 +2598,13 @@ compare(const struct timeval *t1, const struct timeval *t2)
 }
 
 #undef Sleep
-int WSAAPI
-rb_w32_select(int nfds, fd_set *rd, fd_set *wr, fd_set *ex,
-	      struct timeval *timeout)
+
+int rb_w32_check_interrupt(void *);	/* @internal */
+
+/* @internal */
+int
+rb_w32_select_with_thread(int nfds, fd_set *rd, fd_set *wr, fd_set *ex,
+			  struct timeval *timeout, void *th)
 {
     int r;
     rb_fdset_t pipe_rd;
@@ -2536,14 +2649,23 @@ rb_w32_select(int nfds, fd_set *rd, fd_set *wr, fd_set *ex,
     rb_fd_init(&else_rd);
     nonsock += extract_fd(&else_rd, rd, is_not_socket);
 
+    rb_fd_init(&else_wr);
+    nonsock += extract_fd(&else_wr, wr, is_not_socket);
+
+    // check invalid handles
+    if (extract_fd(NULL, else_rd.fdset, is_invalid_handle) > 0 ||
+	extract_fd(NULL, else_wr.fdset, is_invalid_handle) > 0) {
+	rb_fd_term(&else_wr);
+	rb_fd_term(&else_rd);
+	errno = EBADF;
+	return -1;
+    }
+
     rb_fd_init(&pipe_rd);
     extract_fd(&pipe_rd, else_rd.fdset, is_pipe); // should not call is_pipe for socket
 
     rb_fd_init(&cons_rd);
     extract_fd(&cons_rd, else_rd.fdset, is_console); // ditto
-
-    rb_fd_init(&else_wr);
-    nonsock += extract_fd(&else_wr, wr, is_not_socket);
 
     rb_fd_init(&except);
     extract_fd(&except, ex, is_not_socket); // drop only
@@ -2561,6 +2683,10 @@ rb_w32_select(int nfds, fd_set *rd, fd_set *wr, fd_set *ex,
 	wait.tv_sec = 0; wait.tv_usec = 10 * 1000; // 10ms
 	zero.tv_sec = 0; zero.tv_usec = 0;         //  0ms
 	for (;;) {
+	    if (th && rb_w32_check_interrupt(th) != WAIT_TIMEOUT) {
+		r = -1;
+		break;
+	    }
 	    if (nonsock) {
 		// modifying {else,pipe,cons}_rd is safe because
 		// if they are modified, function returns immediately.
@@ -2571,7 +2697,7 @@ rb_w32_select(int nfds, fd_set *rd, fd_set *wr, fd_set *ex,
 	    if (else_rd.fdset->fd_count || else_wr.fdset->fd_count) {
 		r = do_select(nfds, rd, wr, ex, &zero); // polling
 		if (r < 0) break; // XXX: should I ignore error and return signaled handles?
-		r = copy_fd(rd, else_rd.fdset);
+		r += copy_fd(rd, else_rd.fdset);
 		r += copy_fd(wr, else_wr.fdset);
 		if (ex)
 		    r += ex->fd_count;
@@ -2583,20 +2709,25 @@ rb_w32_select(int nfds, fd_set *rd, fd_set *wr, fd_set *ex,
 		fd_set orig_rd;
 		fd_set orig_wr;
 		fd_set orig_ex;
-		if (rd) orig_rd = *rd;
-		if (wr) orig_wr = *wr;
-		if (ex) orig_ex = *ex;
+
+		FD_ZERO(&orig_rd);
+		FD_ZERO(&orig_wr);
+		FD_ZERO(&orig_ex);
+
+		if (rd) copy_fd(&orig_rd, rd);
+		if (wr) copy_fd(&orig_wr, wr);
+		if (ex) copy_fd(&orig_ex, ex);
 		r = do_select(nfds, rd, wr, ex, &zero);	// polling
 		if (r != 0) break; // signaled or error
-		if (rd) *rd = orig_rd;
-		if (wr) *wr = orig_wr;
-		if (ex) *ex = orig_ex;
+		if (rd) copy_fd(rd, &orig_rd);
+		if (wr) copy_fd(wr, &orig_wr);
+		if (ex) copy_fd(ex, &orig_ex);
 
 		if (timeout) {
 		    struct timeval now;
 		    gettimeofday(&now, NULL);
 		    rest = limit;
-		    if (!subtract(&rest, &now)) break;
+		    if (!rb_w32_time_subtract(&rest, &now)) break;
 		    if (compare(&rest, &wait) < 0) dowait = &rest;
 		}
 		Sleep(dowait->tv_sec * 1000 + dowait->tv_usec / 1000);
@@ -2605,12 +2736,32 @@ rb_w32_select(int nfds, fd_set *rd, fd_set *wr, fd_set *ex,
     }
 
     rb_fd_term(&except);
-    rb_fd_term(&else_wr);
     rb_fd_term(&cons_rd);
     rb_fd_term(&pipe_rd);
+    rb_fd_term(&else_wr);
     rb_fd_term(&else_rd);
 
     return r;
+}
+
+int WSAAPI
+rb_w32_select(int nfds, fd_set *rd, fd_set *wr, fd_set *ex,
+	      struct timeval *timeout)
+{
+    return rb_w32_select_with_thread(nfds, rd, wr, ex, timeout, 0);
+}
+
+static FARPROC
+get_wsa_extension_function(SOCKET s, GUID *guid)
+{
+    DWORD dmy;
+    FARPROC ptr = NULL;
+
+    WSAIoctl(s, SIO_GET_EXTENSION_FUNCTION_POINTER, guid, sizeof(*guid),
+	     &ptr, sizeof(ptr), &dmy, NULL, NULL);
+    if (!ptr)
+	errno = ENOSYS;
+    return ptr;
 }
 
 #undef accept
@@ -2778,6 +2929,44 @@ rb_w32_listen(int s, int backlog)
 #undef sendto
 
 static int
+finish_overlapped_socket(SOCKET s, WSAOVERLAPPED *wol, int result, DWORD *len, DWORD size)
+{
+    DWORD flg;
+    int err;
+
+    if (result != SOCKET_ERROR)
+	*len = size;
+    else if ((err = WSAGetLastError()) == WSA_IO_PENDING) {
+	switch (rb_w32_wait_events_blocking(&wol->hEvent, 1, INFINITE)) {
+	  case WAIT_OBJECT_0:
+	    RUBY_CRITICAL(
+		result = WSAGetOverlappedResult(s, wol, &size, TRUE, &flg)
+		);
+	    if (result) {
+		*len = size;
+		break;
+	    }
+	    /* thru */
+	  default:
+	    errno = map_errno(WSAGetLastError());
+	    /* thru */
+	  case WAIT_OBJECT_0 + 1:
+	    /* interrupted */
+	    *len = -1;
+	    cancel_io((HANDLE)s);
+	    break;
+	}
+    }
+    else {
+	errno = map_errno(err);
+	*len = -1;
+    }
+    CloseHandle(wol->hEvent);
+
+    return result;
+}
+
+static int
 overlapped_socket_io(BOOL input, int fd, char *buf, int len, int flags,
 		     struct sockaddr *addr, int *addrlen)
 {
@@ -2788,7 +2977,6 @@ overlapped_socket_io(BOOL input, int fd, char *buf, int len, int flags,
     DWORD flg;
     WSAOVERLAPPED wol;
     WSABUF wbuf;
-    int err;
     SOCKET s;
 
     if (!NtSocketsInitialized)
@@ -2817,6 +3005,7 @@ overlapped_socket_io(BOOL input, int fd, char *buf, int len, int flags,
     }
     else {
 	DWORD size;
+	DWORD rlen;
 	wbuf.len = len;
 	wbuf.buf = buf;
 	memset(&wol, 0, sizeof(wol));
@@ -2839,35 +3028,8 @@ overlapped_socket_io(BOOL input, int fd, char *buf, int len, int flags,
 	    }
 	});
 
-	if (ret != SOCKET_ERROR) {
-	    r = size;
-	}
-	else if ((err = WSAGetLastError()) == WSA_IO_PENDING) {
-	    switch (rb_w32_wait_events_blocking(&wol.hEvent, 1, INFINITE)) {
-	      case WAIT_OBJECT_0:
-		RUBY_CRITICAL(
-		    ret = WSAGetOverlappedResult(s, &wol, &size, TRUE, &flg)
-		    );
-		if (ret) {
-		    r = size;
-		    break;
-		}
-		/* thru */
-	      default:
-		errno = map_errno(WSAGetLastError());
-		/* thru */
-	      case WAIT_OBJECT_0 + 1:
-		/* interrupted */
-		r = -1;
-		cancel_io((HANDLE)s);
-		break;
-	    }
-	}
-	else {
-	    errno = map_errno(err);
-	    r = -1;
-	}
-	CloseHandle(wol.hEvent);
+	finish_overlapped_socket(s, &wol, ret, &rlen, size);
+	r = (int)rlen;
     }
 
     return r;
@@ -2893,7 +3055,7 @@ rb_w32_send(int fd, const char *buf, int len, int flags)
 }
 
 int WSAAPI
-rb_w32_sendto(int fd, const char *buf, int len, int flags, 
+rb_w32_sendto(int fd, const char *buf, int len, int flags,
 	      const struct sockaddr *to, int tolen)
 {
     return overlapped_socket_io(FALSE, fd, (char *)buf, len, flags,
@@ -2952,13 +3114,9 @@ recvmsg(int fd, struct msghdr *msg, int flags)
 
     if (!pWSARecvMsg) {
 	static GUID guid = WSAID_WSARECVMSG;
-	DWORD dmy;
-	WSAIoctl(s, SIO_GET_EXTENSION_FUNCTION_POINTER, &guid, sizeof(guid),
-		 &pWSARecvMsg, sizeof(pWSARecvMsg), &dmy, NULL, NULL);
-	if (!pWSARecvMsg) {
-	    errno = ENOSYS;
+	pWSARecvMsg = (WSARecvMsg_t)get_wsa_extension_function(s, &guid);
+	if (!pWSARecvMsg)
 	    return -1;
-	}
     }
 
     msghdr_to_wsamsg(msg, &wsamsg);
@@ -2976,44 +3134,14 @@ recvmsg(int fd, struct msghdr *msg, int flags)
     }
     else {
 	DWORD size;
-	int err;
 	WSAOVERLAPPED wol;
 	memset(&wol, 0, sizeof(wol));
 	RUBY_CRITICAL({
 	    wol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-	    ret = pWSARecvMsg(s, &wsamsg, &len, &wol, NULL);
+	    ret = pWSARecvMsg(s, &wsamsg, &size, &wol, NULL);
 	});
 
-	if (ret != SOCKET_ERROR) {
-	    /* nothing to do */
-	}
-	else if ((err = WSAGetLastError()) == WSA_IO_PENDING) {
-	    DWORD flg;
-	    switch (rb_w32_wait_events_blocking(&wol.hEvent, 1, INFINITE)) {
-	      case WAIT_OBJECT_0:
-		RUBY_CRITICAL(
-		    ret = WSAGetOverlappedResult(s, &wol, &size, TRUE, &flg)
-		    );
-		if (ret) {
-		    len = size;
-		    break;
-		}
-		/* thru */
-	      default:
-		errno = map_errno(WSAGetLastError());
-		/* thru */
-	      case WAIT_OBJECT_0 + 1:
-		/* interrupted */
-		len = -1;
-		cancel_io((HANDLE)s);
-		break;
-	    }
-	}
-	else {
-	    errno = map_errno(err);
-	    len = -1;
-	}
-	CloseHandle(wol.hEvent);
+	ret = finish_overlapped_socket(s, &wol, ret, &len, size);
     }
     if (ret == SOCKET_ERROR)
 	return -1;
@@ -3045,13 +3173,9 @@ sendmsg(int fd, const struct msghdr *msg, int flags)
 
     if (!pWSASendMsg) {
 	static GUID guid = WSAID_WSASENDMSG;
-	DWORD dmy;
-	WSAIoctl(s, SIO_GET_EXTENSION_FUNCTION_POINTER, &guid, sizeof(guid),
-		 &pWSASendMsg, sizeof(pWSASendMsg), &dmy, NULL, NULL);
-	if (!pWSASendMsg) {
-	    errno = ENOSYS;
+	pWSASendMsg = (WSASendMsg_t)get_wsa_extension_function(s, &guid);
+	if (!pWSASendMsg)
 	    return -1;
-	}
     }
 
     msghdr_to_wsamsg(msg, &wsamsg);
@@ -3068,44 +3192,14 @@ sendmsg(int fd, const struct msghdr *msg, int flags)
     }
     else {
 	DWORD size;
-	int err;
 	WSAOVERLAPPED wol;
 	memset(&wol, 0, sizeof(wol));
 	RUBY_CRITICAL({
 	    wol.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
-	    ret = pWSASendMsg(s, &wsamsg, flags, &len, &wol, NULL);
+	    ret = pWSASendMsg(s, &wsamsg, flags, &size, &wol, NULL);
 	});
 
-	if (ret != SOCKET_ERROR) {
-	    /* nothing to do */
-	}
-	else if ((err = WSAGetLastError()) == WSA_IO_PENDING) {
-	    DWORD flg;
-	    switch (rb_w32_wait_events_blocking(&wol.hEvent, 1, INFINITE)) {
-	      case WAIT_OBJECT_0:
-		RUBY_CRITICAL(
-		    ret = WSAGetOverlappedResult(s, &wol, &size, TRUE, &flg)
-		    );
-		if (ret) {
-		    len = size;
-		    break;
-		}
-		/* thru */
-	      default:
-		errno = map_errno(WSAGetLastError());
-		/* thru */
-	      case WAIT_OBJECT_0 + 1:
-		/* interrupted */
-		len = -1;
-		cancel_io((HANDLE)s);
-		break;
-	    }
-	}
-	else {
-	    errno = map_errno(err);
-	    len = -1;
-	}
-	CloseHandle(wol.hEvent);
+	finish_overlapped_socket(s, &wol, ret, &len, size);
     }
 
     return len;
@@ -3127,7 +3221,7 @@ rb_w32_setsockopt(int s, int level, int optname, const char *optval, int optlen)
     });
     return r;
 }
-    
+
 #undef shutdown
 
 int WSAAPI
@@ -3384,6 +3478,8 @@ socketpair_internal(int af, int type, int protocol, SOCKET *sv)
 	return -1;
     }
 
+    sv[0] = (SOCKET)INVALID_HANDLE_VALUE;
+    sv[1] = (SOCKET)INVALID_HANDLE_VALUE;
     RUBY_CRITICAL({
 	do {
 	    svr = open_ifs_socket(af, type, protocol);
@@ -3535,6 +3631,7 @@ poll_child_status(struct ChildRecord *child, int *stat_loc)
 
     if (!GetExitCodeProcess(child->hProcess, &exitcode)) {
 	/* If an error occured, return immediatly. */
+    error_exit:
 	err = GetLastError();
 	if (err == ERROR_INVALID_PARAMETER)
 	    errno = ECHILD;
@@ -3548,8 +3645,12 @@ poll_child_status(struct ChildRecord *child, int *stat_loc)
 	return -1;
     }
     if (exitcode != STILL_ACTIVE) {
-	/* If already died, return immediatly. */
-	rb_pid_t pid = child->pid;
+        rb_pid_t pid;
+	/* If already died, wait process's real termination. */
+        if (rb_w32_wait_events_blocking(&child->hProcess, 1, INFINITE) != WAIT_OBJECT_0) {
+	    goto error_exit;
+        }
+	pid = child->pid;
 	CloseChildHandle(child);
 	if (stat_loc) *stat_loc = exitcode << 8;
 	return pid;
@@ -3564,7 +3665,8 @@ waitpid(rb_pid_t pid, int *stat_loc, int options)
 
     if (options == WNOHANG) {
 	timeout = 0;
-    } else {
+    }
+    else {
 	timeout = INFINITE;
     }
 
@@ -3708,7 +3810,7 @@ kill(int pid, int sig)
     int ret = 0;
     DWORD err;
 
-    if (pid <= 0) {
+    if (pid < 0 || pid == 0 && sig != SIGINT) {
 	errno = EINVAL;
 	return -1;
     }
@@ -3745,7 +3847,13 @@ kill(int pid, int sig)
 
       case SIGINT:
 	RUBY_CRITICAL({
-	    if (!GenerateConsoleCtrlEvent(CTRL_C_EVENT, (DWORD)pid)) {
+	    DWORD ctrlEvent = CTRL_C_EVENT;
+	    if (pid != 0) {
+	        /* CTRL+C signal cannot be generated for process groups.
+		 * Instead, we use CTRL+BREAK signal. */
+	        ctrlEvent = CTRL_BREAK_EVENT;
+	    }
+	    if (!GenerateConsoleCtrlEvent(ctrlEvent, (DWORD)pid)) {
 		if ((err = GetLastError()) == 0)
 		    errno = EPERM;
 		else
@@ -3757,7 +3865,14 @@ kill(int pid, int sig)
 
       case SIGKILL:
 	RUBY_CRITICAL({
-	    HANDLE hProc = OpenProcess(PROCESS_TERMINATE, FALSE, (DWORD)pid);
+	    HANDLE hProc;
+	    struct ChildRecord* child = FindChildSlot(pid);
+	    if (child) {
+		hProc = child->hProcess;
+	    }
+	    else {
+		hProc = OpenProcess(PROCESS_TERMINATE | PROCESS_QUERY_INFORMATION, FALSE, (DWORD)pid);
+	    }
 	    if (hProc == NULL || hProc == INVALID_HANDLE_VALUE) {
 		if (GetLastError() == ERROR_INVALID_PARAMETER) {
 		    errno = ESRCH;
@@ -3768,11 +3883,24 @@ kill(int pid, int sig)
 		ret = -1;
 	    }
 	    else {
-		if (!TerminateProcess(hProc, 0)) {
-		    errno = EPERM;
+		DWORD status;
+		if (!GetExitCodeProcess(hProc, &status)) {
+		    errno = map_errno(GetLastError());
 		    ret = -1;
 		}
-		CloseHandle(hProc);
+		else if (status == STILL_ACTIVE) {
+		    if (!TerminateProcess(hProc, 0)) {
+			errno = EPERM;
+			ret = -1;
+		    }
+		}
+		else {
+		    errno = ESRCH;
+		    ret = -1;
+		}
+		if (!child) {
+		    CloseHandle(hProc);
+		}
 	    }
 	});
 	break;
@@ -3789,22 +3917,14 @@ kill(int pid, int sig)
 static int
 wlink(const WCHAR *from, const WCHAR *to)
 {
-    static BOOL (WINAPI *pCreateHardLinkW)(LPCWSTR, LPCWSTR, LPSECURITY_ATTRIBUTES) = NULL;
+    typedef BOOL (WINAPI link_func)(LPCWSTR, LPCWSTR, LPSECURITY_ATTRIBUTES);
+    static link_func *pCreateHardLinkW = NULL;
     static int myerrno = 0;
 
     if (!pCreateHardLinkW && !myerrno) {
-	HANDLE hKernel;
-
-	hKernel = GetModuleHandle("kernel32.dll");
-	if (hKernel) {
-	    pCreateHardLinkW = (BOOL (WINAPI *)(LPCWSTR, LPCWSTR, LPSECURITY_ATTRIBUTES))GetProcAddress(hKernel, "CreateHardLinkW");
-	    if (!pCreateHardLinkW) {
-		myerrno = ENOSYS;
-	    }
-	}
-	else {
-	    myerrno = map_errno(GetLastError());
-	}
+	pCreateHardLinkW = (link_func *)get_proc_address("kernel32", "CreateHardLinkW", NULL);
+	if (!pCreateHardLinkW)
+	    myerrno = ENOSYS;
     }
     if (!pCreateHardLinkW) {
 	errno = myerrno;
@@ -3869,8 +3989,8 @@ rb_w32_getenv(const char *name)
     int len = strlen(name);
     char *env;
 
-    if (envarea)
-	FreeEnvironmentStrings(envarea);
+    if (len == 0) return NULL;
+    if (envarea) FreeEnvironmentStrings(envarea);
     envarea = GetEnvironmentStrings();
     if (!envarea) {
 	map_errno(GetLastError());
@@ -3903,17 +4023,18 @@ wrename(const WCHAR *oldpath, const WCHAR *newpath)
 	if (newatts != -1 && newatts & FILE_ATTRIBUTE_READONLY)
 	    SetFileAttributesW(newpath, newatts & ~ FILE_ATTRIBUTE_READONLY);
 
-	if (!MoveFileW(oldpath, newpath))
-	    res = -1;
+	if (IsWinNT()) {
+	    if (!MoveFileExW(oldpath, newpath, MOVEFILE_REPLACE_EXISTING | MOVEFILE_COPY_ALLOWED))
+		res = -1;
+	}
+	else {
+	    if (!MoveFileW(oldpath, newpath))
+		res = -1;
 
-	if (res) {
-	    switch (GetLastError()) {
-	      case ERROR_ALREADY_EXISTS:
-	      case ERROR_FILE_EXISTS:
-		if (IsWinNT()) {
-		    if (MoveFileExW(oldpath, newpath, MOVEFILE_REPLACE_EXISTING))
-			res = 0;
-		} else {
+	    if (res) {
+		switch (GetLastError()) {
+		  case ERROR_ALREADY_EXISTS:
+		  case ERROR_FILE_EXISTS:
 		    for (;;) {
 			if (!DeleteFileW(newpath) && GetLastError() != ERROR_FILE_NOT_FOUND)
 			    break;
@@ -4006,7 +4127,8 @@ isUNCRoot(const WCHAR *path)
 	(dest).st_ctime = (src).st_ctime;	\
     } while (0)
 
-#ifdef __BORLANDC__
+static time_t filetime_to_unixtime(const FILETIME *ft);
+
 #undef fstat
 int
 rb_w32_fstat(int fd, struct stat *st)
@@ -4015,10 +4137,18 @@ rb_w32_fstat(int fd, struct stat *st)
     int ret = fstat(fd, st);
 
     if (ret) return ret;
+#ifdef __BORLANDC__
     st->st_mode &= ~(S_IWGRP | S_IWOTH);
-    if (GetFileInformationByHandle((HANDLE)_get_osfhandle(fd), &info) &&
-	!(info.dwFileAttributes & FILE_ATTRIBUTE_READONLY)) {
-	st->st_mode |= S_IWUSR;
+#endif
+    if (GetFileInformationByHandle((HANDLE)_get_osfhandle(fd), &info)) {
+#ifdef __BORLANDC__
+	if (!(info.dwFileAttributes & FILE_ATTRIBUTE_READONLY)) {
+	    st->st_mode |= S_IWUSR;
+	}
+#endif
+	st->st_atime = filetime_to_unixtime(&info.ftLastAccessTime);
+	st->st_mtime = filetime_to_unixtime(&info.ftLastWriteTime);
+	st->st_ctime = filetime_to_unixtime(&info.ftCreationTime);
     }
     return ret;
 }
@@ -4031,17 +4161,23 @@ rb_w32_fstati64(int fd, struct stati64 *st)
     int ret = fstat(fd, &tmp);
 
     if (ret) return ret;
+#ifdef __BORLANDC__
     tmp.st_mode &= ~(S_IWGRP | S_IWOTH);
+#endif
     COPY_STAT(tmp, *st, +);
     if (GetFileInformationByHandle((HANDLE)_get_osfhandle(fd), &info)) {
+#ifdef __BORLANDC__
 	if (!(info.dwFileAttributes & FILE_ATTRIBUTE_READONLY)) {
 	    st->st_mode |= S_IWUSR;
 	}
+#endif
 	st->st_size = ((__int64)info.nFileSizeHigh << 32) | info.nFileSizeLow;
+	st->st_atime = filetime_to_unixtime(&info.ftLastAccessTime);
+	st->st_mtime = filetime_to_unixtime(&info.ftLastWriteTime);
+	st->st_ctime = filetime_to_unixtime(&info.ftCreationTime);
     }
     return ret;
 }
-#endif
 
 static time_t
 filetime_to_unixtime(const FILETIME *ft)
@@ -4099,7 +4235,14 @@ static int
 check_valid_dir(const WCHAR *path)
 {
     WIN32_FIND_DATAW fd;
-    HANDLE fh = open_dir_handle(path, &fd);
+    HANDLE fh;
+
+    /* GetFileAttributes() determines "..." as directory. */
+    /* We recheck it by FindFirstFile(). */
+    if (wcsstr(path, L"...") == NULL)
+	return 0;
+
+    fh = open_dir_handle(path, &fd);
     if (fh == INVALID_HANDLE_VALUE)
 	return -1;
     FindClose(fh);
@@ -4111,6 +4254,7 @@ winnt_stat(const WCHAR *path, struct stati64 *st)
 {
     HANDLE h;
     WIN32_FIND_DATAW wfd;
+    WIN32_FILE_ATTRIBUTE_DATA wfa;
 
     memset(st, 0, sizeof(*st));
     st->st_nlink = 1;
@@ -4119,27 +4263,43 @@ winnt_stat(const WCHAR *path, struct stati64 *st)
 	errno = ENOENT;
 	return -1;
     }
-    h = FindFirstFileW(path, &wfd);
-    if (h != INVALID_HANDLE_VALUE) {
-	FindClose(h);
-	st->st_mode  = fileattr_to_unixmode(wfd.dwFileAttributes, path);
-	st->st_atime = filetime_to_unixtime(&wfd.ftLastAccessTime);
-	st->st_mtime = filetime_to_unixtime(&wfd.ftLastWriteTime);
-	st->st_ctime = filetime_to_unixtime(&wfd.ftCreationTime);
-	st->st_size = ((__int64)wfd.nFileSizeHigh << 32) | wfd.nFileSizeLow;
+    if (GetFileAttributesExW(path, GetFileExInfoStandard, (void*)&wfa)) {
+	if (wfa.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+	    if (check_valid_dir(path)) return -1;
+	    st->st_size = 0;
+	}
+	else {
+	    st->st_size = ((__int64)wfa.nFileSizeHigh << 32) | wfa.nFileSizeLow;
+	}
+	st->st_mode  = fileattr_to_unixmode(wfa.dwFileAttributes, path);
+	st->st_atime = filetime_to_unixtime(&wfa.ftLastAccessTime);
+	st->st_mtime = filetime_to_unixtime(&wfa.ftLastWriteTime);
+	st->st_ctime = filetime_to_unixtime(&wfa.ftCreationTime);
     }
     else {
-	// If runtime stat(2) is called for network shares, it fails on WinNT.
-	// Because GetDriveType returns 1 for network shares. (Win98 returns 4)
-	DWORD attr = GetFileAttributesW(path);
-	if (attr == (DWORD)-1L) {
+	/* GetFileAttributesEx failed; check why. */
+	int e = GetLastError();
+
+	if ((e == ERROR_FILE_NOT_FOUND) || (e == ERROR_INVALID_NAME)
+	    || (e == ERROR_PATH_NOT_FOUND || (e == ERROR_BAD_NETPATH))) {
+	    errno = map_errno(e);
+	    return -1;
+	}
+
+	/* Fall back to FindFirstFile for ERROR_SHARING_VIOLATION */
+	h = FindFirstFileW(path, &wfd);
+	if (h != INVALID_HANDLE_VALUE) {
+	    FindClose(h);
+	    st->st_mode  = fileattr_to_unixmode(wfd.dwFileAttributes, path);
+	    st->st_atime = filetime_to_unixtime(&wfd.ftLastAccessTime);
+	    st->st_mtime = filetime_to_unixtime(&wfd.ftLastWriteTime);
+	    st->st_ctime = filetime_to_unixtime(&wfd.ftCreationTime);
+	    st->st_size = ((__int64)wfd.nFileSizeHigh << 32) | wfd.nFileSizeLow;
+	}
+	else {
 	    errno = map_errno(GetLastError());
 	    return -1;
 	}
-	if (attr & FILE_ATTRIBUTE_DIRECTORY) {
-	    if (check_valid_dir(path)) return -1;
-	}
-	st->st_mode  = fileattr_to_unixmode(attr, path);
     }
 
     st->st_dev = st->st_rdev = (iswalpha(path[0]) && path[1] == L':') ?
@@ -4180,13 +4340,14 @@ wstati64(const WCHAR *path, struct stati64 *st)
     WCHAR *buf1, *s, *end;
     int len, size;
     int ret;
+    VALUE v;
 
     if (!path || !st) {
 	errno = EFAULT;
 	return -1;
     }
     size = lstrlenW(path) + 2;
-    buf1 = ALLOCA_N(WCHAR, size);
+    buf1 = ALLOCV_N(WCHAR, v, size);
     for (p = path, s = buf1; *p; p++, s++) {
 	if (*p == L'/')
 	    *s = L'\\';
@@ -4214,6 +4375,9 @@ wstati64(const WCHAR *path, struct stati64 *st)
     if (ret == 0) {
 	st->st_mode &= ~(S_IWGRP | S_IWOTH);
     }
+    if (v)
+	ALLOCV_END(v);
+
     return ret;
 }
 
@@ -4303,7 +4467,7 @@ rb_chsize(HANDLE h, off_t size)
 }
 
 int
-truncate(const char *path, off_t length)
+rb_w32_truncate(const char *path, off_t length)
 {
     HANDLE h;
     int ret;
@@ -4329,18 +4493,18 @@ truncate(const char *path, off_t length)
 }
 
 int
-ftruncate(int fd, off_t length)
+rb_w32_ftruncate(int fd, off_t length)
 {
-    long h;
+    HANDLE h;
 
 #ifdef WIN95
     if (IsWin95()) {
 	return chsize(fd, (unsigned long)length);
     }
 #endif
-    h = _get_osfhandle(fd);
-    if (h == -1) return -1;
-    return rb_chsize((HANDLE)h, length);
+    h = (HANDLE)_get_osfhandle(fd);
+    if (h == (HANDLE)-1) return -1;
+    return rb_chsize(h, length);
 }
 
 #ifdef __BORLANDC__
@@ -4402,7 +4566,7 @@ fseeko(FILE *stream, off_t offset, int whence)
 }
 
 off_t
-ftello(FILE *stream)
+rb_w32_ftello(FILE *stream)
 {
     off_t pos;
     if (fgetpos(stream, (fpos_t *)&pos)) return (off_t)-1;
@@ -4472,8 +4636,7 @@ rb_w32_getc(FILE* stream)
     if (enough_to_get(stream->FILE_COUNT)) {
 	c = (unsigned char)*stream->FILE_READPTR++;
     }
-    else 
-    {
+    else {
 	c = _filbuf(stream);
 #if defined __BORLANDC__
         if ((c == EOF) && (errno == EPIPE)) {
@@ -4492,8 +4655,7 @@ rb_w32_putc(int c, FILE* stream)
     if (enough_to_put(stream->FILE_COUNT)) {
 	c = (unsigned char)(*stream->FILE_READPTR++ = (char)c);
     }
-    else 
-    {
+    else {
 	c = _flsbuf(c, stream);
 	catch_interrupt();
     }
@@ -4645,24 +4807,21 @@ rb_w32_getpid(void)
 rb_pid_t
 rb_w32_getppid(void)
 {
-    static long (WINAPI *pNtQueryInformationProcess)(HANDLE, int, void *, ULONG, ULONG *) = NULL;
+    typedef long (WINAPI query_func)(HANDLE, int, void *, ULONG, ULONG *);
+    static query_func *pNtQueryInformationProcess = NULL;
     rb_pid_t ppid = 0;
 
     if (!IsWin95() && rb_w32_osver() >= 5) {
-	if (!pNtQueryInformationProcess) {
-	    HANDLE hNtDll = GetModuleHandle("ntdll.dll");
-	    if (hNtDll) {
-		pNtQueryInformationProcess = (long (WINAPI *)(HANDLE, int, void *, ULONG, ULONG *))GetProcAddress(hNtDll, "NtQueryInformationProcess");
-	    }
-	}
+	if (!pNtQueryInformationProcess)
+	    pNtQueryInformationProcess = (query_func *)get_proc_address("ntdll.dll", "NtQueryInformationProcess", NULL);
 	if (pNtQueryInformationProcess) {
 	    struct {
 		long ExitStatus;
 		void* PebBaseAddress;
-		ULONG AffinityMask;
-		ULONG BasePriority;
-		ULONG UniqueProcessId;
-		ULONG ParentProcessId;
+		uintptr_t AffinityMask;
+		uintptr_t BasePriority;
+		uintptr_t UniqueProcessId;
+		uintptr_t ParentProcessId;
 	    } pbi;
 	    ULONG len;
 	    long ret = pNtQueryInformationProcess(GetCurrentProcess(), 0, &pbi, sizeof(pbi), &len);
@@ -4834,7 +4993,7 @@ rb_w32_wopen(const WCHAR *file, int oflag, ...)
     /* allocate a C Runtime file handle */
     RUBY_CRITICAL({
 	h = CreateFile("NUL", 0, 0, NULL, OPEN_ALWAYS, 0, NULL);
-	fd = _open_osfhandle((long)h, 0);
+	fd = _open_osfhandle((intptr_t)h, 0);
 	CloseHandle(h);
     });
     if (fd == -1) {
@@ -4843,7 +5002,7 @@ rb_w32_wopen(const WCHAR *file, int oflag, ...)
     }
     RUBY_CRITICAL({
 	MTHREAD_ONLY(EnterCriticalSection(&(_pioinfo(fd)->lock)));
-	_set_osfhnd(fd, (long)INVALID_HANDLE_VALUE);
+	_set_osfhnd(fd, (intptr_t)INVALID_HANDLE_VALUE);
 	_set_osflags(fd, 0);
 
 	h = CreateFileW(file, access, FILE_SHARE_READ | FILE_SHARE_WRITE, &sec,
@@ -4872,7 +5031,7 @@ rb_w32_wopen(const WCHAR *file, int oflag, ...)
 	if (!(flags & (FDEV | FPIPE)) && (oflag & O_APPEND))
 	    flags |= FAPPEND;
 
-	_set_osfhnd(fd, (long)h);
+	_set_osfhnd(fd, (intptr_t)h);
 	_osfile(fd) = flags | FOPEN;
 
 	MTHREAD_ONLY(LeaveCriticalSection(&_pioinfo(fd)->lock));
@@ -4921,7 +5080,7 @@ rb_w32_pipe(int fds[2])
 	return _pipe(fds, 65536L, _O_NOINHERIT);
 
     p = strchr(name, '0');
-    snprintf(p, strlen(p) + 1, "%x-%lx", rb_w32_getpid(), serial++);
+    snprintf(p, strlen(p) + 1, "%"PRI_PIDT_PREFIX"x-%lx", rb_w32_getpid(), serial++);
 
     sec.nLength = sizeof(sec);
     sec.lpSecurityDescriptor = NULL;
@@ -4953,7 +5112,7 @@ rb_w32_pipe(int fds[2])
     RUBY_CRITICAL(do {
 	ret = 0;
 	h = CreateFile("NUL", 0, 0, NULL, OPEN_ALWAYS, 0, NULL);
-	fdRead = _open_osfhandle((long)h, 0);
+	fdRead = _open_osfhandle((intptr_t)h, 0);
 	CloseHandle(h);
 	if (fdRead == -1) {
 	    errno = EMFILE;
@@ -4964,7 +5123,7 @@ rb_w32_pipe(int fds[2])
 	}
 
 	MTHREAD_ONLY(EnterCriticalSection(&(_pioinfo(fdRead)->lock)));
-	_set_osfhnd(fdRead, (long)hRead);
+	_set_osfhnd(fdRead, (intptr_t)hRead);
 	_set_osflags(fdRead, FOPEN | FPIPE | FNOINHERIT);
 	MTHREAD_ONLY(LeaveCriticalSection(&(_pioinfo(fdRead)->lock)));
     } while (0));
@@ -4973,7 +5132,7 @@ rb_w32_pipe(int fds[2])
 
     RUBY_CRITICAL(do {
 	h = CreateFile("NUL", 0, 0, NULL, OPEN_ALWAYS, 0, NULL);
-	fdWrite = _open_osfhandle((long)h, 0);
+	fdWrite = _open_osfhandle((intptr_t)h, 0);
 	CloseHandle(h);
 	if (fdWrite == -1) {
 	    errno = EMFILE;
@@ -4982,7 +5141,7 @@ rb_w32_pipe(int fds[2])
 	    break;
 	}
 	MTHREAD_ONLY(EnterCriticalSection(&(_pioinfo(fdWrite)->lock)));
-	_set_osfhnd(fdWrite, (long)hWrite);
+	_set_osfhnd(fdWrite, (intptr_t)hWrite);
 	_set_osflags(fdWrite, FOPEN | FPIPE | FNOINHERIT);
 	MTHREAD_ONLY(LeaveCriticalSection(&(_pioinfo(fdWrite)->lock)));
     } while (0));
@@ -5021,8 +5180,51 @@ rb_w32_close(int fd)
     return 0;
 }
 
+static int
+setup_overlapped(OVERLAPPED *ol, int fd)
+{
+    memset(ol, 0, sizeof(*ol));
+    if (!(_osfile(fd) & (FDEV | FPIPE))) {
+	LONG high = 0;
+	DWORD method = _osfile(fd) & FAPPEND ? FILE_END : FILE_CURRENT;
+	DWORD low = SetFilePointer((HANDLE)_osfhnd(fd), 0, &high, method);
+#ifndef INVALID_SET_FILE_POINTER
+#define INVALID_SET_FILE_POINTER ((DWORD)-1)
+#endif
+	if (low == INVALID_SET_FILE_POINTER) {
+	    DWORD err = GetLastError();
+	    if (err != NO_ERROR) {
+		errno = map_errno(err);
+		return -1;
+	    }
+	}
+	ol->Offset = low;
+	ol->OffsetHigh = high;
+    }
+    ol->hEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
+    if (!ol->hEvent) {
+	errno = map_errno(GetLastError());
+	return -1;
+    }
+    return 0;
+}
+
+static void
+finish_overlapped(OVERLAPPED *ol, int fd, DWORD size)
+{
+    CloseHandle(ol->hEvent);
+
+    if (!(_osfile(fd) & (FDEV | FPIPE))) {
+	LONG high = ol->OffsetHigh;
+	DWORD low = ol->Offset + size;
+	if (low < ol->Offset)
+	    ++high;
+	SetFilePointer((HANDLE)_osfhnd(fd), low, &high, FILE_BEGIN);
+    }
+}
+
 #undef read
-size_t
+ssize_t
 rb_w32_read(int fd, void *buf, size_t size)
 {
     SOCKET sock = TO_SOCKET(fd);
@@ -5032,6 +5234,8 @@ rb_w32_read(int fd, void *buf, size_t size)
     size_t len;
     size_t ret;
     OVERLAPPED ol, *pol = NULL;
+    BOOL isconsole;
+    BOOL islineinput = FALSE;
     int start = 0;
 
     if (is_socket(sock))
@@ -5049,16 +5253,23 @@ rb_w32_read(int fd, void *buf, size_t size)
     MTHREAD_ONLY(EnterCriticalSection(&(_pioinfo(fd)->lock)));
 
     if (!size || _osfile(fd) & FEOFLAG) {
+	_set_osflags(fd, _osfile(fd) & ~FEOFLAG);
 	MTHREAD_ONLY(LeaveCriticalSection(&_pioinfo(fd)->lock));
 	return 0;
     }
 
     ret = 0;
+    isconsole = is_console(_osfhnd(fd)) && (osver.dwMajorVersion < 6 || (osver.dwMajorVersion == 6 && osver.dwMinorVersion < 2));
+    if (isconsole) {
+	DWORD mode;
+	GetConsoleMode((HANDLE)_osfhnd(fd),&mode);
+	islineinput = (mode & ENABLE_LINE_INPUT) != 0;
+    }
   retry:
     /* get rid of console reading bug */
-    if (is_console(_osfhnd(fd))) {
+    if (isconsole) {
 	if (start)
-	    len = min(16 * 1024, size);
+	    len = 1;
 	else {
 	    len = 0;
 	    start = 1;
@@ -5070,25 +5281,7 @@ rb_w32_read(int fd, void *buf, size_t size)
 
     /* if have cancel_io, use Overlapped I/O */
     if (cancel_io) {
-	memset(&ol, 0, sizeof(ol));
-	if (!(_osfile(fd) & (FDEV | FPIPE))) {
-	    LONG high = 0;
-	    DWORD low = SetFilePointer((HANDLE)_osfhnd(fd), 0, &high,
-				       FILE_CURRENT);
-#ifndef INVALID_SET_FILE_POINTER
-#define INVALID_SET_FILE_POINTER ((DWORD)-1)
-#endif
-	    if (low == INVALID_SET_FILE_POINTER) {
-		errno = map_errno(GetLastError());
-		MTHREAD_ONLY(LeaveCriticalSection(&_pioinfo(fd)->lock));
-		return -1;
-	    }
-	    ol.Offset = low;
-	    ol.OffsetHigh = high;
-	}
-	ol.hEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
-	if (!ol.hEvent) {
-	    errno = map_errno(GetLastError());
+	if (setup_overlapped(&ol, fd)) {
 	    MTHREAD_ONLY(LeaveCriticalSection(&_pioinfo(fd)->lock));
 	    return -1;
 	}
@@ -5142,23 +5335,18 @@ rb_w32_read(int fd, void *buf, size_t size)
     }
 
     if (pol) {
-	CloseHandle(ol.hEvent);
-
-	if (!(_osfile(fd) & (FDEV | FPIPE))) {
-	    LONG high = ol.OffsetHigh;
-	    DWORD low = ol.Offset + read;
-	    if (low < ol.Offset)
-		++high;
-	    SetFilePointer((HANDLE)_osfhnd(fd), low, &high, FILE_BEGIN);
-	}
+	finish_overlapped(&ol, fd, read);
     }
 
     ret += read;
-    if (read == len) {
-	buf = (char *)buf + len;
-	if (size > 0)
+    if (read >= len) {
+	buf = (char *)buf + read;
+	if (!(isconsole && len == 1 && (!islineinput || *((char *)buf - 1) == '\n')) && size > 0)
 	    goto retry;
     }
+    if (read == 0)
+	_set_osflags(fd, _osfile(fd) | FEOFLAG);
+
 
     MTHREAD_ONLY(LeaveCriticalSection(&_pioinfo(fd)->lock));
 
@@ -5166,7 +5354,7 @@ rb_w32_read(int fd, void *buf, size_t size)
 }
 
 #undef write
-size_t
+ssize_t
 rb_w32_write(int fd, const void *buf, size_t size)
 {
     SOCKET sock = TO_SOCKET(fd);
@@ -5185,7 +5373,8 @@ rb_w32_write(int fd, const void *buf, size_t size)
 	return -1;
     }
 
-    if (_osfile(fd) & FTEXT) {
+    if ((_osfile(fd) & FTEXT) &&
+        (!(_osfile(fd) & FPIPE) || fd == fileno(stdout) || fd == fileno(stderr))) {
 	return _write(fd, buf, size);
     }
 
@@ -5204,25 +5393,7 @@ rb_w32_write(int fd, const void *buf, size_t size)
 
     /* if have cancel_io, use Overlapped I/O */
     if (cancel_io) {
-	memset(&ol, 0, sizeof(ol));
-	if (!(_osfile(fd) & (FDEV | FPIPE))) {
-	    LONG high = 0;
-	    DWORD method = _osfile(fd) & FAPPEND ? FILE_END : FILE_CURRENT;
-	    DWORD low = SetFilePointer((HANDLE)_osfhnd(fd), 0, &high, method);
-#ifndef INVALID_SET_FILE_POINTER
-#define INVALID_SET_FILE_POINTER ((DWORD)-1)
-#endif
-	    if (low == INVALID_SET_FILE_POINTER) {
-		errno = map_errno(GetLastError());
-		MTHREAD_ONLY(LeaveCriticalSection(&_pioinfo(fd)->lock));
-		return -1;
-	    }
-	    ol.Offset = low;
-	    ol.OffsetHigh = high;
-	}
-	ol.hEvent = CreateEvent(NULL, TRUE, TRUE, NULL);
-	if (!ol.hEvent) {
-	    errno = map_errno(GetLastError());
+	if (setup_overlapped(&ol, fd)) {
 	    MTHREAD_ONLY(LeaveCriticalSection(&_pioinfo(fd)->lock));
 	    return -1;
 	}
@@ -5268,15 +5439,7 @@ rb_w32_write(int fd, const void *buf, size_t size)
     }
 
     if (pol) {
-	CloseHandle(ol.hEvent);
-
-	if (!(_osfile(fd) & (FDEV | FPIPE))) {
-	    LONG high = ol.OffsetHigh;
-	    DWORD low = ol.Offset + written;
-	    if (low < ol.Offset)
-		++high;
-	    SetFilePointer((HANDLE)_osfhnd(fd), low, &high, FILE_BEGIN);
-	}
+	finish_overlapped(&ol, fd, written);
     }
 
     ret += written;
@@ -5291,27 +5454,39 @@ rb_w32_write(int fd, const void *buf, size_t size)
     return ret;
 }
 
+long
+rb_w32_write_console(uintptr_t strarg, int fd)
+{
+    static int disable;
+    HANDLE handle;
+    DWORD dwMode, reslen;
+    VALUE str = strarg;
+
+    if (disable) return -1L;
+    handle = (HANDLE)_osfhnd(fd);
+    if (!GetConsoleMode(handle, &dwMode) ||
+	!rb_econv_has_convpath_p(rb_enc_name(rb_enc_get(str)), "UTF-16LE"))
+	return -1L;
+
+    str = rb_str_encode(str, rb_enc_from_encoding(rb_enc_find("UTF-16LE")),
+			ECONV_INVALID_REPLACE|ECONV_UNDEF_REPLACE, Qnil);
+    if (!WriteConsoleW(handle, (LPWSTR)RSTRING_PTR(str), RSTRING_LEN(str)/2,
+		       &reslen, NULL)) {
+	if (GetLastError() == ERROR_CALL_NOT_IMPLEMENTED)
+	    disable = TRUE;
+	return -1L;
+    }
+    return (long)reslen;
+}
+
 static int
 unixtime_to_filetime(time_t time, FILETIME *ft)
 {
-    struct tm *tm;
-    SYSTEMTIME st;
-    FILETIME lt;
+    ULARGE_INTEGER tmp;
 
-    tm = localtime(&time);
-    st.wYear = tm->tm_year + 1900;
-    st.wMonth = tm->tm_mon + 1;
-    st.wDayOfWeek = tm->tm_wday;
-    st.wDay = tm->tm_mday;
-    st.wHour = tm->tm_hour;
-    st.wMinute = tm->tm_min;
-    st.wSecond = tm->tm_sec;
-    st.wMilliseconds = 0;
-    if (!SystemTimeToFileTime(&st, &lt) ||
-	!LocalFileTimeToFileTime(&lt, ft)) {
-	errno = map_errno(GetLastError());
-	return -1;
-    }
+    tmp.QuadPart = ((LONG_LONG)time + (LONG_LONG)((1970-1601)*365.2425) * 24 * 60 * 60) * 10 * 1000 * 1000;
+    ft->dwLowDateTime = tmp.LowPart;
+    ft->dwHighDateTime = tmp.HighPart;
     return 0;
 }
 
@@ -5503,7 +5678,7 @@ wunlink(const WCHAR *path)
 	if (attr != (DWORD)-1 && (attr & FILE_ATTRIBUTE_READONLY)) {
 	    SetFileAttributesW(path, attr & ~FILE_ATTRIBUTE_READONLY);
 	}
-	if (DeleteFileW(path) == FALSE) {
+	if (!DeleteFileW(path)) {
 	    errno = map_errno(GetLastError());
 	    ret = -1;
 	    if (attr != (DWORD)-1 && (attr & FILE_ATTRIBUTE_READONLY)) {
@@ -5546,7 +5721,7 @@ rb_w32_uchmod(const char *path, int mode)
     WCHAR *wpath;
     int ret;
 
-    if (!(wpath = filecp_to_wstr(path, NULL)))
+    if (!(wpath = utf8_to_wstr(path, NULL)))
 	return -1;
     ret = _wchmod(wpath, mode);
     free(wpath);
@@ -5557,11 +5732,13 @@ rb_w32_uchmod(const char *path, int mode)
 int
 rb_w32_isatty(int fd)
 {
+    DWORD mode;
+
     // validate fd by using _get_osfhandle() because we cannot access _nhandle
     if (_get_osfhandle(fd) == -1) {
 	return 0;
     }
-    if (!(_osfile(fd) & FDEV)) {
+    if (!GetConsoleMode((HANDLE)_osfhnd(fd), &mode)) {
 	errno = ENOTTY;
 	return 0;
     }
@@ -5643,3 +5820,24 @@ signbit(double x)
     return *ip < 0;
 }
 #endif
+
+char * WSAAPI
+rb_w32_inet_ntop(int af, void *addr, char *numaddr, size_t numaddr_len)
+{
+    typedef char *(WSAAPI inet_ntop_t)(int, void *, char *, size_t);
+    inet_ntop_t *pInetNtop;
+    pInetNtop = (inet_ntop_t *)get_proc_address("ws2_32", "inet_ntop", NULL);
+    if(pInetNtop){
+       return pInetNtop(af,addr,numaddr,numaddr_len);
+    }else{
+       struct in_addr in;
+       memcpy(&in.s_addr, addr, sizeof(in.s_addr));
+       snprintf(numaddr, numaddr_len, "%s", inet_ntoa(in));
+    }
+    return numaddr;
+}
+
+char
+rb_w32_fd_is_text(int fd) {
+    return _osfile(fd) & FTEXT;
+}

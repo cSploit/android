@@ -726,8 +726,8 @@ module Net
       if options.kind_of?(Hash)
         username = options["Name"]
         password = options["Password"]
-	login_prompt = options["LoginPrompt"] if options["LoginPrompt"]
-	password_prompt = options["PasswordPrompt"] if options["PasswordPrompt"]
+        login_prompt = options["LoginPrompt"] if options["LoginPrompt"]
+        password_prompt = options["PasswordPrompt"] if options["PasswordPrompt"]
       else
         username = options
       end
@@ -752,6 +752,11 @@ module Net
         end
       end
       line
+    end
+
+    # Closes the connection
+    def close
+      @sock.close
     end
 
   end  # class Telnet

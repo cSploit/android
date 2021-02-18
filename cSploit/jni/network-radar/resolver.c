@@ -28,9 +28,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include <csploit/logger.h>
-#include <csploit/control.h>
+#include "logger.h"
 
+#include "control.h"
 #include "event.h"
 #include "host.h"
 #include "resolver.h"
@@ -58,7 +58,7 @@ void on_query_end(void *arg, int status, int timeouts, struct hostent *ent) {
   
   if(h && !(h->name)) {
     
-    e = (struct event *) malloc(sizeof(struct event));
+    e = malloc(sizeof(struct event));
     
     if(!e) {
       print( ERROR, "malloc: %s\n", strerror(errno));

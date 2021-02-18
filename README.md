@@ -1,3 +1,29 @@
+csploit 1.8  
+
+TODO:  
+Fix the logging cracker.  
+Compile lattest ruby to use latest msf.  
+Implement a shodan menu.  
+
+Usage:  
+Setting the sources:  
+
+git clone https://github.com/e2002e/android  
+cd android  
+git checkout v1.8.0  
+
+Compiling the c libraries:  
+
+cd cSploit/jni  
+export PATH=/path/to/ndk10c/:$PATH  
+./build.sh  
+
+When you launch Android Studio, it will include the assets directory created by the build script from the jni folder,  
+and the modified java will unpack the core during the first run on android.  
+The default settings are really narrow concerning compatibility, in other words,  
+touch neither the buld.gradle /gradle-wrapper.properties files nor the manifest.  
+
+
 cSploit - An Android network penetration suite.
 ==============================
 

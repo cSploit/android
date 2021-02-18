@@ -9,18 +9,23 @@
 
 #ifdef HAVE_RUBY_ENCODING_H
 #include "ruby/encoding.h"
-#define FORCE_UTF8(obj) rb_enc_associate((obj), rb_utf8_encoding())
+#define FORCE_UTF8(obj) ((obj) = rb_enc_associate(rb_str_dup(obj), rb_utf8_encoding()))
 #else
 #define FORCE_UTF8(obj)
+#endif
+#ifdef HAVE_RUBY_ST_H
+#include "ruby/st.h"
+#else
+#include "st.h"
 #endif
 
 #define option_given_p(opts, key) RTEST(rb_funcall(opts, i_key_p, 1, key))
 
 /* unicode */
 
-typedef unsigned long	UTF32;	/* at least 32 bits */
-typedef unsigned short UTF16;	/* at least 16 bits */
-typedef unsigned char	UTF8;	  /* typically 8 bits */
+typedef unsigned long UTF32;  /* at least 32 bits */
+typedef unsigned short UTF16; /* at least 16 bits */
+typedef unsigned char UTF8;   /* typically 8 bits */
 
 #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD
 #define UNI_SUR_HIGH_START  (UTF32)0xD800
@@ -39,11 +44,17 @@ typedef struct JSON_ParserStruct {
     int allow_nan;
     int parsing_name;
     int symbolize_names;
+    int quirks_mode;
     VALUE object_class;
     VALUE array_class;
+    int create_additions;
+    VALUE match_string;
 } JSON_Parser;
 
 #define GET_PARSER                          \
+    GET_PARSER_INIT;                        \
+    if (!json->Vsource) rb_raise(rb_eTypeError, "uninitialized instance")
+#define GET_PARSER_INIT                     \
     JSON_Parser *json;                      \
     Data_Get_Struct(self, JSON_Parser, json)
 

@@ -11,6 +11,9 @@
  *
  * maintainers:
  * - Takaaki Tateishi (ttate@kt.jaist.ac.jp)
+ *
+ * doumentation:
+ * - Vincent Batts (vbatts@hashbangbash.com)
  */
 
 #include "ruby.h"
@@ -70,8 +73,6 @@ struct windata {
     WINDOW *window;
 };
 
-#define CHECK(c) c
-
 static VALUE window_attroff(VALUE obj, VALUE attrs);
 static VALUE window_attron(VALUE obj, VALUE attrs);
 static VALUE window_attrset(VALUE obj, VALUE attrs);
@@ -85,8 +86,8 @@ no_window(void)
 #define GetWINDOW(obj, winp) do {\
     if (!OBJ_TAINTED(obj) && rb_safe_level() >= 4)\
 	rb_raise(rb_eSecurityError, "Insecure: operation on untainted window");\
-    Data_Get_Struct(obj, struct windata, winp);\
-    if (winp->window == 0) no_window();\
+    Data_Get_Struct((obj), struct windata, (winp));\
+    if ((winp)->window == 0) no_window();\
 } while (0)
 
 static void
@@ -116,7 +117,13 @@ prep_window(VALUE class, WINDOW *window)
 
 /*-------------------------- module Curses --------------------------*/
 
-/* def init_screen */
+/*
+ * Document-method: Curses.init_screen
+ *
+ * Initialize a standard screen
+ *
+ * see also Curses.stdscr
+ */
 static VALUE
 curses_init_screen(void)
 {
@@ -131,10 +138,31 @@ curses_init_screen(void)
     return rb_stdscr;
 }
 
-/* def stdscr */
+/*
+ * Document-method: Curses.stdscr
+ *
+ * The Standard Screen.
+ *
+ * Upon initializing curses, a default window called stdscr,
+ * which is the size of the terminal screen, is created.
+ *
+ * Many curses functions use this window.
+ */
 #define curses_stdscr curses_init_screen
 
-/* def close_screen */
+/*
+ * Document-method: Curses.close_screen
+ *
+ * A program should always call Curses.close_screen before exiting or
+ * escaping from curses mode temporarily. This routine
+ * restores tty modes, moves the cursor to the lower
+ * left-hand corner of the screen and resets the terminal
+ * into the proper non-visual mode.
+ *
+ * Calling Curses.refresh or Curses.doupdate after a temporary
+ * escape causes the program to resume visual mode.
+ *
+ */
 static VALUE
 curses_close_screen(void)
 {
@@ -147,6 +175,13 @@ curses_close_screen(void)
     return Qnil;
 }
 
+/*
+ * This is no runtime method,
+ * but a function called before the proc ends
+ *
+ * Similar to Curses.close_screen, except that it also
+ * garbage collects/unregisters the Curses.stdscr
+ */
 static void
 curses_finalize(VALUE dummy)
 {
@@ -161,7 +196,13 @@ curses_finalize(VALUE dummy)
 }
 
 #ifdef HAVE_ISENDWIN
-/* def closed? */
+/*
+ * Document-method: Curses.closed?
+ *
+ * Returns +true+ if the window/screen has been closed,
+ * without any subsequent Curses.refresh calls,
+ * returns +false+ otherwise.
+ */
 static VALUE
 curses_closed(void)
 {
@@ -175,7 +216,13 @@ curses_closed(void)
 #define curses_closed rb_f_notimplement
 #endif
 
-/* def clear */
+/*
+ * Document-method: Curses.clear
+ *
+ * Clears every position on the screen completely,
+ * so that a subsequent call by Curses.refresh for the screen/window
+ * will be repainted from scratch.
+ */
 static VALUE
 curses_clear(VALUE obj)
 {
@@ -184,7 +231,11 @@ curses_clear(VALUE obj)
     return Qnil;
 }
 
-/* def clrtoeol */
+/*
+ * Document-method: Curses.clrtoeol
+ *
+ * Clears to the end of line, that the cursor is currently on.
+ */
 static VALUE
 curses_clrtoeol(void)
 {
@@ -193,7 +244,12 @@ curses_clrtoeol(void)
     return Qnil;
 }
 
-/* def refresh */
+/*
+ * Document-method: Curses.refresh
+ *
+ * Refreshes the windows and lines.
+ *
+ */
 static VALUE
 curses_refresh(VALUE obj)
 {
@@ -202,7 +258,14 @@ curses_refresh(VALUE obj)
     return Qnil;
 }
 
-/* def doupdate */
+/*
+ * Document-method: Curses.doupdate
+ *
+ * Refreshes the windows and lines.
+ *
+ * Curses.doupdate allows multiple updates with
+ * more efficiency than Curses.refresh alone.
+ */
 static VALUE
 curses_doupdate(VALUE obj)
 {
@@ -215,7 +278,12 @@ curses_doupdate(VALUE obj)
     return Qnil;
 }
 
-/* def echo */
+/*
+ * Document-method: Curses.echo
+ *
+ * Enables characters typed by the user
+ * to be echoed by Curses.getch as they are typed.
+ */
 static VALUE
 curses_echo(VALUE obj)
 {
@@ -224,7 +292,12 @@ curses_echo(VALUE obj)
     return Qnil;
 }
 
-/* def noecho */
+/*
+ * Document-method: Curses.noecho
+ *
+ * Disables characters typed by the user
+ * to be echoed by Curses.getch as they are typed.
+ */
 static VALUE
 curses_noecho(VALUE obj)
 {
@@ -233,7 +306,20 @@ curses_noecho(VALUE obj)
     return Qnil;
 }
 
-/* def raw */
+/*
+ * Document-method: Curses.raw
+ *
+ * Put the terminal into raw mode.
+ *
+ * Raw mode is similar to Curses.cbreak mode, in that characters typed
+ * are immediately passed through to the user program.
+ *
+ * The differences are that in raw mode, the interrupt, quit,
+ * suspend, and flow control characters are all passed through
+ * uninterpreted, instead of generating a signal. The behavior
+ * of the BREAK key depends on other bits in the tty driver
+ * that are not set by curses.
+ */
 static VALUE
 curses_raw(VALUE obj)
 {
@@ -242,7 +328,13 @@ curses_raw(VALUE obj)
     return Qnil;
 }
 
-/* def noraw */
+/*
+ * Document-method: Curses.noraw
+ *
+ * Put the terminal out of raw mode.
+ *
+ * see Curses.raw for more detail
+ */
 static VALUE
 curses_noraw(VALUE obj)
 {
@@ -251,7 +343,28 @@ curses_noraw(VALUE obj)
     return Qnil;
 }
 
-/* def cbreak */
+/*
+ * Document-method: Curses.cbreak
+ *
+ * Put the terminal into cbreak mode.
+ *
+ * Normally, the tty driver buffers typed characters until
+ * a newline or carriage return is typed. The Curses.cbreak
+ * routine disables line buffering and erase/kill
+ * character-processing (interrupt and flow control characters
+ * are unaffected), making characters typed by the user
+ * immediately available to the program.
+ *
+ * The Curses.nocbreak routine returns the terminal to normal (cooked) mode.
+ *
+ * Initially the terminal may or may not be in cbreak mode,
+ * as the mode is inherited; therefore, a program should
+ * call Curses.cbreak or Curses.nocbreak explicitly.
+ * Most interactive programs using curses set the cbreak mode.
+ * Note that Curses.cbreak overrides Curses.raw.
+ *
+ * see also Curses.raw
+ */
 static VALUE
 curses_cbreak(VALUE obj)
 {
@@ -260,7 +373,13 @@ curses_cbreak(VALUE obj)
     return Qnil;
 }
 
-/* def nocbreak */
+/*
+ * Document-method: Curses.nocbreak
+ *
+ * Put the terminal into normal mode (out of cbreak mode).
+ *
+ * See Curses.cbreak for more detail.
+ */
 static VALUE
 curses_nocbreak(VALUE obj)
 {
@@ -269,7 +388,20 @@ curses_nocbreak(VALUE obj)
     return Qnil;
 }
 
-/* def nl */
+/*
+ * Document-method: Curses.nl
+ *
+ * Enable the underlying display device to translate
+ * the return key into newline on input, and whether it
+ * translates newline into return and line-feed on output
+ * (in either case, the call Curses.addch('\n') does the
+ * equivalent of return and line feed on the virtual screen).
+ *
+ * Initially, these translations do occur. If you disable
+ * them using Curses.nonl, curses will be able to make better use
+ * of the line-feed capability, resulting in faster cursor
+ * motion. Also, curses will then be able to detect the return key.
+ */
 static VALUE
 curses_nl(VALUE obj)
 {
@@ -278,7 +410,14 @@ curses_nl(VALUE obj)
     return Qnil;
 }
 
-/* def nonl */
+/*
+ * Document-method: Curses.nl
+ *
+ * Disable the underlying display device to translate
+ * the return key into newline on input
+ *
+ * See Curses.nl for more detail
+ */
 static VALUE
 curses_nonl(VALUE obj)
 {
@@ -287,7 +426,14 @@ curses_nonl(VALUE obj)
     return Qnil;
 }
 
-/* def beep */
+/*
+ * Document-method: Curses.beep
+ *
+ * Sounds an audible alarm on the terminal, if possible;
+ * otherwise it flashes the screen (visual bell).
+ *
+ * see also Curses.flash
+ */
 static VALUE
 curses_beep(VALUE obj)
 {
@@ -298,7 +444,14 @@ curses_beep(VALUE obj)
     return Qnil;
 }
 
-/* def flash */
+/*
+ * Document-method: Curses.flash
+ *
+ * Flashs the screen, for visual alarm on the terminal, if possible;
+ * otherwise it sounds the alert.
+ *
+ * see also Curses.beep
+ */
 static VALUE
 curses_flash(VALUE obj)
 {
@@ -331,7 +484,15 @@ curses_char(VALUE c)
 }
 
 #ifdef HAVE_UNGETCH
-/* def ungetch */
+/*
+ * Document-method: Curses.ungetch
+ * call-seq: ungetch(ch)
+ *
+ * Places +ch+ back onto the input queue to be returned by
+ * the next call to Curses.getch.
+ *
+ * There is just one input queue for all windows.
+ */
 static VALUE
 curses_ungetch(VALUE obj, VALUE ch)
 {
@@ -344,7 +505,14 @@ curses_ungetch(VALUE obj, VALUE ch)
 #define curses_ungetch rb_f_notimplement
 #endif
 
-/* def setpos(y, x) */
+/*
+ * Document-method: Curses.setpos
+ * call-seq: setpos(y, x)
+ *
+ * A setter for the position of the cursor,
+ * using coordinates +x+ and +y+
+ *
+ */
 static VALUE
 curses_setpos(VALUE obj, VALUE y, VALUE x)
 {
@@ -353,7 +521,15 @@ curses_setpos(VALUE obj, VALUE y, VALUE x)
     return Qnil;
 }
 
-/* def standout */
+/*
+ * Document-method: Curses.standout
+ *
+ * Enables the best highlighting mode of the terminal.
+ *
+ * This is equivalent to Curses:Window.attron(A_STANDOUT)
+ *
+ * see also Curses::Window.attrset additional information
+ */
 static VALUE
 curses_standout(VALUE obj)
 {
@@ -362,7 +538,15 @@ curses_standout(VALUE obj)
     return Qnil;
 }
 
-/* def standend */
+/*
+ * Document-method: Curses.standend
+ *
+ * Enables the Normal display (no highlight)
+ *
+ * This is equivalent to Curses.attron(A_NORMAL)
+ *
+ * see also Curses::Window.attrset for additional information.
+ */
 static VALUE
 curses_standend(VALUE obj)
 {
@@ -371,7 +555,11 @@ curses_standend(VALUE obj)
     return Qnil;
 }
 
-/* def inch */
+/*
+ * Document-method: Curses.inch
+ *
+ * Returns the character at the current position.
+ */
 static VALUE
 curses_inch(VALUE obj)
 {
@@ -379,7 +567,14 @@ curses_inch(VALUE obj)
     return CH2FIX(inch());
 }
 
-/* def addch(ch) */
+/*
+ * Document-method: Curses.addch
+ * call-seq: addch(ch)
+ *
+ * Add a character +ch+, with attributes, then advance the cursor.
+ *
+ * see also the system manual for curs_addch(3)
+ */
 static VALUE
 curses_addch(VALUE obj, VALUE ch)
 {
@@ -388,7 +583,13 @@ curses_addch(VALUE obj, VALUE ch)
     return Qnil;
 }
 
-/* def insch(ch) */
+/*
+ * Document-method: Curses.insch
+ * call-seq: insch(ch)
+ *
+ * Insert a character +ch+, before the cursor.
+ *
+ */
 static VALUE
 curses_insch(VALUE obj, VALUE ch)
 {
@@ -397,7 +598,13 @@ curses_insch(VALUE obj, VALUE ch)
     return Qnil;
 }
 
-/* def addstr(str) */
+/*
+ * Document-method: Curses.addstr
+ * call-seq: addstr(str)
+ *
+ * add a string of characters +str+, to the window and advance cursor
+ *
+ */
 static VALUE
 curses_addstr(VALUE obj, VALUE str)
 {
@@ -418,7 +625,14 @@ getch_func(void *arg)
     return Qnil;
 }
 
-/* def getch */
+/*
+ * Document-method: Curses.getch
+ *
+ * Read and returns a character from the window.
+ *
+ * See Curses::Key to all the function KEY_* available
+ *
+ */
 static VALUE
 curses_getch(VALUE obj)
 {
@@ -450,7 +664,12 @@ getstr_func(void *arg)
     return Qnil;
 }
 
-/* def getstr */
+/*
+ * Document-method: Curses.getstr
+ *
+ * This is equivalent to a series f Curses::Window.getch calls
+ *
+ */
 static VALUE
 curses_getstr(VALUE obj)
 {
@@ -461,7 +680,12 @@ curses_getstr(VALUE obj)
     return rb_locale_str_new_cstr(rtn);
 }
 
-/* def delch */
+/*
+ * Document-method: Curses.delch
+ *
+ * Delete the character under the cursor
+ *
+ */
 static VALUE
 curses_delch(VALUE obj)
 {
@@ -470,7 +694,12 @@ curses_delch(VALUE obj)
     return Qnil;
 }
 
-/* def delelteln */
+/*
+ * Document-method: Curses.deleteln
+ *
+ * Delete the line under the cursor.
+ *
+ */
 static VALUE
 curses_deleteln(VALUE obj)
 {
@@ -481,7 +710,12 @@ curses_deleteln(VALUE obj)
     return Qnil;
 }
 
-/* def insertln */
+/*
+ * Document-method: Curses.insertln
+ *
+ * Inserts a line above the cursor, and the bottom line is lost
+ *
+ */
 static VALUE
 curses_insertln(VALUE obj)
 {
@@ -492,7 +726,12 @@ curses_insertln(VALUE obj)
     return Qnil;
 }
 
-/* def keyname */
+/*
+ * Document-method: Curses.keyname
+ * call-seq: keyname(c)
+ *
+ * Returns the character string corresponding to key +c+
+ */
 static VALUE
 curses_keyname(VALUE obj, VALUE c)
 {
@@ -513,19 +752,32 @@ curses_keyname(VALUE obj, VALUE c)
 #endif
 }
 
+/*
+ * Document-method: Curses.lines
+ *
+ * Returns the number of lines on the screen
+ */
 static VALUE
 curses_lines(void)
 {
     return INT2FIX(LINES);
 }
 
+/*
+ * Document-method: Curses.cols
+ *
+ * Returns the number of columns on the screen
+ */
 static VALUE
 curses_cols(void)
 {
     return INT2FIX(COLS);
 }
 
-/**
+/*
+ * Document-method: Curses.curs_set
+ * call-seq: curs_set(visibility)
+ *
  * Sets Cursor Visibility.
  * 0: invisible
  * 1: visible
@@ -543,6 +795,18 @@ curses_curs_set(VALUE obj, VALUE visibility)
 #endif
 }
 
+/*
+ * Document-method: Curses.scrl
+ * call-seq: scrl(num)
+ *
+ * Scrolls the current window Fixnum +num+ lines.
+ * The current cursor position is not changed.
+ *
+ * For positive +num+, it scrolls up.
+ *
+ * For negative +num+, it scrolls down.
+ *
+ */
 static VALUE
 curses_scrl(VALUE obj, VALUE n)
 {
@@ -555,6 +819,21 @@ curses_scrl(VALUE obj, VALUE n)
 #endif
 }
 
+/*
+ * Document-method: Curses.setscrreg
+ *
+ * call-seq:
+ *   setscrreg(top, bottom)
+ *
+ * Set a software scrolling region in a window.
+ * +top+ and +bottom+ are lines numbers of the margin.
+ *
+ * If this option and Curses.scrollok are enabled, an attempt to move off
+ * the bottom margin line causes all lines in the scrolling region
+ * to scroll one line in the direction of the first line.
+ * Only the text of the window is scrolled.
+ *
+ */
 static VALUE
 curses_setscrreg(VALUE obj, VALUE top, VALUE bottom)
 {
@@ -567,6 +846,14 @@ curses_setscrreg(VALUE obj, VALUE top, VALUE bottom)
 #endif
 }
 
+/*
+ * Document-method: Curses.attroff
+ * call-seq: attroff(attrs)
+ *
+ * Turns on the named attributes +attrs+ without affecting any others.
+ *
+ * See also Curses::Window.attrset for additional information.
+ */
 static VALUE
 curses_attroff(VALUE obj, VALUE attrs)
 {
@@ -575,6 +862,15 @@ curses_attroff(VALUE obj, VALUE attrs)
     /* return INT2FIX(attroff(NUM2INT(attrs))); */
 }
 
+/*
+ * Document-method: Curses.attron
+ * call-seq: attron(attrs)
+ *
+ * Turns off the named attributes +attrs+
+ * without turning any other attributes on or off.
+ *
+ * See also Curses::Window.attrset for additional information.
+ */
 static VALUE
 curses_attron(VALUE obj, VALUE attrs)
 {
@@ -583,6 +879,15 @@ curses_attron(VALUE obj, VALUE attrs)
     /* return INT2FIX(attroff(NUM2INT(attrs))); */
 }
 
+/*
+ * Document-method: Curses.attrset
+ * call-seq: attrset(attrs)
+ *
+ * Sets the current attributes of the given window to +attrs+.
+ *
+ * see also Curses::Window.attrset
+ *
+ */
 static VALUE
 curses_attrset(VALUE obj, VALUE attrs)
 {
@@ -591,6 +896,19 @@ curses_attrset(VALUE obj, VALUE attrs)
     /* return INT2FIX(attroff(NUM2INT(attrs))); */
 }
 
+/*
+ * Document-method: Curses.bkgdset
+ * call-seq: bkgdset(ch)
+ *
+ * Manipulate the background of the named window
+ * with character Integer +ch+
+ *
+ * The background becomes a property of the character
+ * and moves with the character through any scrolling
+ * and insert/delete line/character operations.
+ *
+ * see also the system manual for curs_bkgd(3)
+ */
 static VALUE
 curses_bkgdset(VALUE obj, VALUE ch)
 {
@@ -601,6 +919,17 @@ curses_bkgdset(VALUE obj, VALUE ch)
     return Qnil;
 }
 
+/*
+ * call-seq: bkgd(ch)
+ *
+ * Window background manipulation routines.
+ *
+ * Set the background property of the current
+ * and then apply the character Integer +ch+ setting
+ * to every character position in that window.
+ *
+ * see also the system manual for curs_bkgd(3)
+ */
 static VALUE
 curses_bkgd(VALUE obj, VALUE ch)
 {
@@ -613,6 +942,11 @@ curses_bkgd(VALUE obj, VALUE ch)
 }
 
 #if defined(HAVE_USE_DEFAULT_COLORS)
+/*
+ * tells the curses library to use terminal's default colors.
+ *
+ * see also the system manual for default_colors(3)
+ */
 static VALUE
 curses_use_default_colors(VALUE obj)
 {
@@ -625,6 +959,12 @@ curses_use_default_colors(VALUE obj)
 #endif
 
 #if defined(HAVE_TABSIZE)
+/*
+ * Document-method: Curses.TABSIZE=
+ * call-seq: TABSIZE=(value)
+ *
+ * Sets the TABSIZE to Integer +value+
+ */
 static VALUE
 curses_tabsize_set(VALUE obj, VALUE val)
 {
@@ -636,6 +976,9 @@ curses_tabsize_set(VALUE obj, VALUE val)
 #endif
 
 #if defined(HAVE_TABSIZE)
+/*
+ * Returns the number of positions in a tab.
+ */
 static VALUE
 curses_tabsize_get(VALUE ojb)
 {
@@ -646,6 +989,11 @@ curses_tabsize_get(VALUE ojb)
 #endif
 
 #if defined(HAVE_ESCDELAY)
+/*
+ * call-seq: Curses.ESCDELAY=(value)
+ *
+ * Sets the ESCDELAY to Integer +value+
+ */
 static VALUE
 curses_escdelay_set(VALUE obj, VALUE val)
 {
@@ -657,6 +1005,10 @@ curses_escdelay_set(VALUE obj, VALUE val)
 #endif
 
 #if defined(HAVE_ESCDELAY)
+/*
+ * Returns the total time, in milliseconds, for which
+ * curses will await a character sequence, e.g., a function key
+ */
 static VALUE
 curses_escdelay_get(VALUE obj)
 {
@@ -666,6 +1018,21 @@ curses_escdelay_get(VALUE obj)
 #define curses_escdelay_get rb_f_notimplement
 #endif
 
+/*
+ * Document-method: Curses.resize
+ * call-seq: resize(lines, cols)
+ *
+ * alias for Curses.resizeterm
+ *
+ */
+
+/*
+ * Document-method: Curses.resizeterm
+ * call-seq: resizeterm(lines, cols)
+ *
+ * Resize the current term to Fixnum +lines+ and Fixnum +cols+
+ *
+ */
 static VALUE
 curses_resizeterm(VALUE obj, VALUE lin, VALUE col)
 {
@@ -678,6 +1045,14 @@ curses_resizeterm(VALUE obj, VALUE lin, VALUE col)
 }
 
 #ifdef USE_COLOR
+/*
+ * Document-method: Curses.start_color
+ *
+ * Initializes the color attributes, for terminals that support it.
+ *
+ * This must be called, in order to use color attributes.
+ * It is good practice to call it just after Curses.init_screen
+ */
 static VALUE
 curses_start_color(VALUE obj)
 {
@@ -686,6 +1061,20 @@ curses_start_color(VALUE obj)
     return (start_color() == OK) ? Qtrue : Qfalse;
 }
 
+/*
+ * Document-method: Curses.init_pair
+ * call-seq: init_pair(pair, f, b)
+ *
+ * Changes the definition of a color-pair.
+ *
+ * It takes three arguments: the number of the color-pair to be changed +pair+,
+ * the foreground color number +f+, and the background color number +b+.
+ *
+ * If the color-pair was previously initialized, the screen is
+ * refreshed and all occurrences of that color-pair are changed
+ * to the new definition.
+ *
+ */
 static VALUE
 curses_init_pair(VALUE obj, VALUE pair, VALUE f, VALUE b)
 {
@@ -694,6 +1083,22 @@ curses_init_pair(VALUE obj, VALUE pair, VALUE f, VALUE b)
     return (init_pair(NUM2INT(pair),NUM2INT(f),NUM2INT(b)) == OK) ? Qtrue : Qfalse;
 }
 
+/*
+ * Document-method: Curses.init_color
+ * call-seq: init_color(color, r, g, b)
+ *
+ * Changes the definition of a color. It takes four arguments:
+ * * the number of the color to be changed, +color+
+ * * the amount of red, +r+
+ * * the amount of green, +g+
+ * * the amount of blue, +b+
+ *
+ * The value of the first argument must be between 0 and  COLORS.
+ * (See the section Colors for the default color index.)  Each
+ * of the last three arguments must be a value between 0 and 1000.
+ * When Curses.init_color is used, all occurrences of that color
+ * on the screen immediately change to the new definition.
+ */
 static VALUE
 curses_init_color(VALUE obj, VALUE color, VALUE r, VALUE g, VALUE b)
 {
@@ -703,6 +1108,11 @@ curses_init_color(VALUE obj, VALUE color, VALUE r, VALUE g, VALUE b)
 		       NUM2INT(g),NUM2INT(b)) == OK) ? Qtrue : Qfalse;
 }
 
+/*
+ * Document-method: Curses.has_colors?
+ *
+ * Returns +true+ or +false+ depending on whether the terminal has color capbilities.
+ */
 static VALUE
 curses_has_colors(VALUE obj)
 {
@@ -710,6 +1120,11 @@ curses_has_colors(VALUE obj)
     return has_colors() ? Qtrue : Qfalse;
 }
 
+/*
+ * Document-method: Curses.can_change_color?
+ *
+ * Returns +true+ or +false+ depending on whether the terminal can change color attributes
+ */
 static VALUE
 curses_can_change_color(VALUE obj)
 {
@@ -718,6 +1133,11 @@ curses_can_change_color(VALUE obj)
 }
 
 #if defined(HAVE_COLORS)
+/*
+ * Document-method: Curses.color
+ *
+ * returns COLORS
+ */
 static VALUE
 curses_colors(VALUE obj)
 {
@@ -727,6 +1147,12 @@ curses_colors(VALUE obj)
 #define curses_colors rb_f_notimplement
 #endif
 
+/*
+ * Document-method: Curses.color_content
+ * call-seq: color_content(color)
+ *
+ * Returns an 3 item Array of the RGB values in +color+
+ */
 static VALUE
 curses_color_content(VALUE obj, VALUE color)
 {
@@ -739,6 +1165,11 @@ curses_color_content(VALUE obj, VALUE color)
 
 
 #if defined(HAVE_COLOR_PAIRS)
+/*
+ * Document-method: Curses.color_pairs
+ *
+ * Returns the COLOR_PAIRS available, if the curses library supports it.
+ */
 static VALUE
 curses_color_pairs(VALUE obj)
 {
@@ -748,6 +1179,13 @@ curses_color_pairs(VALUE obj)
 #define curses_color_pairs rb_f_notimplement
 #endif
 
+/*
+ * Document-method: Curses.pair_content
+ * call-seq: pair_content(pair)
+ *
+ * Returns a 2 item Array, with the foreground and
+ * background color, in +pair+
+ */
 static VALUE
 curses_pair_content(VALUE obj, VALUE pair)
 {
@@ -758,12 +1196,28 @@ curses_pair_content(VALUE obj, VALUE pair)
     return rb_ary_new3(2,INT2FIX(f),INT2FIX(b));
 }
 
+/*
+ * Document-method: Curses.color_pair
+ * call-seq: color_pair(attrs)
+ *
+ * Sets the color pair attributes to +attrs+.
+ *
+ * This should be equivalent to Curses.attrset(COLOR_PAIR(+attrs+))
+ *
+ * TODO: validate that equivalency
+ */
 static VALUE
 curses_color_pair(VALUE obj, VALUE attrs)
 {
     return INT2FIX(COLOR_PAIR(NUM2INT(attrs)));
 }
 
+/*
+ * Document-method: Curses.pair_number
+ * call-seq: pair_number(attrs)
+ *
+ * Returns the Fixnum color pair number of attributes +attrs+.
+ */
 static VALUE
 curses_pair_number(VALUE obj, VALUE attrs)
 {
@@ -786,8 +1240,8 @@ no_mevent(void)
 #define GetMOUSE(obj, data) do {\
     if (!OBJ_TAINTED(obj) && rb_safe_level() >= 4)\
 	rb_raise(rb_eSecurityError, "Insecure: operation on untainted mouse");\
-    Data_Get_Struct(obj, struct mousedata, data);\
-    if (data->mevent == 0) no_mevent();\
+    Data_Get_Struct((obj), struct mousedata, (data));\
+    if ((data)->mevent == 0) no_mevent();\
 } while (0)
 
 static void
@@ -797,6 +1251,15 @@ curses_mousedata_free(struct mousedata *mdata)
 	xfree(mdata->mevent);
 }
 
+/*
+ * Document-method: Curses.getmouse
+ *
+ * Returns coordinates of the mouse.
+ *
+ * This will read and pop the mouse event data off the queue
+ *
+ * See the BUTTON*, ALL_MOUSE_EVENTS and REPORT_MOUSE_POSITION constants, to examine the mask of the event
+ */
 static VALUE
 curses_getmouse(VALUE obj)
 {
@@ -810,6 +1273,14 @@ curses_getmouse(VALUE obj)
     return (getmouse(mdata->mevent) == OK) ? val : Qnil;
 }
 
+/*
+ * Document-method: Curses.ungetmouse
+ *
+ * It pushes a KEY_MOUSE event onto the input queue, and associates with that
+ * event the given state data and screen-relative character-cell coordinates.
+ *
+ * The Curses.ungetmouse function behaves analogously to Curses.ungetch.
+ */
 static VALUE
 curses_ungetmouse(VALUE obj, VALUE mevent)
 {
@@ -820,6 +1291,22 @@ curses_ungetmouse(VALUE obj, VALUE mevent)
     return (ungetmouse(mdata->mevent) == OK) ? Qtrue : Qfalse;
 }
 
+/*
+ * Document-method: Curses.mouseinterval
+ * call-seq: mouseinterval(interval)
+ *
+ * The Curses.mouseinterval function sets the maximum time
+ * (in thousands of a second) that can elapse between press
+ * and release events for them to be recognized as a click.
+ *
+ * Use Curses.mouseinterval(0) to disable click resolution.
+ * This function returns the previous interval value.
+ *
+ * Use Curses.mouseinterval(-1) to obtain the interval without
+ * altering it.
+ *
+ * The default is one sixth of a second.
+ */
 static VALUE
 curses_mouseinterval(VALUE obj, VALUE interval)
 {
@@ -827,6 +1314,12 @@ curses_mouseinterval(VALUE obj, VALUE interval)
     return mouseinterval(NUM2INT(interval)) ? Qtrue : Qfalse;
 }
 
+/*
+ * Document-method: Curses.mousemask
+ * call-seq: mousemask(mask)
+ *
+ * Returns the +mask+ of the reportable events
+ */
 static VALUE
 curses_mousemask(VALUE obj, VALUE mask)
 {
@@ -842,15 +1335,51 @@ static VALUE func_name (VALUE mouse) \
     return (UINT2NUM(mdata->mevent -> mem)); \
 }
 
+/*
+ * Document-method: Curses::MouseEvent.eid
+ *
+ * Returns the current mouse id
+ */
 DEFINE_MOUSE_GET_MEMBER(curs_mouse_id, id)
+/*
+ * Document-method: Curses::MouseEvent.x
+ *
+ * Returns the current mouse's X coordinate
+ */
 DEFINE_MOUSE_GET_MEMBER(curs_mouse_x, x)
+/*
+ * Document-method: Curses::MouseEvent.y
+ *
+ * Returns the current mouse's Y coordinate
+ */
 DEFINE_MOUSE_GET_MEMBER(curs_mouse_y, y)
+/*
+ * Document-method: Curses::MouseEvent.z
+ *
+ * Returns the current mouse's Z coordinate
+ */
 DEFINE_MOUSE_GET_MEMBER(curs_mouse_z, z)
+/*
+ * Document-method: Curses::MouseEvent.bstate
+ *
+ * Returns the current mouse's button state.  Use this with the button state
+ * constants to determine which buttons were pressed.
+ */
 DEFINE_MOUSE_GET_MEMBER(curs_mouse_bstate, bstate)
 #undef define_curs_mouse_member
 #endif /* USE_MOUSE */
 
 #ifdef HAVE_TIMEOUT
+/*
+ * Document-method: Curses.timeout=
+ * call-seq: timeout=(delay)
+ *
+ * Sets block and non-blocking reads for the window.
+ * - If delay is negative, blocking read is used (i.e., waits indefinitely for input).
+ * - If delay is zero, then non-blocking read is used (i.e., read returns ERR if no input is waiting).
+ * - If delay is positive, then read blocks for delay milliseconds, and returns ERR if there is still no input.
+ *
+ */
 static VALUE
 curses_timeout(VALUE obj, VALUE delay)
 {
@@ -863,6 +1392,14 @@ curses_timeout(VALUE obj, VALUE delay)
 #endif
 
 #ifdef HAVE_DEF_PROG_MODE
+/*
+ * Document-method: Curses.def_prog_mode
+ *
+ * Save the current terminal modes as the "program"
+ * state for use by the Curses.reset_prog_mode
+ *
+ * This is done automatically by Curses.init_screen
+ */
 static VALUE
 curses_def_prog_mode(VALUE obj)
 {
@@ -874,6 +1411,14 @@ curses_def_prog_mode(VALUE obj)
 #endif
 
 #ifdef HAVE_RESET_PROG_MODE
+/*
+ * Document-method: Curses.reset_prog_mode
+ *
+ * Reset the current terminal modes to the saved state
+ * by the Curses.def_prog_mode
+ *
+ * This is done automatically by Curses.close_screen
+ */
 static VALUE
 curses_reset_prog_mode(VALUE obj)
 {
@@ -886,7 +1431,7 @@ curses_reset_prog_mode(VALUE obj)
 
 /*-------------------------- class Window --------------------------*/
 
-/* def self.allocate */
+/* returns a Curses::Window object */
 static VALUE
 window_s_allocate(VALUE class)
 {
@@ -895,7 +1440,17 @@ window_s_allocate(VALUE class)
     return Data_Make_Struct(class, struct windata, 0, free_window, winp);
 }
 
-/* def initialize(h, w, top, left) */
+/*
+ * Document-method: Curses::Window.new
+ * call-seq: new(height, width, top, left)
+ *
+ * Contruct a new Curses::Window with constraints of
+ * +height+ lines, +width+ columns, begin at +top+ line, and begin +left+ most column.
+ *
+ * A new window using full screen is called as
+ * 	Curses::Window.new(0,0,0,0)
+ *
+ */
 static VALUE
 window_initialize(VALUE obj, VALUE h, VALUE w, VALUE top, VALUE left)
 {
@@ -913,7 +1468,14 @@ window_initialize(VALUE obj, VALUE h, VALUE w, VALUE top, VALUE left)
     return obj;
 }
 
-/* def subwin(height, width, top, left) */
+/*
+ * Document-method: Curses::Window.subwin
+ * call-seq: subwin(height, width, top, left)
+ *
+ * Contruct a new subwindow with constraints of
+ * +height+ lines, +width+ columns, begin at +top+ line, and begin +left+ most column.
+ *
+ */
 static VALUE
 window_subwin(VALUE obj, VALUE height, VALUE width, VALUE top, VALUE left)
 {
@@ -933,7 +1495,11 @@ window_subwin(VALUE obj, VALUE height, VALUE width, VALUE top, VALUE left)
     return win;
 }
 
-/* def close */
+/*
+ * Document-method: Curses::Window.close
+ *
+ * Deletes the window, and frees the memory
+ */
 static VALUE
 window_close(VALUE obj)
 {
@@ -946,7 +1512,11 @@ window_close(VALUE obj)
     return Qnil;
 }
 
-/* def clear */
+/*
+ * Document-method: Curses::Window.clear
+ *
+ * Clear the window.
+ */
 static VALUE
 window_clear(VALUE obj)
 {
@@ -958,7 +1528,11 @@ window_clear(VALUE obj)
     return Qnil;
 }
 
-/* def clrtoeol */
+/*
+ * Document-method: Curses::Window.clrtoeol
+ *
+ * Clear the window to the end of line, that the cursor is currently on.
+ */
 static VALUE
 window_clrtoeol(VALUE obj)
 {
@@ -970,7 +1544,12 @@ window_clrtoeol(VALUE obj)
     return Qnil;
 }
 
-/* def refresh */
+/*
+ * Document-method: Curses::Window.refresh
+ *
+ * Refreshes the windows and lines.
+ *
+ */
 static VALUE
 window_refresh(VALUE obj)
 {
@@ -982,7 +1561,14 @@ window_refresh(VALUE obj)
     return Qnil;
 }
 
-/* def noutrefresh */
+/*
+ * Document-method: Curses::Window.noutrefresh
+ *
+ * Refreshes the windows and lines.
+ *
+ * Curses::Window.noutrefresh allows multiple updates with
+ * more efficiency than Curses::Window.refresh alone.
+ */
 static VALUE
 window_noutrefresh(VALUE obj)
 {
@@ -998,7 +1584,12 @@ window_noutrefresh(VALUE obj)
     return Qnil;
 }
 
-/* def move(y, x) */
+/*
+ * Document-method: Curses::Window.move
+ * call-seq: move(y,x)
+ *
+ * Moves the window so that the upper left-hand corner is at position (+y+, +x+)
+ */
 static VALUE
 window_move(VALUE obj, VALUE y, VALUE x)
 {
@@ -1010,7 +1601,15 @@ window_move(VALUE obj, VALUE y, VALUE x)
     return Qnil;
 }
 
-/* def setpos(y, x) */
+/*
+ * Document-method: Curses::Window.setpos
+ * call-seq: setpos(y, x)
+ *
+ * A setter for the position of the cursor
+ * in the current window,
+ * using coordinates +x+ and +y+
+ *
+ */
 static VALUE
 window_setpos(VALUE obj, VALUE y, VALUE x)
 {
@@ -1021,7 +1620,11 @@ window_setpos(VALUE obj, VALUE y, VALUE x)
     return Qnil;
 }
 
-/* def cury */
+/*
+ * Document-method: Curses::Window.cury
+ *
+ * A getter for the current line (Y coord) of the window
+ */
 static VALUE
 window_cury(VALUE obj)
 {
@@ -1033,7 +1636,11 @@ window_cury(VALUE obj)
     return INT2FIX(y);
 }
 
-/* def curx */
+/*
+ * Document-method: Curses::Window.curx
+ *
+ * A getter for the current column (X coord) of the window
+ */
 static VALUE
 window_curx(VALUE obj)
 {
@@ -1045,7 +1652,11 @@ window_curx(VALUE obj)
     return INT2FIX(x);
 }
 
-/* def maxy */
+/*
+ * Document-method: Curses::Window.maxy
+ *
+ * A getter for the maximum lines for the window
+ */
 static VALUE
 window_maxy(VALUE obj)
 {
@@ -1065,7 +1676,11 @@ window_maxy(VALUE obj)
 #endif
 }
 
-/* def maxx */
+/*
+ * Document-method: Curses::Window.maxx
+ *
+ * A getter for the maximum columns for the window
+ */
 static VALUE
 window_maxx(VALUE obj)
 {
@@ -1085,7 +1700,11 @@ window_maxx(VALUE obj)
 #endif
 }
 
-/* def begy */
+/*
+ * Document-method: Curses::Window.begy
+ *
+ * A getter for the beginning line (Y coord) of the window
+ */
 static VALUE
 window_begy(VALUE obj)
 {
@@ -1101,7 +1720,11 @@ window_begy(VALUE obj)
 #endif
 }
 
-/* def begx */
+/*
+ * Document-method: Curses::Window.begx
+ *
+ * A getter for the beginning column (X coord) of the window
+ */
 static VALUE
 window_begx(VALUE obj)
 {
@@ -1117,7 +1740,17 @@ window_begx(VALUE obj)
 #endif
 }
 
-/* def box(vert, hor) */
+/*
+ * Document-method: Curses::Window.box
+ * call-seq: box(vert, hor)
+ *
+ * set the characters to frame the window in.
+ * The vertical +vert+ and horizontal +hor+ character.
+ *
+ * 	win = Curses::Window.new(5,5,5,5)
+ * 	win.box(?|, ?-)
+ *
+ */
 static VALUE
 window_box(int argc, VALUE *argv, VALUE self)
 {
@@ -1151,7 +1784,15 @@ window_box(int argc, VALUE *argv, VALUE self)
     return Qnil;
 }
 
-/* def standout */
+/*
+ * Document-method: Curses::Window.standout
+ *
+ * Enables the best highlighting mode of the terminal.
+ *
+ * This is equivalent to Curses::Window.attron(A_STANDOUT)
+ *
+ * see also Curses::Window.attrset
+ */
 static VALUE
 window_standout(VALUE obj)
 {
@@ -1162,7 +1803,15 @@ window_standout(VALUE obj)
     return Qnil;
 }
 
-/* def standend */
+/*
+ * Document-method: Curses::Window.standend
+ *
+ * Enables the Normal display (no highlight)
+ *
+ * This is equivalent to Curses::Window.attron(A_NORMAL)
+ *
+ * see also Curses::Window.attrset
+ */
 static VALUE
 window_standend(VALUE obj)
 {
@@ -1173,7 +1822,11 @@ window_standend(VALUE obj)
     return Qnil;
 }
 
-/* def inch */
+/*
+ * Document-method: Curses::Window.inch
+ *
+ * Returns the character at the current position of the window.
+ */
 static VALUE
 window_inch(VALUE obj)
 {
@@ -1183,7 +1836,14 @@ window_inch(VALUE obj)
     return CH2FIX(winch(winp->window));
 }
 
-/* def addch(ch) */
+/*
+ * Document-method: Curses::Window.addch
+ * call-seq: addch(ch)
+ *
+ * Add a character +ch+, with attributes, to the window, then advance the cursor.
+ *
+ * see also the system manual for curs_addch(3)
+ */
 static VALUE
 window_addch(VALUE obj, VALUE ch)
 {
@@ -1195,7 +1855,13 @@ window_addch(VALUE obj, VALUE ch)
     return Qnil;
 }
 
-/* def insch(ch) */
+/*
+ * Document-method: Curses::Window.insch
+ * call-seq: insch(ch)
+ *
+ * Insert a character +ch+, before the cursor, in the current window
+ *
+ */
 static VALUE
 window_insch(VALUE obj, VALUE ch)
 {
@@ -1207,7 +1873,13 @@ window_insch(VALUE obj, VALUE ch)
     return Qnil;
 }
 
-/* def addstr(str) */
+/*
+ * Document-method: Curses::Window.addstr
+ * call-seq: addstr(str)
+ *
+ * add a string of characters +str+, to the window and advance cursor
+ *
+ */
 static VALUE
 window_addstr(VALUE obj, VALUE str)
 {
@@ -1222,7 +1894,16 @@ window_addstr(VALUE obj, VALUE str)
     return Qnil;
 }
 
-/* def <<(str) */
+/*
+ * Document-method: Curses::Window.<<
+ *
+ * call-seq:
+ *   <<(str)
+ *
+ * Add String +str+ to the current string.
+ *
+ * See also Curses::Window.addstr
+ */
 static VALUE
 window_addstr2(VALUE obj, VALUE str)
 {
@@ -1243,7 +1924,14 @@ wgetch_func(void *_arg)
     return Qnil;
 }
 
-/* def getch */
+/*
+ * Document-method: Curses::Window.getch
+ *
+ * Read and returns a character from the window.
+ *
+ * See Curses::Key to all the function KEY_* available
+ *
+ */
 static VALUE
 window_getch(VALUE obj)
 {
@@ -1281,7 +1969,12 @@ wgetstr_func(void *_arg)
     return Qnil;
 }
 
-/* def getstr */
+/*
+ * Document-method: Curses::Window.getstr
+ *
+ * This is equivalent to a series f Curses::Window.getch calls
+ *
+ */
 static VALUE
 window_getstr(VALUE obj)
 {
@@ -1294,7 +1987,12 @@ window_getstr(VALUE obj)
     return rb_locale_str_new_cstr(arg.rtn);
 }
 
-/* def delch */
+/*
+ * Document-method: Curses::Window.delch
+ *
+ * Delete the character under the cursor
+ *
+ */
 static VALUE
 window_delch(VALUE obj)
 {
@@ -1305,7 +2003,12 @@ window_delch(VALUE obj)
     return Qnil;
 }
 
-/* def delelteln */
+/*
+ * Document-method: Curses::Window.deleteln
+ *
+ * Delete the line under the cursor.
+ *
+ */
 static VALUE
 window_deleteln(VALUE obj)
 {
@@ -1318,7 +2021,12 @@ window_deleteln(VALUE obj)
     return Qnil;
 }
 
-/* def insertln */
+/*
+ * Document-method: Curses::Window.insertln
+ *
+ * Inserts a line above the cursor, and the bottom line is lost
+ *
+ */
 static VALUE
 window_insertln(VALUE obj)
 {
@@ -1331,6 +2039,21 @@ window_insertln(VALUE obj)
     return Qnil;
 }
 
+/*
+ * Document-method: Curses::Window.scrollok
+ * call-seq: scrollok(bool)
+ *
+ * Controls what happens when the cursor of a window
+ * is moved off the edge of the window or scrolling region,
+ * either as a result of a newline action on the bottom line,
+ * or typing the last character of the last line.
+ *
+ * If disabled, (+bool+ is false), the cursor is left on the bottom line.
+ *
+ * If enabled, (+bool+ is true), the window is scrolled up one line
+ * (Note that to get the physical scrolling effect on the terminal,
+ * it is also necessary to call Curses::Window.idlok)
+ */
 static VALUE
 window_scrollok(VALUE obj, VALUE bf)
 {
@@ -1341,6 +2064,22 @@ window_scrollok(VALUE obj, VALUE bf)
     return Qnil;
 }
 
+/*
+ * Document-method: Curses::Window.idlok
+ * call-seq: idlok(bool)
+ *
+ * If +bool+ is +true+ curses considers using the hardware insert/delete
+ * line feature of terminals so equipped.
+ *
+ * If +bool+ is +false+, disables use of line insertion and deletion.
+ * This option should be enabled only if the application needs insert/delete
+ * line, for example, for a screen editor.
+ *
+ * It is disabled by default because insert/delete line tends to be visually
+ * annoying when used in applications where it is not really needed.
+ * If insert/delete line cannot be used, curses redraws the changed portions of all lines.
+ *
+ */
 static VALUE
 window_idlok(VALUE obj, VALUE bf)
 {
@@ -1351,6 +2090,20 @@ window_idlok(VALUE obj, VALUE bf)
     return Qnil;
 }
 
+/*
+ * Document-method: Curses::Window.setscrreg
+ * call-seq:
+ *   setscrreg(top, bottom)
+ *
+ * Set a software scrolling region in a window.
+ * +top+ and +bottom+ are lines numbers of the margin.
+ *
+ * If this option and Curses::Window.scrollok are enabled, an attempt to move
+ * off the bottom margin line causes all lines in the scrolling region to
+ * scroll one line in the direction of the first line.  Only the text of the
+ * window is scrolled.
+ *
+ */
 static VALUE
 window_setscrreg(VALUE obj, VALUE top, VALUE bottom)
 {
@@ -1368,6 +2121,13 @@ window_setscrreg(VALUE obj, VALUE top, VALUE bottom)
 }
 
 #if defined(USE_COLOR) && defined(HAVE_WCOLOR_SET)
+/*
+ * Document-method: Curses::Window.color_set
+ * call-seq: color_set(col)
+ *
+ * Sets the current color of the given window to the
+ * foreground/background combination described by the Fixnum +col+.
+ */
 static VALUE
 window_color_set(VALUE obj, VALUE col)
 {
@@ -1380,6 +2140,11 @@ window_color_set(VALUE obj, VALUE col)
 }
 #endif /* defined(USE_COLOR) && defined(HAVE_WCOLOR_SET) */
 
+/*
+ * Document-method: Curses::Window.scroll
+ *
+ * Scrolls the current window up one line.
+ */
 static VALUE
 window_scroll(VALUE obj)
 {
@@ -1390,6 +2155,18 @@ window_scroll(VALUE obj)
     return (scroll(winp->window) == OK) ? Qtrue : Qfalse;
 }
 
+/*
+ * Document-method: Curses::Window.scrl
+ * call-seq: scrl(num)
+ *
+ * Scrolls the current window Fixnum +num+ lines.
+ * The current cursor position is not changed.
+ *
+ * For positive +num+, it scrolls up.
+ *
+ * For negative +num+, it scrolls down.
+ *
+ */
 static VALUE
 window_scrl(VALUE obj, VALUE n)
 {
@@ -1404,6 +2181,14 @@ window_scrl(VALUE obj, VALUE n)
 #endif
 }
 
+/*
+ * Document-method: Curses::Window.attroff
+ * call-seq: attroff(attrs)
+ *
+ * Turns on the named attributes +attrs+ without affecting any others.
+ *
+ * See also Curses::Window.attrset
+ */
 static VALUE
 window_attroff(VALUE obj, VALUE attrs)
 {
@@ -1417,6 +2202,15 @@ window_attroff(VALUE obj, VALUE attrs)
 #endif
 }
 
+/*
+ * Document-method: Curses::Window.attron
+ * call-seq: attron(attrs)
+ *
+ * Turns off the named attributes +attrs+
+ * without turning any other attributes on or off.
+ *
+ * See also Curses::Window.attrset
+ */
 static VALUE
 window_attron(VALUE obj, VALUE attrs)
 {
@@ -1439,6 +2233,32 @@ window_attron(VALUE obj, VALUE attrs)
 #endif
 }
 
+/*
+ * Document-method: Curses::Window.attrset
+ * call-seq: attrset(attrs)
+ *
+ * Sets the current attributes of the given window to +attrs+.
+ *
+ * The following video attributes, defined in <curses.h>, can
+ * be passed to the routines Curses::Window.attron, Curses::Window.attroff,
+ * and Curses::Window.attrset, or OR'd with the characters passed to addch.
+ *   A_NORMAL        Normal display (no highlight)
+ *   A_STANDOUT      Best highlighting mode of the terminal.
+ *   A_UNDERLINE     Underlining
+ *   A_REVERSE       Reverse video
+ *   A_BLINK         Blinking
+ *   A_DIM           Half bright
+ *   A_BOLD          Extra bright or bold
+ *   A_PROTECT       Protected mode
+ *   A_INVIS         Invisible or blank mode
+ *   A_ALTCHARSET    Alternate character set
+ *   A_CHARTEXT      Bit-mask to extract a character
+ *   COLOR_PAIR(n)   Color-pair number n
+ *
+ * TODO: provide some examples here.
+ *
+ * see also system manual curs_attr(3)
+ */
 static VALUE
 window_attrset(VALUE obj, VALUE attrs)
 {
@@ -1452,6 +2272,15 @@ window_attrset(VALUE obj, VALUE attrs)
 #endif
 }
 
+/*
+ * Document-method: Curses::Window.bkgdset
+ * call-seq: bkgdset(ch)
+ *
+ * Manipulate the background of the current window
+ * with character Integer +ch+
+ *
+ * see also Curses.bkgdset
+ */
 static VALUE
 window_bkgdset(VALUE obj, VALUE ch)
 {
@@ -1464,6 +2293,15 @@ window_bkgdset(VALUE obj, VALUE ch)
     return Qnil;
 }
 
+/*
+ * Document-method: Curses::Window.bkgd
+ * call-seq: bkgd(ch)
+ *
+ * Set the background of the current window
+ * and apply character Integer +ch+ to every character.
+ *
+ * see also Curses.bkgd
+ */
 static VALUE
 window_bkgd(VALUE obj, VALUE ch)
 {
@@ -1477,6 +2315,11 @@ window_bkgd(VALUE obj, VALUE ch)
 #endif
 }
 
+/*
+ * Document-method: Curses::Window.getbkgd
+ *
+ * Returns an Interer (+ch+) for the character property in the current window.
+ */
 static VALUE
 window_getbkgd(VALUE obj)
 {
@@ -1491,6 +2334,13 @@ window_getbkgd(VALUE obj)
 #endif
 }
 
+/*
+ * Document-method: Curses::Window.resize
+ * call-seq: resize(lines, cols)
+ *
+ * Resize the current window to Fixnum +lines+ and Fixnum +cols+
+ *
+ */
 static VALUE
 window_resize(VALUE obj, VALUE lin, VALUE col)
 {
@@ -1506,6 +2356,33 @@ window_resize(VALUE obj, VALUE lin, VALUE col)
 
 
 #ifdef HAVE_KEYPAD
+/*
+ * Document-method: Curses::Window.keypad=
+ * call-seq:
+ *   keypad=(bool)
+ *
+ * See Curses::Window.keypad
+ */
+
+/*
+ * Document-method: Curses::Window.keypad
+ * call-seq:
+ *   keypad(bool)
+ *
+ * Enables the keypad of the user's terminal.
+ *
+ * If enabled (+bool+ is +true+), the user can press a function key
+ * (such as an arrow key) and wgetch returns a single value representing
+ * the function key, as in KEY_LEFT.  If disabled (+bool+ is +false+),
+ * curses does not treat function keys specially and the program has to
+ * interpret the escape sequences itself.  If the keypad in the terminal
+ * can be turned on (made to transmit) and off (made to work locally),
+ * turning on this option causes the terminal keypad to be turned on when
+ * Curses::Window.getch is called.
+ *
+ * The default value for keypad is false.
+ *
+ */
 static VALUE
 window_keypad(VALUE obj, VALUE val)
 {
@@ -1527,6 +2404,15 @@ window_keypad(VALUE obj, VALUE val)
 #endif
 
 #ifdef HAVE_NODELAY
+/*
+ * Document-method: Curses::Window.nodelay
+ * call-seq: nodelay(bool)
+ *
+ * Causes Curses::Window.getch to be a non-blocking call.  If no input is ready, getch returns ERR.
+ *
+ * If disabled (+bool+ is +false+), Curses::Window.getch waits until a key is pressed.
+ *
+ */
 static VALUE
 window_nodelay(VALUE obj, VALUE val)
 {
@@ -1546,6 +2432,16 @@ window_nodelay(VALUE obj, VALUE val)
 #endif
 
 #ifdef HAVE_WTIMEOUT
+/*
+ * Document-method: Curses::Window.timeout=
+ * call-seq: timeout=(delay)
+ *
+ * Sets block and non-blocking reads for the window.
+ * - If delay is negative, blocking read is used (i.e., waits indefinitely for input).
+ * - If delay is zero, then non-blocking read is used (i.e., read returns ERR if no input is waiting).
+ * - If delay is positive, then read blocks for delay milliseconds, and returns ERR if there is still no input.
+ *
+ */
 static VALUE
 window_timeout(VALUE obj, VALUE delay)
 {
@@ -1560,15 +2456,68 @@ window_timeout(VALUE obj, VALUE delay)
 #endif
 
 /*------------------------- Initialization -------------------------*/
+
+/*
+ * Document-module: Curses
+ *
+ * == Description
+ * An implementation of the CRT screen handling and optimization library.
+ *
+ * == Structures and such
+ *
+ * === Classes
+ *
+ * * Curses::Window - class with the means to draw a window or box
+ * * Curses::MouseEvent - class for collecting mouse events
+ *
+ * === Modules
+ *
+ * Curses:: The curses implementation
+ * Curses::Key:: Collection of constants for keypress events
+ *
+ * == Examples
+ *
+ * * hello.rb
+ *     :include: hello.rb
+ *
+ *
+ * * rain.rb
+ *     :include: rain.rb
+ *
+ *
+ */
 void
 Init_curses(void)
 {
     mCurses    = rb_define_module("Curses");
+
+    /*
+     * Document-module: Curses::Key
+     *
+     *
+     * a container for the KEY_* values.
+     *
+     * See also system manual for getch(3)
+     *
+     */
     mKey       = rb_define_module_under(mCurses, "Key");
 
     rb_gc_register_address(&rb_stdscr);
 
 #ifdef USE_MOUSE
+    /*
+     * Document-class: Curses::MouseEvent
+     *
+     * == Description
+     *
+     * Curses::MouseEvent
+     *
+     * == Example
+     *
+     * * mouse.rb
+     *     :include: mouse.rb
+     *
+     */
     cMouseEvent = rb_define_class_under(mCurses,"MouseEvent",rb_cObject);
     rb_undef_method(CLASS_OF(cMouseEvent),"new");
     rb_define_method(cMouseEvent, "eid", curs_mouse_id, 0);
@@ -1655,6 +2604,36 @@ Init_curses(void)
     rb_define_module_function(mCurses, "def_prog_mode", curses_def_prog_mode, 0);
     rb_define_module_function(mCurses, "reset_prog_mode", curses_reset_prog_mode, 0);
 
+    /*
+     * Document-class: Curses::Window
+     *
+     * == Description
+     *
+     * The means by which to create and manage frames or windows.
+     * While there may be more than one window at a time, only one window
+     * will receive input.
+     *
+     * == Usage
+     *
+     *   require 'curses'
+     *
+     *   Curses.init_screen()
+     *
+     *   my_str = "LOOK! PONIES!"
+     *   win = Curses::Window.new( 8, (my_str.length + 10),
+     *                             (Curses.lines - 8) / 2,
+     *                             (Curses.cols - (my_str.length + 10)) / 2 )
+     *   win.box("|", "-")
+     *   win.setpos(2,3)
+     *   win.addstr(my_str)
+     *   # or even
+     *   win << "\nORLY"
+     *   win << "\nYES!! " + my_str
+     *   win.refresh
+     *   win.getch
+     *   win.close
+     *
+     */
     cWindow = rb_define_class_under(mCurses, "Window", rb_cData);
     rb_define_alloc_func(cWindow, window_s_allocate);
     rb_define_method(cWindow, "initialize", window_initialize, 4);
@@ -1710,165 +2689,572 @@ Init_curses(void)
 #define rb_curses_define_const(c) rb_define_const(mCurses,#c,UINT2NUM(c))
 
 #ifdef USE_COLOR
+    /* Document-const: A_ATTRIBUTES
+     *
+     * Character attribute mask:
+     * Bit-mask to extract attributes
+     *
+     * See Curses.inch or Curses::Window.inch
+     */
     rb_curses_define_const(A_ATTRIBUTES);
 #ifdef A_NORMAL
+    /* Document-const: A_NORMAL
+     *
+     * Attribute mask:
+     * Normal display (no highlight)
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_NORMAL);
 #endif
+    /* Document-const: A_STANDOUT
+     *
+     * Attribute mask:
+     * Best highlighting mode of the terminal.
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_STANDOUT);
+    /* Document-const: A_UNDERLINE
+     *
+     * Attribute mask:
+     * Underlining
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_UNDERLINE);
+    /* Document-const: A_REVERSE
+     *
+     * Attribute mask:
+     * Reverse video
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_REVERSE);
+    /* Document-const: A_BLINK
+     *
+     * Attribute mask:
+     * Blinking
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_BLINK);
+    /* Document-const: A_DIM
+     *
+     * Attribute mask:
+     * Half bright
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_DIM);
+    /* Document-const: A_BOLD
+     *
+     * Attribute mask:
+     * Extra bright or bold
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_BOLD);
+    /* Document-const: A_PROTECT
+     *
+     * Attribute mask:
+     * Protected mode
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_PROTECT);
 #ifdef A_INVIS /* for NetBSD */
+    /* Document-const: A_INVIS
+     *
+     * Attribute mask:
+     * Invisible or blank mode
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_INVIS);
 #endif
+    /* Document-const: A_ALTCHARSET
+     *
+     * Attribute mask:
+     * Alternate character set
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_ALTCHARSET);
+    /* Document-const: A_CHARTEXT
+     *
+     * Attribute mask:
+     * Bit-mask to extract a character
+     *
+     * See Curses.attrset
+     */
     rb_curses_define_const(A_CHARTEXT);
 #ifdef A_HORIZONTAL
+    /* Document-const: A_HORIZONTAL
+     *
+     * Attribute mask:
+     * horizontal highlight
+     *
+     * Check system curs_attr(3x) for support
+     */
     rb_curses_define_const(A_HORIZONTAL);
 #endif
 #ifdef A_LEFT
+    /* Document-const: A_LEFT
+     *
+     * Attribute mask:
+     * left highlight
+     *
+     * Check system curs_attr(3x) for support
+     */
     rb_curses_define_const(A_LEFT);
 #endif
 #ifdef A_LOW
+    /* Document-const: A_LOW
+     *
+     * Attribute mask:
+     * low highlight
+     *
+     * Check system curs_attr(3x) for support
+     */
     rb_curses_define_const(A_LOW);
 #endif
 #ifdef A_RIGHT
+    /* Document-const: A_RIGHT
+     *
+     * Attribute mask:
+     * right highlight
+     *
+     * Check system curs_attr(3x) for support
+     */
     rb_curses_define_const(A_RIGHT);
 #endif
 #ifdef A_TOP
+    /* Document-const: A_TOP
+     *
+     * Attribute mask:
+     * top highlight
+     *
+     * Check system curs_attr(3x) for support
+     */
     rb_curses_define_const(A_TOP);
 #endif
 #ifdef A_VERTICAL
+    /* Document-const: A_VERTICAL
+     *
+     * Attribute mask:
+     * vertical highlight
+     *
+     * Check system curs_attr(3x) for support
+     */
     rb_curses_define_const(A_VERTICAL);
 #endif
+    /* Document-const: A_COLOR
+     *
+     * Character attribute mask:
+     * Bit-mask to extract color-pair field information
+     *
+     * See Curses.inch or Curses::Window.inch
+     */
     rb_curses_define_const(A_COLOR);
 
 #ifdef COLORS
+    /*
+     * Document-const: Curses::COLORS
+     *
+     * Number of the colors available
+     */
     rb_curses_define_const(COLORS);
 #endif
+    /*
+     * Document-const: Curses::COLOR_BLACK
+     *
+     * Value of the color black
+     */
     rb_curses_define_const(COLOR_BLACK);
+    /*
+     * Document-const: COLOR_RED
+     *
+     * Value of the color red
+     */
     rb_curses_define_const(COLOR_RED);
+    /*
+     * Document-const: COLOR_GREEN
+     *
+     * Value of the color green
+     */
     rb_curses_define_const(COLOR_GREEN);
+    /*
+     * Document-const: COLOR_YELLOW
+     *
+     * Value of the color yellow
+     */
     rb_curses_define_const(COLOR_YELLOW);
+    /*
+     * Document-const: COLOR_BLUE
+     *
+     * Value of the color blue
+     */
     rb_curses_define_const(COLOR_BLUE);
+    /*
+     * Document-const: COLOR_MAGENTA
+     *
+     * Value of the color magenta
+     */
     rb_curses_define_const(COLOR_MAGENTA);
+    /*
+     * Document-const: COLOR_CYAN
+     *
+     * Value of the color cyan
+     */
     rb_curses_define_const(COLOR_CYAN);
+    /*
+     * Document-const: COLOR_WHITE
+     *
+     * Value of the color white
+     */
     rb_curses_define_const(COLOR_WHITE);
 #endif /* USE_COLOR */
 #ifdef USE_MOUSE
 #ifdef BUTTON1_PRESSED
+    /* Document-const: BUTTON1_PRESSED
+     *
+     * Mouse event mask:
+     * mouse button 1 down
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON1_PRESSED);
 #endif
 #ifdef BUTTON1_RELEASED
+    /* Document-const: BUTTON1_RELEASED
+     *
+     * Mouse event mask:
+     * mouse button 1 up
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON1_RELEASED);
 #endif
 #ifdef BUTTON1_CLICKED
+    /* Document-const: BUTTON1_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 1 clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON1_CLICKED);
 #endif
 #ifdef BUTTON1_DOUBLE_CLICKED
+    /* Document-const: BUTTON1_DOUBLE_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 1 double clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON1_DOUBLE_CLICKED);
 #endif
 #ifdef BUTTON1_TRIPLE_CLICKED
+    /* Document-const: BUTTON1_TRIPLE_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 1 triple clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON1_TRIPLE_CLICKED);
 #endif
 #ifdef BUTTON2_PRESSED
+    /* Document-const: BUTTON2_PRESSED
+     *
+     * Mouse event mask:
+     * mouse button 2 down
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON2_PRESSED);
 #endif
 #ifdef BUTTON2_RELEASED
+    /* Document-const: BUTTON2_RELEASED
+     *
+     * Mouse event mask:
+     * mouse button 2 up
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON2_RELEASED);
 #endif
 #ifdef BUTTON2_CLICKED
+    /* Document-const: BUTTON2_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 2 clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON2_CLICKED);
 #endif
 #ifdef BUTTON2_DOUBLE_CLICKED
+    /* Document-const: BUTTON2_DOUBLE_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 2 double clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON2_DOUBLE_CLICKED);
 #endif
 #ifdef BUTTON2_TRIPLE_CLICKED
+    /* Document-const: BUTTON2_TRIPLE_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 2 triple clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON2_TRIPLE_CLICKED);
 #endif
 #ifdef BUTTON3_PRESSED
+    /* Document-const: BUTTON3_PRESSED
+     *
+     * Mouse event mask:
+     * mouse button 3 down
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON3_PRESSED);
 #endif
 #ifdef BUTTON3_RELEASED
+    /* Document-const: BUTTON3_RELEASED
+     *
+     * Mouse event mask:
+     * mouse button 3 up
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON3_RELEASED);
 #endif
 #ifdef BUTTON3_CLICKED
+    /* Document-const: BUTTON3_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 3 clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON3_CLICKED);
 #endif
 #ifdef BUTTON3_DOUBLE_CLICKED
+    /* Document-const: BUTTON3_DOUBLE_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 3 double clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON3_DOUBLE_CLICKED);
 #endif
 #ifdef BUTTON3_TRIPLE_CLICKED
+    /* Document-const: BUTTON3_TRIPLE_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 3 triple clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON3_TRIPLE_CLICKED);
 #endif
 #ifdef BUTTON4_PRESSED
+    /* Document-const: BUTTON4_PRESSED
+     *
+     * Mouse event mask:
+     * mouse button 4 down
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON4_PRESSED);
 #endif
 #ifdef BUTTON4_RELEASED
+    /* Document-const: BUTTON4_RELEASED
+     *
+     * Mouse event mask:
+     * mouse button 4 up
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON4_RELEASED);
 #endif
 #ifdef BUTTON4_CLICKED
+    /* Document-const: BUTTON4_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 4 clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON4_CLICKED);
 #endif
 #ifdef BUTTON4_DOUBLE_CLICKED
+    /* Document-const: BUTTON4_DOUBLE_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 4 double clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON4_DOUBLE_CLICKED);
 #endif
 #ifdef BUTTON4_TRIPLE_CLICKED
+    /* Document-const: BUTTON4_TRIPLE_CLICKED
+     *
+     * Mouse event mask:
+     * mouse button 4 triple clicked
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON4_TRIPLE_CLICKED);
 #endif
 #ifdef BUTTON_SHIFT
+    /* Document-const: BUTTON_SHIFT
+     *
+     * Mouse event mask:
+     * shift was down during button state change
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON_SHIFT);
 #endif
 #ifdef BUTTON_CTRL
+    /* Document-const: BUTTON_CTRL
+     *
+     * Mouse event mask:
+     * control was down during button state change
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON_CTRL);
 #endif
 #ifdef BUTTON_ALT
+    /* Document-const: BUTTON_ALT
+     *
+     * Mouse event mask:
+     * alt was down during button state change
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(BUTTON_ALT);
 #endif
 #ifdef ALL_MOUSE_EVENTS
+    /* Document-const: ALL_MOUSE_EVENTS
+     *
+     * Mouse event mask:
+     * report all button state changes
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(ALL_MOUSE_EVENTS);
 #endif
 #ifdef REPORT_MOUSE_POSITION
+    /* Document-const: REPORT_MOUSE_POSITION
+     *
+     * Mouse event mask:
+     * report mouse movement
+     *
+     * See Curses.getmouse
+     */
     rb_curses_define_const(REPORT_MOUSE_POSITION);
 #endif
 #endif /* USE_MOUSE */
 
 #if defined(KEY_MOUSE) && defined(USE_MOUSE)
+    /* Document-const: KEY_MOUSE
+     * Mouse event read
+     */
+    /* Document-const: MOUSE
+     * Mouse event read
+     */
     rb_curses_define_const(KEY_MOUSE);
     rb_define_const(mKey, "MOUSE", INT2NUM(KEY_MOUSE));
 #endif
 #ifdef KEY_MIN
+    /* Document-const: KEY_MIN
+     * The minimum allowed curses key value.
+     */
+    /* Document-const: MIN
+     * The minimum allowed curses key value.
+     */
     rb_curses_define_const(KEY_MIN);
     rb_define_const(mKey, "MIN", INT2NUM(KEY_MIN));
 #endif
 #ifdef KEY_BREAK
+    /* Document-const: KEY_BREAK
+     * Break key
+     */
+    /* Document-const: BREAK
+     * Break key
+     */
     rb_curses_define_const(KEY_BREAK);
     rb_define_const(mKey, "BREAK", INT2NUM(KEY_BREAK));
 #endif
 #ifdef KEY_DOWN
+    /* Document-const: KEY_DOWN
+     * the down arrow key
+     */
+    /* Document-const: DOWN
+     * the down arrow key
+     */
     rb_curses_define_const(KEY_DOWN);
     rb_define_const(mKey, "DOWN", INT2NUM(KEY_DOWN));
 #endif
 #ifdef KEY_UP
+    /* Document-const: KEY_UP
+     * the up arrow key
+     */
+    /* Document-const: UP
+     * the up arrow key
+     */
     rb_curses_define_const(KEY_UP);
     rb_define_const(mKey, "UP", INT2NUM(KEY_UP));
 #endif
 #ifdef KEY_LEFT
+    /* Document-const: KEY_LEFT
+     * the left arrow key
+     */
+    /* Document-const: LEFT
+     * the left arrow key
+     */
     rb_curses_define_const(KEY_LEFT);
     rb_define_const(mKey, "LEFT", INT2NUM(KEY_LEFT));
 #endif
 #ifdef KEY_RIGHT
+    /* Document-const: KEY_RIGHT
+     * the right arrow key
+     */
+    /* Document-const: RIGHT
+     * the right arrow key
+     */
     rb_curses_define_const(KEY_RIGHT);
     rb_define_const(mKey, "RIGHT", INT2NUM(KEY_RIGHT));
 #endif
 #ifdef KEY_HOME
+    /* Document-const: KEY_HOME
+     * Home key (upward+left arrow)
+     */
+    /* Document-const: HOME
+     * Home key (upward+left arrow)
+     */
     rb_curses_define_const(KEY_HOME);
     rb_define_const(mKey, "HOME", INT2NUM(KEY_HOME));
 #endif
 #ifdef KEY_BACKSPACE
+    /* Document-const: KEY_BACKSPACE
+     * Backspace
+     */
+    /* Document-const: BACKSPACE
+     * Backspace
+     */
     rb_curses_define_const(KEY_BACKSPACE);
     rb_define_const(mKey, "BACKSPACE", INT2NUM(KEY_BACKSPACE));
 #endif
@@ -1886,334 +3272,832 @@ Init_curses(void)
     }
 #endif
 #ifdef KEY_DL
+    /* Document-const: KEY_DL
+     * Delete line
+     */
+    /* Document-const: DL
+     * Delete line
+     */
     rb_curses_define_const(KEY_DL);
     rb_define_const(mKey, "DL", INT2NUM(KEY_DL));
 #endif
 #ifdef KEY_IL
+    /* Document-const: KEY_IL
+     * Insert line
+     */
+    /* Document-const: IL
+     * Insert line
+     */
     rb_curses_define_const(KEY_IL);
     rb_define_const(mKey, "IL", INT2NUM(KEY_IL));
 #endif
 #ifdef KEY_DC
+    /* Document-const: KEY_DC
+     * Delete character
+     */
+    /* Document-const: DC
+     * Delete character
+     */
     rb_curses_define_const(KEY_DC);
     rb_define_const(mKey, "DC", INT2NUM(KEY_DC));
 #endif
 #ifdef KEY_IC
+    /* Document-const: KEY_IC
+     * Insert char or enter insert mode
+     */
+    /* Document-const: IC
+     * Insert char or enter insert mode
+     */
     rb_curses_define_const(KEY_IC);
     rb_define_const(mKey, "IC", INT2NUM(KEY_IC));
 #endif
 #ifdef KEY_EIC
+    /* Document-const: KEY_EIC
+     * Enter insert char mode
+     */
+    /* Document-const: EIC
+     * Enter insert char mode
+     */
     rb_curses_define_const(KEY_EIC);
     rb_define_const(mKey, "EIC", INT2NUM(KEY_EIC));
 #endif
 #ifdef KEY_CLEAR
+    /* Document-const: KEY_CLEAR
+     * Clear Screen
+     */
+    /* Document-const: CLEAR
+     * Clear Screen
+     */
     rb_curses_define_const(KEY_CLEAR);
     rb_define_const(mKey, "CLEAR", INT2NUM(KEY_CLEAR));
 #endif
 #ifdef KEY_EOS
+    /* Document-const: KEY_EOS
+     * Clear to end of screen
+     */
+    /* Document-const: EOS
+     * Clear to end of screen
+     */
     rb_curses_define_const(KEY_EOS);
     rb_define_const(mKey, "EOS", INT2NUM(KEY_EOS));
 #endif
 #ifdef KEY_EOL
+    /* Document-const: KEY_EOL
+     * Clear to end of line
+     */
+    /* Document-const: EOL
+     * Clear to end of line
+     */
     rb_curses_define_const(KEY_EOL);
     rb_define_const(mKey, "EOL", INT2NUM(KEY_EOL));
 #endif
 #ifdef KEY_SF
+    /* Document-const: KEY_SF
+     * Scroll 1 line forward
+     */
+    /* Document-const: SF
+     * Scroll 1 line forward
+     */
     rb_curses_define_const(KEY_SF);
     rb_define_const(mKey, "SF", INT2NUM(KEY_SF));
 #endif
 #ifdef KEY_SR
+    /* Document-const: KEY_SR
+     * Scroll 1 line backware (reverse)
+     */
+    /* Document-const: SR
+     * Scroll 1 line backware (reverse)
+     */
     rb_curses_define_const(KEY_SR);
     rb_define_const(mKey, "SR", INT2NUM(KEY_SR));
 #endif
 #ifdef KEY_NPAGE
+    /* Document-const: KEY_NPAGE
+     * Next page
+     */
+    /* Document-const: NPAGE
+     * Next page
+     */
     rb_curses_define_const(KEY_NPAGE);
     rb_define_const(mKey, "NPAGE", INT2NUM(KEY_NPAGE));
 #endif
 #ifdef KEY_PPAGE
+    /* Document-const: KEY_PPAGE
+     * Previous page
+     */
+    /* Document-const: PPAGE
+     * Previous page
+     */
     rb_curses_define_const(KEY_PPAGE);
     rb_define_const(mKey, "PPAGE", INT2NUM(KEY_PPAGE));
 #endif
 #ifdef KEY_STAB
+    /* Document-const: KEY_STAB
+     * Set tab
+     */
+    /* Document-const: STAB
+     * Set tab
+     */
     rb_curses_define_const(KEY_STAB);
     rb_define_const(mKey, "STAB", INT2NUM(KEY_STAB));
 #endif
 #ifdef KEY_CTAB
+    /* Document-const: KEY_CTAB
+     * Clear tab
+     */
+    /* Document-const: CTAB
+     * Clear tab
+     */
     rb_curses_define_const(KEY_CTAB);
     rb_define_const(mKey, "CTAB", INT2NUM(KEY_CTAB));
 #endif
 #ifdef KEY_CATAB
+    /* Document-const: KEY_CATAB
+     * Clear all tabs
+     */
+    /* Document-const: CATAB
+     * Clear all tabs
+     */
     rb_curses_define_const(KEY_CATAB);
     rb_define_const(mKey, "CATAB", INT2NUM(KEY_CATAB));
 #endif
 #ifdef KEY_ENTER
+    /* Document-const: KEY_ENTER
+     * Enter or send
+     */
+    /* Document-const: ENTER
+     * Enter or send
+     */
     rb_curses_define_const(KEY_ENTER);
     rb_define_const(mKey, "ENTER", INT2NUM(KEY_ENTER));
 #endif
 #ifdef KEY_SRESET
+    /* Document-const: KEY_SRESET
+     * Soft (partial) reset
+     */
+    /* Document-const: SRESET
+     * Soft (partial) reset
+     */
     rb_curses_define_const(KEY_SRESET);
     rb_define_const(mKey, "SRESET", INT2NUM(KEY_SRESET));
 #endif
 #ifdef KEY_RESET
+    /* Document-const: KEY_RESET
+     * Reset or hard reset
+     */
+    /* Document-const: RESET
+     * Reset or hard reset
+     */
     rb_curses_define_const(KEY_RESET);
     rb_define_const(mKey, "RESET", INT2NUM(KEY_RESET));
 #endif
 #ifdef KEY_PRINT
+    /* Document-const: KEY_PRINT
+     * Print or copy
+     */
+    /* Document-const: PRINT
+     * Print or copy
+     */
     rb_curses_define_const(KEY_PRINT);
     rb_define_const(mKey, "PRINT", INT2NUM(KEY_PRINT));
 #endif
 #ifdef KEY_LL
+    /* Document-const: KEY_LL
+     * Home down or bottom (lower left)
+     */
+    /* Document-const: LL
+     * Home down or bottom (lower left)
+     */
     rb_curses_define_const(KEY_LL);
     rb_define_const(mKey, "LL", INT2NUM(KEY_LL));
 #endif
 #ifdef KEY_A1
+    /* Document-const: KEY_A1
+     * Upper left of keypad
+     */
+    /* Document-const: A1
+     * Upper left of keypad
+     */
     rb_curses_define_const(KEY_A1);
     rb_define_const(mKey, "A1", INT2NUM(KEY_A1));
 #endif
 #ifdef KEY_A3
+    /* Document-const: KEY_A3
+     * Upper right of keypad
+     */
+    /* Document-const: A3
+     * Upper right of keypad
+     */
     rb_curses_define_const(KEY_A3);
     rb_define_const(mKey, "A3", INT2NUM(KEY_A3));
 #endif
 #ifdef KEY_B2
+    /* Document-const: KEY_B2
+     * Center of keypad
+     */
+    /* Document-const: B2
+     * Center of keypad
+     */
     rb_curses_define_const(KEY_B2);
     rb_define_const(mKey, "B2", INT2NUM(KEY_B2));
 #endif
 #ifdef KEY_C1
+    /* Document-const: KEY_C1
+     * Lower left of keypad
+     */
+    /* Document-const: C1
+     * Lower left of keypad
+     */
     rb_curses_define_const(KEY_C1);
     rb_define_const(mKey, "C1", INT2NUM(KEY_C1));
 #endif
 #ifdef KEY_C3
+    /* Document-const: KEY_C3
+     * Lower right of keypad
+     */
+    /* Document-const: C3
+     * Lower right of keypad
+     */
     rb_curses_define_const(KEY_C3);
     rb_define_const(mKey, "C3", INT2NUM(KEY_C3));
 #endif
 #ifdef KEY_BTAB
+    /* Document-const: BTAB
+     * Back tab key
+     */
+    /* Document-const: KEY_BTAB
+     * Back tab key
+     */
     rb_curses_define_const(KEY_BTAB);
     rb_define_const(mKey, "BTAB", INT2NUM(KEY_BTAB));
 #endif
 #ifdef KEY_BEG
+    /* Document-const: KEY_BEG
+     * Beginning key
+     */
+    /* Document-const: BEG
+     * Beginning key
+     */
     rb_curses_define_const(KEY_BEG);
     rb_define_const(mKey, "BEG", INT2NUM(KEY_BEG));
 #endif
 #ifdef KEY_CANCEL
+    /* Document-const: KEY_CANCEL
+     * Cancel key
+     */
+    /* Document-const: CANCEL
+     * Cancel key
+     */
     rb_curses_define_const(KEY_CANCEL);
     rb_define_const(mKey, "CANCEL", INT2NUM(KEY_CANCEL));
 #endif
 #ifdef KEY_CLOSE
+    /* Document-const: KEY_CLOSE
+     * Close key
+     */
+    /* Document-const: CLOSE
+     * Close key
+     */
     rb_curses_define_const(KEY_CLOSE);
     rb_define_const(mKey, "CLOSE", INT2NUM(KEY_CLOSE));
 #endif
 #ifdef KEY_COMMAND
+    /* Document-const: KEY_COMMAND
+     * Cmd (command) key
+     */
+    /* Document-const: COMMAND
+     * Cmd (command) key
+     */
     rb_curses_define_const(KEY_COMMAND);
     rb_define_const(mKey, "COMMAND", INT2NUM(KEY_COMMAND));
 #endif
 #ifdef KEY_COPY
+    /* Document-const: KEY_COPY
+     * Copy key
+     */
+    /* Document-const: COPY
+     * Copy key
+     */
     rb_curses_define_const(KEY_COPY);
     rb_define_const(mKey, "COPY", INT2NUM(KEY_COPY));
 #endif
 #ifdef KEY_CREATE
+    /* Document-const: KEY_CREATE
+     * Create key
+     */
+    /* Document-const: CREATE
+     * Create key
+     */
     rb_curses_define_const(KEY_CREATE);
     rb_define_const(mKey, "CREATE", INT2NUM(KEY_CREATE));
 #endif
 #ifdef KEY_END
+    /* Document-const: KEY_END
+     * End key
+     */
+    /* Document-const: END
+     * End key
+     */
     rb_curses_define_const(KEY_END);
     rb_define_const(mKey, "END", INT2NUM(KEY_END));
 #endif
 #ifdef KEY_EXIT
+    /* Document-const: KEY_EXIT
+     * Exit key
+     */
+    /* Document-const: EXIT
+     * Exit key
+     */
     rb_curses_define_const(KEY_EXIT);
     rb_define_const(mKey, "EXIT", INT2NUM(KEY_EXIT));
 #endif
 #ifdef KEY_FIND
+    /* Document-const: KEY_FIND
+     * Find key
+     */
+    /* Document-const: FIND
+     * Find key
+     */
     rb_curses_define_const(KEY_FIND);
     rb_define_const(mKey, "FIND", INT2NUM(KEY_FIND));
 #endif
 #ifdef KEY_HELP
+    /* Document-const: KEY_HELP
+     * Help key
+     */
+    /* Document-const: HELP
+     * Help key
+     */
     rb_curses_define_const(KEY_HELP);
     rb_define_const(mKey, "HELP", INT2NUM(KEY_HELP));
 #endif
 #ifdef KEY_MARK
+    /* Document-const: KEY_MARK
+     * Mark key
+     */
+    /* Document-const: MARK
+     * Mark key
+     */
     rb_curses_define_const(KEY_MARK);
     rb_define_const(mKey, "MARK", INT2NUM(KEY_MARK));
 #endif
 #ifdef KEY_MESSAGE
+    /* Document-const: KEY_MESSAGE
+     * Message key
+     */
+    /* Document-const: MESSAGE
+     * Message key
+     */
     rb_curses_define_const(KEY_MESSAGE);
     rb_define_const(mKey, "MESSAGE", INT2NUM(KEY_MESSAGE));
 #endif
 #ifdef KEY_MOVE
+    /* Document-const: KEY_MOVE
+     * Move key
+     */
+    /* Document-const: MOVE
+     * Move key
+     */
     rb_curses_define_const(KEY_MOVE);
     rb_define_const(mKey, "MOVE", INT2NUM(KEY_MOVE));
 #endif
 #ifdef KEY_NEXT
+    /* Document-const: KEY_NEXT
+     * Next object key
+     */
+    /* Document-const: NEXT
+     * Next object key
+     */
     rb_curses_define_const(KEY_NEXT);
     rb_define_const(mKey, "NEXT", INT2NUM(KEY_NEXT));
 #endif
 #ifdef KEY_OPEN
+    /* Document-const: KEY_OPEN
+     * Open key
+     */
+    /* Document-const: OPEN
+     * Open key
+     */
     rb_curses_define_const(KEY_OPEN);
     rb_define_const(mKey, "OPEN", INT2NUM(KEY_OPEN));
 #endif
 #ifdef KEY_OPTIONS
+    /* Document-const: KEY_OPTIONS
+     * Options key
+     */
+    /* Document-const: OPTIONS
+     * Options key
+     */
     rb_curses_define_const(KEY_OPTIONS);
     rb_define_const(mKey, "OPTIONS", INT2NUM(KEY_OPTIONS));
 #endif
 #ifdef KEY_PREVIOUS
+    /* Document-const: KEY_PREVIOUS
+     * Previous object key
+     */
+    /* Document-const: PREVIOUS
+     * Previous object key
+     */
     rb_curses_define_const(KEY_PREVIOUS);
     rb_define_const(mKey, "PREVIOUS", INT2NUM(KEY_PREVIOUS));
 #endif
 #ifdef KEY_REDO
+    /* Document-const: KEY_REDO
+     * Redo key
+     */
+    /* Document-const: REDO
+     * Redo key
+     */
     rb_curses_define_const(KEY_REDO);
     rb_define_const(mKey, "REDO", INT2NUM(KEY_REDO));
 #endif
 #ifdef KEY_REFERENCE
+    /* Document-const: KEY_REFERENCE
+     * Reference key
+     */
+    /* Document-const: REFERENCE
+     * Reference key
+     */
     rb_curses_define_const(KEY_REFERENCE);
     rb_define_const(mKey, "REFERENCE", INT2NUM(KEY_REFERENCE));
 #endif
 #ifdef KEY_REFRESH
+    /* Document-const: KEY_REFRESH
+     * Refresh key
+     */
+    /* Document-const: REFRESH
+     * Refresh key
+     */
     rb_curses_define_const(KEY_REFRESH);
     rb_define_const(mKey, "REFRESH", INT2NUM(KEY_REFRESH));
 #endif
 #ifdef KEY_REPLACE
+    /* Document-const: KEY_REPLACE
+     * Replace key
+     */
+    /* Document-const: REPLACE
+     * Replace key
+     */
     rb_curses_define_const(KEY_REPLACE);
     rb_define_const(mKey, "REPLACE", INT2NUM(KEY_REPLACE));
 #endif
 #ifdef KEY_RESTART
+    /* Document-const: KEY_RESTART
+     * Restart key
+     */
+    /* Document-const: RESTART
+     * Restart key
+     */
     rb_curses_define_const(KEY_RESTART);
     rb_define_const(mKey, "RESTART", INT2NUM(KEY_RESTART));
 #endif
 #ifdef KEY_RESUME
+    /* Document-const: KEY_RESUME
+     * Resume key
+     */
+    /* Document-const: RESUME
+     * Resume key
+     */
     rb_curses_define_const(KEY_RESUME);
     rb_define_const(mKey, "RESUME", INT2NUM(KEY_RESUME));
 #endif
 #ifdef KEY_SAVE
+    /* Document-const: KEY_SAVE
+     * Save key
+     */
+    /* Document-const: SAVE
+     * Save key
+     */
     rb_curses_define_const(KEY_SAVE);
     rb_define_const(mKey, "SAVE", INT2NUM(KEY_SAVE));
 #endif
 #ifdef KEY_SBEG
+    /* Document-const: KEY_SBEG
+     * Shifted beginning key
+     */
+    /* Document-const: SBEG
+     * Shifted beginning key
+     */
     rb_curses_define_const(KEY_SBEG);
     rb_define_const(mKey, "SBEG", INT2NUM(KEY_SBEG));
 #endif
 #ifdef KEY_SCANCEL
+    /* Document-const: KEY_SCANCEL
+     * Shifted cancel key
+     */
+    /* Document-const: SCANCEL
+     * Shifted cancel key
+     */
     rb_curses_define_const(KEY_SCANCEL);
     rb_define_const(mKey, "SCANCEL", INT2NUM(KEY_SCANCEL));
 #endif
 #ifdef KEY_SCOMMAND
+    /* Document-const: KEY_SCOMMAND
+     * Shifted command key
+     */
+    /* Document-const: SCOMMAND
+     * Shifted command key
+     */
     rb_curses_define_const(KEY_SCOMMAND);
     rb_define_const(mKey, "SCOMMAND", INT2NUM(KEY_SCOMMAND));
 #endif
 #ifdef KEY_SCOPY
+    /* Document-const: KEY_SCOPY
+     * Shifted copy key
+     */
+    /* Document-const: SCOPY
+     * Shifted copy key
+     */
     rb_curses_define_const(KEY_SCOPY);
     rb_define_const(mKey, "SCOPY", INT2NUM(KEY_SCOPY));
 #endif
 #ifdef KEY_SCREATE
+    /* Document-const: KEY_SCREATE
+     * Shifted create key
+     */
+    /* Document-const: SCREATE
+     * Shifted create key
+     */
     rb_curses_define_const(KEY_SCREATE);
     rb_define_const(mKey, "SCREATE", INT2NUM(KEY_SCREATE));
 #endif
 #ifdef KEY_SDC
+    /* Document-const: KEY_SDC
+     * Shifted delete char key
+     */
+    /* Document-const: SDC
+     * Shifted delete char key
+     */
     rb_curses_define_const(KEY_SDC);
     rb_define_const(mKey, "SDC", INT2NUM(KEY_SDC));
 #endif
 #ifdef KEY_SDL
+    /* Document-const: KEY_SDL
+     * Shifted delete line key
+     */
+    /* Document-const: SDL
+     * Shifted delete line key
+     */
     rb_curses_define_const(KEY_SDL);
     rb_define_const(mKey, "SDL", INT2NUM(KEY_SDL));
 #endif
 #ifdef KEY_SELECT
+    /* Document-const: KEY_SELECT
+     * Select key
+     */
+    /* Document-const: SELECT
+     * Select key
+     */
     rb_curses_define_const(KEY_SELECT);
     rb_define_const(mKey, "SELECT", INT2NUM(KEY_SELECT));
 #endif
 #ifdef KEY_SEND
+    /* Document-const: KEY_SEND
+     * Shifted end key
+     */
+    /* Document-const: SEND
+     * Shifted end key
+     */
     rb_curses_define_const(KEY_SEND);
     rb_define_const(mKey, "SEND", INT2NUM(KEY_SEND));
 #endif
 #ifdef KEY_SEOL
+    /* Document-const: KEY_SEOL
+     * Shifted clear line key
+     */
+    /* Document-const: SEOL
+     * Shifted clear line key
+     */
     rb_curses_define_const(KEY_SEOL);
     rb_define_const(mKey, "SEOL", INT2NUM(KEY_SEOL));
 #endif
 #ifdef KEY_SEXIT
+    /* Document-const: KEY_SEXIT
+     * Shifted exit key
+     */
+    /* Document-const: SEXIT
+     * Shifted exit key
+     */
     rb_curses_define_const(KEY_SEXIT);
     rb_define_const(mKey, "SEXIT", INT2NUM(KEY_SEXIT));
 #endif
 #ifdef KEY_SFIND
+    /* Document-const: KEY_SFIND
+     * Shifted find key
+     */
+    /* Document-const: SFIND
+     * Shifted find key
+     */
     rb_curses_define_const(KEY_SFIND);
     rb_define_const(mKey, "SFIND", INT2NUM(KEY_SFIND));
 #endif
 #ifdef KEY_SHELP
+    /* Document-const: KEY_SHELP
+     * Shifted help key
+     */
+    /* Document-const: SHELP
+     * Shifted help key
+     */
     rb_curses_define_const(KEY_SHELP);
     rb_define_const(mKey, "SHELP", INT2NUM(KEY_SHELP));
 #endif
 #ifdef KEY_SHOME
+    /* Document-const: KEY_SHOME
+     * Shifted home key
+     */
+    /* Document-const: SHOME
+     * Shifted home key
+     */
     rb_curses_define_const(KEY_SHOME);
     rb_define_const(mKey, "SHOME", INT2NUM(KEY_SHOME));
 #endif
 #ifdef KEY_SIC
+    /* Document-const: KEY_SIC
+     * Shifted input key
+     */
+    /* Document-const: SIC
+     * Shifted input key
+     */
     rb_curses_define_const(KEY_SIC);
     rb_define_const(mKey, "SIC", INT2NUM(KEY_SIC));
 #endif
 #ifdef KEY_SLEFT
+    /* Document-const: KEY_SLEFT
+     * Shifted left arrow key
+     */
+    /* Document-const: SLEFT
+     * Shifted left arrow key
+     */
     rb_curses_define_const(KEY_SLEFT);
     rb_define_const(mKey, "SLEFT", INT2NUM(KEY_SLEFT));
 #endif
 #ifdef KEY_SMESSAGE
+    /* Document-const: KEY_SMESSAGE
+     * Shifted message key
+     */
+    /* Document-const: SMESSAGE
+     * Shifted message key
+     */
     rb_curses_define_const(KEY_SMESSAGE);
     rb_define_const(mKey, "SMESSAGE", INT2NUM(KEY_SMESSAGE));
 #endif
 #ifdef KEY_SMOVE
+    /* Document-const: KEY_SMOVE
+     * Shifted move key
+     */
+    /* Document-const: SMOVE
+     * Shifted move key
+     */
     rb_curses_define_const(KEY_SMOVE);
     rb_define_const(mKey, "SMOVE", INT2NUM(KEY_SMOVE));
 #endif
 #ifdef KEY_SNEXT
+    /* Document-const: KEY_SNEXT
+     * Shifted next key
+     */
+    /* Document-const: SNEXT
+     * Shifted next key
+     */
     rb_curses_define_const(KEY_SNEXT);
     rb_define_const(mKey, "SNEXT", INT2NUM(KEY_SNEXT));
 #endif
 #ifdef KEY_SOPTIONS
+    /* Document-const: KEY_SOPTIONS
+     * Shifted options key
+     */
+    /* Document-const: SOPTIONS
+     * Shifted options key
+     */
     rb_curses_define_const(KEY_SOPTIONS);
     rb_define_const(mKey, "SOPTIONS", INT2NUM(KEY_SOPTIONS));
 #endif
 #ifdef KEY_SPREVIOUS
+    /* Document-const: KEY_SPREVIOUS
+     * Shifted previous key
+     */
+    /* Document-const: SPREVIOUS
+     * Shifted previous key
+     */
     rb_curses_define_const(KEY_SPREVIOUS);
     rb_define_const(mKey, "SPREVIOUS", INT2NUM(KEY_SPREVIOUS));
 #endif
 #ifdef KEY_SPRINT
+    /* Document-const: KEY_SPRINT
+     * Shifted print key
+     */
+    /* Document-const: SPRINT
+     * Shifted print key
+     */
     rb_curses_define_const(KEY_SPRINT);
     rb_define_const(mKey, "SPRINT", INT2NUM(KEY_SPRINT));
 #endif
 #ifdef KEY_SREDO
+    /* Document-const: KEY_SREDO
+     * Shifted redo key
+     */
+    /* Document-const: SREDO
+     * Shifted redo key
+     */
     rb_curses_define_const(KEY_SREDO);
     rb_define_const(mKey, "SREDO", INT2NUM(KEY_SREDO));
 #endif
 #ifdef KEY_SREPLACE
+    /* Document-const: KEY_SREPLACE
+     * Shifted replace key
+     */
+    /* Document-const: SREPLACE
+     * Shifted replace key
+     */
     rb_curses_define_const(KEY_SREPLACE);
     rb_define_const(mKey, "SREPLACE", INT2NUM(KEY_SREPLACE));
 #endif
 #ifdef KEY_SRIGHT
+    /* Document-const: KEY_SRIGHT
+     * Shifted right arrow key
+     */
+    /* Document-const: SRIGHT
+     * Shifted right arrow key
+     */
     rb_curses_define_const(KEY_SRIGHT);
     rb_define_const(mKey, "SRIGHT", INT2NUM(KEY_SRIGHT));
 #endif
 #ifdef KEY_SRSUME
+    /* Document-const: KEY_SRSUME
+     * Shifted resume key
+     */
+    /* Document-const: SRSUME
+     * Shifted resume key
+     */
     rb_curses_define_const(KEY_SRSUME);
     rb_define_const(mKey, "SRSUME", INT2NUM(KEY_SRSUME));
 #endif
 #ifdef KEY_SSAVE
+    /* Document-const: KEY_SSAVE
+     * Shifted save key
+     */
+    /* Document-const: SSAVE
+     * Shifted save key
+     */
     rb_curses_define_const(KEY_SSAVE);
     rb_define_const(mKey, "SSAVE", INT2NUM(KEY_SSAVE));
 #endif
 #ifdef KEY_SSUSPEND
+    /* Document-const: KEY_SSUSPEND
+     * Shifted suspend key
+     */
+    /* Document-const: SSUSPEND
+     * Shifted suspend key
+     */
     rb_curses_define_const(KEY_SSUSPEND);
     rb_define_const(mKey, "SSUSPEND", INT2NUM(KEY_SSUSPEND));
 #endif
 #ifdef KEY_SUNDO
+    /* Document-const: KEY_SUNDO
+     * Shifted undo key
+     */
+    /* Document-const: SUNDO
+     * Shifted undo key
+     */
     rb_curses_define_const(KEY_SUNDO);
     rb_define_const(mKey, "SUNDO", INT2NUM(KEY_SUNDO));
 #endif
 #ifdef KEY_SUSPEND
+    /* Document-const: KEY_SUSPEND
+     * Suspend key
+     */
+    /* Document-const: SUSPEND
+     * Suspend key
+     */
     rb_curses_define_const(KEY_SUSPEND);
     rb_define_const(mKey, "SUSPEND", INT2NUM(KEY_SUSPEND));
 #endif
 #ifdef KEY_UNDO
+    /* Document-const: KEY_UNDO
+     * Undo key
+     */
+    /* Document-const: UNDO
+     * Undo key
+     */
     rb_curses_define_const(KEY_UNDO);
     rb_define_const(mKey, "UNDO", INT2NUM(KEY_UNDO));
 #endif
 #ifdef KEY_RESIZE
+    /* Document-const: KEY_RESIZE
+     * Screen Resized
+     */
+    /* Document-const: RESIZE
+     * Screen Resized
+     */
     rb_curses_define_const(KEY_RESIZE);
     rb_define_const(mKey, "RESIZE", INT2NUM(KEY_RESIZE));
 #endif
 #ifdef KEY_MAX
+    /* Document-const: KEY_MAX
+     * The maximum allowed curses key value.
+     */
+    /* Document-const: MAX
+     * The maximum allowed curses key value.
+     */
     rb_curses_define_const(KEY_MAX);
     rb_define_const(mKey, "MAX", INT2NUM(KEY_MAX));
 #endif

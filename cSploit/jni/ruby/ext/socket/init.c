@@ -43,11 +43,12 @@ VALUE
 rsock_init_sock(VALUE sock, int fd)
 {
     rb_io_t *fp;
+#ifndef _WIN32
     struct stat sbuf;
 
-#ifndef _WIN32
     if (fstat(fd, &sbuf) < 0)
         rb_sys_fail(0);
+    rb_update_max_fd(fd);
     if (!S_ISSOCK(sbuf.st_mode))
         rb_raise(rb_eArgError, "not a socket file descriptor");
 #else
@@ -129,7 +130,7 @@ rsock_s_recvfrom(VALUE sock, int argc, VALUE *argv, enum sock_recv_type from)
 
     while (rb_io_check_closed(fptr),
 	   rb_thread_wait_fd(arg.fd),
-	   (slen = BLOCKING_REGION(recvfrom_blocking, &arg)) < 0) {
+	   (slen = BLOCKING_REGION_FD(recvfrom_blocking, &arg)) < 0) {
         if (!rb_io_wait_readable(fptr->fd)) {
             rb_sys_fail("recvfrom(2)");
         }
@@ -250,78 +251,56 @@ rsock_socket(int domain, int type, int proto)
 	    fd = socket(domain, type, proto);
 	}
     }
+    if (0 <= fd)
+        rb_update_max_fd(fd);
     return fd;
 }
 
 static int
-wait_connectable0(int fd, rb_fdset_t *fds_w, rb_fdset_t *fds_e)
+wait_connectable(int fd)
 {
     int sockerr;
     socklen_t sockerrlen;
+    int revents;
+    int ret;
 
     for (;;) {
-	rb_fd_zero(fds_w);
-	rb_fd_zero(fds_e);
+	/*
+	 * Stevens book says, succuessful finish turn on RB_WAITFD_OUT and
+	 * failure finish turn on both RB_WAITFD_IN and RB_WAITFD_OUT.
+	 */
+	revents = rb_wait_for_single_fd(fd, RB_WAITFD_IN|RB_WAITFD_OUT, NULL);
 
-	rb_fd_set(fd, fds_w);
-	rb_fd_set(fd, fds_e);
-
-	rb_thread_select(fd+1, 0, rb_fd_ptr(fds_w), rb_fd_ptr(fds_e), 0);
-
-	if (rb_fd_isset(fd, fds_w)) {
-	    return 0;
-	}
-	else if (rb_fd_isset(fd, fds_e)) {
+	if (revents & (RB_WAITFD_IN|RB_WAITFD_OUT)) {
 	    sockerrlen = (socklen_t)sizeof(sockerr);
-	    if (getsockopt(fd, SOL_SOCKET, SO_ERROR, (void *)&sockerr,
-			   &sockerrlen) == 0) {
-		if (sockerr == 0)
+	    ret = getsockopt(fd, SOL_SOCKET, SO_ERROR, (void *)&sockerr, &sockerrlen);
+
+	    /*
+	     * Solaris getsockopt(SO_ERROR) return -1 and set errno
+	     * in getsockopt(). Let's return immediately.
+	     */
+	    if (ret < 0)
+		break;
+	    if (sockerr == 0) {
+		if (revents & RB_WAITFD_OUT)
+		    break;
+		else
 		    continue;	/* workaround for winsock */
-		errno = sockerr;
 	    }
-	    return -1;
+
+	    /* BSD and Linux use sockerr. */
+	    errno = sockerr;
+	    ret = -1;
+	    break;
+	}
+
+	if ((revents & (RB_WAITFD_IN|RB_WAITFD_OUT)) == RB_WAITFD_OUT) {
+	    ret = 0;
+	    break;
 	}
     }
-}
 
-struct wait_connectable_arg {
-    int fd;
-    rb_fdset_t fds_w;
-    rb_fdset_t fds_e;
-};
-
-#ifdef HAVE_RB_FD_INIT
-static VALUE
-try_wait_connectable(VALUE arg)
-{
-    struct wait_connectable_arg *p = (struct wait_connectable_arg *)arg;
-    return (VALUE)wait_connectable0(p->fd, &p->fds_w, &p->fds_e);
-}
-
-static VALUE
-wait_connectable_ensure(VALUE arg)
-{
-    struct wait_connectable_arg *p = (struct wait_connectable_arg *)arg;
-    rb_fd_term(&p->fds_w);
-    rb_fd_term(&p->fds_e);
-    return Qnil;
-}
-#endif
-
-static int
-wait_connectable(int fd)
-{
-    struct wait_connectable_arg arg;
-
-    rb_fd_init(&arg.fds_w);
-    rb_fd_init(&arg.fds_e);
-#ifdef HAVE_RB_FD_INIT
-    arg.fd = fd;
-    return (int)rb_ensure(try_wait_connectable, (VALUE)&arg,
-			  wait_connectable_ensure,(VALUE)&arg);
-#else
-    return wait_connectable0(fd, &arg.fds_w, &arg.fds_e);
-#endif
+    return ret;
 }
 
 #ifdef __CYGWIN__
@@ -380,9 +359,15 @@ rsock_connect(int fd, const struct sockaddr *sockaddr, int len, int socks)
     if (socks) func = socks_connect_blocking;
 #endif
     for (;;) {
-	status = (int)BLOCKING_REGION(func, &arg);
+	status = (int)BLOCKING_REGION_FD(func, &arg);
 	if (status < 0) {
 	    switch (errno) {
+	      case EINTR:
+#if defined(ERESTART)
+	      case ERESTART:
+#endif
+		continue;
+
 	      case EAGAIN:
 #ifdef EINPROGRESS
 	      case EINPROGRESS:
@@ -467,6 +452,7 @@ VALUE
 rsock_s_accept_nonblock(VALUE klass, rb_io_t *fptr, struct sockaddr *sockaddr, socklen_t *len)
 {
     int fd2;
+    socklen_t len0 = len ? *len : 0;
 
     rb_secure(3);
     rb_io_set_nonblock(fptr);
@@ -485,6 +471,8 @@ rsock_s_accept_nonblock(VALUE klass, rb_io_t *fptr, struct sockaddr *sockaddr, s
 	}
         rb_sys_fail("accept(2)");
     }
+    if (len && len0 < *len) *len = len0;
+    rb_update_max_fd(fd2);
     make_fd_nonblock(fd2);
     return rsock_init_sock(rb_obj_alloc(klass), fd2);
 }
@@ -499,7 +487,12 @@ static VALUE
 accept_blocking(void *data)
 {
     struct accept_arg *arg = data;
-    return (VALUE)accept(arg->fd, arg->sockaddr, arg->len);
+    int ret;
+    socklen_t len0 = 0;
+    if (arg->len) len0 = *arg->len;
+    ret = accept(arg->fd, arg->sockaddr, arg->len);
+    if (arg->len && len0 < *arg->len) *arg->len = len0;
+    return (VALUE)ret;
 }
 
 VALUE
@@ -515,7 +508,7 @@ rsock_s_accept(VALUE klass, int fd, struct sockaddr *sockaddr, socklen_t *len)
     arg.len = len;
   retry:
     rb_thread_wait_fd(fd);
-    fd2 = (int)BLOCKING_REGION(accept_blocking, &arg);
+    fd2 = (int)BLOCKING_REGION_FD(accept_blocking, &arg);
     if (fd2 < 0) {
 	switch (errno) {
 	  case EMFILE:
@@ -531,6 +524,7 @@ rsock_s_accept(VALUE klass, int fd, struct sockaddr *sockaddr, socklen_t *len)
 	}
 	rb_sys_fail(0);
     }
+    rb_update_max_fd(fd2);
     if (!klass) return INT2NUM(fd2);
     return rsock_init_sock(rb_obj_alloc(klass), fd2);
 }
@@ -548,12 +542,12 @@ rsock_getfamily(int sockfd)
     return ss.ss_family;
 }
 
-/*
- * SocketError is the error class for socket.
- */
 void
 rsock_init_socket_init()
 {
+    /*
+     * SocketError is the error class for socket.
+     */
     rb_eSocket = rb_define_class("SocketError", rb_eStandardError);
     rsock_init_ipsocket();
     rsock_init_tcpsocket();

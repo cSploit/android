@@ -1,11 +1,12 @@
 /*
-  rational.c: Coded by Tadayoshi Funaba 2008,2009
+  rational.c: Coded by Tadayoshi Funaba 2008-2011
 
   This implementation is based on Keiju Ishitsuka's Rational library
   which is written in ruby.
 */
 
 #include "ruby.h"
+#include "internal.h"
 #include <math.h>
 #include <float.h>
 
@@ -32,7 +33,7 @@ static ID id_abs, id_cmp, id_convert, id_eqeq_p, id_expt, id_fdiv,
 inline static VALUE \
 f_##n(VALUE x, VALUE y)\
 {\
-  return rb_funcall(x, op, 1, y);\
+  return rb_funcall(x, (op), 1, y);\
 }
 
 #define fun1(n) \
@@ -136,8 +137,22 @@ fun1(floor)
 fun1(inspect)
 fun1(integer_p)
 fun1(negate)
-fun1(to_f)
-fun1(to_i)
+
+inline static VALUE
+f_to_i(VALUE x)
+{
+    if (TYPE(x) == T_STRING)
+	return rb_str_to_inum(x, 10, 0);
+    return rb_funcall(x, id_to_i, 0);
+}
+inline static VALUE
+f_to_f(VALUE x)
+{
+    if (TYPE(x) == T_STRING)
+	return DBL2NUM(rb_str_to_dbl(x, 0));
+    return rb_funcall(x, id_to_f, 0);
+}
+
 fun1(to_s)
 fun1(truncate)
 
@@ -152,6 +167,8 @@ f_eqeq_p(VALUE x, VALUE y)
 fun2(expt)
 fun2(fdiv)
 fun2(idiv)
+
+#define f_expt10(x) f_expt(INT2FIX(10), x)
 
 inline static VALUE
 f_negative_p(VALUE x)
@@ -588,7 +605,7 @@ inline static VALUE
 f_imul(long a, long b)
 {
     VALUE r;
-    long c;
+    volatile long c;
 
     if (a == 0 || b == 0)
 	return ZERO;
@@ -667,7 +684,7 @@ f_addsub(VALUE self, VALUE anum, VALUE aden, VALUE bnum, VALUE bden, int k)
 
 /*
  * call-seq:
- *    rat + numeric  ->  numeric_result
+ *    rat + numeric  ->  numeric
  *
  * Performs addition.
  *
@@ -709,7 +726,7 @@ nurat_add(VALUE self, VALUE other)
 
 /*
  * call-seq:
- *    rat - numeric  ->  numeric_result
+ *    rat - numeric  ->  numeric
  *
  * Performs subtraction.
  *
@@ -790,7 +807,7 @@ f_muldiv(VALUE self, VALUE anum, VALUE aden, VALUE bnum, VALUE bden, int k)
 
 /*
  * call-seq:
- *    rat * numeric  ->  numeric_result
+ *    rat * numeric  ->  numeric
  *
  * Performs multiplication.
  *
@@ -832,8 +849,8 @@ nurat_mul(VALUE self, VALUE other)
 
 /*
  * call-seq:
- *    rat / numeric     ->  numeric_result
- *    rat.quo(numeric)  ->  numeric_result
+ *    rat / numeric     ->  numeric
+ *    rat.quo(numeric)  ->  numeric
  *
  * Performs division.
  *
@@ -913,7 +930,7 @@ nurat_fdiv(VALUE self, VALUE other)
 
 /*
  * call-seq:
- *    rat ** numeric  ->  numeric_result
+ *    rat ** numeric  ->  numeric
  *
  * Performs exponentiation.
  *
@@ -929,7 +946,7 @@ nurat_fdiv(VALUE self, VALUE other)
 static VALUE
 nurat_expt(VALUE self, VALUE other)
 {
-    if (k_exact_zero_p(other))
+    if (k_numeric_p(other) && k_exact_zero_p(other))
 	return f_rational_new_bang1(CLASS_OF(self), ONE);
 
     if (k_rational_p(other)) {
@@ -1091,6 +1108,8 @@ nurat_coerce(VALUE self, VALUE other)
 	if (k_exact_zero_p(RCOMPLEX(other)->imag))
 	    return rb_assoc_new(f_rational_new_bang1
 				(CLASS_OF(self), RCOMPLEX(other)->real), self);
+	else
+	    return rb_assoc_new(other, rb_Complex(self, INT2FIX(0)));
     }
 
     rb_raise(rb_eTypeError, "%s can't be coerced into %s",
@@ -1144,7 +1163,6 @@ nurat_ceil(VALUE self)
     get_dat1(self);
     return f_negate(f_idiv(f_negate(dat->num), dat->den));
 }
-
 
 /*
  * call-seq:
@@ -1209,8 +1227,12 @@ f_round_common(int argc, VALUE *argv, VALUE self, VALUE (*func)(VALUE))
     if (!k_integer_p(n))
 	rb_raise(rb_eTypeError, "not an integer");
 
-    b = f_expt(INT2FIX(10), n);
+    b = f_expt10(n);
     s = f_mul(self, b);
+
+    if (!k_rational_p(s)) {
+	s = f_rational_new_bang1(CLASS_OF(self), s);
+    }
 
     s = (*func)(s);
 
@@ -1365,12 +1387,12 @@ nurat_to_r(VALUE self)
 }
 
 #define id_ceil rb_intern("ceil")
-#define f_ceil(x) rb_funcall(x, id_ceil, 0)
+#define f_ceil(x) rb_funcall((x), id_ceil, 0)
 
 #define id_quo rb_intern("quo")
-#define f_quo(x,y) rb_funcall(x, id_quo, 1, y)
+#define f_quo(x,y) rb_funcall((x), id_quo, 1, (y))
 
-#define f_reciprocal(x) f_quo(ONE, x)
+#define f_reciprocal(x) f_quo(ONE, (x))
 
 /*
   The algorithm here is the method described in CLISP.  Bruno Haible has
@@ -1588,6 +1610,8 @@ nurat_marshal_load(VALUE self, VALUE a)
 {
     get_dat1(self);
     Check_Type(a, T_ARRAY);
+    if (RARRAY_LEN(a) != 2)
+	rb_raise(rb_eArgError, "marshaled rational must have an array whose length is 2 but %ld", RARRAY_LEN(a));
     dat->num = RARRAY_PTR(a)[0];
     dat->den = RARRAY_PTR(a)[1];
     rb_copy_generic_ivar(self, a);
@@ -1690,13 +1714,13 @@ rb_Rational(VALUE x, VALUE y)
 }
 
 #define id_numerator rb_intern("numerator")
-#define f_numerator(x) rb_funcall(x, id_numerator, 0)
+#define f_numerator(x) rb_funcall((x), id_numerator, 0)
 
 #define id_denominator rb_intern("denominator")
-#define f_denominator(x) rb_funcall(x, id_denominator, 0)
+#define f_denominator(x) rb_funcall((x), id_denominator, 0)
 
 #define id_to_r rb_intern("to_r")
-#define f_to_r(x) rb_funcall(x, id_to_r, 0)
+#define f_to_r(x) rb_funcall((x), id_to_r, 0)
 
 /*
  * call-seq:
@@ -1867,7 +1891,7 @@ float_decode(VALUE self)
 #endif
 
 #define id_lshift rb_intern("<<")
-#define f_lshift(x,n) rb_funcall(x, id_lshift, 1, n)
+#define f_lshift(x,n) rb_funcall((x), id_lshift, 1, (n))
 
 /*
  * call-seq:
@@ -2001,16 +2025,10 @@ make_patterns(void)
 }
 
 #define id_match rb_intern("match")
-#define f_match(x,y) rb_funcall(x, id_match, 1, y)
-
-#define id_aref rb_intern("[]")
-#define f_aref(x,y) rb_funcall(x, id_aref, 1, y)
-
-#define id_post_match rb_intern("post_match")
-#define f_post_match(x) rb_funcall(x, id_post_match, 0)
+#define f_match(x,y) rb_funcall((x), id_match, 1, (y))
 
 #define id_split rb_intern("split")
-#define f_split(x,y) rb_funcall(x, id_split, 1, y)
+#define f_split(x,y) rb_funcall((x), id_split, 1, (y))
 
 #include <ctype.h>
 
@@ -2028,33 +2046,45 @@ string_to_r_internal(VALUE self)
 
     if (!NIL_P(m)) {
 	VALUE v, ifp, exp, ip, fp;
-	VALUE si = f_aref(m, INT2FIX(1));
-	VALUE nu = f_aref(m, INT2FIX(2));
-	VALUE de = f_aref(m, INT2FIX(3));
-	VALUE re = f_post_match(m);
+	VALUE si = rb_reg_nth_match(1, m);
+	VALUE nu = rb_reg_nth_match(2, m);
+	VALUE de = rb_reg_nth_match(3, m);
+	VALUE re = rb_reg_match_post(m);
 
 	{
 	    VALUE a;
 
-	    a = f_split(nu, an_e_pat);
-	    ifp = RARRAY_PTR(a)[0];
-	    if (RARRAY_LEN(a) != 2)
+	    if (!strpbrk(RSTRING_PTR(nu), "eE")) {
+		ifp = nu; /* not a copy */
 		exp = Qnil;
-	    else
-		exp = RARRAY_PTR(a)[1];
+	    }
+	    else {
+		a = f_split(nu, an_e_pat);
+		ifp = RARRAY_PTR(a)[0];
+		if (RARRAY_LEN(a) != 2)
+		    exp = Qnil;
+		else
+		    exp = RARRAY_PTR(a)[1];
+	    }
 
-	    a = f_split(ifp, a_dot_pat);
-	    ip = RARRAY_PTR(a)[0];
-	    if (RARRAY_LEN(a) != 2)
+	    if (!strchr(RSTRING_PTR(ifp), '.')) {
+		ip = ifp; /* not a copy */
 		fp = Qnil;
-	    else
-		fp = RARRAY_PTR(a)[1];
+	    }
+	    else {
+		a = f_split(ifp, a_dot_pat);
+		ip = RARRAY_PTR(a)[0];
+		if (RARRAY_LEN(a) != 2)
+		    fp = Qnil;
+		else
+		    fp = RARRAY_PTR(a)[1];
+	    }
 	}
 
 	v = rb_rational_new1(f_to_i(ip));
 
 	if (!NIL_P(fp)) {
-	    char *p = StringValuePtr(fp);
+	    char *p = RSTRING_PTR(fp);
 	    long count = 0;
 	    VALUE l;
 
@@ -2063,16 +2093,15 @@ string_to_r_internal(VALUE self)
 		    count++;
 		p++;
 	    }
-
-	    l = f_expt(INT2FIX(10), LONG2NUM(count));
+	    l = f_expt10(LONG2NUM(count));
 	    v = f_mul(v, l);
 	    v = f_add(v, f_to_i(fp));
 	    v = f_div(v, l);
 	}
-	if (!NIL_P(si) && *StringValuePtr(si) == '-')
+	if (!NIL_P(si) && *RSTRING_PTR(si) == '-')
 	    v = f_negate(v);
 	if (!NIL_P(exp))
-	    v = f_mul(v, f_expt(INT2FIX(10), f_to_i(exp)));
+	    v = f_mul(v, f_expt10(f_to_i(exp)));
 #if 0
 	if (!NIL_P(de) && (!NIL_P(fp) || !NIL_P(exp)))
 	    return rb_assoc_new(v, rb_usascii_str_new2("dummy"));
@@ -2098,7 +2127,7 @@ string_to_r_strict(VALUE self)
 }
 
 #define id_gsub rb_intern("gsub")
-#define f_gsub(x,y,z) rb_funcall(x, id_gsub, 2, y, z)
+#define f_gsub(x,y,z) rb_funcall((x), id_gsub, 2, (y), (z))
 
 /*
  * call-seq:
@@ -2126,7 +2155,7 @@ string_to_r_strict(VALUE self)
 static VALUE
 string_to_r(VALUE self)
 {
-    VALUE s, a, backref;
+    VALUE s, a, a1, backref;
 
     backref = rb_backref_get();
     rb_match_busy(backref);
@@ -2136,13 +2165,17 @@ string_to_r(VALUE self)
 
     rb_backref_set(backref);
 
-    if (!NIL_P(RARRAY_PTR(a)[0]))
-	return RARRAY_PTR(a)[0];
+    a1 = RARRAY_PTR(a)[0];
+    if (!NIL_P(a1)) {
+	if (TYPE(a1) == T_FLOAT)
+	    rb_raise(rb_eFloatDomainError, "Infinity");
+	return a1;
+    }
     return rb_rational_new1(INT2FIX(0));
 }
 
 #define id_to_r rb_intern("to_r")
-#define f_to_r(x) rb_funcall(x, id_to_r, 0)
+#define f_to_r(x) rb_funcall((x), id_to_r, 0)
 
 static VALUE
 nurat_s_convert(int argc, VALUE *argv, VALUE klass)
@@ -2224,8 +2257,8 @@ nurat_s_convert(int argc, VALUE *argv, VALUE klass)
  * a/b (b>0).  Where a is numerator and b is denominator.  Integer a
  * equals rational a/1 mathematically.
  *
- * In ruby, you can create rational object with Rational or to_r
- * method.  The return values will be irreducible.
+ * In ruby, you can create rational object with Rational, to_r or
+ * rationalize method.  The return values will be irreducible.
  *
  *    Rational(1)      #=> (1/1)
  *    Rational(2, 3)   #=> (2/3)
@@ -2242,6 +2275,7 @@ nurat_s_convert(int argc, VALUE *argv, VALUE klass)
  *    0.3.to_r         #=> (5404319552844595/18014398509481984)
  *    '0.3'.to_r       #=> (3/10)
  *    '2/3'.to_r       #=> (2/3)
+ *    0.3.rationalize  #=> (3/10)
  *
  * A rational object is an exact number, which helps you to write
  * program without any rounding errors.

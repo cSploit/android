@@ -14,9 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
 
 #include <pthread.h>
 #include <string.h>
@@ -27,7 +24,7 @@
 #include <stddef.h>
 #include <unistd.h>
 
-#include <csploit/logger.h>
+#include "logger.h"
 
 #include "netdefs.h"
 #include "host.h"

@@ -27,9 +27,28 @@ extern "C" {
 #include <stdio_ext.h>
 #endif
 
+#include "ruby/config.h"
+#if defined(HAVE_POLL)
+#  include <poll.h>
+#  define RB_WAITFD_IN  POLLIN
+#  define RB_WAITFD_PRI POLLPRI
+#  define RB_WAITFD_OUT POLLOUT
+#else
+#  define RB_WAITFD_IN  0x001
+#  define RB_WAITFD_PRI 0x002
+#  define RB_WAITFD_OUT 0x004
+#endif
+
 #if defined __GNUC__ && __GNUC__ >= 4
 #pragma GCC visibility push(default)
 #endif
+
+typedef struct {
+    char *ptr;                  /* off + len <= capa */
+    int off;
+    int len;
+    int capa;
+} rb_io_buffer_t;
 
 typedef struct rb_io_t {
     int fd;                     /* file descriptor */
@@ -40,15 +59,7 @@ typedef struct rb_io_t {
     VALUE pathv;		/* pathname for file */
     void (*finalize)(struct rb_io_t*,int); /* finalize proc */
 
-    char *wbuf;                 /* wbuf_off + wbuf_len <= wbuf_capa */
-    int wbuf_off;
-    int wbuf_len;
-    int wbuf_capa;
-
-    char *rbuf;                 /* rbuf_off + rbuf_len <= rbuf_capa */
-    int rbuf_off;
-    int rbuf_len;
-    int rbuf_capa;
+    rb_io_buffer_t wbuf, rbuf;
 
     VALUE tied_io_for_writing;
 
@@ -66,10 +77,7 @@ typedef struct rb_io_t {
     } encs;
 
     rb_econv_t *readconv;
-    char *cbuf;                /* cbuf_off + cbuf_len <= cbuf_capa */
-    int cbuf_off;
-    int cbuf_len;
-    int cbuf_capa;
+    rb_io_buffer_t cbuf;
 
     rb_econv_t *writeconv;
     VALUE writeconv_asciicompat;
@@ -101,45 +109,48 @@ typedef struct rb_io_t {
 
 #define GetOpenFile(obj,fp) rb_io_check_closed((fp) = RFILE(rb_io_taint_check(obj))->fptr)
 
+#define RB_IO_BUFFER_INIT(buf) do {\
+    (buf).ptr = NULL;\
+    (buf).off = 0;\
+    (buf).len = 0;\
+    (buf).capa = 0;\
+} while (0)
+
 #define MakeOpenFile(obj, fp) do {\
     if (RFILE(obj)->fptr) {\
 	rb_io_close(obj);\
 	rb_io_fptr_finalize(RFILE(obj)->fptr);\
 	RFILE(obj)->fptr = 0;\
     }\
-    fp = 0;\
-    fp = RFILE(obj)->fptr = ALLOC(rb_io_t);\
-    fp->fd = -1;\
-    fp->stdio_file = NULL;\
-    fp->mode = 0;\
-    fp->pid = 0;\
-    fp->lineno = 0;\
-    fp->pathv = Qnil;\
-    fp->finalize = 0;\
-    fp->wbuf = NULL;\
-    fp->wbuf_off = 0;\
-    fp->wbuf_len = 0;\
-    fp->wbuf_capa = 0;\
-    fp->rbuf = NULL;\
-    fp->rbuf_off = 0;\
-    fp->rbuf_len = 0;\
-    fp->rbuf_capa = 0;\
-    fp->readconv = NULL;\
-    fp->cbuf = NULL;\
-    fp->cbuf_off = 0;\
-    fp->cbuf_len = 0;\
-    fp->cbuf_capa = 0;\
-    fp->writeconv = NULL;\
-    fp->writeconv_asciicompat = Qnil;\
-    fp->writeconv_pre_ecflags = 0;\
-    fp->writeconv_pre_ecopts = Qnil;\
-    fp->writeconv_initialized = 0;\
-    fp->tied_io_for_writing = 0;\
-    fp->encs.enc = NULL;\
-    fp->encs.enc2 = NULL;\
-    fp->encs.ecflags = 0;\
-    fp->encs.ecopts = Qnil;\
-    fp->write_lock = 0;\
+    (fp) = 0;\
+    RB_IO_FPTR_NEW(fp);\
+    RFILE(obj)->fptr = (fp);\
+} while (0)
+
+#define RB_IO_FPTR_NEW(fp) do {\
+    (fp) = ALLOC(rb_io_t);\
+    (fp)->fd = -1;\
+    (fp)->stdio_file = NULL;\
+    (fp)->mode = 0;\
+    (fp)->pid = 0;\
+    (fp)->lineno = 0;\
+    (fp)->pathv = Qnil;\
+    (fp)->finalize = 0;\
+    RB_IO_BUFFER_INIT((fp)->wbuf);\
+    RB_IO_BUFFER_INIT((fp)->rbuf);\
+    RB_IO_BUFFER_INIT((fp)->cbuf);\
+    (fp)->readconv = NULL;\
+    (fp)->writeconv = NULL;\
+    (fp)->writeconv_asciicompat = Qnil;\
+    (fp)->writeconv_pre_ecflags = 0;\
+    (fp)->writeconv_pre_ecopts = Qnil;\
+    (fp)->writeconv_initialized = 0;\
+    (fp)->tied_io_for_writing = 0;\
+    (fp)->encs.enc = NULL;\
+    (fp)->encs.enc2 = NULL;\
+    (fp)->encs.ecflags = 0;\
+    (fp)->encs.ecopts = Qnil;\
+    (fp)->write_lock = 0;\
 } while (0)
 
 FILE *rb_io_stdio_file(rb_io_t *fptr);
@@ -150,14 +161,21 @@ int rb_io_modestr_oflags(const char *modestr);
 int rb_io_oflags_fmode(int oflags);
 void rb_io_check_writable(rb_io_t*);
 void rb_io_check_readable(rb_io_t*);
+void rb_io_check_char_readable(rb_io_t *fptr);
+void rb_io_check_byte_readable(rb_io_t *fptr);
 int rb_io_fptr_finalize(rb_io_t*);
 void rb_io_synchronized(rb_io_t*);
 void rb_io_check_initialized(rb_io_t*);
 void rb_io_check_closed(rb_io_t*);
+VALUE rb_io_get_io(VALUE io);
+VALUE rb_io_get_write_io(VALUE io);
+VALUE rb_io_set_write_io(VALUE io, VALUE w);
 int rb_io_wait_readable(int);
 int rb_io_wait_writable(int);
+int rb_wait_for_single_fd(int fd, int events, struct timeval *tv);
 void rb_io_set_nonblock(rb_io_t *fptr);
 int rb_io_extract_encoding_option(VALUE opt, rb_encoding **enc_p, rb_encoding **enc2_p, int *fmode_p);
+ssize_t rb_io_bufwrite(VALUE io, const void *buf, size_t size);
 
 /* compatibility for ruby 1.8 and older */
 #define rb_io_mode_flags(modestr) rb_io_modestr_fmode(modestr)

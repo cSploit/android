@@ -1,4 +1,5 @@
 require 'test/unit'
+require 'envutil'
 
 class TestEncodingConverter < Test::Unit::TestCase
   def check_ec(edst, esrc, eres, dst, src, ec, off, len, opts=nil)
@@ -449,6 +450,16 @@ class TestEncodingConverter < Test::Unit::TestCase
     assert_econv("abc\rdef", :finished, 50, ec, "abc\ndef", "")
   end
 
+  def test_no_universal_newline1
+    ec = Encoding::Converter.new("UTF-8", "EUC-JP", universal_newline: false)
+    assert_econv("abc\r\ndef", :finished, 50, ec, "abc\r\ndef", "")
+  end
+
+  def test_no_universal_newline2
+    ec = Encoding::Converter.new("", "", universal_newline: false)
+    assert_econv("abc\r\ndef", :finished, 50, ec, "abc\r\ndef", "")
+  end
+
   def test_after_output
     ec = Encoding::Converter.new("UTF-8", "EUC-JP")
     a =     ["",  "abc\u{3042}def", ec, nil, 100, :after_output=>true]
@@ -891,5 +902,30 @@ class TestEncodingConverter < Test::Unit::TestCase
       broken = "\x80".force_encoding("euc-jp")
       "".encode("euc-jp", :undef => :replace, :replace => broken)
     }
+  end
+
+  def test_newline_option
+    ec1 = Encoding::Converter.new("", "", universal_newline: true)
+    ec2 = Encoding::Converter.new("", "", newline: :universal)
+    assert_equal(ec1, ec2)
+  end
+
+  def test_default_external
+    cmd = <<EOS
+    Encoding.default_external = ext = ARGV[0]
+    Encoding.default_internal = int ='utf-8'
+    begin
+      Encoding::Converter.new(ext, int)
+    ensure
+      Marshal.dump($!, STDOUT)
+      STDOUT.flush
+    end
+EOS
+    Encoding.list.grep(->(enc) {/^ISO-8859-\d(?:[0-5])?\z/i =~ enc.name}) do |enc|
+      error = IO.popen([EnvUtil.rubybin, "-e", cmd, enc.name]) do |child|
+        Marshal.load(child)
+      end
+      assert_nil(error)
+    end
   end
 end

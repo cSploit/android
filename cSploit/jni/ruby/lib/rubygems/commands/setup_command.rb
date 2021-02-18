@@ -1,7 +1,4 @@
 require 'rubygems/command'
-require 'fileutils'
-require 'rbconfig'
-require 'tmpdir'
 
 ##
 # Installs RubyGems itself.  This command is ordinarily only available from a
@@ -10,6 +7,8 @@ require 'tmpdir'
 class Gem::Commands::SetupCommand < Gem::Command
 
   def initialize
+    require 'tmpdir'
+
     super 'setup', 'Install RubyGems',
           :format_executable => true, :rdoc => true, :ri => true,
           :site_or_vendor => :sitelibdir,
@@ -28,13 +27,7 @@ class Gem::Commands::SetupCommand < Gem::Command
     end
 
     add_option '--[no-]vendor',
-               'Install into vendorlibdir not sitelibdir',
-               '(Requires Ruby 1.8.7)' do |vendor, options|
-      if vendor and Gem.ruby_version < Gem::Version.new('1.8.7') then
-        raise OptionParser::InvalidOption,
-              "requires ruby 1.8.7+ (you have #{Gem.ruby_version})"
-      end
-
+               'Install into vendorlibdir not sitelibdir' do |vendor, options|
       options[:site_or_vendor] = vendor ? :vendorlibdir : :sitelibdir
     end
 
@@ -56,7 +49,7 @@ class Gem::Commands::SetupCommand < Gem::Command
   end
 
   def check_ruby_version
-    required_version = Gem::Requirement.new '>= 1.8.6'
+    required_version = Gem::Requirement.new '>= 1.8.7'
 
     unless required_version.satisfied_by? Gem.ruby_version then
       alert_error "Expected Ruby version #{required_version}, is #{Gem.ruby_version}"
@@ -98,6 +91,7 @@ By default, this RubyGems will install gem as:
 
     check_ruby_version
 
+    require 'fileutils'
     if Gem.configuration.really_verbose then
       extend FileUtils::Verbose
     else
@@ -111,8 +105,6 @@ By default, this RubyGems will install gem as:
     install_executables bin_dir
 
     remove_old_bin_files bin_dir
-
-    remove_source_caches install_destdir
 
     say "RubyGems #{Gem::VERSION} installed"
 
@@ -132,7 +124,7 @@ By default, this RubyGems will install gem as:
                       open release_notes do |io|
                         text = io.gets '==='
                         text << io.gets('===')
-                        text[0...-3]
+                        text[0...-3].sub(/^# coding:.*?^=/m, '')
                       end
                     else
                       "Oh-no! Unable to find release notes!"
@@ -260,9 +252,19 @@ TEXT
   end
 
   def make_destination_dirs(install_destdir)
-    lib_dir = nil
-    bin_dir = nil
+    lib_dir, bin_dir = Gem.default_rubygems_dirs
 
+    unless lib_dir
+      lib_dir, bin_dir = generate_default_dirs(install_destdir)
+    end
+
+    mkdir_p lib_dir
+    mkdir_p bin_dir
+
+    return lib_dir, bin_dir
+  end
+
+  def generate_default_dirs(install_destdir)
     prefix = options[:prefix]
     site_or_vendor = options[:site_or_vendor]
 
@@ -291,10 +293,7 @@ TEXT
       bin_dir = File.join install_destdir, bin_dir.gsub(/^[a-zA-Z]:/, '')
     end
 
-    mkdir_p lib_dir
-    mkdir_p bin_dir
-
-    return lib_dir, bin_dir
+    [lib_dir, bin_dir]
   end
 
   def remove_old_bin_files(bin_dir)
@@ -329,21 +328,6 @@ abort "#{deprecation_message}"
     end
   end
 
-  def remove_source_caches(install_destdir)
-    if install_destdir.empty?
-      require 'rubygems/source_info_cache'
-
-      user_cache_file = File.join(install_destdir,
-                                  Gem::SourceInfoCache.user_cache_file)
-      system_cache_file = File.join(install_destdir,
-                                    Gem::SourceInfoCache.system_cache_file)
-
-      say "Removing old source_cache files" if Gem.configuration.really_verbose
-      rm_f user_cache_file if File.writable? File.dirname(user_cache_file)
-      rm_f system_cache_file if File.writable? File.dirname(system_cache_file)
-    end
-  end
-
   def run_rdoc(*args)
     begin
       gem 'rdoc'
@@ -352,9 +336,10 @@ abort "#{deprecation_message}"
 
     require 'rdoc/rdoc'
 
-    args << '--quiet'
-    args << '--main' << 'README'
-    args << '.' << 'README' << 'LICENSE.txt' << 'GPL.txt'
+    args << '--main' << 'README.rdoc' << '--quiet'
+    args << '.'
+    args << 'README.rdoc' << 'UPGRADING.rdoc'
+    args << 'LICENSE.txt' << 'MIT.txt' << 'History.txt'
 
     r = RDoc::RDoc.new
     r.document args

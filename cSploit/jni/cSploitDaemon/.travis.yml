@@ -1,6 +1,5 @@
 language: c
-sudo: required
 before_script:
-  - wget "https://github.com/cSploit/common/releases/download/v1.0/libcsploit-common-1.0.tar.gz" -O ../common.tar.gz
-  - (cd .. ; tar -xzf common.tar.gz ; cd libcsploit-common-1.0; ./configure; make; sudo make install )
+  - wget "https://github.com/cSploit/common/archive/master.zip" -O ../common.zip
+  - (cd .. ; unzip -q common.zip ; mv common-master cSploitCommon )
 script: make

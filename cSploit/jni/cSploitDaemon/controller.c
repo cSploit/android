@@ -18,16 +18,16 @@
 
 #include <stdio.h>
 
-#include <csploit/message.h>
-#include <csploit/logger.h>
-#include <csploit/control_messages.h>
-
 #include "connection.h"
+#include "message.h"
 #include "controller.h"
 #include "authenticator.h"
 #include "command.h"
 #include "handler.h"
+#include "logger.h"
 #include "cSploitd.h"
+
+#include "control_messages.h"
 
 //TODO #incude "module.h"
 

@@ -4,7 +4,11 @@ require 'rubygems/builder'
 class Gem::Commands::BuildCommand < Gem::Command
 
   def initialize
-    super('build', 'Build a gem from a gemspec')
+    super 'build', 'Build a gem from a gemspec'
+
+    add_option '--force', 'skip validation of the spec' do |value, options|
+      options[:force] = true
+    end
   end
 
   def arguments # :nodoc:
@@ -17,32 +21,34 @@ class Gem::Commands::BuildCommand < Gem::Command
 
   def execute
     gemspec = get_one_gem_name
-    if File.exist?(gemspec)
-      specs = load_gemspecs(gemspec)
-      specs.each do |spec|
-        Gem::Builder.new(spec).build
+
+    if File.exist? gemspec
+      spec = load_gemspec gemspec
+
+      if spec then
+        Gem::Builder.new(spec).build options[:force]
+      else
+        alert_error "Error loading gemspec. Aborting."
+        terminate_interaction 1
       end
     else
       alert_error "Gemspec file not found: #{gemspec}"
+      terminate_interaction 1
     end
   end
 
-  def load_gemspecs(filename)
+  def load_gemspec filename
     if yaml?(filename)
-      result = []
       open(filename) do |f|
         begin
-          while not f.eof? and spec = Gem::Specification.from_yaml(f)
-            result << spec
-          end
-        rescue Gem::EndOfYAMLException => e
-          # OK
+          Gem::Specification.from_yaml(f)
+        rescue Gem::EndOfYAMLException
+          nil
         end
       end
     else
-      result = [Gem::Specification.load(filename)]
+      Gem::Specification.load(filename) # can return nil
     end
-    result
   end
 
   def yaml?(filename)

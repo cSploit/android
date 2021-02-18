@@ -42,6 +42,7 @@ module EnvUtil
       out_p.set_encoding(enc) if out_p
       err_p.set_encoding(enc) if err_p
     end
+    timeout = opt.delete(:timeout) || 10
     c = "C"
     child_env = {}
     LANG_ENVS.each {|lc| child_env[lc] = c}
@@ -54,13 +55,12 @@ module EnvUtil
     out_c.close if capture_stdout
     err_c.close if capture_stderr && capture_stderr != :merge_to_stdout
     if block_given?
-      return yield in_p, out_p, err_p
+      return yield in_p, out_p, err_p, pid
     else
       th_stdout = Thread.new { out_p.read } if capture_stdout
       th_stderr = Thread.new { err_p.read } if capture_stderr && capture_stderr != :merge_to_stdout
       in_p.write stdin_data.to_str
       in_p.close
-      timeout = opt.fetch(:timeout, 10)
       if (!th_stdout || th_stdout.join(timeout)) && (!th_stderr || th_stderr.join(timeout))
         stdout = th_stdout.value if capture_stdout
         stderr = th_stderr.value if capture_stderr && capture_stderr != :merge_to_stdout
@@ -122,7 +122,13 @@ module Test
     module Assertions
       public
       def assert_normal_exit(testsrc, message = '', opt = {})
-        out, _, status = EnvUtil.invoke_ruby(%W'-W0', testsrc, true, :merge_to_stdout, opt)
+        if opt.include?(:child_env)
+          opt = opt.dup
+          child_env = [opt.delete(:child_env)] || []
+        else
+          child_env = []
+        end
+        out, _, status = EnvUtil.invoke_ruby(child_env + %W'-W0', testsrc, true, :merge_to_stdout, opt)
         pid = status.pid
         faildesc = proc do
           signo = status.termsig
@@ -173,6 +179,40 @@ module Test
         assert(status.success?, m)
       end
 
+      def assert_warn(msg)
+        stderr = EnvUtil.verbose_warning { yield }
+        assert(msg === stderr, "warning message #{stderr.inspect} is expected to match #{msg.inspect}")
+      end
+
+      def assert_no_memory_leak(args, prepare, code, message=nil, opt = {})
+        limit = opt.delete(:limit) || 1.5
+        token = "\e[7;1m#{$$.to_s}:#{Time.now.strftime('%s.%L')}:#{rand(0x10000).to_s(16)}:\e[m"
+        token_dump = token.dump
+        token_re = Regexp.quote(token)
+        envs = args.shift if Array === args and Hash === args.first
+        args = [
+          "--disable=gems",
+          "-r", File.expand_path("../memory_status", __FILE__),
+          *args,
+          "-v", "-",
+        ]
+        args.unshift(envs) if envs
+        cmd = [
+          'END {STDERR.puts '"#{token_dump}"'"FINAL=#{Memory::Status.new.size}"}',
+          prepare,
+          'STDERR.puts('"#{token_dump}"'"START=#{$initial_size = Memory::Status.new.size}")',
+          code,
+        ].join("\n")
+        _, err, status = EnvUtil.invoke_ruby(args, cmd, true, true, opt)
+        before = err.sub!(/^#{token_re}START=(\d+)\n/, '') && $1.to_i
+        after = err.sub!(/^#{token_re}FINAL=(\d+)\n/, '') && $1.to_i
+        assert_equal([true, ""], [status.success?, err], message)
+        assert_operator(after.fdiv(before), :<, limit, message)
+      end
+
+      def assert_is_minus_zero(f)
+        assert(1.0/f == -Float::INFINITY, "#{f} is not -0.0")
+      end
     end
   end
 end
@@ -192,6 +232,6 @@ else
     CONFIG['bindir'] = dir
     CONFIG['ruby_install_name'] = name
     CONFIG['RUBY_INSTALL_NAME'] = name
-    Gem::ConfigMap[:bindir] = dir if defined?(Gem)
+    Gem::ConfigMap[:bindir] = dir if defined?(Gem::ConfigMap)
   end
 end

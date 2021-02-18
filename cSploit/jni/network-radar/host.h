@@ -22,10 +22,10 @@
 #include <arpa/inet.h>
 #include <time.h>
 #include <stdlib.h>
-#include <csploit/sorted_arraylist.h>
-#include <csploit/control.h>
 
 #include "netdefs.h"
+#include "sorted_arraylist.h"
+#include "control.h"
 
 /// we tried to DNS resolve this host
 #define HOST_LOOKUP_DNS 1

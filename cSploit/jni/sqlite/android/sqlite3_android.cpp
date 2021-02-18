@@ -21,22 +21,19 @@
 #include <string.h>
 #include <unistd.h>
 
-#ifdef SQLITE_ENABLE_ICU
 #include <unicode/ucol.h>
 #include <unicode/uiter.h>
 #include <unicode/ustring.h>
 #include <unicode/utypes.h>
-#endif //SQLITE_ENABLE_ICU
-#include <log/log.h>
+#include <cutils/log.h>
 
 #include "sqlite3_android.h"
 #include "PhoneNumberUtils.h"
+#include "PhonebookIndex.h"
 
 #define ENABLE_ANDROID_LOG 0
 #define SMALL_BUFFER_SIZE 10
-#define PHONE_NUMBER_BUFFER_SIZE 40
 
-#ifdef SQLITE_ENABLE_ICU
 static int collate16(void *p, int n1, const void *v1, int n2, const void *v2)
 {
     UCollator *coll = (UCollator *) p;
@@ -64,7 +61,7 @@ static int collate8(void *p, int n1, const void *v1, int n2, const void *v2)
     UCollationResult result = ucol_strcollIter(coll, &i1, &i2, &status);
 
     if (U_FAILURE(status)) {
-//        ALOGE("Collation iterator error: %d\n", status);
+//        LOGE("Collation iterator error: %d\n", status);
     }
 
     if (result == UCOL_LESS) {
@@ -75,11 +72,57 @@ static int collate8(void *p, int n1, const void *v1, int n2, const void *v2)
         return 0;
     }
 }
-#endif // SQLITE_ENABLE_ICU
+
+/**
+ * Obtains the first UNICODE letter from the supplied string, normalizes and returns it.
+ */
+static void get_phonebook_index(
+    sqlite3_context * context, int argc, sqlite3_value ** argv)
+{
+    if (argc != 2) {
+      sqlite3_result_null(context);
+      return;
+    }
+
+    char const * src = (char const *)sqlite3_value_text(argv[0]);
+    char const * locale = (char const *)sqlite3_value_text(argv[1]);
+    if (src == NULL || src[0] == 0 || locale == NULL) {
+      sqlite3_result_null(context);
+      return;
+    }
+
+    UCharIterator iter;
+    uiter_setUTF8(&iter, src, -1);
+
+    UBool isError = FALSE;
+    UChar index[SMALL_BUFFER_SIZE];
+    uint32_t len = android::GetPhonebookIndex(&iter, locale, index, sizeof(index), &isError);
+    if (isError) {
+      sqlite3_result_null(context);
+      return;
+    }
+
+    uint32_t outlen = 0;
+    uint8_t out[SMALL_BUFFER_SIZE];
+    for (uint32_t i = 0; i < len; i++) {
+      U8_APPEND(out, outlen, sizeof(out), index[i], isError);
+      if (isError) {
+        sqlite3_result_null(context);
+        return;
+      }
+    }
+
+    if (outlen == 0) {
+      sqlite3_result_null(context);
+      return;
+    }
+
+    sqlite3_result_text(context, (const char*)out, outlen, SQLITE_TRANSIENT);
+}
 
 static void phone_numbers_equal(sqlite3_context * context, int argc, sqlite3_value ** argv)
 {
-    if (argc != 2 && argc != 3 && argc != 4) {
+    if (argc != 2 && argc != 3) {
         sqlite3_result_int(context, 0);
         return;
     }
@@ -88,12 +131,8 @@ static void phone_numbers_equal(sqlite3_context * context, int argc, sqlite3_val
     char const * num2 = (char const *)sqlite3_value_text(argv[1]);
 
     bool use_strict = false;
-    int min_match = 0;
-    if (argc == 3 || argc == 4) {
+    if (argc == 3) {
         use_strict = (sqlite3_value_int(argv[2]) != 0);
-        if (!use_strict && argc == 4) {
-            min_match = sqlite3_value_int(argv[3]);
-        }
     }
 
     if (num1 == NULL || num2 == NULL) {
@@ -102,11 +141,9 @@ static void phone_numbers_equal(sqlite3_context * context, int argc, sqlite3_val
     }
 
     bool equal =
-        (use_strict ? android::phone_number_compare_strict(num1, num2)
-                    : ((min_match > 0)
-                           ? android::phone_number_compare_loose_with_minmatch(
-                                 num1, num2, min_match)
-                           : android::phone_number_compare_loose(num1, num2)));
+        (use_strict ?
+         android::phone_number_compare_strict(num1, num2) :
+         android::phone_number_compare_loose(num1, num2));
 
     if (equal) {
         sqlite3_result_int(context, 1);
@@ -114,27 +151,6 @@ static void phone_numbers_equal(sqlite3_context * context, int argc, sqlite3_val
         sqlite3_result_int(context, 0);
     }
 }
-
-static void phone_number_stripped_reversed(sqlite3_context * context, int argc,
-      sqlite3_value ** argv)
-{
-    if (argc != 1) {
-        sqlite3_result_int(context, 0);
-        return;
-    }
-
-    char const * number = (char const *)sqlite3_value_text(argv[0]);
-    if (number == NULL) {
-        sqlite3_result_null(context);
-        return;
-    }
-
-    char out[PHONE_NUMBER_BUFFER_SIZE];
-    int outlen = 0;
-    android::phone_number_stripped_reversed_inter(number, out, PHONE_NUMBER_BUFFER_SIZE, &outlen);
-    sqlite3_result_text(context, (const char*)out, outlen, SQLITE_TRANSIENT);
-}
-
 
 #if ENABLE_ANDROID_LOG
 static void android_log(sqlite3_context * context, int argc, sqlite3_value ** argv)
@@ -155,7 +171,7 @@ static void android_log(sqlite3_context * context, int argc, sqlite3_value ** ar
             if (msg == NULL) {
                 msg = "";
             }
-            ALOG(LOG_INFO, tag, "%s", msg);
+            LOG(LOG_INFO, tag, msg);
             sqlite3_result_int(context, 1);
             return;
 
@@ -174,33 +190,17 @@ static void delete_file(sqlite3_context * context, int argc, sqlite3_value ** ar
     }
 
     char const * path = (char const *)sqlite3_value_text(argv[0]);
-    // Don't allow ".." in paths
-    if (path == NULL || strstr(path, "/../") != NULL) {
+    char const * external_storage = getenv("EXTERNAL_STORAGE");
+    if (path == NULL || external_storage == NULL) {
         sqlite3_result_null(context);
         return;
     }
 
-    // We only allow deleting files in the EXTERNAL_STORAGE path, or one of the
-    // SECONDARY_STORAGE paths
-    bool good_path = false;
-    char const * external_storage = getenv("EXTERNAL_STORAGE");
-    if (external_storage && strncmp(external_storage, path, strlen(external_storage)) == 0) {
-        good_path = true;
-    } else {
-        // check SECONDARY_STORAGE, which should be a colon separated list of paths
-        char const * secondary_paths = getenv("SECONDARY_STORAGE");
-        while (secondary_paths && secondary_paths[0]) {
-            const char* colon = strchr(secondary_paths, ':');
-            int length = (colon ? colon - secondary_paths : strlen(secondary_paths));
-            if (strncmp(secondary_paths, path, length) == 0) {
-                good_path = true;
-            }
-            secondary_paths += length;
-            while (*secondary_paths == ':') secondary_paths++;
-        }
+    if (strncmp(external_storage, path, strlen(external_storage)) != 0) {
+        sqlite3_result_null(context);
+        return;
     }
-
-    if (!good_path) {
+    if (strstr(path, "/../") != NULL) {
         sqlite3_result_null(context);
         return;
     }
@@ -215,7 +215,6 @@ static void delete_file(sqlite3_context * context, int argc, sqlite3_value ** ar
     }
 }
 
-#ifdef SQLITE_ENABLE_ICU
 static void tokenize_auxdata_delete(void * data)
 {
     sqlite3_stmt * statement = (sqlite3_stmt *)data;
@@ -237,7 +236,6 @@ struct SqliteUserData {
     UCollator* collator;
 };
 
-#if 0
 /**
  * This function is invoked as:
  *
@@ -269,13 +267,13 @@ struct SqliteUserData {
  */
 static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
 {
-    //ALOGD("enter tokenize");
+    //LOGD("enter tokenize");
     int err;
     int useTokenIndex = 0;
     int useDataTag = 0;
 
     if (!(argc >= 4 || argc <= 6)) {
-        ALOGE("Tokenize requires 4 to 6 arguments");
+        LOGE("Tokenize requires 4 to 6 arguments");
         sqlite3_result_null(context);
         return;
     }
@@ -292,7 +290,7 @@ static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
     UCollator* collator = (UCollator*)sqlite3_user_data(context);
     char const * tokenTable = (char const *)sqlite3_value_text(argv[0]);
     if (tokenTable == NULL) {
-        ALOGE("tokenTable null");
+        LOGE("tokenTable null");
         sqlite3_result_null(context);
         return;
     }
@@ -309,7 +307,7 @@ static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
         err = sqlite3_prepare_v2(handle, sql, -1, &statement, NULL);
         sqlite3_free(sql);
         if (err) {
-            ALOGE("prepare failed");
+            LOGE("prepare failed");
             sqlite3_result_null(context);
             return;
         }
@@ -326,7 +324,7 @@ static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
     int64_t rowID = sqlite3_value_int64(argv[1]);
     err = sqlite3_bind_int64(statement, 2, rowID);
     if (err != SQLITE_OK) {
-        ALOGE("bind failed");
+        LOGE("bind failed");
         sqlite3_result_null(context);
         return;
     }
@@ -336,7 +334,7 @@ static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
         int dataTagParamIndex = useTokenIndex ? 4 : 3;
         err = sqlite3_bind_value(statement, dataTagParamIndex, argv[5]);
         if (err != SQLITE_OK) {
-            ALOGE("bind failed");
+            LOGE("bind failed");
             sqlite3_result_null(context);
             return;
         }
@@ -354,7 +352,7 @@ static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
     // Get the raw bytes for the delimiter
     const UChar * delim = (const UChar *)sqlite3_value_text16(argv[3]);
     if (delim == NULL) {
-        ALOGE("can't get delimiter");
+        LOGE("can't get delimiter");
         sqlite3_result_null(context);
         return;
     }
@@ -375,7 +373,7 @@ static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
         uint32_t result = ucol_getSortKey(collator, token, -1, (uint8_t*)keybuf, sizeof(keybuf)-1);
         if (result > sizeof(keybuf)) {
             // TODO allocate memory for this super big string
-            ALOGE("ucol_getSortKey needs bigger buffer %d", result);
+            LOGE("ucol_getSortKey needs bigger buffer %d", result);
             break;
         }
         uint32_t keysize = result-1;
@@ -385,7 +383,7 @@ static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
         err = sqlite3_bind_text(statement, 1, base16buf, base16Size, SQLITE_STATIC);
 
         if (err != SQLITE_OK) {
-            ALOGE(" sqlite3_bind_text16 error %d", err);
+            LOGE(" sqlite3_bind_text16 error %d", err);
             free(base16buf);
             break;
         }
@@ -393,7 +391,7 @@ static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
         if (useTokenIndex) {
             err = sqlite3_bind_int(statement, 3, numTokens);
             if (err != SQLITE_OK) {
-                ALOGE(" sqlite3_bind_int error %d", err);
+                LOGE(" sqlite3_bind_int error %d", err);
                 free(base16buf);
                 break;
             }
@@ -403,7 +401,7 @@ static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
         free(base16buf);
 
         if (err != SQLITE_DONE) {
-            ALOGE(" sqlite3_step error %d", err);
+            LOGE(" sqlite3_step error %d", err);
             break;
         }
         numTokens++;
@@ -414,7 +412,6 @@ static void tokenize(sqlite3_context * context, int argc, sqlite3_value ** argv)
     } while ((token = u_strtok_r(NULL, delim, &state)) != NULL);
     sqlite3_result_int(context, numTokens);
 }
-#endif
 
 static void localized_collator_dtor(UCollator* collator)
 {
@@ -426,16 +423,12 @@ static void localized_collator_dtor(UCollator* collator)
 // This collator may be removed in the near future, so you MUST not use now.
 #define PHONEBOOK_COLLATOR_NAME "PHONEBOOK"
 
-#endif // SQLITE_ENABLE_ICU
-
-extern "C" int register_localized_collators(sqlite3* handle __attribute((unused)),
-                                            const char* systemLocale __attribute((unused)),
-                                            int utf16Storage __attribute((unused)))
+extern "C" int register_localized_collators(sqlite3* handle, const char* systemLocale, int utf16Storage)
 {
-// This function is no-op for the VNDK, but should exist in case when some vendor
-// module has a reference to this function.
-#ifdef SQLITE_ENABLE_ICU
+    int err;
     UErrorCode status = U_ZERO_ERROR;
+    void* icudata;
+
     UCollator* collator = ucol_open(systemLocale, &status);
     if (U_FAILURE(status)) {
         return -1;
@@ -446,7 +439,10 @@ extern "C" int register_localized_collators(sqlite3* handle __attribute((unused)
         return -1;
     }
 
-    int err;
+    status = U_ZERO_ERROR;
+    char buf[1024];
+    ucol_getShortDefinitionString(collator, NULL, buf, 1024, &status);
+
     if (utf16Storage) {
         err = sqlite3_create_collation_v2(handle, LOCALIZED_COLLATOR_NAME, SQLITE_UTF16, collator,
                 collate16, (void(*)(void*))localized_collator_dtor);
@@ -459,7 +455,6 @@ extern "C" int register_localized_collators(sqlite3* handle __attribute((unused)
         return err;
     }
 
-#if 0
     // Register the _TOKENIZE function
     err = sqlite3_create_function(handle, "_TOKENIZE", 4, SQLITE_UTF16, collator, tokenize, NULL, NULL);
     if (err != SQLITE_OK) {
@@ -473,11 +468,17 @@ extern "C" int register_localized_collators(sqlite3* handle __attribute((unused)
     if (err != SQLITE_OK) {
         return err;
     }
-#endif
+
 
     //// PHONEBOOK_COLLATOR
+    // The collator may be removed in the near future. Do not depend on it.
+    // TODO: it might be better to have another function for registering phonebook collator.
     status = U_ZERO_ERROR;
-    collator = ucol_open(systemLocale, &status);
+    if (strcmp(systemLocale, "ja") == 0 || strcmp(systemLocale, "ja_JP") == 0) {
+        collator = ucol_open("ja@collation=phonebook", &status);
+    } else {
+        collator = ucol_open(systemLocale, &status);
+    }
     if (U_FAILURE(status)) {
         return -1;
     }
@@ -488,6 +489,8 @@ extern "C" int register_localized_collators(sqlite3* handle __attribute((unused)
         return -1;
     }
 
+    status = U_ZERO_ERROR;
+    // ucol_getShortDefinitionString(collator, NULL, buf, 1024, &status);
     if (utf16Storage) {
         err = sqlite3_create_collation_v2(handle, PHONEBOOK_COLLATOR_NAME, SQLITE_UTF16, collator,
                 collate16, (void(*)(void*))localized_collator_dtor);
@@ -500,16 +503,14 @@ extern "C" int register_localized_collators(sqlite3* handle __attribute((unused)
         return err;
     }
     //// PHONEBOOK_COLLATOR
-#endif //SQLITE_ENABLE_ICU
 
     return SQLITE_OK;
 }
 
 
-extern "C" int register_android_functions(sqlite3 * handle, int utf16Storage __attribute((unused)))
+extern "C" int register_android_functions(sqlite3 * handle, int utf16Storage)
 {
     int err;
-#ifdef SQLITE_ENABLE_ICU
     UErrorCode status = U_ZERO_ERROR;
 
     UCollator * collator = ucol_open(NULL, &status);
@@ -535,7 +536,6 @@ extern "C" int register_android_functions(sqlite3 * handle, int utf16Storage __a
     if (err != SQLITE_OK) {
         return err;
     }
-#endif // SQLITE_ENABLE_ICU
 
     // Register the PHONE_NUM_EQUALS function
     err = sqlite3_create_function(
@@ -548,14 +548,6 @@ extern "C" int register_android_functions(sqlite3 * handle, int utf16Storage __a
     // Register the PHONE_NUM_EQUALS function with an additional argument "use_strict"
     err = sqlite3_create_function(
         handle, "PHONE_NUMBERS_EQUAL", 3,
-        SQLITE_UTF8, NULL, phone_numbers_equal, NULL, NULL);
-    if (err != SQLITE_OK) {
-        return err;
-    }
-
-    // Register the PHONE_NUM_EQUALS function with additional arguments "use_strict" and "min_match"
-    err = sqlite3_create_function(
-        handle, "PHONE_NUMBERS_EQUAL", 4,
         SQLITE_UTF8, NULL, phone_numbers_equal, NULL, NULL);
     if (err != SQLITE_OK) {
         return err;
@@ -575,14 +567,11 @@ extern "C" int register_android_functions(sqlite3 * handle, int utf16Storage __a
     }
 #endif
 
-    // Register the _PHONE_NUMBER_STRIPPED_REVERSED function, which imitates
-    // PhoneNumberUtils.getStrippedReversed.  This function is used by
-    // packages/providers/ContactsProvider/src/com/android/providers/contacts/LegacyApiSupport.java
-    // to provide compatibility with Android 1.6 and earlier.
+    // Register the GET_PHONEBOOK_INDEX function
     err = sqlite3_create_function(handle,
-        "_PHONE_NUMBER_STRIPPED_REVERSED",
-        1, SQLITE_UTF8, NULL,
-        phone_number_stripped_reversed,
+        "GET_PHONEBOOK_INDEX",
+        2, SQLITE_UTF8, NULL,
+        get_phonebook_index,
         NULL, NULL);
     if (err != SQLITE_OK) {
         return err;

@@ -13,6 +13,7 @@ class TestEncoding < Test::Unit::TestCase
       assert_equal(e, Encoding.find(e.name.upcase))
       assert_equal(e, Encoding.find(e.name.capitalize))
       assert_equal(e, Encoding.find(e.name.downcase))
+      assert_equal(e, Encoding.find(e))
     end
   end
 
@@ -41,7 +42,7 @@ class TestEncoding < Test::Unit::TestCase
     assert_nothing_raised{Encoding.find("locale")}
     assert_nothing_raised{Encoding.find("filesystem")}
 
-    if /(?:ms|dar)win/ !~ RUBY_PLATFORM
+    if /(?:ms|dar)win|mingw/ !~ RUBY_PLATFORM
       # Unix's filesystem encoding is default_external
       assert_ruby_status(%w[-EUTF-8:EUC-JP], <<-'EOS')
         exit Encoding.find("filesystem") == Encoding::UTF_8
@@ -49,6 +50,9 @@ class TestEncoding < Test::Unit::TestCase
         exit Encoding.find("filesystem") == Encoding::EUC_JP
       EOS
     end
+
+    bug5150 = '[ruby-dev:44327]'
+    assert_raise(TypeError, bug5150) {Encoding.find(1)}
   end
 
   def test_replicate
@@ -94,5 +98,19 @@ class TestEncoding < Test::Unit::TestCase
     assert_equal(str, str2)
     str2 = Marshal.load(Marshal.dump(str2))
     assert_equal(str, str2, '[ruby-dev:38596]')
+  end
+
+  def test_unsafe
+    bug5279 = '[ruby-dev:44469]'
+    assert_ruby_status([], '$SAFE=4; "a".encode("utf-16be")', bug5279)
+  end
+
+  def test_compatible_p
+    ua = "abc".force_encoding(Encoding::UTF_8)
+    assert_equal(Encoding::UTF_8, Encoding.compatible?(ua, :abc))
+    assert_equal(nil, Encoding.compatible?(ua, 1))
+    bin = "a".force_encoding(Encoding::ASCII_8BIT)
+    asc = "b".force_encoding(Encoding::US_ASCII)
+    assert_equal(Encoding::ASCII_8BIT, Encoding.compatible?(bin, asc))
   end
 end

@@ -17,62 +17,46 @@
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ * Format and print trivial file transfer protocol packets.
  */
 
-/* \summary: Trivial File Transfer Protocol (TFTP) printer */
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-tftp.c,v 1.37.2.1 2007/09/14 01:03:12 guy Exp $ (LBL)";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include <tcpdump-stdinc.h>
 
+#ifdef SEGSIZE
+#undef SEGSIZE					/* SINIX sucks */
+#endif
+
+#include <stdio.h>
 #include <string.h>
 
-#include "netdissect.h"
+#include "interface.h"
+#include "addrtoname.h"
 #include "extract.h"
-
-/*
- * Trivial File Transfer Protocol (IEN-133)
- */
-
-/*
- * Packet types.
- */
-#define	RRQ	01			/* read request */
-#define	WRQ	02			/* write request */
-#define	DATA	03			/* data packet */
-#define	ACK	04			/* acknowledgement */
-#define	TFTP_ERROR	05			/* error code */
-#define OACK	06			/* option acknowledgement */
-
-/*
- * Error codes.
- */
-#define	EUNDEF		0		/* not defined */
-#define	ENOTFOUND	1		/* file not found */
-#define	EACCESS		2		/* access violation */
-#define	ENOSPACE	3		/* disk full or allocation exceeded */
-#define	EBADOP		4		/* illegal TFTP operation */
-#define	EBADID		5		/* unknown transfer ID */
-#define	EEXISTS		6		/* file already exists */
-#define	ENOUSER		7		/* no such user */
-
-static const char tstr[] = " [|tftp]";
+#include "tftp.h"
 
 /* op code to string mapping */
-static const struct tok op2str[] = {
+static struct tok op2str[] = {
 	{ RRQ,		"RRQ" },	/* read request */
 	{ WRQ,		"WRQ" },	/* write request */
 	{ DATA,		"DATA" },	/* data packet */
 	{ ACK,		"ACK" },	/* acknowledgement */
-	{ TFTP_ERROR,	"ERROR" },	/* error code */
+	{ ERROR,	"ERROR" },	/* error code */
 	{ OACK,		"OACK" },	/* option acknowledgement */
 	{ 0,		NULL }
 };
 
 /* error code to string mapping */
-static const struct tok err2str[] = {
+static struct tok err2str[] = {
 	{ EUNDEF,	"EUNDEF" },	/* not defined */
 	{ ENOTFOUND,	"ENOTFOUND" },	/* file not found */
 	{ EACCESS,	"EACCESS" },	/* access violation */
@@ -88,116 +72,90 @@ static const struct tok err2str[] = {
  * Print trivial file transfer program requests
  */
 void
-tftp_print(netdissect_options *ndo,
-           register const u_char *bp, u_int length)
+tftp_print(register const u_char *bp, u_int length)
 {
+	register const struct tftphdr *tp;
 	register const char *cp;
-	register int opcode;
-	u_int ui;
+	register const u_char *p;
+	register int opcode, i;
+	static char tstr[] = " [|tftp]";
+
+	tp = (const struct tftphdr *)bp;
 
 	/* Print length */
-	ND_PRINT((ndo, " %d", length));
+	printf(" %d", length);
 
 	/* Print tftp request type */
-	if (length < 2)
-		goto trunc;
-	ND_TCHECK_16BITS(bp);
-	opcode = EXTRACT_16BITS(bp);
+	TCHECK(tp->th_opcode);
+	opcode = EXTRACT_16BITS(&tp->th_opcode);
 	cp = tok2str(op2str, "tftp-#%d", opcode);
-	ND_PRINT((ndo, " %s", cp));
+	printf(" %s", cp);
 	/* Bail if bogus opcode */
 	if (*cp == 't')
 		return;
-	bp += 2;
-	length -= 2;
 
 	switch (opcode) {
 
 	case RRQ:
 	case WRQ:
-		if (length == 0)
-			goto trunc;
-		ND_PRINT((ndo, " "));
-		/* Print filename */
-		ND_PRINT((ndo, "\""));
-		ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
-		ND_PRINT((ndo, "\""));
-		if (ui == 0)
-			goto trunc;
-		bp += ui;
-		length -= ui;
-
-		/* Print the mode - RRQ and WRQ only */
-		if (length == 0)
-			goto trunc;	/* no mode */
-		ND_PRINT((ndo, " "));
-		ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
-		if (ui == 0)
-			goto trunc;
-		bp += ui;
-		length -= ui;
-
-		/* Print options, if any */
-		while (length != 0) {
-			ND_TCHECK(*bp);
-			if (*bp != '\0')
-				ND_PRINT((ndo, " "));
-			ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
-			if (ui == 0)
-				goto trunc;
-			bp += ui;
-			length -= ui;
-		}
-		break;
-
 	case OACK:
-		/* Print options */
-		while (length != 0) {
-			ND_TCHECK(*bp);
-			if (*bp != '\0')
-				ND_PRINT((ndo, " "));
-			ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
-			if (ui == 0)
-				goto trunc;
-			bp += ui;
-			length -= ui;
+		/*
+		 * XXX Not all arpa/tftp.h's specify th_stuff as any
+		 * array; use address of th_block instead
+		 */
+#ifdef notdef
+		p = (u_char *)tp->th_stuff;
+#else
+		p = (u_char *)&tp->th_block;
+#endif
+		putchar(' ');
+		/* Print filename or first option */
+		if (opcode != OACK)
+			putchar('"');
+		i = fn_print(p, snapend);
+		if (opcode != OACK)
+			putchar('"');
+
+		/* Print the mode (RRQ and WRQ only) and any options */
+		while ((p = (const u_char *)strchr((const char *)p, '\0')) != NULL) {
+			if (length <= (u_int)(p - (const u_char *)&tp->th_block))
+				break;
+			p++;
+			if (*p != '\0') {
+				putchar(' ');
+				fn_print(p, snapend);
+			}
 		}
+		
+		if (i)
+			goto trunc;
 		break;
 
 	case ACK:
 	case DATA:
-		if (length < 2)
-			goto trunc;	/* no block number */
-		ND_TCHECK_16BITS(bp);
-		ND_PRINT((ndo, " block %d", EXTRACT_16BITS(bp)));
+		TCHECK(tp->th_block);
+		printf(" block %d", EXTRACT_16BITS(&tp->th_block));
 		break;
 
-	case TFTP_ERROR:
+	case ERROR:
 		/* Print error code string */
-		if (length < 2)
-			goto trunc;	/* no error code */
-		ND_TCHECK_16BITS(bp);
-		ND_PRINT((ndo, " %s", tok2str(err2str, "tftp-err-#%d \"",
-				       EXTRACT_16BITS(bp))));
-		bp += 2;
-		length -= 2;
+		TCHECK(tp->th_code);
+		printf(" %s \"", tok2str(err2str, "tftp-err-#%d \"",
+				       EXTRACT_16BITS(&tp->th_code)));
 		/* Print error message string */
-		if (length == 0)
-			goto trunc;	/* no error message */
-		ND_PRINT((ndo, " \""));
-		ui = fn_printztn(ndo, bp, length, ndo->ndo_snapend);
-		ND_PRINT((ndo, "\""));
-		if (ui == 0)
+		i = fn_print((const u_char *)tp->th_data, snapend);
+		putchar('"');
+		if (i)
 			goto trunc;
 		break;
 
 	default:
 		/* We shouldn't get here */
-		ND_PRINT((ndo, "(unknown #%d)", opcode));
+		printf("(unknown #%d)", opcode);
 		break;
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, "%s", tstr));
+	fputs(tstr, stdout);
 	return;
 }

@@ -3,21 +3,25 @@ require 'test/unit'
 class TestSymbol < Test::Unit::TestCase
   # [ruby-core:3573]
 
-  def assert_eval_inspected(sym)
+  def assert_eval_inspected(sym, valid = true)
     n = sym.inspect
+    if valid
+      bug5136 = '[ruby-dev:44314]'
+      assert_not_match(/\A:"/, n, bug5136)
+    end
     assert_nothing_raised(SyntaxError) {assert_equal(sym, eval(n))}
   end
 
   def test_inspect_invalid
     # 2) Symbol#inspect sometimes returns invalid symbol representations:
     assert_eval_inspected(:"!")
-    assert_eval_inspected(:"=")
-    assert_eval_inspected(:"0")
+    assert_eval_inspected(:"=", false)
+    assert_eval_inspected(:"0", false)
     assert_eval_inspected(:"$1")
-    assert_eval_inspected(:"@1")
-    assert_eval_inspected(:"@@1")
-    assert_eval_inspected(:"@")
-    assert_eval_inspected(:"@@")
+    assert_eval_inspected(:"@1", false)
+    assert_eval_inspected(:"@@1", false)
+    assert_eval_inspected(:"@", false)
+    assert_eval_inspected(:"@@", false)
   end
 
   def assert_inspect_evaled(n)
@@ -29,7 +33,7 @@ class TestSymbol < Test::Unit::TestCase
     assert_inspect_evaled(':foo')
     assert_inspect_evaled(':foo!')
     assert_inspect_evaled(':bar?')
-    assert_inspect_evaled(':<<')
+    assert_inspect_evaled(":<<")
     assert_inspect_evaled(':>>')
     assert_inspect_evaled(':<=')
     assert_inspect_evaled(':>=')
@@ -96,6 +100,33 @@ class TestSymbol < Test::Unit::TestCase
 
     assert_equal(3, :foo.to_proc.call(o, 1, 2))
     assert_raise(ArgumentError) { :foo.to_proc.call }
+  end
+
+  def m_block_given?
+    block_given?
+  end
+
+  def m2_block_given?(m = nil)
+    if m
+      [block_given?, m.call(self)]
+    else
+      block_given?
+    end
+  end
+
+  def test_block_given_to_proc
+    bug8531 = '[Bug #8531]'
+    m = :m_block_given?.to_proc
+    assert(!m.call(self), "#{bug8531} without block")
+    assert(m.call(self) {}, "#{bug8531} with block")
+    assert(!m.call(self), "#{bug8531} without block second")
+  end
+
+  def test_block_persist_between_calls
+    bug8531 = '[Bug #8531]'
+    m2 = :m2_block_given?.to_proc
+    assert_equal([true, false], m2.call(self, m2) {}, "#{bug8531} nested with block")
+    assert_equal([false, false], m2.call(self, m2), "#{bug8531} nested without block")
   end
 
   def test_succ

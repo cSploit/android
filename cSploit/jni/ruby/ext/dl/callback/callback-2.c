@@ -1,0 +1,4127 @@
+#include "dl.h"
+
+extern VALUE rb_DLCdeclCallbackAddrs, rb_DLCdeclCallbackProcs;
+#ifdef FUNC_STDCALL
+extern VALUE rb_DLStdcallCallbackAddrs, rb_DLStdcallCallbackProcs;
+#endif
+extern ID   rb_dl_cb_call;
+
+static char
+FUNC_CDECL(rb_dl_callback_char_0_0_cdecl)()
+{
+    VALUE ret, cb;
+
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 0);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 0, NULL);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_0_1_cdecl)()
+{
+    VALUE ret, cb;
+
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 20);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 0, NULL);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_0_2_cdecl)()
+{
+    VALUE ret, cb;
+
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 40);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 0, NULL);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_0_3_cdecl)()
+{
+    VALUE ret, cb;
+
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 60);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 0, NULL);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_0_4_cdecl)()
+{
+    VALUE ret, cb;
+
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 80);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 0, NULL);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_1_0_cdecl)(DLSTACK_TYPE stack0)
+{
+    VALUE ret, cb, args[1];
+    args[0] = LONG2NUM(stack0);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 1);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 1, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_1_1_cdecl)(DLSTACK_TYPE stack0)
+{
+    VALUE ret, cb, args[1];
+    args[0] = LONG2NUM(stack0);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 21);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 1, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_1_2_cdecl)(DLSTACK_TYPE stack0)
+{
+    VALUE ret, cb, args[1];
+    args[0] = LONG2NUM(stack0);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 41);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 1, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_1_3_cdecl)(DLSTACK_TYPE stack0)
+{
+    VALUE ret, cb, args[1];
+    args[0] = LONG2NUM(stack0);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 61);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 1, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_1_4_cdecl)(DLSTACK_TYPE stack0)
+{
+    VALUE ret, cb, args[1];
+    args[0] = LONG2NUM(stack0);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 81);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 1, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_2_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1)
+{
+    VALUE ret, cb, args[2];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 2);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 2, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_2_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1)
+{
+    VALUE ret, cb, args[2];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 22);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 2, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_2_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1)
+{
+    VALUE ret, cb, args[2];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 42);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 2, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_2_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1)
+{
+    VALUE ret, cb, args[2];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 62);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 2, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_2_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1)
+{
+    VALUE ret, cb, args[2];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 82);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 2, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_3_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2)
+{
+    VALUE ret, cb, args[3];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 3);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 3, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_3_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2)
+{
+    VALUE ret, cb, args[3];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 23);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 3, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_3_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2)
+{
+    VALUE ret, cb, args[3];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 43);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 3, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_3_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2)
+{
+    VALUE ret, cb, args[3];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 63);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 3, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_3_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2)
+{
+    VALUE ret, cb, args[3];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 83);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 3, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_4_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3)
+{
+    VALUE ret, cb, args[4];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 4);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 4, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_4_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3)
+{
+    VALUE ret, cb, args[4];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 24);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 4, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_4_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3)
+{
+    VALUE ret, cb, args[4];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 44);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 4, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_4_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3)
+{
+    VALUE ret, cb, args[4];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 64);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 4, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_4_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3)
+{
+    VALUE ret, cb, args[4];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 84);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 4, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_5_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4)
+{
+    VALUE ret, cb, args[5];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 5);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 5, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_5_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4)
+{
+    VALUE ret, cb, args[5];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 25);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 5, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_5_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4)
+{
+    VALUE ret, cb, args[5];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 45);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 5, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_5_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4)
+{
+    VALUE ret, cb, args[5];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 65);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 5, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_5_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4)
+{
+    VALUE ret, cb, args[5];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 85);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 5, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_6_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5)
+{
+    VALUE ret, cb, args[6];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 6);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 6, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_6_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5)
+{
+    VALUE ret, cb, args[6];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 26);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 6, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_6_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5)
+{
+    VALUE ret, cb, args[6];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 46);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 6, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_6_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5)
+{
+    VALUE ret, cb, args[6];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 66);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 6, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_6_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5)
+{
+    VALUE ret, cb, args[6];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 86);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 6, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_7_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6)
+{
+    VALUE ret, cb, args[7];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 7);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 7, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_7_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6)
+{
+    VALUE ret, cb, args[7];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 27);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 7, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_7_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6)
+{
+    VALUE ret, cb, args[7];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 47);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 7, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_7_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6)
+{
+    VALUE ret, cb, args[7];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 67);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 7, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_7_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6)
+{
+    VALUE ret, cb, args[7];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 87);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 7, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_8_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7)
+{
+    VALUE ret, cb, args[8];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 8);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 8, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_8_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7)
+{
+    VALUE ret, cb, args[8];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 28);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 8, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_8_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7)
+{
+    VALUE ret, cb, args[8];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 48);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 8, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_8_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7)
+{
+    VALUE ret, cb, args[8];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 68);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 8, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_8_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7)
+{
+    VALUE ret, cb, args[8];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 88);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 8, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_9_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8)
+{
+    VALUE ret, cb, args[9];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 9);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 9, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_9_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8)
+{
+    VALUE ret, cb, args[9];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 29);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 9, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_9_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8)
+{
+    VALUE ret, cb, args[9];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 49);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 9, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_9_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8)
+{
+    VALUE ret, cb, args[9];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 69);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 9, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_9_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8)
+{
+    VALUE ret, cb, args[9];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 89);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 9, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_10_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9)
+{
+    VALUE ret, cb, args[10];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 10);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 10, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_10_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9)
+{
+    VALUE ret, cb, args[10];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 30);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 10, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_10_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9)
+{
+    VALUE ret, cb, args[10];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 50);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 10, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_10_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9)
+{
+    VALUE ret, cb, args[10];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 70);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 10, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_10_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9)
+{
+    VALUE ret, cb, args[10];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 90);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 10, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_11_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10)
+{
+    VALUE ret, cb, args[11];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 11);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 11, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_11_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10)
+{
+    VALUE ret, cb, args[11];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 31);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 11, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_11_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10)
+{
+    VALUE ret, cb, args[11];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 51);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 11, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_11_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10)
+{
+    VALUE ret, cb, args[11];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 71);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 11, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_11_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10)
+{
+    VALUE ret, cb, args[11];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 91);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 11, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_12_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11)
+{
+    VALUE ret, cb, args[12];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 12);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 12, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_12_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11)
+{
+    VALUE ret, cb, args[12];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 32);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 12, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_12_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11)
+{
+    VALUE ret, cb, args[12];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 52);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 12, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_12_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11)
+{
+    VALUE ret, cb, args[12];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 72);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 12, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_12_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11)
+{
+    VALUE ret, cb, args[12];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 92);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 12, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_13_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12)
+{
+    VALUE ret, cb, args[13];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 13);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 13, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_13_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12)
+{
+    VALUE ret, cb, args[13];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 33);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 13, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_13_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12)
+{
+    VALUE ret, cb, args[13];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 53);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 13, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_13_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12)
+{
+    VALUE ret, cb, args[13];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 73);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 13, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_13_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12)
+{
+    VALUE ret, cb, args[13];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 93);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 13, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_14_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13)
+{
+    VALUE ret, cb, args[14];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 14);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 14, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_14_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13)
+{
+    VALUE ret, cb, args[14];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 34);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 14, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_14_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13)
+{
+    VALUE ret, cb, args[14];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 54);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 14, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_14_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13)
+{
+    VALUE ret, cb, args[14];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 74);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 14, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_14_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13)
+{
+    VALUE ret, cb, args[14];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 94);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 14, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_15_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14)
+{
+    VALUE ret, cb, args[15];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 15);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 15, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_15_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14)
+{
+    VALUE ret, cb, args[15];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 35);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 15, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_15_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14)
+{
+    VALUE ret, cb, args[15];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 55);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 15, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_15_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14)
+{
+    VALUE ret, cb, args[15];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 75);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 15, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_15_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14)
+{
+    VALUE ret, cb, args[15];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 95);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 15, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_16_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15)
+{
+    VALUE ret, cb, args[16];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 16);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 16, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_16_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15)
+{
+    VALUE ret, cb, args[16];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 36);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 16, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_16_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15)
+{
+    VALUE ret, cb, args[16];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 56);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 16, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_16_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15)
+{
+    VALUE ret, cb, args[16];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 76);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 16, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_16_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15)
+{
+    VALUE ret, cb, args[16];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 96);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 16, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_17_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16)
+{
+    VALUE ret, cb, args[17];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 17);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 17, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_17_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16)
+{
+    VALUE ret, cb, args[17];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 37);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 17, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_17_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16)
+{
+    VALUE ret, cb, args[17];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 57);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 17, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_17_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16)
+{
+    VALUE ret, cb, args[17];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 77);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 17, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_17_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16)
+{
+    VALUE ret, cb, args[17];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 97);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 17, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_18_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17)
+{
+    VALUE ret, cb, args[18];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 18);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 18, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_18_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17)
+{
+    VALUE ret, cb, args[18];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 38);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 18, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_18_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17)
+{
+    VALUE ret, cb, args[18];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 58);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 18, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_18_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17)
+{
+    VALUE ret, cb, args[18];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 78);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 18, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_18_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17)
+{
+    VALUE ret, cb, args[18];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 98);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 18, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_19_0_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17, DLSTACK_TYPE stack18)
+{
+    VALUE ret, cb, args[19];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    args[18] = LONG2NUM(stack18);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 19);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 19, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_19_1_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17, DLSTACK_TYPE stack18)
+{
+    VALUE ret, cb, args[19];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    args[18] = LONG2NUM(stack18);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 39);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 19, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_19_2_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17, DLSTACK_TYPE stack18)
+{
+    VALUE ret, cb, args[19];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    args[18] = LONG2NUM(stack18);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 59);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 19, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_19_3_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17, DLSTACK_TYPE stack18)
+{
+    VALUE ret, cb, args[19];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    args[18] = LONG2NUM(stack18);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 79);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 19, args);
+    return NUM2CHR(ret);
+}
+
+
+static char
+FUNC_CDECL(rb_dl_callback_char_19_4_cdecl)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17, DLSTACK_TYPE stack18)
+{
+    VALUE ret, cb, args[19];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    args[18] = LONG2NUM(stack18);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLCdeclCallbackProcs, 2), 99);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 19, args);
+    return NUM2CHR(ret);
+}
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_0_0_stdcall)()
+{
+    VALUE ret, cb;
+
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 0);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 0, NULL);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_0_1_stdcall)()
+{
+    VALUE ret, cb;
+
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 20);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 0, NULL);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_0_2_stdcall)()
+{
+    VALUE ret, cb;
+
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 40);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 0, NULL);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_0_3_stdcall)()
+{
+    VALUE ret, cb;
+
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 60);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 0, NULL);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_0_4_stdcall)()
+{
+    VALUE ret, cb;
+
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 80);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 0, NULL);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_1_0_stdcall)(DLSTACK_TYPE stack0)
+{
+    VALUE ret, cb, args[1];
+    args[0] = LONG2NUM(stack0);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 1);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 1, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_1_1_stdcall)(DLSTACK_TYPE stack0)
+{
+    VALUE ret, cb, args[1];
+    args[0] = LONG2NUM(stack0);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 21);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 1, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_1_2_stdcall)(DLSTACK_TYPE stack0)
+{
+    VALUE ret, cb, args[1];
+    args[0] = LONG2NUM(stack0);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 41);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 1, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_1_3_stdcall)(DLSTACK_TYPE stack0)
+{
+    VALUE ret, cb, args[1];
+    args[0] = LONG2NUM(stack0);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 61);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 1, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_1_4_stdcall)(DLSTACK_TYPE stack0)
+{
+    VALUE ret, cb, args[1];
+    args[0] = LONG2NUM(stack0);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 81);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 1, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_2_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1)
+{
+    VALUE ret, cb, args[2];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 2);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 2, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_2_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1)
+{
+    VALUE ret, cb, args[2];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 22);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 2, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_2_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1)
+{
+    VALUE ret, cb, args[2];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 42);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 2, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_2_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1)
+{
+    VALUE ret, cb, args[2];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 62);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 2, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_2_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1)
+{
+    VALUE ret, cb, args[2];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 82);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 2, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_3_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2)
+{
+    VALUE ret, cb, args[3];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 3);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 3, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_3_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2)
+{
+    VALUE ret, cb, args[3];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 23);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 3, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_3_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2)
+{
+    VALUE ret, cb, args[3];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 43);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 3, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_3_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2)
+{
+    VALUE ret, cb, args[3];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 63);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 3, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_3_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2)
+{
+    VALUE ret, cb, args[3];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 83);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 3, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_4_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3)
+{
+    VALUE ret, cb, args[4];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 4);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 4, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_4_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3)
+{
+    VALUE ret, cb, args[4];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 24);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 4, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_4_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3)
+{
+    VALUE ret, cb, args[4];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 44);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 4, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_4_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3)
+{
+    VALUE ret, cb, args[4];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 64);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 4, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_4_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3)
+{
+    VALUE ret, cb, args[4];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 84);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 4, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_5_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4)
+{
+    VALUE ret, cb, args[5];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 5);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 5, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_5_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4)
+{
+    VALUE ret, cb, args[5];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 25);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 5, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_5_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4)
+{
+    VALUE ret, cb, args[5];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 45);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 5, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_5_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4)
+{
+    VALUE ret, cb, args[5];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 65);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 5, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_5_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4)
+{
+    VALUE ret, cb, args[5];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 85);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 5, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_6_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5)
+{
+    VALUE ret, cb, args[6];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 6);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 6, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_6_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5)
+{
+    VALUE ret, cb, args[6];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 26);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 6, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_6_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5)
+{
+    VALUE ret, cb, args[6];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 46);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 6, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_6_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5)
+{
+    VALUE ret, cb, args[6];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 66);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 6, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_6_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5)
+{
+    VALUE ret, cb, args[6];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 86);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 6, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_7_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6)
+{
+    VALUE ret, cb, args[7];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 7);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 7, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_7_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6)
+{
+    VALUE ret, cb, args[7];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 27);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 7, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_7_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6)
+{
+    VALUE ret, cb, args[7];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 47);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 7, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_7_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6)
+{
+    VALUE ret, cb, args[7];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 67);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 7, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_7_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6)
+{
+    VALUE ret, cb, args[7];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 87);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 7, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_8_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7)
+{
+    VALUE ret, cb, args[8];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 8);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 8, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_8_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7)
+{
+    VALUE ret, cb, args[8];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 28);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 8, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_8_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7)
+{
+    VALUE ret, cb, args[8];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 48);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 8, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_8_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7)
+{
+    VALUE ret, cb, args[8];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 68);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 8, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_8_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7)
+{
+    VALUE ret, cb, args[8];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 88);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 8, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_9_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8)
+{
+    VALUE ret, cb, args[9];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 9);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 9, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_9_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8)
+{
+    VALUE ret, cb, args[9];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 29);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 9, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_9_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8)
+{
+    VALUE ret, cb, args[9];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 49);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 9, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_9_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8)
+{
+    VALUE ret, cb, args[9];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 69);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 9, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_9_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8)
+{
+    VALUE ret, cb, args[9];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 89);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 9, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_10_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9)
+{
+    VALUE ret, cb, args[10];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 10);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 10, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_10_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9)
+{
+    VALUE ret, cb, args[10];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 30);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 10, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_10_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9)
+{
+    VALUE ret, cb, args[10];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 50);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 10, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_10_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9)
+{
+    VALUE ret, cb, args[10];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 70);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 10, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_10_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9)
+{
+    VALUE ret, cb, args[10];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 90);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 10, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_11_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10)
+{
+    VALUE ret, cb, args[11];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 11);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 11, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_11_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10)
+{
+    VALUE ret, cb, args[11];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 31);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 11, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_11_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10)
+{
+    VALUE ret, cb, args[11];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 51);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 11, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_11_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10)
+{
+    VALUE ret, cb, args[11];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 71);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 11, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_11_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10)
+{
+    VALUE ret, cb, args[11];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 91);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 11, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_12_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11)
+{
+    VALUE ret, cb, args[12];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 12);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 12, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_12_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11)
+{
+    VALUE ret, cb, args[12];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 32);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 12, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_12_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11)
+{
+    VALUE ret, cb, args[12];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 52);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 12, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_12_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11)
+{
+    VALUE ret, cb, args[12];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 72);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 12, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_12_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11)
+{
+    VALUE ret, cb, args[12];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 92);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 12, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_13_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12)
+{
+    VALUE ret, cb, args[13];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 13);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 13, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_13_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12)
+{
+    VALUE ret, cb, args[13];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 33);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 13, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_13_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12)
+{
+    VALUE ret, cb, args[13];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 53);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 13, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_13_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12)
+{
+    VALUE ret, cb, args[13];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 73);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 13, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_13_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12)
+{
+    VALUE ret, cb, args[13];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 93);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 13, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_14_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13)
+{
+    VALUE ret, cb, args[14];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 14);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 14, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_14_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13)
+{
+    VALUE ret, cb, args[14];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 34);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 14, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_14_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13)
+{
+    VALUE ret, cb, args[14];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 54);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 14, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_14_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13)
+{
+    VALUE ret, cb, args[14];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 74);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 14, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_14_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13)
+{
+    VALUE ret, cb, args[14];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 94);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 14, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_15_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14)
+{
+    VALUE ret, cb, args[15];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 15);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 15, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_15_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14)
+{
+    VALUE ret, cb, args[15];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 35);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 15, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_15_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14)
+{
+    VALUE ret, cb, args[15];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 55);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 15, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_15_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14)
+{
+    VALUE ret, cb, args[15];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 75);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 15, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_15_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14)
+{
+    VALUE ret, cb, args[15];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 95);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 15, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_16_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15)
+{
+    VALUE ret, cb, args[16];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 16);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 16, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_16_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15)
+{
+    VALUE ret, cb, args[16];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 36);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 16, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_16_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15)
+{
+    VALUE ret, cb, args[16];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 56);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 16, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_16_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15)
+{
+    VALUE ret, cb, args[16];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 76);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 16, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_16_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15)
+{
+    VALUE ret, cb, args[16];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 96);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 16, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_17_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16)
+{
+    VALUE ret, cb, args[17];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 17);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 17, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_17_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16)
+{
+    VALUE ret, cb, args[17];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 37);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 17, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_17_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16)
+{
+    VALUE ret, cb, args[17];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 57);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 17, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_17_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16)
+{
+    VALUE ret, cb, args[17];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 77);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 17, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_17_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16)
+{
+    VALUE ret, cb, args[17];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 97);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 17, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_18_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17)
+{
+    VALUE ret, cb, args[18];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 18);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 18, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_18_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17)
+{
+    VALUE ret, cb, args[18];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 38);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 18, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_18_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17)
+{
+    VALUE ret, cb, args[18];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 58);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 18, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_18_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17)
+{
+    VALUE ret, cb, args[18];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 78);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 18, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_18_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17)
+{
+    VALUE ret, cb, args[18];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 98);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 18, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_19_0_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17, DLSTACK_TYPE stack18)
+{
+    VALUE ret, cb, args[19];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    args[18] = LONG2NUM(stack18);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 19);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 19, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_19_1_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17, DLSTACK_TYPE stack18)
+{
+    VALUE ret, cb, args[19];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    args[18] = LONG2NUM(stack18);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 39);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 19, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_19_2_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17, DLSTACK_TYPE stack18)
+{
+    VALUE ret, cb, args[19];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    args[18] = LONG2NUM(stack18);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 59);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 19, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_19_3_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17, DLSTACK_TYPE stack18)
+{
+    VALUE ret, cb, args[19];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    args[18] = LONG2NUM(stack18);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 79);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 19, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+
+#ifdef FUNC_STDCALL
+static char
+FUNC_STDCALL(rb_dl_callback_char_19_4_stdcall)(DLSTACK_TYPE stack0, DLSTACK_TYPE stack1, DLSTACK_TYPE stack2, DLSTACK_TYPE stack3, DLSTACK_TYPE stack4, DLSTACK_TYPE stack5, DLSTACK_TYPE stack6, DLSTACK_TYPE stack7, DLSTACK_TYPE stack8, DLSTACK_TYPE stack9, DLSTACK_TYPE stack10, DLSTACK_TYPE stack11, DLSTACK_TYPE stack12, DLSTACK_TYPE stack13, DLSTACK_TYPE stack14, DLSTACK_TYPE stack15, DLSTACK_TYPE stack16, DLSTACK_TYPE stack17, DLSTACK_TYPE stack18)
+{
+    VALUE ret, cb, args[19];
+    args[0] = LONG2NUM(stack0);
+    args[1] = LONG2NUM(stack1);
+    args[2] = LONG2NUM(stack2);
+    args[3] = LONG2NUM(stack3);
+    args[4] = LONG2NUM(stack4);
+    args[5] = LONG2NUM(stack5);
+    args[6] = LONG2NUM(stack6);
+    args[7] = LONG2NUM(stack7);
+    args[8] = LONG2NUM(stack8);
+    args[9] = LONG2NUM(stack9);
+    args[10] = LONG2NUM(stack10);
+    args[11] = LONG2NUM(stack11);
+    args[12] = LONG2NUM(stack12);
+    args[13] = LONG2NUM(stack13);
+    args[14] = LONG2NUM(stack14);
+    args[15] = LONG2NUM(stack15);
+    args[16] = LONG2NUM(stack16);
+    args[17] = LONG2NUM(stack17);
+    args[18] = LONG2NUM(stack18);
+    cb = rb_ary_entry(rb_ary_entry(rb_DLStdcallCallbackProcs, 2), 99);
+    ret = rb_funcall2(cb, rb_dl_cb_call, 19, args);
+    return NUM2CHR(ret);
+}
+#endif
+
+void
+rb_dl_init_callbacks_2()
+{
+    rb_ary_push(rb_DLCdeclCallbackProcs, rb_ary_new3(100,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil));
+    rb_ary_push(rb_DLCdeclCallbackAddrs, rb_ary_new3(100,PTR2NUM(rb_dl_callback_char_0_0_cdecl),PTR2NUM(rb_dl_callback_char_1_0_cdecl),PTR2NUM(rb_dl_callback_char_2_0_cdecl),PTR2NUM(rb_dl_callback_char_3_0_cdecl),PTR2NUM(rb_dl_callback_char_4_0_cdecl),PTR2NUM(rb_dl_callback_char_5_0_cdecl),PTR2NUM(rb_dl_callback_char_6_0_cdecl),PTR2NUM(rb_dl_callback_char_7_0_cdecl),PTR2NUM(rb_dl_callback_char_8_0_cdecl),PTR2NUM(rb_dl_callback_char_9_0_cdecl),PTR2NUM(rb_dl_callback_char_10_0_cdecl),PTR2NUM(rb_dl_callback_char_11_0_cdecl),PTR2NUM(rb_dl_callback_char_12_0_cdecl),PTR2NUM(rb_dl_callback_char_13_0_cdecl),PTR2NUM(rb_dl_callback_char_14_0_cdecl),PTR2NUM(rb_dl_callback_char_15_0_cdecl),PTR2NUM(rb_dl_callback_char_16_0_cdecl),PTR2NUM(rb_dl_callback_char_17_0_cdecl),PTR2NUM(rb_dl_callback_char_18_0_cdecl),PTR2NUM(rb_dl_callback_char_19_0_cdecl),PTR2NUM(rb_dl_callback_char_0_1_cdecl),PTR2NUM(rb_dl_callback_char_1_1_cdecl),PTR2NUM(rb_dl_callback_char_2_1_cdecl),PTR2NUM(rb_dl_callback_char_3_1_cdecl),PTR2NUM(rb_dl_callback_char_4_1_cdecl),PTR2NUM(rb_dl_callback_char_5_1_cdecl),PTR2NUM(rb_dl_callback_char_6_1_cdecl),PTR2NUM(rb_dl_callback_char_7_1_cdecl),PTR2NUM(rb_dl_callback_char_8_1_cdecl),PTR2NUM(rb_dl_callback_char_9_1_cdecl),PTR2NUM(rb_dl_callback_char_10_1_cdecl),PTR2NUM(rb_dl_callback_char_11_1_cdecl),PTR2NUM(rb_dl_callback_char_12_1_cdecl),PTR2NUM(rb_dl_callback_char_13_1_cdecl),PTR2NUM(rb_dl_callback_char_14_1_cdecl),PTR2NUM(rb_dl_callback_char_15_1_cdecl),PTR2NUM(rb_dl_callback_char_16_1_cdecl),PTR2NUM(rb_dl_callback_char_17_1_cdecl),PTR2NUM(rb_dl_callback_char_18_1_cdecl),PTR2NUM(rb_dl_callback_char_19_1_cdecl),PTR2NUM(rb_dl_callback_char_0_2_cdecl),PTR2NUM(rb_dl_callback_char_1_2_cdecl),PTR2NUM(rb_dl_callback_char_2_2_cdecl),PTR2NUM(rb_dl_callback_char_3_2_cdecl),PTR2NUM(rb_dl_callback_char_4_2_cdecl),PTR2NUM(rb_dl_callback_char_5_2_cdecl),PTR2NUM(rb_dl_callback_char_6_2_cdecl),PTR2NUM(rb_dl_callback_char_7_2_cdecl),PTR2NUM(rb_dl_callback_char_8_2_cdecl),PTR2NUM(rb_dl_callback_char_9_2_cdecl),PTR2NUM(rb_dl_callback_char_10_2_cdecl),PTR2NUM(rb_dl_callback_char_11_2_cdecl),PTR2NUM(rb_dl_callback_char_12_2_cdecl),PTR2NUM(rb_dl_callback_char_13_2_cdecl),PTR2NUM(rb_dl_callback_char_14_2_cdecl),PTR2NUM(rb_dl_callback_char_15_2_cdecl),PTR2NUM(rb_dl_callback_char_16_2_cdecl),PTR2NUM(rb_dl_callback_char_17_2_cdecl),PTR2NUM(rb_dl_callback_char_18_2_cdecl),PTR2NUM(rb_dl_callback_char_19_2_cdecl),PTR2NUM(rb_dl_callback_char_0_3_cdecl),PTR2NUM(rb_dl_callback_char_1_3_cdecl),PTR2NUM(rb_dl_callback_char_2_3_cdecl),PTR2NUM(rb_dl_callback_char_3_3_cdecl),PTR2NUM(rb_dl_callback_char_4_3_cdecl),PTR2NUM(rb_dl_callback_char_5_3_cdecl),PTR2NUM(rb_dl_callback_char_6_3_cdecl),PTR2NUM(rb_dl_callback_char_7_3_cdecl),PTR2NUM(rb_dl_callback_char_8_3_cdecl),PTR2NUM(rb_dl_callback_char_9_3_cdecl),PTR2NUM(rb_dl_callback_char_10_3_cdecl),PTR2NUM(rb_dl_callback_char_11_3_cdecl),PTR2NUM(rb_dl_callback_char_12_3_cdecl),PTR2NUM(rb_dl_callback_char_13_3_cdecl),PTR2NUM(rb_dl_callback_char_14_3_cdecl),PTR2NUM(rb_dl_callback_char_15_3_cdecl),PTR2NUM(rb_dl_callback_char_16_3_cdecl),PTR2NUM(rb_dl_callback_char_17_3_cdecl),PTR2NUM(rb_dl_callback_char_18_3_cdecl),PTR2NUM(rb_dl_callback_char_19_3_cdecl),PTR2NUM(rb_dl_callback_char_0_4_cdecl),PTR2NUM(rb_dl_callback_char_1_4_cdecl),PTR2NUM(rb_dl_callback_char_2_4_cdecl),PTR2NUM(rb_dl_callback_char_3_4_cdecl),PTR2NUM(rb_dl_callback_char_4_4_cdecl),PTR2NUM(rb_dl_callback_char_5_4_cdecl),PTR2NUM(rb_dl_callback_char_6_4_cdecl),PTR2NUM(rb_dl_callback_char_7_4_cdecl),PTR2NUM(rb_dl_callback_char_8_4_cdecl),PTR2NUM(rb_dl_callback_char_9_4_cdecl),PTR2NUM(rb_dl_callback_char_10_4_cdecl),PTR2NUM(rb_dl_callback_char_11_4_cdecl),PTR2NUM(rb_dl_callback_char_12_4_cdecl),PTR2NUM(rb_dl_callback_char_13_4_cdecl),PTR2NUM(rb_dl_callback_char_14_4_cdecl),PTR2NUM(rb_dl_callback_char_15_4_cdecl),PTR2NUM(rb_dl_callback_char_16_4_cdecl),PTR2NUM(rb_dl_callback_char_17_4_cdecl),PTR2NUM(rb_dl_callback_char_18_4_cdecl),PTR2NUM(rb_dl_callback_char_19_4_cdecl)));
+#ifdef FUNC_STDCALL
+    rb_ary_push(rb_DLStdcallCallbackProcs, rb_ary_new3(100,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil,Qnil));
+    rb_ary_push(rb_DLStdcallCallbackAddrs, rb_ary_new3(100,PTR2NUM(rb_dl_callback_char_0_0_stdcall),PTR2NUM(rb_dl_callback_char_1_0_stdcall),PTR2NUM(rb_dl_callback_char_2_0_stdcall),PTR2NUM(rb_dl_callback_char_3_0_stdcall),PTR2NUM(rb_dl_callback_char_4_0_stdcall),PTR2NUM(rb_dl_callback_char_5_0_stdcall),PTR2NUM(rb_dl_callback_char_6_0_stdcall),PTR2NUM(rb_dl_callback_char_7_0_stdcall),PTR2NUM(rb_dl_callback_char_8_0_stdcall),PTR2NUM(rb_dl_callback_char_9_0_stdcall),PTR2NUM(rb_dl_callback_char_10_0_stdcall),PTR2NUM(rb_dl_callback_char_11_0_stdcall),PTR2NUM(rb_dl_callback_char_12_0_stdcall),PTR2NUM(rb_dl_callback_char_13_0_stdcall),PTR2NUM(rb_dl_callback_char_14_0_stdcall),PTR2NUM(rb_dl_callback_char_15_0_stdcall),PTR2NUM(rb_dl_callback_char_16_0_stdcall),PTR2NUM(rb_dl_callback_char_17_0_stdcall),PTR2NUM(rb_dl_callback_char_18_0_stdcall),PTR2NUM(rb_dl_callback_char_19_0_stdcall),PTR2NUM(rb_dl_callback_char_0_1_stdcall),PTR2NUM(rb_dl_callback_char_1_1_stdcall),PTR2NUM(rb_dl_callback_char_2_1_stdcall),PTR2NUM(rb_dl_callback_char_3_1_stdcall),PTR2NUM(rb_dl_callback_char_4_1_stdcall),PTR2NUM(rb_dl_callback_char_5_1_stdcall),PTR2NUM(rb_dl_callback_char_6_1_stdcall),PTR2NUM(rb_dl_callback_char_7_1_stdcall),PTR2NUM(rb_dl_callback_char_8_1_stdcall),PTR2NUM(rb_dl_callback_char_9_1_stdcall),PTR2NUM(rb_dl_callback_char_10_1_stdcall),PTR2NUM(rb_dl_callback_char_11_1_stdcall),PTR2NUM(rb_dl_callback_char_12_1_stdcall),PTR2NUM(rb_dl_callback_char_13_1_stdcall),PTR2NUM(rb_dl_callback_char_14_1_stdcall),PTR2NUM(rb_dl_callback_char_15_1_stdcall),PTR2NUM(rb_dl_callback_char_16_1_stdcall),PTR2NUM(rb_dl_callback_char_17_1_stdcall),PTR2NUM(rb_dl_callback_char_18_1_stdcall),PTR2NUM(rb_dl_callback_char_19_1_stdcall),PTR2NUM(rb_dl_callback_char_0_2_stdcall),PTR2NUM(rb_dl_callback_char_1_2_stdcall),PTR2NUM(rb_dl_callback_char_2_2_stdcall),PTR2NUM(rb_dl_callback_char_3_2_stdcall),PTR2NUM(rb_dl_callback_char_4_2_stdcall),PTR2NUM(rb_dl_callback_char_5_2_stdcall),PTR2NUM(rb_dl_callback_char_6_2_stdcall),PTR2NUM(rb_dl_callback_char_7_2_stdcall),PTR2NUM(rb_dl_callback_char_8_2_stdcall),PTR2NUM(rb_dl_callback_char_9_2_stdcall),PTR2NUM(rb_dl_callback_char_10_2_stdcall),PTR2NUM(rb_dl_callback_char_11_2_stdcall),PTR2NUM(rb_dl_callback_char_12_2_stdcall),PTR2NUM(rb_dl_callback_char_13_2_stdcall),PTR2NUM(rb_dl_callback_char_14_2_stdcall),PTR2NUM(rb_dl_callback_char_15_2_stdcall),PTR2NUM(rb_dl_callback_char_16_2_stdcall),PTR2NUM(rb_dl_callback_char_17_2_stdcall),PTR2NUM(rb_dl_callback_char_18_2_stdcall),PTR2NUM(rb_dl_callback_char_19_2_stdcall),PTR2NUM(rb_dl_callback_char_0_3_stdcall),PTR2NUM(rb_dl_callback_char_1_3_stdcall),PTR2NUM(rb_dl_callback_char_2_3_stdcall),PTR2NUM(rb_dl_callback_char_3_3_stdcall),PTR2NUM(rb_dl_callback_char_4_3_stdcall),PTR2NUM(rb_dl_callback_char_5_3_stdcall),PTR2NUM(rb_dl_callback_char_6_3_stdcall),PTR2NUM(rb_dl_callback_char_7_3_stdcall),PTR2NUM(rb_dl_callback_char_8_3_stdcall),PTR2NUM(rb_dl_callback_char_9_3_stdcall),PTR2NUM(rb_dl_callback_char_10_3_stdcall),PTR2NUM(rb_dl_callback_char_11_3_stdcall),PTR2NUM(rb_dl_callback_char_12_3_stdcall),PTR2NUM(rb_dl_callback_char_13_3_stdcall),PTR2NUM(rb_dl_callback_char_14_3_stdcall),PTR2NUM(rb_dl_callback_char_15_3_stdcall),PTR2NUM(rb_dl_callback_char_16_3_stdcall),PTR2NUM(rb_dl_callback_char_17_3_stdcall),PTR2NUM(rb_dl_callback_char_18_3_stdcall),PTR2NUM(rb_dl_callback_char_19_3_stdcall),PTR2NUM(rb_dl_callback_char_0_4_stdcall),PTR2NUM(rb_dl_callback_char_1_4_stdcall),PTR2NUM(rb_dl_callback_char_2_4_stdcall),PTR2NUM(rb_dl_callback_char_3_4_stdcall),PTR2NUM(rb_dl_callback_char_4_4_stdcall),PTR2NUM(rb_dl_callback_char_5_4_stdcall),PTR2NUM(rb_dl_callback_char_6_4_stdcall),PTR2NUM(rb_dl_callback_char_7_4_stdcall),PTR2NUM(rb_dl_callback_char_8_4_stdcall),PTR2NUM(rb_dl_callback_char_9_4_stdcall),PTR2NUM(rb_dl_callback_char_10_4_stdcall),PTR2NUM(rb_dl_callback_char_11_4_stdcall),PTR2NUM(rb_dl_callback_char_12_4_stdcall),PTR2NUM(rb_dl_callback_char_13_4_stdcall),PTR2NUM(rb_dl_callback_char_14_4_stdcall),PTR2NUM(rb_dl_callback_char_15_4_stdcall),PTR2NUM(rb_dl_callback_char_16_4_stdcall),PTR2NUM(rb_dl_callback_char_17_4_stdcall),PTR2NUM(rb_dl_callback_char_18_4_stdcall),PTR2NUM(rb_dl_callback_char_19_4_stdcall)));
+#endif
+}

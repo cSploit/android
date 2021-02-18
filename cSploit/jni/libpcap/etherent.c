@@ -19,57 +19,63 @@
  * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/libpcap/etherent.c,v 1.22 2003/11/15 23:23:57 guy Exp $ (LBL)";
 #endif
 
-#include <pcap-types.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
+#include <sys/types.h>
+
+#include <ctype.h>
 #include <memory.h>
 #include <stdio.h>
 #include <string.h>
 
 #include "pcap-int.h"
 
-#include <pcap/namedb.h>
+#include <pcap-namedb.h>
 
 #ifdef HAVE_OS_PROTO_H
 #include "os-proto.h"
 #endif
 
+static inline int xdtoi(int);
 static inline int skip_space(FILE *);
 static inline int skip_line(FILE *);
 
 /* Hex digit to integer. */
-static inline u_char
-xdtoi(u_char c)
+static inline int
+xdtoi(c)
+	register int c;
 {
-	if (c >= '0' && c <= '9')
-		return (u_char)(c - '0');
-	else if (c >= 'a' && c <= 'f')
-		return (u_char)(c - 'a' + 10);
+	if (isdigit(c))
+		return c - '0';
+	else if (islower(c))
+		return c - 'a' + 10;
 	else
-		return (u_char)(c - 'A' + 10);
+		return c - 'A' + 10;
 }
 
-/*
- * Skip linear white space (space and tab) and any CRs before LF.
- * Stop when we hit a non-white-space character or an end-of-line LF.
- */
 static inline int
-skip_space(FILE *f)
+skip_space(f)
+	FILE *f;
 {
 	int c;
 
 	do {
 		c = getc(f);
-	} while (c == ' ' || c == '\t' || c == '\r');
+	} while (isspace(c) && c != '\n');
 
 	return c;
 }
 
 static inline int
-skip_line(FILE *f)
+skip_line(f)
+	FILE *f;
 {
 	int c;
 
@@ -83,61 +89,47 @@ skip_line(FILE *f)
 struct pcap_etherent *
 pcap_next_etherent(FILE *fp)
 {
-	register int c, i;
-	u_char d;
+	register int c, d, i;
 	char *bp;
-	size_t namesize;
 	static struct pcap_etherent e;
 
 	memset((char *)&e, 0, sizeof(e));
-	for (;;) {
+	do {
 		/* Find addr */
 		c = skip_space(fp);
-		if (c == EOF)
-			return (NULL);
 		if (c == '\n')
 			continue;
 
 		/* If this is a comment, or first thing on line
-		   cannot be Ethernet address, skip the line. */
-		if (!PCAP_ISXDIGIT(c)) {
+		   cannot be etehrnet address, skip the line. */
+		if (!isxdigit(c)) {
 			c = skip_line(fp);
-			if (c == EOF)
-				return (NULL);
 			continue;
 		}
 
 		/* must be the start of an address */
 		for (i = 0; i < 6; i += 1) {
-			d = xdtoi((u_char)c);
+			d = xdtoi(c);
 			c = getc(fp);
-			if (c == EOF)
-				return (NULL);
-			if (PCAP_ISXDIGIT(c)) {
+			if (isxdigit(c)) {
 				d <<= 4;
-				d |= xdtoi((u_char)c);
+				d |= xdtoi(c);
 				c = getc(fp);
-				if (c == EOF)
-					return (NULL);
 			}
 			e.addr[i] = d;
 			if (c != ':')
 				break;
 			c = getc(fp);
-			if (c == EOF)
-				return (NULL);
 		}
+		if (c == EOF)
+			break;
 
 		/* Must be whitespace */
-		if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
+		if (!isspace(c)) {
 			c = skip_line(fp);
-			if (c == EOF)
-				return (NULL);
 			continue;
 		}
 		c = skip_space(fp);
-		if (c == EOF)
-			return (NULL);
 
 		/* hit end of line... */
 		if (c == '\n')
@@ -145,22 +137,17 @@ pcap_next_etherent(FILE *fp)
 
 		if (c == '#') {
 			c = skip_line(fp);
-			if (c == EOF)
-				return (NULL);
 			continue;
 		}
 
 		/* pick up name */
 		bp = e.name;
-		/* Use 'namesize' to prevent buffer overflow. */
-		namesize = sizeof(e.name) - 1;
+		/* Use 'd' to prevent buffer overflow. */
+		d = sizeof(e.name) - 1;
 		do {
-			*bp++ = (u_char)c;
+			*bp++ = c;
 			c = getc(fp);
-			if (c == EOF)
-				return (NULL);
-		} while (c != ' ' && c != '\t' && c != '\r' && c != '\n'
-		    && --namesize != 0);
+		} while (!isspace(c) && c != EOF && --d > 0);
 		*bp = '\0';
 
 		/* Eat trailing junk */
@@ -168,5 +155,8 @@ pcap_next_etherent(FILE *fp)
 			(void)skip_line(fp);
 
 		return &e;
-	}
+
+	} while (c != EOF);
+
+	return (NULL);
 }

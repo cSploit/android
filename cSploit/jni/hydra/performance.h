@@ -1,14 +1,14 @@
-#include <errno.h>
-#include <fcntl.h>
+#include <unistd.h>
 #include <netdb.h>
+#include <errno.h>
 #include <sys/select.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <unistd.h>
+#include <fcntl.h>
 
 /* handles select errors */
-int32_t my_select(int32_t fd, fd_set *fdread, fd_set *fdwrite, fd_set *fdex, long sec, long usec) {
-  int32_t ret_val;
+int my_select(int fd, fd_set * fdread, fd_set * fdwrite, fd_set * fdex, long sec, long usec) {
+  int ret_val;
   struct timeval stv;
   fd_set *fdr2, *fdw2, *fde2;
 
@@ -18,25 +18,21 @@ int32_t my_select(int32_t fd, fd_set *fdread, fd_set *fdwrite, fd_set *fdex, lon
     fde2 = fdex;
     stv.tv_sec = sec;
     stv.tv_usec = usec;
-    if (debug > 1)
-      printf("before select\n");
     ret_val = select(fd, fdr2, fdw2, fde2, &stv);
-    if (debug > 1)
-      printf("after select\n");
-    /* XXX select() sometimes returns errno=EINTR (signal found) */
+  /* XXX select() sometimes returns errno=EINTR (signal found) */
   } while (ret_val == -1 && errno == EINTR);
 
   return ret_val;
 }
 
 /*reads in a non-blocking way*/
-ssize_t read_safe(int32_t fd, void *buffer, size_t len) {
-  int32_t r = 0;
-  int32_t total = 0;
-  uint32_t toread = len;
+ssize_t read_safe(int fd, void *buffer, size_t len) {
+  int r = 0;
+  int total = 0;
+  int toread = len;
   fd_set fr;
   struct timeval tv;
-  int32_t ret = 0;
+  int ret = 0;
 
   (void)fcntl(fd, F_SETFL, O_NONBLOCK);
   do {
@@ -45,7 +41,7 @@ ssize_t read_safe(int32_t fd, void *buffer, size_t len) {
     tv.tv_sec = 0;
     tv.tv_usec = 250000;
     ret = select(fd + 1, &fr, 0, 0, &tv);
-    /* XXX select() sometimes return errno=EINTR (signal found) */
+  /* XXX select() sometimes return errno=EINTR (signal found) */
   } while (ret == -1 && errno == EINTR);
 
   if (ret < 0) {
@@ -57,7 +53,7 @@ ssize_t read_safe(int32_t fd, void *buffer, size_t len) {
   }
 
   if (ret > 0) {
-    while ((r = read(fd, (char *)((char *)buffer + total), toread))) {
+    while ((r = read(fd, (char*) ((char*)buffer + total), toread))) {
       if (r == -1) {
         if (errno == EAGAIN)
           break;

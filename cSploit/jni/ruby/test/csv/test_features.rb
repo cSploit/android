@@ -7,12 +7,14 @@
 #  Copyright 2005 James Edward Gray II. You can redistribute or modify this code
 #  under the terms of Ruby's license.
 
-require "test/unit"
 require "zlib"
 
-require "csv"
+require_relative "base"
+require "tempfile"
 
-class TestCSVFeatures < Test::Unit::TestCase
+class TestCSV::Features < TestCSV
+  extend DifferentOFS
+
   TEST_CASES = [ [%Q{a,b},               ["a", "b"]],
                  [%Q{a,"""b"""},         ["a", "\"b\""]],
                  [%Q{a,"""b"},           ["a", "\"b"]],
@@ -32,6 +34,7 @@ class TestCSVFeatures < Test::Unit::TestCase
                  [%Q{"\r\n,",},          ["\r\n,", nil]] ]
 
   def setup
+    super
     @sample_data = <<-END_DATA.gsub(/^ +/, "")
     line,1,abc
     line,2,"def\nghi"
@@ -206,7 +209,9 @@ class TestCSVFeatures < Test::Unit::TestCase
   end
 
   def test_gzip_writer_bug_fix
-    file   = File.join(File.dirname(__FILE__), "temp.gz")
+    tempfile = Tempfile.new(%w"temp .gz")
+    tempfile.close
+    file = tempfile.path
     zipped = nil
     assert_nothing_raised(NoMethodError) do
       zipped = CSV.new(Zlib::GzipWriter.open(file))
@@ -218,7 +223,7 @@ class TestCSVFeatures < Test::Unit::TestCase
     assert( Zlib::GzipReader.open(file) { |f| f.read }.
                              include?($INPUT_RECORD_SEPARATOR),
             "@row_sep did not default" )
-    File.unlink(file)
+    tempfile.close(true)
   end
 
   def test_inspect_is_smart_about_io_types
@@ -228,11 +233,13 @@ class TestCSVFeatures < Test::Unit::TestCase
     str = CSV.new($stderr).inspect
     assert(str.include?("io_type:$stderr"), "IO type not detected.")
 
-    path = File.join(File.dirname(__FILE__), "temp.csv")
+    tempfile = Tempfile.new(%w"temp .csv")
+    tempfile.close
+    path = tempfile.path
     File.open(path, "w") { |csv| csv << "one,two,three\n1,2,3\n" }
     str  = CSV.open(path) { |csv| csv.inspect }
     assert(str.include?("io_type:File"), "IO type not detected.")
-    File.unlink(path)
+    tempfile.close(true)
   end
 
   def test_inspect_shows_key_attributes

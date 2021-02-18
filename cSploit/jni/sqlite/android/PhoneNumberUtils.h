@@ -21,9 +21,7 @@
 namespace android {
 
 bool phone_number_compare_loose(const char* a, const char* b);
-bool phone_number_compare_loose_with_minmatch(const char* a, const char* b, int min_match);
 bool phone_number_compare_strict(const char* a, const char* b);
-bool phone_number_stripped_reversed_inter(const char* in, char* out, const int len, int *outlen);
 
 }  // namespace android
 

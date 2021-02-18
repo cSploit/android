@@ -1,1 +1,2 @@
+CC=gcc
 STRIP=strip

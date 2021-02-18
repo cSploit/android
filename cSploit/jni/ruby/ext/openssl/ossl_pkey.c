@@ -85,6 +85,53 @@ ossl_pkey_new_from_file(VALUE filename)
     return ossl_pkey_new(pkey);
 }
 
+/*
+ *  call-seq:
+ *     OpenSSL::PKey.read(string [, pwd ] ) -> PKey
+ *     OpenSSL::PKey.read(file [, pwd ]) -> PKey
+ *
+ * === Parameters
+ * * +string+ is a DER- or PEM-encoded string containing an arbitrary private
+ * or public key.
+ * * +file+ is an instance of +File+ containing a DER- or PEM-encoded
+ * arbitrary private or public key.
+ * * +pwd+ is an optional password in case +string+ or +file+ is an encrypted
+ * PEM resource.
+ */
+static VALUE
+ossl_pkey_new_from_data(int argc, VALUE *argv, VALUE self)
+{
+     EVP_PKEY *pkey;
+     BIO *bio;
+     VALUE data, pass;
+     char *passwd = NULL;
+
+     rb_scan_args(argc, argv, "11", &data, &pass);
+
+     bio = ossl_obj2bio(data);
+     if (!(pkey = d2i_PrivateKey_bio(bio, NULL))) {
+	OSSL_BIO_reset(bio);
+	if (!NIL_P(pass)) {
+	    passwd = StringValuePtr(pass);
+	}
+	if (!(pkey = PEM_read_bio_PrivateKey(bio, NULL, ossl_pem_passwd_cb, passwd))) {
+	    OSSL_BIO_reset(bio);
+	    if (!(pkey = d2i_PUBKEY_bio(bio, NULL))) {
+		OSSL_BIO_reset(bio);
+		if (!NIL_P(pass)) {
+		    passwd = StringValuePtr(pass);
+		}
+		pkey = PEM_read_bio_PUBKEY(bio, NULL, ossl_pem_passwd_cb, passwd);
+	    }
+	}
+    }
+
+    BIO_free(bio);
+    if (!pkey)
+	ossl_raise(rb_eArgError, "Could not parse PKey");
+    return ossl_pkey_new(pkey);
+}
+
 EVP_PKEY *
 GetPKeyPtr(VALUE obj)
 {
@@ -150,6 +197,13 @@ ossl_pkey_alloc(VALUE klass)
     return obj;
 }
 
+/*
+ *  call-seq:
+ *      PKeyClass.new -> self
+ *
+ * Because PKey is an abstract class, actually calling this method explicitly
+ * will raise a +NotImplementedError+.
+ */
 static VALUE
 ossl_pkey_initialize(VALUE self)
 {
@@ -159,6 +213,23 @@ ossl_pkey_initialize(VALUE self)
     return self;
 }
 
+/*
+ *  call-seq:
+ *      pkey.sign(digest, data) -> String
+ *
+ * To sign the +String+ +data+, +digest+, an instance of OpenSSL::Digest, must
+ * be provided. The return value is again a +String+ containing the signature.
+ * A PKeyError is raised should errors occur.
+ * Any previous state of the +Digest+ instance is irrelevant to the signature
+ * outcome, the digest instance is reset to its initial state during the
+ * operation.
+ *
+ * == Example
+ *   data = 'Sign me!'
+ *   digest = OpenSSL::Digest::SHA256.new
+ *   pkey = OpenSSL::PKey::RSA.new(2048)
+ *   signature = pkey.sign(digest, data)
+ */
 static VALUE
 ossl_pkey_sign(VALUE self, VALUE digest, VALUE data)
 {
@@ -183,6 +254,27 @@ ossl_pkey_sign(VALUE self, VALUE digest, VALUE data)
     return str;
 }
 
+/*
+ *  call-seq:
+ *      pkey.verify(digest, signature, data) -> String
+ *
+ * To verify the +String+ +signature+, +digest+, an instance of
+ * OpenSSL::Digest, must be provided to re-compute the message digest of the
+ * original +data+, also a +String+. The return value is +true+ if the
+ * signature is valid, +false+ otherwise. A PKeyError is raised should errors
+ * occur.
+ * Any previous state of the +Digest+ instance is irrelevant to the validation
+ * outcome, the digest instance is reset to its initial state during the
+ * operation.
+ *
+ * == Example
+ *   data = 'Sign me!'
+ *   digest = OpenSSL::Digest::SHA256.new
+ *   pkey = OpenSSL::PKey::RSA.new(2048)
+ *   signature = pkey.sign(digest, data)
+ *   pub_key = pkey.public_key
+ *   puts pub_key.verify(digest, signature, data) # => true
+ */
 static VALUE
 ossl_pkey_verify(VALUE self, VALUE digest, VALUE sig, VALUE data)
 {
@@ -194,7 +286,7 @@ ossl_pkey_verify(VALUE self, VALUE digest, VALUE sig, VALUE data)
     StringValue(sig);
     StringValue(data);
     EVP_VerifyUpdate(&ctx, RSTRING_PTR(data), RSTRING_LEN(data));
-    switch (EVP_VerifyFinal(&ctx, (unsigned char *)RSTRING_PTR(sig), RSTRING_LEN(sig), pkey)) {
+    switch (EVP_VerifyFinal(&ctx, (unsigned char *)RSTRING_PTR(sig), RSTRING_LENINT(sig), pkey)) {
     case 0:
 	return Qfalse;
     case 1:
@@ -211,15 +303,81 @@ ossl_pkey_verify(VALUE self, VALUE digest, VALUE sig, VALUE data)
 void
 Init_ossl_pkey()
 {
-#if 0 /* let rdoc know about mOSSL */
-    mOSSL = rb_define_module("OpenSSL");
+#if 0
+    mOSSL = rb_define_module("OpenSSL"); /* let rdoc know about mOSSL */
 #endif
 
+    /* Document-module: OpenSSL::PKey
+     *
+     * == Asymmetric Public Key Algorithms
+     *
+     * Asymmetric public key algorithms solve the problem of establishing and
+     * sharing secret keys to en-/decrypt messages. The key in such an
+     * algorithm consists of two parts: a public key that may be distributed
+     * to others and a private key that needs to remain secret.
+     *
+     * Messages encrypted with a public key can only be encrypted by
+     * recipients that are in possession of the associated private key.
+     * Since public key algorithms are considerably slower than symmetric
+     * key algorithms (cf. OpenSSL::Cipher) they are often used to establish
+     * a symmetric key shared between two parties that are in possession of
+     * each other's public key.
+     *
+     * Asymmetric algorithms offer a lot of nice features that are used in a
+     * lot of different areas. A very common application is the creation and
+     * validation of digital signatures. To sign a document, the signatory
+     * generally uses a message digest algorithm (cf. OpenSSL::Digest) to
+     * compute a digest of the document that is then encrypted (i.e. signed)
+     * using the private key. Anyone in possession of the public key may then
+     * verify the signature by computing the message digest of the original
+     * document on their own, decrypting the signature using the signatory's
+     * public key and comparing the result to the message digest they
+     * previously computed. The signature is valid if and only if the
+     * decrypted signature is equal to this message digest.
+     *
+     * The PKey module offers support for three popular public/private key
+     * algorithms:
+     * * RSA (OpenSSL::PKey::RSA)
+     * * DSA (OpenSSL::PKey::DSA)
+     * * Elliptic Curve Cryptography (OpenSSL::PKey::EC)
+     * Each of these implementations is in fact a sub-class of the abstract
+     * PKey class which offers the interface for supporting digital signatures
+     * in the form of PKey#sign and PKey#verify.
+     *
+     * == Diffie-Hellman Key Exchange
+     *
+     * Finally PKey also features OpenSSL::PKey::DH, an implementation of
+     * the Diffie-Hellman key exchange protocol based on discrete logarithms
+     * in finite fields, the same basis that DSA is built on.
+     * The Diffie-Hellman protocol can be used to exchange (symmetric) keys
+     * over insecure channels without needing any prior joint knowledge
+     * between the participating parties. As the security of DH demands
+     * relatively long "public keys" (i.e. the part that is overtly
+     * transmitted between participants) DH tends to be quite slow. If
+     * security or speed is your primary concern, OpenSSL::PKey::EC offers
+     * another implementation of the Diffie-Hellman protocol.
+     *
+     */
     mPKey = rb_define_module_under(mOSSL, "PKey");
 
+    /* Document-class: OpenSSL::PKey::PKeyError
+     *
+     *Raised when errors occur during PKey#sign or PKey#verify.
+     */
     ePKeyError = rb_define_class_under(mPKey, "PKeyError", eOSSLError);
 
+    /* Document-class: OpenSSL::PKey::PKey
+     *
+     * An abstract class that bundles signature creation (PKey#sign) and
+     * validation (PKey#verify) that is common to all implementations except
+     * OpenSSL::PKey::DH
+     * * OpenSSL::PKey::RSA
+     * * OpenSSL::PKey::DSA
+     * * OpenSSL::PKey::EC
+     */
     cPKey = rb_define_class_under(mPKey, "PKey", rb_cObject);
+
+    rb_define_module_function(mPKey, "read", ossl_pkey_new_from_data, -1);
 
     rb_define_alloc_func(cPKey, ossl_pkey_alloc);
     rb_define_method(cPKey, "initialize", ossl_pkey_initialize, 0);

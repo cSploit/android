@@ -22,8 +22,8 @@
 
 #include <pthread.h>
 
-#include <csploit/list.h>
-#include <csploit/control.h>
+#include "list.h"
+#include "control.h"
 
 typedef struct dead_node {
   node *next;

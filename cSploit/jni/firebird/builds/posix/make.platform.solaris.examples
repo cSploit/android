@@ -1,0 +1,42 @@
+# The contents of this file are subject to the Interbase Public
+# License Version 1.0 (the "License"); you may not use this file
+# except in compliance with the License. You may obtain a copy
+# of the License at http://www.Inprise.com/IPL.html
+#
+# Software distributed under the License is distributed on an
+# "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, either express
+# or implied. See the License for the specific language governing
+# rights and limitations under the License.
+#
+# The Original Code was created by Inprise Corporation
+# and its predecessors. Portions created by Inprise Corporation are
+# Copyright (C) Inprise Corporation.
+#
+# All Rights Reserved.
+# Contributor(s): __Konstantin Kuznetsov___________________________________.
+# This file can be used to build FB on Solaris 2.6 x 86 with gcc 3.3.3 and bash
+#
+# Use SOLX86 to identify x86 version of Solaris.  Neil McCalden
+# 2 Oct 2002, Nickolay Samofatov - Major Cleanup
+
+WARNINGS=-Wall -W -Wno-unused -Wno-parentheses -Wno-switch -Wwrite-strings -Wno-non-virtual-dtor
+COMM_SOLX_FLAGS:=-DSOLARIS -DBSD_COMP -fno-omit-frame-pointer -fmessage-length=0 -MMD -fPIC
+
+SFIO=@SFIO_DIR@
+SFIO_LDFLAGS=@SFIO_LDFLAGS@
+
+PROD_FLAGS=-w $(COMM_SOLX_FLAGS) -O2 -march=pentium 
+DEV_FLAGS=$(COMM_SOLX_FLAGS) -ggdb -g3 -p $(WARNINGS)
+
+ifdef SFIO
+LINK_LIBS+=$(SFIO_LDFLAGS) -lstdio -lsfio
+STATICLINK_LIBS+=$(SFIO_LDFLAGS) -lstdio -lsfio
+SO_LINK_LIBS+=$(SFIO_LDFLAGS) -lstdio -lsfio
+endif
+
+LIB_LINK_OPTIONS= -G 
+LIB_PLATFORM_RPATH= -R $(1)
+LIB_LINK_SONAME= -h $(1)
+LIB_LINK_MAPFILE= -Xlinker -M$(1)
+
+UNDEF_PLATFORM = -Wl,-z,defs

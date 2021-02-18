@@ -22,9 +22,9 @@
 #include <stdint.h>
 #include <pthread.h>
 
-#include <csploit/list.h>
-#include <csploit/control.h>
-#include <csploit/message.h>
+#include "list.h"
+#include "control.h"
+#include "message.h"
 
 struct conn_node;
 struct child_node;

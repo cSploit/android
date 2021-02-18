@@ -1,0 +1,100 @@
+--- openssl-1.0.1e.orig/ssl/s3_clnt.c
++++ openssl-1.0.1e/ssl/s3_clnt.c
+@@ -606,7 +606,7 @@ int ssl3_connect(SSL *s)
+ 
+ 		case SSL3_ST_CR_FINISHED_A:
+ 		case SSL3_ST_CR_FINISHED_B:
+-
++			s->s3->flags |= SSL3_FLAGS_CCS_OK;
+ 			ret=ssl3_get_finished(s,SSL3_ST_CR_FINISHED_A,
+ 				SSL3_ST_CR_FINISHED_B);
+ 			if (ret <= 0) goto end;
+@@ -915,6 +916,7 @@
+ 		SSLerr(SSL_F_SSL3_GET_SERVER_HELLO,SSL_R_ATTEMPT_TO_REUSE_SESSION_IN_DIFFERENT_CONTEXT);
+ 		goto f_err;
+ 		}
++	    s->s3->flags |= SSL3_FLAGS_CCS_OK;
+ 	    s->hit=1;
+ 	    }
+ 	else	/* a miss or crap from the other end */
+--- openssl-1.0.1e.orig/ssl/s3_pkt.c
++++ openssl-1.0.1e/ssl/s3_pkt.c
+@@ -1297,6 +1297,13 @@ start:
+ 			goto f_err;
+ 			}
+ 
++		if (!(s->s3->flags & SSL3_FLAGS_CCS_OK))
++			{
++			al=SSL_AD_UNEXPECTED_MESSAGE;
++			SSLerr(SSL_F_SSL3_READ_BYTES,SSL_R_UNEXPECTED_CCS);
++			goto f_err;
++			}
++
+ 		rr->length=0;
+ 
+ 		if (s->msg_callback)
+@@ -1431,7 +1438,12 @@ int ssl3_do_change_cipher_spec(SSL *s)
+ 
+ 	if (s->s3->tmp.key_block == NULL)
+ 		{
+-		if (s->session == NULL) 
++		if (s->session->master_key_length == 0)
++			{
++			SSLerr(SSL_F_SSL3_DO_CHANGE_CIPHER_SPEC,SSL_R_UNEXPECTED_CCS);
++			return (0);
++			}
++		if (s->session == NULL)
+ 			{
+ 			/* might happen if dtls1_read_bytes() calls this */
+ 			SSLerr(SSL_F_SSL3_DO_CHANGE_CIPHER_SPEC,SSL_R_CCS_RECEIVED_EARLY);
+--- openssl-1.0.1e.orig/ssl/s3_srvr.c
++++ openssl-1.0.1e/ssl/s3_srvr.c
+@@ -670,6 +670,7 @@ int ssl3_accept(SSL *s)
+ 		case SSL3_ST_SR_CERT_VRFY_B:
+ 
+ 			/* we should decide if we expected this one */
++			s->s3->flags |= SSL3_FLAGS_CCS_OK;
+ 			ret=ssl3_get_cert_verify(s);
+ 			if (ret <= 0) goto end;
+ 
+@@ -687,6 +688,7 @@ int ssl3_accept(SSL *s)
+ 			channel_id = s->s3->tlsext_channel_id_valid;
+ #endif
+ 
++			s->s3->flags |= SSL3_FLAGS_CCS_OK;
+ 			if (next_proto_neg)
+ 				s->state=SSL3_ST_SR_NEXT_PROTO_A;
+ 			else if (channel_id)
+--- openssl-1.0.1e.orig/ssl/ssl.h
++++ openssl-1.0.1e/ssl/ssl.h
+@@ -2640,6 +2640,7 @@ void ERR_load_SSL_strings(void);
+ #define SSL_R_WRONG_VERSION_NUMBER			 267
+ #define SSL_R_X509_LIB					 268
+ #define SSL_R_X509_VERIFICATION_SETUP_PROBLEMS		 269
++#define SSL_R_UNEXPECTED_CCS				 388
+ 
+ #ifdef  __cplusplus
+ }
+--- openssl-1.0.1e.orig/ssl/ssl3.h
++++ openssl-1.0.1e/ssl/ssl3.h
+@@ -388,6 +388,10 @@ typedef struct ssl3_buffer_st
+ #define TLS1_FLAGS_TLS_PADDING_BUG		0x0008
+ #define TLS1_FLAGS_SKIP_CERT_VERIFY		0x0010
+ #define TLS1_FLAGS_KEEP_HANDSHAKE		0x0020
++/* SSL3_FLAGS_CCS_OK indicates that a ChangeCipherSpec record is acceptable at
++ * this point in the handshake. If this flag is not set then received CCS
++ * records will cause a fatal error for the connection. */
++#define SSL3_FLAGS_CCS_OK			0x0080
+  
+ /* SSL3_FLAGS_SGC_RESTART_DONE is set when we
+  * restart a handshake because of MS SGC and so prevents us
+--- openssl-1.0.1e.orig/ssl/ssl_err.c
++++ openssl-1.0.1e/ssl/ssl_err.c
+@@ -604,6 +604,7 @@ static ERR_STRING_DATA SSL_str_reasons[]
+ {ERR_REASON(SSL_R_WRONG_VERSION_NUMBER)  ,"wrong version number"},
+ {ERR_REASON(SSL_R_X509_LIB)              ,"x509 lib"},
+ {ERR_REASON(SSL_R_X509_VERIFICATION_SETUP_PROBLEMS),"x509 verification setup problems"},
++{ERR_REASON(SSL_R_UNEXPECTED_CCS),"unexpected CCS"},
+ {0,NULL}
+ 	};
+ 

@@ -13,6 +13,7 @@
 #include "ruby/re.h"
 #include "ruby/encoding.h"
 #include "ruby/util.h"
+#include "internal.h"
 #include "regint.h"
 #include <ctype.h>
 
@@ -21,8 +22,8 @@ VALUE rb_eRegexpError;
 typedef char onig_errmsg_buffer[ONIG_MAX_ERROR_MESSAGE_LEN];
 #define errcpy(err, msg) strlcpy((err), (msg), ONIG_MAX_ERROR_MESSAGE_LEN)
 
-#define BEG(no) regs->beg[no]
-#define END(no) regs->end[no]
+#define BEG(no) (regs->beg[(no)])
+#define END(no) (regs->end[(no)])
 
 #if 'a' == 97   /* it's ascii */
 static const char casetable[] = {
@@ -314,18 +315,19 @@ rb_reg_check(VALUE re)
     }
 }
 
-int rb_str_buf_cat_escaped_char(VALUE result, unsigned int c, int unicode_p);
-
 static void
 rb_reg_expr_str(VALUE str, const char *s, long len,
 	rb_encoding *enc, rb_encoding *resenc)
 {
     const char *p, *pend;
+    int cr = ENC_CODERANGE_UNKNOWN;
     int need_escape = 0;
     int c, clen;
 
     p = s; pend = p + len;
-    if (rb_enc_asciicompat(enc)) {
+    rb_str_coderange_scan_restartable(p, pend, enc, &cr);
+    if (rb_enc_asciicompat(enc) &&
+	(cr == ENC_CODERANGE_VALID || cr == ENC_CODERANGE_7BIT)) {
 	while (p < pend) {
 	    c = rb_enc_ascget(p, pend, &clen, enc);
 	    if (c == -1) {
@@ -587,7 +589,7 @@ rb_reg_to_s(VALUE re)
 static void
 rb_reg_raise(const char *s, long len, const char *err, VALUE re)
 {
-    VALUE desc = rb_reg_desc(s, len, re);
+    volatile VALUE desc = rb_reg_desc(s, len, re);
 
     rb_raise(rb_eRegexpError, "%s: %s", err, RSTRING_PTR(desc));
 }
@@ -859,7 +861,7 @@ update_char_offset(VALUE match)
     struct re_registers *regs;
     int i, num_regs, num_pos;
     long c;
-    char *s, *p, *q, *e;
+    char *s, *p, *q;
     rb_encoding *enc;
     pair_t *pairs;
 
@@ -895,7 +897,6 @@ update_char_offset(VALUE match)
     qsort(pairs, num_pos, sizeof(pair_t), pair_byte_cmp);
 
     s = p = RSTRING_PTR(RMATCH(match)->str);
-    e = s + RSTRING_LEN(RMATCH(match)->str);
     c = 0;
     for (i = 0; i < num_pos; i++) {
         q = s + pairs[i].byte_pos;
@@ -1395,7 +1396,7 @@ rb_reg_search(VALUE re, VALUE str, long pos, int reverse)
 	else {
 	    onig_errmsg_buffer err = "";
 	    onig_error_code_to_str((UChar*)err, (int)result);
-	    rb_reg_raise(RREGEXP_SRC_PTR(re), RREGEXP_SRC_LEN(re), err, 0);
+	    rb_reg_raise(RREGEXP_SRC_PTR(re), RREGEXP_SRC_LEN(re), err, re);
 	}
     }
 
@@ -1899,9 +1900,7 @@ read_escaped_byte(const char **pp, const char *end, onig_errmsg_buffer err)
     int code;
     int meta_prefix = 0, ctrl_prefix = 0;
     size_t len;
-    int retbyte;
 
-    retbyte = -1;
     if (p == end || *p++ != '\\') {
         errcpy(err, "too short escaped multibyte character");
         return -1;
@@ -2446,6 +2445,7 @@ rb_reg_initialize_str(VALUE obj, VALUE str, int options, onig_errmsg_buffer err,
     }
     ret = rb_reg_initialize(obj, RSTRING_PTR(str), RSTRING_LEN(str), enc,
 			    options, err, sourcefile, sourceline);
+    OBJ_INFECT(obj, str);
     RB_GC_GUARD(str);
     return ret;
 }
@@ -2712,7 +2712,7 @@ reg_match_pos(VALUE re, VALUE *strp, long pos)
  *  The parser detects 'regexp-literal =~ expression' for the assignment.
  *  The regexp must be a literal without interpolation and placed at left hand side.
  *
- *  The assignment is not occur if the regexp is not a literal.
+ *  The assignment does not occur if the regexp is not a literal.
  *
  *     re = /(?<lhs>\w+)\s*=\s*(?<rhs>\w+)/
  *     re =~ "  x = y  "
@@ -2726,7 +2726,7 @@ reg_match_pos(VALUE re, VALUE *strp, long pos)
  *     /(?<lhs>\w+)\s*=\s*#{rhs_pat}/ =~ "x = y"
  *     p lhs    # undefined local variable
  *
- *  The assignment is not occur if the regexp is placed at right hand side.
+ *  The assignment does not occur if the regexp is placed at the right hand side.
  *
  *    "  x = y  " =~ /(?<lhs>\w+)\s*=\s*(?<rhs>\w+)/
  *    p lhs, rhs # undefined local variable
@@ -3284,7 +3284,7 @@ rb_reg_regsub(VALUE str, VALUE src, struct re_registers *regs, VALUE regexp)
     rb_encoding *str_enc = rb_enc_get(str);
     rb_encoding *src_enc = rb_enc_get(src);
     int acompat = rb_enc_asciicompat(str_enc);
-#define ASCGET(s,e,cl) (acompat ? (*cl=1,ISASCII(s[0])?s[0]:-1) : rb_enc_ascget(s, e, cl, str_enc))
+#define ASCGET(s,e,cl) (acompat ? (*(cl)=1,ISASCII((s)[0])?(s)[0]:-1) : rb_enc_ascget((s), (e), (cl), str_enc))
 
     p = s = RSTRING_PTR(str);
     e = s + RSTRING_LEN(str);
@@ -3557,10 +3557,16 @@ Init_Regexp(void)
     rb_define_method(rb_cRegexp, "names", rb_reg_names, 0);
     rb_define_method(rb_cRegexp, "named_captures", rb_reg_named_captures, 0);
 
+    /* see Regexp.options and Regexp.new */
     rb_define_const(rb_cRegexp, "IGNORECASE", INT2FIX(ONIG_OPTION_IGNORECASE));
+    /* see Regexp.options and Regexp.new */
     rb_define_const(rb_cRegexp, "EXTENDED", INT2FIX(ONIG_OPTION_EXTEND));
+    /* see Regexp.options and Regexp.new */
     rb_define_const(rb_cRegexp, "MULTILINE", INT2FIX(ONIG_OPTION_MULTILINE));
+    /* see Regexp.options and Regexp.new */
     rb_define_const(rb_cRegexp, "FIXEDENCODING", INT2FIX(ARG_ENCODING_FIXED));
+    /* see Regexp.options and Regexp.new */
+    rb_define_const(rb_cRegexp, "NOENCODING", INT2FIX(ARG_ENCODING_NONE));
 
     rb_global_variable(&reg_cache);
 

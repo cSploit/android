@@ -23,8 +23,7 @@
 #include <signal.h>
 #include <stdlib.h>
 
-#include <csploit/logger.h>
-
+#include "logger.h"
 #include "cSploitd.h"
 
 /**

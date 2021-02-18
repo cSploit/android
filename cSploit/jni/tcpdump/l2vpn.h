@@ -1,4 +1,5 @@
-/*
+/* @(#) $Header: /tcpdump/master/tcpdump/l2vpn.h,v 1.1 2004/06/15 09:42:41 hannes Exp $ (LBL) */
+/* 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that: (1) source code
  * distributions retain the above copyright notice and this paragraph
@@ -10,8 +11,7 @@
  * LIMITATION, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  * FOR A PARTICULAR PURPOSE.
  *
- * Original code by Hannes Gredler (hannes@gredler.at)
+ * Original code by Hannes Gredler (hannes@juniper.net)
  */
 
-extern const struct tok l2vpn_encaps_values[];
-extern const struct tok mpls_pw_types_values[];
+extern struct tok l2vpn_encaps_values[];

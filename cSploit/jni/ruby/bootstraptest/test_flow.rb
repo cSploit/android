@@ -29,7 +29,7 @@ assert_equal %q{ok}, %q{
       end
     end
   end
-  
+
   ('a').lines.map{|e|
     break :ok
   }
@@ -517,9 +517,62 @@ assert_equal %Q{ENSURE\n}, %q{
     end
   end
   e = Bug2728.new
+}],
+ ['[ruby-core:28132]', %q{
+  class Bug2729
+    include Enumerable
+    def each
+      begin
+        yield :foo
+      ensure
+        proc {}.call
+      end
+    end
+  end
+  e = Bug2729.new
+}],
+ ['[ruby-core:39125]', %q{
+  class Bug5234
+    include Enumerable
+    def each
+      begin
+        yield :foo
+      ensure
+        proc
+      end
+    end
+  end
+  e = Bug5234.new
+}],
+ ['[ruby-dev:45656]', %q{
+  class Bug6460
+    include Enumerable
+    def each
+      begin
+        yield :foo
+      ensure
+        1.times { Proc.new }
+      end
+    end
+  end
+  e = Bug6460.new
 }]].each do |bug, src|
   assert_equal "foo", src + %q{e.detect {true}}, bug
   assert_equal "true", src + %q{e.any? {true}}, bug
   assert_equal "false", src + %q{e.all? {false}}, bug
   assert_equal "true", src + %q{e.include?(:foo)}, bug
 end
+
+assert_equal('ok', %q{
+  class FOO < RuntimeError; end
+  class BAR < RuntimeError; end
+  def m
+    raise FOO
+  end
+  set_trace_func(proc{|t,| raise BAR if t == 'return'})
+  begin
+    m
+  rescue BAR
+    'ok'
+  end
+}, '[ruby-core:51128] [ruby-trunk - Bug #7624]')

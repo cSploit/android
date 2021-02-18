@@ -6,9 +6,13 @@
  *
  * Rayan Zachariassen, CA*Net
  */
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/libpcap/pcap-enet.c,v 1.8 2003/11/15 23:24:02 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <sys/types.h>
@@ -18,7 +22,7 @@
 #include <sys/socket.h>
 
 #include <net/if.h>
-#include <pcap/bpf.h>
+#include <pcap-bpf.h>
 #include <net/enet.h>
 
 #include <netinet/in.h>
@@ -75,7 +79,7 @@ readloop(int cnt, int if_fd, struct bpf_program *fp, printfunc printit)
 			ph = (struct packet_header *)bp;
 			caplen = ph->tap.th_wirelen > snaplen ? snaplen : ph->tap
 .th_wirelen ;
-			if (pcap_filter(fcode, (char *)ph->packet,
+			if (bpf_filter(fcode, (char *)ph->packet,
 						ph->tap.th_wirelen, caplen)) {
 				if (cnt >= 0 && --cnt < 0)
 					goto out;
@@ -89,7 +93,7 @@ readloop(int cnt, int if_fd, struct bpf_program *fp, printfunc printit)
 		}
 #else	/* !IBMRTPC */
 		caplen = cc > snaplen ? snaplen : cc ;
-		if (pcap_filter(fcode, buf.hdr.packet, cc, caplen)) {
+		if (bpf_filter(fcode, buf.hdr.packet, cc, caplen)) {
 			if (cnt >= 0 && --cnt < 0)
 				goto out;
 			(*printit)(buf.hdr.packet, &tv, cc, caplen);

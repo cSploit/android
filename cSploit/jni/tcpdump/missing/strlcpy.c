@@ -28,15 +28,18 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef HAVE_CONFIG_H
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/missing/strlcpy.c,v 1.5 2003/11/16 09:36:52 guy Exp $ (LBL)";
+#endif
+
+#ifdef HAVE_CONFIG_H 
 #include <config.h>
 #endif
 
-#include <netdissect-stdinc.h>
+#include <tcpdump-stdinc.h>
 
 #include <string.h>
-
-#include "netdissect.h"
 
 /*
  * Copy src to string dst of size siz.  At most siz-1 characters

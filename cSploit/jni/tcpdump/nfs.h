@@ -1,4 +1,5 @@
-/*	NetBSD: nfs.h,v 1.1 1996/05/23 22:49:53 fvdl Exp 	*/
+/* @(#) $Header: /tcpdump/master/tcpdump/nfs.h,v 1.7 2002/12/11 07:13:55 guy Exp $ (LBL) */
+/*	$NetBSD: nfs.h,v 1.1 1996/05/23 22:49:53 fvdl Exp $	*/
 
 /*
  * Copyright (c) 1989, 1993
@@ -214,7 +215,6 @@
 #define NFSV3ACCESS_EXTEND		0x08
 #define NFSV3ACCESS_DELETE		0x10
 #define NFSV3ACCESS_EXECUTE		0x20
-#define NFSV3ACCESS_FULL		0x3f
 
 #define NFSV3WRITE_UNSTABLE		0
 #define NFSV3WRITE_DATASYNC		1
@@ -238,11 +238,11 @@
 		txdr_unsigned(((t) == VFIFO) ? MAKEIMODE(VCHR, (m)) : \
 				MAKEIMODE((t), (m)))
 #define vtonfsv3_mode(m)	txdr_unsigned((m) & 07777)
-#define	nfstov_mode(a)		(fxdr_unsigned(uint16_t, (a))&07777)
+#define	nfstov_mode(a)		(fxdr_unsigned(u_int16_t, (a))&07777)
 #define	vtonfsv2_type(a)	txdr_unsigned(nfsv2_type[((int32_t)(a))])
 #define	vtonfsv3_type(a)	txdr_unsigned(nfsv3_type[((int32_t)(a))])
-#define	nfsv2tov_type(a)	nv2tov_type[fxdr_unsigned(uint32_t,(a))&0x7]
-#define	nfsv3tov_type(a)	nv3tov_type[fxdr_unsigned(uint32_t,(a))&0x7]
+#define	nfsv2tov_type(a)	nv2tov_type[fxdr_unsigned(u_int32_t,(a))&0x7]
+#define	nfsv3tov_type(a)	nv3tov_type[fxdr_unsigned(u_int32_t,(a))&0x7]
 
 /* File types */
 typedef enum { NFNON=0, NFREG=1, NFDIR=2, NFBLK=3, NFCHR=4, NFLNK=5,
@@ -266,14 +266,14 @@ union nfsfh {
 typedef union nfsfh nfsfh_t;
 
 struct nfsv2_time {
-	uint32_t nfsv2_sec;
-	uint32_t nfsv2_usec;
+	u_int32_t nfsv2_sec;
+	u_int32_t nfsv2_usec;
 };
 typedef struct nfsv2_time	nfstime2;
 
 struct nfsv3_time {
-	uint32_t nfsv3_sec;
-	uint32_t nfsv3_nsec;
+	u_int32_t nfsv3_sec;
+	u_int32_t nfsv3_nsec;
 };
 typedef struct nfsv3_time	nfstime3;
 
@@ -282,16 +282,31 @@ typedef struct nfsv3_time	nfstime3;
  * protocol and to facilitate xdr conversion.
  */
 struct nfs_uquad {
-	uint32_t nfsuquad[2];
+	u_int32_t nfsuquad[2];
 };
 typedef	struct nfs_uquad	nfsuint64;
+
+#if 0 /* XXX - this doesn't seemed to be used and it doesn't work
+       * with non-gcc, so comment it out for now.
+       */
+
+/*
+ * Used to convert between two u_longs and a u_quad_t.
+ */
+union nfs_quadconvert {
+	u_int32_t lval[2];
+	u_int64_t qval;
+};
+typedef union nfs_quadconvert	nfsquad_t;
+
+#endif
 
 /*
  * NFS Version 3 special file number.
  */
 struct nfsv3_spec {
-	uint32_t specdata1;
-	uint32_t specdata2;
+	u_int32_t specdata1;
+	u_int32_t specdata2;
 };
 typedef	struct nfsv3_spec	nfsv3spec;
 
@@ -305,19 +320,19 @@ typedef	struct nfsv3_spec	nfsv3spec;
  *     NFSX_FATTR(v3) macro.
  */
 struct nfs_fattr {
-	uint32_t fa_type;
-	uint32_t fa_mode;
-	uint32_t fa_nlink;
-	uint32_t fa_uid;
-	uint32_t fa_gid;
+	u_int32_t fa_type;
+	u_int32_t fa_mode;
+	u_int32_t fa_nlink;
+	u_int32_t fa_uid;
+	u_int32_t fa_gid;
 	union {
 		struct {
-			uint32_t nfsv2fa_size;
-			uint32_t nfsv2fa_blocksize;
-			uint32_t nfsv2fa_rdev;
-			uint32_t nfsv2fa_blocks;
-			uint32_t nfsv2fa_fsid;
-			uint32_t nfsv2fa_fileid;
+			u_int32_t nfsv2fa_size;
+			u_int32_t nfsv2fa_blocksize;
+			u_int32_t nfsv2fa_rdev;
+			u_int32_t nfsv2fa_blocks;
+			u_int32_t nfsv2fa_fsid;
+			u_int32_t nfsv2fa_fileid;
 			nfstime2  nfsv2fa_atime;
 			nfstime2  nfsv2fa_mtime;
 			nfstime2  nfsv2fa_ctime;
@@ -355,10 +370,10 @@ struct nfs_fattr {
 #define	fa3_ctime		fa_un.fa_nfsv3.nfsv3fa_ctime
 
 struct nfsv2_sattr {
-	uint32_t sa_mode;
-	uint32_t sa_uid;
-	uint32_t sa_gid;
-	uint32_t sa_size;
+	u_int32_t sa_mode;
+	u_int32_t sa_uid;
+	u_int32_t sa_gid;
+	u_int32_t sa_size;
 	nfstime2  sa_atime;
 	nfstime2  sa_mtime;
 };
@@ -367,28 +382,28 @@ struct nfsv2_sattr {
  * NFS Version 3 sattr structure for the new node creation case.
  */
 struct nfsv3_sattr {
-	uint32_t   sa_modeset;
-	uint32_t   sa_mode;
-	uint32_t   sa_uidset;
-	uint32_t   sa_uid;
-	uint32_t   sa_gidset;
-	uint32_t   sa_gid;
-	uint32_t   sa_sizeset;
-	uint32_t   sa_size;
-	uint32_t   sa_atimetype;
+	u_int32_t   sa_modeset;
+	u_int32_t   sa_mode;
+	u_int32_t   sa_uidset;
+	u_int32_t   sa_uid;
+	u_int32_t   sa_gidset;
+	u_int32_t   sa_gid;
+	u_int32_t   sa_sizeset;
+	u_int32_t   sa_size;
+	u_int32_t   sa_atimetype;
 	nfstime3  sa_atime;
-	uint32_t   sa_mtimetype;
+	u_int32_t   sa_mtimetype;
 	nfstime3  sa_mtime;
 };
 
 struct nfs_statfs {
 	union {
 		struct {
-			uint32_t nfsv2sf_tsize;
-			uint32_t nfsv2sf_bsize;
-			uint32_t nfsv2sf_blocks;
-			uint32_t nfsv2sf_bfree;
-			uint32_t nfsv2sf_bavail;
+			u_int32_t nfsv2sf_tsize;
+			u_int32_t nfsv2sf_bsize;
+			u_int32_t nfsv2sf_blocks;
+			u_int32_t nfsv2sf_bfree;
+			u_int32_t nfsv2sf_bavail;
 		} sf_nfsv2;
 		struct {
 			nfsuint64 nfsv3sf_tbytes;
@@ -397,7 +412,7 @@ struct nfs_statfs {
 			nfsuint64 nfsv3sf_tfiles;
 			nfsuint64 nfsv3sf_ffiles;
 			nfsuint64 nfsv3sf_afiles;
-			uint32_t nfsv3sf_invarsec;
+			u_int32_t nfsv3sf_invarsec;
 		} sf_nfsv3;
 	} sf_un;
 };
@@ -416,23 +431,23 @@ struct nfs_statfs {
 #define sf_invarsec	sf_un.sf_nfsv3.nfsv3sf_invarsec
 
 struct nfsv3_fsinfo {
-	uint32_t fs_rtmax;
-	uint32_t fs_rtpref;
-	uint32_t fs_rtmult;
-	uint32_t fs_wtmax;
-	uint32_t fs_wtpref;
-	uint32_t fs_wtmult;
-	uint32_t fs_dtpref;
+	u_int32_t fs_rtmax;
+	u_int32_t fs_rtpref;
+	u_int32_t fs_rtmult;
+	u_int32_t fs_wtmax;
+	u_int32_t fs_wtpref;
+	u_int32_t fs_wtmult;
+	u_int32_t fs_dtpref;
 	nfsuint64 fs_maxfilesize;
 	nfstime3  fs_timedelta;
-	uint32_t fs_properties;
+	u_int32_t fs_properties;
 };
 
 struct nfsv3_pathconf {
-	uint32_t pc_linkmax;
-	uint32_t pc_namemax;
-	uint32_t pc_notrunc;
-	uint32_t pc_chownrestricted;
-	uint32_t pc_caseinsensitive;
-	uint32_t pc_casepreserving;
+	u_int32_t pc_linkmax;
+	u_int32_t pc_namemax;
+	u_int32_t pc_notrunc;
+	u_int32_t pc_chownrestricted;
+	u_int32_t pc_caseinsensitive;
+	u_int32_t pc_casepreserving;
 };

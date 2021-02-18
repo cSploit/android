@@ -23,23 +23,26 @@
  * FOR A PARTICULAR PURPOSE.
  */
 
-/* \summary: Virtual Router Redundancy Protocol (VRRP) printer */
+#ifndef lint
+static const char rcsid[] _U_ =
+    "@(#) $Header: /tcpdump/master/tcpdump/print-vrrp.c,v 1.9.2.1 2005/05/06 07:57:20 guy Exp $";
+#endif
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include <netdissect-stdinc.h>
+#include <tcpdump-stdinc.h>
 
-#include "netdissect.h"
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "interface.h"
 #include "extract.h"
 #include "addrtoname.h"
 
-#include "ip.h"
-#include "ipproto.h"
 /*
- * RFC 2338 (VRRP v2):
- *
+ * RFC 2338:
  *     0                   1                   2                   3
  *     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -58,27 +61,6 @@
  *    |                     Authentication Data (1)                   |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  *    |                     Authentication Data (2)                   |
- *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *
- *
- * RFC 5798 (VRRP v3):
- *
- *    0                   1                   2                   3
- *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
- *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *    |                    IPv4 Fields or IPv6 Fields                 |
- *   ...                                                             ...
- *    |                                                               |
- *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *    |Version| Type  | Virtual Rtr ID|   Priority    |Count IPvX Addr|
- *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *    |(rsvd) |     Max Adver Int     |          Checksum             |
- *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
- *    |                                                               |
- *    +                                                               +
- *    |                       IPvX Address(es)                        |
- *    +                                                               +
- *    |                                                               |
  *    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
  */
 
@@ -103,81 +85,57 @@ static const struct tok auth2str[] = {
 };
 
 void
-vrrp_print(netdissect_options *ndo,
-           register const u_char *bp, register u_int len,
-           register const u_char *bp2, int ttl)
+vrrp_print(register const u_char *bp, register u_int len, int ttl)
 {
-	int version, type, auth_type = VRRP_AUTH_NONE; /* keep compiler happy */
+	int version, type, auth_type;
 	const char *type_s;
 
-	ND_TCHECK(bp[0]);
+	TCHECK(bp[0]);
 	version = (bp[0] & 0xf0) >> 4;
 	type = bp[0] & 0x0f;
 	type_s = tok2str(type2str, "unknown type (%u)", type);
-	ND_PRINT((ndo, "VRRPv%u, %s", version, type_s));
+	printf("VRRPv%u, %s", version, type_s);
 	if (ttl != 255)
-		ND_PRINT((ndo, ", (ttl %u)", ttl));
-	if (version < 2 || version > 3 || type != VRRP_TYPE_ADVERTISEMENT)
+		printf(", (ttl %u)", ttl);
+	if (version != 2 || type != VRRP_TYPE_ADVERTISEMENT)
 		return;
-	ND_TCHECK(bp[2]);
-	ND_PRINT((ndo, ", vrid %u, prio %u", bp[1], bp[2]));
-	ND_TCHECK(bp[5]);
-
-	if (version == 2) {
-		auth_type = bp[4];
-		ND_PRINT((ndo, ", authtype %s", tok2str(auth2str, NULL, auth_type)));
-		ND_PRINT((ndo, ", intvl %us, length %u", bp[5], len));
-	} else { /* version == 3 */
-		uint16_t intvl = (bp[4] & 0x0f) << 8 | bp[5];
-		ND_PRINT((ndo, ", intvl %ucs, length %u", intvl, len));
-	}
-
-	if (ndo->ndo_vflag) {
+	TCHECK(bp[2]);
+	printf(", vrid %u, prio %u", bp[1], bp[2]);
+	TCHECK(bp[5]);
+	auth_type = bp[4];
+	printf(", authtype %s", tok2str(auth2str, NULL, auth_type));
+	printf(", intvl %us, length %u", bp[5],len);
+	if (vflag) {
 		int naddrs = bp[3];
 		int i;
 		char c;
 
-		if (version == 2 && ND_TTEST2(bp[0], len)) {
-			struct cksum_vec vec[1];
-
-			vec[0].ptr = bp;
-			vec[0].len = len;
-			if (in_cksum(vec, 1))
-				ND_PRINT((ndo, ", (bad vrrp cksum %x)",
-					EXTRACT_16BITS(&bp[6])));
-		}
-
-		if (version == 3 && ND_TTEST2(bp[0], len)) {
-			uint16_t cksum = nextproto4_cksum(ndo, (const struct ip *)bp2, bp,
-				len, len, IPPROTO_VRRP);
-			if (cksum)
-				ND_PRINT((ndo, ", (bad vrrp cksum %x)",
-					EXTRACT_16BITS(&bp[6])));
-		}
-
-		ND_PRINT((ndo, ", addrs"));
+		if (TTEST2(bp[0], len) && in_cksum((const u_short*)bp, len, 0))
+			printf(", (bad vrrp cksum %x)",
+				EXTRACT_16BITS(&bp[6]));
+		printf(", addrs");
 		if (naddrs > 1)
-			ND_PRINT((ndo, "(%d)", naddrs));
-		ND_PRINT((ndo, ":"));
+			printf("(%d)", naddrs);
+		printf(":");
 		c = ' ';
 		bp += 8;
 		for (i = 0; i < naddrs; i++) {
-			ND_TCHECK(bp[3]);
-			ND_PRINT((ndo, "%c%s", c, ipaddr_string(ndo, bp)));
+			TCHECK(bp[3]);
+			printf("%c%s", c, ipaddr_string(bp));
 			c = ',';
 			bp += 4;
 		}
-		if (version == 2 && auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
-			ND_TCHECK(bp[7]);
-			ND_PRINT((ndo, " auth \""));
-			if (fn_printn(ndo, bp, 8, ndo->ndo_snapend)) {
-				ND_PRINT((ndo, "\""));
+		if (auth_type == VRRP_AUTH_SIMPLE) { /* simple text password */
+			TCHECK(bp[7]);
+			printf(" auth \"");
+			if (fn_printn(bp, 8, snapend)) {
+				printf("\"");
 				goto trunc;
 			}
-			ND_PRINT((ndo, "\""));
+			printf("\"");
 		}
 	}
 	return;
 trunc:
-	ND_PRINT((ndo, "[|vrrp]"));
+	printf("[|vrrp]");
 }

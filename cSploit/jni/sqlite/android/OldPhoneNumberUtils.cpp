@@ -154,18 +154,45 @@ static bool matchIntlPrefixAndCC(const char* a, int len)
     return state == 6 || state == 7 || state == 8;
 }
 
+/** or -1 if both are negative */
+static int minPositive(int a, int b)
+{
+    if (a >= 0 && b >= 0) {
+        return (a < b) ? a : b;
+    } else if (a >= 0) { /* && b < 0 */
+        return a;
+    } else if (b >= 0) { /* && a < 0 */
+        return b;
+    } else { /* a < 0 && b < 0 */
+        return -1;
+    }
+}
+
+/**
+ * Return the offset into a of the first appearance of b, or -1 if there
+ * is no such character in a.
+ */
+static int indexOf(const char *a, char b) {
+    const char *ix = strchr(a, b);
+
+    if (ix == NULL)
+        return -1;
+    else
+        return ix - a;
+}
+
 /**
  * Compare phone numbers a and b, return true if they're identical
  * enough for caller ID purposes.
  *
  * - Compares from right to left
- * - requires minimum characters to match
+ * - requires MIN_MATCH (7) characters to match
  * - handles common trunk prefixes and international prefixes
  *   (basically, everything except the Russian trunk prefix)
  *
  * Tolerates nulls
  */
-bool phone_number_compare_loose_with_minmatch(const char* a, const char* b, int min_match)
+bool phone_number_compare_loose(const char* a, const char* b)
 {
     int ia, ib;
     int matched;
@@ -216,11 +243,11 @@ bool phone_number_compare_loose_with_minmatch(const char* a, const char* b, int 
         }
     }
 
-    if (matched < min_match) {
+    if (matched < MIN_MATCH) {
         const int effectiveALen = strlen(a) - numSeparatorCharsInA;
         const int effectiveBLen = strlen(b) - numSeparatorCharsInB;
 
-        // if the number of dialable chars in a and b match, but the matched chars < min_match,
+        // if the number of dialable chars in a and b match, but the matched chars < MIN_MATCH,
         // treat them as equal (i.e. 404-04 and 40404)
         if (effectiveALen == effectiveBLen && effectiveALen == matched) {
             return true;
@@ -230,7 +257,7 @@ bool phone_number_compare_loose_with_minmatch(const char* a, const char* b, int 
     }
 
     // At least one string has matched completely;
-    if (matched >= min_match && (ia < 0 || ib < 0)) {
+    if (matched >= MIN_MATCH && (ia < 0 || ib < 0)) {
         return true;
     }
 
@@ -243,15 +270,15 @@ bool phone_number_compare_loose_with_minmatch(const char* a, const char* b, int 
      *     (for this, a '0' and a '00' prefix would have succeeded above)
      */
 
-    if (matchIntlPrefix(a, ia + 1) && matchIntlPrefix(b, ib + 1)) {
+    if (matchIntlPrefix(a, ia + 1) && matchIntlPrefix(b, ib +1)) {
         return true;
     }
 
-    if (matchTrunkPrefix(a, ia + 1) && matchIntlPrefixAndCC(b, ib + 1)) {
+    if (matchTrunkPrefix(a, ia + 1) && matchIntlPrefixAndCC(b, ib +1)) {
         return true;
     }
 
-    if (matchTrunkPrefix(b, ib + 1) && matchIntlPrefixAndCC(a, ia + 1)) {
+    if (matchTrunkPrefix(b, ib + 1) && matchIntlPrefixAndCC(a, ia +1)) {
         return true;
     }
 
@@ -265,18 +292,11 @@ bool phone_number_compare_loose_with_minmatch(const char* a, const char* b, int 
      */
     bool aPlusFirst = (*a == '+');
     bool bPlusFirst = (*b == '+');
-    bool aIgnoreUnmatched = aPlusFirst && (ia - ib) >= 0 && (ia - ib) <= 1;
-    bool bIgnoreUnmatched = bPlusFirst && (ib - ia) >= 0 && (ib - ia) <= 1;
-    if (ia < 4 && ib < 4 && (aIgnoreUnmatched || bIgnoreUnmatched) && !(aPlusFirst && bPlusFirst)) {
+    if (ia < 4 && ib < 4 && (aPlusFirst || bPlusFirst) && !(aPlusFirst && bPlusFirst)) {
         return true;
     }
 
     return false;
-}
-
-bool phone_number_compare_loose(const char* a, const char* b)
-{
-    return phone_number_compare_loose_with_minmatch(a, b, MIN_MATCH);
 }
 
 }  // namespace android
