@@ -189,12 +189,13 @@ jobject inaddr_to_inetaddress(JNIEnv *env, in_addr_t a) {
  * @param m a pointer to the received message
  * @returns the jobject on success, NULL on error.
  */
-jobject create_hop_event(JNIEnv *env, message *m) {
+jobject create_hop_event(JNIEnv *env, void *arg) {
   jobject addr, res;
   jstring jname;
   struct nmap_hop_info *hop_info;
   char *pos;
-  
+  message *m = (message *) arg;
+
   hop_info = (struct nmap_hop_info*) m->data;
   jname = NULL;
   res = NULL;
@@ -450,12 +451,10 @@ jobject create_account_event(JNIEnv *env, void *arg) {
  * @param m the received ::message
  * @returns a new object on success, NULL on error.
  */
-jobject create_message_event(JNIEnv *env, void *arg) {
+jobject create_message_event(JNIEnv *env, message *m) {
   jobject res;
   char *severity, *mesg;
   jstring jseverity, jmessage;
-  message *m = (message *) arg;
-  
   jseverity = jmessage = "";
   res = NULL;
   
@@ -507,9 +506,9 @@ jobject create_message_event(JNIEnv *env, void *arg) {
  * @param arg a pointer to a ::message containing an ::hydra_attempts_info
  * @returns a new object on success, NULL on error.
  */
-jobject create_attempts_event(JNIEnv *env, void *arg) {
+jobject create_attempts_event(JNIEnv *env, void  *arg) {
   jobject res;
-  jlong jsent, jleft;
+  jint jrate, jsent, jelapsed, jleft, jeta;
   struct hydra_attempts_info *attempts_info;
   message *m = (message *) arg;
 
@@ -522,14 +521,17 @@ jobject create_attempts_event(JNIEnv *env, void *arg) {
   if(attempts_info->left > INT64_MAX) {
     LOGW("%s: left logins exceed maximum Java long value", __func__);
   }
-  
+
+  jrate = attempts_info->rate;
   jsent = attempts_info->sent;
+  jelapsed = attempts_info->elapsed;
   jleft = attempts_info->left;
-  
+  jeta = attempts_info->eta;
+
   res = (*env)->NewObject(env,
                         cache.csploit.events.attempts.class,
                         cache.csploit.events.attempts.ctor,
-                        jsent, jleft);
+                        jrate, jsent, jelapsed, jleft, jeta);
   
   if((*env)->ExceptionCheck(env)) {
     (*env)->ExceptionDescribe(env);

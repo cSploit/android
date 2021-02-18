@@ -31,8 +31,11 @@ enum hydra_action {
 /// hydra attempts info
 struct hydra_attempts_info {
   char                hydra_action;   ///< must be set to ::HYDRA_ATTEMPTS
-  unsigned long int   sent;           ///< # of sent logins
-  unsigned long int   left;          ///< ETA in minutes
+  uint32_t  rate;
+  uint32_t  sent;           ///< # of sent logins
+  uint32_t  elapsed;
+  uint32_t  left;           ///< # of logins left to try
+  uint32_t  eta;
 };
 
 /// hydra warning info

@@ -43,9 +43,6 @@ void dummy_rdp() {
 #else
 
 #include "rdp.h"
-
-#define ssl_cert_free hydra_ssl_cert_free
-
 extern char *HYDRA_EXIT;
 
 BOOL g_encryption = True;
@@ -898,7 +895,7 @@ SSL_CERT *ssl_cert_read(uint8 * data, uint32 len) {
   /* this will move the data pointer but we don't care, we don't use it again */
   return d2i_X509(NULL, (D2I_X509_CONST unsigned char **) &data, len);
 }
-
+#define ssl_cert_free hydra_ssl_cert_free
 void ssl_cert_free(SSL_CERT * cert) {
   X509_free(cert);
 }

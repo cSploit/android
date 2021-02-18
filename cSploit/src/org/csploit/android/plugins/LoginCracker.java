@@ -560,7 +560,6 @@ public class LoginCracker extends Plugin {
 
         @Override
         public void onStart(String command) {
-            reset();
             super.onStart(command);
             LoginCracker.this.runOnUiThread(new Runnable() {
                 @Override
@@ -643,6 +642,7 @@ public class LoginCracker extends Plugin {
 
         @Override
         public void onEnd(int code) {
+            reset();
             if (mRunning) {
                 LoginCracker.this.runOnUiThread(new Runnable() {
                     @Override

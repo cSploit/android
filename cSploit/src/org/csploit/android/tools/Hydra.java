@@ -76,7 +76,7 @@ public class Hydra extends Tool
   }
 
   public Child crack(Target target, int port, String service, String charset, int minlength, int maxlength, String username, String userWordlist, String passWordlist, AttemptsReceiver receiver) throws ChildManager.ChildNotStartedException {
-    String command = "-F ";
+    String command = "-f ";
 
     if(userWordlist != null)
       command += "-L " + userWordlist;
@@ -88,7 +88,7 @@ public class Hydra extends Tool
       command += " -P " + passWordlist;
 
     else
-      command += " -x \"" + minlength + ":" + maxlength + ":" + charset + "\" ";
+      command += " -x " + minlength + ":" + maxlength + ":" + charset;
 
     command += " -s " + port + " -V " + service + "://" + target.getCommandLineRepresentation();
 
