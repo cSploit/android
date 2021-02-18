@@ -111,6 +111,12 @@ public class Traceroute extends Plugin {
 		super.onBackPressed();
 	}
 
+
+
+
+
+
+
 	private class Receiver extends NMap.TraceReceiver {
 		@Override
 		public void onStart(String commandLine) {
@@ -168,7 +174,7 @@ public class Traceroute extends Plugin {
 				@Override
 				public void run() {
 				if (usec > 0)
-					mListAdapter.add(address + " ( " + formatTime(usec) + " )" + ":" + name);
+					mListAdapter.add(address + " ( " + formatTime(usec) + " )" + " " + name);
 
 				else
 					mListAdapter.add(address

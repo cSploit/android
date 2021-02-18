@@ -78,7 +78,7 @@ message *parse_hydra_status(char *line) {
   struct hydra_attempts_info *status_info;
   message *m;
   
-  if(regexec(&status_pattern, line, 7, pmatch, 0))
+  if(regexec(&status_pattern, line, 3, pmatch, 0))
     return NULL;
   
   m = create_message(0, sizeof(struct hydra_attempts_info), 0);

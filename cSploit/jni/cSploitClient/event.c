@@ -114,13 +114,13 @@ jobject create_stderrnewline_event(JNIEnv *env, void *arg) {
  * @param arg a pointer to the exit status
  * @returns the jobject on success, NULL on error.
  */
-jobject create_child_end_event(JNIEnv *env, void *arg) {
+jobject create_child_end_event(JNIEnv *env, int signal) {
   jobject event;
   
   event = (*env)->NewObject(env,
                             cache.csploit.events.child_end.class,
                             cache.csploit.events.child_end.ctor,
-                            (jint) *((uint8_t *) arg));
+                            signal);
   
   if(event)
     return event;
@@ -456,7 +456,7 @@ jobject create_message_event(JNIEnv *env, void *arg) {
   jstring jseverity, jmessage;
   message *m = (message *) arg;
   
-  jseverity = jmessage = NULL;
+  jseverity = jmessage = "";
   res = NULL;
   
   switch(m->data[0]) {

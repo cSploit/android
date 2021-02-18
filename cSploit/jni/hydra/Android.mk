@@ -91,14 +91,12 @@ LOCAL_STATIC_LIBRARIES := \
 	libapr-1 \
 	libaprutil-1 \
 	libiconv\
-	libneon
-						
-LOCAL_SHARED_LIBRARIES := \
-	libcrypto\
-	libssl\
+	libneon\
 	libsqlite\
-	libexpat
-					
+	libexpat\
+	libssl_static\
+	libcrypto_static
+
 LOCAL_MODULE:= hydra
 
 include $(BUILD_EXECUTABLE)

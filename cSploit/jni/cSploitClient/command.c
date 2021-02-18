@@ -134,7 +134,7 @@ int on_cmd_end(JNIEnv *env, message *m) {
   
   pthread_cond_broadcast(&(children.control.cond));
   
-  event = create_child_end_event(env, &(end_info->exit_value));
+  event = create_child_end_event(env, end_info->exit_value);
   
   if(!event) {
     LOGE("%s: cannot create event", __func__);

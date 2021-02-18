@@ -39,12 +39,14 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
+import org.csploit.android.events.Login;
 import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.gui.dialogs.FinishDialog;
 import org.csploit.android.gui.dialogs.InputDialog;
@@ -177,7 +179,8 @@ public class LoginCracker extends Plugin {
             mRunning = true;
 
         } catch (ChildManager.ChildNotStartedException e) {
-            setStoppedState();
+            System.errorLogging(e);
+            Toast.makeText(LoginCracker.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
         }
 
 
@@ -557,12 +560,13 @@ public class LoginCracker extends Plugin {
 
         @Override
         public void onStart(String command) {
+            reset();
             super.onStart(command);
-
             LoginCracker.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mRunning = true;
+                    mStarted = java.lang.System.currentTimeMillis();
                     mStatusText.setTextColor(Color.BLUE);
                     mProgressBar.setVisibility(View.VISIBLE);
                 }
@@ -575,20 +579,16 @@ public class LoginCracker extends Plugin {
 
             mNow = java.lang.System.currentTimeMillis();
 
-            if (mLastAttempt == 0)
-                mLastAttempt = mNow;
+            long timeElapsed = (mNow - mStarted);
+            double timeNeeded = (timeElapsed * (total / progress));
 
-            else {
-                long timeElapsed = (mNow - mStarted);
-                double timeNeeded = (timeElapsed / progress) * total;
+            mEndTime = (mStarted + (long) timeNeeded);
+            mLastAttempt = mNow;
+            mLastLeft = mEndTime - mNow;
 
-                mEndTime = (mStarted + (long) timeNeeded);
-                mLastAttempt = mNow;
-                mLastLeft = mEndTime - mNow;
+            status += "\t[ " + formatTimeLeft(mLastLeft) + " "
+                    + getString(R.string.left) + " ]";
 
-                status += "\t[ " + formatTimeLeft(mLastLeft) + " "
-                        + getString(R.string.left) + " ]";
-            }
 
             final String text = status;
             final int percentage = (int) ((progress / total) * 100);
@@ -605,7 +605,6 @@ public class LoginCracker extends Plugin {
 
         @Override
         public void onAccountFound(final String login, final String password) {
-            reset();
             //TODO CRACK SEVERAL ACCOUNTS -f -F
             LoginCracker.this.runOnUiThread(new Runnable() {
                 @Override
@@ -617,8 +616,6 @@ public class LoginCracker extends Plugin {
 
         @Override
         public void onWarning(String message) {
-            reset();
-
             final String error = message;
 
             LoginCracker.this.runOnUiThread(new Runnable() {
@@ -632,8 +629,6 @@ public class LoginCracker extends Plugin {
 
         @Override
         public void onError(String message) {
-            reset();
-
             final String error = message;
 
             LoginCracker.this.runOnUiThread(new Runnable() {
@@ -649,8 +644,6 @@ public class LoginCracker extends Plugin {
         @Override
         public void onEnd(int code) {
             if (mRunning) {
-                reset();
-
                 LoginCracker.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

@@ -38,8 +38,8 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 28
+    buildToolsVersion '29.0.3'
     useLibrary 'org.apache.http.legacy'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
