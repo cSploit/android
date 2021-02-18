@@ -32,10 +32,8 @@ enum hydra_action {
 struct hydra_attempts_info {
   char                hydra_action;   ///< must be set to ::HYDRA_ATTEMPTS
   uint32_t  rate;
-  uint32_t  sent;           ///< # of sent logins
-  uint32_t  elapsed;
-  uint32_t  left;           ///< # of logins left to try
-  uint32_t  eta;
+  uint32_t  sent;
+  uint32_t  left;
 };
 
 /// hydra warning info

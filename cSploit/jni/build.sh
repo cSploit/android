@@ -359,7 +359,6 @@ case $pkg in
 ruby) build_ruby
   ;;
 core|cores) build_cores
-            copy_jni_libs
   ;;
 jni) build_jni
      copy_jni_libs

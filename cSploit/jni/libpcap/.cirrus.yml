@@ -1,0 +1,25 @@
+# The internal git client reads CIRRUS_CLONE_DEPTH.
+env:
+  CIRRUS_CLONE_DEPTH: 3
+  MAXJOBS: 2
+  IGNORE_OSVERSION: yes
+
+task:
+  freebsd_instance:
+    image_family: $IMAGE_FAMILY
+  env:
+    matrix:
+      - IMAGE_FAMILY: freebsd-11-4
+      - IMAGE_FAMILY: freebsd-12-2
+      - IMAGE_FAMILY: freebsd-13-0-snap
+  script:
+    - freebsd-version
+    - pkg install -qy autoconf
+    - touch .devel
+    - ./configure --enable-remote --prefix=/tmp
+    - make -s all
+    - make -s testprogs
+    - make install
+    - make releasetar
+    - testprogs/findalldevstest
+

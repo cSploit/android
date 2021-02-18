@@ -38,13 +38,9 @@ public class Hydra extends Tool
   {
     public void onEnd( int exitCode ) {
       if( exitCode != 0 )
-        Logger.error("hydra exited with code " + exitCode );
+        Logger.error( "hydra exited with code " + exitCode );
     }
-    public void onDeath( int signal ) {
-      Logger.error("hydra killed by signal " + signal);
-    }
-
-    public abstract void onAttemptStatus(long progress, long total);
+    public abstract void onAttemptStatus(int rate, int progress, int left);
 
     public abstract void onWarning(String message);
 
@@ -55,7 +51,7 @@ public class Hydra extends Tool
     public void onEvent(Event e) {
       if(e instanceof Attempts) {
         Attempts a = (Attempts)e;
-        onAttemptStatus(a.sent, a.sent + a.left);
+        onAttemptStatus(a.rate, a.sent, a.left);
       } else if(e instanceof Message) {
         Message m = (Message)e;
 

@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.text.Html;
 import android.view.Gravity;
@@ -102,7 +103,7 @@ import static org.csploit.android.core.UpdateChecker.UPDATE_NOT_AVAILABLE;
 import static org.csploit.android.net.NetworkRadar.NRDR_STOPPED;
 
 @SuppressLint("NewApi")
-public class MainActivity extends ActionBarActivity implements NetworkRadar.TargetListener {
+public class MainActivity extends AppCompatActivity implements NetworkRadar.TargetListener {
   private String UPDATE_MESSAGE;
   private static final int WIFI_CONNECTION_REQUEST = 1012;
   private boolean isWifiAvailable = false;

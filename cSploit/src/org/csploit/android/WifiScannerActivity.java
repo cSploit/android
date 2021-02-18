@@ -136,7 +136,7 @@ public class WifiScannerActivity extends ListActivity
     setContentView(R.layout.wifi_scanner);
     //getActionBar().setDisplayHomeAsUpEnabled(true);
 
-    mWifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+    mWifiManager = (WifiManager) this.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
     mClipboard = (ClipboardManager) this.getSystemService(Context.CLIPBOARD_SERVICE);
     mWifiMatcher = new WirelessMatcher(getResources().openRawResource(R.raw.alice));
     mScanReceiver = new ScanReceiver();

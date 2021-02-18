@@ -103,14 +103,15 @@ message *parse_hydra_status(char *line) {
   status_info->rate = strtoul(line + pmatch[1].rm_so, NULL, 10);
   status_info->sent = strtoul(line + pmatch[2].rm_so, NULL, 10);
 
+/*
   status_info->elapsed = (strtoul(line + pmatch[3].rm_so, NULL, 10) * 60) +
                           strtoul(line + pmatch[4].rm_so, NULL, 10);
-
+*/
   status_info->left = strtoul(line + pmatch[5].rm_so, NULL, 10);
-
+/*
   status_info->eta = (strtoul(line + pmatch[6].rm_so, NULL, 10) * 60) +
                       strtoul(line + pmatch[7].rm_so, NULL, 10);
-  
+ */
   return m;
 }
 

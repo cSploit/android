@@ -573,19 +573,20 @@ public class LoginCracker extends Plugin {
         }
 
         @Override
-        public void onAttemptStatus(final long progress, final long total) {
+        public void onAttemptStatus(final int rate, final int progress, final int left) {
             String status = "";
 
+            int total = progress + left;
             mNow = java.lang.System.currentTimeMillis();
 
             long timeElapsed = (mNow - mStarted);
-            double timeNeeded = (timeElapsed * (total / progress));
+            double timeNeeded = (timeElapsed * (total / progress - 1));
 
             mEndTime = (mStarted + (long) timeNeeded);
             mLastAttempt = mNow;
             mLastLeft = mEndTime - mNow;
 
-            status += "\t[ " + formatTimeLeft(mLastLeft) + " "
+            status += "rate: " + rate + "\t[ " + formatTimeLeft(mLastLeft) + " "
                     + getString(R.string.left) + " ]";
 
 

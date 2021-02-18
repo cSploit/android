@@ -451,12 +451,13 @@ jobject create_account_event(JNIEnv *env, void *arg) {
  * @param m the received ::message
  * @returns a new object on success, NULL on error.
  */
-jobject create_message_event(JNIEnv *env, message *m) {
+jobject create_message_event(JNIEnv *env, void *arg) {
   jobject res;
   char *severity, *mesg;
   jstring jseverity, jmessage;
   jseverity = jmessage = "";
   res = NULL;
+  message *m = (message *) arg;
   
   switch(m->data[0]) {
     case HYDRA_WARNING:
@@ -508,7 +509,7 @@ jobject create_message_event(JNIEnv *env, message *m) {
  */
 jobject create_attempts_event(JNIEnv *env, void  *arg) {
   jobject res;
-  jint jrate, jsent, jelapsed, jleft, jeta;
+  jint jrate, jsent, jleft;
   struct hydra_attempts_info *attempts_info;
   message *m = (message *) arg;
 
@@ -524,14 +525,12 @@ jobject create_attempts_event(JNIEnv *env, void  *arg) {
 
   jrate = attempts_info->rate;
   jsent = attempts_info->sent;
-  jelapsed = attempts_info->elapsed;
   jleft = attempts_info->left;
-  jeta = attempts_info->eta;
 
   res = (*env)->NewObject(env,
                         cache.csploit.events.attempts.class,
                         cache.csploit.events.attempts.ctor,
-                        jrate, jsent, jelapsed, jleft, jeta);
+                        jrate, jsent, jleft);
   
   if((*env)->ExceptionCheck(env)) {
     (*env)->ExceptionDescribe(env);

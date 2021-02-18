@@ -1,0 +1,10 @@
+Makefile
+*~
+*.a
+*.o
+config.log
+config.cache
+config.status
+stamp-h
+stamp-h.in
+autom4te.cache/
