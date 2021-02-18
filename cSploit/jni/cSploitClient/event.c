@@ -434,10 +434,13 @@ jobject create_account_event(JNIEnv *env, void *arg) {
  * @param m the received ::message
  * @returns a new object on success, NULL on error.
  */
-jobject create_message_event(JNIEnv *env, message *m) {
+jobject create_message_event(JNIEnv *env, void *arg) {
   jobject res;
-  char *severity, *message;
-  jstring jseverity, jmessage;
+  char *severity, *msg;
+  jstring jseverity;
+  jstring jmessage;
+  message *m;
+  m = (message *) arg;
   
   jseverity = jmessage = NULL;
   res = NULL;
@@ -445,12 +448,12 @@ jobject create_message_event(JNIEnv *env, message *m) {
   switch(m->data[0]) {
     case HYDRA_WARNING:
       severity = "WARNING";
-      message = ((struct hydra_warning_info *) m->data)->text;
+      msg = ((struct hydra_warning_info *) m->data)->text;
       break;
     case ARPSPOOF_ERROR:
     case HYDRA_ERROR:
       severity = "ERROR";
-      message = ((struct hydra_error_info *) m->data)->text;
+      msg = ((struct hydra_error_info *) m->data)->text;
       break;
     default:
       LOGE("%s: unknown message code %02hhX", __func__, m->data[0]);
@@ -460,7 +463,7 @@ jobject create_message_event(JNIEnv *env, message *m) {
   jseverity = (*env)->NewStringUTF(env, severity);
   if(!jseverity) goto cleanup;
   
-  jmessage = (*env)->NewStringUTF(env, message);
+  jmessage = (*env)->NewStringUTF(env, msg);
   if(!jmessage) goto cleanup;
       
   
@@ -490,10 +493,11 @@ jobject create_message_event(JNIEnv *env, message *m) {
  * @param arg a pointer to a ::message containing an ::hydra_attempts_info
  * @returns a new object on success, NULL on error.
  */
-jobject create_attempts_event(JNIEnv *env, message *m) {
+jobject create_attempts_event(JNIEnv *env, void *arg) {
   jobject res;
-  jlong jsent, jleft, jelapsed, jeta;
+  jlong jsent, jleft;
   struct hydra_attempts_info *attempts_info;
+  message *m = (message*) arg;
   
   attempts_info = (struct hydra_attempts_info *) m->data;
   
@@ -507,13 +511,11 @@ jobject create_attempts_event(JNIEnv *env, message *m) {
   
   jsent = attempts_info->sent;
   jleft = attempts_info->left;
-  jelapsed = attempts_info->elapsed;
-  jeta = attempts_info->eta;
   
   res = (*env)->NewObject(env,
                         cache.csploit.events.attempts.class,
                         cache.csploit.events.attempts.ctor,
-                        jsent, jleft, jelapsed, jeta);
+                        jsent, jleft);
   
   if((*env)->ExceptionCheck(env)) {
     (*env)->ExceptionDescribe(env);
@@ -528,12 +530,12 @@ jobject create_attempts_event(JNIEnv *env, message *m) {
  * @param m the received ::message
  * @returns a new object on success, NULL on error.
  */
-jobject create_login_event(JNIEnv *env, message *m) {
+jobject create_login_event(JNIEnv *env, void *arg) {
   jstring jlogin, jpswd;
   jobject res, addr;
   struct hydra_login_info *login_info;
   char *pos;
-  
+  message *m = (message *) arg;
   res = addr = NULL;
   pos = NULL;
   jlogin = jpswd = NULL;
@@ -589,9 +591,10 @@ jobject create_login_event(JNIEnv *env, message *m) {
  * @param m the received message
  * @returns the jobject on success, NULL on error.
  */
-jobject create_packet_event(JNIEnv *env, message *m) {
+jobject create_packet_event(JNIEnv *env, void *arg) {
   jobject src, dst, res;
   struct tcpdump_packet_info *packet_info;
+  message *m = (message *) arg;
   
   packet_info = (struct tcpdump_packet_info *) m->data;
   
@@ -625,11 +628,12 @@ jobject create_packet_event(JNIEnv *env, message *m) {
  * @param m the received message
  * @returns the jobject on success, NULL on error.
  */
-jobject create_fusebind_event(JNIEnv *env, message *m) {
+jobject create_fusebind_event(JNIEnv *env, void *arg) {
   jobject res;
   char *src, *mnt;
   jstring *jsrc, *jmnt;
   struct fusemount_bind_info *bind_info;
+  message *m = (message *) arg;
   
   bind_info = (struct fusemount_bind_info *) m->data;
   res = NULL;
@@ -687,13 +691,14 @@ jobject create_fusebind_event(JNIEnv *env, message *m) {
  * @param m the received message
  * @returns the jobject on success, NULL on error.
  */
-jobject create_host_event(JNIEnv *env, message *m) {
+jobject create_host_event(JNIEnv *env, void *arg) {
   jstring jname;
   jobject res, ip_addr;
   jbyteArray eth_addr;
   struct nrdr_host_info *hinfo;
   char *pos;
-  
+  message *m = (message *) arg;
+
   res = ip_addr = NULL;
   pos = NULL;
   jname = NULL;
@@ -744,12 +749,14 @@ jobject create_host_event(JNIEnv *env, message *m) {
  * @param m the received message
  * @returns the jobject on success, NULL on error.
  */
-jobject create_hostlost_event(JNIEnv *env, message *m) {
+jobject create_hostlost_event(JNIEnv *env, void *arg) {
   jobject res, addr;
   struct nrdr_host_del_info *hinfo;
-  
+  message *m = (message *) arg;
+
   hinfo = (struct nrdr_host_del_info *) m->data;
-  
+
+
   addr = inaddr_to_inetaddress(env, hinfo->ip_addr);
   if(!addr) return NULL;
   

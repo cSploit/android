@@ -6,13 +6,12 @@ package org.csploit.android.events;
 public class Attempts implements Event {
   public final long sent;
   public final long left;
-  public final long elapsed;
-  public final long eta;
 
-  public Attempts(long sent, long left, long elapsed, long eta) {
+  public Attempts(long sent, long left) {
     this.sent = sent;
     this.left = left;
-    this.elapsed = elapsed;
-    this.eta = eta;
+  }
+  public String toString() {
+    return String.format("AttemptsEvent: { sent=%d, left=%d }", sent, left);
   }
 }

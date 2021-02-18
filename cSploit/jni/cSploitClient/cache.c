@@ -130,7 +130,7 @@ int init_csploit_events_cache(JNIEnv *env) {
     { "org/csploit/android/events/Account", "(Ljava/net/InetAddress;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V" },
     { "org/csploit/android/events/Message", "(Ljava/lang/String;Ljava/lang/String;)V" },
     { "org/csploit/android/events/Login", "(ILjava/net/InetAddress;Ljava/lang/String;Ljava/lang/String;)V" },
-    { "org/csploit/android/events/Attempts", "(JJJJ)V" },
+    { "org/csploit/android/events/Attempts", "(JJ)V" },
     { "org/csploit/android/events/Packet", "(Ljava/net/InetAddress;Ljava/net/InetAddress;I)V" },
     { "org/csploit/android/events/FuseBind", "(Ljava/lang/String;Ljava/lang/String;)V" },
     { "org/csploit/android/events/Host", "([BLjava/net/InetAddress;Ljava/lang/String;)V" },

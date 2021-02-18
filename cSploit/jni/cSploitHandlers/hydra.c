@@ -74,7 +74,7 @@ void hydra_fini() {
  * @returns a ::message on success, NULL on error.
  */
 message *parse_hydra_status(char *line) {
-  regmatch_t pmatch[7];
+  regmatch_t pmatch[3];
   struct hydra_attempts_info *status_info;
   message *m;
   
@@ -90,21 +90,13 @@ message *parse_hydra_status(char *line) {
   // terminate parts
   *(line + pmatch[1].rm_eo) = '\0';
   *(line + pmatch[2].rm_eo) = '\0';
-  *(line + pmatch[3].rm_eo) = '\0';
-  *(line + pmatch[4].rm_eo) = '\0';
-  *(line + pmatch[5].rm_eo) = '\0';
-  *(line + pmatch[6].rm_eo) = '\0';
   
   
   status_info = (struct hydra_attempts_info *) m->data;
   status_info->hydra_action = HYDRA_ATTEMPTS;
   
   status_info->sent = strtoul(line + pmatch[1].rm_so, NULL, 10);
-  status_info->left = strtoul(line + pmatch[4].rm_so, NULL, 10);
-  status_info->elapsed = (strtoul(line + pmatch[2].rm_so, NULL, 10) * 60) + 
-                          strtoul(line + pmatch[3].rm_so, NULL, 10);
-  status_info->eta = (strtoul(line + pmatch[5].rm_so, NULL, 10) * 60) + 
-                      strtoul(line + pmatch[6].rm_so, NULL, 10);
+  status_info->left = strtoul(line + pmatch[2].rm_so, NULL, 10);
   
   return m;
 }

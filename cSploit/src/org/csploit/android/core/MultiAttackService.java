@@ -117,7 +117,7 @@ public class MultiAttackService extends IntentService {
 
     private void inspect() throws InterruptedException {
       try {
-        process = System.getTools().nmap.inpsect(target, new NMap.InspectionReceiver() {
+        process = System.getTools().nmap.inspect(target, new NMap.InspectionReceiver() {
           @Override
           public void onOpenPortFound(int port, String protocol) {
             target.addOpenPort(port, Network.Protocol.fromString(protocol));

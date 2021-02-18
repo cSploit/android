@@ -113,7 +113,7 @@ message *parse_nmap_hop(char *line) {
   hop_info->hop = atoi(line);
   if(strncmp(line + pmatch[2].rm_so, "...", 3)) {
     sscanf(line + pmatch[2].rm_so, "%f", &(time));
-    hop_info->usec = (uint32_t)(tousec * time);
+    hop_info->usec = (uint64_t)(tousec * time);
   }
   hop_info->address = inet_addr(line + pmatch[3].rm_so);
   

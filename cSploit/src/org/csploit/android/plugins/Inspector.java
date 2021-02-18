@@ -111,7 +111,7 @@ public class Inspector extends Plugin{
 
       write_services();
 
-      mProcess = System.getTools().nmap.inpsect( target, mReceiver, mFocusedScan);
+      mProcess = System.getTools().nmap.inspect( target, mReceiver, mFocusedScan);
 
       mActivity.setVisibility(View.VISIBLE);
       mRunning = true;

@@ -138,7 +138,7 @@ public class NMap extends Tool {
     return super.async( command, receiver );
   }
 
-  public Child inpsect( Target target, InspectionReceiver receiver, boolean focusedScan ) throws ChildManager.ChildNotStartedException {
+  public Child inspect(Target target, InspectionReceiver receiver, boolean focusedScan ) throws ChildManager.ChildNotStartedException {
     String cmd;
     LinkedList<Integer> tcp,udp;
     Network.Protocol protocol;

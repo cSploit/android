@@ -557,11 +557,16 @@ public class LoginCracker extends Plugin {
 
         @Override
         public void onStart(String command) {
-            reset();
-
-            mStarted = java.lang.System.currentTimeMillis();
-
             super.onStart(command);
+
+            LoginCracker.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mRunning = true;
+                    mStatusText.setTextColor(Color.BLUE);
+                    mProgressBar.setVisibility(View.VISIBLE);
+                }
+            });
         }
 
         @Override

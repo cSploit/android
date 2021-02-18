@@ -144,7 +144,7 @@ public class MainActivity extends ActionBarActivity implements NetworkRadar.Targ
     createUpdateStatusText();
 
     mUpdateStatus
-            .setText(UPDATE_MESSAGE.replace("#STATUS#", "..."));
+            .setText(UPDATE_MESSAGE);
 
     mUpdateReceiver.register(MainActivity.this);
 

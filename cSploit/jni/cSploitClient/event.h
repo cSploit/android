@@ -32,13 +32,13 @@ jobject create_port_event(JNIEnv *, void *);
 jobject create_os_event(JNIEnv *, void *);
 jobject create_ready_event(JNIEnv *, void *);
 jobject create_account_event(JNIEnv *, void *);
-jobject create_message_event(JNIEnv *, message *);
-jobject create_login_event(JNIEnv *, message *);
-jobject create_attempts_event(JNIEnv *, message *);
-jobject create_packet_event(JNIEnv *, message *);
-jobject create_fusebind_event(JNIEnv *, message *);
-jobject create_host_event(JNIEnv *, message *);
-jobject create_hostlost_event(JNIEnv *, message *);
+jobject create_message_event(JNIEnv *, void *);
+jobject create_login_event(JNIEnv *, void *);
+jobject create_attempts_event(JNIEnv *, void *);
+jobject create_packet_event(JNIEnv *, void *);
+jobject create_fusebind_event(JNIEnv *, void *);
+jobject create_host_event(JNIEnv *, void *);
+jobject create_hostlost_event(JNIEnv *, void *);
 int send_event(JNIEnv *, child_node *, jobject);
 
 #endif

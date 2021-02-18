@@ -38,8 +38,8 @@ enum nmap_proto {
 
 struct nmap_hop_info {
   char            nmap_action;    ///< must be set to ::HOP
-  uint16_t        hop;            ///< the hop number
-  uint32_t        usec;           ///< useconds for reach this address
+  uint32_t        hop;            ///< the hop number
+  uint64_t        usec;           ///< useconds for reach this address
   in_addr_t       address;        ///< the address
 };
 

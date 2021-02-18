@@ -53,8 +53,8 @@ android {
 
     defaultConfig {
         minSdkVersion 9
-        versionCode 1
-        versionName "1.5.4"
+        versionCode 18
+        versionName "1.8.0"
     }
 
     signingConfigs {
