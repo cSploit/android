@@ -123,7 +123,7 @@ int init_csploit_events_cache(JNIEnv *env) {
     { "org/csploit/android/events/ChildEnd", "(I)V" },
     { "org/csploit/android/events/ChildDied", "(I)V" },
     { "org/csploit/android/events/StderrNewline", "(Ljava/lang/String;)V" },
-    { "org/csploit/android/events/Hop", "(IJLjava/net/InetAddress;)V" },
+    { "org/csploit/android/events/Hop", "(IJLjava/net/InetAddress;Ljava/lang/String;)V" },
     { "org/csploit/android/events/Port", "(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)V" },
     { "org/csploit/android/events/Os", "(SLjava/lang/String;Ljava/lang/String;)V" },
     { "org/csploit/android/events/Ready", "()V" },

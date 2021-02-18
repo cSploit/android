@@ -18,7 +18,7 @@ import org.csploit.android.events.StderrNewline;
  */
 public class ChildManager {
 
-  private static final List<Child> children = new ArrayList<Child>(25);
+  private static final List<Child> children = new ArrayList<Child>(64);
 
   public static List<String> handlers = null;
 

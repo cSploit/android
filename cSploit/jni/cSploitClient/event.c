@@ -186,31 +186,47 @@ jobject inaddr_to_inetaddress(JNIEnv *env, in_addr_t a) {
 
 /**
  * @brief create an org.csploit.android.events.Hop
- * @param arg a pointer to an ::nmap_hop_info
+ * @param m a pointer to the received message
  * @returns the jobject on success, NULL on error.
  */
-jobject create_hop_event(JNIEnv *env, void *arg) {
+jobject create_hop_event(JNIEnv *env, message *m) {
   jobject addr, res;
+  jstring jname;
   struct nmap_hop_info *hop_info;
+  char *pos;
   
-  hop_info = (struct nmap_hop_info*)arg;
+  hop_info = (struct nmap_hop_info*) m->data;
+  jname = NULL;
+  res = NULL;
   
   addr = inaddr_to_inetaddress(env, hop_info->address);
   
   if(!addr)
     return NULL;
   
+  pos = string_array_next(m, hop_info->name, NULL);
+  
+  if(pos) {
+    jname = (*env)->NewStringUTF(env, pos);
+    if(!jname) goto cleanup;
+  }
+  
   res = (*env)->NewObject(env,
                           cache.csploit.events.hop.class,
                           cache.csploit.events.hop.ctor,
-                          hop_info->hop, (jlong)(hop_info->usec), addr);
-  
-  (*env)->DeleteLocalRef(env, addr);
+                          hop_info->hop, (jlong)(hop_info->usec), addr, jname);
+                          
+  cleanup:
   
   if(!res && (*env)->ExceptionCheck(env)) {
     (*env)->ExceptionDescribe(env);
     (*env)->ExceptionClear(env);
   }
+  
+  if(jname)
+    (*env)->DeleteLocalRef(env, jname);
+    
+  (*env)->DeleteLocalRef(env, addr);
   
   return res;
 }
@@ -436,11 +452,9 @@ jobject create_account_event(JNIEnv *env, void *arg) {
  */
 jobject create_message_event(JNIEnv *env, void *arg) {
   jobject res;
-  char *severity, *msg;
-  jstring jseverity;
-  jstring jmessage;
-  message *m;
-  m = (message *) arg;
+  char *severity, *mesg;
+  jstring jseverity, jmessage;
+  message *m = (message *) arg;
   
   jseverity = jmessage = NULL;
   res = NULL;
@@ -448,12 +462,12 @@ jobject create_message_event(JNIEnv *env, void *arg) {
   switch(m->data[0]) {
     case HYDRA_WARNING:
       severity = "WARNING";
-      msg = ((struct hydra_warning_info *) m->data)->text;
+      mesg = ((struct hydra_warning_info *) m->data)->text;
       break;
     case ARPSPOOF_ERROR:
     case HYDRA_ERROR:
       severity = "ERROR";
-      msg = ((struct hydra_error_info *) m->data)->text;
+      mesg = ((struct hydra_error_info *) m->data)->text;
       break;
     default:
       LOGE("%s: unknown message code %02hhX", __func__, m->data[0]);
@@ -463,7 +477,7 @@ jobject create_message_event(JNIEnv *env, void *arg) {
   jseverity = (*env)->NewStringUTF(env, severity);
   if(!jseverity) goto cleanup;
   
-  jmessage = (*env)->NewStringUTF(env, msg);
+  jmessage = (*env)->NewStringUTF(env, mesg);
   if(!jmessage) goto cleanup;
       
   
@@ -497,8 +511,8 @@ jobject create_attempts_event(JNIEnv *env, void *arg) {
   jobject res;
   jlong jsent, jleft;
   struct hydra_attempts_info *attempts_info;
-  message *m = (message*) arg;
-  
+  message *m = (message *) arg;
+
   attempts_info = (struct hydra_attempts_info *) m->data;
   
   if(attempts_info->sent > INT64_MAX) {
@@ -535,11 +549,12 @@ jobject create_login_event(JNIEnv *env, void *arg) {
   jobject res, addr;
   struct hydra_login_info *login_info;
   char *pos;
-  message *m = (message *) arg;
+  
   res = addr = NULL;
   pos = NULL;
   jlogin = jpswd = NULL;
-  
+  message *m = (message *) arg;
+
   login_info = (struct hydra_login_info *) m->data;
   
   if(login_info->contents & HAVE_ADDRESS) {
@@ -595,7 +610,7 @@ jobject create_packet_event(JNIEnv *env, void *arg) {
   jobject src, dst, res;
   struct tcpdump_packet_info *packet_info;
   message *m = (message *) arg;
-  
+
   packet_info = (struct tcpdump_packet_info *) m->data;
   
   src = inaddr_to_inetaddress(env, packet_info->src);
@@ -634,7 +649,6 @@ jobject create_fusebind_event(JNIEnv *env, void *arg) {
   jstring *jsrc, *jmnt;
   struct fusemount_bind_info *bind_info;
   message *m = (message *) arg;
-  
   bind_info = (struct fusemount_bind_info *) m->data;
   res = NULL;
   jsrc = jmnt = NULL;
@@ -697,12 +711,11 @@ jobject create_host_event(JNIEnv *env, void *arg) {
   jbyteArray eth_addr;
   struct nrdr_host_info *hinfo;
   char *pos;
-  message *m = (message *) arg;
-
+  
   res = ip_addr = NULL;
   pos = NULL;
   jname = NULL;
-  
+  message *m = (message *) arg;
   hinfo = (struct nrdr_host_info *) m->data;
   
   ip_addr = inaddr_to_inetaddress(env, hinfo->ip_addr);
@@ -753,10 +766,8 @@ jobject create_hostlost_event(JNIEnv *env, void *arg) {
   jobject res, addr;
   struct nrdr_host_del_info *hinfo;
   message *m = (message *) arg;
-
   hinfo = (struct nrdr_host_del_info *) m->data;
-
-
+  
   addr = inaddr_to_inetaddress(env, hinfo->ip_addr);
   if(!addr) return NULL;
   

@@ -51,7 +51,7 @@ __attribute__((constructor))
 void nmap_init() {
   int ret;
   
-  if((ret = regcomp(&hop_pattern, "^([0-9]+) +(\\.\\.\\.|[0-9\\.]+ m?s) +(" IPv4_REGEX "|[0-9]+)", REG_EXTENDED | REG_ICASE))) {
+  if((ret = regcomp(&hop_pattern, "^([0-9]+) +(\\.\\.\\.|\\.\\.\\. [0-9]+|--|[0-9\\.]+ m?s) +(([^ ]+) +\\()?(" IPv4_REGEX ")", REG_EXTENDED | REG_ICASE))) {
     print( ERROR, "%s: regcomp(hop_pattern): %d", ret);
   }
   if((ret = regcomp(&port_pattern, "^Discovered open port ([0-9]+)/([a-z]+)", REG_EXTENDED | REG_ICASE))) {
@@ -78,13 +78,13 @@ void nmap_fini() {
  * @returns a ::message on success, NULL on error.
  */
 message *parse_nmap_hop(char *line) {
-  regmatch_t pmatch[4];
+  regmatch_t pmatch[6];
   struct nmap_hop_info *hop_info;
   unsigned long tousec;
   float time;
   message *m;
   
-  if(regexec(&hop_pattern, line, 4, pmatch, 0))
+  if(regexec(&hop_pattern, line, 6, pmatch, 0))
     return NULL;
   
   m = create_message(0, sizeof(struct nmap_hop_info), 0);
@@ -96,26 +96,28 @@ message *parse_nmap_hop(char *line) {
   // terminate single parts
   *(line + pmatch[1].rm_eo) = '\0';
   *(line + pmatch[2].rm_eo) = '\0';
-  *(line + pmatch[3].rm_eo) = '\0';
-  
-  if(*(line + pmatch[2].rm_eo - 2) == 'm') { // millisconds
-    tousec = 1000;
-    *(line + pmatch[2].rm_eo - 3) = '\0';
-  } else if(*(line + pmatch[2].rm_eo - 1) == 's'){ // seconds
-    tousec = 1000000;
-    *(line + pmatch[2].rm_eo -2) = '\0';
-  } else { // ...
-    tousec = 0;
-  }
+  *(line + pmatch[5].rm_eo) = '\0';
   
   hop_info = (struct nmap_hop_info *) m->data;
   hop_info->nmap_action = HOP;
   hop_info->hop = atoi(line);
-  if(strncmp(line + pmatch[2].rm_so, "...", 3)) {
+  
+  if(*(line + pmatch[2].rm_eo - 1) == 's') {
+    tousec = *(line + pmatch[2].rm_eo - 2) == 'm' ? 1000 : 1000000;
     sscanf(line + pmatch[2].rm_so, "%f", &(time));
     hop_info->usec = (uint64_t)(tousec * time);
   }
-  hop_info->address = inet_addr(line + pmatch[3].rm_so);
+  
+  hop_info->address = inet_addr(line + pmatch[5].rm_so);
+
+  if(pmatch[4].rm_so != -1) {
+    *(line + pmatch[4].rm_eo) = '\0';
+    if(string_array_add(m, offsetof(struct nmap_hop_info, name), (line + pmatch[4].rm_so))) {
+      print( ERROR, "cannot add string to message");
+      free_message(m);
+      m = NULL;
+    }
+  }
   
   return m;
 }

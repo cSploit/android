@@ -41,7 +41,8 @@ struct nmap_hop_info {
   uint32_t        hop;            ///< the hop number
   uint64_t        usec;           ///< useconds for reach this address
   in_addr_t       address;        ///< the address
-};
+  char            name[];         ///< hostname if any
+} __attribute__ ((__packed__));
 
 struct nmap_port_info {
   char            nmap_action;    ///< must be set to ::PORT

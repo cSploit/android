@@ -78,7 +78,7 @@ int on_nmap(JNIEnv *env, child_node *c, message *m) {
   
   switch(m->data[0]) {
     case HOP:
-      event = create_hop_event(env, m->data);
+      event = create_hop_event(env, m);
       break;
     case PORT:
     case SERVICE:

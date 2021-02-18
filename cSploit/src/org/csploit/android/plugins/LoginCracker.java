@@ -96,7 +96,7 @@ public class LoginCracker extends Plugin {
     private String mPassWordlist = null;
     private boolean mRunning = false;
     private boolean mAccountFound = false;
-    private AttemptReceiver mReceiver = null;
+    private Receiver mAttemptsReceiver = null;
     private String mCustomCharset = null;
 
     public LoginCracker() {
@@ -104,6 +104,8 @@ public class LoginCracker extends Plugin {
 
                 new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
                 R.layout.plugin_login_cracker, R.drawable.action_login);
+        mAttemptsReceiver = new Receiver();
+
     }
 
     private void setStoppedState(final String user, final String pass) {
@@ -167,7 +169,7 @@ public class LoginCracker extends Plugin {
                                     mCustomCharset == null ? CHARSETS_MAPPING[mCharsetSpinner
                                             .getSelectedItemPosition()] : mCustomCharset,
                                     min, max, (String) mUserSpinner.getSelectedItem(),
-                                    mUserWordlist, mPassWordlist, mReceiver);
+                                    mUserWordlist, mPassWordlist, mAttemptsReceiver);
 
             mActivity.setVisibility(View.VISIBLE);
             mStatusText.setTextColor(Color.DKGRAY);
@@ -311,8 +313,6 @@ public class LoginCracker extends Plugin {
         mActivity = (ProgressBar) findViewById(R.id.activity);
 
         mProgressBar.setMax(100);
-
-        mReceiver = new AttemptReceiver();
 
         mStartButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -524,7 +524,7 @@ public class LoginCracker extends Plugin {
         }
     }
 
-    private class AttemptReceiver extends Hydra.AttemptReceiver {
+    private class Receiver extends Hydra.AttemptsReceiver {
         private long mStarted = 0;
         private long mEndTime = 0;
         private long mLastAttempt = 0;
@@ -606,7 +606,7 @@ public class LoginCracker extends Plugin {
         @Override
         public void onAccountFound(final String login, final String password) {
             reset();
-
+            //TODO CRACK SEVERAL ACCOUNTS -f -F
             LoginCracker.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {

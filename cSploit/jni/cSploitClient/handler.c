@@ -181,25 +181,25 @@ int on_handler_list(message *m) {
     
     name_len = strlen(h->name);
     
-    if(!handlers.by_name.blind && !strncmp(h->name, "blind", 5)) {
+    if(!handlers.by_name.blind && !strncmp(h->name, "blind", 6)) {
       handlers.by_name.blind = h;
-    } else if(!handlers.by_name.raw && !strncmp(h->name, "raw", 3)) {
+    } else if(!handlers.by_name.raw && !strncmp(h->name, "raw", 4)) {
       handlers.by_name.raw = h;
-    } else if(!handlers.by_name.nmap && !strncmp(h->name, "nmap", 4)) {
+    } else if(!handlers.by_name.nmap && !strncmp(h->name, "nmap", 5)) {
       handlers.by_name.nmap = h;
-    } else if(!handlers.by_name.ettercap && !strncmp(h->name, "ettercap", 8)) {
+    } else if(!handlers.by_name.ettercap && !strncmp(h->name, "ettercap", 9)) {
       handlers.by_name.ettercap = h;
-    } else if(!handlers.by_name.hydra && !strncmp(h->name, "hydra", 5)) {
+    } else if(!handlers.by_name.hydra && !strncmp(h->name, "hydra", 6)) {
       handlers.by_name.hydra = h;
-    } else if(!handlers.by_name.arpspoof && !strncmp(h->name, "arpspoof", 8)) {
+    } else if(!handlers.by_name.arpspoof && !strncmp(h->name, "arpspoof", 9)) {
       handlers.by_name.arpspoof = h;
-    } else if(!handlers.by_name.tcpdump && !strncmp(h->name, "tcpdump", 7)) {
+    } else if(!handlers.by_name.tcpdump && !strncmp(h->name, "tcpdump", 8)) {
       handlers.by_name.tcpdump = h;
-    } else if(!handlers.by_name.fusemounts && !strncmp(h->name, "fusemounts", 10)) {
+    } else if(!handlers.by_name.fusemounts && !strncmp(h->name, "fusemounts", 11)) {
       handlers.by_name.fusemounts = h;
-    } else if(!handlers.by_name.network_radar && !strncmp(h->name, "network-radar", 13)) {
+    } else if(!handlers.by_name.network_radar && !strncmp(h->name, "network-radar", 14)) {
       handlers.by_name.network_radar = h;
-    } else if(!handlers.by_name.msfrpcd && !strncmp(h->name, "msfrpcd", 7)) {
+    } else if(!handlers.by_name.msfrpcd && !strncmp(h->name, "msfrpcd", 8)) {
       handlers.by_name.msfrpcd = h;
     }
     

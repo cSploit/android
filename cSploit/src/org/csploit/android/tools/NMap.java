@@ -48,13 +48,13 @@ public class NMap extends Tool {
     public void onEvent(Event e) {
       if(e instanceof Hop) {
         Hop hop = (Hop)e;
-        onHop(hop.hop, hop.usec, hop.node.getHostAddress());
+        onHop(hop.hop, hop.usec, hop.node.getHostAddress(), hop.name);
       } else {
         Logger.error("unknown event: " + e);
       }
     }
 
-    public abstract void onHop( int hop, long usec, String address );
+    public abstract void onHop( int hop, long usec, String address, String name);
   }
 
   public static abstract class SynScanReceiver extends Child.EventReceiver

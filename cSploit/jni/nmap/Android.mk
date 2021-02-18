@@ -154,8 +154,9 @@ LOCAL_SRC_FILES:= \
 LOCAL_STATIC_LIBRARIES:= \
 	libnbase\
 	libpcap\
-	libssl_static\
-	libcrypto_static
+LOCAL_SHARED_LIBRARIES:= \
+	libssl\
+	libcrypto
 LOCAL_MODULE := libnsock
 
 include $(BUILD_STATIC_LIBRARY)
@@ -202,8 +203,9 @@ LOCAL_STATIC_LIBRARIES:= \
 	libdnet\
 	libpcre\
 	libpcap\
-	libssl_static\
-	libcrypto_static
+LOCAL_SHARED_LIBRARIES:= \
+	libssl\
+	libcrypto
 LOCAL_MODULE := libnetutil
 
 include $(BUILD_STATIC_LIBRARY)

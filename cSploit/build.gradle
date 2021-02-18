@@ -21,26 +21,26 @@ allprojects {
 apply plugin:  'com.android.application'
 
 dependencies {
-    compile 'com.android.support:support-v4:22.0.0'
-    compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'org.apache.commons:commons-compress:1.9'
-    compile 'org.apache.commons:commons-compress:1.9:sources'
-    compile 'commons-net:commons-net:3.3'
-    compile 'junit:junit:4.12'
-    compile 'joda-time:joda-time:2.7'
-    compile 'com.github.zafarkhaja:java-semver:0.8.0'
-    compile 'com.sksamuel.diff:diff:1.1.11'
-    compile 'org.unbescape:unbescape:1.1.0.RELEASE'
-    compile 'org.msgpack:msgpack:0.6.11'
-    compile 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
-    compile 'org.tukaani:xz:1.0'
-    compile 'ch.acra:acra:4.6.1'
+    implementation 'com.android.support:support-v4:23.4.0'
+    implementation 'com.android.support:appcompat-v7:23.4.0'
+    implementation 'org.apache.commons:commons-compress:1.20'
+    implementation 'org.apache.commons:commons-compress:1.9:sources'
+    implementation 'commons-net:commons-net:3.3'
+    implementation 'junit:junit:4.13.2'
+    implementation 'joda-time:joda-time:2.10.10'
+    implementation 'com.github.zafarkhaja:java-semver:0.9.0'
+    implementation 'com.sksamuel.diff:diff:1.1.11'
+    implementation 'org.unbescape:unbescape:1.1.6.RELEASE'
+    implementation 'org.msgpack:msgpack:0.6.12'
+    implementation 'com.googlecode.juniversalchardet:juniversalchardet:1.0.3'
+    implementation 'org.tukaani:xz:1.8'
+    implementation 'ch.acra:acra:4.6.2'
 }
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 23
     buildToolsVersion "22.0.1"
-
+    useLibrary 'org.apache.http.legacy'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7

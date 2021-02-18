@@ -27,7 +27,7 @@ jobject create_newline_event(JNIEnv *, void *);
 jobject create_child_end_event(JNIEnv *, void *);
 jobject create_child_died_event(JNIEnv *, int);
 jobject create_stderrnewline_event(JNIEnv *, void *);
-jobject create_hop_event(JNIEnv *, void *);
+jobject create_hop_event(JNIEnv *, message *);
 jobject create_port_event(JNIEnv *, void *);
 jobject create_os_event(JNIEnv *, void *);
 jobject create_ready_event(JNIEnv *, void *);

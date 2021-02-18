@@ -162,22 +162,21 @@ public class Traceroute extends Plugin {
       }
     }
 
-    @Override
-    public void onHop(int hop, final long usec, final String address) {
-
+		@Override
+		public void onHop(int hop, final long usec, final String address, final String name) {
 			Traceroute.this.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					if (usec > 0)
-						mListAdapter.add(address + " ( " + formatTime(usec) + " )");
+				if (usec > 0)
+					mListAdapter.add(address + " ( " + formatTime(usec) + " )" + ":" + name);
 
-					else
-						mListAdapter.add(address
-								+ getString(R.string.untraced_hops));
+				else
+					mListAdapter.add(address
+							+ getString(R.string.untraced_hops));
 
-					mListAdapter.notifyDataSetChanged();
-				}
-			});
+				mListAdapter.notifyDataSetChanged();
+			}
+				});
 		}
 	}
 }

@@ -34,8 +34,16 @@ public class Hydra extends Tool
     mCmdPrefix = null;
   }
 
-  public static abstract class AttemptReceiver extends Child.EventReceiver
+  public static abstract class AttemptsReceiver extends Child.EventReceiver
   {
+    public void onEnd( int exitCode ) {
+      if( exitCode != 0 )
+        Logger.error("hydra exited with code " + exitCode );
+    }
+    public void onDeath( int signal ) {
+      Logger.error("hydra killed by signal " + signal);
+    }
+
     public abstract void onAttemptStatus(long progress, long total);
 
     public abstract void onWarning(String message);
@@ -67,7 +75,7 @@ public class Hydra extends Tool
     }
   }
 
-  public Child crack(Target target, int port, String service, String charset, int minlength, int maxlength, String username, String userWordlist, String passWordlist, AttemptReceiver receiver) throws ChildManager.ChildNotStartedException {
+  public Child crack(Target target, int port, String service, String charset, int minlength, int maxlength, String username, String userWordlist, String passWordlist, AttemptsReceiver receiver) throws ChildManager.ChildNotStartedException {
     String command = "-F ";
 
     if(userWordlist != null)
@@ -82,7 +90,7 @@ public class Hydra extends Tool
     else
       command += " -x \"" + minlength + ":" + maxlength + ":" + charset + "\" ";
 
-    command += " -s " + port + " -V -t 10 " + target.getCommandLineRepresentation() + " " + service;
+    command += " -s " + port + " -V -t 1 " + target.getCommandLineRepresentation() + " " + service;
 
     if(service.equalsIgnoreCase("http-head"))
       command += " /";

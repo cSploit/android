@@ -43,9 +43,6 @@ void dummy_rdp() {
 #else
 
 #include "rdp.h"
-
-#define ssl_cert_free hydra_ssl_cert_free
-
 extern char *HYDRA_EXIT;
 
 BOOL g_encryption = True;
@@ -3212,4 +3209,3 @@ int service_rdp_init(char *ip, int sp, unsigned char options, char *miscptr, FIL
 
   return 0;
 }
-#undef ssl_cert_free
