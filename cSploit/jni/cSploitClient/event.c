@@ -510,7 +510,7 @@ jobject create_message_event(JNIEnv *env, void *arg) {
  */
 jobject create_attempts_event(JNIEnv *env, void  *arg) {
   jobject res;
-  jint jrate, jsent, jleft;
+  jint jrate, jsent, jelapsed, jleft, jeta;
   struct hydra_attempts_info *attempts_info;
   message *m = (message *) arg;
 
@@ -526,12 +526,14 @@ jobject create_attempts_event(JNIEnv *env, void  *arg) {
 
   jrate = attempts_info->rate;
   jsent = attempts_info->sent;
+  jelapsed = attempts_info->elapsed;
   jleft = attempts_info->left;
+  jeta = attempts_info->eta;
 
   res = (*env)->NewObject(env,
                         cache.csploit.events.attempts.class,
                         cache.csploit.events.attempts.ctor,
-                        jrate, jsent, jleft);
+                        jrate, jsent, jelapsed, jleft, jeta);
   
   if((*env)->ExceptionCheck(env)) {
     (*env)->ExceptionDescribe(env);
@@ -552,9 +554,7 @@ jobject create_login_event(JNIEnv *env, void *arg) {
   struct hydra_login_info *login_info;
   char *pos;
   
-  res = addr = NULL;
-  pos = NULL;
-  jlogin = jpswd = NULL;
+  res = jlogin = jpswd = addr = NULL;
   message *m = (message *) arg;
 
   login_info = (struct hydra_login_info *) m->data;
@@ -563,7 +563,8 @@ jobject create_login_event(JNIEnv *env, void *arg) {
     addr = inaddr_to_inetaddress(env, login_info->address);
     if(!addr) return NULL;
   }
-  
+  pos = login_info->data;
+
   if(login_info->contents & HAVE_LOGIN) {
     pos = string_array_next(m, login_info->data, pos);
     
@@ -713,10 +714,9 @@ jobject create_host_event(JNIEnv *env, void *arg) {
   jbyteArray eth_addr;
   struct nrdr_host_info *hinfo;
   char *pos;
-  
-  res = ip_addr = NULL;
-  pos = '\0';
-  jname = NULL;
+
+  jname = res = NULL;
+
   message *m = (message *) arg;
   hinfo = (struct nrdr_host_info *) m->data;
   
@@ -727,7 +727,8 @@ jobject create_host_event(JNIEnv *env, void *arg) {
   if(!eth_addr) goto cleanup;
   
   (*env)->SetByteArrayRegion(env, eth_addr, 0, 6, (const jbyte *) hinfo->eth_addr);
-  
+
+  pos = hinfo->name;
   pos = string_array_next(m, hinfo->name, pos);
   
   if(pos) {

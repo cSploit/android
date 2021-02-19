@@ -209,8 +209,7 @@ int on_handler_list(message *m) {
     
     list_add(&handlers.list, (node *) h);
     
-    handler_info =  (struct hndl_info *) (
-                    ((char *) handler_info) + sizeof(struct hndl_info) + name_len + 1);
+    handler_info =  (struct hndl_info *) (((char *) handler_info) + sizeof(struct hndl_info) + name_len + 1);
   }
   
   name_len = ( handlers.status == HANDLER_WAIT );

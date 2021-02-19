@@ -94,7 +94,6 @@ message *parse_hydra_status(char *line) {
   *(line + pmatch[4].rm_eo) = '\0';
   *(line + pmatch[5].rm_eo) = '\0';
   *(line + pmatch[6].rm_eo) = '\0';
-  *(line + pmatch[7].rm_eo) = '\0';
   
   status_info = (struct hydra_attempts_info *) m->data;
   status_info->hydra_action = HYDRA_ATTEMPTS;
@@ -102,15 +101,15 @@ message *parse_hydra_status(char *line) {
   status_info->rate = strtoul(line + pmatch[1].rm_so, NULL, 10);
   status_info->sent = strtoul(line + pmatch[2].rm_so, NULL, 10);
 
-/*
+
   status_info->elapsed = (strtoul(line + pmatch[3].rm_so, NULL, 10) * 60) +
                           strtoul(line + pmatch[4].rm_so, NULL, 10);
-*/
+
   status_info->left = strtoul(line + pmatch[5].rm_so, NULL, 10);
-/*
+
   status_info->eta = (strtoul(line + pmatch[6].rm_so, NULL, 10) * 60) +
                       strtoul(line + pmatch[7].rm_so, NULL, 10);
- */
+
   return m;
 }
 
@@ -169,15 +168,8 @@ message *parse_hydra_login(char *line) {
     return NULL;
   }
 
-    *(line + pmatch[1].rm_eo) = '\0';
-    *(line + pmatch[2].rm_eo) = '\0';
-    *(line + pmatch[3].rm_eo) = '\0';
-    *(line + pmatch[4].rm_eo) = '\0';
-    *(line + pmatch[5].rm_eo) = '\0';
-    *(line + pmatch[6].rm_eo) = '\0';
-    *(line + pmatch[7].rm_eo) = '\0';
-    *(line + pmatch[8].rm_eo) = '\0';
-  
+  *(line + pmatch[1].rm_eo) = '\0';
+
   login_info = (struct hydra_login_info *)m->data;
   login_info->hydra_action = HYDRA_LOGIN;
   login_info->port = (uint16_t) strtoul(line + pmatch[1].rm_so, NULL, 10);

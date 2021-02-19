@@ -214,7 +214,7 @@ message *parse_nmap_xml_port(char *line) {
     service_info->proto = UNKNOWN;
   }
   
-  service_info->port = strtoul(line + pmatch[2].rm_so, NULL, 10);
+  service_info->port = (uint32_t) strtoul(line + pmatch[2].rm_so, NULL, 10);
   
   if(pmatch[5].rm_eo >= 0) {
     

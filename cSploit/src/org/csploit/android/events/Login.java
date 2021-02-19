@@ -7,13 +7,13 @@ import java.net.InetAddress;
  */
 public class Login implements Event {
   public final short port;
-  public final InetAddress address;
+  public final String address;
   public final String login;
   public final String password;
 
   public Login(short port, InetAddress address, String login, String password) {
     this.port = port;
-    this.address = address;
+    this.address = address.getHostAddress();
     this.login = login;
     this.password = password;
   }

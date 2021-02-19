@@ -72,6 +72,7 @@ public class Hydra extends Tool
       else if(e instanceof Login) {
         Login a = (Login) e;
         onAccountFound(a.login, a.password);
+        Logger.debug(String.format("%s", a.password));
       } else {
         Logger.error("Unknown event: " + e);
       }

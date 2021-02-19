@@ -33,8 +33,12 @@ struct hydra_attempts_info {
   char                hydra_action;   ///< must be set to ::HYDRA_ATTEMPTS
   uint32_t  rate;
   uint32_t  sent;
-  uint32_t  left;
-}__attribute__ ((__packed__));;
+  uint32_t  elapsed;
+  uint32_t  left;          ///< # of logins left to try
+           ///< elapsed time in minutes
+  uint32_t  eta;            ///< ETA in minutes
+
+};
 
 /// hydra warning info
 struct hydra_warning_info {
