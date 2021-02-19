@@ -19,7 +19,7 @@ public class Hop implements Event {
     this.node = node;
     this.name = name;
   }
-
+  @Override
   public String toString() {
     return String.format("HopEvent: { hop=%d, usec=%d, node=%s, name=%s }", hop, usec, node.getHostAddress(), name);
   }

@@ -11,7 +11,7 @@ public class HostLost implements Event {
   public HostLost(InetAddress ipAddress) {
     this.ipAddress = ipAddress;
   }
-
+  @Override
   public String toString() {
     return String.format("HostLost: { ipAddress='%s' }", ipAddress.getHostAddress());
   }

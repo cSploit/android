@@ -15,7 +15,7 @@ public class Host implements Event {
     this.ethAddress = ethAddress;
     this.name = name;
   }
-
+  @Override
   public String toString() {
     return String.format("Host: { ethAddress=[%02X:%02X:%02X:%02X:%02X:%02X], ipAddress='%s', name='%s' }",
             ethAddress[0], ethAddress[1], ethAddress[2], ethAddress[3], ethAddress[4], ethAddress[5],

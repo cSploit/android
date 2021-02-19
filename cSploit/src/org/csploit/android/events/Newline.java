@@ -9,7 +9,7 @@ public class Newline implements Event {
   public Newline(String line) {
     this.line = line;
   }
-
+  @Override
   public String toString() {
     return String.format("NewlineEvent: { line='%s' }", line);
   }

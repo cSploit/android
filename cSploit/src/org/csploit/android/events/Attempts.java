@@ -13,6 +13,7 @@ public class Attempts implements Event {
         this.sent = sent;
         this.left = left;
     }
+    @Override
     public String toString() {
         return String.format("Attempts: { rate='%d', sent='%d', left='%d' }", rate, sent, left);
     }

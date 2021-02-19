@@ -141,7 +141,8 @@ message *parse_hydra_alert(char *line) {
     alert_info->hydra_action = HYDRA_ERROR;
   else
     alert_info->hydra_action = HYDRA_WARNING;
-  
+
+  size_t len = strlen(alert_info->text);
   memcpy(alert_info->text, line + pmatch[0].rm_eo, len);
   *(alert_info->text + len) = '\0';
   
@@ -198,7 +199,7 @@ message *parse_hydra_login(char *line) {
       goto error;
     }
   }
-  
+
   if(pmatch[8].rm_eo >= 0) {
     *(line + pmatch[8].rm_eo) = '\0';
 

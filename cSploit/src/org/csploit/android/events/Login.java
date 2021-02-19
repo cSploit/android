@@ -17,6 +17,7 @@ public class Login implements Event {
     this.login = login;
     this.password = password;
   }
+  @Override
   public String toString() {
     return String.format("Login: { port=%d, address='%s', login='%s', password='%s' }",
             port, address, login, password);

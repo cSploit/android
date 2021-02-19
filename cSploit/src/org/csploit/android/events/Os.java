@@ -13,7 +13,7 @@ public class Os implements Event {
     this.os = os;
     this.type = type;
   }
-
+  @Override
   public String toString() {
     return String.format("Os: { accuracy=%d, os='%s', type='%s' }", accuracy, os, type);
   }

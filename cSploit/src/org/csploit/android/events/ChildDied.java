@@ -9,7 +9,7 @@ public class ChildDied implements Event {
   public ChildDied(int signal) {
     this.signal = signal;
   }
-
+  @Override
   public String toString() {
     return String.format("ChildDied: { signal=%d }", signal);
   }

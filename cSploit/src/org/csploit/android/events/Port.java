@@ -22,7 +22,7 @@ public class Port implements Event {
     this.service = service;
     this.version = version;
   }
-
+  @Override
   public String toString() {
     return String.format("Port: { protocol='%s', port=%d, service='%s', version='%s' }",
             protocol, port, service, version);

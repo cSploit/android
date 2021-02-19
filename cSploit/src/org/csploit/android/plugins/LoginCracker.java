@@ -125,7 +125,7 @@ public class LoginCracker extends Plugin {
                 mProgressBar.setProgress(0);
                 mStartButton.setChecked(false);
                 mStatusText.setTextColor(Color.GREEN);
-                mStatusText.setText("USERNAME = " + user + " - PASSWORD = "+ pass);
+                mStatusText.setText("USERNAME = " + user + " - PASSWORD = " + pass);
             }
         });
     }
@@ -515,11 +515,7 @@ public class LoginCracker extends Plugin {
 
         @Override
         public void onAttemptStatus(final int rate, final int progress, final int left) {
-            String status = "";
-
             int total = progress + left;
-
-            final String text = status;
             final int percentage = (int) ((progress / total) * 100);
 
             LoginCracker.this.runOnUiThread(new Runnable() {

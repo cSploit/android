@@ -170,11 +170,11 @@ message *parse_nmap_port(char *line) {
  * @returns a ::message on success, NULL on error.
  */
 message *parse_nmap_xml_port(char *line) {
-  regmatch_t pmatch[7];
+  regmatch_t pmatch[8];
   struct nmap_service_info *service_info;
   message *m;
   
-  if(regexec(&xml_port_pattern, line, 7, pmatch, 0))
+  if(regexec(&xml_port_pattern, line, 8, pmatch, 0))
     return NULL;
     
   print( DEBUG, "%s", line);
@@ -193,12 +193,14 @@ message *parse_nmap_xml_port(char *line) {
   *(line + pmatch[2].rm_eo) = '\0';
   if(pmatch[5].rm_eo >= 0)
     *(line + pmatch[5].rm_eo) = '\0';
-  
+  if(pmatch[7].rm_eo >= 0)
+    *(line + pmatch[7].rm_eo) = '\0';
+
   // debug
   print( DEBUG, "proto:   '%s'", (line + pmatch[1].rm_so));
   print( DEBUG, "port:    '%s'", (line + pmatch[2].rm_so));
   if(pmatch[5].rm_eo >= 0) print( DEBUG, "service: '%s'", (line + pmatch[5].rm_so));
-  if(pmatch[6].rm_eo >= 0) print( DEBUG, "version: '%s'", (line + pmatch[7].rm_so));
+  if(pmatch[7].rm_eo >= 0) print( DEBUG, "version: '%s'", (line + pmatch[7].rm_so));
   
   if(!strncmp(line + pmatch[1].rm_so, "tcp", 4)) {
     service_info->proto = TCP;
@@ -218,7 +220,7 @@ message *parse_nmap_xml_port(char *line) {
     
     service_info->nmap_action = SERVICE;
     if(string_array_add(m, offsetof(struct nmap_service_info, service), (line + pmatch[5].rm_so)) ||
-      (pmatch[6].rm_eo >= 0 && string_array_add(m, offsetof(struct nmap_service_info, service), (line + pmatch[6].rm_so)))) {
+      (pmatch[7].rm_eo >= 0 && string_array_add(m, offsetof(struct nmap_service_info, service), (line + pmatch[7].rm_so)))) {
       print( ERROR, "cannot add string to message");
       goto error;
     }
