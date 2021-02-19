@@ -14,6 +14,6 @@ public class Attempts implements Event {
         this.left = left;
     }
     public String toString() {
-        return String.format("AttemptsEvent: { rate=%d, sent=%d, left=%d }", rate, sent, left);
+        return String.format("Attempts: { rate='%d', sent='%d', left='%d' }", rate, sent, left);
     }
 }

@@ -175,7 +175,7 @@ message *parse_hydra_login(char *line) {
   
   login_info = (struct hydra_login_info *)m->data;
   login_info->hydra_action = HYDRA_LOGIN;
-  login_info->port = strtoul(line + pmatch[1].rm_so, NULL, 10);
+  login_info->port = (uint16_t) strtoul(line + pmatch[1].rm_so, NULL, 10);
   login_info->contents = 0;
   
   if(pmatch[3].rm_eo >= 0) {

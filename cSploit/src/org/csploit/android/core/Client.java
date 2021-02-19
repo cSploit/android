@@ -6,7 +6,6 @@ package org.csploit.android.core;
 public class Client {
 
   static {
-    java.lang.System.loadLibrary("cSploitCommon");
     java.lang.System.loadLibrary("cSploitClient");
   }
 

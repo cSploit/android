@@ -51,15 +51,15 @@ struct nmap_port_info {
 };
 
 struct nmap_service_info {
-  char            nmap_action;    ///< must be set to ::SERVICE
-  char            proto;          ///< ::nmap_proto used by this port
-  uint16_t        port;           ///< the port number
-  /**
-   * @brief array of null-terminated strings
-   * service[0] is the service name
-   * service[1] is the verison (can be empty)
-   */
-  char            service[];
+    char            nmap_action;    ///< must be set to ::SERVICE
+    char            proto;          ///< ::nmap_proto used by this port
+    uint16_t        port;           ///< the port number
+    /**
+     * @brief array of null-terminated strings
+     * service[0] is the service name
+     * service[1] is the verison (can be empty)
+     */
+    char            service[];
 };
 
 struct nmap_os_info {

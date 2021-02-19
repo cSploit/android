@@ -4,19 +4,19 @@ package org.csploit.android.events;
  * an open port has been found
  */
 public class Port implements Event {
+  public final short port;
   public final String protocol;
-  public final int port;
   public final String service;
   public final String version;
 
-  public Port(String protocol, int port) {
-    this.protocol = protocol;
+  public Port(short port, String protocol) {
     this.port = port;
+    this.protocol = protocol;
     this.service = null;
     this.version = null;
   }
 
-  public Port(String protocol, int port, String service, String version) {
+  public Port(short port, String protocol, String service, String version) {
     this.protocol = protocol;
     this.port = port;
     this.service = service;

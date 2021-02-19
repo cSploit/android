@@ -318,17 +318,17 @@ public class PortScanner extends Plugin {
 			});
 		}
 
-    @Override
-    public void onPortFound(final int port, String protocol) {
+    	@Override
+		public void onPortFound(final int port, String protocol) {
 			final String portProtocol = protocol;
-      final String resolvedProtocol = System.getProtocolByPort(port);
+			final String resolvedProtocol = System.getProtocolByPort(port);
 
-      System.addOpenPort(port, Network.Protocol.fromString(protocol));
+			System.addOpenPort(port, Network.Protocol.fromString(protocol));
 
 			PortScanner.this.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-          String entry;
+					String entry;
 
 					if (resolvedProtocol != null)
 						entry = port + " ( " + resolvedProtocol + " )";
@@ -338,10 +338,10 @@ public class PortScanner extends Plugin {
 
 					// add open port to the listview and notify the environment
 					// about the event
-          if(!mPortList.contains(entry)) {
-					  mPortList.add(entry);
-					  mListAdapter.notifyDataSetChanged();
-          }
+					if(!mPortList.contains(entry)) {
+							  mPortList.add(entry);
+							  mListAdapter.notifyDataSetChanged();
+					}
 				}
 			});
 		}

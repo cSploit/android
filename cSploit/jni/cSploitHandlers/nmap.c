@@ -263,7 +263,7 @@ message *parse_nmap_xml_os(char *line) {
   os_info = (struct nmap_os_info*) m->data;
   
   os_info->nmap_action = OS;
-  os_info->accuracy = strtoul(line + pmatch[3].rm_so, NULL, 10);
+  os_info->accuracy = (uint8_t) strtoul(line + pmatch[3].rm_so, NULL, 10);
   if(string_array_add(m, offsetof(struct nmap_os_info, os), line + pmatch[2].rm_so) ||
       string_array_add(m, offsetof(struct nmap_os_info, os), line + pmatch[1].rm_so)) {
     print( ERROR, "cannot add string to message");

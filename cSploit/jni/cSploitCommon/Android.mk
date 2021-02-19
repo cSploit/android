@@ -23,7 +23,9 @@ include $(CLEAR_VARS)
 LOCAL_CFLAGS:= -Wall -Werror
 LOCAL_EXPORT_LDLIBS:= -ldl
   
-LOCAL_SRC_FILES:= $(wildcard $(LOCAL_PATH)/*.c)
+LOCAL_SRC_FILES:= $(wildcard $(LOCAL_PATH)/src/*.c)
+
+LOCAL_C_INCLUDES:= $(LOCAL_PATH)/include/csploit
 
 LOCAL_MODULE:= cSploitCommon
 
@@ -34,7 +36,9 @@ include $(CLEAR_VARS)
 LOCAL_CFLAGS:= -Wall -Werror
 LOCAL_EXPORT_LDLIBS:= -ldl
   
-LOCAL_SRC_FILES:= $(wildcard $(LOCAL_PATH)/*.c)
+LOCAL_SRC_FILES:= $(wildcard $(LOCAL_PATH)/src/*.c)
+
+LOCAL_C_INCLUDES:= $(LOCAL_PATH)/include/csploit
 
 LOCAL_MODULE:= cSploitCommon_static
 

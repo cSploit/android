@@ -59,8 +59,7 @@ directories="/enc/trans/
 /racc/
 /"
 apis="19"
-abis="armeabi
-armeabi-v7a"
+abis="armeabi armeabi-v7a"
 
 check_ndk() {
   ndk_build=$(which ndk-build) || \

@@ -289,7 +289,7 @@ jobject create_port_event(JNIEnv *env, void *arg) {
   res = (*env)->NewObject(env,
                           cache.csploit.events.port.class,
                           cache.csploit.events.port.ctor,
-                          jproto, (jint)(service_info->port),
+                          (jint)(service_info->port), jproto,
                           jservice, jversion);
   
   cleanup:
