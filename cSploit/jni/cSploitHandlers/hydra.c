@@ -123,17 +123,15 @@ message *parse_hydra_alert(char *line) {
   regmatch_t pmatch[1];
   struct hydra_warning_info *alert_info;  // warning and error info differ only by hydra_action
   message *m;
-  size_t len;
   
   if(regexec(&alert_pattern, line, 1, pmatch, 0))
     return NULL;
+
   
-  len = strlen(line + pmatch[0].rm_eo);
-  
-  m = create_message(0, sizeof(struct hydra_warning_info) + len + 1, 0);
+  m = create_message(0, sizeof(struct hydra_warning_info), 0);
   
   if(!m) {
-    print( ERROR, "cannot craete messages");
+    print( ERROR, "cannot create messages");
     return NULL;
   }
   
@@ -156,11 +154,11 @@ message *parse_hydra_alert(char *line) {
  * @returns a ::message on success, NULL on error.
  */
 message *parse_hydra_login(char *line) {
-  regmatch_t pmatch[11];
+  regmatch_t pmatch[9];
   struct hydra_login_info *login_info;
   message *m;
   
-  if(regexec(&login_pattern, line, 11, pmatch, 0))
+  if(regexec(&login_pattern, line, 9, pmatch, 0))
     return NULL;
   
   m = create_message(0, sizeof(struct hydra_login_info), 0);
@@ -170,7 +168,14 @@ message *parse_hydra_login(char *line) {
     return NULL;
   }
 
-  *(line + pmatch[1].rm_eo) = '\0';
+    *(line + pmatch[1].rm_eo) = '\0';
+    *(line + pmatch[2].rm_eo) = '\0';
+    *(line + pmatch[3].rm_eo) = '\0';
+    *(line + pmatch[4].rm_eo) = '\0';
+    *(line + pmatch[5].rm_eo) = '\0';
+    *(line + pmatch[6].rm_eo) = '\0';
+    *(line + pmatch[7].rm_eo) = '\0';
+    *(line + pmatch[8].rm_eo) = '\0';
   
   login_info = (struct hydra_login_info *)m->data;
   login_info->hydra_action = HYDRA_LOGIN;
@@ -194,11 +199,11 @@ message *parse_hydra_login(char *line) {
     }
   }
   
-  if(pmatch[9].rm_eo >= 0) {
-    *(line + pmatch[9].rm_eo) = '\0';
+  if(pmatch[8].rm_eo >= 0) {
+    *(line + pmatch[8].rm_eo) = '\0';
 
     login_info->contents |= HAVE_PASSWORD;
-    if(string_array_add(m, offsetof(struct hydra_login_info, data), line + pmatch[9].rm_so)) {
+    if(string_array_add(m, offsetof(struct hydra_login_info, data), line + pmatch[8].rm_so)) {
       print( ERROR, "cannot add string to message");
       goto error;
     }

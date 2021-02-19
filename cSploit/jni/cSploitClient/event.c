@@ -581,7 +581,7 @@ jobject create_login_event(JNIEnv *env, void *arg) {
   res = (*env)->NewObject(env,
                           cache.csploit.events.login.class,
                           cache.csploit.events.login.ctor,
-                          (jint)(login_info->port), addr,
+                          (jshort)(login_info->port), addr,
                           jlogin, jpswd);
   
   cleanup:
@@ -715,7 +715,7 @@ jobject create_host_event(JNIEnv *env, void *arg) {
   char *pos;
   
   res = ip_addr = NULL;
-  pos = NULL;
+  pos = '\0';
   jname = NULL;
   message *m = (message *) arg;
   hinfo = (struct nrdr_host_info *) m->data;
