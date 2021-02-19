@@ -108,6 +108,18 @@ int hydra_get_options(char *options[]) {
     options[i++] = "-d";
   }
 
+  /* COMPLETE HELP */
+  widget = lookup_widget(GTK_WIDGET(wndMain), "chkCompleteHelp");
+  if (gtk_toggle_button_get_active((GtkToggleButton *) widget)) {
+    options[i++] = "-h";
+  }
+
+  /* Service Module Usage Details */
+  widget = lookup_widget(GTK_WIDGET(wndMain), "chkServiceDetails");
+  if (gtk_toggle_button_get_active((GtkToggleButton *) widget)) {
+    options[i++] = "-U";
+  }
+
   /* use colon separated list? */
   widget = lookup_widget(GTK_WIDGET(wndMain), "chkColon");
   if (gtk_toggle_button_get_active((GtkToggleButton *) widget)) {
@@ -116,16 +128,21 @@ int hydra_get_options(char *options[]) {
     options[i++] = (char *) gtk_entry_get_text((GtkEntry *) widget);
 
   } else {
-    /* get the username, or username list */
-    widget = lookup_widget(GTK_WIDGET(wndMain), "radioUsername1");
+    /* disable usernames */
+    widget = lookup_widget(GTK_WIDGET(wndMain), "chkDisUser");
     if (gtk_toggle_button_get_active((GtkToggleButton *) widget)) {
-      options[i++] = "-l";
-      widget = lookup_widget(GTK_WIDGET(wndMain), "entUsername");
-      options[i++] = (char *) gtk_entry_get_text((GtkEntry *) widget);
     } else {
-      options[i++] = "-L";
-      widget = lookup_widget(GTK_WIDGET(wndMain), "entUsernameFile");
-      options[i++] = (char *) gtk_entry_get_text((GtkEntry *) widget);
+      /* get the username, or username list */
+      widget = lookup_widget(GTK_WIDGET(wndMain), "radioUsername1");
+      if (gtk_toggle_button_get_active((GtkToggleButton *) widget)) {
+        options[i++] = "-l";
+        widget = lookup_widget(GTK_WIDGET(wndMain), "entUsername");
+        options[i++] = (char *) gtk_entry_get_text((GtkEntry *) widget);
+      } else {
+        options[i++] = "-L";
+        widget = lookup_widget(GTK_WIDGET(wndMain), "entUsernameFile");
+        options[i++] = (char *) gtk_entry_get_text((GtkEntry *) widget);
+      }
     }
 
     /* get the pass, pass list, or generate */
@@ -205,9 +222,21 @@ int hydra_get_options(char *options[]) {
   }
 
   /* exit after first found pair? */
+  /* per host */
   widget = lookup_widget(GTK_WIDGET(wndMain), "chkExitf");
   if (gtk_toggle_button_get_active((GtkToggleButton *) widget)) {
     options[i++] = "-f";
+  }
+  /* global */
+  widget = lookup_widget(GTK_WIDGET(wndMain), "chkExitF");
+  if (gtk_toggle_button_get_active((GtkToggleButton *) widget)) {
+    options[i++] = "-F";
+  }
+
+  /* Do not print messages about connection errors */
+  widget = lookup_widget(GTK_WIDGET(wndMain), "chkNoErr");
+  if (gtk_toggle_button_get_active((GtkToggleButton *) widget)) {
+    options[i++] = "-q";
   }
 
   /* get additional parameters */
@@ -689,6 +718,26 @@ void on_chkColon_toggled(GtkToggleButton * togglebutton, gpointer user_data) {
   } else {
     gtk_widget_set_sensitive(user, TRUE);
     gtk_widget_set_sensitive(pass, TRUE);
+  }
+}
+
+void on_chkDisUser_toggled(GtkToggleButton * togglebutton, gpointer user_data) {
+  GtkWidget *radioUsername1, *radioUsername2, *entUsername, *entUsernameFile;
+  radioUsername1 = lookup_widget(GTK_WIDGET(wndMain), "radioUsername1");;
+  radioUsername2 = lookup_widget(GTK_WIDGET(wndMain), "radioUsername2");
+  entUsername = lookup_widget(GTK_WIDGET(wndMain), "entUsername");
+  entUsernameFile = lookup_widget(GTK_WIDGET(wndMain), "entUsernameFile");
+
+  if (gtk_toggle_button_get_active(togglebutton)) {
+    gtk_widget_set_sensitive(radioUsername1, FALSE);
+    gtk_widget_set_sensitive(radioUsername2, FALSE);
+    gtk_widget_set_sensitive(entUsername, FALSE);
+    gtk_widget_set_sensitive(entUsernameFile, FALSE);
+  } else {
+    gtk_widget_set_sensitive(radioUsername1, TRUE);
+    gtk_widget_set_sensitive(radioUsername2, TRUE);
+    gtk_widget_set_sensitive(entUsername, TRUE);
+    gtk_widget_set_sensitive(entUsernameFile, TRUE);
   }
 }
 

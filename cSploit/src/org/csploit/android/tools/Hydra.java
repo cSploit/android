@@ -40,6 +40,11 @@ public class Hydra extends Tool
       if( exitCode != 0 )
         Logger.error( "hydra exited with code " + exitCode );
     }
+    public void onDeath(int signal) {
+      Logger.error("hydra killed by signal " + signal);
+    }
+
+
     public abstract void onAttemptStatus(int rate, int progress, int left);
 
     public abstract void onWarning(String message);
@@ -50,9 +55,10 @@ public class Hydra extends Tool
 
     public void onEvent(Event e) {
       if(e instanceof Attempts) {
-        Attempts a = (Attempts)e;
+        Attempts a = (Attempts) e;
         onAttemptStatus(a.rate, a.sent, a.left);
-      } else if(e instanceof Message) {
+      }
+      /*else if(e instanceof Message) {
         Message m = (Message)e;
 
         if(m.severity == Message.Severity.ERROR) {
@@ -62,7 +68,8 @@ public class Hydra extends Tool
         } else {
           Logger.error("Unknown event: " + e);
         }
-      } else if(e instanceof Login) {
+      } */
+      else if(e instanceof Login) {
         Login a = (Login) e;
         onAccountFound(a.login, a.password);
       } else {
@@ -72,7 +79,7 @@ public class Hydra extends Tool
   }
 
   public Child crack(Target target, int port, String service, String charset, int minlength, int maxlength, String username, String userWordlist, String passWordlist, AttemptsReceiver receiver) throws ChildManager.ChildNotStartedException {
-    String command = "-f ";
+    String command = "-F ";
 
     if(userWordlist != null)
       command += "-L " + userWordlist;
@@ -84,12 +91,12 @@ public class Hydra extends Tool
       command += " -P " + passWordlist;
 
     else
-      command += " -x " + minlength + ":" + maxlength + ":" + charset;
+      command += " -x " + "\"" + minlength + ":" + maxlength + ":" + charset + "\"";
 
-    command += " -s " + port + " -V " + service + "://" + target.getCommandLineRepresentation();
+    command += " -t 1 " + service + "://" + target.getCommandLineRepresentation() + ":" + port;
 
-    if(service.equalsIgnoreCase("http-head"))
-      command += " /";
+    if(service.equalsIgnoreCase("http-get") || service.equalsIgnoreCase("https-get"))
+      command += "/";
 
     return super.async(command, receiver);
   }

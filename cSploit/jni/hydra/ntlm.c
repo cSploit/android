@@ -1172,7 +1172,7 @@ static void dumpRaw(FILE * fp, unsigned char *buf, size_t len) {
 
 static char *unicodeToString(char *p, size_t len) {
   int i;
-  static char buf[1024];
+  static char buf[4096];
 
   assert(len + 1 < sizeof buf);
 
@@ -1186,7 +1186,7 @@ static char *unicodeToString(char *p, size_t len) {
 }
 
 static unsigned char *strToUnicode(char *p) {
-  static unsigned char buf[1024];
+  static unsigned char buf[4096];
   size_t l = strlen(p);
   int i = 0;
 
@@ -1201,7 +1201,7 @@ static unsigned char *strToUnicode(char *p) {
 }
 
 static unsigned char *toString(char *p, size_t len) {
-  static unsigned char buf[1024];
+  static unsigned char buf[4096];
 
   assert(len + 1 < sizeof buf);
 
@@ -1307,7 +1307,7 @@ void dumpAuthResponse(FILE * fp, tSmbNtlmAuthResponse * response);
 void dumpAuthRequest(FILE * fp, tSmbNtlmAuthRequest * request) {
   fprintf(fp, "NTLM Request:\n");
   fprintf(fp, "      Ident = %s\n", request->ident);
-  fprintf(fp, "      mType = %d\n", IVAL(&request->msgType, 0));
+  fprintf(fp, "      mType = %u\n", IVAL(&request->msgType, 0));
   fprintf(fp, "      Flags = %08x\n", IVAL(&request->flags, 0));
   fprintf(fp, "       Host = %s\n", GetString(request, host));
   fprintf(fp, "     Domain = %s\n", GetString(request, domain));
@@ -1316,7 +1316,7 @@ void dumpAuthRequest(FILE * fp, tSmbNtlmAuthRequest * request) {
 void dumpAuthChallenge(FILE * fp, tSmbNtlmAuthChallenge * challenge) {
   fprintf(fp, "NTLM Challenge:\n");
   fprintf(fp, "      Ident = %s\n", challenge->ident);
-  fprintf(fp, "      mType = %d\n", IVAL(&challenge->msgType, 0));
+  fprintf(fp, "      mType = %u\n", IVAL(&challenge->msgType, 0));
   fprintf(fp, "     Domain = %s\n", GetUnicodeString(challenge, uDomain));
   fprintf(fp, "      Flags = %08x\n", IVAL(&challenge->flags, 0));
   fprintf(fp, "  Challenge = ");
@@ -1327,7 +1327,7 @@ void dumpAuthChallenge(FILE * fp, tSmbNtlmAuthChallenge * challenge) {
 void dumpAuthResponse(FILE * fp, tSmbNtlmAuthResponse * response) {
   fprintf(fp, "NTLM Response:\n");
   fprintf(fp, "      Ident = %s\n", response->ident);
-  fprintf(fp, "      mType = %d\n", IVAL(&response->msgType, 0));
+  fprintf(fp, "      mType = %u\n", IVAL(&response->msgType, 0));
   fprintf(fp, "     LmResp = ");
   DumpBuffer(fp, response, lmResponse);
   fprintf(fp, "     NTResp = ");

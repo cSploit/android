@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
@@ -79,7 +78,7 @@ message *parse_hydra_status(char *line) {
   struct hydra_attempts_info *status_info;
   message *m;
   
-  if(regexec(&status_pattern, line, 7, pmatch, 0))
+  if(regexec(&status_pattern, line, 8, pmatch, 0))
     return NULL;
   
   m = create_message(0, sizeof(struct hydra_attempts_info), 0);
@@ -95,7 +94,7 @@ message *parse_hydra_status(char *line) {
   *(line + pmatch[4].rm_eo) = '\0';
   *(line + pmatch[5].rm_eo) = '\0';
   *(line + pmatch[6].rm_eo) = '\0';
-  
+  *(line + pmatch[7].rm_eo) = '\0';
   
   status_info = (struct hydra_attempts_info *) m->data;
   status_info->hydra_action = HYDRA_ATTEMPTS;

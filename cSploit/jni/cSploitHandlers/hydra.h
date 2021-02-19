@@ -34,7 +34,7 @@ struct hydra_attempts_info {
   uint32_t  rate;
   uint32_t  sent;
   uint32_t  left;
-};
+}__attribute__ ((__packed__));;
 
 /// hydra warning info
 struct hydra_warning_info {

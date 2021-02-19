@@ -47,6 +47,7 @@ int __first_connect = 1;
 char ipstring[64];
 unsigned int colored_output = 1;
 char quiet = 0;
+int old_ssl = 0;
 
 #ifdef LIBOPENSSL
 SSL *ssl = NULL;
@@ -439,22 +440,24 @@ int internal__hydra_connect(char *host, int port, int protocol, int type) {
 
 #ifdef LIBOPENSSL
 RSA *ssl_temp_rsa_cb(SSL * ssl, int export, int keylength) {
-  if (rsa == NULL) {
+  if(rsa->n && RSA_size(rsa)!=(keylength/8)){
+      RSA_free(rsa);
+  }
+  if (rsa->n == 0) {
 #ifdef NO_RSA_LEGACY
-    RSA *private = RSA_new();
+    RSA *rsa = RSA_new();
     BIGNUM *f4 = BN_new();
-
     BN_set_word(f4, RSA_F4);
-    RSA_generate_key_ex(rsa, 1024, f4, NULL);
+    RSA_generate_key_ex(rsa, keylength, f4, NULL);
 #else
-    rsa = RSA_generate_key(1024, RSA_F4, NULL, NULL);
+    rsa = RSA_generate_key(keylength, RSA_F4, NULL, NULL);
 #endif
   }
   return rsa;
 }
 
 
-int internal__hydra_connect_to_ssl(int socket) {
+int internal__hydra_connect_to_ssl(int socket, char *hostname) {
   int err;
 
   if (ssl_first) {
@@ -466,17 +469,31 @@ int internal__hydra_connect_to_ssl(int socket) {
 
   if (sslContext == NULL) {
     /* context: ssl2 + ssl3 is allowed, whatever the server demands */
-    if ((sslContext = SSL_CTX_new(SSLv23_client_method())) == NULL) {
-      if (verbose) {
-        err = ERR_get_error();
-        fprintf(stderr, "[ERROR] SSL allocating context: %s\n", ERR_error_string(err, NULL));
+    if (old_ssl) {
+      if ((sslContext = SSL_CTX_new(SSLv23_client_method())) == NULL) {
+        if (verbose) {
+          err = ERR_get_error();
+          fprintf(stderr, "[ERROR] SSL allocating context: %s\n", ERR_error_string(err, NULL));
+        }
+        return -1;
       }
-      return -1;
+    } else {
+//    if ((sslContext = SSL_CTX_new(SSLv23_client_method())) == NULL) {
+#ifndef TLSv1_2_client_method
+  #define TLSv1_2_client_method TLSv1_client_method
+#endif
+      if ((sslContext = SSL_CTX_new(TLSv1_2_client_method())) == NULL) {
+        if (verbose) {
+          err = ERR_get_error();
+          fprintf(stderr, "[ERROR] SSL allocating context: %s\n", ERR_error_string(err, NULL));
+        }
+        return -1;
+      }
     }
     /* set the compatbility mode */
     SSL_CTX_set_options(sslContext, SSL_OP_ALL);
-    SSL_CTX_set_options(sslContext, SSL_OP_NO_SSLv2);
-    SSL_CTX_set_options(sslContext, SSL_OP_NO_TLSv1);
+//    SSL_CTX_set_options(sslContext, SSL_OP_NO_SSLv2);
+//    SSL_CTX_set_options(sslContext, SSL_OP_NO_TLSv1);
 
     /* we set the default verifiers and dont care for the results */
     (void) SSL_CTX_set_default_verify_paths(sslContext);
@@ -494,7 +511,11 @@ int internal__hydra_connect_to_ssl(int socket) {
     return -1;
   }
 
+  /* add SNI */
+  SSL_set_tlsext_host_name(ssl, hostname);
+
   SSL_set_fd(ssl, socket);
+
   if (SSL_connect(ssl) <= 0) {
 //    fprintf(stderr, "[ERROR] SSL Connect %d\n", SSL_connect(ssl));
     if (verbose) {
@@ -512,13 +533,13 @@ int internal__hydra_connect_to_ssl(int socket) {
   return socket;
 }
 
-int internal__hydra_connect_ssl(char *host, int port, int protocol, int type) {
+int internal__hydra_connect_ssl(char *host, int port, int protocol, int type, char *hostname) {
   int socket;
 
   if ((socket = internal__hydra_connect(host, port, protocol, type)) < 0)
     return -1;
 
-  return internal__hydra_connect_to_ssl(socket);
+  return internal__hydra_connect_to_ssl(socket, hostname);
 }
 #endif
 
@@ -559,7 +580,7 @@ void hydra_child_exit(int code) {
     __fck = write(intern_socket, "E", 1);
   }
   do {
-    usleep(10000);
+    sleepn(10);
   } while (read(intern_socket, buf, 1) <= 0);
 //  sleep(2); // be sure that mommy receives our message
   exit(0);                      // might be killed before reaching this
@@ -662,6 +683,7 @@ void hydra_report_debug(FILE * st, char *format, ...) {
 }
 
 void hydra_report_found(int port, char *svc, FILE * fp) {
+/*
   if (!strcmp(svc, "rsh"))
     if (colored_output)
       fprintf(fp, "[\e[31m%d\e[0m][\e[31m%s\e[0m] login: \e[32m%s\e[0m\n", port, svc, hydra_get_next_login());
@@ -680,10 +702,12 @@ void hydra_report_found(int port, char *svc, FILE * fp) {
   }
 
   fflush(fp);
+*/
 }
 
 /* needed for irc module to display the general server password */
 void hydra_report_pass_found(int port, char *ip, char *svc, FILE * fp) {
+/*
   strcpy(ipaddr_str, hydra_address2string(ip));
   if (colored_output)
     fprintf(fp, "[\e[31m%d\e[0m][\e[31m%s\e[0m] host: \e[32m%s\e[0m   password: \e[32m%s\e[0m\n", port, svc, ipaddr_str, hydra_get_next_password());
@@ -692,10 +716,11 @@ void hydra_report_pass_found(int port, char *ip, char *svc, FILE * fp) {
   if (stdout != fp)
     printf("[%d][%s] host: %s   password: %s\n", port, svc, ipaddr_str, hydra_get_next_password());
   fflush(fp);
+*/
 }
 
 void hydra_report_found_host(int port, char *ip, char *svc, FILE * fp) {
-  char *keyw = "password";
+/*  char *keyw = "password";
 
   strcpy(ipaddr_str, hydra_address2string(ip));
   if (!strcmp(svc, "smtp-enum"))
@@ -732,9 +757,11 @@ void hydra_report_found_host(int port, char *ip, char *svc, FILE * fp) {
   }
   fflush(fp);
   fflush(stdout);
+*/
 }
 
 void hydra_report_found_host_msg(int port, char *ip, char *svc, FILE * fp, char *msg) {
+/*
   strcpy(ipaddr_str, hydra_address2string(ip));
   if (colored_output)
     fprintf(fp, "[\e[31m%d\e[0m][\e[31m%s\e[0m] host: \e[32m%s\e[0m   login: \e[32m%s\e[0m   password: \e[32m%s\e[0m  [%s]\n", port, svc, ipaddr_str, hydra_get_next_login(),
@@ -744,25 +771,28 @@ void hydra_report_found_host_msg(int port, char *ip, char *svc, FILE * fp, char 
   if (stdout != fp)
     printf("[%d][%s] host: %s   login: %s   password: %s\n", port, svc, ipaddr_str, hydra_get_next_login(), hydra_get_next_password());
   fflush(fp);
+*/
 }
 
-int hydra_connect_to_ssl(int socket) {
+int hydra_connect_to_ssl(int socket, char *hostname) {
 #ifdef LIBOPENSSL
-  return (internal__hydra_connect_to_ssl(socket));
+  return (internal__hydra_connect_to_ssl(socket, hostname));
 #else
+  fprintf(stderr, "Error: not compiled with SSL\n");
   return -1;
 #endif
 }
 
-int hydra_connect_ssl(char *host, int port) {
+int hydra_connect_ssl(char *host, int port, char *hostname) {
   if (__first_connect != 0)
     __first_connect = 0;
   else
     sleep(conwait);
 #ifdef LIBOPENSSL
-  return (internal__hydra_connect_ssl(host, port, SOCK_STREAM, 6));
+  return (internal__hydra_connect_ssl(host, port, SOCK_STREAM, 6, hostname));
 #else
-  return (internal__hydra_connect(host, port, SOCK_STREAM, 6));
+  fprintf(stderr, "Error: not compiled with SSL\n");
+  return -1;
 #endif
 }
 
@@ -894,7 +924,7 @@ char *hydra_receive_line(int socket) {
         if (buff[k] == 0)
           buff[k] = 32;
       buff[got] = 0;
-      usleep(100);
+      usleepn(100);
     }
   }
 
@@ -914,7 +944,7 @@ char *hydra_receive_line(int socket) {
       got += j;
       buff[got] = 0;
     }
-    usleep(100);
+    usleepn(100);
   }
 
   if (debug) {
@@ -967,8 +997,8 @@ int make_to_lower(char *buf) {
 
 char *hydra_strrep(char *string, char *oldpiece, char *newpiece) {
   int str_index, newstr_index, oldpiece_index, end, new_len, old_len, cpy_len;
-  char *c, oldstring[1024];
-  static char newstring[1024];
+  char *c, oldstring[1024], newstring[1024];
+  static char finalstring[1024];
 
   if (string == NULL || oldpiece == NULL || newpiece == NULL || strlen(string) >= sizeof(oldstring) - 1
       || (strlen(string) + strlen(newpiece) - strlen(oldpiece) >= sizeof(newstring) - 1 && strlen(string) > strlen(oldpiece)))
@@ -1004,7 +1034,8 @@ char *hydra_strrep(char *string, char *oldpiece, char *newpiece) {
   strcpy(newstring + newstr_index, oldstring + str_index);
   strcpy(oldstring, newstring);
 //  }
-  return newstring;
+  strcpy(finalstring, newstring);
+  return finalstring;
 }
 
 unsigned char hydra_conv64(unsigned char in) {
@@ -1142,7 +1173,8 @@ char *hydra_address2string(char *address) {
   } else
 #endif
   {
-    fprintf(stderr, "[ERROR] unknown address string size!\n");
+    if (debug)
+      fprintf(stderr, "[ERROR] unknown address string size!\n");
     return NULL;
   }
   return NULL;                  // not reached
@@ -1186,16 +1218,20 @@ char *hydra_string_replace(const char *string, const char *substr, const char *r
   char *tok = NULL;
   char *newstr = NULL;
 
+  if (string == NULL)
+    return NULL;
+  if (substr == NULL || replacement == NULL)
+    return strdup(string);
   tok = strstr(string, substr);
   if (tok == NULL)
     return strdup(string);
-  newstr = malloc(strlen(string) - strlen(substr) + strlen(replacement) + 1);
+  newstr = malloc(strlen(string) - strlen(substr) + strlen(replacement) + 2);
   if (newstr == NULL)
     return NULL;
+  memset(newstr, 0, strlen(string) - strlen(substr) + strlen(replacement) + 2);
   memcpy(newstr, string, tok - string);
   memcpy(newstr + (tok - string), replacement, strlen(replacement));
   memcpy(newstr + (tok - string) + strlen(replacement), tok + strlen(substr), strlen(string) - strlen(substr) - (tok - string));
-  memset(newstr + strlen(string) - strlen(substr) + strlen(replacement), 0, 1);
   return newstr;
 }
 

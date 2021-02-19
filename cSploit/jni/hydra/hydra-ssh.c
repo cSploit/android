@@ -48,7 +48,7 @@ int start_ssh(int s, char *ip, int port, unsigned char options, char *miscptr, F
     if (ssh_connect(session) != 0) {
       //if the connection was drop, exit and let hydra main handle it
       if (verbose)
-        hydra_report(stderr, "[ERROR] could not connect to target port %d\n", port);
+        hydra_report(stderr, "[ERROR] could not connect to target port %d: %s\n", port, ssh_get_error(session));
       return 3;
     }
 
@@ -80,7 +80,7 @@ int start_ssh(int s, char *ip, int port, unsigned char options, char *miscptr, F
     return 4;
   }
 
-  if (auth_state == SSH_AUTH_ERROR) {
+  if (auth_state == SSH_AUTH_ERROR || !ssh_is_connected(session)) {
     new_session = 1;
     return 1;
   }
@@ -107,7 +107,7 @@ int start_ssh(int s, char *ip, int port, unsigned char options, char *miscptr, F
   return 1;
 }
 
-void service_ssh(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+void service_ssh(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   int run = 1, next_run = 1, sock = -1;
 
   hydra_register_socket(sp);
@@ -151,7 +151,7 @@ void service_ssh(char *ip, int sp, unsigned char options, char *miscptr, FILE * 
 #endif
 #endif
 
-int service_ssh_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+int service_ssh_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   // called before the childrens are forked off, so this is the function
   // which should be filled if initial connections and service setup has to be
   // performed once only.
@@ -175,7 +175,7 @@ int service_ssh_init(char *ip, int sp, unsigned char options, char *miscptr, FIL
   ssh_options_set(session, SSH_OPTIONS_COMPRESSION_C_S, "none");
   ssh_options_set(session, SSH_OPTIONS_COMPRESSION_S_C, "none");
   if (ssh_connect(session) != 0) {
-    fprintf(stderr, "[ERROR] could not connect to ssh://%s:%d\n", hydra_address2string(ip), port);
+    fprintf(stderr, "[ERROR] could not connect to ssh://%s:%d - %s\n", hydra_address2string(ip), port, ssh_get_error(session));
     return 2;
   } 
   rc = ssh_userauth_none(session, NULL);

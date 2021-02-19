@@ -110,9 +110,9 @@ public class MainActivity extends AppCompatActivity implements NetworkRadar.Targ
   private TargetAdapter mTargetAdapter = null;
   private NetworkRadar mNetworkRadar = null;
   private Child mMsfRpcd = null;
-  private RadarReceiver mRadarReceiver = new RadarReceiver();
-  private UpdateReceiver mUpdateReceiver = new UpdateReceiver();
-  private WipeReceiver mWipeReceiver = new WipeReceiver();
+  private final RadarReceiver mRadarReceiver = new RadarReceiver();
+  private final UpdateReceiver mUpdateReceiver = new UpdateReceiver();
+  private final WipeReceiver mWipeReceiver = new WipeReceiver();
   private Menu mMenu = null;
   private TextView mUpdateStatus = null;
   private Toast mToast = null;
@@ -480,7 +480,7 @@ public class MainActivity extends AppCompatActivity implements NetworkRadar.Targ
     }).show();
   }
 
-  private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+  private final ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
 
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
       MenuInflater inflater = mode.getMenuInflater();

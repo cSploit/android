@@ -85,7 +85,7 @@ int on_nmap(JNIEnv *env, child_node *c, message *m) {
       event = create_port_event(env, m);
       break;
     case OS:
-      event = create_os_event(env, m->data);
+      event = create_os_event(env, m);
       break;
     default:
       LOGW("%s: unkown nmap action: %02hhX", __func__, m->data[0]);

@@ -18,7 +18,7 @@ char apop_challenge[300] = "";
 pool *plist = NULL, *p = NULL;
 
 /* functions */
-int service_pop3_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port);
+int service_pop3_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname);
 
 pool *list_create(pool data) {
   pool *p;
@@ -205,7 +205,10 @@ int start_pop3(int s, char *ip, int port, unsigned char options, char *miscptr, 
 
       memset(buffer, 0, sizeof(buffer));
       sasl_plain(buffer, login, pass);
-      sprintf(buffer, "%.250s\r\n", buffer);
+
+      char tmp_buffer[sizeof(buffer)];
+      sprintf(tmp_buffer, "%.250s\r\n", buffer);
+      strcpy(buffer, tmp_buffer);
     }
     break;
 
@@ -279,7 +282,10 @@ int start_pop3(int s, char *ip, int port, unsigned char options, char *miscptr, 
         break;
       }
       hydra_tobase64((unsigned char *) buffer, strlen(buffer), sizeof(buffer));
-      sprintf(buffer, "%.250s\r\n", buffer);
+
+      char tmp_buffer[sizeof(buffer)];
+      sprintf(tmp_buffer, "%.250s\r\n", buffer);
+      strcpy(buffer, tmp_buffer);
       free(preplogin);
     }
     break;
@@ -405,13 +411,13 @@ int start_pop3(int s, char *ip, int port, unsigned char options, char *miscptr, 
   return 2;
 }
 
-void service_pop3(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
-  int run = 1, next_run = 1, sock = -1, i;
+void service_pop3(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
+  int run = 1, next_run = 1, sock = -1;
   char *ptr = NULL;
 
   //extract data from the pool, ip is the key
   if (plist == NULL)
-    if (service_pop3_init(ip, sp, options, miscptr, fp, port) != 0)
+    if (service_pop3_init(ip, sp, options, miscptr, fp, port, hostname) != 0)
       hydra_child_exit(2);
   p = list_find(ip);
   if (p == NULL) {
@@ -432,11 +438,11 @@ void service_pop3(char *ip, int sp, unsigned char options, char *miscptr, FILE *
 
       if (sock >= 0)
         sock = hydra_disconnect(sock);
-      //      usleep(300000);
+      //      sleepn(300);
       if ((options & OPTION_SSL) == 0) {
         sock = hydra_connect_tcp(ip, port);
       } else {
-        sock = hydra_connect_ssl(ip, port);
+        sock = hydra_connect_ssl(ip, port, hostname);
       }
       if (sock < 0) {
         if (verbose || debug)
@@ -469,7 +475,7 @@ void service_pop3(char *ip, int sp, unsigned char options, char *miscptr, FILE *
           hydra_report(stderr, "[ERROR] TLS negotiation failed, no answer received from STARTTLS request\n");
         } else {
           free(buf);
-          if ((hydra_connect_to_ssl(sock) == -1)) {
+          if ((hydra_connect_to_ssl(sock, hostname) == -1)) {
             if (verbose)
               hydra_report(stderr, "[ERROR] Can't use TLS\n");
             p->disable_tls = 1;
@@ -505,7 +511,7 @@ void service_pop3(char *ip, int sp, unsigned char options, char *miscptr, FILE *
 }
 
 
-int service_pop3_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+int service_pop3_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   int myport = PORT_POP3, mysslport = PORT_POP3_SSL;
   char *ptr = NULL;
   int sock = -1;
@@ -519,7 +525,7 @@ int service_pop3_init(char *ip, int sp, unsigned char options, char *miscptr, FI
 
   if (sock >= 0)
     sock = hydra_disconnect(sock);
-//      usleep(300000);
+//      sleepn(300);
   if ((options & OPTION_SSL) == 0) {
     if (port != 0)
       myport = port;
@@ -527,7 +533,7 @@ int service_pop3_init(char *ip, int sp, unsigned char options, char *miscptr, FI
   } else {
     if (port != 0)
       mysslport = port;
-    sock = hydra_connect_ssl(p.ip, mysslport);
+    sock = hydra_connect_ssl(p.ip, mysslport, hostname);
   }
   if (sock < 0) {
     if (verbose || debug)
@@ -587,7 +593,7 @@ int service_pop3_init(char *ip, int sp, unsigned char options, char *miscptr, FI
         hydra_report(stderr, "[ERROR] TLS negotiation failed, no answer received from STARTTLS request\n");
       } else {
         free(buf);
-        if ((hydra_connect_to_ssl(sock) == -1)) {
+        if ((hydra_connect_to_ssl(sock, hostname) == -1)) {
           if (verbose)
             hydra_report(stderr, "[ERROR] Can't use TLS\n");
           p.disable_tls = 1;

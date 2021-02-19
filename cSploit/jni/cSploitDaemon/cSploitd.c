@@ -96,7 +96,7 @@ int main(int argc, char **argv) {
   int clfd;
   char deamonize;
   
-  if(argc==2 && !strncmp(argv[1], "-f", 3)) {
+  if(argc==2 && !strncmp(argv[1], "-f", 2)) {
     deamonize=0;
   } else {
     deamonize=1;

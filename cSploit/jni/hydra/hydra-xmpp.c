@@ -47,7 +47,7 @@ int start_xmpp(int s, char *ip, int port, unsigned char options, char *miscptr, 
   }
 
   hydra_send(s, buffer, strlen(buffer), 0);
-  usleep(300000);
+  sleepn(300);
   if ((buf = hydra_receive_line(s)) == NULL)
     return 3;
 
@@ -96,6 +96,7 @@ int start_xmpp(int s, char *ip, int port, unsigned char options, char *miscptr, 
           /* server now would ask for the password */
           if ((strstr(buf, CHALLENGE_STR) != NULL) || (strstr(buf, CHALLENGE_STR2) != NULL)) {
             char *ptr = strstr(buf, CHALLENGE_STR);
+
             if (!ptr)
               ptr = strstr(buf, CHALLENGE_STR2);
             char *ptr_end = strstr(ptr, CHALLENGE_END_STR);
@@ -243,7 +244,7 @@ int start_xmpp(int s, char *ip, int port, unsigned char options, char *miscptr, 
     if (hydra_send(s, buffer, strlen(buffer), 0) < 0) {
       return 1;
     }
-    usleep(50000);
+    sleepn(50);
     buf = hydra_receive_line(s);
     if (buf == NULL)
       return 1;
@@ -277,7 +278,7 @@ int start_xmpp(int s, char *ip, int port, unsigned char options, char *miscptr, 
   return 3;
 }
 
-void service_xmpp(char *target, char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+void service_xmpp(char *target, char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   int run = 1, next_run = 1, sock = -1, tls = 0;
   char buffer[500], *buf = NULL;
   int myport = PORT_XMPP, mysslport = PORT_XMPP_SSL, disable_tls = 0;
@@ -319,7 +320,7 @@ void service_xmpp(char *target, char *ip, int sp, unsigned char options, char *m
       } else {
         if (port != 0)
           mysslport = port;
-        sock = hydra_connect_ssl(ip, mysslport);
+        sock = hydra_connect_ssl(ip, mysslport, hostname);
         port = mysslport;
       }
       if (sock < 0) {
@@ -333,57 +334,55 @@ void service_xmpp(char *target, char *ip, int sp, unsigned char options, char *m
         hydra_child_exit(1);
       }
       //some server is longer to answer
-      usleep(300000);
-      buf = hydra_receive_line(sock);
+      sleepn(300);
+      do {
+        if ((buf = hydra_receive_line(sock)) == NULL) {
+          /* no auth method identified */
+          hydra_report(stderr, "[ERROR] no authentication methods can be identified %s\n", buf);
+          free(buf);
+          hydra_child_exit(1);
+        }
 
-      if (buf == NULL)
-        hydra_child_exit(1);
+        if (strstr(buf, "<stream:stream") == NULL) {
+          if (verbose || debug)
+            hydra_report(stderr, "[ERROR] Not an xmpp protocol or service shutdown: %s\n", buf);
+          free(buf);
+          hydra_child_exit(1);
+        }
 
-      if (strstr(buf, "<stream:stream") == NULL) {
-        if (verbose || debug)
-          hydra_report(stderr, "[ERROR] Not an xmpp protocol or service shutdown: %s\n", buf);
+        if (strstr(buf, "<stream:error")) {
+          if (strstr(buf, "<host-unknown"))
+            hydra_report(stderr, "[ERROR] %s host unknown, you have to specify a fqdn xmpp server, the domain name will be used in the jabber init request : %s\n", domain, buf);
+          else
+            hydra_report(stderr, "[ERROR] xmpp protocol : %s\n", buf);
+          free(buf);
+          hydra_child_exit(1);
+        }
+
+        /* try to identify which features is supported */
+        if (strstr(buf, ":xmpp-tls") != NULL) {
+          tls = 1;
+        }
+
+        if (strstr(buf, ":xmpp-sasl") != NULL) {
+          if (strstr(buf, "<mechanism>SCRAM-SHA-1</mechanism>") != NULL) {
+            xmpp_auth_mechanism = AUTH_SCRAMSHA1;
+          }
+          if (strstr(buf, "<mechanism>CRAM-MD5</mechanism>") != NULL) {
+            xmpp_auth_mechanism = AUTH_CRAMMD5;
+          }
+          if (strstr(buf, "<mechanism>DIGEST-MD5</mechanism>") != NULL) {
+            xmpp_auth_mechanism = AUTH_DIGESTMD5;
+          }
+          if (strstr(buf, "<mechanism>PLAIN</mechanism>") != NULL) {
+            xmpp_auth_mechanism = AUTH_PLAIN;
+          }
+          if (strstr(buf, "<mechanism>LOGIN</mechanism>") != NULL) {
+            xmpp_auth_mechanism = AUTH_LOGIN;
+          }
+        }
         free(buf);
-        hydra_child_exit(1);
-      }
-
-      if (strstr(buf, "<stream:error")) {
-        if (strstr(buf, "<host-unknown"))
-          hydra_report(stderr, "[ERROR] %s host unknown, you have to specify a fqdn xmpp server, the domain name will be used in the jabber init request : %s\n", domain, buf);
-        else
-          hydra_report(stderr, "[ERROR] xmpp protocol : %s\n", buf);
-        free(buf);
-        hydra_child_exit(1);
-      }
-
-      /* try to identify which features is supported */
-      if (strstr(buf, ":xmpp-tls") != NULL) {
-        tls = 1;
-      }
-
-      if (strstr(buf, ":xmpp-sasl") != NULL) {
-        if (strstr(buf, "<mechanism>SCRAM-SHA-1</mechanism>") != NULL) {
-          xmpp_auth_mechanism = AUTH_SCRAMSHA1;
-        }
-        if (strstr(buf, "<mechanism>CRAM-MD5</mechanism>") != NULL) {
-          xmpp_auth_mechanism = AUTH_CRAMMD5;
-        }
-        if (strstr(buf, "<mechanism>DIGEST-MD5</mechanism>") != NULL) {
-          xmpp_auth_mechanism = AUTH_DIGESTMD5;
-        }
-        if (strstr(buf, "<mechanism>PLAIN</mechanism>") != NULL) {
-          xmpp_auth_mechanism = AUTH_PLAIN;
-        }
-        if (strstr(buf, "<mechanism>LOGIN</mechanism>") != NULL) {
-          xmpp_auth_mechanism = AUTH_LOGIN;
-        }
-      }
-      if (xmpp_auth_mechanism == AUTH_ERROR) {
-        /* no auth method identified */
-        hydra_report(stderr, "[ERROR] no authentication methods can be identified %s\n", buf);
-        free(buf);
-        hydra_child_exit(1);
-      }
-      free(buf);
+      } while (xmpp_auth_mechanism == AUTH_ERROR);
 
       if ((miscptr != NULL) && (strlen(miscptr) > 0)) {
         int i;
@@ -436,7 +435,7 @@ void service_xmpp(char *target, char *ip, int sp, unsigned char options, char *m
         char *STARTTLS = "<starttls xmlns='urn:ietf:params:xml:ns:xmpp-tls'/>";
 
         hydra_send(sock, STARTTLS, strlen(STARTTLS), 0);
-        usleep(300000);
+        sleepn(300);
         buf = hydra_receive_line(sock);
 
         if (buf == NULL || strstr(buf, "<failure") != NULL) {
@@ -444,7 +443,7 @@ void service_xmpp(char *target, char *ip, int sp, unsigned char options, char *m
             hydra_report(stderr, "[VERBOSE] TLS negotiation failed\n");
         } else {
           free(buf);
-          if ((hydra_connect_to_ssl(sock) == -1)) {
+          if ((hydra_connect_to_ssl(sock, hostname) == -1)) {
             if (verbose)
               hydra_report(stderr, "[ERROR] Can't use TLS\n");
             disable_tls = 1;
@@ -461,7 +460,7 @@ void service_xmpp(char *target, char *ip, int sp, unsigned char options, char *m
             hydra_child_exit(1);
           }
           //some server is longer to answer
-          usleep(300000);
+          sleepn(300);
           buf = hydra_receive_line(sock);
           if ((buf == NULL) || (strstr(buf, "<stream:stream") == NULL))
             hydra_child_exit(1);
@@ -487,7 +486,7 @@ void service_xmpp(char *target, char *ip, int sp, unsigned char options, char *m
   }
 }
 
-int service_xmpp_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+int service_xmpp_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   // called before the childrens are forked off, so this is the function
   // which should be filled if initial connections and service setup has to be
   // performed once only.

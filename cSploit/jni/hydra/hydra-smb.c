@@ -900,7 +900,7 @@ unsigned long SMBSessionSetup(int s, char *szLogin, char *szPassword, char *misc
   unsigned char *NTLMv2hash = NULL;
   unsigned char *NTLMhash = NULL;
   unsigned char *LMhash = NULL;
-  unsigned char unicodeLogin[32 * 2];
+//  unsigned char unicodeLogin[32 * 2];
   int j;
   char bufReceive[512];
   int nReceiveBufferSize = 0;
@@ -1303,7 +1303,7 @@ int start_smb(int s, char *ip, int port, unsigned char options, char *miscptr, F
   return 1;
 }
 
-void service_smb(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+void service_smb(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   int run = 1, next_run = 1, sock = -1;
 
   //default is both (local and domain) checks and normal passwd
@@ -1375,7 +1375,7 @@ void service_smb(char *ip, int sp, unsigned char options, char *miscptr, FILE * 
     case 1:                    /* connect and service init function */
       if (sock >= 0)
         sock = hydra_disconnect(sock);
-//      usleep(300000);
+//      sleepn(300);
 
       if (port != 0) {
         sock = hydra_connect_tcp(ip, port);
@@ -1427,7 +1427,7 @@ void service_smb(char *ip, int sp, unsigned char options, char *miscptr, FILE * 
 }
 #endif
 
-int service_smb_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+int service_smb_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   // called before the childrens are forked off, so this is the function
   // which should be filled if initial connections and service setup has to be
   // performed once only.

@@ -113,7 +113,11 @@ int start_nntp(int s, char *ip, int port, unsigned char options, char *miscptr, 
 
     memset(buffer, 0, sizeof(buffer));
     sasl_plain(buffer, login, pass);
-    sprintf(buffer, "%.250s\r\n", buffer);
+
+    char tmp_buffer[sizeof(buffer)];
+    sprintf(tmp_buffer, "%.250s\r\n", buffer);
+    strcpy(buffer, tmp_buffer);
+
     break;
 #ifdef LIBOPENSSL
   case AUTH_CRAMMD5:{
@@ -147,7 +151,10 @@ int start_nntp(int s, char *ip, int port, unsigned char options, char *miscptr, 
 
       sprintf(buffer, "%s %.250s", preplogin, buffer2);
       hydra_tobase64((unsigned char *) buffer, strlen(buffer), sizeof(buffer));
-      sprintf(buffer, "%.250s\r\n", buffer);
+
+      char tmp_buffer[sizeof(buffer)];
+      sprintf(tmp_buffer, "%.250s\r\n", buffer);
+      strcpy(buffer, tmp_buffer);
       free(preplogin);
     }
     break;
@@ -259,7 +266,7 @@ int start_nntp(int s, char *ip, int port, unsigned char options, char *miscptr, 
   return 2;
 }
 
-void service_nntp(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+void service_nntp(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   int i = 0, run = 1, next_run = 1, sock = -1;
   int myport = PORT_NNTP, mysslport = PORT_NNTP_SSL, disable_tls = 0;
   char *buffer1 = "CAPABILITIES\r\n";
@@ -272,7 +279,7 @@ void service_nntp(char *ip, int sp, unsigned char options, char *miscptr, FILE *
     case 1:                    /* connect and service init function */
       if (sock >= 0)
         sock = hydra_disconnect(sock);
-//      usleep(300000);
+//      sleepn(300);
       if ((options & OPTION_SSL) == 0) {
         if (port != 0)
           myport = port;
@@ -281,7 +288,7 @@ void service_nntp(char *ip, int sp, unsigned char options, char *miscptr, FILE *
       } else {
         if (port != 0)
           mysslport = port;
-        sock = hydra_connect_ssl(ip, mysslport);
+        sock = hydra_connect_ssl(ip, mysslport, hostname);
         port = mysslport;
       }
       if (sock < 0) {
@@ -289,7 +296,7 @@ void service_nntp(char *ip, int sp, unsigned char options, char *miscptr, FILE *
           hydra_report(stderr, "[ERROR] Child with pid %d terminating, can not connect\n", (int) getpid());
         hydra_child_exit(1);
       }
-//      usleep(300000);
+//      sleepn(300);
       buf = hydra_receive_line(sock);
       if (buf == NULL || buf[0] != '2') {       /* check the first line */
         if (verbose || debug)
@@ -320,7 +327,7 @@ void service_nntp(char *ip, int sp, unsigned char options, char *miscptr, FILE *
               hydra_report(stderr, "[VERBOSE] TLS negotiation failed\n");
           } else {
             free(buf);
-            if ((hydra_connect_to_ssl(sock) == -1)) {
+            if ((hydra_connect_to_ssl(sock, hostname) == -1)) {
               if (verbose)
                 hydra_report(stderr, "[ERROR] Can't use TLS\n");
               disable_tls = 1;
@@ -445,7 +452,7 @@ SASL PLAIN DIGEST-MD5 LOGIN NTLM CRAM-MD5
           break;
         }
       }
-      usleep(25000);
+      sleepn(25);
       free(buf);
       next_run = 2;
       break;
@@ -465,7 +472,7 @@ SASL PLAIN DIGEST-MD5 LOGIN NTLM CRAM-MD5
   }
 }
 
-int service_nntp_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+int service_nntp_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   // called before the childrens are forked off, so this is the function
   // which should be filled if initial connections and service setup has to be
   // performed once only.

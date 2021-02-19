@@ -30,7 +30,7 @@ struct nrdr_host_info {
   uint32_t  ip_addr;        ///< IP address of the host
   uint8_t   eth_addr[6];    ///< Ethernet MAC address of the host
   char      name[];         ///< hostname
-} __attribute__ ((__packed__));
+} __attribute__ ((__packed__));;
 
 struct nrdr_host_del_info {
   char      nrdr_action;    ///< must be set to ::NRDR_HOST_DEL

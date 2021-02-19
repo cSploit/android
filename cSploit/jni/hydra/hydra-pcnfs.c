@@ -136,7 +136,7 @@ int start_pcnfs(int s, char *ip, int port, unsigned char options, char *miscptr,
   return 1;
 }
 
-void service_pcnfs(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+void service_pcnfs(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   int run = 1, next_run = 1, sock = -1;
 
   hydra_register_socket(sp);
@@ -159,7 +159,7 @@ void service_pcnfs(char *ip, int sp, unsigned char options, char *miscptr, FILE 
       {
         if (sock >= 0)
           sock = hydra_disconnect(sock);
-//        usleep(275000);
+//        sleepn(275);
         if ((sock = hydra_connect_udp(ip, port)) < 0) {
           if (quiet != 1) fprintf(stderr, "[ERROR] Child with pid %d terminating, can not connect\n", (int) getpid());
           hydra_child_exit(1);
@@ -183,7 +183,7 @@ void service_pcnfs(char *ip, int sp, unsigned char options, char *miscptr, FILE 
   }
 }
 
-int service_pcnfs_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+int service_pcnfs_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   // called before the childrens are forked off, so this is the function
   // which should be filled if initial connections and service setup has to be
   // performed once only.

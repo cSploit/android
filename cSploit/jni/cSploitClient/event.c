@@ -322,11 +322,12 @@ jobject create_os_event(JNIEnv *env, void *arg) {
   jobject res;
   struct nmap_os_info *os_info;
   char *pos;
-  
+  message *m = (message *) arg;
+
   res = NULL;
   jtype = jos = NULL;
   
-  os_info = (struct nmap_os_info *) arg;
+  os_info = (struct nmap_os_info *) m->data;
   
   for(pos=os_info->os;*pos!='\0';pos++);
   
@@ -455,7 +456,7 @@ jobject create_message_event(JNIEnv *env, void *arg) {
   jobject res;
   char *severity, *mesg;
   jstring jseverity, jmessage;
-  jseverity = jmessage = "";
+  jseverity = jmessage = NULL;
   res = NULL;
   message *m = (message *) arg;
   
@@ -737,7 +738,7 @@ jobject create_host_event(JNIEnv *env, void *arg) {
   res = (*env)->NewObject(env,
                           cache.csploit.events.host.class,
                           cache.csploit.events.host.ctor,
-                          eth_addr, ip_addr, jname);
+                          ip_addr, eth_addr, jname);
   
   cleanup:
   

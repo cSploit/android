@@ -124,7 +124,7 @@ handler *get_handler_by_name(const char *name) {
   handler *h;
   size_t len;
   
-  len = strlen(name) + 1;
+  len = strlen(name);
   
   pthread_mutex_lock(&(handlers.control.mutex));
   

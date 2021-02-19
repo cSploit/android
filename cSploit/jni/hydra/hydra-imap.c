@@ -19,7 +19,7 @@ char *imap_read_server_capacity(int sock) {
     if (buf != NULL) {
       if (strstr(buf, "CAPABILITY") != NULL && buf[0] == '*') {
         resp = 1;
-        usleep(300000);
+        sleepn(300);
         /* we got the capability info then get the completed warning info from server */
         while (hydra_data_ready(sock)) {
           free(buf);
@@ -102,9 +102,9 @@ int start_imap(int s, char *ip, int port, unsigned char options, char *miscptr, 
     }
     free(buf);
 
-    memset(buffer, 0, sizeof(buffer));
-    sasl_plain(buffer, login, pass);
-    sprintf(buffer, "%.250s\r\n", buffer);
+    memset(buffer2, 0, sizeof(buffer2));
+    sasl_plain(buffer2, login, pass);
+    sprintf(buffer, "%.250s\r\n", buffer2);
     break;
 
 #ifdef LIBOPENSSL
@@ -177,7 +177,11 @@ int start_imap(int s, char *ip, int port, unsigned char options, char *miscptr, 
         break;
       }
       hydra_tobase64((unsigned char *) buffer, strlen(buffer), sizeof(buffer));
-      sprintf(buffer, "%.250s\r\n", buffer);
+
+      char tmp_buffer[sizeof(buffer)];
+      sprintf(tmp_buffer, "%.250s\r\n", buffer);
+      strcpy(buffer, tmp_buffer);
+
       free(preplogin);
     }
     break;
@@ -349,7 +353,7 @@ int start_imap(int s, char *ip, int port, unsigned char options, char *miscptr, 
   return 1;
 }
 
-void service_imap(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+void service_imap(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   int run = 1, next_run = 1, sock = -1;
   int myport = PORT_IMAP, mysslport = PORT_IMAP_SSL, disable_tls = 1;
   char *buffer1 = "1 CAPABILITY\r\n";
@@ -362,7 +366,7 @@ void service_imap(char *ip, int sp, unsigned char options, char *miscptr, FILE *
     case 1:                    /* connect and service init function */
       if (sock >= 0)
         sock = hydra_disconnect(sock);
-//      usleep(275000);
+//      sleepn(275);
       if ((options & OPTION_SSL) == 0) {
         if (port != 0)
           myport = port;
@@ -371,7 +375,7 @@ void service_imap(char *ip, int sp, unsigned char options, char *miscptr, FILE *
       } else {
         if (port != 0)
           mysslport = port;
-        sock = hydra_connect_ssl(ip, mysslport);
+        sock = hydra_connect_ssl(ip, mysslport, hostname);
         port = mysslport;
       }
       if (sock < 0) {
@@ -421,7 +425,7 @@ void service_imap(char *ip, int sp, unsigned char options, char *miscptr, FILE *
             hydra_report(stderr, "[ERROR] TLS negotiation failed, no answer received from STARTTLS request\n");
           } else {
             free(buf);
-            if ((hydra_connect_to_ssl(sock) == -1)) {
+            if ((hydra_connect_to_ssl(sock, hostname) == -1)) {
               if (verbose)
                 hydra_report(stderr, "[ERROR] Can't use TLS\n");
               disable_tls = 1;
@@ -567,7 +571,7 @@ void service_imap(char *ip, int sp, unsigned char options, char *miscptr, FILE *
   }
 }
 
-int service_imap_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+int service_imap_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   // called before the childrens are forked off, so this is the function
   // which should be filled if initial connections and service setup has to be
   // performed once only.

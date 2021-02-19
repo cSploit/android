@@ -895,8 +895,8 @@ SSL_CERT *ssl_cert_read(uint8 * data, uint32 len) {
   /* this will move the data pointer but we don't care, we don't use it again */
   return d2i_X509(NULL, (D2I_X509_CONST unsigned char **) &data, len);
 }
-#define ssl_cert_free hydra_ssl_cert_free
-void ssl_cert_free(SSL_CERT * cert) {
+
+static void ssl_cert_free(SSL_CERT * cert) {
   X509_free(cert);
 }
 
@@ -2449,9 +2449,12 @@ int start_rdp(int s, char *ip, int port, unsigned char options, char *miscptr, F
 }
 
 /* Client program */
-void service_rdp(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+void service_rdp(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   int run = 1, next_run = 1;
   int myport = PORT_RDP;
+
+  if (port != 0)
+    myport = port;
 
   hydra_register_socket(sp);
   if (memcmp(hydra_get_next_pair(), &HYDRA_EXIT, sizeof(HYDRA_EXIT)) == 0)
@@ -3196,7 +3199,7 @@ static BOOL process_data_pdu(STREAM s, uint32 * ext_disc_reason) {
 }
 #endif
 
-int service_rdp_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+int service_rdp_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   // called before the childrens are forked off, so this is the function
   // which should be filled if initial connections and service setup has to be
   // performed once only.
@@ -3209,4 +3212,3 @@ int service_rdp_init(char *ip, int sp, unsigned char options, char *miscptr, FIL
 
   return 0;
 }
-#undef ssl_cert_free

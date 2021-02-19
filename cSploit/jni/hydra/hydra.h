@@ -35,6 +35,10 @@
 #include <libssh/libssh.h>
 #endif
 
+#ifdef HAVE_ZLIB
+#include <zlib.h>
+#endif
+
 #define OPTION_SSL 1
 
 #define PORT_NOPORT     -1
@@ -118,12 +122,26 @@
 #define PORT_S7_300_SSL  102
 #define PORT_REDIS      6379
 #define PORT_REDIS_SSL   6379
+#define PORT_RTSP      554
+#define PORT_RTSP_SSL  554
 
 #define False 0
 #define True  1
 
 #ifndef INET_ADDRSTRLEN
 #define INET_ADDRSTRLEN 16
+#endif
+
+#ifndef _WIN32
+
+int sleepn(time_t seconds);
+int usleepn(long int useconds);
+
+#else
+
+int sleepn(unsigned int seconds);
+int usleepn(unsigned int useconds);
+
 #endif
 
 #define _HYDRA_H

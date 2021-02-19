@@ -66,7 +66,7 @@ int start_postgres(int s, char *ip, int port, unsigned char options, char *miscp
   return 1;
 }
 
-void service_postgres(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+void service_postgres(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   int run = 1, next_run = 1, sock = -1;
   int myport = PORT_POSTGRES, mysslport = PORT_POSTGRES_SSL;
 
@@ -80,7 +80,7 @@ void service_postgres(char *ip, int sp, unsigned char options, char *miscptr, FI
     case 1:                    /* connect and service init function */
       if (sock >= 0)
         sock = hydra_disconnect(sock);
-//                              usleep(275000);
+//                              sleepn(275);
       if ((options & OPTION_SSL) == 0) {
         if (port != 0)
           myport = port;
@@ -89,7 +89,7 @@ void service_postgres(char *ip, int sp, unsigned char options, char *miscptr, FI
       } else {
         if (port != 0)
           mysslport = port;
-        sock = hydra_connect_ssl(ip, mysslport);
+        sock = hydra_connect_ssl(ip, mysslport, hostname);
         port = mysslport;
       }
       if (sock < 0) {
@@ -119,7 +119,7 @@ void service_postgres(char *ip, int sp, unsigned char options, char *miscptr, FI
 
 #endif
 
-int service_postgres_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+int service_postgres_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   // called before the childrens are forked off, so this is the function
   // which should be filled if initial connections and service setup has to be
   // performed once only.

@@ -52,7 +52,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 9
+        minSdkVersion 14
         versionCode 18
         versionName "1.8.0"
     }

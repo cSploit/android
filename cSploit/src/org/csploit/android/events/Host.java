@@ -6,13 +6,13 @@ import java.net.InetAddress;
  * an host has been found
  */
 public class Host implements Event {
-  public final byte[] ethAddress;
   public final InetAddress ipAddress;
+  public final byte[] ethAddress;
   public final String name;
 
-  public Host(byte[] ethAddress, InetAddress ipAddress, String name) {
-    this.ethAddress = ethAddress;
+  public Host(InetAddress ipAddress, byte[] ethAddress, String name) {
     this.ipAddress = ipAddress;
+    this.ethAddress = ethAddress;
     this.name = name;
   }
 

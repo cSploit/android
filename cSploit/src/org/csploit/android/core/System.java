@@ -169,7 +169,7 @@ public class System
         PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
 
         if(mWakeLock == null)
-          mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "wakeLock");
+          mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "csploit:wakeLock");
 
         if(!mWakeLock.isHeld())
           mWakeLock.acquire();
@@ -966,7 +966,6 @@ public class System
 
   public static int getPortByProtocol(String protocol){
     preloadServices();
-
     return mServices.containsKey(protocol) ? Integer.parseInt(mServices.get(protocol)) : 0;
   }
 

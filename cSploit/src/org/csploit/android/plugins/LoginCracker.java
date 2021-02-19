@@ -44,6 +44,7 @@ import android.widget.ToggleButton;
 
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
+import org.csploit.android.core.Client;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
 import org.csploit.android.events.Login;
@@ -66,10 +67,10 @@ public class LoginCracker extends Plugin {
     private static final int SELECT_USER_WORDLIST = 1012;
     private static final int SELECT_PASS_WORDLIST = 1013;
     private static final String[] PROTOCOLS = new String[]{"ftp",
-            "http-head", "icq", "imap", "imap-ntlm", "ldap", "oracle-listener",
-            "mssql", "mysql", "pcanywhere", "nntp", "pcnfs", "pop3",
+            "http-get", "https-get", "icq", "imap", "imap-ntlm", "ldap", "oracle-listener",
+            "mssql", "mysql", "pcanywhere", "nntp", "pcnfs", "pop3", "pop3s",
             "pop3-ntlm", "rexec", "rlogin", "rsh", "smb", "smbnt", "socks5",
-            "ssh", "telnet", "cisco", "cisco-enable", "vnc", "snmp", "cvs",
+            "ssh", "telnet", "cisco", "cisco-enable", "vnc", "smtp", "smtps", "snmp", "cvs",
             "smtp-auth", "smtp-auth-ntlm", "teamspeak", "sip", "vmauthd"};
     private static final String[] CHARSETS = new String[]{"a-z", "A-Z",
             "a-z0-9", "A-Z0-9", "a-zA-Z0-9", "a-zA-Z0-9 + custom"};
@@ -98,7 +99,7 @@ public class LoginCracker extends Plugin {
     private String mPassWordlist = null;
     private boolean mRunning = false;
     private boolean mAccountFound = false;
-    private Receiver mAttemptsReceiver = null;
+    private Receiver mAttemptsReceiver;
     private String mCustomCharset = null;
 
     public LoginCracker() {
@@ -107,7 +108,6 @@ public class LoginCracker extends Plugin {
                 new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
                 R.layout.plugin_login_cracker, R.drawable.action_login);
         mAttemptsReceiver = new Receiver();
-
     }
 
     private void setStoppedState(final String user, final String pass) {
@@ -125,8 +125,7 @@ public class LoginCracker extends Plugin {
                 mProgressBar.setProgress(0);
                 mStartButton.setChecked(false);
                 mStatusText.setTextColor(Color.GREEN);
-                mStatusText.setText("USERNAME = " + user + " - PASSWORD = "
-                        + pass);
+                mStatusText.setText("USERNAME = " + user + " - PASSWORD = "+ pass);
             }
         });
     }
@@ -153,12 +152,10 @@ public class LoginCracker extends Plugin {
     }
 
     private void setStartedState() {
-        int min = Integer.parseInt((String) mMinSpinner.getSelectedItem()), max = Integer
-                .parseInt((String) mMaxSpinner.getSelectedItem());
-
+        int min = Integer.parseInt((String) mMinSpinner.getSelectedItem());
+        int max = Integer.parseInt((String) mMaxSpinner.getSelectedItem());
         if (min > max)
-            max = min + 1;
-
+            max = min;
         mAccountFound = false;
 
         try {
@@ -182,8 +179,6 @@ public class LoginCracker extends Plugin {
             System.errorLogging(e);
             Toast.makeText(LoginCracker.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
         }
-
-
     }
 
     public void onCreate(Bundle savedInstanceState) {
@@ -210,16 +205,11 @@ public class LoginCracker extends Plugin {
         mPortSpinner.setAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, ports));
         mPortSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-            public void onItemSelected(AdapterView<?> adapter, View view,
+            public void onItemSelected(AdapterView<?> adapterView, View view,
                                        int position, long id) {
-                String port = (String) adapter.getItemAtPosition(position);
-                int protocolIndex = mProtocolAdapter.getIndexByPort(port);
-
-                if (protocolIndex != -1)
-                    mProtocolSpinner.setSelection(protocolIndex);
             }
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
-            public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
 
@@ -227,15 +217,14 @@ public class LoginCracker extends Plugin {
         mProtocolSpinner.setAdapter(new ProtocolAdapter());
         mProtocolSpinner
                 .setOnItemSelectedListener(new OnItemSelectedListener() {
-                    public void onItemSelected(AdapterView<?> adapter,
+                    public void onItemSelected(AdapterView<?> adapterView,
                                                View view, int position, long id) {
-                        int portIndex = mProtocolAdapter
-                                .getPortIndexByProtocol(position);
+                        int portIndex = mProtocolAdapter.getPortIndexByProtocol(position);
                         if (portIndex != -1)
                             mPortSpinner.setSelection(portIndex);
                     }
 
-                    public void onNothingSelected(AdapterView<?> arg0) {
+                    public void onNothingSelected(AdapterView<?> adapterView) {
                     }
                 });
 
@@ -458,31 +447,13 @@ public class LoginCracker extends Plugin {
             return false;
         }
 
-        public int getIndexByPort(String port) {
-            String portProtocol = System.getProtocolByPort(port), protocol;
-
-            if (portProtocol != null) {
-                for (int i = 0; i < mProtocols.size(); i++) {
-                    protocol = mProtocols.get(i);
-                    if (protocol.equals(portProtocol)
-                            || protocol.toLowerCase().contains(portProtocol)) {
-                        return i;
-                    }
-                }
-            }
-
-            return -1;
-        }
-
         public int getPortIndexByProtocol(int position) {
-            String protocol = mProtocols.get(position), portProtocol;
+            String protocol = mProtocols.get(position);
 
             for (int i = 0; i < mOpenPorts.size(); i++) {
-                portProtocol = System.getProtocolByPort(""
-                        + mOpenPorts.get(i).getNumber());
+                String portProtocol = System.getProtocolByPort(mOpenPorts.get(i).getNumber());
                 if (portProtocol != null) {
-                    if (portProtocol.equals(protocol)
-                            || protocol.toLowerCase().contains(portProtocol))
+                    if (portProtocol.equals(protocol) || protocol.toLowerCase().contains(portProtocol))
                         return i;
                 }
             }
@@ -528,36 +499,6 @@ public class LoginCracker extends Plugin {
     }
 
     private class Receiver extends Hydra.AttemptsReceiver {
-        private long mStarted = 0;
-        private long mEndTime = 0;
-        private long mLastAttempt = 0;
-        private long mLastLeft = 0;
-        private long mNow = 0;
-
-        private String formatTimeLeft(long millis) {
-            int seconds = (int) (millis / 1000) % 60, minutes = (int) ((millis / 60000) % 60), hours = (int) ((millis / 3600000) % 24);
-            String time = "";
-
-            if (hours > 0)
-                time += hours + "h";
-
-            if (minutes > 0)
-                time += " " + minutes + "m";
-
-            if (seconds > 0)
-                time += " " + seconds + "s";
-
-            return time.trim();
-        }
-
-        private void reset() {
-            mLastAttempt = 0;
-            mStarted = 0;
-            mEndTime = 0;
-            mLastLeft = 0;
-            mNow = 0;
-        }
-
         @Override
         public void onStart(String command) {
             super.onStart(command);
@@ -565,7 +506,7 @@ public class LoginCracker extends Plugin {
                 @Override
                 public void run() {
                     mRunning = true;
-                    mStarted = java.lang.System.currentTimeMillis();
+                    //mStarted = java.lang.System.currentTimeMillis();
                     mStatusText.setTextColor(Color.BLUE);
                     mProgressBar.setVisibility(View.VISIBLE);
                 }
@@ -577,18 +518,6 @@ public class LoginCracker extends Plugin {
             String status = "";
 
             int total = progress + left;
-            mNow = java.lang.System.currentTimeMillis();
-
-            long timeElapsed = (mNow - mStarted);
-            double timeNeeded = (timeElapsed * (total / progress - 1));
-
-            mEndTime = (mStarted + (long) timeNeeded);
-            mLastAttempt = mNow;
-            mLastLeft = mEndTime - mNow;
-
-            status += "rate: " + rate + "\t[ " + formatTimeLeft(mLastLeft) + " "
-                    + getString(R.string.left) + " ]";
-
 
             final String text = status;
             final int percentage = (int) ((progress / total) * 100);
@@ -597,7 +526,6 @@ public class LoginCracker extends Plugin {
                 @Override
                 public void run() {
                     mStatusText.setTextColor(Color.DKGRAY);
-                    mStatusText.setText(text);
                     mProgressBar.setProgress(percentage);
                 }
             });
@@ -643,7 +571,6 @@ public class LoginCracker extends Plugin {
 
         @Override
         public void onEnd(int code) {
-            reset();
             if (mRunning) {
                 LoginCracker.this.runOnUiThread(new Runnable() {
                     @Override

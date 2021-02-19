@@ -6,19 +6,23 @@ char *webtarget = NULL;
 char *slash = "/";
 char *http_buf = NULL;
 int webport, freemischttp = 0;
-
 int http_auth_mechanism = AUTH_BASIC;
 
 int start_http(int s, char *ip, int port, unsigned char options, char *miscptr, FILE * fp, char *type) {
   char *empty = "";
   char *login, *pass, buffer[500], buffer2[500];
-  char *header = "";            /* XXX TODO */
+  char header[64] = "Content-Length: 0\r\n";
   char *ptr, *fooptr;
+  int complete_line = 0;
+  char tmpreplybuf[1024] = "", *tmpreplybufptr;
 
   if (strlen(login = hydra_get_next_login()) == 0)
     login = empty;
   if (strlen(pass = hydra_get_next_password()) == 0)
     pass = empty;
+
+  if (strcmp(type, "POST") != 0)
+    header[0] = 0;
 
   // we must reset this if buf is NULL and we do MD5 digest
   if (http_buf == NULL && http_auth_mechanism == AUTH_DIGESTMD5)
@@ -31,14 +35,14 @@ int start_http(int s, char *ip, int port, unsigned char options, char *miscptr, 
 
     /* again: no snprintf to be portable. dont worry, buffer cant overflow */
     if (use_proxy == 1 && proxy_authentication != NULL)
-      sprintf(buffer, "%s http://%s:%d%.250s HTTP/1.0\r\nHost: %s\r\nAuthorization: Basic %s\r\nProxy-Authorization: Basic %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\n%s\r\n",
+      sprintf(buffer, "%s http://%s:%d%.250s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\nAuthorization: Basic %s\r\nProxy-Authorization: Basic %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\n%s\r\n",
               type, webtarget, webport, miscptr, webtarget, buffer2, proxy_authentication, header);
     else {
       if (use_proxy == 1)
-        sprintf(buffer, "%s http://%s:%d%.250s HTTP/1.0\r\nHost: %s\r\nAuthorization: Basic %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\n%s\r\n",
+        sprintf(buffer, "%s http://%s:%d%.250s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\nAuthorization: Basic %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\n%s\r\n",
                 type, webtarget, webport, miscptr, webtarget, buffer2, header);
       else
-        sprintf(buffer, "%s %.250s HTTP/1.0\r\nHost: %s\r\nAuthorization: Basic %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\n%s\r\n", type, miscptr, webtarget, buffer2, header);
+        sprintf(buffer, "%s %.250s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\nAuthorization: Basic %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\n%s\r\n", type, miscptr, webtarget, buffer2, header);
     }
     if (debug)
       hydra_report(stderr, "C:%s\n", buffer);
@@ -79,14 +83,14 @@ int start_http(int s, char *ip, int port, unsigned char options, char *miscptr, 
       //send the first..
       if (use_proxy == 1 && proxy_authentication != NULL)
         sprintf(buffer,
-                "%s http://%s:%d%s HTTP/1.0\r\nHost: %s\r\nAuthorization: NTLM %s\r\nProxy-Authorization: Basic %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n",
+                "%s http://%s:%d%s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\nAuthorization: NTLM %s\r\nProxy-Authorization: Basic %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n",
                 type, webtarget, webport, miscptr, webtarget, buf1, proxy_authentication, header);
       else {
         if (use_proxy == 1)
-          sprintf(buffer, "%s http://%s:%d%s HTTP/1.0\r\nHost: %s\r\nAuthorization: NTLM %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n",
+          sprintf(buffer, "%s http://%s:%d%s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\nAuthorization: NTLM %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n",
                   type, webtarget, webport, miscptr, webtarget, buf1, header);
         else
-          sprintf(buffer, "%s %s HTTP/1.0\r\nHost: %s\r\nAuthorization: NTLM %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n", type, miscptr, webtarget,
+          sprintf(buffer, "%s %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\nAuthorization: NTLM %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n", type, miscptr, webtarget,
                   buf1, header);
       }
 
@@ -128,14 +132,14 @@ int start_http(int s, char *ip, int port, unsigned char options, char *miscptr, 
       //create the auth response
       if (use_proxy == 1 && proxy_authentication != NULL)
         sprintf(buffer,
-                "%s http://%s:%d%s HTTP/1.0\r\nHost: %s\r\nAuthorization: NTLM %s\r\nProxy-Authorization: Basic %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n",
+                "%s http://%s:%d%s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\nAuthorization: NTLM %s\r\nProxy-Authorization: Basic %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n",
                 type, webtarget, webport, miscptr, webtarget, buf1, proxy_authentication, header);
       else {
         if (use_proxy == 1)
-          sprintf(buffer, "%s http://%s:%d%s HTTP/1.0\r\nHost: %s\r\nAuthorization: NTLM %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n",
+          sprintf(buffer, "%s http://%s:%d%s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\nAuthorization: NTLM %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n",
                   type, webtarget, webport, miscptr, webtarget, buf1, header);
         else
-          sprintf(buffer, "%s %s HTTP/1.0\r\nHost: %s\r\nAuthorization: NTLM %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n", type, miscptr, webtarget,
+          sprintf(buffer, "%s %s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\nAuthorization: NTLM %s\r\nUser-Agent: Mozilla/4.0 (Hydra)\r\nConnection: keep-alive\r\n%s\r\n", type, miscptr, webtarget,
                   buf1, header);
       }
 
@@ -152,9 +156,29 @@ int start_http(int s, char *ip, int port, unsigned char options, char *miscptr, 
   if (http_buf != NULL)
     free(http_buf);
   http_buf = hydra_receive_line(s);
-  while (http_buf != NULL && strstr(http_buf, "HTTP/1.") == NULL) {
-    free(http_buf);
-    http_buf = hydra_receive_line(s);
+  complete_line = 0;
+  tmpreplybuf[0] = 0;
+
+  while (http_buf != NULL && (strstr(http_buf, "HTTP/1.") == NULL || (index(http_buf, '\n') == NULL && complete_line == 0))) {
+    if (debug) printf("il: %d, tmpreplybuf: %s, http_buf: %s\n", complete_line, tmpreplybuf, http_buf);
+    if (tmpreplybuf[0] == 0 && strstr(http_buf, "HTTP/1.") != NULL) {
+      strncpy(tmpreplybuf, http_buf, sizeof(tmpreplybuf) - 1);
+      tmpreplybuf[sizeof(tmpreplybuf) - 1] = 0;
+      free(http_buf);
+      http_buf = hydra_receive_line(s);
+    } else if (tmpreplybuf[0] != 0) {
+      complete_line = 1;
+      if ((tmpreplybufptr = malloc(strlen(tmpreplybuf) + strlen(http_buf) + 1)) != NULL) {
+        strcpy(tmpreplybufptr, tmpreplybuf);
+        strcat(tmpreplybufptr, http_buf);
+        free(http_buf);
+        http_buf = tmpreplybufptr;
+        if (debug) printf("http_buf now: %s\n", http_buf);
+      }
+    } else {
+      free(http_buf);
+      http_buf = hydra_receive_line(s);
+    }
   }
 
   //if server cut the connection, just exit cleanly or 
@@ -168,7 +192,9 @@ int start_http(int s, char *ip, int port, unsigned char options, char *miscptr, 
   if (debug)
     hydra_report(stderr, "S:%s\n", http_buf);
 
-  ptr = ((char *) index(http_buf, ' ')) + 1;
+  ptr = ((char *) index(http_buf, ' '));
+  if (ptr != NULL)
+    ptr++;
   if (ptr != NULL && (*ptr == '2' || *ptr == '3' || strncmp(ptr, "403", 3) == 0 || strncmp(ptr, "404", 3) == 0)) {
     hydra_report_found_host(port, ip, "www", fp);
     hydra_completed_pair_found();
@@ -178,7 +204,7 @@ int start_http(int s, char *ip, int port, unsigned char options, char *miscptr, 
     }
   } else {
     if (ptr != NULL && *ptr != '4')
-      fprintf(stderr, "[WARNING] Unusual return code: %c for %s:%s\n", (char) *(index(http_buf, ' ') + 1), login, pass);
+      fprintf(stderr, "[WARNING] Unusual return code: %.3s for %s:%s\n", (char *) ptr, login, pass);
 
     //the first authentication type failed, check the type from server header
     if ((hydra_strcasestr(http_buf, "WWW-Authenticate: Basic") == NULL) && (http_auth_mechanism == AUTH_BASIC)) {
@@ -211,7 +237,7 @@ int start_http(int s, char *ip, int port, unsigned char options, char *miscptr, 
   return 1;
 }
 
-void service_http(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *type) {
+void service_http(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname, char *type) {
   int run = 1, next_run = 1, sock = -1;
   int myport = PORT_HTTP, mysslport = PORT_HTTP_SSL;
   char *ptr, *ptr2;
@@ -219,6 +245,8 @@ void service_http(char *ip, int sp, unsigned char options, char *miscptr, FILE *
   hydra_register_socket(sp);
   if (memcmp(hydra_get_next_pair(), &HYDRA_EXIT, sizeof(HYDRA_EXIT)) == 0)
     return;
+
+  printf("DEBUG0: %s\n", miscptr);
 
   if ((webtarget = strstr(miscptr, "://")) != NULL) {
     webtarget += strlen("://");
@@ -236,12 +264,12 @@ void service_http(char *ip, int sp, unsigned char options, char *miscptr, FILE *
       strcpy(miscptr, ptr2);
       *ptr2 = 0;
     } else
-      webtarget = NULL;
-  }
-  if (cmdlinetarget != NULL && webtarget == NULL)
-    webtarget = cmdlinetarget;
-  else if (webtarget == NULL && cmdlinetarget == NULL)
-    webtarget = hydra_address2string(ip);
+      webtarget = hostname;
+  } else
+    if (strlen(miscptr) == 0)
+      miscptr = strdup("/");
+  if (webtarget == NULL)
+    webtarget = hostname;
   if (port != 0)
     webport = port;
   else if ((options & OPTION_SSL) == 0)
@@ -264,7 +292,7 @@ void service_http(char *ip, int sp, unsigned char options, char *miscptr, FILE *
         } else {
           if (port != 0)
             mysslport = port;
-          sock = hydra_connect_ssl(ip, mysslport);
+          sock = hydra_connect_ssl(ip, mysslport, hostname);
           port = mysslport;
         }
         if (sock < 0) {
@@ -296,15 +324,19 @@ void service_http(char *ip, int sp, unsigned char options, char *miscptr, FILE *
   }
 }
 
-void service_http_get(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
-  service_http(ip, sp, options, miscptr, fp, port, "GET");
+void service_http_get(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
+  service_http(ip, sp, options, miscptr, fp, port, hostname, "GET");
 }
 
-void service_http_head(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
-  service_http(ip, sp, options, miscptr, fp, port, "HEAD");
+void service_http_post(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
+  service_http(ip, sp, options, miscptr, fp, port, hostname, "POST");
 }
 
-int service_http_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+void service_http_head(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
+  service_http(ip, sp, options, miscptr, fp, port, hostname, "HEAD");
+}
+
+int service_http_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   // called before the childrens are forked off, so this is the function
   // which should be filled if initial connections and service setup has to be
   // performed once only.

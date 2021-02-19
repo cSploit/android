@@ -1,5 +1,10 @@
 #include "hydra-mod.h"
+
+#ifdef HAVE_ZLIB
+#include <zlib.h>
+#else
 #include "crc32.h"
+#endif
 
 /*
 
@@ -65,7 +70,11 @@ int start_teamspeak(int s, char *ip, int port, unsigned char options, char *misc
   teamspeak.loginlen = 0;
   strcpy((char *) &teamspeak.login, "");
 
+#ifdef HAVE_ZLIB
+  teamspeak.crc = crc32(0L, (const Bytef *)&teamspeak, sizeof(struct team_speak));
+#else
   teamspeak.crc = crc32(&teamspeak, sizeof(struct team_speak));
+#endif
 
   if (hydra_send(s, (char *) &teamspeak, sizeof(struct team_speak), 0) < 0) {
     return 3;
@@ -77,6 +86,13 @@ int start_teamspeak(int s, char *ip, int port, unsigned char options, char *misc
       hydra_report_found_host(port, ip, "teamspeak", fp);
       hydra_completed_pair_found();
     }
+    if (buf[0x4B] != 0) {
+      hydra_report(stderr, "[ERROR] Child with pid %d terminating, can not connect\n", (int) getpid());
+      hydra_child_exit(1);
+    }
+  } else {
+    hydra_report(stderr, "[ERROR] Child with pid %d terminating, can not connect\n", (int) getpid());
+    hydra_child_exit(1);
   }
 
   hydra_completed_pair();
@@ -86,7 +102,7 @@ int start_teamspeak(int s, char *ip, int port, unsigned char options, char *misc
   return 1;
 }
 
-void service_teamspeak(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+void service_teamspeak(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   int run = 1, next_run = 1, sock = -1;
   int myport = PORT_TEAMSPEAK;
 
@@ -100,7 +116,7 @@ void service_teamspeak(char *ip, int sp, unsigned char options, char *miscptr, F
     case 1:                    /* connect and service init function */
 //      if (sock >= 0)
 //      sock = hydra_disconnect(sock);
-//      usleep(300000);
+//      sleepn(300);
       if (sock < 0) {
         if (port != 0)
           myport = port;
@@ -126,7 +142,7 @@ void service_teamspeak(char *ip, int sp, unsigned char options, char *miscptr, F
   }
 }
 
-int service_teamspeak_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port) {
+int service_teamspeak_init(char *ip, int sp, unsigned char options, char *miscptr, FILE * fp, int port, char *hostname) {
   // called before the childrens are forked off, so this is the function
   // which should be filled if initial connections and service setup has to be
   // performed once only.

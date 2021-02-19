@@ -40,7 +40,7 @@ public class Traceroute extends Plugin {
 	private ProgressBar mTraceProgress = null;
 	private boolean mRunning = false;
 	private ArrayAdapter<String> mListAdapter = null;
-	private Receiver mTraceReceiver = null;
+	private Receiver mTraceReceiver;
 
 	public Traceroute() {
 		super(R.string.trace, R.string.trace_desc,
@@ -53,9 +53,9 @@ public class Traceroute extends Plugin {
 
 	private void setStoppedState() {
 		if(mProcess!=null) {
-      mProcess.kill();
-      mProcess = null;
-    }
+			mProcess.kill();
+			mProcess = null;
+		}
 		mTraceProgress.setVisibility(View.INVISIBLE);
 		mRunning = false;
 		mTraceToggleButton.setChecked(false);
@@ -63,15 +63,13 @@ public class Traceroute extends Plugin {
 
 	private void setStartedState() {
 		mListAdapter.clear();
-
-    try {
-      System.getTools().nmap.trace(System.getCurrentTarget(), mTraceReceiver);
-
-      mRunning = true;
-    } catch (ChildManager.ChildNotStartedException e) {
-      System.errorLogging(e);
-      Toast.makeText(Traceroute.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
-    }
+		try {
+		  System.getTools().nmap.trace(System.getCurrentTarget(), mTraceReceiver);
+		  mRunning = true;
+		} catch (ChildManager.ChildNotStartedException e) {
+		  System.errorLogging(e);
+		  Toast.makeText(Traceroute.this, getString(R.string.child_not_started), Toast.LENGTH_LONG).show();
+		}
   }
 
 	@Override

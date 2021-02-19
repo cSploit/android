@@ -124,10 +124,10 @@ LOCAL_CFLAGS += -DHAVE_CONFIG_H -D_U_="__attribute__((unused))"
 
 LOCAL_C_INCLUDES += \
 	$(LOCAL_PATH)/missing\
-	external/openssl/include\
-	external/libpcap
+	openssl/include\
+	libpcap
 
-LOCAL_SHARED_LIBRARIES += libssl libcrypto
+LOCAL_STATIC_LIBRARIES += libssl_static libcrypto_static
 
 LOCAL_STATIC_LIBRARIES += libpcap
 

@@ -133,7 +133,7 @@ int init_csploit_events_cache(JNIEnv *env) {
     { "org/csploit/android/events/Attempts", "(III)V" },
     { "org/csploit/android/events/Packet", "(Ljava/net/InetAddress;Ljava/net/InetAddress;I)V" },
     { "org/csploit/android/events/FuseBind", "(Ljava/lang/String;Ljava/lang/String;)V" },
-    { "org/csploit/android/events/Host", "([BLjava/net/InetAddress;Ljava/lang/String;)V" },
+    { "org/csploit/android/events/Host", "(Ljava/net/InetAddress;[BLjava/lang/String;)V" },
     { "org/csploit/android/events/HostLost", "(Ljava/net/InetAddress;)V" },
   };
   struct class_and_ctor_cache *ptr;
