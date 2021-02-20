@@ -62,7 +62,7 @@ public class CSploitApplication extends Application {
 
     super.onCreate();
 
-    ACRA.init(this);
+    //ACRA.init(this);
 
     // initialize the system
     try {
@@ -73,7 +73,7 @@ public class CSploitApplication extends Application {
         System.errorLogging(e);
     }
 
-    ACRA.setConfig(ACRA.getConfig().setApplicationLogFile(System.getCorePath() + "/cSploitd.log"));
+    //ACRA.setConfig(ACRA.getConfig().setApplicationLogFile(System.getCorePath() + "/cSploitd.log"));
 
     // load system modules even if the initialization failed
     System.registerPlugin(new RouterPwn());

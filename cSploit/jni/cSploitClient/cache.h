@@ -42,7 +42,7 @@ struct events_cache {
         account,
         message,
         login,
-        attempts,
+        status,
         packet,
         fusebind,
         host,

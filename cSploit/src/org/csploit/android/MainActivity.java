@@ -104,313 +104,311 @@ import static org.csploit.android.net.NetworkRadar.NRDR_STOPPED;
 
 @SuppressLint("NewApi")
 public class MainActivity extends AppCompatActivity implements NetworkRadar.TargetListener {
-  private String UPDATE_MESSAGE;
-  private static final int WIFI_CONNECTION_REQUEST = 1012;
-  private boolean isWifiAvailable = false;
-  private TargetAdapter mTargetAdapter = null;
-  private NetworkRadar mNetworkRadar = null;
-  private Child mMsfRpcd = null;
-  private final RadarReceiver mRadarReceiver = new RadarReceiver();
-  private final UpdateReceiver mUpdateReceiver = new UpdateReceiver();
-  private final WipeReceiver mWipeReceiver = new WipeReceiver();
-  private Menu mMenu = null;
-  private TextView mUpdateStatus = null;
-  private Toast mToast = null;
-  private long mLastBackPressTime = 0;
-  private ActionMode mActionMode = null;
-  private ListView lv;
-  private boolean isRootMissing = false;
+    private String UPDATE_MESSAGE;
+    private static final int WIFI_CONNECTION_REQUEST = 1012;
+    private boolean isWifiAvailable = false;
+    private TargetAdapter mTargetAdapter = null;
+    private NetworkRadar mNetworkRadar = null;
+    private Child mMsfRpcd = null;
+    private final RadarReceiver mRadarReceiver = new RadarReceiver();
+    private final UpdateReceiver mUpdateReceiver = new UpdateReceiver();
+    private final WipeReceiver mWipeReceiver = new WipeReceiver();
+    private Menu mMenu = null;
+    private TextView mUpdateStatus = null;
+    private Toast mToast = null;
+    private long mLastBackPressTime = 0;
+    private ActionMode mActionMode = null;
+    private ListView lv;
+    private boolean isRootMissing = false;
 
-  private void createUpdateStatusText() {
-    if (mUpdateStatus != null) return;
+    private void createUpdateStatusText() {
+        if (mUpdateStatus != null) return;
 
-    RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
+        RelativeLayout layout = (RelativeLayout) findViewById(R.id.layout);
 
-    mUpdateStatus = new TextView(this);
+        mUpdateStatus = new TextView(this);
 
-    LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
-            LayoutParams.MATCH_PARENT);
+        LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.MATCH_PARENT);
 
-    mUpdateStatus.setGravity(Gravity.CENTER);
-    mUpdateStatus.setLayoutParams(params);
+        mUpdateStatus.setGravity(Gravity.CENTER);
+        mUpdateStatus.setLayoutParams(params);
 
-    layout.addView(mUpdateStatus);
-  }
-
-  private void createUpdateLayout() {
-
-    lv.setVisibility(View.GONE);
-    findViewById(R.id.textView).setVisibility(View.GONE);
-
-    createUpdateStatusText();
-
-    mUpdateStatus
-            .setText(UPDATE_MESSAGE);
-
-    mUpdateReceiver.register(MainActivity.this);
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-      invalidateOptionsMenu();
-  }
-
-  private void createOfflineLayout() {
-
-    lv.setVisibility(View.GONE);
-    findViewById(R.id.textView).setVisibility(View.GONE);
-
-    createUpdateStatusText();
-
-    mUpdateStatus.setText(getString(R.string.no_connectivity));
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-      invalidateOptionsMenu();
-  }
-
-  public void createOnlineLayout() {
-    findViewById(R.id.textView).setVisibility(View.VISIBLE);
-    lv.setVisibility(View.VISIBLE);
-
-    if (mUpdateStatus != null)
-      mUpdateStatus.setVisibility(View.GONE);
-
-    if (mTargetAdapter != null)
-      return;
-
-    mTargetAdapter = new TargetAdapter();
-
-    lv.setAdapter(mTargetAdapter);
-
-    lv.setOnItemLongClickListener(new OnItemLongClickListener() {
-      @Override
-      public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        Target t = System.getTarget(position);
-        if (t.getType() == Target.Type.NETWORK) {
-          if (mActionMode == null)
-            targetAliasPrompt(t);
-          return true;
-        }
-        if (mActionMode == null) {
-          mTargetAdapter.clearSelection();
-          mActionMode = startSupportActionMode(mActionModeCallback);
-        }
-        mTargetAdapter.toggleSelection(position);
-        return true;
-      }
-    });
-
-    mRadarReceiver.register(MainActivity.this);
-    mUpdateReceiver.register(MainActivity.this);
-    mWipeReceiver.register(MainActivity.this);
-
-    // if called for the second time after wifi connection
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-      invalidateOptionsMenu();
-  }
-
-  @Override
-  protected void onActivityResult(int requestCode, int resultCode,
-                                  Intent intent) {
-    if (requestCode == WIFI_CONNECTION_REQUEST && resultCode == RESULT_OK
-            && intent.hasExtra(WifiScannerActivity.CONNECTED)) {
-      System.reloadNetworkMapping();
-      try {
-        onCreate(null);
-      } catch (IllegalStateException e) {
-        // already attached.  don't reattach.
-      }
-    }
-  }
-
-  private void createLayout() {
-    boolean wifiAvailable = Network.isWifiConnected(this);
-    boolean connectivityAvailable = wifiAvailable || Network.isConnectivityAvailable(this);
-    boolean coreBeating = System.isCoreInitialized();
-
-    if (coreBeating && wifiAvailable) {
-      createOnlineLayout();
-    } else if (connectivityAvailable) {
-      createUpdateLayout();
-    } else {
-      createOfflineLayout();
-    }
-  }
-
-  private void onInitializationError(final String message) {
-    MainActivity.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        new FatalDialog(getString(R.string.initialization_error),
-                message, message.contains(">"),
-                MainActivity.this).show();
-      }
-    });
-  }
-
-  private boolean startCore() {
-    isRootMissing = false;
-    try {
-      System.initCore();
-
-      return true;
-    } catch (System.SuException e) {
-      onInitializationError(getString(R.string.only_4_root));
-      isRootMissing = true;
-    } catch (System.DaemonException e) {
-      Logger.error(e.getMessage());
+        layout.addView(mUpdateStatus);
     }
 
-    return false;
-  }
+    private void createUpdateLayout() {
 
-  private void onCoreBeating() {
-    if (Client.hadCrashed()) {
-      Logger.warning("Client has previously crashed, building a crash report.");
-      CrashReporter.notifyNativeLibraryCrash();
-      onInitializationError(getString(R.string.JNI_crash_detected));
-    }
-  }
+        lv.setVisibility(View.GONE);
+        findViewById(R.id.textView).setVisibility(View.GONE);
 
-  private void onCoreUpdated() {
-    if (startCore()) {
-      onCoreBeating();
-    } else if (isRootMissing) {
-      return;
+        createUpdateStatusText();
+
+        mUpdateStatus
+                .setText(UPDATE_MESSAGE);
+
+        mUpdateReceiver.register(MainActivity.this);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            invalidateOptionsMenu();
     }
 
-    MainActivity.this.runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        System.reloadNetworkMapping();
-        createLayout();
-        if (System.isInitialized())
-          startNetworkRadar(true);
-      }
-    });
-  }
+    private void createOfflineLayout() {
 
-  @Override
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
-    Boolean isDark = themePrefs.getBoolean("isDark", false);
-    boolean connectivityAvailable;
+        lv.setVisibility(View.GONE);
+        findViewById(R.id.textView).setVisibility(View.GONE);
 
-    if (isDark)
-      setTheme(R.style.DarkTheme);
-    else
-      setTheme(R.style.AppTheme);
+        createUpdateStatusText();
 
-    setContentView(R.layout.target_layout);
+        mUpdateStatus.setText(getString(R.string.no_connectivity));
 
-    lv = (ListView) findViewById(R.id.android_list);
-    lv.setOnItemClickListener(new ListView.OnItemClickListener() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+            invalidateOptionsMenu();
+    }
 
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void createOnlineLayout() {
+        findViewById(R.id.textView).setVisibility(View.VISIBLE);
+        lv.setVisibility(View.VISIBLE);
 
-        if (mActionMode != null) {
-          ((TargetAdapter) lv.getAdapter()).toggleSelection(position);
+        if (mUpdateStatus != null)
+          mUpdateStatus.setVisibility(View.GONE);
+
+        if (mTargetAdapter != null)
           return;
+
+        mTargetAdapter = new TargetAdapter();
+
+        lv.setAdapter(mTargetAdapter);
+
+        lv.setOnItemLongClickListener(new OnItemLongClickListener() {
+          @Override
+          public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            Target t = System.getTarget(position);
+            if (t.getType() == Target.Type.NETWORK) {
+                if (mActionMode == null)
+                  targetAliasPrompt(t);
+                return true;
+            }
+            if (mActionMode == null) {
+                mTargetAdapter.clearSelection();
+                mActionMode = startSupportActionMode(mActionModeCallback);
+            }
+            mTargetAdapter.toggleSelection(position);
+            return true;
+          }
+        });
+
+        mRadarReceiver.register(MainActivity.this);
+        mUpdateReceiver.register(MainActivity.this);
+        mWipeReceiver.register(MainActivity.this);
+
+        // if called for the second time after wifi connection
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
+          invalidateOptionsMenu();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent intent) {
+        if (requestCode == WIFI_CONNECTION_REQUEST && resultCode == RESULT_OK
+                && intent.hasExtra(WifiScannerActivity.CONNECTED)) {
+            System.reloadNetworkMapping();
+            try {
+               onCreate(null);
+            } catch (IllegalStateException e) {
+              // already attached.  don't reattach.
+            }
+        }
+    }
+
+    private void createLayout() {
+        boolean wifiAvailable = Network.isWifiConnected(this);
+        boolean connectivityAvailable = wifiAvailable || Network.isConnectivityAvailable(this);
+        boolean coreBeating = System.isCoreInitialized();
+
+        if (coreBeating && wifiAvailable) {
+            createOnlineLayout();
+        } else if (connectivityAvailable) {
+            createUpdateLayout();
+        } else {
+            createOfflineLayout();
+        }
+    }
+
+    private void onInitializationError(final String message) {
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              new FatalDialog(getString(R.string.initialization_error),
+                      message, message.contains(">"),
+                      MainActivity.this).show();
+            }
+        });
+    }
+
+    private boolean startCore() {
+        isRootMissing = false;
+        try {
+            System.initCore();
+
+            return true;
+        } catch (System.SuException e) {
+            onInitializationError(getString(R.string.only_4_root));
+            isRootMissing = true;
+        } catch (System.DaemonException e) {
+            Logger.error(e.getMessage());
+        }
+        return false;
+    }
+
+    private void onCoreBeating() {
+        if (Client.hadCrashed()) {
+            Logger.warning("Client has previously crashed, building a crash report.");
+            CrashReporter.notifyNativeLibraryCrash();
+            onInitializationError(getString(R.string.JNI_crash_detected));
+        }
+    }
+
+    private void onCoreUpdated() {
+        if (startCore()) {
+            onCoreBeating();
+        } else if (isRootMissing) {
+            return;
         }
 
-        new Thread(new Runnable() {
+        MainActivity.this.runOnUiThread(new Runnable() {
           @Override
           public void run() {
-
-            startActivityForResult(new Intent(MainActivity.this,
-                    ActionActivity.class), WIFI_CONNECTION_REQUEST);
-
-            overridePendingTransition(R.anim.slide_in_left,
-                    R.anim.slide_out_left);
+            System.reloadNetworkMapping();
+            createLayout();
+            if (System.isInitialized())
+                startNetworkRadar   (true);
           }
-        }).start();
+      });
+    }
 
-        System.setCurrentTarget(position);
-        Toast.makeText(MainActivity.this,
-                getString(R.string.selected_) + System.getCurrentTarget(),
-                Toast.LENGTH_SHORT).show();
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
+        Boolean isDark = themePrefs.getBoolean("isDark", false);
+        boolean connectivityAvailable;
 
-      }
-    });
+        if (isDark)
+          setTheme(R.style.DarkTheme);
+        else
+          setTheme(R.style.AppTheme);
 
-    isWifiAvailable = Network.isWifiConnected(this);
-    connectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable(this);
+        setContentView(R.layout.target_layout);
 
-    // make sure system object was correctly initialized during application
-    // startup
-    if (!System.isInitialized()) {
-      // wifi available but system failed to initialize, this is a fatal
-      // :(
-      if (isWifiAvailable) {
+        lv = (ListView) findViewById(R.id.android_list);
+        lv.setOnItemClickListener(new ListView.OnItemClickListener() {
 
-        // retry
-        try {
-          System.init(MainActivity.this.getApplicationContext());
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-          System.registerPlugin(new RouterPwn());
-          System.registerPlugin(new Traceroute());
-          System.registerPlugin(new PortScanner());
-          System.registerPlugin(new Inspector());
-          System.registerPlugin(new ExploitFinder());
-          System.registerPlugin(new LoginCracker());
-          System.registerPlugin(new Sessions());
-          System.registerPlugin(new MITM());
-          System.registerPlugin(new PacketForger());
-        } catch (Exception e) {
-          if (!(e instanceof NoRouteToHostException))
-            System.errorLogging(e);
+                if (mActionMode != null) {
+                  ((TargetAdapter) lv.getAdapter()).toggleSelection(position);
+                  return;
+                }
 
-          onInitializationError(System.getLastError());
+                new Thread(new Runnable() {
+                  @Override
+                  public void run() {
 
-          return;
+                    startActivityForResult(new Intent(MainActivity.this,
+                            ActionActivity.class), WIFI_CONNECTION_REQUEST);
+
+                    overridePendingTransition(R.anim.slide_in_left,
+                            R.anim.slide_out_left);
+                  }
+                }).start();
+
+                System.setCurrentTarget(position);
+                Toast.makeText(MainActivity.this,
+                        getString(R.string.selected_) + System.getCurrentTarget(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        isWifiAvailable = Network.isWifiConnected(this);
+        connectivityAvailable = isWifiAvailable || Network.isConnectivityAvailable(this);
+
+        // make sure system object was correctly initialized during application
+        // startup
+        if (!System.isInitialized()) {
+        // wifi available but system failed to initialize, this is a fatal
+        // :(
+            if (isWifiAvailable) {
+
+            // retry
+                try {
+                    System.init(MainActivity.this.getApplicationContext());
+
+                    System.registerPlugin(new RouterPwn());
+                    System.registerPlugin(new Traceroute());
+                    System.registerPlugin(new PortScanner());
+                    System.registerPlugin(new Inspector());
+                    System.registerPlugin(new ExploitFinder());
+                    System.registerPlugin(new LoginCracker());
+                    System.registerPlugin(new Sessions());
+                    System.registerPlugin(new MITM());
+                    System.registerPlugin(new PacketForger());
+                  } catch (Exception e) {
+                    if (!(e instanceof NoRouteToHostException))
+                        System.errorLogging(e);
+
+                    onInitializationError(System.getLastError());
+
+                    return;
+                }
+            }
         }
-      }
+
+        boolean coreInstalled = System.isCoreInstalled();
+        boolean coreBeating = System.isCoreInitialized();
+
+        if (coreInstalled && !coreBeating) {
+            coreBeating = startCore();
+            if (coreBeating) {
+              onCoreBeating();
+            } else if (isRootMissing) {
+                return;
+            }
+        }
+
+        if (!connectivityAvailable) {
+            if (!coreInstalled) {
+                onInitializationError(getString(R.string.no_core_no_connectivity));
+                return;
+            } else if (!coreBeating) {
+                onInitializationError(getString(R.string.heart_attack));
+                return;
+            }
+        }
+
+        if (!coreInstalled) {
+          //UPDATE_MESSAGE = getString(R.string.missing_core_update);
+            new ToolsInstaller(getApplication().getApplicationContext()).install();
+            System.reloadTools();
+            onCoreUpdated();
+        } else if (!coreBeating) {
+            UPDATE_MESSAGE = getString(R.string.heart_attack_update);
+        } else if (!isWifiAvailable) {
+            UPDATE_MESSAGE = getString(R.string.no_wifi_available);
+        }
+
+        if (connectivityAvailable)
+            startUpdateChecker();
+
+        if (coreBeating && isWifiAvailable)
+            startNetworkRadar(true);
+
+        if (!MsfRpcd.isLocal() || System.getLocalMsfVersion() != null)
+            StartRPCServer();
+
+        createLayout();
     }
-
-    boolean coreInstalled = System.isCoreInstalled();
-    boolean coreBeating = System.isCoreInitialized();
-
-    if (coreInstalled && !coreBeating) {
-      coreBeating = startCore();
-      if (coreBeating) {
-        onCoreBeating();
-      } else if (isRootMissing) {
-        return;
-      }
-    }
-
-    if (!connectivityAvailable) {
-      if (!coreInstalled) {
-        onInitializationError(getString(R.string.no_core_no_connectivity));
-        return;
-      } else if (!coreBeating) {
-        onInitializationError(getString(R.string.heart_attack));
-        return;
-      }
-    }
-
-    if (!coreInstalled) {
-      //UPDATE_MESSAGE = getString(R.string.missing_core_update);
-      new ToolsInstaller(getApplication().getApplicationContext()).install();
-      System.reloadTools();
-      onCoreUpdated();
-    } else if (!coreBeating) {
-      UPDATE_MESSAGE = getString(R.string.heart_attack_update);
-    } else if (!isWifiAvailable) {
-      UPDATE_MESSAGE = getString(R.string.no_wifi_available);
-    }
-
-    if (connectivityAvailable)
-      startUpdateChecker();
-
-    if (coreBeating && isWifiAvailable)
-      startNetworkRadar(true);
-
-    if (!MsfRpcd.isLocal() || System.getLocalMsfVersion() != null)
-      StartRPCServer();
-
-    createLayout();
-  }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {

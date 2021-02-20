@@ -132,7 +132,7 @@ jboolean send_to_child(JNIEnv *env, jclass clazz __attribute__((unused)), int id
   m = create_message(seq, len, c->id);
   
   if(!m) {
-    LOGE("%s: cannot craete messages", __func__);
+    LOGE("%s: cannot create messages", __func__);
     goto cleanup;
   }
   

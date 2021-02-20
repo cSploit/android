@@ -149,7 +149,7 @@ int on_handler_list(message *m) {
   
   ret = 0;
   end = m->data + m->head.size;
-  handler_info = (struct hndl_info *) (m->data +1);
+  handler_info = (struct hndl_info *) (m->data + 1);
   
   pthread_mutex_lock(&(handlers.control.mutex));
   

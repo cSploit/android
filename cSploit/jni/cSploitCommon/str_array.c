@@ -61,7 +61,7 @@ int string_array_add(message *m, size_t array_offset, char *string) {
       array_end<end && ( *array_end!='\0' || ( prev && prev!='\0' ))
       ;prev=array_end++);
   
-  needed_bytes = (strlen(string) + 1) - (end - array_end);
+  needed_bytes = (strlen(string)) - (end - array_end);
   
   if(needed_bytes > 0) {
     needed_bytes += m->head.size;
@@ -81,7 +81,7 @@ int string_array_add(message *m, size_t array_offset, char *string) {
     array_end = m->data + array_offset + (array_end - array_start);
   }
   
-  strncpy(array_end, string, strlen(string) + 1);
+  strncpy(array_end, string, strlen(string));
   
   return 0;
 }

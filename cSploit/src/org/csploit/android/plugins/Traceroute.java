@@ -141,30 +141,30 @@ public class Traceroute extends Plugin {
 			});
 		}
 
-    private String formatTime(long usec) {
+		private String formatTime(long usec) {
 
-      if(usec == 0)
-        return "0 ms";
+			if(usec == 0)
+			return "0 ms";
 
-      long msec = (usec / 1000);
-      long sec = (msec / 1000);
-      long min = (sec / 60);
+			long msec = (usec / 1000);
+			long sec = (msec / 1000);
+			long min = (sec / 60);
 
-      usec %= 1000;
-      msec %= 1000;
-      sec %= 60;
-      min %= 60;
+			usec %= 1000;
+			msec %= 1000;
+			sec %= 60;
+			min %= 60;
 
-      if(min > 0) {
-        return min + "m " + sec + " s";
-      } else if(sec > 0) {
-        return sec + "." + msec + " s";
-      } else if(msec > 0) {
-        return msec + "." + usec + " ms";
-      } else {
-        return "0." + usec + " ms";
-      }
-    }
+			if(min > 0) {
+			return min + "m " + sec + " s";
+			} else if(sec > 0) {
+			return sec + "." + msec + " s";
+			} else if(msec > 0) {
+			return msec + "." + usec + " ms";
+			} else {
+			return "0." + usec + " ms";
+			}
+		}
 
 		@Override
 		public void onHop(int hop, final long usec, final String address, final String name) {

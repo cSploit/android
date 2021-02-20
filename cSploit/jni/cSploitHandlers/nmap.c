@@ -96,7 +96,6 @@ message *parse_nmap_hop(char *line) {
   // terminate single parts
   *(line + pmatch[1].rm_eo) = '\0';
   *(line + pmatch[2].rm_eo) = '\0';
-  *(line + pmatch[5].rm_eo) = '\0';
   
   hop_info = (struct nmap_hop_info *) m->data;
   hop_info->nmap_action = HOP;
@@ -107,7 +106,7 @@ message *parse_nmap_hop(char *line) {
     sscanf(line + pmatch[2].rm_so, "%f", &(time));
     hop_info->usec = (uint64_t)(tousec * time);
   }
-  
+  *(line + pmatch[5].rm_eo) = '\0';
   hop_info->address = inet_addr(line + pmatch[5].rm_so);
 
   if(pmatch[4].rm_so != -1) {
@@ -214,7 +213,7 @@ message *parse_nmap_xml_port(char *line) {
     service_info->proto = UNKNOWN;
   }
   
-  service_info->port = (uint32_t) strtoul(line + pmatch[2].rm_so, NULL, 10);
+  service_info->port = (uint16_t) strtoul(line + pmatch[2].rm_so, NULL, 10);
   
   if(pmatch[5].rm_eo >= 0) {
     

@@ -99,7 +99,7 @@ public class LoginCracker extends Plugin {
     private String mPassWordlist = null;
     private boolean mRunning = false;
     private boolean mAccountFound = false;
-    private Receiver mAttemptsReceiver;
+    private Receiver mAttemptsReceiver = null;
     private String mCustomCharset = null;
 
     public LoginCracker() {
@@ -157,6 +157,9 @@ public class LoginCracker extends Plugin {
         if (min > max)
             max = min;
         mAccountFound = false;
+        mActivity.setVisibility(View.VISIBLE);
+        mStatusText.setTextColor(Color.DKGRAY);
+        mStatusText.setText(getString(R.string.starting_dots));
 
         try {
             mProcess =
@@ -170,9 +173,6 @@ public class LoginCracker extends Plugin {
                                     min, max, (String) mUserSpinner.getSelectedItem(),
                                     mUserWordlist, mPassWordlist, mAttemptsReceiver);
 
-            mActivity.setVisibility(View.VISIBLE);
-            mStatusText.setTextColor(Color.DKGRAY);
-            mStatusText.setText(getString(R.string.starting_dots));
             mRunning = true;
 
         } catch (ChildManager.ChildNotStartedException e) {
@@ -499,19 +499,6 @@ public class LoginCracker extends Plugin {
     }
 
     private class Receiver extends Hydra.AttemptsReceiver {
-        @Override
-        public void onStart(String command) {
-            super.onStart(command);
-            LoginCracker.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mRunning = true;
-                    //mStarted = java.lang.System.currentTimeMillis();
-                    mStatusText.setTextColor(Color.BLUE);
-                    mProgressBar.setVisibility(View.VISIBLE);
-                }
-            });
-        }
 
         @Override
         public void onAttemptStatus(final int rate, final int progress, final int left) {
@@ -561,6 +548,16 @@ public class LoginCracker extends Plugin {
                     setStoppedState();
                     mStatusText.setTextColor(Color.RED);
                     mStatusText.setText(error);
+                }
+            });
+        }
+        @Override
+        public void onStart(String command) {
+            super.onStart(command);
+            LoginCracker.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mRunning = true;
                 }
             });
         }

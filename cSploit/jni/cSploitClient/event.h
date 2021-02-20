@@ -34,7 +34,7 @@ jobject create_ready_event(JNIEnv *, void *);
 jobject create_account_event(JNIEnv *, void *);
 jobject create_message_event(JNIEnv *, void*);
 jobject create_login_event(JNIEnv *, void *);
-jobject create_attempts_event(JNIEnv *, void *);
+jobject create_status_event(JNIEnv *, void *);
 jobject create_packet_event(JNIEnv *, void *);
 jobject create_fusebind_event(JNIEnv *, void *);
 jobject create_host_event(JNIEnv *, void *);

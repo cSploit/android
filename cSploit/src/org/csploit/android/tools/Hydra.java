@@ -21,10 +21,9 @@ package org.csploit.android.tools;
 import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
-import org.csploit.android.events.Attempts;
+import org.csploit.android.events.Status;
 import org.csploit.android.events.Event;
 import org.csploit.android.events.Login;
-import org.csploit.android.events.Message;
 import org.csploit.android.net.Target;
 
 public class Hydra extends Tool
@@ -54,8 +53,8 @@ public class Hydra extends Tool
     public abstract void onAccountFound(String login, String password);
 
     public void onEvent(Event e) {
-      if(e instanceof Attempts) {
-        Attempts a = (Attempts) e;
+      if(e instanceof Status) {
+        Status a = (Status) e;
         onAttemptStatus(a.rate, a.sent, a.left);
       }
       /*else if(e instanceof Message) {

@@ -29,7 +29,7 @@ enum hydra_action {
 };
 
 /// hydra attempts info
-struct hydra_attempts_info {
+struct hydra_status_info {
   char                hydra_action;   ///< must be set to ::HYDRA_ATTEMPTS
   uint32_t  rate;
   uint32_t  sent;
@@ -59,8 +59,8 @@ struct hydra_error_info {
 /// hydra login info
 struct hydra_login_info {
   char                hydra_action;   ///< must be set to ::LOGIN
-  uint16_t            port;           ///< port where we found this login.
   uint8_t             contents;       ///< 0 OR bitmask of ::HAVE_ADDRESS, ::HAVE_LOGIN, ::HAVE_PASSWORD
+  uint16_t            port;           ///< port where we found this login.
   in_addr_t           address;        ///< address where we found this login, if ( ::hydra_login_info.contents & ::HAVE_ADDRESS )
   /**
    * @brief found credentials
@@ -71,7 +71,7 @@ struct hydra_login_info {
    * check ::hydra_account_info.contents for their existence.
    */
   char                data[];
-};
+} __attribute__((packed));
 
 message *hydra_output_parser(char *);
 

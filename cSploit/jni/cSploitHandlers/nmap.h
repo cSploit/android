@@ -57,7 +57,7 @@ struct nmap_service_info {
     /**
      * @brief array of null-terminated strings
      * service[0] is the service name
-     * service[1] is the verison (can be empty)
+     * service[1] is the version (can be empty)
      */
     char            service[];
 };

@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -41,9 +42,8 @@ import org.csploit.android.gui.dialogs.FinishDialog;
 
 import java.util.ArrayList;
 
-public class ActionActivity extends ActionBarActivity {
+public class ActionActivity extends AppCompatActivity {
     private ArrayList<Plugin> mAvailable = null;
-    private ListView theList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,7 +60,7 @@ public class ActionActivity extends ActionBarActivity {
             setTitle("cSploit > " + System.getCurrentTarget());
             setContentView(R.layout.actions_layout);
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            theList = (ListView) findViewById(R.id.android_list);
+            ListView theList = (ListView) findViewById(R.id.android_list);
             mAvailable = System.getPluginsForTarget();
             ActionsAdapter mActionsAdapter = new ActionsAdapter();
             theList.setAdapter(mActionsAdapter);

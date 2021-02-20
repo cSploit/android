@@ -146,7 +146,7 @@ int on_hydra(JNIEnv *env, child_node *c, message *m) {
   
   switch(m->data[0]) {
     case HYDRA_ATTEMPTS:
-      event = create_attempts_event(env, m);
+      event = create_status_event(env, m);
       break;
     case HYDRA_WARNING:
     case HYDRA_ERROR:

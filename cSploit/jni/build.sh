@@ -359,7 +359,8 @@ ruby) build_ruby
   ;;
 core|cores) build_cores
   ;;
-jni) build_jni
+jni) build_cores
+     build_jni
      copy_jni_libs
   ;;
 *)

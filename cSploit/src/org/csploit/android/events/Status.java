@@ -3,14 +3,14 @@ package org.csploit.android.events;
 /**
  * hydra attempts status
  */
-public class Attempts implements Event {
+public class Status implements Event {
     public final int rate;
     public final int sent;
     public final int elapsed;
     public final int left;
     public final int eta;
 
-    public Attempts(int rate, int sent, int elapsed, int left, int eta) {
+    public Status(int rate, int sent, int elapsed, int left, int eta) {
         this.rate = rate;
         this.sent = sent;
         this.elapsed = elapsed;

@@ -505,34 +505,34 @@ jobject create_message_event(JNIEnv *env, void *arg) {
 
 /**
  * @brief create an org.csploit.android.events.Attempts
- * @param arg a pointer to a ::message containing an ::hydra_attempts_info
+ * @param arg a pointer to a ::message containing an ::hydra_status_info
  * @returns a new object on success, NULL on error.
  */
-jobject create_attempts_event(JNIEnv *env, void  *arg) {
+jobject create_status_event(JNIEnv *env, void  *arg) {
   jobject res;
   jint jrate, jsent, jelapsed, jleft, jeta;
-  struct hydra_attempts_info *attempts_info;
+  struct hydra_status_info *status_info;
   message *m = (message *) arg;
 
-  attempts_info = (struct hydra_attempts_info *) m->data;
+  status_info = (struct hydra_status_info *) m->data;
   
-  if(attempts_info->sent > INT64_MAX) {
+  if(status_info->sent > INT64_MAX) {
     LOGW("%s: sent logins exceed maximum Java long value", __func__);
   }
   
-  if(attempts_info->left > INT64_MAX) {
+  if(status_info->left > INT64_MAX) {
     LOGW("%s: left logins exceed maximum Java long value", __func__);
   }
 
-  jrate = attempts_info->rate;
-  jsent = attempts_info->sent;
-  jelapsed = attempts_info->elapsed;
-  jleft = attempts_info->left;
-  jeta = attempts_info->eta;
+  jrate = status_info->rate;
+  jsent = status_info->sent;
+  jelapsed = status_info->elapsed;
+  jleft = status_info->left;
+  jeta = status_info->eta;
 
   res = (*env)->NewObject(env,
-                        cache.csploit.events.attempts.class,
-                        cache.csploit.events.attempts.ctor,
+                        cache.csploit.events.status.class,
+                        cache.csploit.events.status.ctor,
                         jrate, jsent, jelapsed, jleft, jeta);
   
   if((*env)->ExceptionCheck(env)) {
@@ -558,12 +558,13 @@ jobject create_login_event(JNIEnv *env, void *arg) {
   message *m = (message *) arg;
 
   login_info = (struct hydra_login_info *) m->data;
-  
+  LOGW("%d", login_info->contents);
+
   if(login_info->contents & HAVE_ADDRESS) {
     addr = inaddr_to_inetaddress(env, login_info->address);
     if(!addr) return NULL;
   }
-  pos = login_info->data;
+  pos = NULL;
 
   if(login_info->contents & HAVE_LOGIN) {
     pos = string_array_next(m, login_info->data, pos);
@@ -571,14 +572,13 @@ jobject create_login_event(JNIEnv *env, void *arg) {
     jlogin = (*env)->NewStringUTF(env, pos);
     if(!jlogin) goto cleanup;
   }
-  
   if(login_info->contents & HAVE_PASSWORD) {
     pos = string_array_next(m, login_info->data, pos);
-    
     jpswd = (*env)->NewStringUTF(env, pos);
+    LOGW("%s ...", (char *) jpswd);
     if(!jpswd) goto cleanup;
   }
-  
+
   res = (*env)->NewObject(env,
                           cache.csploit.events.login.class,
                           cache.csploit.events.login.ctor,
@@ -728,7 +728,7 @@ jobject create_host_event(JNIEnv *env, void *arg) {
   
   (*env)->SetByteArrayRegion(env, eth_addr, 0, 6, (const jbyte *) hinfo->eth_addr);
 
-  pos = hinfo->name;
+  pos = NULL;
   pos = string_array_next(m, hinfo->name, pos);
   
   if(pos) {

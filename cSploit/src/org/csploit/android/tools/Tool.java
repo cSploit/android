@@ -22,8 +22,7 @@ import org.csploit.android.core.Child;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Logger;
 
-public abstract class Tool
-{
+public abstract class Tool {
   protected boolean mEnabled = true;
   protected String mHandler = null;
   protected String mCmdPrefix = null;
@@ -68,7 +67,7 @@ public abstract class Tool
   }
 
   public boolean isEnabled() {
-    return mEnabled;
+  return mEnabled;
   }
 
   public void setEnabled() {
