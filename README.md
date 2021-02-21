@@ -1,14 +1,13 @@
 csploit 1.8  
 
 TODO:  
-Fix the logging cracker.  
+Fix the logging cracker's status event
 Compile lattest ruby to use latest msf.  
-Implement a shodan menu.  
 
 Usage:  
 Setting the sources:  
 
-git clone https://github.com/e2002e/android  
+git clone https://github.com/e2002e/android
 cd android  
 git checkout v1.8.0  
 
