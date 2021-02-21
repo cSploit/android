@@ -21,8 +21,8 @@ allprojects {
 apply plugin:  'com.android.application'
 
 dependencies {
-    implementation 'com.android.support:support-v4:24.2.1'
-    implementation 'com.android.support:appcompat-v7:24.2.1'
+    implementation 'com.android.support:support-v4:23.4.0'
+    implementation 'com.android.support:appcompat-v7:23.4.0'
     implementation 'org.apache.commons:commons-compress:1.20'
     implementation 'org.apache.commons:commons-compress:1.9:sources'
     implementation 'commons-net:commons-net:3.3'

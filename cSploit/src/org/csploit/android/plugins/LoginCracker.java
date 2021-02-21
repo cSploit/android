@@ -35,6 +35,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
@@ -42,6 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import org.csploit.android.MainActivity;
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
 import org.csploit.android.core.Client;
@@ -55,6 +59,7 @@ import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Port;
 import org.csploit.android.tools.Hydra;
+import org.tukaani.xz.check.Check;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -83,6 +88,7 @@ public class LoginCracker extends Plugin {
             "system", "webadmin", "daemon ", "bin ", "sys ", "adm ", "lp ",
             "uucp ", "nuucp ", "smmsp ", "listen ", "gdm ", "sshd ",
             "webservd ", "oracle", "httpd", "nginx", "-- ADD --"};
+    private static String[] STOP = new String[]{"Globally", "Per host", "Don't stop"};
     private Spinner mPortSpinner = null;
     private Spinner mProtocolSpinner = null;
     private ProtocolAdapter mProtocolAdapter = null;
@@ -101,6 +107,12 @@ public class LoginCracker extends Plugin {
     private boolean mAccountFound = false;
     private Receiver mAttemptsReceiver = null;
     private String mCustomCharset = null;
+    private CheckBox mStopCheck = null;
+    private CheckBox mLoopCheck = null;
+    private EditText mThreads = null;
+    private EditText mOpt = null;
+    private ListView mFound = null;
+    private ArrayAdapter mAdapter = null;
 
     public LoginCracker() {
         super(R.string.login_cracker, R.string.login_cracker_desc,
@@ -108,26 +120,6 @@ public class LoginCracker extends Plugin {
                 new Target.Type[]{Target.Type.ENDPOINT, Target.Type.REMOTE},
                 R.layout.plugin_login_cracker, R.drawable.action_login);
         mAttemptsReceiver = new Receiver();
-    }
-
-    private void setStoppedState(final String user, final String pass) {
-        if (mProcess != null) {
-            mProcess.kill();
-            mProcess = null;
-        }
-        mRunning = false;
-        mAccountFound = true;
-
-        LoginCracker.this.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mActivity.setVisibility(View.INVISIBLE);
-                mProgressBar.setProgress(0);
-                mStartButton.setChecked(false);
-                mStatusText.setTextColor(Color.GREEN);
-                mStatusText.setText("USERNAME = " + user + " - PASSWORD = " + pass);
-            }
-        });
     }
 
     private void setStoppedState() {
@@ -171,7 +163,8 @@ public class LoginCracker extends Plugin {
                                     mCustomCharset == null ? CHARSETS_MAPPING[mCharsetSpinner
                                             .getSelectedItemPosition()] : mCustomCharset,
                                     min, max, (String) mUserSpinner.getSelectedItem(),
-                                    mUserWordlist, mPassWordlist, mAttemptsReceiver);
+                                    mUserWordlist, mPassWordlist, mStopCheck.isChecked(),
+                                    mLoopCheck.isChecked(), Integer.valueOf(mThreads.getText().toString()), mOpt.getText().toString(), mAttemptsReceiver);
 
             mRunning = true;
 
@@ -303,6 +296,13 @@ public class LoginCracker extends Plugin {
         mStatusText = (TextView) findViewById(R.id.statusText);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
         mActivity = (ProgressBar) findViewById(R.id.activity);
+
+        mStopCheck = (CheckBox) findViewById(R.id.stopCheck);
+        mLoopCheck = (CheckBox) findViewById(R.id.loopCheck);
+        mThreads = (EditText) findViewById(R.id.tasksEdit);
+        mFound = (ListView) findViewById(R.id.foundList);
+        mAdapter = new ArrayAdapter(this, R.layout.found_layout);
+        mFound.setAdapter(mAdapter);
 
         mProgressBar.setMax(100);
 
@@ -517,10 +517,12 @@ public class LoginCracker extends Plugin {
         @Override
         public void onAccountFound(final String login, final String password) {
             //TODO CRACK SEVERAL ACCOUNTS -f -F
+            final String creds = login + ":" + password;
             LoginCracker.this.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    setStoppedState(login, password);
+                    mAdapter.add(creds);
+                    mAdapter.notifyDataSetChanged();
                 }
             });
         }

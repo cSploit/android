@@ -558,35 +558,21 @@ jobject create_login_event(JNIEnv *env, void *arg) {
   message *m = (message *) arg;
 
   login_info = (struct hydra_login_info *) m->data;
-  LOGW("%d", login_info->contents);
 
-  if(login_info->contents & HAVE_ADDRESS) {
-    addr = inaddr_to_inetaddress(env, login_info->address);
-    if(!addr) return NULL;
-  }
+  addr = inaddr_to_inetaddress(env, login_info->address);
+
   pos = NULL;
-
-  if(login_info->contents & HAVE_LOGIN) {
-    pos = string_array_next(m, login_info->data, pos);
-    
-    jlogin = (*env)->NewStringUTF(env, pos);
-    if(!jlogin) goto cleanup;
-  }
-  if(login_info->contents & HAVE_PASSWORD) {
-    pos = string_array_next(m, login_info->data, pos);
-    jpswd = (*env)->NewStringUTF(env, pos);
-    LOGW("%s ...", (char *) jpswd);
-    if(!jpswd) goto cleanup;
-  }
+  pos = string_array_next(m, login_info->data, pos);
+  jlogin = (*env)->NewStringUTF(env, pos);
+  pos = string_array_next(m, login_info->data, pos);
+  jpswd = (*env)->NewStringUTF(env, pos);
 
   res = (*env)->NewObject(env,
                           cache.csploit.events.login.class,
                           cache.csploit.events.login.ctor,
                           (jshort)(login_info->port), addr,
                           jlogin, jpswd);
-  
-  cleanup:
-  
+
   if((*env)->ExceptionCheck(env)) {
     (*env)->ExceptionDescribe(env);
     (*env)->ExceptionClear(env);

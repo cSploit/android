@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:orientation="vertical"
                 android:padding="8dp">
@@ -143,33 +144,166 @@
     </LinearLayout>
 
     <LinearLayout
-            android:id="@+id/linearLayout6"
-            android:layout_width="wrap_content"
+        android:id="@+id/linearLayout6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/linearLayout5"
+        android:layout_alignRight="@+id/linearLayout5"
+        android:layout_below="@+id/linearLayout5">
+
+        <Spinner
+            android:id="@+id/minSpinner"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/linearLayout5"
-            android:layout_alignRight="@+id/linearLayout5"
-            android:layout_below="@+id/linearLayout5">
+            android:layout_weight="0.50"/>
 
         <Spinner
-                android:id="@+id/minSpinner"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.50"/>
-
-        <Spinner
-                android:id="@+id/maxSpinner"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.50"/>
+            android:id="@+id/maxSpinner"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"/>
     </LinearLayout>
 
     <LinearLayout
-            android:id="@+id/linearLayout7"
+        android:id="@+id/linearLayout7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linearLayout6"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tasks"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/linearLayout6"
+            android:layout_weight="0.50"
+            android:fontFamily="sans-serif-condensed"
+            android:text="@string/hydra_threads"
+            android:textAllCaps="true"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/app_color" />
+
+        <EditText
+            android:id="@+id/tasksEdit"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:inputType="number"
+            android:text="@string/hydra_tasks"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linearLayout6"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@id/linearLayout7"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/loop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:fontFamily="sans-serif-condensed"
+            android:text="@string/hydra_loop_around_users"
+            android:textAllCaps="true"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/app_color" />
+
+        <CheckBox
+            android:id="@+id/loopCheck"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:checked="false" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linearLayout6"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_toRightOf="@id/linearLayout8"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:fontFamily="sans-serif-condensed"
+            android:text="@string/hydra_stop_on_found"
+            android:textAllCaps="true"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/app_color" />
+
+        <CheckBox
+            android:id="@+id/stopCheck"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.50"
+            android:checked="true" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linearLayout7"
+        android:layout_alignLeft="@+id/linearLayout7"
+        android:layout_alignRight="@+id/linearLayout6">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:fontFamily="sans-serif-condensed"
+            android:text="@string/hydra_opt"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/app_color" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout11"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/linearLayout10"
+        android:layout_alignLeft="@+id/linearLayout10"
+        android:layout_alignRight="@+id/linearLayout10">
+
+        <TextEdit
+            android:id="@+id/opt"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:fontFamily="sans-serif-condensed"
+            android:text="/"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/app_color"
+            tools:ignore="HardcodedText" />
+    </LinearLayout>
+
+
+    <ListView
+        android:id="@+id/foundList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/linearLayout12"
+        android:layout_below="@id/linearLayout11" />
+
+    <LinearLayout
+            android:id="@+id/linearLayout12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/linearLayout11"
             android:layout_alignParentBottom="true"
-            android:layout_alignRight="@+id/linearLayout6">
+            android:layout_alignRight="@+id/linearLayout11">
 
         <ToggleButton
                 android:id="@+id/startButton"

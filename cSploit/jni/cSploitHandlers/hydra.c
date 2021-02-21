@@ -164,53 +164,43 @@ message *parse_hydra_alert(char *line) {
  * @returns a ::message on success, NULL on error.
  */
 message *parse_hydra_login(char *line) {
-  regmatch_t pmatch[10];
-  struct hydra_login_info *login_info;
-  message *m;
-  
-  if(regexec(&login_pattern, line, 10, pmatch, 0))
+    regmatch_t pmatch[10];
+    struct hydra_login_info *login_info;
+    message *m;
+
+    if(regexec(&login_pattern, line, 10, pmatch, 0))
     return NULL;
-  
-  m = create_message(0, sizeof(struct hydra_login_info), 0);
-  
-  if(!m) {
+
+    m = create_message(0, sizeof(struct hydra_login_info), 0);
+
+    if(!m) {
     print( ERROR, "cannot create messages");
     return NULL;
-  }
+    }
 
-  *(line + pmatch[1].rm_eo) = '\0';
+    *(line + pmatch[1].rm_eo) = '\0';
 
-  login_info = (struct hydra_login_info *)m->data;
+    login_info = (struct hydra_login_info *)m->data;
 
-  login_info->hydra_action = HYDRA_LOGIN;
-  login_info->port = (uint16_t) strtoul(line + pmatch[1].rm_so, NULL, 10);
-  login_info->contents = 0;
-  
-  if(pmatch[3].rm_eo >= 0) {
-    *(line + pmatch[3].rm_eo) = '\0';
+    login_info->hydra_action = HYDRA_LOGIN;
+    login_info->port = (uint16_t) strtoul(line + pmatch[1].rm_so, NULL, 10);
 
-    login_info->contents |= HAVE_ADDRESS;
-    login_info->address = inet_addr(line + pmatch[3].rm_so);
-  }
+    if(pmatch[3].rm_eo >= 0) {
+        *(line + pmatch[3].rm_eo) = '\0';
+        login_info->address = inet_addr(line + pmatch[3].rm_so);
+    }
 
-  if(pmatch[6].rm_eo >= 0) {
     *(line + pmatch[6].rm_eo) = '\0';
-    login_info->contents |= HAVE_LOGIN;
     if(string_array_add(m, offsetof(struct hydra_login_info, data), line + pmatch[6].rm_so)) {
-      print( ERROR, "cannot add string to message");
-      goto error;
+        print( ERROR, "cannot add string to message");
+        goto error;
     }
-  }
 
-  if(pmatch[8].rm_eo >= 0) {
-    *(line + pmatch[8].rm_eo) = '\0';
-    login_info->contents |= HAVE_PASSWORD;
-    print( WARNING, "password");
-    if(string_array_add(m, offsetof(struct hydra_login_info, data), line + pmatch[8].rm_so)) {
-      print( ERROR, "cannot add string to message");
-      goto error;
+    *(line + pmatch[9].rm_eo) = '\0';
+    if(string_array_add(m, offsetof(struct hydra_login_info, data), line + pmatch[9].rm_so)) {
+        print( ERROR, "cannot add string to message");
+        goto error;
     }
-  }
 
   return m;
   
