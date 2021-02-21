@@ -213,6 +213,7 @@ public class ChildManager {
     }
 
     // starting commands from onEvent is not allowed ( should fix it ? )
+    /*
     if(crash) {
       final int signal = (end ? c.exitValue - 128 : c.signal);
       new Thread(new Runnable() {
@@ -222,6 +223,7 @@ public class ChildManager {
         }
       }).start();
     }
+     */
   }
 
   public static class ChildDiedException extends Exception {

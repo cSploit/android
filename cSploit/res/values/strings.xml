@@ -497,10 +497,10 @@
     <string name="crash_dialog_title">cSploit has crashed</string>
     <string name="crash_dialog_text">An unexpected error occurred forcing the application or an it\'s component to stop. Please help us fix this by sending us error data, all you have to do is click \'OK\'.</string>
     <string name="crash_dialog_comment">You might add your comment about the problem below</string>
-    <string name="JNI_crash_detected">JNI library has previously crashed, I hope you sent the report.</string>
+    <string name="JNI_crash_detected">JNI library has previously crashed.</string>
     <string name="hydra_tasks">16</string>
     <string name="hydra_threads">Threads</string>
     <string name="hydra_loop_around_users">Loop around users</string>
     <string name="hydra_stop_on_found">Stop on found</string>
-    <string name="hydra_opt">Http form options (see hydra\'s 8.8 manual)</string>
+    <string name="hydra_opt">Http form options (see hydra\'s help)</string>
 </resources>

@@ -4,7 +4,7 @@ package org.csploit.android.net.reference;
  * OSVDB vulnerability reference
  */
 public class OSVDB implements Vulnerability {
-  private static final String URLBASE = "http://osvdb.org/show/osvdb/";
+  private static final String URLBASE = "https://osvdb.org/show/osvdb/";
 
   private final int id;
   private String summary;

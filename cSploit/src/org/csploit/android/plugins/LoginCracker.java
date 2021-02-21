@@ -45,13 +45,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import org.csploit.android.MainActivity;
 import org.csploit.android.R;
 import org.csploit.android.core.ChildManager;
-import org.csploit.android.core.Client;
 import org.csploit.android.core.Plugin;
 import org.csploit.android.core.System;
-import org.csploit.android.events.Login;
 import org.csploit.android.gui.dialogs.ErrorDialog;
 import org.csploit.android.gui.dialogs.FinishDialog;
 import org.csploit.android.gui.dialogs.InputDialog;
@@ -59,7 +56,6 @@ import org.csploit.android.gui.dialogs.InputDialog.InputDialogListener;
 import org.csploit.android.net.Target;
 import org.csploit.android.net.Target.Port;
 import org.csploit.android.tools.Hydra;
-import org.tukaani.xz.check.Check;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -72,7 +68,7 @@ public class LoginCracker extends Plugin {
     private static final int SELECT_USER_WORDLIST = 1012;
     private static final int SELECT_PASS_WORDLIST = 1013;
     private static final String[] PROTOCOLS = new String[]{"ftp",
-            "http-get", "https-get", "icq", "imap", "imap-ntlm", "ldap", "oracle-listener",
+            "http-get", "https-get", "http-get-form", "https-get-form", "http-post-form", "https-post-form", "icq", "imap", "imap-ntlm", "ldap", "oracle-listener",
             "mssql", "mysql", "pcanywhere", "nntp", "pcnfs", "pop3", "pop3s",
             "pop3-ntlm", "rexec", "rlogin", "rsh", "smb", "smbnt", "socks5",
             "ssh", "telnet", "cisco", "cisco-enable", "vnc", "smtp", "smtps", "snmp", "cvs",
@@ -175,13 +171,13 @@ public class LoginCracker extends Plugin {
     }
 
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         SharedPreferences themePrefs = getSharedPreferences("THEME", 0);
         Boolean isDark = themePrefs.getBoolean("isDark", false);
         if (isDark)
             setTheme(R.style.DarkTheme);
         else
             setTheme(R.style.AppTheme);
-        super.onCreate(savedInstanceState);
 
         if (!System.getCurrentTarget().hasOpenPorts())
             new FinishDialog(getString(R.string.warning),
@@ -300,8 +296,9 @@ public class LoginCracker extends Plugin {
         mStopCheck = (CheckBox) findViewById(R.id.stopCheck);
         mLoopCheck = (CheckBox) findViewById(R.id.loopCheck);
         mThreads = (EditText) findViewById(R.id.tasksEdit);
+        mOpt = (EditText) findViewById(R.id.hydra_opt);
         mFound = (ListView) findViewById(R.id.foundList);
-        mAdapter = new ArrayAdapter(this, R.layout.found_layout);
+        mAdapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1);
         mFound.setAdapter(mAdapter);
 
         mProgressBar.setMax(100);

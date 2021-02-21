@@ -51,53 +51,61 @@ public class Hydra extends Tool
     public abstract void onError(String message);
 
     public abstract void onAccountFound(String login, String password);
+        public void onEvent(Event e) {
+            if(e instanceof Status) {
+                Status a = (Status) e;
+                onAttemptStatus(a.rate, a.sent, a.left);
+            }
+        /*else if(e instanceof Message) {
+          Message m = (Message)e;
 
-    public void onEvent(Event e) {
-      if(e instanceof Status) {
-        Status a = (Status) e;
-        onAttemptStatus(a.rate, a.sent, a.left);
-      }
-      /*else if(e instanceof Message) {
-        Message m = (Message)e;
-
-        if(m.severity == Message.Severity.ERROR) {
-          onError(m.message);
-        } else if(m.severity == Message.Severity.WARNING) {
-          onWarning(m.message);
-        } else {
-          Logger.error("Unknown event: " + e);
+          if(m.severity == Message.Severity.ERROR) {
+            onError(m.message);
+          } else if(m.severity == Message.Severity.WARNING) {
+            onWarning(m.message);
+          } else {
+            Logger.error("Unknown event: " + e);
+          }
+        } */
+            else if(e instanceof Login) {
+                Login a = (Login) e;
+                onAccountFound(a.login, a.password);
+            } else if(e instanceof Status) {
+                Status s = (Status) e;
+                onAttemptStatus(s.rate, s.sent, s.left);
+            }
+            else {
+                Logger.error("Unknown event: " + e);
+            }
         }
-      } */
-      else if(e instanceof Login) {
-        Login a = (Login) e;
-        onAccountFound(a.login, a.password);
-        Logger.debug(String.format("%s", a.password));
-      } else {
-        Logger.error("Unknown event: " + e);
-      }
     }
-  }
 
-  public Child crack(Target target, int port, String service, String charset, int minlength, int maxlength, String username, String userWordlist, String passWordlist, boolean activated, boolean mLoopCheckActivated, Integer integer, String s, AttemptsReceiver receiver) throws ChildManager.ChildNotStartedException {
-    String command = "-F ";
+    public Child crack(Target target, int port, String service, String charset, int minlength, int maxlength, String username, String userWordlist,
+                       String passWordlist, boolean stop, boolean loop, Integer threads, String s, AttemptsReceiver receiver) throws ChildManager.ChildNotStartedException {
+        String command = "";
+        if(loop)
+          command += "-u ";
+        if(stop)
+          command += "-f ";
+        command += String.format("-t %d ", threads);
 
-    if(userWordlist != null)
-      command += "-L " + userWordlist;
+        if(userWordlist != null)
+          command += "-L " + userWordlist;
+        else
+          command += "-l " + username;
 
-    else
-      command += "-l " + username;
+        if(passWordlist != null)
+          command += " -P " + passWordlist;
 
-    if(passWordlist != null)
-      command += " -P " + passWordlist;
+        else
+          command += " -x " + "\"" + minlength + ":" + maxlength + ":" + charset + "\"";
 
-    else
-      command += " -x " + "\"" + minlength + ":" + maxlength + ":" + charset + "\"";
+        command += " -t 1 " + service + "://" + target.getCommandLineRepresentation() + ":" + port;
 
-    command += " -t 1 " + service + "://" + target.getCommandLineRepresentation() + ":" + port;
+        if(service.equalsIgnoreCase("http-get") || service.equalsIgnoreCase("https-get") || service.equalsIgnoreCase("http-get-form") ||
+                service.equalsIgnoreCase("https-get-form") || service.equalsIgnoreCase("http-post-form") || service.equalsIgnoreCase("https-post-form"))
+            command += s;
 
-    if(service.equalsIgnoreCase("http-get") || service.equalsIgnoreCase("https-get"))
-      command += "/";
-
-    return super.async(command, receiver);
-  }
+        return super.async(command, receiver);
+    }
 }

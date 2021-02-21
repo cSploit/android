@@ -1010,141 +1010,140 @@ public class MainActivity extends AppCompatActivity implements NetworkRadar.Targ
     });
   }
 
-  public class TargetAdapter extends ArrayAdapter<Target> {
-    public TargetAdapter() {
-      super(MainActivity.this, R.layout.target_list_item);
+    public class TargetAdapter extends ArrayAdapter<Target> {
+        public TargetAdapter() {
+        super(MainActivity.this, R.layout.target_list_item);
+        }
+
+        @Override
+        public int getCount() {
+        return System.getTargets().size();
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View row = convertView;
+            TargetHolder holder;
+
+            if (row == null) {
+                LayoutInflater inflater = (LayoutInflater) MainActivity.this
+                        .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                row = inflater
+                        .inflate(R.layout.target_list_item, parent, false);
+
+                holder = new TargetHolder();
+                holder.itemImage = (ImageView) (row != null ? row
+                        .findViewById(R.id.itemIcon) : null);
+                holder.itemTitle = (TextView) (row != null ? row
+                        .findViewById(R.id.itemTitle) : null);
+                holder.itemDescription = (TextView) (row != null ? row
+                        .findViewById(R.id.itemDescription) : null);
+
+                if (row != null)
+                  row.setTag(holder);
+                } else
+                holder = (TargetHolder) row.getTag();
+
+                Target target = System.getTarget(position);
+
+                if (target.hasAlias())
+                holder.itemTitle.setText(Html.fromHtml("<b>"
+                        + target.getAlias() + "</b> <small>( "
+                        + target.getDisplayAddress() + " )</small>"));
+
+                else
+                holder.itemTitle.setText(target.toString());
+
+                holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
+
+                if (row != null)
+                row.setBackgroundColor(getResources().getColor((target.isSelected() ? R.color.background_material_dark : android.R.color.transparent)));
+
+                holder.itemTitle.setTypeface(null, Typeface.NORMAL);
+                holder.itemImage.setImageResource(target.getDrawableResourceId());
+                holder.itemDescription.setText(target.getDescription());
+
+                return row;
+            }
+
+            public void clearSelection() {
+                for (Target t : System.getTargets())
+                t.setSelected(false);
+                notifyDataSetChanged();
+                if (mActionMode != null)
+                mActionMode.finish();
+            }
+
+        public void toggleSelection(int position) {
+            Target t = System.getTarget(position);
+            t.setSelected(!t.isSelected());
+            notifyDataSetChanged();
+            if (mActionMode != null) {
+                if (getSelectedCount() > 0)
+                  mActionMode.invalidate();
+                else
+                  mActionMode.finish();
+            }
+        }
+
+        public int getSelectedCount() {
+            int i = 0;
+            for (Target t : System.getTargets())
+                if (t.isSelected())
+                    i++;
+            return i;
+        }
+
+        public ArrayList<Target> getSelected() {
+            ArrayList<Target> result = new ArrayList<Target>();
+            for (Target t : System.getTargets())
+            if (t.isSelected())
+                result.add(t);
+            return result;
+        }
+
+        public int[] getSelectedPositions() {
+            int[] res = new int[getSelectedCount()];
+            int j = 0;
+
+            for (int i = 0; i < System.getTargets().size(); i++)
+            if (System.getTarget(i).isSelected())
+              res[j++] = i;
+            return res;
+        }
+
+        class TargetHolder {
+            ImageView itemImage;
+            TextView itemTitle;
+            TextView itemDescription;
+        }
     }
 
-    @Override
-    public int getCount() {
-      return System.getTargets().size();
-    }
+    private class RadarReceiver extends ManagedReceiver {
+        private IntentFilter mFilter = null;
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-      View row = convertView;
-      TargetHolder holder;
+        public RadarReceiver() {
+            mFilter = new IntentFilter();
+            mFilter.addAction(NRDR_STOPPED);
+        }
 
-      if (row == null) {
-        LayoutInflater inflater = (LayoutInflater) MainActivity.this
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        row = inflater
-                .inflate(R.layout.target_list_item, parent, false);
-
-        holder = new TargetHolder();
-        holder.itemImage = (ImageView) (row != null ? row
-                .findViewById(R.id.itemIcon) : null);
-        holder.itemTitle = (TextView) (row != null ? row
-                .findViewById(R.id.itemTitle) : null);
-        holder.itemDescription = (TextView) (row != null ? row
-                .findViewById(R.id.itemDescription) : null);
-
-        if (row != null)
-          row.setTag(holder);
-      } else
-        holder = (TargetHolder) row.getTag();
-
-      Target target = System.getTarget(position);
-
-      if (target.hasAlias())
-        holder.itemTitle.setText(Html.fromHtml("<b>"
-                + target.getAlias() + "</b> <small>( "
-                + target.getDisplayAddress() + " )</small>"));
-
-      else
-        holder.itemTitle.setText(target.toString());
-
-      holder.itemTitle.setTextColor(getResources().getColor((target.isConnected() ? R.color.app_color : R.color.gray_text)));
-
-      if (row != null)
-        row.setBackgroundColor(getResources().getColor((target.isSelected() ? R.color.background_material_dark : android.R.color.transparent)));
-
-      holder.itemTitle.setTypeface(null, Typeface.NORMAL);
-      holder.itemImage.setImageResource(target.getDrawableResourceId());
-      holder.itemDescription.setText(target.getDescription());
-
-      return row;
-    }
-
-    public void clearSelection() {
-      for (Target t : System.getTargets())
-        t.setSelected(false);
-      notifyDataSetChanged();
-      if (mActionMode != null)
-        mActionMode.finish();
-    }
-
-    public void toggleSelection(int position) {
-      Target t = System.getTarget(position);
-      t.setSelected(!t.isSelected());
-      notifyDataSetChanged();
-      if (mActionMode != null) {
-        if (getSelectedCount() > 0)
-          mActionMode.invalidate();
-        else
-          mActionMode.finish();
-      }
-    }
-
-    public int getSelectedCount() {
-      int i = 0;
-      for (Target t : System.getTargets())
-        if (t.isSelected())
-          i++;
-      return i;
-    }
-
-    public ArrayList<Target> getSelected() {
-      ArrayList<Target> result = new ArrayList<Target>();
-      for (Target t : System.getTargets())
-        if (t.isSelected())
-          result.add(t);
-      return result;
-    }
-
-    public int[] getSelectedPositions() {
-      int[] res = new int[getSelectedCount()];
-      int j = 0;
-
-      for (int i = 0; i < System.getTargets().size(); i++)
-        if (System.getTarget(i).isSelected())
-          res[j++] = i;
-      return res;
-    }
-
-    class TargetHolder {
-      ImageView itemImage;
-      TextView itemTitle;
-      TextView itemDescription;
-    }
-  }
-
-  private class RadarReceiver extends ManagedReceiver {
-    private IntentFilter mFilter = null;
-
-    public RadarReceiver() {
-      mFilter = new IntentFilter();
-
-      mFilter.addAction(NRDR_STOPPED);
-    }
-
-    public IntentFilter getFilter() {
+        public IntentFilter getFilter() {
       return mFilter;
     }
 
-    @SuppressWarnings("ConstantConditions")
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      if (intent.getAction() == null)
-        return;
+        @SuppressWarnings("ConstantConditions")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction() == null)
+                return;
 
-      if (intent.getAction().equals(NRDR_STOPPED)) {
+            if (intent.getAction().equals(NRDR_STOPPED)) {
 
-        Toast.makeText(MainActivity.this, R.string.net_discovery_stopped,
-                Toast.LENGTH_SHORT).show();
-      }
+                Toast.makeText(MainActivity.this, R.string.net_discovery_stopped,
+                    Toast.LENGTH_SHORT).show();
+            }
+        }
     }
-  }
 
   private class WipeReceiver extends ManagedReceiver {
     private IntentFilter mFilter = null;

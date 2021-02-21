@@ -51,7 +51,7 @@ __attribute__((constructor))
 void hydra_init() {
   int ret;
   
-  if((ret = regcomp(&status_pattern, "^\\[STATUS\\] ([0-9]+)\\.[0-9] tries/min, ([0-9]+) tries in ([0-9]{2}):([0-9]{2})h, ([0-9]+) todo in ([0-9]{2}):([0-9]{2})h", REG_EXTENDED))) {
+  if((ret = regcomp(&status_pattern, "^\\[STATUS\\] ([0-9,]+) tries/min, ([0-9]+) tries in ([0-9]{2}):([0-9]{2})h, ([0-9]+) todo in ([0-9]{2}):([0-9]{2})h", REG_EXTENDED))) {
     print( ERROR, "regcomp(status_pattern): %d", ret);
   }
   if((ret = regcomp(&alert_pattern, "^\\[(ERROR|WARNING)\\] ", REG_EXTENDED | REG_ICASE))) {

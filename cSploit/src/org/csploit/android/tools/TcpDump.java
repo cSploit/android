@@ -40,6 +40,7 @@ public class TcpDump extends Tool{
       if(e instanceof Packet) {
         Packet p = (Packet)e;
         onPacket(p.src, p.dst, p.len);
+        Logger.warning("DEBUG: " + e);
       } else {
         Logger.warning("Unknown event: " + e);
       }

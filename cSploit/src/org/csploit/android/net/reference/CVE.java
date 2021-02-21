@@ -4,7 +4,7 @@ package org.csploit.android.net.reference;
  * CVE vulnerability reference
  */
 public class CVE implements Vulnerability {
-  private static final String URLBASE = "http://www.cvedetails.com/cve/";
+  private static final String URLBASE = "https://www.cvedetails.com/cve/";
 
   private final String id;
   private String summary;

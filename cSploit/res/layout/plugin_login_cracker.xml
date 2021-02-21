@@ -168,12 +168,13 @@
         android:id="@+id/linearLayout7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/linearLayout6"
         android:layout_below="@id/linearLayout6"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/tasks"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.50"
             android:fontFamily="sans-serif-condensed"
@@ -188,8 +189,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="0.50"
             android:inputType="number"
-            android:text="@string/hydra_tasks"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
+            android:text="@string/hydra_tasks"/>
     </LinearLayout>
 
     <LinearLayout
@@ -203,7 +203,7 @@
 
         <TextView
             android:id="@+id/loop"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.50"
             android:fontFamily="sans-serif-condensed"
@@ -233,7 +233,7 @@
 
         <TextView
             android:id="@+id/stop"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.50"
             android:fontFamily="sans-serif-condensed"
@@ -256,17 +256,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/linearLayout7"
-        android:layout_alignLeft="@+id/linearLayout7"
-        android:layout_alignRight="@+id/linearLayout6">
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:orientation="horizontal">
 
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.5"
             android:fontFamily="sans-serif-condensed"
             android:text="@string/hydra_opt"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/app_color" />
+            android:textColor="@color/app_color"/>
     </LinearLayout>
 
     <LinearLayout
@@ -277,25 +278,26 @@
         android:layout_alignLeft="@+id/linearLayout10"
         android:layout_alignRight="@+id/linearLayout10">
 
-        <TextEdit
-            android:id="@+id/opt"
-            android:layout_width="0dp"
+        <EditText
+            android:id="@+id/hydra_opt"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="0.5"
-            android:fontFamily="sans-serif-condensed"
-            android:text="/"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/app_color"
-            tools:ignore="HardcodedText" />
+            android:layout_weight="1"
+            android:inputType="text"
+            android:text="/" />
     </LinearLayout>
 
-
-    <ListView
-        android:id="@+id/foundList"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/linearLayout12"
-        android:layout_below="@id/linearLayout11" />
+        android:layout_alignLeft="@id/linearLayout11"
+        android:layout_alignRight="@id/linearLayout11"
+        android:layout_below="@id/linearLayout11">
+        <ListView
+            android:id="@+id/foundList"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
 
     <LinearLayout
             android:id="@+id/linearLayout12"
