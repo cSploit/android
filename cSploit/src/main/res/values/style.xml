@@ -13,6 +13,7 @@
         <item name="colorControlHighlight">@color/selectable_blue</item>
         <item name="android:colorBackground">@color/background_window</item>
         <item name="android:animation">@style/AppAnimation</item>
+        <item name="android:navigationBarColor">@color/app_color</item>
     </style>
 
     <!-- this dark theme needs a lot of help and support in the app overall -->
