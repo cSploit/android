@@ -190,7 +190,87 @@ public final class LoggingHelper {
             @NonNull String tag,
             @NonNull String name,
             @Nullable java.util.Collection<?> collection) {
-        
+
         d(tag, name + " size = " + (collection != null ? collection.size() : 0));
+    }
+
+    /**
+     * Log formatted message (like String.format)
+     */
+    public static void d(@NonNull String tag, @NonNull String format, Object... args) {
+        try {
+            d(tag, String.format(format, args));
+        } catch (Exception e) {
+            d(tag, format + " [formatting error]");
+        }
+    }
+
+    /**
+     * Log formatted warning
+     */
+    public static void w(@NonNull String tag, @NonNull String format, Object... args) {
+        try {
+            w(tag, String.format(format, args));
+        } catch (Exception e) {
+            w(tag, format + " [formatting error]");
+        }
+    }
+
+    /**
+     * Log formatted error
+     */
+    public static void e(@NonNull String tag, @NonNull String format, Object... args) {
+        try {
+            e(tag, String.format(format, args));
+        } catch (Exception e) {
+            e(tag, format + " [formatting error]");
+        }
+    }
+
+    /**
+     * Create a performance timer for measuring code execution
+     */
+    public static class PerformanceTimer {
+        private final String tag;
+        private final String operation;
+        private final long startTime;
+
+        public PerformanceTimer(@NonNull String tag, @NonNull String operation) {
+            this.tag = tag;
+            this.operation = operation;
+            this.startTime = System.currentTimeMillis();
+        }
+
+        /**
+         * Log the elapsed time since timer creation
+         */
+        public void logElapsed() {
+            long elapsed = System.currentTimeMillis() - startTime;
+            logPerformance(tag, operation, elapsed);
+        }
+
+        /**
+         * Get elapsed time without logging
+         */
+        public long getElapsed() {
+            return System.currentTimeMillis() - startTime;
+        }
+    }
+
+    /**
+     * Thread-aware logging that includes thread name
+     */
+    public static void logThread(@NonNull String tag, @NonNull String message) {
+        String threadInfo = "Thread[" + Thread.currentThread().getName() + "]";
+        d(tag, threadInfo + " " + message);
+    }
+
+    /**
+     * Log with context (tag auto-generated from calling class)
+     */
+    public static void contextLog(@NonNull String message) {
+        StackTraceElement ste = Thread.currentThread().getStackTrace()[2];
+        String tag = ste.getClassName().substring(ste.getClassName().lastIndexOf('.') + 1);
+        d(tag, message);
     }
 }
