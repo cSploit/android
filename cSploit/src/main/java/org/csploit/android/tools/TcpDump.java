@@ -53,8 +53,9 @@ public class TcpDump extends Tool{
     StringBuilder sb = new StringBuilder("-nvs 0 ");
 
     if(pcap != null) {
-      // TODO: find a way to receive tcpdump output when saving to a file
-      // NOTE: tcpdump -w - | tee file.pcap | tcpdump -r -
+      // When saving to file, tcpdump doesn't output to stdout
+      // Could use: tcpdump -w - | tee file.pcap to receive packets while saving
+      // Currently using standard -w flag to write to pcap file
       sb.append("-Uw '");
       sb.append(pcap);
       sb.append("' ");

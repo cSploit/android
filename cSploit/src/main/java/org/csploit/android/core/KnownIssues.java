@@ -17,7 +17,7 @@ public class KnownIssues {
    * check for known issue using Java
    */
   public void check() {
-    //TODO
+    // Implementation pending - used to check for known Android issues
   }
 
   /**

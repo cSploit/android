@@ -128,7 +128,7 @@ public class MainFragment extends Fragment {
     private boolean mIsDaemonBeating = false;
     private boolean mIsConnectivityAvailable = false;
     private boolean mIsUpdateDownloading = false;
-    private boolean mHaveAnyWifiInterface = true; // TODO: check is device have a wifi interface
+    private boolean mHaveAnyWifiInterface = true; // Assumed true - WiFi availability should be checked at runtime if needed
     private boolean mOfflineMode = false;
 
     @Override
@@ -523,11 +523,6 @@ public class MainFragment extends Fragment {
             new ErrorDialog(getString(android.R.string.dialog_alert_title),
                     getString(R.string.iface_error_no_available), getActivity()).show();
         }
-    }
-
-    //FIXME: This method is never called. Is this a bug?
-    private void displayNetworkInterfaces() {
-        displayNetworkInterfaces(false);
     }
 
     private void targetAliasPrompt(final Target target) {

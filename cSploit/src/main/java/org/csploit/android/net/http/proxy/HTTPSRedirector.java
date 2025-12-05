@@ -128,13 +128,10 @@ public class HTTPSRedirector implements Runnable
                   BufferedReader bReader = new BufferedReader(new InputStreamReader(byteArrayInputStream));
                   StringBuilder builder = new StringBuilder();
                   String line = null;
-                  ArrayList<String> headers = new ArrayList<String>();
                   boolean headersProcessed = false;
 
                   while((line = bReader.readLine()) != null){
                     if(headersProcessed == false){
-                      //FIXME: It had been modified, but it had not been used further. Is this a bug?
-                      headers.add(line);
 
                       // \r\n\r\n received ?
                       if(line.trim().isEmpty())
