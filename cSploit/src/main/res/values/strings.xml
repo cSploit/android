@@ -545,4 +545,20 @@
     <!-- permissions -->
     <string name="permissions_fail">Sorry, you need to approve all permission requests.</string>
     <string name="permissions_succeed">Thanks!</string>
+
+    <!-- common errors and messages -->
+    <string name="child_not_started">Child process not started</string>
+    <string name="tool_not_running">Tool is not running</string>
+    <string name="no_file_path">No file path provided</string>
+    <string name="error_loading">Error loading</string>
+    <string name="tap_again_confirm">Tap again to confirm</string>
+    <string name="tool_execution_error">Tool execution error</string>
+    <string name="arpspoof_error">arpspoof error</string>
+    <string name="connection_killer_needs_gateway">Connection killer requires a gateway</string>
+    <string name="tool_not_available">Tool not available</string>
+    <string name="invalid_configuration">Invalid configuration</string>
+    <string name="operation_cancelled">Operation cancelled</string>
+    <string name="operation_completed">Operation completed</string>
+    <string name="loading_data">Loading data&#8230;</string>
+    <string name="please_wait">Please wait&#8230;</string>
 </resources>

@@ -236,15 +236,81 @@ public final class UIHelper {
      */
     public static void error(@NonNull Context context, @NonNull String title,
                             @NonNull String message) {
+        error(context, title, message, null);
+    }
+
+    /**
+     * Show error dialog with callback
+     *
+     * @param context Android context
+     * @param title dialog title
+     * @param message error message
+     * @param onDismiss callback when dismissed
+     */
+    public static void error(@NonNull Context context, @NonNull String title,
+                            @NonNull String message, @Nullable Runnable onDismiss) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title)
                 .setMessage(message)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+                .setPositiveButton("OK", (dialog, which) -> {
+                    if (onDismiss != null) onDismiss.run();
+                    dialog.dismiss();
+                });
 
         AlertDialog dialog = builder.create();
         dialog.show();
         LoggingHelper.e(TAG, "Error dialog: " + title + " - " + message);
+    }
+
+    /**
+     * Show "child not started" error
+     *
+     * @param context Android context
+     * @param toolName name of the tool that failed to start
+     */
+    public static void childNotStarted(@NonNull Context context, @NonNull String toolName) {
+        error(context, "Error", toolName + " failed to start");
+    }
+
+    /**
+     * Show "child not started" toast error
+     *
+     * @param context Android context
+     */
+    public static void childNotStartedToast(@NonNull Context context) {
+        toastError(context, "Child process not started");
+    }
+
+    /**
+     * Show "tap again" confirmation toast
+     *
+     * @param context Android context
+     */
+    public static void tapAgainToConfirm(@NonNull Context context) {
+        toast(context, "Tap again to confirm", Toast.LENGTH_SHORT);
+    }
+
+    /**
+     * Show tool execution error
+     *
+     * @param context Android context
+     * @param toolName name of the tool
+     * @param error error message from tool
+     */
+    public static void toolError(@NonNull Context context, @NonNull String toolName,
+                                @NonNull String error) {
+        error(context, toolName + " Error", error);
+    }
+
+    /**
+     * Show "not running" error
+     *
+     * @param context Android context
+     * @param serviceName name of the service
+     */
+    public static void notRunning(@NonNull Context context, @NonNull String serviceName) {
+        error(context, "Error", serviceName + " is not running");
     }
 
     /**
