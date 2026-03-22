@@ -1,4 +1,5 @@
 package org.csploit.android.core;
+import org.csploit.android.helpers.LoggingHelper;
 
 import org.acra.ACRA;
 import org.acra.ErrorReporter;
@@ -32,7 +33,7 @@ public class CrashReporter {
       reporter.putCustomData("coreVersion", System.getCoreVersion());
       reporter.putCustomData("rubyVersion", System.getLocalRubyVersion());
       reporter.putCustomData("msfVersion", System.getLocalMsfVersion());
-      Logger.error(e.getMessage());
+      LoggingHelper.error(e.getMessage());
     }
     reporter.handleException(error);
   }

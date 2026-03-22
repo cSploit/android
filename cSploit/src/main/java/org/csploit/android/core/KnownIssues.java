@@ -1,4 +1,5 @@
 package org.csploit.android.core;
+import org.csploit.android.helpers.LoggingHelper;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -24,13 +25,13 @@ public class KnownIssues {
       String osVersion = java.lang.System.getProperty("os.version");
       
       // Log detected runtime environment
-      Logger.debug(String.format("Java version: %s, OS: %s", javaVersion, osVersion));
+      LoggingHelper.debug(String.format("Java version: %s, OS: %s", javaVersion, osVersion));
       
       // Runtime compatibility checks could be added here as needed
       // e.g., checking for specific Java versions with known bugs
       
     } catch (Exception e) {
-      Logger.warning("Error checking for known issues: " + e.getMessage());
+      LoggingHelper.warning("Error checking for known issues: " + e.getMessage());
     }
   }
 
@@ -56,15 +57,15 @@ public class KnownIssues {
 
         if (!foundIssues.contains(issue)) {
           foundIssues.add(issue);
-          Logger.info(String.format("issue #%d loaded from file", issue));
+          LoggingHelper.info(String.format("issue #%d loaded from file", issue));
         }
       }
     } catch (FileNotFoundException e) {
       // File absent is not an error — daemon may not have reported any issues
     } catch (IOException e) {
-      Logger.warning(String.format("unable to read from '%s': %s", file, e.getMessage()));
+      LoggingHelper.warning(String.format("unable to read from '%s': %s", file, e.getMessage()));
     } catch (NumberFormatException e) {
-      Logger.error(String.format("unable to parse '%s' as number.", line));
+      LoggingHelper.error(String.format("unable to parse '%s' as number.", line));
     }
   }
 

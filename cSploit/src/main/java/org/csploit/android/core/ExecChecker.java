@@ -81,7 +81,7 @@ public class ExecChecker {
               String.format("touch '%1$s' && chmod %2$o '%1$s' && test -x '%1$s' && rm '%1$s'",
                       tmpname, 0755)) == 0;
     } catch (Exception e) {
-      Logger.error(e.getMessage());
+      LoggingHelper.error(e.getMessage());
     }
     return false;
   }
@@ -103,11 +103,11 @@ public class ExecChecker {
           }
 
           if(newMountpointFound)
-            Logger.info("found a fuse mount: source='" + source + "' mountpoint='" + mountpoint + "'");
+            LoggingHelper.info("found a fuse mount: source='" + source + "' mountpoint='" + mountpoint + "'");
         }
       }).join();
     } catch (Exception e) {
-      Logger.error(e.getMessage());
+      LoggingHelper.error(e.getMessage());
     }
   }
 
@@ -166,7 +166,7 @@ public class ExecChecker {
       return (tmpfile.canExecute() || tmpfile.setExecutable(true, false));
 
     } catch (IOException e) {
-      Logger.warning(String.format("cannot create files over '%s'",dir));
+      LoggingHelper.warning(String.format("cannot create files over '%s'",dir));
     } finally {
       if(tmpfile!=null && tmpfile.exists())
         tmpfile.delete();
@@ -207,7 +207,7 @@ public class ExecChecker {
 
       // remount
       if(System.getTools().raw.run(String.format("mount -oremount,exec '%s'", mountpoint))!=0) {
-        Logger.warning(String.format("cannot remount '%s' with exec flag", mountpoint));
+        LoggingHelper.warning(String.format("cannot remount '%s' with exec flag", mountpoint));
         return false;
       }
 
@@ -239,10 +239,10 @@ public class ExecChecker {
   private void restoreMountpoint(String mountpoint) {
     try {
       if(System.getTools().raw.run(String.format("mount -oremount,noexec '%s'", mountpoint))!=0) {
-        Logger.warning(String.format("cannot remount '%s' with noexec flag", mountpoint));
+        LoggingHelper.warning(String.format("cannot remount '%s' with noexec flag", mountpoint));
       }
     } catch (Exception e) {
-      Logger.error(e.getMessage());
+      LoggingHelper.error(e.getMessage());
     }
   }
 

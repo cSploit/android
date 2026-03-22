@@ -89,7 +89,7 @@ public class MultiAttackService extends IntentService {
           exploit();
         if((tasks&CRACK)!=0)
           crack();
-        Logger.debug(target+" done");
+        LoggingHelper.debug(target+" done");
 
         synchronized (MultiAttackService.this) {
           completedTargets++;
@@ -104,7 +104,7 @@ public class MultiAttackService extends IntentService {
           future.cancel(false);
         if(process != null && process.running)
           process.kill();
-        Logger.info(e.getMessage());
+        LoggingHelper.info(e.getMessage());
       }
     }
 
@@ -123,7 +123,7 @@ public class MultiAttackService extends IntentService {
         }, null);
         process.join();
       } catch (ChildManager.ChildNotStartedException e) {
-        Logger.error("cannot start nmap process");
+        LoggingHelper.error("cannot start nmap process");
       }
     }
 
@@ -163,7 +163,7 @@ public class MultiAttackService extends IntentService {
 
         process.join();
       } catch (ChildManager.ChildNotStartedException e) {
-        Logger.error("cannot start nmap process");
+        LoggingHelper.error("cannot start nmap process");
       }
     }
 
@@ -223,7 +223,7 @@ public class MultiAttackService extends IntentService {
       @Override
       public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Logger.debug("received action: "+action);
+        LoggingHelper.debug("received action: "+action);
         if(action==null)
           return;
         // user cancelled our notification
@@ -247,10 +247,10 @@ public class MultiAttackService extends IntentService {
    */
   private void finishNotification() {
     if(mContentIntent==null){
-      Logger.debug("deleting notifications");
+      LoggingHelper.debug("deleting notifications");
       mNotificationManager.cancel(NOTIFICATION_ID);
     } else {
-      Logger.debug("assign '"+mContentIntent.toString()+"'to notification");
+      LoggingHelper.debug("assign '"+mContentIntent.toString()+"'to notification");
       mBuilder.setContentIntent(PendingIntentHelper.getActivityImmutable(this, CLICK_CODE, mContentIntent))
               .setProgress(0,0,false)
               .setAutoCancel(true)
@@ -293,7 +293,7 @@ public class MultiAttackService extends IntentService {
         if (target != null) {
           validTargets.add(target);
         } else {
-          Logger.warning("Target with UUID " + uuid + " not found, skipping");
+          LoggingHelper.warning("Target with UUID " + uuid + " not found, skipping");
         }
       }
       targets = validTargets.toArray(new Target[0]);
@@ -301,11 +301,11 @@ public class MultiAttackService extends IntentService {
       // Fallback to legacy index-based lookup (deprecated)
       int[] targetsIndex = intent.getIntArrayExtra(MULTI_TARGETS);
       if (targetsIndex == null || targetsIndex.length == 0) {
-        Logger.error("No targets specified for multi-attack");
+        LoggingHelper.error("No targets specified for multi-attack");
         return;
       }
 
-      Logger.warning("Using deprecated index-based target lookup. Use MULTI_TARGET_UUIDS instead.");
+      LoggingHelper.warning("Using deprecated index-based target lookup. Use MULTI_TARGET_UUIDS instead.");
       List<Target> list = System.getTargets();
       java.util.ArrayList<Target> validTargets = new java.util.ArrayList<>();
 
@@ -313,14 +313,14 @@ public class MultiAttackService extends IntentService {
         if (targetsIndex[i] >= 0 && targetsIndex[i] < list.size()) {
           validTargets.add(list.get(targetsIndex[i]));
         } else {
-          Logger.warning("Invalid target index: " + targetsIndex[i] + ", skipping");
+          LoggingHelper.warning("Invalid target index: " + targetsIndex[i] + ", skipping");
         }
       }
       targets = validTargets.toArray(new Target[0]);
     }
 
     if (targets.length == 0) {
-      Logger.error("No valid targets for multi-attack");
+      LoggingHelper.error("No valid targets for multi-attack");
       return;
     }
 
@@ -341,8 +341,8 @@ public class MultiAttackService extends IntentService {
       }
     }
 
-    Logger.debug("targets: "+targets.length);
-    Logger.debug("tasks: "+ tasks);
+    LoggingHelper.debug("targets: "+targets.length);
+    LoggingHelper.debug("tasks: "+ tasks);
 
     setupNotification();
 

@@ -17,6 +17,7 @@
  * along with dSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.csploit.android.core;
+import org.csploit.android.helpers.LoggingHelper;
 
 // a little class to profile network latency ^_^
 public class Profiler{
@@ -55,7 +56,7 @@ public class Profiler{
     if(mEnabled && mTick > 0 && mProfiling != null){
       long delta = java.lang.System.currentTimeMillis() - mTick;
 
-      Logger.debug("[" + mProfiling + "] " + format(delta));
+      LoggingHelper.debug("[" + mProfiling + "] " + format(delta));
 
       mProfiling = null;
       mTick = 0;

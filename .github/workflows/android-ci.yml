@@ -49,6 +49,7 @@ jobs:
           name: lint-results
           path: cSploit/build/reports/lint-results*.html
           retention-days: 7
+          if-no-files-found: warn
 
   test:
     name: Unit Tests

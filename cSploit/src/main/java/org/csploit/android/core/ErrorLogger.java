@@ -15,6 +15,7 @@
  * along with cSploit.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.csploit.android.core;
+import org.csploit.android.helpers.LoggingHelper;
 
 import android.content.Context;
 import java.io.BufferedWriter;
@@ -58,12 +59,12 @@ public class ErrorLogger {
         if (throwable == null) return;
 
         String errorMessage = formatException(throwable);
-        Logger.error(errorMessage);
+        LoggingHelper.error(errorMessage);
 
         try {
             writeToErrorLog(errorMessage);
         } catch (IOException e) {
-            Logger.error("Failed to write error to log file: " + e.getMessage());
+            LoggingHelper.error("Failed to write error to log file: " + e.getMessage());
         }
     }
 
@@ -73,12 +74,12 @@ public class ErrorLogger {
      * @param message The error message to log
      */
     public void logError(String message) {
-        Logger.error(message);
+        LoggingHelper.error(message);
 
         try {
             writeToErrorLog(message);
         } catch (IOException e) {
-            Logger.error("Failed to write error to log file: " + e.getMessage());
+            LoggingHelper.error("Failed to write error to log file: " + e.getMessage());
         }
     }
 
@@ -90,12 +91,12 @@ public class ErrorLogger {
      */
     public void logError(String message, Throwable throwable) {
         String fullMessage = message + "\n" + formatException(throwable);
-        Logger.error(fullMessage);
+        LoggingHelper.error(fullMessage);
 
         try {
             writeToErrorLog(fullMessage);
         } catch (IOException e) {
-            Logger.error("Failed to write error to log file: " + e.getMessage());
+            LoggingHelper.error("Failed to write error to log file: " + e.getMessage());
         }
     }
 

@@ -1,4 +1,5 @@
 package org.csploit.android.core;
+import org.csploit.android.helpers.LoggingHelper;
 
 import android.content.Context;
 
@@ -95,18 +96,18 @@ public class ChildManager {
 
     // Check if client is connected, try to reconnect if not
     if (!Client.isConnected()) {
-      Logger.warning("Client not connected, attempting to reconnect...");
+      LoggingHelper.warning("Client not connected, attempting to reconnect...");
       try {
         System.initCore();
       } catch (Exception e) {
-        Logger.error("Failed to reconnect to daemon: " + e.getMessage());
+        LoggingHelper.error("Failed to reconnect to daemon: " + e.getMessage());
         throw new ChildNotStartedException("Daemon not connected: " + e.getMessage());
       }
     }
 
     // Check if authenticated
     if (!Client.isAuthenticated()) {
-      Logger.warning("Client not authenticated, attempting to login...");
+      LoggingHelper.warning("Client not authenticated, attempting to login...");
       Context ctx = System.getContext();
       String token = ctx != null ? SecureCredentialsHelper.getOrCreateDaemonToken(ctx) : "";
       if (!Client.Login("android", token)) {
@@ -116,7 +117,7 @@ public class ChildManager {
 
     c.id = Client.StartCommand(handler, cmd, env);
     if (c.id == -1) {
-      Logger.debug(String.format("{ handler='%s', cmd='%s' } => FAILED", handler, cmd));
+      LoggingHelper.debug(String.format("{ handler='%s', cmd='%s' } => FAILED", handler, cmd));
       
       // Try to get more info about why it failed
       String errorDetails = "Unknown error";
@@ -131,7 +132,7 @@ public class ChildManager {
       throw new ChildNotStartedException(errorDetails);
     }
 
-    Logger.debug(String.format("{ handler='%s', cmd='%s' } => %d", handler, cmd, c.id));
+    LoggingHelper.debug(String.format("{ handler='%s', cmd='%s' } => %d", handler, cmd, c.id));
 
     c.running = true;
     c.receiver = receiver;
@@ -202,7 +203,7 @@ public class ChildManager {
 
     if(event instanceof ChildEnd) {
       c.exitValue = ((ChildEnd) event).exit_status;
-      Logger.debug("Child #" + c.id + " exited ( exitValue=" + c.exitValue + " )");
+      LoggingHelper.debug("Child #" + c.id + " exited ( exitValue=" + c.exitValue + " )");
       if(c.receiver != null)
         c.receiver.onEnd(c.exitValue);
       terminated = true;
@@ -212,7 +213,7 @@ public class ChildManager {
       }
     } else  if(event instanceof ChildDied) {
       c.signal = ((ChildDied) event).signal;
-      Logger.debug("Child #" + c.id + " died ( signal=" + c.signal + " )");
+      LoggingHelper.debug("Child #" + c.id + " died ( signal=" + c.signal + " )");
       if(c.receiver != null)
         c.receiver.onDeath(c.signal);
       terminated = true;
@@ -248,7 +249,7 @@ public class ChildManager {
     Child c;
 
     if(!(event instanceof Newline)) {
-      Logger.debug("received an event: " + event);
+      LoggingHelper.debug("received an event: " + event);
     }
 
     synchronized (children) {
@@ -256,8 +257,8 @@ public class ChildManager {
         try {
           children.wait();
         } catch (InterruptedException e) {
-          Logger.error(e.getMessage());
-          Logger.error("event lost: " + event);
+          LoggingHelper.error(e.getMessage());
+          LoggingHelper.error("event lost: " + event);
           return;
         }
       }
