@@ -46,6 +46,7 @@ import org.csploit.android.R;
 import org.csploit.android.core.System;
 
 import java.net.HttpCookie;
+import android.annotation.SuppressLint;
 
 public class HijackerWebView extends AppCompatActivity {
   private static final String DEFAULT_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.4 (KHTML, like Gecko) Chrome/22.0.1229.94 Safari/537.4";
@@ -78,6 +79,7 @@ public class HijackerWebView extends AppCompatActivity {
     mProgressBar.setMax(100);
     mSettings = mWebView.getSettings();
 
+    @SuppressLint("SetJavaScriptEnabled")
     mSettings.setJavaScriptEnabled(true);
     mSettings.setJavaScriptCanOpenWindowsAutomatically(true);
     mSettings.setBuiltInZoomControls(true);
